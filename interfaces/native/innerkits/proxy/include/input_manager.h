@@ -202,6 +202,18 @@ public:
      * @since 9
      */
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
+    /**
+     * @brief Adds an input event monitor. After such a monitor is added,
+     * an input event is copied and distributed to the monitor while being distributed to the original target.
+     * @param monitor Indicates the input event monitor. After an input event is generated,
+     * the functions of the monitor object will be called.
+     * @param actionsType Indicates the actionsType for monitor.
+     * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
+     * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
+     * the monitor fails to be added.
+     * @since 9
+     */
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, std::vector<int32_t> actionsType);
 
     /**
      * @brief Removes a monitor.

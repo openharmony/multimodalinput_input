@@ -123,6 +123,36 @@ int32_t InputHandlerManager::AddGestureMonitor(
     return handlerId;
 }
 
+int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+    std::vector<int32_t> actionsType)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(consumer, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    CHKFR(((actionsMonitorHandlers_.size() + monitorHandlers_.size() + interHandlers_.size()) <
+        MAX_N_INPUT_HANDLERS), ERROR_EXCEED_MAX_COUNT, "The number of handlers exceeds the maximum");
+    int32_t handlerId = GetNextId();
+    CHKFR((handlerId != INVALID_HANDLER_ID), INVALID_HANDLER_ID, "Exceeded limit of 32-bit maximum number of integers");
+    MMI_HILOGD("Register new handler:%{public}d", handlerId);
+    if (RET_OK == AddLocal(handlerId, handlerType, actionsType, consumer)) {
+        MMI_HILOGD("New handler successfully registered, report to server");
+        if (IsNeedAddToServer(actionsType)) {
+            MMI_HILOGD("handlerType:%{public}d", handlerType);
+            int32_t ret = AddToServer(handlerType, HANDLE_EVENT_TYPE_NONE, 0, 0, actionsType);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Add Handler:%{public}d:%{public}d to server failed", handlerType, handlerId);
+                RemoveLocalActions(handlerId, handlerType);
+                return ret;
+            }
+        }
+        MMI_HILOGI("Finish add Handler:%{public}d:%{public}d to server", handlerType, handlerId);
+    } else {
+        MMI_HILOGE("Add Handler:%{public}d:%{public}d local failed", handlerType, handlerId);
+        handlerId = INVALID_HANDLER_ID;
+    }
+    return handlerId;
+}
+
 int32_t InputHandlerManager::RemoveGestureMonitor(int32_t handlerId, InputHandlerType handlerType)
 {
     std::lock_guard<std::mutex> guard(mtxHandlers_);
@@ -147,29 +177,59 @@ int32_t InputHandlerManager::RemoveGestureMonitor(int32_t handlerId, InputHandle
     return ret;
 }
 
+bool InputHandlerManager::IsNeedAddToServer(std::vector<int32_t> actionsType)
+{
+    bool isNeedAddToServer = false;
+    for (auto action : actionsType) {
+        if (std::find(addToServerActions_.begin(), addToServerActions_.end(), action) == addToServerActions_.end()) {
+            addToServerActions_.push_back(action);
+            isNeedAddToServer = true;
+        }
+    }
+    return isNeedAddToServer;
+}
+
 int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    const HandleEventType currentType = GetEventType();
-    uint32_t currentTags = GetDeviceTags();
     uint32_t deviceTags = 0;
-    int32_t ret = RemoveLocal(handlerId, handlerType, deviceTags);
-    if (ret == RET_OK) {
+    auto iter = monitorHandlers_.find(handlerId);
+    if (iter != monitorHandlers_.end()) {
+        const HandleEventType currentType = GetEventType();
+        uint32_t currentTags = GetDeviceTags();
+        int32_t ret = RemoveLocal(handlerId, handlerType, deviceTags);
         const HandleEventType newType = GetEventType();
         const int32_t newLevel = GetPriority();
         const uint64_t newTags = GetDeviceTags();
-        if (currentType != newType || ((currentTags & deviceTags) != 0)) {
+        if (ret == RET_OK && (currentType != newType || ((currentTags & deviceTags) != 0))) {
             ret = RemoveFromServer(handlerType, newType, newLevel, newTags);
             if (ret != RET_OK) {
                 return ret;
             }
+            MMI_HILOGI("Remove Handler:%{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ",
+                handlerType, handlerId, currentType, currentTags);
         }
-        MMI_HILOGI("Remove Handler:%{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ",
-                   handlerType, handlerId, currentType, currentTags);
+        return ret;
     }
-    return ret;
+
+    auto it = actionsMonitorHandlers_.find(handlerId);
+    if (it != actionsMonitorHandlers_.end()) {
+        std::vector<int32_t> actionsType = it->second.actionsType_;
+        size_t currentSize = addToServerActions_.size();
+        int32_t ret = RemoveLocalActions(handlerId, handlerType);
+        size_t newSize = addToServerActions_.size();
+        if (ret == RET_OK && currentSize != newSize) {
+            ret = RemoveFromServer(handlerType, HANDLE_EVENT_TYPE_NONE, 0, 0, actionsType);
+            if (ret != RET_OK) {
+                return ret;
+            }
+            MMI_HILOGI("Remove Handler:%{public}d:%{public}d", handlerType, handlerId);
+        }
+        return ret;
+    }
+    return RET_ERR;
 }
 
 int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
@@ -243,10 +303,31 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     return RET_OK;
 }
 
-int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags)
+int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType, std::vector<int32_t> actionsType,
+    std::shared_ptr<IInputEventConsumer> monitor)
 {
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->AddInputHandler(handlerType, eventType, priority, deviceTags);
+    InputHandlerManager::Handler handler{
+        .handlerId_ = handlerId,
+        .handlerType_ = handlerType,
+        .eventType_ = HANDLE_EVENT_TYPE_NONE,
+        .consumer_ = monitor,
+        .actionsType_ = actionsType,
+    };
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto ret = actionsMonitorHandlers_.emplace(handler.handlerId_, handler);
+        if (!ret.second) {
+            MMI_HILOGE("Actions duplicate handler:%{public}d", handler.handlerId_);
+            return RET_ERR;
+        }
+    }
+    return RET_OK;
+}
+
+int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+    uint32_t deviceTags, std::vector<int32_t> actionsType)
+{
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->AddInputHandler(handlerType,
+        eventType, priority, deviceTags, actionsType);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -281,10 +362,45 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     return RET_OK;
 }
 
-int32_t InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags)
+void InputHandlerManager::UpdateAddToServerActions()
 {
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
+    std::vector<int32_t> addToServerActions;
+    for (const auto &[key, value] : actionsMonitorHandlers_) {
+        for (auto action : value.actionsType_) {
+            if (std::find(addToServerActions.begin(), addToServerActions.end(), action) ==
+                addToServerActions.end()) {
+                addToServerActions.push_back(action);
+            }
+        }
+    }
+    addToServerActions_.clear();
+    addToServerActions_ = addToServerActions;
+}
+
+int32_t InputHandlerManager::RemoveLocalActions(int32_t handlerId, InputHandlerType handlerType)
+ 
+{
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto iter = actionsMonitorHandlers_.find(handlerId);
+        if (iter == actionsMonitorHandlers_.end()) {
+            MMI_HILOGE("No handler with specified");
+            return RET_ERR;
+        }
+        if (handlerType != iter->second.handlerType_) {
+            MMI_HILOGE("Unmatched handler type, FindHandlerType:%{public}d", iter->second.handlerType_);
+            return RET_ERR;
+        }
+        actionsMonitorHandlers_.erase(iter);
+        UpdateAddToServerActions();
+    }
+    return RET_OK;
+}
+
+int32_t InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+    uint32_t deviceTags, std::vector<int32_t> actionsType)
+{
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputHandler(handlerType, eventType,
+        priority, deviceTags, actionsType);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -454,6 +570,22 @@ int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEven
         }
         consumerCount++;
     }
+    for (const auto &item : actionsMonitorHandlers_) {
+        for (auto action : item.second.actionsType_) {
+            if (action != pointerEvent->GetPointerAction()) {
+                continue;
+            }
+            int32_t handlerId = item.first;
+            std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
+            CHKPR(consumer, INVALID_HANDLER_ID);
+            auto ret = consumerInfos.emplace(handlerId, consumer);
+            if (!ret.second) {
+                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+                continue;
+            }
+            consumerCount++;
+        }
+    }
     return consumerCount;
 }
 
@@ -521,8 +653,9 @@ void InputHandlerManager::OnConnected()
     HandleEventType eventType = GetEventType();
     int32_t priority = GetPriority();
     uint32_t deviceTags = GetDeviceTags();
-    if (eventType != HANDLE_EVENT_TYPE_NONE) {
-        AddToServer(GetHandlerType(), eventType, priority, deviceTags);
+    std::vector<int32_t> actionsType = GetActionsType();
+    if (eventType != HANDLE_EVENT_TYPE_NONE || !actionsType.empty()) {
+        AddToServer(GetHandlerType(), eventType, priority, deviceTags, actionsType);
     }
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -530,9 +663,15 @@ void InputHandlerManager::OnConnected()
 bool InputHandlerManager::HasHandler(int32_t handlerId)
 {
     std::lock_guard<std::mutex> guard(mtxHandlers_);
+    bool hasHandler = false;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         auto iter = monitorHandlers_.find(handlerId);
-        return (iter != monitorHandlers_.end());
+        hasHandler =  (iter != monitorHandlers_.end()) ? true : false;
+        if (!hasHandler) {
+            auto iter = actionsMonitorHandlers_.find(handlerId);
+            return (iter != actionsMonitorHandlers_.end());
+        }
+        return hasHandler;
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
         for (const auto &item : interHandlers_) {
@@ -594,6 +733,11 @@ uint32_t InputHandlerManager::GetDeviceTags() const
         }
     }
     return deviceTags;
+}
+
+std::vector<int32_t> InputHandlerManager::GetActionsType() const
+{
+    return addToServerActions_;
 }
 
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
