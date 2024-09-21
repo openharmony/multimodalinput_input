@@ -4390,12 +4390,14 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
 void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId)
 {
     CHKPV(keyEvent);
+    bool hasFound = false;
     for (const auto &item : windowsPerDisplay_) {
         if (item.second.focusWindowId == focusWindowId) {
             keyEvent->SetTargetDisplayId(item.second.displayId);
+            hasFound = true;
         }
     }
-    if (!displayGroupInfo_.displaysInfo.empty()) {
+    if (!hasFound && !displayGroupInfo_.displaysInfo.empty()) {
         keyEvent->SetTargetDisplayId(displayGroupInfo_.displaysInfo[0].id);
     }
 }
