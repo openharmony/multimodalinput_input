@@ -129,6 +129,7 @@ private:
     bool HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent);
     void HangUpCallProcess();
     void RejectCallProcess();
+    void RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     SubscriberCollection subscriberMap_;
