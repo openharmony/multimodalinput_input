@@ -46,7 +46,6 @@ constexpr int32_t DEFAULT_FRAME_RATE { 30 };
 constexpr int32_t INVALID_DISPLAY_ID { -1 };
 } // namespace
 
-inline constexpr int32_t DEFUALT_COOPERATE_PRIORITY { 10 };
 struct isMagicCursor {
     std::string name;
     bool isShow { false };
@@ -182,7 +181,6 @@ private:
     int32_t CreateDynamicCanvas();
     int32_t ParsingDynamicImage(MOUSE_ICON mouseStyle);
     void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
-    void DeletPidInfo(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void ResetDynamicVariable();
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
@@ -199,7 +197,6 @@ private:
 private:
     struct PidInfo {
         int32_t pid { 0 };
-        int32_t priority { 0 };
         bool visible { false };
     };
     bool hasDisplay_ { false };
