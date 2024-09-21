@@ -2161,6 +2161,12 @@ bool PointerDrawingManager::IsPointerVisible()
         }
     }
     if (!hapPidInfos_.empty()) {
+        if (pid_ == 0 && pidInfos_.empty()) {
+            auto info = hapPidInfos_.back();
+            MMI_HILOGI("Only hap visible pid:%{public}d-visible:%{public}s",
+                info.pid, info.visible ? "true" : "false");
+            return item.visible;
+        }
         for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
                 MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
@@ -2209,12 +2215,27 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 
 bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 {
+    bool ret = true;
+    int32_t count = 0;
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
-            return it->visible;
+            count++;
+            ret = it->visible;
+            break;
         }
     }
-    return true;
+    if (count == 0 && !hapPidInfos_.empty()) {
+        for (auto& item : hapPidInfos_) {
+            if (item.pid == pid_) {
+                MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
+                    item.pid, item.visible ? "true" : "false");
+                count++;
+                ret = item.visible;
+                break;
+            }
+        }
+    }
+    return ret;
 }
 
 void PointerDrawingManager::OnSessionLost(int32_t pid)
