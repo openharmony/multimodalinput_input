@@ -88,9 +88,9 @@ public:
     virtual int32_t GetKeyboardRepeatDelay(int32_t &delay) = 0;
     virtual int32_t GetKeyboardRepeatRate(int32_t &rate) = 0;
     virtual int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) = 0;
+        int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) = 0;
     virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) = 0;
+        int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) = 0;
     virtual int32_t AddGestureMonitor(InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) = 0;
     virtual int32_t RemoveGestureMonitor(InputHandlerType handlerType,
