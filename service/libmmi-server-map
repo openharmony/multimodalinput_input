@@ -15,8 +15,30 @@
  1.0 {
     global:
         extern "C++" {
-            OHOS::MMI::MultimodalInputConnectStub::*;
-            OHOS::MMI::MMIService::**;
+            OHOS::MMI::*;
+            "vtable for OHOS::MMI::EventDispatchHandler";
+            "vtable for OHOS::MMI::UDSServer";
+            "vtable for OHOS::MMI::InputDeviceManager";
+            "vtable for OHOS::MMI::EventFilterHandler";
+            "vtable for OHOS::MMI::DelegateInterface";
+            "vtable for OHOS::MMI::DelegateTasks";
+            "vtable for OHOS::MMI::EventNormalizeHandler";
+            "vtable for OHOS::MMI::EventInterceptorHandler";
+            "vtable for OHOS::MMI::EventInterceptorHandler::InterceptorCollection";
+            "vtable for OHOS::MMI::EventMonitorHandler";
+            "vtable for OHOS::MMI::EventMonitorHandler::MonitorCollection";
+            "vtable for OHOS::MMI::InjectNoticeManager::InjectNoticeConnection";
+            "vtable for OHOS::MMI::AuthorizationDialog::DialogAbilityConnection";
+            "VTT for OHOS::MMI::InjectNoticeManager::InjectNoticeConnection";
+            "VTT for OHOS::MMI::AuthorizationDialog::DialogAbilityConnection";
+            "vtable for OHOS::MMI::KeyCommandHandler";
+            "vtable for OHOS::MMI::SettingDataShare";
+            "vtable for OHOS::MMI::KeySubscribeHandler";
+            "vtable for OHOS::MMI::MultiModalInputPreferencesManager";
+            "VTT for OHOS::MMI::AppDebugListener";
+            "vtable for OHOS::MMI::AppDebugListener";
+            "vtable for OHOS::MMI::KeySubscriberHandler";
+            "vtable for OHOS::MMI::SwitchSubscriberHandler"
         };
     local:
         *;

@@ -37,7 +37,6 @@ public:
     PermissionHelper(const PermissionHelper&) = delete;
     PermissionHelper& operator=(const PermissionHelper&) = delete;
 
-    bool CheckPermission(uint32_t required);
     bool CheckMonitor();
     bool CheckInterceptor();
     int32_t GetTokenType();
@@ -51,7 +50,6 @@ public:
 
 private:
     PermissionHelper() {}
-    bool CheckHapPermission(uint32_t tokenId, uint32_t required);
     bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);
     bool CheckHapPermission(std::string permissionCode);
 };
