@@ -1140,6 +1140,13 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     if (mouseStyle != MOUSE_ICON::RUNNING && (mouseStyle != MOUSE_ICON::DEFAULT ||
             mouseIcons_[mouseStyle].iconPath != (IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg"))) {
         if (canvasNode_ != nullptr) {
+            Rosen::RSAnimationTimingProtocol protocol;
+            protocol.SetDuration(0);
+            Rosen::RSNode::Animate(
+                protocol,
+                Rosen::RSAnimationTimingCurve::LINEAR,
+                [this]() { canvasNode_->SetRotation(0); });
+            Rosen::RSTransaction::FlushImplicitTransaction();
             canvasNode_->SetVisible(false);
         }
         MMI_HILOGE("current pointer is not running");
