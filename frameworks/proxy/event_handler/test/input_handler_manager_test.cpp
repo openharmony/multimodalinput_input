@@ -476,5 +476,86 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDisconnected, TestSi
     inputHdlMgr.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     EXPECT_NO_FATAL_FAILURE(inputHdlMgr.OnDisconnected());
 }
+
+/**
+ * @tc.name: InputHandlerManagerTest_IsMatchGesture_001
+ * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsMatchGesture_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MYInputHandlerManager inputHdlMgr;
+    InputHandlerManager::Handler handler;
+    handler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    handler.gestureHandler_.gestureType = TOUCH_GESTURE_TYPE_SWIPE;
+    handler.gestureHandler_.fingers = 1;
+    int32_t action = PointerEvent::TOUCH_ACTION_SWIPE_DOWN;
+    int32_t count = 1;
+    bool ret = inputHdlMgr.IsMatchGesture(handler, action, count);
+    ASSERT_TRUE(ret);
+    handler.gestureHandler_.gestureType = 10;
+    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
+    ASSERT_TRUE(ret);
+    action = PointerEvent::TOUCH_ACTION_PINCH_OPENED;
+    handler.gestureHandler_.gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    handler.gestureHandler_.fingers == ALL_FINGER_COUNT;
+    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
+    ASSERT_TRUE(ret);
+    handler.gestureHandler_.gestureType = 10;
+    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
+    ASSERT_FALSE(ret);
+    handler.gestureHandler_.gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    handler.gestureHandler_.fingers == 10;
+    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
+    ASSERT_TRUE(ret);
+    handler.eventType_ = 10;
+    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_HasHandler_002
+ * @tc.desc: Test the funcation HasHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_HasHandler_002, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    int32_t handlerId = 2;
+    InputHandlerManager::Handler handler;
+    handler.handlerId_ = 2;
+    manager.interHandlers_.push_back(handler);
+    bool ret = manager.HasHandler(handlerId);
+    ASSERT_TRUE(ret);
+    handlerId = 3;
+    ret = manager.HasHandler(handlerId);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_CheckInputDeviceSource_004
+ * @tc.desc: Test the funcation CheckInputDeviceSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource_004, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    uint32_t deviceTags = 1;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    bool result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
+    ASSERT_FALSE(result);
+    deviceTags = 2;
+    result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
+    ASSERT_FALSE(result);
+    deviceTags = 4;
+    result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
+    ASSERT_TRUE(result);
+}
 } // namespace MMI
 } // namespace OHOS
