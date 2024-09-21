@@ -824,32 +824,44 @@ void TouchDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     std::ostringstream oss;
-    auto titles1 = std::make_tuple("currentPointerId", "maxPointerCount", "currentPointerCount",
-                                   "lastActionTime", "xVelocity", "yVelocity");
 
-    auto data1 = std::vector{std::make_tuple(currentPointerId_, maxPointerCount_, currentPointerCount_,
-                                             lastActionTime_, xVelocity_, yVelocity_)};
+    std::vector<std::string> titles1 = {"currentPointerId", "maxPointerCount", "currentPointerCount",
+                                        "lastActionTime", "xVelocity", "yVelocity"};
+
+    std::vector<std::vector<std::string>> data1 = {
+        {std::to_string(currentPointerId_), std::to_string(maxPointerCount_), std::to_string(currentPointerCount_),
+         std::to_string(lastActionTime_), std::to_string(xVelocity_), std::to_string(yVelocity_)}
+    };
+
     DumpFullTable(oss, "Touch Location Info", titles1, data1);
     oss << std::endl;
 
-    auto titles2 = std::make_tuple("pressure", "itemRectW", "hasBubbleObserver",
-                                   "hasPointerObserver", "isFirstDownAction", "isDownAction", "isFirstDraw");
+    std::vector<std::string> titles2 = {"pressure", "itemRectW", "hasBubbleObserver",
+                                        "hasPointerObserver", "isFirstDownAction", "isDownAction", "isFirstDraw"};
 
-    auto data2 = std::vector{std::make_tuple(pressure_, itemRectW_, hasBubbleObserver_,
-                                             hasPointerObserver_, isFirstDownAction_, isDownAction_, isFirstDraw_)};
+    std::vector<std::vector<std::string>> data2 = {
+        {std::to_string(pressure_), std::to_string(itemRectW_), std::to_string(hasBubbleObserver_),
+         std::to_string(hasPointerObserver_), std::to_string(isFirstDownAction_), std::to_string(isDownAction_),
+         std::to_string(isFirstDraw_)}
+    };
+
     DumpFullTable(oss, "Touch Location Info", titles2, data2);
     oss << std::endl;
 
-    auto bubbleTitles = std::make_tuple("innerCircleRadius", "outerCircleRadius", "outerCircleWidth");
-    auto bubbleData = std::vector{
-            std::make_tuple(bubble_.innerCircleRadius, bubble_.outerCircleRadius, bubble_.outerCircleWidth)};
+    std::vector<std::string> bubbleTitles = {"innerCircleRadius", "outerCircleRadius", "outerCircleWidth"};
+    std::vector<std::vector<std::string>> bubbleData = {
+        {std::to_string(bubble_.innerCircleRadius), std::to_string(bubble_.outerCircleRadius), std::to_string(bubble_.outerCircleWidth)}
+    };
+
     DumpFullTable(oss, "Bubble Info", bubbleTitles, bubbleData);
     oss << std::endl;
 
-    auto devModeTitles = std::make_tuple("Name", "SwitchName", "IsShow");
-    auto devModeData = std::vector{
-            std::make_tuple("BubbleMode", bubbleMode_.SwitchName, bubbleMode_.isShow),
-            std::make_tuple("PointerMode", pointerMode_.SwitchName, pointerMode_.isShow)};
+    std::vector<std::string> devModeTitles = {"Name", "SwitchName", "IsShow"};
+    std::vector<std::vector<std::string>> devModeData = {
+        {"BubbleMode", bubbleMode_.SwitchName, std::to_string(bubbleMode_.isShow)},
+        {"PointerMode", pointerMode_.SwitchName, std::to_string(pointerMode_.isShow)}
+    };
+
     DumpFullTable(oss, "DevMode Info", devModeTitles, devModeData);
     oss << std::endl;
 

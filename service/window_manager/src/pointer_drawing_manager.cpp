@@ -2635,42 +2635,53 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
     std::ostringstream oss;
     oss << std::endl;
 
-    auto displayTitles = std::make_tuple("ID", "X", "Y", "Width", "Height", "DPI", "Name", "Uniq",
-                                         "Direction", "Display Direction", "Display Mode");
+    std::vector<std::string> displayTitles = {"ID", "X", "Y", "Width", "Height", "DPI", "Name", "Uniq",
+                                              "Direction", "Display Direction", "Display Mode"};
     DisplayInfo &di = displayInfo_;
-    auto displayInfo = std::vector{std::make_tuple(di.id, di.x, di.y, di.width, di.height, di.dpi, di.name, di.uniq,
-                                                   di.direction, di.displayDirection,
-                                                   static_cast<int32_t>(di.displayMode))};
+    std::vector<std::vector<std::string>> displayInfo = {
+        {std::to_string(di.id), std::to_string(di.x), std::to_string(di.y), std::to_string(di.width),
+         std::to_string(di.height), std::to_string(di.dpi), di.name, di.uniq,
+         std::to_string(static_cast<int32_t>(di.direction)), std::to_string(static_cast<int32_t>(di.displayDirection)),
+         std::to_string(static_cast<int32_t>(di.displayMode))}};
+
     DumpFullTable(oss, "Display Info", displayTitles, displayInfo);
     oss << std::endl;
 
-    auto titles1 = std::make_tuple("hasDisplay", "hasPointerDevice", "lastPhysicalX", "lastPhysicalY",
-                                   "pid", "windowId", "imageWidth", "imageHeight", "canvasWidth", "canvasHeight");
-    auto data1 = std::vector{std::make_tuple(hasDisplay_, hasPointerDevice_, lastPhysicalX_, lastPhysicalY_,
-                                             pid_, windowId_, imageWidth_, imageHeight_, canvasWidth_, canvasHeight_)};
+    std::vector<std::string> titles1 = {"hasDisplay", "hasPointerDevice", "lastPhysicalX", "lastPhysicalY",
+                                        "pid", "windowId", "imageWidth", "imageHeight", "canvasWidth", "canvasHeight"};
+    std::vector<std::vector<std::string>> data1 = {
+        {std::to_string(hasDisplay_), std::to_string(hasPointerDevice_), std::to_string(lastPhysicalX_),
+         std::to_string(lastPhysicalY_), std::to_string(pid_), std::to_string(windowId_),
+         std::to_string(imageWidth_), std::to_string(imageHeight_), std::to_string(canvasWidth_),
+         std::to_string(canvasHeight_)}};
+
     DumpFullTable(oss, "Cursor Info", titles1, data1);
     oss << std::endl;
 
-    auto titles2 = std::make_tuple("mouseDisplayState", "mouseIconUpdate", "screenId", "userIconHotSpotX",
-                                   "userIconHotSpotY", "tempPointerColor", "lastDirection", "currentDirection");
-    auto data2 = std::vector{std::make_tuple(mouseDisplayState_, mouseIconUpdate_, screenId_, userIconHotSpotX_,
-                                             userIconHotSpotY_, tempPointerColor_, lastDirection_, currentDirection_)};
+    std::vector<std::string> titles2 = {"mouseDisplayState", "mouseIconUpdate", "screenId", "userIconHotSpotX",
+                                        "userIconHotSpotY", "tempPointerColor", "lastDirection", "currentDirection"};
+    std::vector<std::vector<std::string>> data2 = {
+        {std::to_string(mouseDisplayState_), std::to_string(mouseIconUpdate_), std::to_string(screenId_),
+         std::to_string(userIconHotSpotX_), std::to_string(userIconHotSpotY_), std::to_string(tempPointerColor_),
+         std::to_string(lastDirection_), std::to_string(currentDirection_)}};
 
     DumpFullTable(oss, "Cursor Info", titles2, data2);
     oss << std::endl;
 
-    auto styleTitles = std::make_tuple("name", "Size", "Color", "ID");
-    auto styleData = std::vector{
-            std::make_tuple("lastMouseStyle", lastMouseStyle_.size, lastMouseStyle_.color, lastMouseStyle_.id),
-            std::make_tuple("currentMouseStyle", currentMouseStyle_.size, currentMouseStyle_.color,
-                            currentMouseStyle_.id)};
+    std::vector<std::string> styleTitles = {"name", "Size", "Color", "ID"};
+    std::vector<std::vector<std::string>> styleData = {
+        {"lastMouseStyle", std::to_string(lastMouseStyle_.size), std::to_string(lastMouseStyle_.color),
+         std::to_string(lastMouseStyle_.id)},
+        {"currentMouseStyle", std::to_string(currentMouseStyle_.size), std::to_string(currentMouseStyle_.color),
+         std::to_string(currentMouseStyle_.id)}};
+
     DumpFullTable(oss, "Cursor Style Info", styleTitles, styleData);
     oss << std::endl;
 
-    auto pidTitles = std::make_tuple("pid", "visible");
-    std::vector<std::tuple<int32_t, bool>> pidInfos;
-    for (const auto &pidInfo: pidInfos_) {
-        pidInfos.emplace_back(pidInfo.pid, pidInfo.visible);
+    std::vector<std::string> pidTitles = {"pid", "visible"};
+    std::vector<std::vector<std::string>> pidInfos;
+    for (const auto &pidInfo : pidInfos_) {
+        pidInfos.push_back({std::to_string(pidInfo.pid), pidInfo.visible ? "true" : "false"});
     }
     DumpFullTable(oss, "Visible Info", pidTitles, pidInfos);
     oss << std::endl;

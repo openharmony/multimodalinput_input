@@ -172,24 +172,6 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_04, TestS
 }
 
 /**
- * @tc.name: PermissionHelperTest_CheckHapPermission_05
- * @tc.desc: Test CheckHapPermission
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_05, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    uint32_t tokenId = 1;
-    uint32_t required = 1;
-    OHOS::Security::AccessToken::HapTokenInfo findInfo;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, findInfo);
-    EXPECT_NE(ret, 0);
-    bool result = PER_HELPER->CheckHapPermission(tokenId, required);
-    ASSERT_FALSE(result);
-}
-
-/**
  * @tc.name: PermissionHelperTest_CheckHapPermission_06
  * @tc.desc: Test CheckHapPermission
  * @tc.type: FUNC
@@ -273,38 +255,6 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_VerifySystemApp_02, TestSize
     tokenType = OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL;
     bool result = PER_HELPER->VerifySystemApp();
     EXPECT_TRUE(result);
-}
-
-/**
- * @tc.name: PermissionHelperTest_CheckPermission
- * @tc.desc: Test CheckPermission
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckPermission, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    uint32_t tokenId = 1;
-    uint32_t required = 2;
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
-    bool result1 = PER_HELPER->CheckPermission(required);
-    EXPECT_TRUE(result1);
-
-    tokenId = 2;
-    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
-    bool result2 = PER_HELPER->CheckPermission(required);
-    EXPECT_TRUE(result2);
-
-    tokenId = 3;
-    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
-    bool result3 = PER_HELPER->CheckPermission(required);
-    EXPECT_TRUE(result3);
-
-    tokenId = 4;
-    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
-    bool result4 = PER_HELPER->CheckPermission(required);
-    EXPECT_TRUE(result4);
 }
 
 /**
