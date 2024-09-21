@@ -959,7 +959,7 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
     intervalTime_ = tempDelay;
 }
 
-bool CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent)
+bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent)
 {
     if (item.keyCode != keyEvent->GetKeyCode()) {
         return false;
