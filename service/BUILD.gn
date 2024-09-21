@@ -1527,6 +1527,7 @@ ohos_unittest("KeyCommandTest") {
     "key_command/test/key_command_handler_test.cpp",
     "key_command/test/key_command_handler_util_test.cpp",
     "key_command/test/setting_datashare_test.cpp",
+    "key_command/test/ability_manager_client_stub.cpp",
   ]
 
   deps = [
