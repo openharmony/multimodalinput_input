@@ -196,7 +196,14 @@ int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType h
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     uint32_t deviceTags = 0;
     auto iter = monitorHandlers_.find(handlerId);
-    if (iter != monitorHandlers_.end()) {
+    bool isInterHandlers = false;
+    for (auto inter = interHandlers_.begin(); inter != interHandlers_.end(); ++inter) {
+        if (handlerId == inter->handlerId_) {
+            isInterHandlers = true;
+            break;
+        }
+    }
+    if (iter != monitorHandlers_.end() || isInterHandlers) {
         const HandleEventType currentType = GetEventType();
         uint32_t currentTags = GetDeviceTags();
         int32_t ret = RemoveLocal(handlerId, handlerType, deviceTags);
