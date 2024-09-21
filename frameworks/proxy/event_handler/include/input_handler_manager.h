@@ -51,7 +51,6 @@ public:
     HandleEventType GetEventType() const;
     int32_t GetPriority() const;
     uint32_t GetDeviceTags() const;
-    uint32_t GetDeviceTagsActions() const;
     std::vector<int32_t> GetActionsType() const;
 
 protected:
