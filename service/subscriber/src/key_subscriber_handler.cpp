@@ -509,6 +509,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     CHKPF(keyEvent);
     if (HandleRingMute(keyEvent)) {
         MMI_HILOGI("Mute Ring in subscribe keyEvent");
+        RemoveSubscriberTimer(keyEvent);
         return true;
     }
     if (HandleCallEnded(keyEvent)) {
@@ -1317,6 +1318,25 @@ void KeySubscriberHandler::InitDataShareListener()
             CreateObserver(CALL_BEHAVIOR_KEY, func);
         CHKPV(statusObserver);
         helper->RegisterObserver(uri, statusObserver);
+    }
+}
+
+void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_INFO_TRACE;
+    CHKPV(keyEvent);
+    auto keyCode = keyEvent->GetKeyCode();
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    RemoveKeyCode(keyCode, pressedKeys);
+    std::set<int32_t> pids;
+    GetForegroundPids(pids);
+    MMI_HILOGI("Foreground pid size:%{public}zu", pids.size());
+    for (auto &iter : subscriberMap_) {
+        auto keyOption = iter.first;
+        auto subscribers = iter.second;
+        PrintKeyOption(keyOption);
+        IsMatchForegroundPid(subscribers, pids);
+        ClearSubscriberTimer(subscribers);
     }
 }
 } // namespace MMI
