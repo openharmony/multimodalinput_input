@@ -1324,7 +1324,7 @@ void KeySubscriberHandler::InitDataShareListener()
 void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_INFO_TRACE;
-    CHKPF(keyEvent);
+    CHKPV(keyEvent);
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(keyCode, pressedKeys);
