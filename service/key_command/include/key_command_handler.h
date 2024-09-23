@@ -138,10 +138,6 @@ struct KnuckleGesture {
     } lastDownPointer;
 };
 
-struct MultiFingersTap {
-    Ability ability;
-};
-
 struct RepeatKey {
     int32_t keyCode { -1 };
     int32_t keyAction { 0 };
@@ -150,6 +146,10 @@ struct RepeatKey {
     int64_t delay { 0 };
     std::string statusConfig;
     bool statusConfigValue { true };
+    Ability ability;
+};
+
+struct MultiFingersTap {
     Ability ability;
 };
 
@@ -185,18 +185,15 @@ public:
     void SetKnuckleDoubleTapDistance(float distance);
     bool GetKnuckleSwitchValue();
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef UNIT_TEST
-public:
-#else
+    void InitKeyObserver();
 private:
-#endif // UNIT_TEST
     void Print();
     void PrintSeq();
     void PrintExcludeKeys();
@@ -264,12 +261,10 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
-
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
     bool CheckTwoFingerGestureAction() const;
-    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
@@ -283,6 +278,7 @@ private:
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
+    bool CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent);
     int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -298,6 +294,7 @@ private:
     void ReportRegionGesture();
     void ReportLetterGesture();
     void ReportGestureInfo();
+    bool IsMatchedAbility(std::vector<float> gesturePoints_, float gestureLastX, float gestureLastY);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent);
 
@@ -348,6 +345,9 @@ private:
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
     int32_t lastKeyEventCode_ { -1 };
+    int32_t screenRecordingSuccessCount_ { 0 };
+    std::string sessionKey_ { };
+    bool isStartBase_ { false };
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     bool isGesturing_ { false };
     bool isLetterGesturing_ { false };

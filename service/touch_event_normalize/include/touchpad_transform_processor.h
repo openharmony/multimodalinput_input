@@ -31,7 +31,7 @@ enum class MulFingersTap : int32_t {
     NO_TAP = 0,
     TRIPLE_TAP = 3,
     QUAD_TAP = 4,
-    QUINTTAP = 5,
+    QUINT_TAP = 5,
 };
 
 class MultiFingersTapHandler final {
@@ -48,8 +48,8 @@ public:
     };
 
     int32_t HandleMulFingersTap(struct libinput_event_touch *event, int32_t type);
-    MulFingersTap GetMultiFingersState() const;
-    void SetMULTI_FINGERTAP_HDRDefault(bool isAllDefault = true);
+    MulFingersTap GetMultiFingersState();
+    void SetMultiFingersTapHdrDefault(bool isAllDefault = true);
     bool ClearPointerItems(std::shared_ptr<PointerEvent> pointer);
     bool CanAddToPointerMaps(struct libinput_event_touch *event);
     bool CanUnsetPointerItem(struct libinput_event_touch *event);
@@ -75,16 +75,13 @@ public:
     ~TouchPadTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override;
-    static int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
-    static int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
+
     static int32_t SetTouchpadPinchSwitch(bool switchFlag);
     static void GetTouchpadPinchSwitch(bool &switchFlag);
     static int32_t SetTouchpadSwipeSwitch(bool switchFlag);
     static void GetTouchpadSwipeSwitch(bool &switchFlag);
     static int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
     static void GetTouchpadRotateSwitch(bool &rotateSwitch);
-    static int32_t SetTouchpadScrollRows(int32_t rows);
-    static int32_t GetTouchpadScrollRows();
 
 private:
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
@@ -94,7 +91,6 @@ private:
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
     int32_t OnEventTouchPadUp(struct libinput_event *event);
     int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
-    int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture, int32_t fingerCount);
     int32_t OnEventTouchPadSwipeBegin(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeEnd(struct libinput_event *event);
