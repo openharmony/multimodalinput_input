@@ -499,8 +499,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     napi_value argv[3] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_HILOGE("GET_CB_INFO failed");
-        auto infoTemp = std::string("JsOn GET_CB_INFO failed");
-        napi_throw_error(env, nullptr, infoTemp.c_str());
         delete event;
         return nullptr;
     }
