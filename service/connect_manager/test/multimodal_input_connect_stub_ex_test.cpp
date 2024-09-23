@@ -7900,7 +7900,8 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_006, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect
+        ::GetDescriptor()));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
