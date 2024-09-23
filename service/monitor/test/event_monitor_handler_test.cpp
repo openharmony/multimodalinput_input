@@ -869,5 +869,110 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveScreenCaptureMon
     monitorCollection.endScreenCaptureMonitors_[-1] = handlerSet;
     ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveScreenCaptureMonitor(session));
 }
+
+/**
+ * @tc.name: EventMonitorHandlerTest_ProcessScreenCapture_004
+ * @tc.desc: Test ProcessScreenCapture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ProcessScreenCapture_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    int32_t pid = 2;
+    bool isStart = true;
+    UDSServer udSever;
+    InputHandler->udsServer_ = &udSever;
+    udSever.idxPidMap_.insert(std::make_pair(pid, 2));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    udSever.sessionsMap_.insert(std::make_pair(pid, session));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.ProcessScreenCapture(pid, isStart));
+    isStart = false;
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.ProcessScreenCapture(pid, isStart));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_Dump_002
+ * @tc.desc: Test Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    EventMonitorHandler::SessionHandler monitor { InputHandlerType::INTERCEPTOR, 2, session };
+    monitorCollection.monitors_.insert(monitor);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.Dump(fd, args));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_Dump_003
+ * @tc.desc: Test Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    EventMonitorHandler::SessionHandler monitorone { InputHandlerType::INTERCEPTOR, 2, session };
+    monitorCollection.monitors_.insert(monitorone);
+    EventMonitorHandler::SessionHandler monitortwo { InputHandlerType::MONITOR, 3, session };
+    monitorCollection.monitors_.insert(monitortwo);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.Dump(fd, args));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_CheckHasInputHandler_001
+ * @tc.desc: Test CheckHasInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckHasInputHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    HandleEventType eventType = 1;
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.CheckHasInputHandler(eventType));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    EventMonitorHandler::SessionHandler monitorone { InputHandlerType::INTERCEPTOR, 1, session };
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.CheckHasInputHandler(eventType));
+    monitorCollection.monitors_.insert(monitorone);
+    EventMonitorHandler::SessionHandler monitortwo { InputHandlerType::MONITOR, 2, session };
+    monitorCollection.monitors_.insert(monitortwo);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.CheckHasInputHandler(eventType));
+    EventMonitorHandler::SessionHandler monitorthere { InputHandlerType::MONITOR, 3, session };
+    monitorCollection.monitors_.insert(monitorthere);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.CheckHasInputHandler(eventType));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveInputHandler_002
+ * @tc.desc: Verify the invalid and valid event type of RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = 2;
+    std::shared_ptr<IInputEventHandler::IInputEventConsumer> callback = std::make_shared<MyInputEventConsumer>();
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
+    handlerType = InputHandlerType::NONE;
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
+}
 } // namespace MMI
 } // namespace OHOS
