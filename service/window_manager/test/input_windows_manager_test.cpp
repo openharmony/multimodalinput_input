@@ -6578,5 +6578,144 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerEvent, TestS
     inputWindowsManager.lastPointerEvent_->UpdatePointerItem(100, item);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetPointerEvent(pointerAction, pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckUIExtentionWindowPointerHotArea
+ * @tc.desc: Test the funcation CheckUIExtentionWindowPointerHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindowPointerHotArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowInfo winInfo;
+    Rect rect {
+        .x = 100,
+        .y = 100,
+        .width = 1000,
+        .height = 1000,
+    };
+    int32_t logicalX = 300;
+    int32_t logicalY = 300;
+    std::vector<WindowInfo> windowInfos;
+    int32_t windowId = 10;
+    winInfo.id = 20;
+    winInfo.pointerHotAreas.push_back(rect);
+    windowInfos.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CheckUIExtentionWindowPointerHotArea(logicalX, logicalY,
+        windowInfos, windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer
+ * @tc.desc: Test the funcation UpdateTargetPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t longAxis = 1U << 27U;
+    inputWindowsManager.IsFoldable_ = true;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10);
+    item.SetLongAxis(longAxis);
+    pointerEvent->SetPointerId(10);
+    pointerEvent->AddPointerItem(item);
+    inputWindowsManager.cancelTouchStatus_ = true;
+    EXPECT_EQ(inputWindowsManager.UpdateTargetPointer(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CleanInvalidPiexMap
+ * @tc.desc: Test the funcation CleanInvalidPiexMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CleanInvalidPiexMap, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 100;
+    WindowInfo winInfo;
+    winInfo.id = 10;
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CleanInvalidPiexMap());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CleanInvalidPiexMap_001
+ * @tc.desc: Test the funcation CleanInvalidPiexMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CleanInvalidPiexMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 10;
+    WindowInfo winInfo;
+    winInfo.id = 10;
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CleanInvalidPiexMap());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetCancelEventFlag
+ * @tc.desc: Test the funcation GetCancelEventFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfoEX winInfoEx;
+    winInfoEx.flag = true;
+    int32_t pointerId = 100;
+    pointerEvent->SetPointerId(100);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, winInfoEx));
+    EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+
+    pointerEvent->SetPointerId(200);
+    EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetCancelEventFlag_001
+ * @tc.desc: Test the funcation GetCancelEventFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    inputWindowsManager.mouseDownInfo_.pid = 100;
+    EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    inputWindowsManager.mouseDownInfo_.pid = -1;
+    EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
