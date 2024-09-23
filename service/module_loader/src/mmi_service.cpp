@@ -2547,20 +2547,6 @@ void MMIService::InitPreferences()
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 }
 
-int32_t MMIService::SetMoveEventFilters(bool flag)
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&InputEventHandler::SetMoveEventFilters, InputHandler, flag));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to set move event filter flag, ret:%{public}d", ret);
-        return ret;
-    }
-#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-    return RET_OK;
-}
-
 int32_t MMIService::SetCurrentUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
@@ -2574,36 +2560,6 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
         return ret;
     }
     return RET_OK;
-}
-
-int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
-{
-    CALL_INFO_TRACE;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [switchFlag] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
-                switchFlag);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
-{
-    CALL_INFO_TRACE;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [&switchFlag] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
-                switchFlag);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
-    }
-    return ret;
 }
 
 int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
@@ -2687,49 +2643,6 @@ int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
-{
-    CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [rows] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(rows);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set the number of touchpad scrolling rows failed, return %{public}d", ret);
-        return ret;
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER
-    return RET_OK;
-}
-
-#ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
-{
-    rows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_POINTER
-
-int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
-{
-    CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &rows] {
-            return this->ReadTouchpadScrollRows(rows);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get the number of touchpad scrolling rows failed, return %{public}d, pid:%{public}d", ret,
-            GetCallingPid());
-        return ret;
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER
-    return RET_OK;
-}
-
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MMIService::AncoAddChannel(sptr<IAncoChannel> channel)
 {
@@ -2785,23 +2698,6 @@ void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const s
 void MMIService::PrintLog(const std::string &flag, int32_t duration)
 {
     MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
-}
-
-int32_t MMIService::SkipPointerLayer(bool isSkip)
-{
-    CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [isSkip] {
-            return IPointerDrawingManager::GetInstance()->SkipPointerLayer(isSkip);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("Skip pointer layerfailed, return:%{public}d", ret);
-        return ret;
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

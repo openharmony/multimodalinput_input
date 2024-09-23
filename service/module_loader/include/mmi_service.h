@@ -132,7 +132,6 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
-    int32_t SetMoveEventFilters(bool flag) override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
@@ -142,17 +141,12 @@ public:
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
-    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override;
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
-    int32_t SetTouchpadScrollRows(int32_t rows) override;
-    int32_t GetTouchpadScrollRows(int32_t &rows) override;
-    int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();

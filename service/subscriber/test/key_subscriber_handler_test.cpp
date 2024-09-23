@@ -18,13 +18,13 @@
 
 #include <gtest/gtest.h>
 
+#include "device_event_monitor.h"
 #include "key_option.h"
 #include "key_subscriber_handler.h"
 #include "call_manager_client.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "device_event_monitor.h"
 #include "input_event_handler.h"
 #include "key_event.h"
 #include "mmi_log.h"
@@ -420,7 +420,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddSubscriber_001, T
     SessionPtr sess;
     std::shared_ptr<KeyOption> keyOption;
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    auto option = std::make_shared<KeyOption>();
     handler.AddSubscriber(subscriber, option);
     auto it = handler.subscriberMap_.find(option);
     ASSERT_NE(it, handler.subscriberMap_.end());
@@ -706,24 +706,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyCancel_001,
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber_001
- * @tc.desc: Test IsNotifyPowerKeySubsciber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::vector<int32_t> keyCodes = {KeyEvent::KEYCODE_VOLUME_DOWN};
-    EXPECT_TRUE(handler.IsNotifyPowerKeySubsciber(KeyEvent::KEYCODE_VOLUME_DOWN, keyCodes));
-    keyCodes = {KeyEvent::KEYCODE_POWER, KeyEvent::KEYCODE_VOLUME_DOWN};
-    EXPECT_FALSE(handler.IsNotifyPowerKeySubsciber(KeyEvent::KEYCODE_POWER, keyCodes));
-    keyCodes = {KeyEvent::KEYCODE_POWER};
-    EXPECT_TRUE(handler.IsNotifyPowerKeySubsciber(KeyEvent::KEYCODE_POWER, keyCodes));
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_PrintKeyOption_001
  * @tc.desc: Test PrintKeyOption
  * @tc.type: FUNC
@@ -739,231 +721,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyOption_001, 
     keyOption->SetFinalKeyDownDuration(1000);
     keyOption->SetPreKeys({1, 2, 3});
     ASSERT_NO_FATAL_FAILURE(handler.PrintKeyOption(keyOption));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_001
- * @tc.desc: Test HandleKeyUpWithDelay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDelay_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    auto keyOption = std::make_shared<KeyOption>();
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    keyOption->SetFinalKeyUpDelay(0);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
-    keyOption->SetFinalKeyUpDelay(-1);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
-    keyOption->SetFinalKeyUpDelay(1);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_001
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    OHOS::EventFwk::Want want;
-    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
-    OHOS::EventFwk::CommonEventData data;
-    data.SetWant(want);
-    int callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_002
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    OHOS::EventFwk::Want want;
-    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
-    OHOS::EventFwk::CommonEventData data;
-    data.SetWant(want);
-    int callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
-    data.SetWant(want);
-    callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_003
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    OHOS::EventFwk::Want want;
-    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
-    OHOS::EventFwk::CommonEventData data;
-    data.SetWant(want);
-    int callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
-    data.SetWant(want);
-    callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_004
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    OHOS::EventFwk::Want want;
-    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
-    OHOS::EventFwk::CommonEventData data;
-    data.SetWant(want);
-    int callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
-    data.SetWant(want);
-    callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_F1);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_005
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    OHOS::EventFwk::Want want;
-    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
-    OHOS::EventFwk::CommonEventData data;
-    data.SetWant(want);
-    int callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_006
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    OHOS::EventFwk::Want want;
-    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
-    OHOS::EventFwk::CommonEventData data;
-    data.SetWant(want);
-    int callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
-    data.SetWant(want);
-    callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_007
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_007, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    OHOS::EventFwk::Want want;
-    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
-    OHOS::EventFwk::CommonEventData data;
-    data.SetWant(want);
-    int callState = 0;
-    DEVICE_MONITOR->SetCallState(data, callState);
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_008
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_008, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_009
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_009, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -1178,49 +935,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsFunctionKey, TestS
     ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_CONFIG);
     ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_OnSubscribeKeyEvent
- * @tc.desc: Test OnSubscribeKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSubscribeKeyEvent, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    KeySubscriberHandler handler;
-    KeyEvent::KeyItem item;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    handler.enableCombineKey_ = false;
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
-    item.SetKeyCode(KeyEvent::KEYCODE_A);
-    keyEvent->AddKeyItem(item);
-    item.SetKeyCode(KeyEvent::KEYCODE_B);
-    keyEvent->AddKeyItem(item);
-    ASSERT_FALSE(handler.OnSubscribeKeyEvent(keyEvent));
-
-    handler.enableCombineKey_ = true;
-    handler.hasEventExecuting_ = true;
-    handler.keyEvent_ = KeyEvent::Create();
-    ASSERT_NE(handler.keyEvent_, nullptr);
-    handler.keyEvent_->SetKeyCode(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
-    handler.keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    item.SetKeyCode(KeyEvent::KEYCODE_A);
-    handler.keyEvent_->AddKeyItem(item);
-    item.SetKeyCode(KeyEvent::KEYCODE_B);
-    handler.keyEvent_->AddKeyItem(item);
-    ASSERT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
-
-    handler.hasEventExecuting_ = false;
-    handler.needSkipPowerKeyUp_ = true;
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    ASSERT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
-
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
-    ASSERT_FALSE(handler.OnSubscribeKeyEvent(keyEvent));
 }
 
 /**
@@ -1536,24 +1250,188 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberKeyU
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber
- * @tc.desc: Test IsNotifyPowerKeySubsciber
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_001
+ * @tc.desc: Test ring mute
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber, TestSize.Level1)
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_001, TestSize.Level1)
 {
-    KeySubscriberHandler handler;
-    int32_t keyCode = KeyEvent::KEYCODE_A;
-    std::vector<int32_t> keyCodes;
-    ASSERT_TRUE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
-    keyCode = KeyEvent::KEYCODE_POWER;
-    keyCodes.push_back(KeyEvent::KEYCODE_A);
-    ASSERT_TRUE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
-    keyCodes.insert(keyCodes.begin(), KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_FALSE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
-    keyCodes.insert(keyCodes.begin(), KeyEvent::KEYCODE_VOLUME_UP);
-    ASSERT_FALSE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
+    KeySubscriberHandler keySubscriberHandler;
+    OHOS::EventFwk::Want want;
+    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
+    OHOS::EventFwk::CommonEventData data;
+    data.SetWant(want);
+    int callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_002
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_002, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    OHOS::EventFwk::Want want;
+    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
+    OHOS::EventFwk::CommonEventData data;
+    data.SetWant(want);
+    int callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
+    data.SetWant(want);
+    callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_003
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_003, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    OHOS::EventFwk::Want want;
+    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
+    OHOS::EventFwk::CommonEventData data;
+    data.SetWant(want);
+    int callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
+    data.SetWant(want);
+    callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_004
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_004, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    OHOS::EventFwk::Want want;
+    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
+    OHOS::EventFwk::CommonEventData data;
+    data.SetWant(want);
+    int callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
+    data.SetWant(want);
+    callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_F1);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_005
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_005, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    OHOS::EventFwk::Want want;
+    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
+    OHOS::EventFwk::CommonEventData data;
+    data.SetWant(want);
+    int callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_006
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_006, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    OHOS::EventFwk::Want want;
+    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
+    OHOS::EventFwk::CommonEventData data;
+    data.SetWant(want);
+    int callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    want.SetParam("state", StateType::CALL_STATUS_INCOMING);
+    data.SetWant(want);
+    callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_007
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_007, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    OHOS::EventFwk::Want want;
+    want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
+    OHOS::EventFwk::CommonEventData data;
+    data.SetWant(want);
+    int callState = 0;
+    DEVICE_MONITOR->SetCallState(data, callState);
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_008
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_008, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_009
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_009, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -1947,221 +1825,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_07, T
     DEVICE_MONITOR->hasHandleRingMute_ = true;
     keyEvent->keyCode_ = KeyEvent::KEYCODE_CAMERA;
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_08
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_08, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_DOWN;
-
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
-    std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_09
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_09, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_DOWN;
-
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
-    std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr;
-    callManagerClientPtr = std::make_shared<OHOS::Telephony::CallManagerClient>();
-    EXPECT_NE(callManagerClientPtr, nullptr);
-    DEVICE_MONITOR->hasHandleRingMute_ = false;
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_10
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_10, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_DOWN;
-
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
-    std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr;
-    callManagerClientPtr = std::make_shared<OHOS::Telephony::CallManagerClient>();
-    EXPECT_NE(callManagerClientPtr, nullptr);
-    DEVICE_MONITOR->hasHandleRingMute_ = true;
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_UP;
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleRingMute_11
- * @tc.desc: Test ring mute
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_11, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_DOWN;
-
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
-    std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr;
-    callManagerClientPtr = std::make_shared<OHOS::Telephony::CallManagerClient>();
-    EXPECT_NE(callManagerClientPtr, nullptr);
-    DEVICE_MONITOR->hasHandleRingMute_ = true;
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_AddKeyGestureSubscriber_01
- * @tc.desc: Test AddKeyGestureSubscriber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddKeyGestureSubscriber_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    auto keyOption1 = std::make_shared<KeyOption>();
-    keyOption1->SetFinalKey(1);
-    keyOption1->SetFinalKeyDown(true);
-    auto keyOption2 = std::make_shared<KeyOption>();
-    keyOption2->SetFinalKey(1);
-    keyOption2->SetFinalKeyDown(true);
-
-    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
-    SessionPtr sess;
-    std::shared_ptr<KeyOption> option;
-    auto subscriber1 = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, option);
-    auto subscriber2 = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(2, sess, option);
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(3, sess, option);
-    subscribers.push_back(subscriber1);
-    subscribers.push_back(subscriber2);
-    handler.keyGestures_.insert({keyOption2, subscribers});
-
-    for (auto &iter : handler.keyGestures_) {
-        EXPECT_TRUE(handler.IsEqualKeyOption(keyOption1, iter.first));
-    }
-    ASSERT_NO_FATAL_FAILURE(handler.AddKeyGestureSubscriber(subscriber, keyOption1));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_AddKeyGestureSubscriber_02
- * @tc.desc: Test AddKeyGestureSubscriber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddKeyGestureSubscriber_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    auto keyOption1 = std::make_shared<KeyOption>();
-    keyOption1->SetFinalKey(1);
-    keyOption1->SetFinalKeyDown(true);
-    auto keyOption2 = std::make_shared<KeyOption>();
-    keyOption2->SetFinalKey(2);
-    keyOption2->SetFinalKeyDown(false);
-
-    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
-    SessionPtr sess;
-    std::shared_ptr<KeyOption> option;
-    auto subscriber1 = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, option);
-    auto subscriber2 = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(2, sess, option);
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(3, sess, option);
-    subscribers.push_back(subscriber1);
-    subscribers.push_back(subscriber2);
-    handler.keyGestures_.insert({keyOption2, subscribers});
-
-    for (auto &iter : handler.keyGestures_) {
-        EXPECT_FALSE(handler.IsEqualKeyOption(keyOption1, iter.first));
-    }
-    ASSERT_NO_FATAL_FAILURE(handler.AddKeyGestureSubscriber(subscriber, keyOption1));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UnsubscribeKeyEvent_01
- * @tc.desc: Test UnsubscribeKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler keySubscriberHandler;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    EXPECT_NE(sess, nullptr);
-    int32_t subscribeId = 2;
-    int32_t ret1 = keySubscriberHandler.RemoveSubscriber(sess, subscribeId);
-    EXPECT_EQ(ret1, RET_ERR);
-    int32_t ret2 = keySubscriberHandler.UnsubscribeKeyEvent(sess, subscribeId);
-    EXPECT_EQ(ret2, RET_ERR);
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_01
- * @tc.desc: Test NotifySubscriber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    EXPECT_NE(sess, nullptr);
-    std::shared_ptr<KeyOption> keyOption;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    EXPECT_NE(keyEvent, nullptr);
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    EXPECT_NE(subscriber, nullptr);
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
-    ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_02
- * @tc.desc: Test NotifySubscriber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    EXPECT_NE(sess, nullptr);
-    std::shared_ptr<KeyOption> keyOption;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    EXPECT_NE(keyEvent, nullptr);
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    EXPECT_NE(subscriber, nullptr);
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_UP;
-    ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
 }
 
 /**
