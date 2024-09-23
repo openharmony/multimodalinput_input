@@ -322,7 +322,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     if (!lastPointerDownTime_.empty()) {
         int64_t diffTime = item.GetDownTime() - lastPointerDownTime_[0];
         if (diffTime > TWO_FINGERS_TIME_LIMIT) {
-            MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}lld", diffTime);
+            MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}" PRId64, diffTime);
             return;
         }
     }
