@@ -835,6 +835,7 @@ void InputWindowsManager::OnGestureSendEvent(std::shared_ptr<PointerEvent> event
         pointerEvent->UpdateId();
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
 
+        item.SetTargetWindowId(-1);
         pointerEvent->AddPointerItem(item);
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
@@ -872,7 +873,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
 
     windowsPerDisplay_ = windowsPerDisplay;
     for (const auto &window : displayGroupInfo.windowsInfo) {
-        if (window.windowInputType == WindowInputType::TRANSPARENT_VIEW && isSendDown) {
+        if (window.windowInputType == WindowInputType::TRANSPARENT_VIEW) {
             OnGestureSendEvent(lastTouchEvent_);
         }
     }
@@ -3011,7 +3012,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             if (isUiExtentionWindow) {
                 break;
             }
-            if (item.id == targetWindowId || item.windowInputType == WindowInputType::TRANSPARENT_VIEW) {
+            if (item.id == targetWindowId) {
                 touchWindow = &item;
                 break;
             }
