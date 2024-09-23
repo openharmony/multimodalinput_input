@@ -7786,7 +7786,8 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetIntervalSinceLastInput_002, Test
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken())
+        .WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -7805,7 +7806,8 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_001, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken())
+        .WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -7824,7 +7826,8 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_002, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken())
+        .WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -7843,7 +7846,8 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_003, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken())
+        .WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -7862,7 +7866,8 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_004, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken())
+        .WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -7881,7 +7886,8 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_005, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken())
+        .WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -7900,8 +7906,8 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_006, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillRepeatedly(Return(IMultimodalInputConnect
-        ::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken())
+        .WillRepeatedly(Return(IMultimodalInputConnect::GetDescriptor()));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
