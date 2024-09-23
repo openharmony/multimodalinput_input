@@ -583,7 +583,7 @@ public:
      */
     int32_t EnableInputDevice(bool enable);
 
-     /**
+    /**
      * @brief 自定义设置快捷键拉起ability延迟时间
      * @param businessId 应用在ability_launch_config.json中注册的唯一标识符.
      * @param delay 延迟时间 0-4000ms
@@ -772,22 +772,6 @@ public:
     int32_t GetPointerSnapshot(void *pixelMapPtr);
 
     /**
-     * @brief Sets the number of the touchpad scrolling rows.
-     * @param rows Indicates the number of the touchpad scrolling rows.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 12
-     */
-    int32_t SetTouchpadScrollRows(int32_t rows);
-
-    /**
-     * @brief Gets the number of the touchpad scrolling rows.
-     * @param rows Indicates the number of the touchpad scrolling rows.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 12
-     */
-    int32_t GetTouchpadScrollRows(int32_t &rows);
-
-    /**
      * @brief ClearWindowPointerStyle.
      * @param pid Indicates pid.
      * @param windowId Indicates windowId.
@@ -817,8 +801,6 @@ public:
     */
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 
-    int32_t MarkProcessed(int32_t eventId, int64_t actionTime, bool enable = true);
-
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 
     void Authorize(bool isAuthorize);
@@ -841,11 +823,13 @@ public:
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
 
+    int32_t MarkProcessed(int32_t eventId, int64_t actionTime, bool enable = true);
+
     /**
      * @brief Set the switch of touchpad rotate.
      * @param rotateSwitch Indicates the touchpad rotate switch state.
      * @return 0 if success; returns a non-0 value otherwise.
-     * @since 11
+     * @since 12
      */
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
 
@@ -853,17 +837,9 @@ public:
      * @brief Get the switch of touchpad rotate.
      * @param rotateSwitch Indicates the touchpad rotate switch state.
      * @return 0 if success; returns a non-0 value otherwise.
-     * @since 11
-     */
-    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
-
-    /**
-     * @brief Set touch move event filters.
-     * @param flag if set move event filters or not.
-     * @return if success; returns a non-0 value otherwise.
      * @since 12
      */
-    int32_t SetMoveEventFilters(bool flag);
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
     /**
      * @brief Get whether System has IrEmitter.
@@ -891,25 +867,6 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
 
     int32_t SetCurrentUser(int32_t userId);
-    
-    /**
-     * @brief Set the switch of touchpad three finger tap.
-     * @param switchFlag Indicates the touchpad three finger tap switch state.
-     *  true: user can use three finger function. otherwise can't use
-     * @return if success; returns a non-0 value otherwise.
-     * @since 12
-     */
-    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
-
-    /**
-     * @brief Get the switch of touchpad three finger tap.
-     * @param switchFlag Indicates the touchpad three finger tap switch state.
-     * true: user can use three finger function. otherwise can't use
-     * @return if success; returns a non-0 value otherwise.
-     * @since 12
-     */
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
-    
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
     
     /**
@@ -931,8 +888,6 @@ public:
 
     int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
-
-    int32_t SkipPointerLayer(bool isSkip);
 
 private:
     InputManager() = default;

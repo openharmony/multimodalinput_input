@@ -130,25 +130,5 @@ void TouchEventNormalize::GetTouchpadRotateSwitch(bool &rotateSwitch) const
 {
     TouchPadTransformProcessor::GetTouchpadRotateSwitch(rotateSwitch);
 }
-
-int32_t TouchEventNormalize::SetTouchpadThreeFingersTapSwitch(bool switchFlag) const
-{
-    return TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(switchFlag);
-}
-
-int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(bool &switchFlag) const
-{
-    return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(switchFlag);
-}
-
-int32_t TouchEventNormalize::SetTouchpadScrollRows(int32_t rows)
-{
-    return TouchPadTransformProcessor::SetTouchpadScrollRows(rows);
-}
-
-int32_t TouchEventNormalize::GetTouchpadScrollRows() const
-{
-    return TouchPadTransformProcessor::GetTouchpadScrollRows();
-}
 } // namespace MMI
 } // namespace OHOS
