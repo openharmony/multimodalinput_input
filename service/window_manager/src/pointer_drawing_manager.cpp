@@ -2161,18 +2161,18 @@ bool PointerDrawingManager::IsPointerVisible()
         }
     }
     if (!hapPidInfos_.empty()) {
-        if (pid_ == 0 && pidInfos_.empty()) {
-            auto info = hapPidInfos_.back();
-            MMI_HILOGI("Only hap visible pid:%{public}d-visible:%{public}s",
-                info.pid, info.visible ? "true" : "false");
-            return item.visible;
-        }
         for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
                 MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
                     item.pid, item.visible ? "true" : "false");
                 return item.visible;
             }
+        }
+        if (!(INPUT_DEV_MGR->HasPointerDevice() || IsMouseSimulate()) || pid_ == 0) {
+            auto info = hapPidInfos_.back();
+            MMI_HILOGI("Only hap visible pid:%{public}d-visible:%{public}s",
+                info.pid, info.visible ? "true" : "false");
+            return item.visible;
         }
     }
     if (pidInfos_.empty()) {
