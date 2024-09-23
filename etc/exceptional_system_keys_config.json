@@ -313,6 +313,12 @@
             "triggerType": "down"
         },
         {
+            "preKeys": [ 2076 ],
+            "finalKey": 2018,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
             "preKeys": [],
             "finalKey": 2050,
             "longPressTime": 0,
