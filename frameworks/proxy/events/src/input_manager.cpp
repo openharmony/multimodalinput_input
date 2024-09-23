@@ -133,6 +133,11 @@ int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, H
     return InputMgrImpl.AddMonitor(monitor, eventType);
 }
 
+int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, std::vector<int32_t> actionsType)
+{
+    return InputMgrImpl.AddMonitor(monitor, actionsType);
+}
+
 void InputManager::RemoveMonitor(int32_t monitorId)
 {
     InputMgrImpl.RemoveMonitor(monitorId);
