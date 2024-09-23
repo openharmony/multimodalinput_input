@@ -83,8 +83,6 @@ public:
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
-    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -175,8 +173,6 @@ public:
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
     int32_t GetPointerSnapshot(void *pixelMapPtr);
-    int32_t SetTouchpadScrollRows(int32_t rows);
-    int32_t GetTouchpadScrollRows(int32_t &rows);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid, int32_t eventId);
@@ -193,28 +189,24 @@ public:
     void AppendExtraData(const ExtraData& extraData);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
+    int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
 
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
 
-    int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
-
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
     void Authorize(bool isAuthorize);
     int32_t CancelInjection();
-
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t HasIrEmitter(bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
-    int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
-    int32_t SetMoveEventFilters(bool flag);
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     int32_t AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer);
-    int32_t SkipPointerLayer(bool isSkip);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

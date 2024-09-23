@@ -878,7 +878,7 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t deviceId, std::shared_ptr
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE),
         data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGD("Send request failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     ret = ParseInputDevice(reply, inputDevice);
@@ -905,7 +905,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t deviceId, int32_t &
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_TYPE),
         data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        MMI_HILOGD("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     READINT32(reply, keyboardType, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -1864,6 +1864,42 @@ int32_t MultimodalInputConnectProxy::CancelInjection()
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)
+    __attribute__((no_sanitize("cfi")))
+{
+    CALL_DEBUG_ENTER;
+    if (infoId < 0 || pixelMap == nullptr) {
+        MMI_HILOGE("Invalid infoId or pixelMap");
+        return RET_ERR;
+    }
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    if (pixelMapPtr->GetCapacity() == 0) {
+        MMI_HILOGE("pixelMap is empty");
+        return RET_ERR;
+    }
+    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
+        pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, infoId, ERR_INVALID_VALUE);
+    pixelMapPtr->Marshalling(data);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send request, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_DEBUG_ENTER;
@@ -1885,7 +1921,7 @@ int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
     }
     return RET_OK;
 }
-
+ 
 int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
     CALL_DEBUG_ENTER;
@@ -1919,7 +1955,7 @@ int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<Infrared
     }
     return ret;
 }
-
+ 
 int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_DEBUG_ENTER;
@@ -1947,64 +1983,6 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)
-    __attribute__((no_sanitize("cfi")))
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(pixelMap, RET_ERR);
-    if (infoId < 0) {
-        MMI_HILOGE("Invalid infoId");
-        return RET_ERR;
-    }
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
-    if (pixelMapPtr->GetCapacity() == 0) {
-        MMI_HILOGE("pixelMap is empty");
-        return RET_ERR;
-    }
-    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
-        pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEINT32(data, infoId, ERR_INVALID_VALUE);
-    pixelMapPtr->Marshalling(data);
-
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA), data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to send request, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectProxy::SetMoveEventFilters(bool flag)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    WRITEBOOL(data, flag, ERR_INVALID_VALUE);
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
-        SET_MOVE_EVENT_FILTERS), data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
 int32_t MultimodalInputConnectProxy::SetCurrentUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
@@ -2022,7 +2000,77 @@ int32_t MultimodalInputConnectProxy::SetCurrentUser(int32_t userId)
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
     }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(device, ERROR_NULL_POINTER);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    auto axisInfo = device->GetAxisInfo();
+    if (axisInfo.size() > MAX_AXIS_INFO) {
+        return RET_ERR;
+    }
+    WRITEINT32(data, device->GetId(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetType(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(data, device->GetName(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetBus(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetVersion(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetProduct(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetVendor(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(data, device->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(data, device->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT64(data, static_cast<uint64_t>(device->GetCapabilities()), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT32(data, static_cast<uint32_t>(axisInfo.size()), IPC_STUB_WRITE_PARCEL_ERR);
+    for (const auto &item : axisInfo) {
+        WRITEINT32(data, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetMaximum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetAxisType(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetFuzz(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetFlat(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetResolution(), IPC_STUB_WRITE_PARCEL_ERR);
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    READINT32(reply, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, deviceId, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
 }
 
@@ -2097,163 +2145,6 @@ int32_t MultimodalInputConnectProxy::GetPointerSnapshot(void *pixelMapPtr)
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetTouchpadScrollRows(int32_t rows)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEINT32(data, rows, ERR_INVALID_VALUE);
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TOUCHPAD_SCROLL_ROWS), data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectProxy::GetTouchpadScrollRows(int32_t &rows)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_SCROLL_ROWS), data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
-    }
-    READINT32(reply, rows, IPC_PROXY_DEAD_OBJECT_ERR);
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectProxy::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(device, ERROR_NULL_POINTER);
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    auto axisInfo = device->GetAxisInfo();
-    if (axisInfo.size() > MAX_AXIS_INFO) {
-        return RET_ERR;
-    }
-    WRITEINT32(data, device->GetId(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEINT32(data, device->GetType(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITESTRING(data, device->GetName(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEINT32(data, device->GetBus(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEINT32(data, device->GetVersion(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEINT32(data, device->GetProduct(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEINT32(data, device->GetVendor(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITESTRING(data, device->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITESTRING(data, device->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEUINT64(data, static_cast<uint64_t>(device->GetCapabilities()), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEUINT32(data, static_cast<uint32_t>(axisInfo.size()), IPC_STUB_WRITE_PARCEL_ERR);
-    for (const auto &item : axisInfo) {
-        WRITEINT32(data, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
-        WRITEINT32(data, item.GetMaximum(), IPC_STUB_WRITE_PARCEL_ERR);
-        WRITEINT32(data, item.GetAxisType(), IPC_STUB_WRITE_PARCEL_ERR);
-        WRITEINT32(data, item.GetFuzz(), IPC_STUB_WRITE_PARCEL_ERR);
-        WRITEINT32(data, item.GetFlat(), IPC_STUB_WRITE_PARCEL_ERR);
-        WRITEINT32(data, item.GetResolution(), IPC_STUB_WRITE_PARCEL_ERR);
-    }
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    MessageParcel reply;
-    MessageOption option;
-    int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE), data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    READINT32(reply, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    return ret;
-}
-
-int32_t MultimodalInputConnectProxy::RemoveVirtualInputDevice(int32_t deviceId)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEINT32(data, deviceId, ERR_INVALID_VALUE);
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE), data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return ret;
-    }
-    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
-    return ret;
-}
-
-int32_t MultimodalInputConnectProxy::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEBOOL(data, switchFlag, ERR_INVALID_VALUE);
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-                                      MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH),
-                                      data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("MultimodalInputConnectProxy::SetTouchpadSwitch Send request fail, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectProxy::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-                                      MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH),
-                                      data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThree Send request fail, ret:%{public}d", ret);
-    } else {
-        READBOOL(reply, switchFlag);
-    }
-    return RET_OK;
-}
-
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MultimodalInputConnectProxy::AncoAddChannel(sptr<IAncoChannel> channel)
 {
@@ -2323,30 +2214,6 @@ int32_t MultimodalInputConnectProxy::TransferBinderClientSrv(const sptr<IRemoteO
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE),
-        data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return ret;
-    }
-    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
-    return ret;
-}
-
-int32_t MultimodalInputConnectProxy::SkipPointerLayer(bool isSkip)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    WRITEBOOL(data, isSkip, ERR_INVALID_VALUE);
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SKIP_POINTER_LAYER),
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);

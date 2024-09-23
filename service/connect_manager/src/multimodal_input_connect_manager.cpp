@@ -54,7 +54,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
 
     const std::string programName(GetProgramName());
     int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
@@ -76,7 +76,7 @@ int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() co
 int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->GetDisplayBindInfo(infos);
 }
 
@@ -84,21 +84,21 @@ int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::map<std::t
     int32_t> &datas)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->GetAllMmiSubscribedEvents(datas);
 }
 
 int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
 }
 
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->GetWindowPid(windowId);
 }
 
@@ -106,28 +106,28 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
     int32_t priority, uint32_t deviceTags)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority, deviceTags);
 }
 
 int32_t MultimodalInputConnectManager::NotifyNapOnline()
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->NotifyNapOnline();
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputEventObserver()
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->RemoveInputEventObserver();
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->RemoveInputEventFilter(filterId);
 }
 
@@ -233,7 +233,6 @@ int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
 
 int32_t MultimodalInputConnectManager::MarkProcessed(int32_t eventType, int32_t eventId)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->MarkProcessed(eventType, eventId);
 }
@@ -678,15 +677,13 @@ int32_t MultimodalInputConnectManager::GetTouchpadRightClickType(int32_t &type)
 
 int32_t MultimodalInputConnectManager::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SetTouchpadRotateSwitch(rotateSwitch);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->GetTouchpadRotateSwitch(rotateSwitch);
 }
 
@@ -774,25 +771,18 @@ int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
     return multimodalInputConnectService_->SetCurrentUser(userId);
 }
 
-int32_t MultimodalInputConnectManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+int32_t MultimodalInputConnectManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetTouchpadThreeFingersTapSwitch(switchFlag);
+    return multimodalInputConnectService_->AddVirtualInputDevice(device, deviceId);
 }
 
-int32_t MultimodalInputConnectManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+int32_t MultimodalInputConnectManager::RemoveVirtualInputDevice(int32_t deviceId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->GetTouchpadThreeFingersTapSwitch(switchFlag);
-}
-
-int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetMoveEventFilters(flag);
+    return multimodalInputConnectService_->RemoveVirtualInputDevice(deviceId);
 }
 
 int32_t MultimodalInputConnectManager::EnableHardwareCursorStats(bool enable)
@@ -814,32 +804,6 @@ int32_t MultimodalInputConnectManager::GetPointerSnapshot(void *pixelMapPtr)
     return multimodalInputConnectService_->GetPointerSnapshot(pixelMapPtr);
 }
 
-int32_t MultimodalInputConnectManager::SetTouchpadScrollRows(int32_t rows)
-{
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetTouchpadScrollRows(rows);
-}
-
-int32_t MultimodalInputConnectManager::GetTouchpadScrollRows(int32_t &rows)
-{
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->GetTouchpadScrollRows(rows);
-}
-
-int32_t MultimodalInputConnectManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->AddVirtualInputDevice(device, deviceId);
-}
-
-int32_t MultimodalInputConnectManager::RemoveVirtualInputDevice(int32_t deviceId)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->RemoveVirtualInputDevice(deviceId);
-}
-
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MultimodalInputConnectManager::AncoAddChannel(sptr<IAncoChannel> channel)
 {
@@ -855,12 +819,5 @@ int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> chan
     return multimodalInputConnectService_->AncoRemoveChannel(channel);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
-
-int32_t MultimodalInputConnectManager::SkipPointerLayer(bool isSkip)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SkipPointerLayer(isSkip);
-}
 } // namespace MMI
 } // namespace OHOS
