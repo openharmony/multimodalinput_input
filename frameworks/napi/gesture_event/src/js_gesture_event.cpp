@@ -87,9 +87,9 @@ napi_value JsGestureEvent::Export(napi_env env, napi_value exports)
             GetNapiInt32(env, static_cast<int32_t>(TouchGesturAction::PINCH_OPENED))),
     };
     napi_value gestureActionType = nullptr;
-    CHKRP(napi_define_class(env, "TouchGesturAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "TouchGestureAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(gestureActionArr) / sizeof(*gestureActionArr), gestureActionArr, &gestureActionType), DEFINE_CLASS);
-    CHKRP(napi_set_named_property(env, exports, "TouchGesturAction", gestureActionType), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "TouchGestureAction", gestureActionType), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI
