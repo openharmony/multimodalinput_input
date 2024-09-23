@@ -229,8 +229,7 @@ bool TouchGestureDetector::WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent
 
 bool TouchGestureDetector::HandleFingerDown()
 {
-    int32_t fingersCount = downPoint_.size();
-    if (fingersCount < THREE_FINGER_COUNT) {
+    if (downPoint_.size() < THREE_FINGER_COUNT) {
         return false;
     }
     float maxDistance = GetMaxFingerSpacing();
