@@ -69,7 +69,7 @@ public:
             MMI_HILOGD("Display screen off");
             DISPLAY_MONITOR->SetScreenStatus(action);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
-                MMI_HILOGI("Disable fingerSense");
+                MMI_HILOGI("Disable fingersense");
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();

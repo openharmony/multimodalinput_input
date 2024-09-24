@@ -91,7 +91,7 @@ void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> p
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
         if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%{public}s", pointerEvent->DumpPointerAction());
+            MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%s", pointerEvent->DumpPointerAction());
         } else {
             MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%s", pointerEvent->DumpPointerAction());
         }

@@ -16,6 +16,8 @@
 #include "infrared_emitter_controller.h"
 
 #include <dlfcn.h>
+#include <memory>
+#include <mutex>
 
 #include "mmi_log.h"
 
@@ -27,7 +29,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    const std::string IR_WRAPPER_PATH { "libconsumer_ir_service_1.0.z.so" };
+const std::string IR_WRAPPER_PATH { "libconsumer_ir_service_1.0.z.so" };
+std::mutex mutex_;
 }
 using namespace OHOS::HDI::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
@@ -36,6 +39,7 @@ InfraredEmitterController::InfraredEmitterController() {}
 InfraredEmitterController::~InfraredEmitterController()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     irInterface_ = nullptr;
     if (soIrHandle_ != nullptr) {
         dlclose(soIrHandle_);
@@ -45,6 +49,7 @@ InfraredEmitterController::~InfraredEmitterController()
 
 InfraredEmitterController *InfraredEmitterController::GetInstance()
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     return instance_;
 }
 
@@ -90,6 +95,7 @@ void InfraredEmitterController::InitInfraredEmitter()
 bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     CHKPF(irInterface_);
     int32_t tempCarrierFreq = carrierFreq;
@@ -119,6 +125,7 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<
 bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     if (!irInterface_) {
         MMI_HILOGE("Infrared emitter not init");

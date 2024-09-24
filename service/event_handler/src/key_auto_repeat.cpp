@@ -118,10 +118,10 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
         TimerMgr->RemoveTimer(timerId_);
         if (!JudgeLimitPrint(keyEvent_)) {
             MMI_HILOGI("Stop autorepeat, keyCode:%{private}d, repeatKeyCode:%{private}d, keyAction: %{public}d,"
-                "timeId:%{public}d",
+                       "timeId:%{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction(), timerId_);
         } else {
-            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction: %d, timerId:%d",
+            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction: %d, timeId:%d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction(), timerId_);
         }
         timerId_ = -1;
