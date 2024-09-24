@@ -45,7 +45,6 @@ private:
     static GeneralTouchpad vTouchpad_;
     static LibinputWrapper libinput_;
     int32_t trackingID_ { 0 };
-    int32_t preScrollRows_ { 3 };
 
     TouchPadTransformProcessor g_processor_ { 0 };
     bool prePinchSwitch_ { true };
