@@ -3153,5 +3153,79 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
     InputWindowsManager inputWindowsManager;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.AdjustDisplayRotation());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_001
+ * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoint_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string uniq = "uniq";
+    EXPECT_CALL(*messageParcelMock_, GetBindDisplayNameByInputDevice(_)).WillRepeatedly(Return(uniq));
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    int32_t deviceId = 100;
+    libinput_event_touch touch {};
+    EventTouch touchInfo;
+    int32_t physicalDisplayId = 200;
+    displayInfo.id = 100;
+    displayInfo.uniq = "uniq";
+    displayInfo.width = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_FALSE(inputWindowsManager.TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_002
+ * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoint_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string uniq = "uniq";
+    EXPECT_CALL(*messageParcelMock_, GetBindDisplayNameByInputDevice(_)).WillRepeatedly(Return(uniq));
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    int32_t deviceId = 100;
+    libinput_event_touch touch {};
+    EventTouch touchInfo;
+    int32_t physicalDisplayId = 200;
+    displayInfo.id = 100;
+    displayInfo.uniq = "uniq";
+    displayInfo.width = 100;
+    displayInfo.height = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_FALSE(inputWindowsManager.TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_003
+ * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoint_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string uniq = "uniq";
+    EXPECT_CALL(*messageParcelMock_, GetBindDisplayNameByInputDevice(_)).WillRepeatedly(Return(uniq));
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    int32_t deviceId = 100;
+    libinput_event_touch touch {};
+    EventTouch touchInfo;
+    int32_t physicalDisplayId = 200;
+    displayInfo.id = 100;
+    displayInfo.uniq = "uniq";
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_TRUE(inputWindowsManager.TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+}
 } // namespace MMI
 } // namespace OHOS

@@ -6717,5 +6717,57 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag_001
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
     EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_DispatchPointerCancel_001
+ * @tc.desc: Test the funcation DispatchPointerCancel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t displayId = -1;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
+    inputWindowsManager.mouseDownInfo_.id = 10;
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = -1;
+    inputWindowsManager.firstBtnDownWindowInfo_.second = 10;
+    winInfo.id = 10;
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(10, winGroupInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointerCancel(displayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DispatchPointerCancel_002
+ * @tc.desc: Test the funcation DispatchPointerCancel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t displayId = -1;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
+    inputWindowsManager.mouseDownInfo_.id = 50;
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = -1;
+    inputWindowsManager.firstBtnDownWindowInfo_.second = 10;
+    winInfo.id = 10;
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(10, winGroupInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointerCancel(displayId));
+}
 } // namespace MMI
 } // namespace OHOS

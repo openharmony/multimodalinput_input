@@ -83,7 +83,10 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
 
 std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const
 {
-    return "";
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return "";
+    }
+    return DfsMessageParcel::messageParcel->GetBindDisplayNameByInputDevice(inputDeviceId);
 }
 
 std::set<std::pair<int32_t, std::string>> InputDisplayBindHelper::GetDisplayIdNames() const
