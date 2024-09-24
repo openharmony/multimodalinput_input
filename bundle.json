@@ -34,8 +34,7 @@
       "input_feature_switch",
       "input_feature_touchscreen",
       "input_feature_short_key",
-      "input_feature_fingerprint",
-      "input_feature_crown"
+      "input_feature_fingerprint"
     ],
     "adapted_system_type": [
       "standard"
@@ -77,13 +76,14 @@
         "relational_store",
         "faultloggerd",
         "ffrt",
-        "graphic_2d_ext",
         "hdf_core",
+        "qos_manager",
+        "call_manager",
         "bounds_checking_function",
         "call_manager",
         "libinput",
         "screenlock_mgr",
-	"player_framework"
+        "player_framework"
       ],
       "third_party": [
         "cJSON",

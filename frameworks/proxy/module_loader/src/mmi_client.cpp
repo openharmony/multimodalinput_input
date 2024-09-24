@@ -34,6 +34,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string THREAD_NAME { "OS_mmi_EventHdr" };
+const std::string SCENEBOARD_NAME { "com.ohos.sceneboard" };
 } // namespace
 
 using namespace AppExecFwk;
