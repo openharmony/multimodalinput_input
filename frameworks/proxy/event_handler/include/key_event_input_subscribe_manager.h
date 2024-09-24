@@ -36,6 +36,9 @@ public:
         SubscribeKeyEventInfo(std::shared_ptr<KeyOption> keyOption,
             std::function<void(std::shared_ptr<KeyEvent>)> callback);
         ~SubscribeKeyEventInfo() = default;
+        DISALLOW_MOVE(SubscribeKeyEventInfo);
+        SubscribeKeyEventInfo(const SubscribeKeyEventInfo &other);
+        SubscribeKeyEventInfo& operator = (const SubscribeKeyEventInfo &other);
 
         int32_t GetSubscribeId() const
         {
@@ -71,7 +74,7 @@ public:
     void OnConnected();
 
 private:
-    const SubscribeKeyEventInfo* GetSubscribeKeyEvent(int32_t id);
+    std::shared_ptr<const KeyEventInputSubscribeManager::SubscribeKeyEventInfo> GetSubscribeKeyEvent(int32_t id);
 
 private:
     std::set<SubscribeKeyEventInfo> subscribeInfos_;
