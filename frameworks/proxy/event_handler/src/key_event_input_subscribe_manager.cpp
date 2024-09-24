@@ -79,6 +79,21 @@ static bool operator<(const KeyOption &first, const KeyOption &second)
     return (first.GetFinalKeyDownDuration() < second.GetFinalKeyDownDuration());
 }
 
+KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(const SubscribeKeyEventInfo &other)
+    : keyOption_(other.keyOption_), callback_(other.callback_), subscribeId_(other.subscribeId_)
+{}
+
+KeyEventInputSubscribeManager::SubscribeKeyEventInfo& KeyEventInputSubscribeManager::SubscribeKeyEventInfo::operator 
+= (const SubscribeKeyEventInfo &other)
+{
+    if (this != &other) {
+        keyOption_ = other.keyOption_;
+        callback_ = other.callback_;
+        subscribeId_ = other.subscribeId_;
+    }
+    return *this;
+}
+
 bool KeyEventInputSubscribeManager::SubscribeKeyEventInfo::operator<(const SubscribeKeyEventInfo &other) const
 {
     if (keyOption_ == nullptr) {
@@ -173,6 +188,8 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
 
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto info = GetSubscribeKeyEvent(subscribeId);
+    std::shared_ptr<const KeyEventInputSubscribeManager::SubscribeKeyEventInfo> info =
+        GetSubscribeKeyEvent(subscribeId);
     CHKPR(info, ERROR_NULL_POINTER);
     auto callback = info->GetCallback();
     if (!callback) {
@@ -199,8 +216,8 @@ void KeyEventInputSubscribeManager::OnConnected()
     }
 }
 
-const KeyEventInputSubscribeManager::SubscribeKeyEventInfo* KeyEventInputSubscribeManager::GetSubscribeKeyEvent(
-    int32_t id)
+std::shared_ptr<const KeyEventInputSubscribeManager::SubscribeKeyEventInfo>
+KeyEventInputSubscribeManager::GetSubscribeKeyEvent(int32_t id)
 {
     if (id < 0) {
         MMI_HILOGE("Invalid input param id:%{public}d", id);
@@ -209,7 +226,7 @@ const KeyEventInputSubscribeManager::SubscribeKeyEventInfo* KeyEventInputSubscri
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == id) {
-            return &subscriber;
+            return std::make_shared<const SubscribeKeyEventInfo>(subscriber);
         }
     }
     return nullptr;
