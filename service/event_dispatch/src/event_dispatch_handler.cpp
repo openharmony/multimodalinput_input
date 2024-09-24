@@ -30,7 +30,6 @@
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "napi_constants.h"
 #include "proto.h"
@@ -132,19 +131,28 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
     std::shared_ptr<WindowInfo> curWindowInfo = std::make_shared<WindowInfo>(*windowInfo);
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         if (cancelEventList_.find(pointerId) == cancelEventList_.end()) {
-            cancelEventList_[pointerId] = std::set<std::shared_ptr<WindowInfo>, EventDispatchHandler::CancelCmp>();
+            cancelEventList_[pointerId] = std::vector<std::shared_ptr<WindowInfo>>(0);
         }
-        cancelEventList_[pointerId].insert(curWindowInfo);
+        cancelEventList_[pointerId].push_back(curWindowInfo);
     } else if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
-        if (cancelEventList_.find(pointerId) != cancelEventList_.end() &&
-            cancelEventList_[pointerId].find(curWindowInfo) != cancelEventList_[pointerId].end()) {
-            cancelEventList_[pointerId].erase(curWindowInfo);
-        } else {
+        if (cancelEventList_.find(pointerId) == cancelEventList_.end() ||
+            !SearchWindow(cancelEventList_[pointerId], curWindowInfo)) {
             return false;
         }
     }
     return true;
+}
+
+bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>> &windowList,
+                                        std::shared_ptr<WindowInfo> targetWindow)
+{
+    for (auto &window : windowList) {
+        if (window->id == targetWindow->id) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
@@ -196,6 +204,9 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        if (cancelEventList_.find(pointerId) != cancelEventList_.end()) {
+            cancelEventList_.erase(pointerId);
+        }
         WIN_MGR->ClearTargetWindowId(pointerId);
     }
 }
@@ -276,9 +287,9 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     FilterInvalidPointerItem(pointerEvent, fd);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+        InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
+    #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     int32_t pointerAc = pointerEvent->GetPointerAction();
     if (pointerAc == PointerEvent::POINTER_ACTION_PULL_DOWN || pointerAc == PointerEvent::POINTER_ACTION_UP ||
@@ -289,8 +300,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
-        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d, action:%{public}d",
-            sess->GetProgramName().c_str(), sess->GetPid(), pointerEvent->GetPointerAction());
+        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d", sess->GetProgramName().c_str(), sess->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
@@ -335,20 +345,18 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    MMI_HILOGD("Event dispatcher of server, KeyEvent:KeyCode:%{public}d, Action:%{public}d, EventType:%{public}d,"
+    MMI_HILOGD("Event dispatcher of server, KeyEvent:KeyCode:%{private}d, Action:%{public}d, EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
         if (!EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGW("The key event does not report normally, application not response."
-                "KeyEvent(deviceid:%{public}d, key action:%{public}d)",
-                key->GetDeviceId(), key->GetKeyAction());
+            MMI_HILOGW("The key event does not report normally, application not response.KeyEvent(deviceid:%{public}d,"
+                "key action:%{public}d)", key->GetDeviceId(), key->GetKeyAction());
         } else {
-            MMI_HILOGW("The key event does not report normally, application not response."
-                "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
-                key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
+            MMI_HILOGW("The key event does not report normally, application not response.KeyEvent(deviceid:%{public}d,"
+                "key action:%{public}d)", key->GetDeviceId(), key->GetKeyAction());
         }
         return RET_OK;
     }
