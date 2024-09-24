@@ -83,7 +83,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(cons
     : keyOption_(other.keyOption_), callback_(other.callback_), subscribeId_(other.subscribeId_)
 {}
 
-KeyEventInputSubscribeManager::SubscribeKeyEventInfo& KeyEventInputSubscribeManager::SubscribeKeyEventInfo::operator 
+KeyEventInputSubscribeManager::SubscribeKeyEventInfo& KeyEventInputSubscribeManager::SubscribeKeyEventInfo::operator
 = (const SubscribeKeyEventInfo &other)
 {
     if (this != &other) {
