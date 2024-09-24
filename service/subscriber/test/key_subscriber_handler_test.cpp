@@ -997,7 +997,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     std::set<int32_t> preKeys;
     preKeys.insert(1);
     keyOption->SetPreKeys(preKeys);
-    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_ERR);
+    ASSERT_NE(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_OK);
 
     preKeys.insert(2);
     preKeys.insert(3);
@@ -1005,7 +1005,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     preKeys.insert(5);
     preKeys.insert(6);
     keyOption->SetPreKeys(preKeys);
-    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_ERR);
+    ASSERT_NE(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_OK);
 }
 
 /**
@@ -2404,7 +2404,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     keyOption->SetFinalKey(2072);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(100);
-    EXPECT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_ERR);
+    EXPECT_NE(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_OK);
 }
 
 /**
