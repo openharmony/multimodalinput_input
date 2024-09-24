@@ -83,8 +83,8 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(cons
     : keyOption_(other.keyOption_), callback_(other.callback_), subscribeId_(other.subscribeId_)
 {}
 
-KeyEventInputSubscribeManager::SubscribeKeyEventInfo& KeyEventInputSubscribeManager::SubscribeKeyEventInfo::operator
-= (const SubscribeKeyEventInfo &other)
+KeyEventInputSubscribeManager::SubscribeKeyEventInfo& KeyEventInputSubscribeManager::SubscribeKeyEventInfo::operator=(
+    const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &other)
 {
     if (this != &other) {
         keyOption_ = other.keyOption_;
@@ -187,7 +187,6 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     }
 
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
-    auto info = GetSubscribeKeyEvent(subscribeId);
     std::shared_ptr<const KeyEventInputSubscribeManager::SubscribeKeyEventInfo> info =
         GetSubscribeKeyEvent(subscribeId);
     CHKPR(info, ERROR_NULL_POINTER);
