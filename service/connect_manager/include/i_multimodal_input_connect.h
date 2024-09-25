@@ -133,10 +133,10 @@ public:
     virtual int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) = 0;
     virtual int32_t Authorize(bool isAuthorize) = 0;
     virtual int32_t CancelInjection() = 0;
+    virtual int32_t SetPixelMapData(int32_t infoId, void* pixelMap) = 0;
     virtual int32_t HasIrEmitter(bool &hasIrEmitter) = 0;
     virtual int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) = 0;
     virtual int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) = 0;
-    virtual int32_t SetPixelMapData(int32_t infoId, void* pixelMap) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) = 0;
     virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;

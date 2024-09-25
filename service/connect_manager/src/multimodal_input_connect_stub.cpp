@@ -2380,6 +2380,28 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    auto device = std::make_shared<InputDevice>();
+    if (g_parseInputDevice(data, device) != RET_OK) {
+        MMI_HILOGE("ParseInputDevice failed");
+        return RET_ERR;
+    }
+    int32_t deviceId { -1 };
+    int32_t ret = AddVirtualInputDevice(device, deviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AddVirtualInputDevice failed");
+        return ret;
+    }
+    WRITEINT32(reply, deviceId);
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2430,28 +2452,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, 
         return ERR_INVALID_VALUE;
     }
     pixelMap->Marshalling(reply);
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-    auto device = std::make_shared<InputDevice>();
-    if (g_parseInputDevice(data, device) != RET_OK) {
-        MMI_HILOGE("ParseInputDevice failed");
-        return RET_ERR;
-    }
-    int32_t deviceId { -1 };
-    int32_t ret = AddVirtualInputDevice(device, deviceId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("AddVirtualInputDevice failed");
-        return ret;
-    }
-    WRITEINT32(reply, deviceId);
     return RET_OK;
 }
 
