@@ -342,9 +342,10 @@ IconStyle PointerDrawingManager::GetIconStyle(const MOUSE_ICON mouseStyle)
 {
     return {};
 }
-std::map<MOUSE_ICON, IconStyle> PointerDrawingManager::GetMouseIconPath()
+const std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIconPath()
 {
-    return {};
+    static std::map<MOUSE_ICON, IconStyle> emptyMap;
+    return emptyMap;
 }
 int32_t PointerDrawingManager::SwitchPointerStyle()
 {
