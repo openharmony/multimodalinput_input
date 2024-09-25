@@ -189,6 +189,7 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
         gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId);
     if (downPoint_.empty()) {
         if (isRecognized_) {
+            lastTouchEvent_->SetActionTime(GetSysClockTime());
             NotifyGestureEvent(lastTouchEvent_, GestureMode::ACTION_GESTURE_END);
         }
         ReleaseData();
