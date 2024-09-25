@@ -53,8 +53,6 @@ public:
     bool OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    static bool CheckInputDeviceSource(
-        const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags);
 
 private:
     void InitSessionLostCallback();
@@ -84,6 +82,7 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+        bool CheckInputDeviceSource(const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const;
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
         void OnSessionLost(SessionPtr session);

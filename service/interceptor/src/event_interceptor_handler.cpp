@@ -156,23 +156,6 @@ void EventInterceptorHandler::OnSessionLost(SessionPtr session)
     interceptors_.OnSessionLost(session);
 }
 
-bool EventInterceptorHandler::CheckInputDeviceSource(
-    const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags)
-{
-    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
-        ((deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) ||
-        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TABLET_TOOL)))) {
-        return true;
-    } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
-        return true;
-    } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) &&
-        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
-        return true;
-    }
-    return false;
-}
-
 void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CHKPV(keyEvent);
@@ -255,6 +238,23 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+bool EventInterceptorHandler::InterceptorCollection::CheckInputDeviceSource(
+    const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const
+{
+    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+        ((deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) ||
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TABLET_TOOL)))) {
+        return true;
+    } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
+        return true;
+    } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) &&
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
+        return true;
+    }
+    return false;
+}
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -282,7 +282,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
             MMI_HILOGD("Interceptor cap does not have pointer or touch");
             continue;
         }
-        if (!EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
+        if (!CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
             continue;
         }
 #ifndef OHOS_BUILD_EMULATOR
