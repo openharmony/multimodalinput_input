@@ -84,7 +84,7 @@ HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_StartNoticeAbility_001
     CALL_TEST_DEBUG;
     InjectNoticeManager injectNoticeMgr;
     injectNoticeMgr.isStartSrv_ = false;
-    ASSERT_FALSE(injectNoticeMgr.StartNoticeAbility());
+    EXPECT_FALSE(injectNoticeMgr.StartNoticeAbility());
 }
 
 /**
@@ -100,9 +100,9 @@ HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_ConnectNoticeSrv, Test
     injectNoticeMgr.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
     ASSERT_NE(injectNoticeMgr.connectionCallback_, nullptr);
     injectNoticeMgr.connectionCallback_->isConnected_ = true;
-    ASSERT_TRUE(injectNoticeMgr.ConnectNoticeSrv());
+    EXPECT_TRUE(injectNoticeMgr.ConnectNoticeSrv());
     injectNoticeMgr.connectionCallback_->isConnected_ = false;
-    ASSERT_FALSE(injectNoticeMgr.ConnectNoticeSrv());
+    EXPECT_FALSE(injectNoticeMgr.ConnectNoticeSrv());
 }
 } // namespace MMI
 } // namespace OHOS
