@@ -583,6 +583,70 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_01
+ * @tc.desc: Test the funcation HandleKnuckleGestureTouchMove
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->pointerId_ = 5;
+    pointerEvent->targetDisplayId_ = 10;
+    item.rawDisplayX_ = 20.0;
+    item.rawDisplayY_ = 25.0;
+    handler.gestureLastX_ = 1.0f;
+    handler.gestureLastY_ = 2.0f;
+
+    handler.isStartBase_ = true;
+    handler.isGesturing_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(pointerEvent));
+
+    handler.isGesturing_ = true;
+    handler.isLetterGesturing_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(pointerEvent));
+
+    handler.isLetterGesturing_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(pointerEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_04
+ * @tc.desc: Test the funcation HandleKnuckleGestureTouchUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    GESTURESENSE_WRAPPER->touchUp_ = [](const std::vector<float> &, const std::vector<int64_t> &, bool, bool)
+        -> int32_t {
+            return 0;
+    };
+    ASSERT_NE(GESTURESENSE_WRAPPER->touchUp_, nullptr);
+    handler.gesturePoints_.assign(LINE_COORDINATES.begin(), LINE_COORDINATES.end());
+    handler.gestureTimeStamps_.assign(LINE_TIMESTAMPS.begin(), LINE_TIMESTAMPS.end());
+    handler.isGesturing_ = true;
+    handler.isLetterGesturing_ = true;
+    NotifyType notifyType;
+    notifyType = NotifyType::REGIONGESTURE;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+
+    notifyType = NotifyType::LETTERGESTURE;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+
+    notifyType = NotifyType::OTHER;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandleKeyDown_001
  * @tc.desc: test HandleKeyDown
  * @tc.type: FUNC
