@@ -44,6 +44,7 @@ namespace MMI {
 namespace {
 constexpr int32_t DEFAULT_FRAME_RATE { 30 };
 constexpr int32_t INVALID_DISPLAY_ID { -1 };
+constexpr float HARDWARE_CANVAS_SIZE { 512.0f };
 } // namespace
 
 struct isMagicCursor {
@@ -131,6 +132,7 @@ private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
+    bool RetryGetSurfaceBuffer(sptr<OHOS::SurfaceBuffer> buffer, sptr<OHOS::Surface> layer);
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
     void DrawManager();
@@ -171,18 +173,16 @@ private:
     int32_t UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
     void CreateCanvasNode();
     void SetSurfaceNodeVisible(bool visible);
-    bool EnabeHardwareCursorAnimate();
     float CalculateHardwareXOffset(ICON_TYPE iconType);
     float CalculateHardwareYOffset(ICON_TYPE iconType);
     bool SetTraditionsHardWareCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY,
         ICON_TYPE iconType);
     void SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle);
-    int32_t CreateDynamicCanvas();
+    void CreateDynamicCanvas();
     int32_t ParsingDynamicImage(MOUSE_ICON mouseStyle);
     void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    void ResetDynamicVariable();
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
     int32_t RequestNextVSync();
@@ -192,6 +192,9 @@ private:
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
     void UpdateBindDisplayId(int32_t displayId);
+    void PostTaskRSLocation(int32_t physicalX, int32_t physicalY);
+    void DrawTraditionsCursor(MOUSE_ICON mouseStyle);
+    int32_t InitVsync(MOUSE_ICON mouseStyle);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
@@ -250,6 +253,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
