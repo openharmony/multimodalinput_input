@@ -502,6 +502,9 @@ int32_t JsInputMonitor::GetGestureAction(int32_t action) const
         case PointerEvent::TOUCH_ACTION_PINCH_CLOSEED: {
             return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::PINCH_CLOSED);
         }
+        case PointerEvent::TOUCH_ACTION_GESTURE_END: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::GESTURE_END);
+        }
         default: {
             MMI_HILOGW("unknow action, action:%{public}d", action);
             return RET_ERR;
