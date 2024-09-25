@@ -210,6 +210,8 @@ public:
 
     static constexpr int32_t TOUCH_ACTION_PINCH_CLOSEED = 105;
 
+    static constexpr int32_t TOUCH_ACTION_GESTURE_END = 106;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
