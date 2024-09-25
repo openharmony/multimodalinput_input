@@ -68,6 +68,7 @@ private:
     struct GestureHandler {
         TouchGestureType gestureType { TOUCH_GESTURE_TYPE_NONE };
         int32_t fingers { 0 };
+        bool gestureState { false };
     };
     struct Handler {
         int32_t handlerId_ { 0 };
@@ -86,7 +87,7 @@ private:
     {
         return false;
     }
-    bool IsMatchGesture(const Handler &handler, int32_t action, int32_t count) const;
+    bool IsMatchGesture(const Handler &handler, int32_t action, int32_t count);
     int32_t AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
         TouchGestureType gestureType, int32_t fingers, std::shared_ptr<IInputEventConsumer> consumer);
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,

@@ -771,11 +771,16 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
     ANRHDL->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
 }
 
-bool InputHandlerManager::IsMatchGesture(const Handler &handler, int32_t action, int32_t count) const
+bool InputHandlerManager::IsMatchGesture(const Handler &handler, int32_t action, int32_t count)
 {
     if ((handler.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
         return true;
     }
+    auto iter = monitorHandlers_.find(handler.handlerId_);
+    if (iter == monitorHandlers_.end()) {
+        return false;
+    }
+    GestureHandler &gestureHandler = iter->second.gestureHandler_;
     TouchGestureType type = TOUCH_GESTURE_TYPE_NONE;
     switch (action) {
         case PointerEvent::TOUCH_ACTION_SWIPE_DOWN:
@@ -788,15 +793,21 @@ bool InputHandlerManager::IsMatchGesture(const Handler &handler, int32_t action,
         case PointerEvent::TOUCH_ACTION_PINCH_CLOSEED:
             type = TOUCH_GESTURE_TYPE_PINCH;
             break;
-        case PointerEvent::TOUCH_ACTION_GESTURE_END:
+        case PointerEvent::TOUCH_ACTION_GESTURE_END: {
+            if (!gestureHandler.gestureState) {
+                return false;
+            }
+            gestureHandler.gestureState = false;
             return true;
+        }
         default: {
             MMI_HILOGW("Unknown action:%{public}d", action);
             return false;
         }
     }
-    if (((handler.gestureHandler_.gestureType & type) == type) &&
-        (handler.gestureHandler_.fingers == count || handler.gestureHandler_.fingers == ALL_FINGER_COUNT)) {
+    if (((gestureHandler.gestureType & type) == type) &&
+        (gestureHandler.fingers == count || gestureHandler.fingers == ALL_FINGER_COUNT)) {
+        gestureHandler.gestureState = true;
         return true;
     }
     return false;
