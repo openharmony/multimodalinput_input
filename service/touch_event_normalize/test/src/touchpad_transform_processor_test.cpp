@@ -260,12 +260,12 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
 }
 
 /**
- * @tc.name: TouchPadTransformProcessorTest_SetMultiFingersTapHdrDefault_001
- * @tc.desc: Test the behavior of SetMultiFingersTapHdrDefault
+ * @tc.name: TouchPadTransformProcessorTest_SetMULTI_FINGERTAP_HDRDefault_001
+ * @tc.desc: Test the behavior of SetMULTI_FINGERTAP_HDRDefault
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchPadTransformProcessorTest, SetMultiFingersTapHdrDefault_001, TestSize.Level1)
+HWTEST_F(TouchPadTransformProcessorTest, SetMULTI_FINGERTAP_HDRDefault_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     MultiFingersTapHandler processor;
@@ -1226,6 +1226,29 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
     processor.upCnt = 2;
     auto ret = processor.HandleMulFingersTap(touchpad, type);
     ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_CanUnsetPointerItem_001
+ * @tc.desc: test CanUnsetPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_CanUnsetPointerItem_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 530);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 440);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    ASSERT_TRUE(touchpad != nullptr);
+    MultiFingersTapHandler processor;
+
+    bool ret = processor.CanUnsetPointerItem(touchpad);
+    EXPECT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS

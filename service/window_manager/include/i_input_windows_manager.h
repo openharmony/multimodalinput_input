@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "libinput.h"
+
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "i_anco_channel.h"
@@ -81,7 +82,10 @@ public:
     virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
-
+    virtual bool CheckPidInSession(int32_t pid) = 0;
+    virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
+    virtual int32_t GetCurrentUserId() = 0;
+    virtual void SetFoldState () = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent) = 0;
@@ -102,6 +106,7 @@ public:
         PointerStyle &pointerStyle, bool isUiExtension = false) const = 0;
     virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
+    virtual bool IsMouseSimulate() const = 0;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     virtual bool IsNeedRefreshLayer(int32_t windowId) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING

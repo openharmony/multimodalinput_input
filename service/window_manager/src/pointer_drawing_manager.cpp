@@ -26,6 +26,7 @@
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #include "define_multimodal.h"
+#include "event_log_helper.h"
 #include "i_multimodal_input_connect.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
@@ -41,8 +42,8 @@
 #include "scene_board_judgement.h"
 #include "setting_datashare.h"
 #include "util.h"
-#include "dfx_hisysevent.h"
 #include "timer_manager.h"
+#include "system_ability_definition.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -87,12 +88,13 @@ constexpr float RUNNING_Y_RATIO { 0.675f };
 constexpr float INCREASE_RATIO { 1.22f };
 constexpr float ROTATION_ANGLE90 { 90.f };
 constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
-constexpr int32_t MAX_POINTER_COLOR { 0x00ffffff };
+constexpr int32_t MAX_POINTER_COLOR { 0xffffff };
 constexpr int32_t MIN_CURSOR_SIZE { 64 };
 constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
 constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
+constexpr int32_t MAX_TRY_TIMES { 10 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 bool g_isRsRemoteDied { false };
 constexpr uint64_t FOLD_SCREEN_ID_FULL { 0 };
@@ -100,6 +102,7 @@ constexpr uint64_t FOLD_SCREEN_ID_MAIN { 5 };
 constexpr int32_t CANVAS_SIZE { 256 };
 constexpr float IMAGE_PIXEL { 0.0f };
 constexpr int32_t QUEUE_SIZE { 5 };
+std::mutex mutex_;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -121,24 +124,11 @@ void RsRemoteDiedCallback()
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-void PointerDrawingManager::InitPointerCallback()
-{
-    MMI_HILOGI("Init RS Callback start");
-    g_isRsRemoteDied = false;
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (HasMagicCursor() && surfaceNode_ != nullptr) {
-        surfaceNode_ = nullptr;
-        MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
-    }
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-}
-
 PointerDrawingManager::PointerDrawingManager()
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMI_HILOGI("magiccurosr InitStyle");
+    int32_t counter_ = 0;
     hasMagicCursor_.name = "isMagicCursor";
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -148,10 +138,25 @@ PointerDrawingManager::PointerDrawingManager()
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
+void PointerDrawingManager::InitPointerCallback()
+{
+    MMI_HILOGI("Init RS observer start");
+    g_isRsRemoteDied = false;
+    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
+}
+
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
 {
     CALL_DEBUG_ENTER;
     return lastMouseStyle_;
+}
+
+void PointerDrawingManager::ForceClearPointerVisiableStatus()
+{
+    MMI_HILOGI("force clear all pointer visiable status");
+    pidInfos_.clear();
+    UpdatePointerVisible();
 }
 
 bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY)
@@ -169,23 +174,16 @@ bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physi
     return true;
 }
 
-void PointerDrawingManager::ForceClearPointerVisiableStatus()
-{
-    MMI_HILOGI("force clear all pointer visiable status");
-    pidInfos_.clear();
-    UpdatePointerVisible();
-}
-
 int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
     if (surfaceNode_ == nullptr) {
         return RET_ERR;
     }
+    MMI_HILOGD("Pointer window move success, pointerStyle id: %{public}d", pointerStyle.id);
     if (!SetHardWareLocation(displayId, physicalX, physicalY)) {
         return RET_ERR;
     }
-    MMI_HILOGD("Pointer window move success, pointerStyle id: %{public}d", pointerStyle.id);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
     if (cursorEnlarged) {
@@ -224,7 +222,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     Rosen::RSTransaction::FlushImplicitTransaction();
     UpdatePointerVisible();
     mouseIconUpdate_ = false;
-    MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
+    MMI_HILOGD("Leave, display:%{public}d, physicalX:%{private}d, physicalY:%{private}d",
         displayId, physicalX, physicalY);
     return RET_OK;
 }
@@ -245,7 +243,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     const PointerStyle pointerStyle, Direction direction)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Display:%{public}d, physicalX:%{public}d, physicalY:%{public}d, pointerStyle:%{public}d",
+    MMI_HILOGD("Display:%{public}d, physicalX:%{private}d, physicalY:%{private}d, pointerStyle:%{public}d",
         displayId, physicalX, physicalY, pointerStyle.id);
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
@@ -270,7 +268,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
-        MMI_HILOGD("magicCursor DrawPointer enter CreatePointerWindow");
+        MMI_HILOGI("magicCursor DrawPointer enter CreatePointerWindow");
         MAGIC_CURSOR->CreatePointerWindow(displayId, physicalX, physicalY, direction, surfaceNode_);
     } else {
         CreatePointerWindow(displayId, physicalX, physicalY, direction);
@@ -313,8 +311,10 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
     } else if (size > MAX_POINTER_SIZE) {
         size = MAX_POINTER_SIZE;
     }
+    MMI_HILOGD("imageWidth_: %{public}d before", imageWidth_);
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
+    MMI_HILOGD("imageWidth_: %{public}d after", imageWidth_);
     canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -327,10 +327,8 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
         direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
-        MAGIC_CURSOR->EnableCursorInversion();
         MAGIC_CURSOR->CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction, surfaceNode_);
     } else {
-        MAGIC_CURSOR->DisableCursorInversion();
         CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -363,9 +361,6 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     ErrCode ret =
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(magicCursorChangeObserver);
     if (ret != ERR_OK) {
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        DfxHisysevent::ReportMagicCursorFault(dynamicallyKey, "Register setting observer failed");
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         MMI_HILOGE("Register magic cursor change observer failed, ret:%{public}d", ret);
         magicCursorChangeObserver = nullptr;
     }
@@ -403,9 +398,6 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
         bool statusValue = false;
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        statusValue = true;
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
@@ -415,12 +407,12 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
         item.isShow = statusValue;
         this->UpdateStyleOptions();
         if (item.isShow != tmp) {
+            if (surfaceNode_ == nullptr) {
+                MMI_HILOGE("surfaceNode_ is nullptr, no need detach");
+                return;
+            }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-            MAGIC_CURSOR->InitRenderThread([]() { IPointerDrawingManager::GetInstance()->SwitchPointerStyle(); });
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-            CHKPV(surfaceNode_);
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-            MMI_HILOGD("switch pointer style");
+            MMI_HILOGI("switch pointer style");
             int64_t nodeId = surfaceNode_->GetId();
             if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
                 surfaceNode_->DetachToDisplay(screenId_);
@@ -431,13 +423,10 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         }
     };
-    sptr<SettingObserver> statusObserver =
-        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(item.name, updateFunc);
+    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(
+        MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(item.name, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        DfxHisysevent::ReportMagicCursorFault(item.name, "Register setting observer failed");
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
         return RET_ERR;
@@ -933,6 +922,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 {
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -1165,10 +1155,12 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
     userIcon_.reset(newPixelMap);
     userIconHotSpotX_ = static_cast<int32_t>((float)focusX * xAxis);
     userIconHotSpotY_ = static_cast<int32_t>((float)focusY * yAxis);
-    MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
-        "focusX:%{public}d, focuxY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"
-        "userIconHotSpotY_:%{public}d", cursorWidth, cursorHeight, imageInfo.size.width, imageInfo.size.height,
-        focusX, focusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
+    if (EventLogHelper::IsBetaVersion()) {
+        MMI_HILOGI("cursorWidth:%{private}d, cursorHeight:%{private}d, imageWidth:%{public}d, imageHeight:%{public}d,"
+            "focusX:%{private}d, focuxY:%{private}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{private}d,"
+            "userIconHotSpotY_:%{private}d", cursorWidth, cursorHeight, imageInfo.size.width, imageInfo.size.height,
+            focusX, focusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
+    }
     return RET_OK;
 }
 
@@ -1183,6 +1175,10 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     CHKPR(pixelMap, RET_ERR);
     if (windowId < 0) {
         MMI_HILOGE("get invalid windowId, %{public}d", windowId);
+        return RET_ERR;
+    }
+    if (!WIN_MGR->CheckPidInSession(pid)) {
+        MMI_HILOGE("The pid not exists in current session");
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
@@ -1371,9 +1367,10 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     GetPreferenceKey(name);
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, size);
     if (ret != RET_OK) {
-        MMI_HILOGE("Set pointer size failed, code:%{public}d", ret);
+        MMI_HILOGD("Set pointer size failed, code:%{public}d", ret);
         return ret;
     }
+    MMI_HILOGD("Set pointer size successfully, size:%{public}d", size);
 
     if (surfaceNode_ == nullptr) {
         MMI_HILOGI("surfaceNode_ is nullptr");
@@ -1403,8 +1400,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #else
     CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    if (ret != RET_OK) {
+    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
@@ -1497,12 +1493,10 @@ void PointerDrawingManager::DrawManager()
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
-            WIN_MGR->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
         DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
-        WIN_MGR->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
     }
@@ -1544,6 +1538,14 @@ void PointerDrawingManager::UpdatePointerVisible()
 bool PointerDrawingManager::IsPointerVisible()
 {
     CALL_DEBUG_ENTER;
+    if (!pidInfos_.empty()) {
+        auto info = pidInfos_.back();
+        if (!info.visible) {
+            MMI_HILOGI("High priority visible property:%{public}zu.%{public}d-visible:%{public}s",
+                pidInfos_.size(), info.pid, info.visible?"true":"false");
+            return info.visible;
+        }
+    }
     if (!hapPidInfos_.empty()) {
         for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
@@ -1566,7 +1568,8 @@ bool PointerDrawingManager::IsPointerVisible()
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("g_isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
+    std::lock_guard<std::mutex> guard(mutex_);
+    MMI_HILOGI("isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
     if (g_isRsRemoteDied && surfaceNode_ != nullptr) {
         g_isRsRemoteDied = false;
         surfaceNode_->DetachToDisplay(screenId_);
@@ -1655,7 +1658,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
     FixCursorPosition(x, y);
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
-    MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
+    MMI_HILOGD("Pointer window move, x:%{private}d, y:%{private}d", lastPhysicalX_, lastPhysicalY_);
     if (surfaceNode_ != nullptr) {
         surfaceNode_->SetBounds(x,
             y,
@@ -1699,6 +1702,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         }
         MMI_HILOGD("default path has changed from %{public}s to %{public}s",
             it->second.iconPath.c_str(), newIconPath.c_str());
+        it->second.iconPath = newIconPath;
         UpdateIconPath(MOUSE_ICON(MOUSE_ICON::DEFAULT), newIconPath);
     }
     lastMouseStyle_ = style;
@@ -1749,8 +1753,10 @@ std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIcons()
 
 void PointerDrawingManager::UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath)
 {
-    auto iter = mouseIcons_.find(mouseStyle);
-    if (iter == mouseIcons_.end()) {
+    CALL_DEBUG_ENTER;
+    std::map<MOUSE_ICON, IconStyle> &mouseIcons = GetMouseIcons();
+    auto iter = mouseIcons.find(mouseStyle);
+    if (iter == mouseIcons.end()) {
         MMI_HILOGE("Cannot find the mouseStyle:%{public}d", static_cast<int32_t>(mouseStyle));
         return;
     }
@@ -1762,9 +1768,11 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
     CALL_DEBUG_ENTER;
     std::string name = "pointerStyle";
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, pointerStyle.id);
-    if (ret == RET_OK) {
-        MMI_HILOGE("Set pointer style successfully, style:%{public}d", pointerStyle.id);
+    if (ret != RET_OK) {
+        MMI_HILOGD("Set pointer style failed, code:%{public}d", ret);
+        return ret;
     }
+    MMI_HILOGD("Set pointer style successfully, style:%{public}d", pointerStyle.id);
     return RET_OK;
 }
 
@@ -1809,7 +1817,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
     }
-    if (!INPUT_DEV_MGR->HasPointerDevice()) {
+    if (!INPUT_DEV_MGR->HasPointerDevice() && !WIN_MGR->IsMouseSimulate()) {
         MMI_HILOGD("The pointer device is not exist");
         return RET_OK;
     }
@@ -1862,9 +1870,10 @@ int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t wind
     return WIN_MGR->ClearWindowPointerStyle(pid, windowId);
 }
 
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate)
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    bool simulate = WIN_MGR->IsMouseSimulate();
     if (hasDisplay_ && (hasPointerDevice_ || simulate)) {
         if (surfaceNode_ != nullptr) {
             AttachToDisplay();
@@ -1987,15 +1996,6 @@ void PointerDrawingManager::RotateDegree(Direction direction)
     surfaceNode_->SetPivot(0, 0);
     float degree = (static_cast<int>(DIRECTION0) - static_cast<int>(direction)) * ROTATION_ANGLE90;
     surfaceNode_->SetRotation(degree);
-}
-
-int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
-{
-    CALL_INFO_TRACE;
-    if (surfaceNode_ != nullptr) {
-        surfaceNode_->SetSkipLayer(isSkip);
-    }
-    return RET_OK;
 }
 
 void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
