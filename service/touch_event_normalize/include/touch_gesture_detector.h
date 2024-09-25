@@ -30,7 +30,8 @@ enum class GestureMode {
     ACTION_SWIPE_LEFT,
     ACTION_SWIPE_RIGHT,
     ACTION_PINCH_CLOSED,
-    ACTION_PINCH_OPENED
+    ACTION_PINCH_OPENED,
+    ACTION_GESTURE_END
 };
 
 struct Point {

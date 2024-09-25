@@ -64,6 +64,8 @@ public:
             case PointerEvent::TOUCH_ACTION_PINCH_CLOSEED:
                 type = TOUCH_GESTURE_TYPE_PINCH;
                 break;
+            case PointerEvent::TOUCH_ACTION_GESTURE_END:
+                return true;
             default:
                 return false;
         }
