@@ -40,7 +40,6 @@ private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
-    int32_t preScrollRows_ { 3 };
 };
 
 class JoystickTransformProcessorTest : public testing::Test {

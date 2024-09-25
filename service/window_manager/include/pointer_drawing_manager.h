@@ -82,7 +82,7 @@ public:
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
-    void DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate = false) override;
+    void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -93,7 +93,7 @@ public:
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
     std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
-    IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
+    IconStyle GetIconStyle(const MOUSE_ICON mouseStyle);
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
@@ -106,7 +106,6 @@ public:
     void InitPointerCallback() override;
     void InitPointerObserver() override;
     void OnSessionLost(int32_t pid) override;
-    int32_t SkipPointerLayer(bool isSkip) override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
