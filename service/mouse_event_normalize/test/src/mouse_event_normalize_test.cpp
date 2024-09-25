@@ -16,6 +16,8 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
+#include "display_manager.h"
+
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
@@ -33,6 +35,7 @@ public:
     static void TearDownTestCase(void);
     static void SetupMouse();
     static void CloseMouse();
+    static void UpdateDisplayInfo();
 
     void SetUp();
     void TearDown();
@@ -58,6 +61,7 @@ void MouseEventNormalizeTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupMouse();
+    UpdateDisplayInfo();
 }
 
 void MouseEventNormalizeTest::TearDownTestCase(void)
@@ -83,6 +87,24 @@ void MouseEventNormalizeTest::CloseMouse()
 {
     libinput_.RemovePath(vMouse_.GetDevPath());
     vMouse_.Close();
+}
+
+void MouseEventNormalizeTest::UpdateDisplayInfo()
+{
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    ASSERT_TRUE(display != nullptr);
+
+    DisplayGroupInfo displays {
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+        .focusWindowId = -1,
+    };
+    displays.displaysInfo.push_back(DisplayInfo {
+        .name = "default display",
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+    });
+    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void MouseEventNormalizeTest::SetUp()
