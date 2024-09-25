@@ -51,18 +51,16 @@ bool HardwareCursorPointerManager::IsSupported()
         return false;
     }
     if (!isEnable_) {
-        MMI_HILOGI("Get hdi display composer service start");
         powerInterface_ = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
-        MMI_HILOGI("Get hdi display composer service end");
+        CHKPF(powerInterface_);
         isEnable_ = true;
     }
     CHKPF(powerInterface_);
     uint64_t value = 0;
-    MMI_HILOGD("Get display property");
-    auto ret = powerInterface_->GetDisplayProperty(devId_,
-        HDI::Display::Composer::V1_2::DISPLAY_CAPBILITY_HARDWARE_CURSOR, value);
-    if (ret != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
-        MMI_HILOGE("Get display property is error, ret:%{public}d", ret);
+    if (powerInterface_->GetDisplayProperty(devId_,
+        HDI::Display::Composer::V1_2::DISPLAY_CAPBILITY_HARDWARE_CURSOR, value)
+        != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("Get display property is error");
         isDeviceChange_ = true;
         return false;
     }
@@ -77,9 +75,8 @@ bool HardwareCursorPointerManager::IsSupported()
 int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 {
     CHKPR(powerInterface_, RET_ERR);
-    auto ret = powerInterface_->SetHardwareCursorPosition(devId_, x, y);
-    if (ret != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
-        MMI_HILOGE("Set hardware cursor position is error, ret:%{public}d", ret);
+    if (powerInterface_->SetHardwareCursorPosition(devId_, x, y) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("Set hardware cursor position is error");
         return RET_ERR;
     }
     MMI_HILOGD("SetPosition, x:%{private}d, y:%{private}d", x, y);
@@ -90,9 +87,8 @@ int32_t HardwareCursorPointerManager::EnableStats(bool enable)
 {
     CALL_DEBUG_ENTER;
     CHKPR(powerInterface_, RET_ERR);
-    auto ret = powerInterface_->EnableHardwareCursorStats(devId_, enable);
-    if (ret != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
-        MMI_HILOGE("Enable hardware cursor stats is error, ret:%{public}d", ret);
+    if (powerInterface_->EnableHardwareCursorStats(devId_, enable) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("Enable hardware cursor stats is error");
         return RET_ERR;
     }
     MMI_HILOGD("EnableStats, enable:%{public}d", enable);
@@ -103,9 +99,9 @@ int32_t HardwareCursorPointerManager::GetCursorStats(uint32_t &frameCount, uint3
 {
     CALL_DEBUG_ENTER;
     CHKPR(powerInterface_, RET_ERR);
-    auto ret = powerInterface_->GetHardwareCursorStats(devId_, frameCount, vsyncCount);
-    if (ret != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
-        MMI_HILOGE("Get hardware cursor stats is error, ret:%{public}d", ret);
+    if (powerInterface_->GetHardwareCursorStats(devId_, frameCount, vsyncCount) !=
+        HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("Get hardware cursor stats is error");
         return RET_ERR;
     }
     MMI_HILOGD("Get hardware cursor stats, frameCount:%{private}d, vsyncCount:%{private}d", frameCount, vsyncCount);
