@@ -2041,7 +2041,8 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     if (IsWindowRotation()) {
         direction = displayInfo_.direction;
     }
-    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
+    auto& iconPath = GetMouseIconPath();
+    AdjustMouseFocus(direction, ICON_TYPE(iconPath.at(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
         physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
@@ -2381,7 +2382,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         if (pointerStyle.id == MOUSE_ICON::DEFAULT) {
             newIconPath = DefaultIconPath;
         } else {
-            newIconPath = iconPath[MOUSE_ICON(pointerStyle.id)].iconPath;
+            newIconPath = iconPath.at(MOUSE_ICON(pointerStyle.id)).iconPath;
         }
         MMI_HILOGD("default path has changed from %{public}s to %{public}s",
             it->second.iconPath.c_str(), newIconPath.c_str());
@@ -2391,7 +2392,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
     return RET_OK;
 }
 
-std::map<MOUSE_ICON, IconStyle> PointerDrawingManager::GetMouseIconPath()
+const std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIconPath()
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -2482,7 +2483,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
             return RET_ERR;
         }
     }
-    auto iconPath = GetMouseIconPath();
+    auto& iconPath = GetMouseIconPath();
     if (iconPath.find(MOUSE_ICON(pointerStyle.id)) == iconPath.end()) {
         MMI_HILOGE("The param pointerStyle is invalid");
         return RET_ERR;
@@ -2505,7 +2506,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         return RET_OK;
     }
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        iconPath[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
+        iconPath.at(MOUSE_ICON(pointerStyle.id)).iconPath != DefaultIconPath)) {
         PointerStyle style;
         WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
         pointerStyle = style;
