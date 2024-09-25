@@ -30,7 +30,8 @@ public:
         SWIPE_LEFT,
         SWIPE_RIGHT,
         PINCH_CLOSED,
-        PINCH_OPENED
+        PINCH_OPENED,
+        GESTURE_END
     };
     JsGestureEvent() = default;
     ~JsGestureEvent() = default;

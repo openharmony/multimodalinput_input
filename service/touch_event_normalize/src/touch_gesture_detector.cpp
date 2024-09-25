@@ -185,6 +185,9 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
     MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
         gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId);
     if (downPoint_.empty()) {
+        if (isRecognized_) {
+            NotifyGestureEvent(event, GestureMode::ACTION_GESTURE_END);
+        }
         ReleaseData();
     }
 }
