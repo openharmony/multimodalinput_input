@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "display_manager.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
 #include "window_manager_lite.h"
@@ -74,6 +75,9 @@ public:
     ExtraData GetExtraData() const;
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
+    bool CheckPidInSession(int32_t pid);
+    int32_t GetCurrentUserId();
+    void SetFoldState ();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -98,6 +102,7 @@ public:
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
+    bool IsMouseSimulate() const;
     PointerStyle GetLastPointerStyle() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool IsNeedRefreshLayer(int32_t windowId);
@@ -126,6 +131,7 @@ public:
     bool IsAncoWindow(const WindowInfo &window) const;
     bool IsAncoWindowFocus(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateKeyExt(std::shared_ptr<KeyEvent> keyEvent);
     void DumpAncoWindows(std::string& out) const;
     void CleanShellWindowIds();
     bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent);
@@ -141,6 +147,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void UpdatePointerChangeAreas();
 #endif // OHOS_BUILD_ENABLE_POINTER
+
     std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId);
     void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds);
     void AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId);
@@ -154,9 +161,14 @@ public:
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
+    int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
+    void CleanInvalidPiexMap();
+    void HandleWindowPositionChange();
+    void SendCancelEventWhenWindowChange(int32_t pointerId);
+
 private:
-    void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
-    void OnFoldStatusChanged(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
@@ -290,6 +302,7 @@ private:
     MouseLocation mouseLocation_ = { -1, -1 };
     CursorPosition cursorPos_ {};
     std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
+    std::map<int32_t, WindowInfoEX> shellTouchItemDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
@@ -314,12 +327,15 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
-    uint32_t lastFoldStatus_ {};
+    std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEventforWindowChange_ { nullptr };
+    bool cancelTouchStatus_ { false };
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;
     bool isParseConfig_ { false };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
+    bool IsFoldable_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

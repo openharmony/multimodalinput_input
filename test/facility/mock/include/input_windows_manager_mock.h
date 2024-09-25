@@ -49,6 +49,8 @@ public:
     MOCK_METHOD(const std::vector<WindowInfo>&, GetWindowGroupInfoByDisplayId, (int32_t), (const));
     MOCK_METHOD((std::pair<double, double>), TransformWindowXY, (const WindowInfo&, double, double), (const));
     void ClearTargetWindowId(int32_t pointerId) override {}
+    MOCK_METHOD(bool, CheckPidInSession, (int32_t));
+    MOCK_METHOD(int32_t, GetCurrentUserId, ());
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     MOCK_METHOD((std::vector<std::pair<int32_t, TargetInfo>>), UpdateTarget, (std::shared_ptr<KeyEvent>));
@@ -56,6 +58,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));
+    MOCK_METHOD(void, SetFoldState, ());
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MOCK_METHOD(MouseLocation, GetMouseInfo, ());
@@ -64,6 +67,7 @@ public:
     void UpdateAndAdjustMouseLocation(int32_t&, double&, double&, bool) override {}
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
+    MOCK_METHOD(bool, IsMouseSimulate, (), (const));
     MOCK_METHOD(int32_t, SetPointerStyle, (int32_t, int32_t, PointerStyle, bool));
     MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
@@ -92,6 +96,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
+    MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
 
     void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
