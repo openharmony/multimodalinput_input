@@ -128,7 +128,7 @@ group("mmi_subscriber_tests") {
   testonly = true
   deps = [ ":key_shortcut_manager_test" ]
 
-  if (shortcut_key_rules_enabled) {
+  if (input_shortcut_key_rules_enabled) {
     deps += [ ":key_shortcut_rules_test" ]
   }
 }
