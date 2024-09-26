@@ -30,7 +30,8 @@ enum class GestureMode {
     ACTION_SWIPE_LEFT,
     ACTION_SWIPE_RIGHT,
     ACTION_PINCH_CLOSED,
-    ACTION_PINCH_OPENED
+    ACTION_PINCH_OPENED,
+    ACTION_GESTURE_END
 };
 
 struct Point {
@@ -109,6 +110,7 @@ private:
     std::map<int32_t, Point> movePoint_;
     std::map<int32_t, double> lastDistance_;
     std::shared_ptr<GestureListener> listener_ { nullptr };
+    std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
