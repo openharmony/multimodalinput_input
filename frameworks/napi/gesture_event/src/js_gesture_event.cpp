@@ -85,6 +85,8 @@ napi_value JsGestureEvent::Export(napi_env env, napi_value exports)
             GetNapiInt32(env, static_cast<int32_t>(TouchGesturAction::PINCH_CLOSED))),
         DECLARE_NAPI_STATIC_PROPERTY("PINCH_OPENED",
             GetNapiInt32(env, static_cast<int32_t>(TouchGesturAction::PINCH_OPENED))),
+        DECLARE_NAPI_STATIC_PROPERTY("GESTURE_END",
+            GetNapiInt32(env, static_cast<int32_t>(TouchGesturAction::GESTURE_END))),
     };
     napi_value gestureActionType = nullptr;
     CHKRP(napi_define_class(env, "TouchGestureAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,

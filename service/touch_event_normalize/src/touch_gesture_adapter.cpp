@@ -173,6 +173,9 @@ bool TouchGestureAdapter::OnGestureEvent(std::shared_ptr<PointerEvent> event, Ge
         case GestureMode::ACTION_PINCH_OPENED:
             pointEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_PINCH_OPENED);
             break;
+        case GestureMode::ACTION_GESTURE_END:
+            pointEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_GESTURE_END);
+            break;
         default:
             MMI_HILOGW("unknow mode:%{public}d", mode);
             return false;
