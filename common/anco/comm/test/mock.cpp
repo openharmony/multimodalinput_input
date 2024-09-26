@@ -21,11 +21,17 @@ namespace OHOS {
 using namespace OHOS::MMI;
 bool PointerEvent::ReadFromParcel(Parcel &in)
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->ReadFromParcel(in);
 }
 
 bool KeyEvent::ReadFromParcel(Parcel &in)
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->ReadFromParcel(in);
 }
 } // namespace OHOS
