@@ -358,9 +358,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
 
     if (windowInfo == nullptr && pointerEvent->GetTargetDisplayId() != firstBtnDownWindowInfo_.second) {
-        std::vector<WindowInfo> firstBtnDownWindowsInfo =
-            GetWindowGroupInfoByDisplayId(firstBtnDownWindowInfo_.second);
-        for (const auto &item : firstBtnDownWindowsInfo) {
+        windowsInfo.clear();
+        windowsInfo = GetWindowGroupInfoByDisplayId(firstBtnDownWindowInfo_.second);
+        for (const auto &item : windowsInfo) {
             bool checkUIExtentionWindow = false;
             // Determine whether it is a safety sub window
             for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
