@@ -29,7 +29,10 @@
 #include "i_input_event_handler.h"
 #include "key_command_handler.h"
 #include "key_subscriber_handler.h"
+#ifdef OHOS_BUILD_ENABLE_POINTER
 #include "mouse_event_normalize.h"
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 #include "switch_subscriber_handler.h"
 
 namespace OHOS {
@@ -43,7 +46,6 @@ public:
     void Init(UDSServer& udsServer);
     void OnEvent(void *event, int64_t frameTime);
     UDSServer *GetUDSServer() const;
-    int32_t SetMoveEventFilters(bool flag);
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;

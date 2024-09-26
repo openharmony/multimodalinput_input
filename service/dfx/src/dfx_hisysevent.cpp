@@ -560,7 +560,7 @@ void DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime, in
         "FINGERSENSE_KNOCK_EVENT_INFO",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "SK_S_T", FINGERSENSE_EVENT_TIMES,
-        "SKS_T_I", intervalTime,
+        "SKS_T_I", intervalTime / CONVERSION_US_TO_MS,
         "DKS_D_I", distanceInterval,
         "TP_INFO", GetTpVendorName(),
         "S_INFO", GetAccVendorName(),
@@ -661,7 +661,7 @@ void DfxHisysevent::ReportMagicCursorColorChange(std::string fill_Color, std::st
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MMI::MOUSE_ICON mouse_Style)
 {
     int32_t ret = HiSysEventWrite(
@@ -674,7 +674,7 @@ void DfxHisysevent::ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MM
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorSizeChange(std::string fill_Code, std::string mouse_Size)
 {
     int32_t ret = HiSysEventWrite(
@@ -687,7 +687,7 @@ void DfxHisysevent::ReportMagicCursorSizeChange(std::string fill_Code, std::stri
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorFault(std::string error_Code, std::string error_Name)
 {
     int32_t ret = HiSysEventWrite(
@@ -802,14 +802,14 @@ void DfxHisysevent::ReportKnuckleDrawSSuccessTimes()
 void DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(int32_t intervalTime)
 {
     intervalTime /= CONVERSION_US_TO_MS;
-    if (intervalTime >= FAIL_SUCC_TIME_DIFF) {
+    if (intervalTime < 0 || intervalTime >= FAIL_SUCC_TIME_DIFF) {
         return;
     }
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
         "FINGERSENSE_KNOCK_EVENT_INFO",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
-        "RG_S_F_TIME_DIFF", intervalTime / CONVERSION_US_TO_MS,
+        "RG_F_S_TIME_DIFF", intervalTime,
         "TP_INFO", GetTpVendorName(),
         "S_INFO", GetAccVendorName(),
         "LCD_INFO", GetLcdInfo());
@@ -821,14 +821,14 @@ void DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(int32_t intervalTi
 void DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(int32_t intervalTime)
 {
     intervalTime /= CONVERSION_US_TO_MS;
-    if (intervalTime >= FAIL_SUCC_TIME_DIFF) {
+    if (intervalTime < 0 || intervalTime >= FAIL_SUCC_TIME_DIFF) {
         return;
     }
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
         "FINGERSENSE_KNOCK_EVENT_INFO",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
-        "RG_F_S_TIME_DIFF", intervalTime / CONVERSION_US_TO_MS,
+        "RG_S_F_TIME_DIFF", intervalTime,
         "TP_INFO", GetTpVendorName(),
         "S_INFO", GetAccVendorName(),
         "LCD_INFO", GetLcdInfo());
@@ -853,7 +853,7 @@ void DfxHisysevent::ReportFailIfKnockTooFast()
     }
 }
 
-void DfxHisysevent::ReportFailIfOneSuccTwoFail(const std::shared_ptr<PointerEvent> touchEvent)
+void DfxHisysevent::ReportFailIfOneSuccTwoFail(std::shared_ptr<PointerEvent> touchEvent)
 {
     CHKPV(touchEvent);
     int32_t id = touchEvent->GetPointerId();
