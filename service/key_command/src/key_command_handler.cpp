@@ -320,7 +320,9 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (!lastPointerDownTime_.empty()) {
-        int64_t diffTime = item.GetDownTime() - lastPointerDownTime_[0];
+        int64_t lastPointerDownTime = touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ?
+            lastPointerDownTime_[SIMULATE_POINTER_ID] : lastPointerDownTime_[0];
+        int64_t diffTime = item.GetDownTime() - lastPointerDownTime;
         if (diffTime > TWO_FINGERS_TIME_LIMIT) {
             MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}" PRId64, diffTime);
             return;
