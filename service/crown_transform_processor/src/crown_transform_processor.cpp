@@ -113,18 +113,22 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
                 auto pointerEvent = sharedProcessor->GetPointerEvent();
                 CHKPV(pointerEvent);
                 sharedProcessor->HandleCrownRotateEnd();
+#ifndef OHOS_BUILD_ENABLE_POINTER
                 auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
                 CHKPV(inputEventNormalizeHandler);
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER
             });
 
             HandleCrownRotateBegin(rawPointerEvent);
         }
 
+#ifndef OHOS_BUILD_ENABLE_POINTER
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
         inputEventNormalizeHandler->HandlePointerEvent(pointerEvent_);
         DumpInner();
+#endif // OHOS_BUILD_ENABLE_POINTER
         return RET_OK;
     } else {
         MMI_HILOGE("The source is invalid, source:%{public}d", source);
@@ -188,6 +192,7 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double velocity, double
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
 
+#ifndef OHOS_BUILD_ENABLE_POINTER
     auto mouseInfo = WIN_MGR->GetMouseInfo();
 
     PointerEvent::PointerItem pointerItem;
@@ -221,6 +226,7 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double velocity, double
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
+#endif // OHOS_BUILD_ENABLE_POINTER
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
 }
 

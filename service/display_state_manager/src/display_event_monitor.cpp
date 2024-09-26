@@ -44,7 +44,6 @@ public:
     }
 
     virtual ~DisplyChangedReceiver() = default;
-    __attribute__((no_sanitize("cfi")))
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
         CALL_DEBUG_ENTER;
@@ -55,11 +54,12 @@ public:
         }
         MMI_HILOGD("Received screen status:%{public}s", action.c_str());
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-            MMI_HILOGI("Display screen on");
+            MMI_HILOGD("Display screen on");
             DISPLAY_MONITOR->SetScreenStatus(action);
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
             STYLUS_HANDLER->IsLaunchAbility();
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+            CHKPV(FINGERSENSE_WRAPPER);
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
                 MMI_HILOGI("Start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();
@@ -68,7 +68,9 @@ public:
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGD("Display screen off");
             DISPLAY_MONITOR->SetScreenStatus(action);
+            CHKPV(FINGERSENSE_WRAPPER);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
+                MMI_HILOGI("Disable fingersense");
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
@@ -144,10 +146,12 @@ bool DisplayEventMonitor::IsCommonEventSubscriberInit()
 void DisplayEventMonitor::SendCancelEventWhenLock()
 {
     CHKPV(delegateProxy_);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     delegateProxy_->OnPostSyncTask([] {
         WIN_MGR->SendCancelEventWhenLock();
         return RET_OK;
     });
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk
