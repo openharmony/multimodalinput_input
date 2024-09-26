@@ -64,6 +64,7 @@ private:
     std::map<napi_env, napi_ref> envManager_;
     int32_t nextId_ { 0 };
     std::mutex mutex_;
+    std::mutex envMutex_;
 };
 
 #define JS_INPUT_MONITOR_MGR JsInputMonitorManager::GetInstance()
