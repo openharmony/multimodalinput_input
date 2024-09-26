@@ -123,6 +123,8 @@ public:
      */
     static constexpr uint32_t EVENT_FLAG_SIMULATE_NAVIGATION = 0x00000200;
 
+    static constexpr uint32_t EVENT_FLAG_GENERATE_FROM_REAL = 0x00000400;
+
 public:
     /**
      * Copy constructor function for InputEvent
