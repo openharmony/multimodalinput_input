@@ -54,6 +54,7 @@ constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
 constexpr int32_t TOUCH_MAX_THRESHOLD = 20;
 constexpr int32_t TWO_FINGERS_DISTANCE_LIMIT = 16;
 constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
+constexpr int32_t SIMULATE_POINTER_ID = 10000;
 constexpr int32_t TOUCH_LIFT_LIMIT = 24;
 constexpr int32_t TOUCH_RIGHT_LIMIT = 24;
 constexpr int32_t TOUCH_TOP_LIMIT = 80;
