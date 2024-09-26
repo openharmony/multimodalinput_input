@@ -1361,7 +1361,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyboardType_001, TestSize.Level
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -1377,7 +1377,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
