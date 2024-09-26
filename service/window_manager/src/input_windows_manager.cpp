@@ -3134,7 +3134,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
-        bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
+        bool isCompensatePointer = (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+            !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) ||
+            (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
+            !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_GENERATE_FROM_REAL));
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
             MMI_HILOG_DISPATCHI("In Anco, WI:%{public}d, SI:%{public}d SW:%{public}d",
                 touchWindow->id, isCompensatePointer, isFirstSpecialWindow);
