@@ -892,7 +892,9 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+#ifdef SHORTCUT_KEY_RULES_ENABLED
     KEY_SHORTCUT_MGR->ResetCheckState();
+#endif // SHORTCUT_KEY_RULES_ENABLED
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
