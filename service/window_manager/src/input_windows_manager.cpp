@@ -3032,24 +3032,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
         } else if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
             item.defaultHotAreas, item)) {
-            int32_t windowId = 0;
             touchWindow = &item;
-            // Determine whether the landing point is a safety sub window
-            CheckUIExtentionWindowDefaultHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
-                item.uiExtentionWindowInfo, windowId);
-            bool isUiExtentionWindow = false;
-            if (windowId > 0) {
-                for (auto &windowinfo : item.uiExtentionWindowInfo) {
-                    if (windowinfo.id == windowId) {
-                        touchWindow = &windowinfo;
-                        isUiExtentionWindow = true;
-                        break;
-                    }
-                }
-            }
-            if (isUiExtentionWindow) {
-                break;
-            }
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
                 isFirstSpecialWindow = isSpecialWindow;
@@ -3067,10 +3050,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
                 isHotArea = true;
                 continue;
-            } else if (isHotArea) {
-                AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
-                break;
             } else {
+                std::pair<int32_t, int32_t> logicalXY(std::make_pair(static_cast<int32_t>(logicalX),
+                    static_cast<int32_t>(logicalY)));
+                // Determine whether the landing point is a safety sub window
+                CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent, item.uiExtentionWindowInfo,
+                    touchWindow);
                 break;
             }
         } else {
@@ -3310,14 +3295,31 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     return ERR_OK;
 }
 
-void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(int32_t logicalX, int32_t logicalY,
-    const std::vector<WindowInfo>& windowInfos, int32_t& windowId)
+void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t, int32_t> logicalXY,
+    bool isHotArea, const std::shared_ptr<PointerEvent> pointerEvent, const std::vector<WindowInfo>& windowInfos,
+    const WindowInfo* touchWindow)
 {
+    int32_t uiExtentionWindowInfo = 0;
+    int32_t windowdId = touchWindow->id;
+    int32_t logicalX = logicalXY.first;
+    int32_t logicalY = logicalXY.second;
     for (const auto& it : windowInfos) {
         if (IsInHotArea(logicalX, logicalY, it.defaultHotAreas, it)) {
-            windowId = it.id;
+            uiExtentionWindowInfo = it.id;
             break;
         }
+    }
+    if (uiExtentionWindowInfo > 0) {
+        for (auto &windowinfo : windowInfos) {
+            if (windowinfo.id == uiExtentionWindowInfo) {
+                touchWindow = &windowinfo;
+                AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), uiExtentionWindowInfo);
+                break;
+            }
+        }
+    }
+    if (isHotArea) {
+        AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), windowdId);
     }
 }
 
@@ -4048,6 +4050,11 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t w
     for (const auto &item : windowInfos) {
         if (windowId == item.id) {
             return std::make_optional(item);
+        }
+        for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
+            if (windowId == uiExtentionWindow.id) {
+                return std::make_optional(uiExtentionWindow);
+            }
         }
     }
     return std::nullopt;
