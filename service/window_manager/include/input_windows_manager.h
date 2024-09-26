@@ -381,6 +381,7 @@ private:
     bool isParseConfig_ { false };
     int32_t windowStateNotifyPid_ { -1 };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
+    std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
