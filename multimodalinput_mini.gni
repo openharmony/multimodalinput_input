@@ -50,8 +50,8 @@ declare_args() {
   input_feature_fingerprint = false
   input_feature_crown = false
   input_feature_move_event_filters = false
-  shortcut_key_manager_enabled = true
-  shortcut_key_rules_enabled = true
+  input_shortcut_key_manager_enabled = true
+  input_shortcut_key_rules_enabled = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -408,8 +408,8 @@ if (enable_player_framework) {
       [ "module_loader/src/input_screen_capture_agent.cpp" ]
 }
 
-if (shortcut_key_rules_enabled) {
-  shortcut_key_manager_enabled = true
+if (input_shortcut_key_rules_enabled) {
+  input_shortcut_key_manager_enabled = true
 }
 
 if (defined(global_parts_info) &&
