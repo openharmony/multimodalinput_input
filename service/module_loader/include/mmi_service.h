@@ -87,9 +87,9 @@ public:
     int32_t GetKeyboardRepeatDelay(int32_t &delay) override;
     int32_t GetKeyboardRepeatRate(int32_t &rate) override;
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) override;
+        int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) override;
+        int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
     int32_t AddGestureMonitor(InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
     int32_t RemoveGestureMonitor(InputHandlerType handlerType,
@@ -218,6 +218,8 @@ protected:
         int32_t priority, uint32_t deviceTags);
     int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags);
+    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType);
+    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
     int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
@@ -261,6 +263,7 @@ private:
     std::atomic<bool> isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
+    std::thread eventMonitorThread_;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t shellAssitentPid_ { -1 };
 #endif // OHOS_BUILD_ENABLE_ANCO

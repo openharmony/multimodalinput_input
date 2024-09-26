@@ -1802,8 +1802,7 @@ Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, 
     CHKPR(*preKeys, INPUT_PARAMETER_ERROR);
     CHKPR(preKeyCount, INPUT_PARAMETER_ERROR);
     std::set<int32_t> preKey = hotkey->preKeys;
-    int32_t size = preKey.size();
-    if (size <= 0) {
+    if (preKey.empty()) {
         MMI_HILOGE("The pressKeys not exit");
         return INPUT_SERVICE_EXCEPTION;
     }
@@ -1811,7 +1810,7 @@ Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, 
     for (auto it = preKey.begin(); it != preKey.end(); ++it) {
         *preKeys[index++] = *it;
     }
-    *preKeyCount = size;
+    *preKeyCount = index;
     return INPUT_SUCCESS;
 }
 
@@ -2047,6 +2046,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     std::lock_guard guard(g_CallBacksMutex);
 
     Input_HotkeyInfo *hotkeyInfo = new (std::nothrow) Input_HotkeyInfo();
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
         delete hotkeyInfo;
@@ -2142,6 +2142,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     std::lock_guard guard(g_CallBacksMutex);
 
     Input_HotkeyInfo *hotkeyInfo = new (std::nothrow) Input_HotkeyInfo();
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
         delete hotkeyInfo;

@@ -53,6 +53,7 @@ public:
     virtual bool IsSceneBoardEnabled() = 0;
     virtual bool IsWindowRotation() = 0;
     virtual int32_t GetDisplayId() = 0;
+    virtual std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -61,6 +62,7 @@ class MessageParcelMock : public DfsMessageParcel {
 public:
     MOCK_METHOD1(GetSession, SessionPtr(int32_t fd));
     MOCK_METHOD1(GetClientFd, int32_t(int32_t pid));
+    MOCK_METHOD1(GetBindDisplayNameByInputDevice, std::string(int32_t inputDeviceId));
     MOCK_METHOD0(HasPointerDevice, bool());
     MOCK_METHOD2(GetInputDevice, std::shared_ptr<InputDevice>(int32_t deviceId, bool checked));
     MOCK_METHOD0(GetMouseDisplayState, bool());

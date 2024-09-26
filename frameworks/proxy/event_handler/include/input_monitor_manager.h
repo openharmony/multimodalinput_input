@@ -37,6 +37,8 @@ public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
         HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
     int32_t RemoveMonitor(int32_t monitorId);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
+        std::vector<int32_t> actionsType);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     InputHandlerType GetHandlerType() const override;
 

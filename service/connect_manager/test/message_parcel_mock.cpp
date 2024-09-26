@@ -63,6 +63,14 @@ bool Parcel::WriteInt32(int32_t value)
     return DfsMessageParcel::messageParcel->WriteInt32(value);
 }
 
+bool Parcel::WriteInt64(int64_t value)
+{
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
+    return DfsMessageParcel::messageParcel->WriteInt64(value);
+}
+
 int32_t Parcel::ReadInt32()
 {
     if (DfsMessageParcel::messageParcel == nullptr) {

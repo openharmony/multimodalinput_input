@@ -16,7 +16,6 @@
 #include "mouse_transform_processor.h"
 
 #include <cinttypes>
-#include <chrono>
 #include <functional>
 
 #include <linux/input-event-codes.h>
@@ -75,7 +74,6 @@ const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.fo
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr char ROTATE_WINDOW_ROTATE { '0' };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
-constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 15 };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -206,14 +204,6 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
-        int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
-        GetTouchpadRightClickType(switchTypeData);
-        RightClickType switchType = RightClickType(switchTypeData);
-        if (type == LIBINPUT_EVENT_POINTER_TAP && switchType == RightClickType::TP_TWO_FINGER_TAP &&
-            button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
-            MMI_HILOGD("Right click up, do sleep");
-            std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_BUTTON_UP));
-        }
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);

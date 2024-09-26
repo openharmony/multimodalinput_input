@@ -40,6 +40,7 @@
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "event_dump.h"
+#include "event_statistic.h"
 #include "event_log_helper.h"
 #include "ffrt.h"
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -380,6 +381,8 @@ void MMIService::OnStart()
     AddReloadDeviceTimer();
     t_ = std::thread([this] {this->OnThread();});
     pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
+    eventMonitorThread_ = std::thread(&EventStatistic::WriteEventFile);
+    pthread_setname_np(eventMonitorThread_.native_handle(), "event-monitor");
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -799,7 +802,12 @@ int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    bool isHap = (!PER_HELPER->VerifySystemApp());
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    bool isHap = false;
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        isHap = true;
+    }
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, visible, priority, isHap] {
@@ -1283,10 +1291,18 @@ int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, Han
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
+
+int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerType, actionsType);
+}
+
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags)
+    uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
@@ -1296,11 +1312,20 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, handlerType, eventType, priority, deviceTags] {
-            return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
-        }
-        );
+    int32_t ret = RET_ERR;
+    if (actionsType.empty()) {
+        ret = delegateTasks_.PostSyncTask(
+            [this, pid, handlerType, eventType, priority, deviceTags] {
+                return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
+            }
+            );
+    } else {
+        ret = delegateTasks_.PostSyncTask(
+            [this, pid, handlerType, actionsType] {
+                return this->CheckAddInput(pid, handlerType, actionsType);
+            }
+            );
+    }
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return ret;
@@ -1332,19 +1357,35 @@ int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, 
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
+
+int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, actionsType);
+}
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags)
+    uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, handlerType, eventType, priority, deviceTags] {
-            return this->CheckRemoveInput(pid, handlerType, eventType, priority, deviceTags);
-        }
-        );
+    int32_t ret = RET_ERR;
+    if (actionsType.empty()) {
+        ret = delegateTasks_.PostSyncTask(
+            [this, pid, handlerType, eventType, priority, deviceTags] {
+                return this->CheckRemoveInput(pid, handlerType, eventType, priority, deviceTags);
+            }
+            );
+    } else {
+        ret = delegateTasks_.PostSyncTask(
+            [this, pid, handlerType, actionsType] {
+                return this->CheckRemoveInput(pid, handlerType, actionsType);
+            }
+            );
+    }
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
         return ret;
@@ -1636,6 +1677,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
+        WIN_MGR->SetFoldState();
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {

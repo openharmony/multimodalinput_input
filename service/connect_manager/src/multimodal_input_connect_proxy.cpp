@@ -999,7 +999,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardRepeatRate(int32_t &rate)
 }
 
 int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -1007,10 +1007,18 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
+    int32_t actionsTypeSize = actionsType.size();
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
-    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
-    WRITEINT32(data, priority, ERR_INVALID_VALUE);
-    WRITEUINT32(data, deviceTags, ERR_INVALID_VALUE);
+    WRITEINT32(data, actionsTypeSize, ERR_INVALID_VALUE);
+    if (actionsTypeSize == 0) {
+        WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
+        WRITEINT32(data, priority, ERR_INVALID_VALUE);
+        WRITEUINT32(data, deviceTags, ERR_INVALID_VALUE);
+    } else {
+        for (const auto &item : actionsType) {
+            WRITEINT32(data, item, ERR_INVALID_VALUE);
+        }
+    }
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -1024,7 +1032,7 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
 }
 
 int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -1032,10 +1040,19 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handler
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
+    int32_t actionsTypeSize = actionsType.size();
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
-    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
-    WRITEINT32(data, priority, ERR_INVALID_VALUE);
-    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
+    WRITEINT32(data, actionsTypeSize, ERR_INVALID_VALUE);
+    if (actionsType.empty()) {
+        WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
+        WRITEINT32(data, priority, ERR_INVALID_VALUE);
+        WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
+    } else {
+        WRITEINT32(data, static_cast<int32_t>(actionsType.size()));
+        for (const auto &item : actionsType) {
+            WRITEINT32(data, item);
+        }
+    }
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -1514,6 +1531,7 @@ int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData& extraData)
     for (const auto &item : extraData.buffer) {
         WRITEUINT8(data, item);
     }
+    WRITEINT32(data, extraData.toolType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pointerId, ERR_INVALID_VALUE);
     MessageParcel reply;

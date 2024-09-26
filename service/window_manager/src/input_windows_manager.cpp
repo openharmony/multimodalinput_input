@@ -101,6 +101,32 @@ enum PointerHotArea : int32_t {
     BOTTOM_RIGHT = 7,
 };
 
+enum SourceTool : int32_t {
+    UNKNOWN = 0,
+    FINGER = 1,
+    PEN = 2,
+    RUBBER = 3,
+    BRUSH = 4,
+    PENCIL = 5,
+    AIRBRUSH = 6,
+    MOUSE = 7,
+    LENS = 8,
+    TOUCHPAD = 9,
+    JOYSTICK = 10,
+};
+
+std::unordered_map<int32_t, int32_t> InputWindowsManager::convertToolTypeMap_ = {
+    {PointerEvent::TOOL_TYPE_FINGER, SourceTool::FINGER},
+    {PointerEvent::TOOL_TYPE_PEN, SourceTool::PEN},
+    {PointerEvent::TOOL_TYPE_RUBBER, SourceTool::RUBBER},
+    {PointerEvent::TOOL_TYPE_BRUSH, SourceTool::BRUSH},
+    {PointerEvent::TOOL_TYPE_PENCIL, SourceTool::PENCIL},
+    {PointerEvent::TOOL_TYPE_AIRBRUSH, SourceTool::AIRBRUSH},
+    {PointerEvent::TOOL_TYPE_MOUSE, SourceTool::MOUSE},
+    {PointerEvent::TOOL_TYPE_LENS, SourceTool::LENS},
+    {PointerEvent::TOOL_TYPE_TOUCHPAD, SourceTool::TOUCHPAD},
+};
+
 std::shared_ptr<IInputWindowsManager> IInputWindowsManager::instance_;
 std::mutex IInputWindowsManager::mutex_;
 
@@ -332,9 +358,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
 
     if (windowInfo == nullptr && pointerEvent->GetTargetDisplayId() != firstBtnDownWindowInfo_.second) {
-        std::vector<WindowInfo> firstBtnDownWindowsInfo =
-            GetWindowGroupInfoByDisplayId(firstBtnDownWindowInfo_.second);
-        for (const auto &item : firstBtnDownWindowsInfo) {
+        windowsInfo.clear();
+        windowsInfo = GetWindowGroupInfoByDisplayId(firstBtnDownWindowInfo_.second);
+        for (const auto &item : windowsInfo) {
             bool checkUIExtentionWindow = false;
             // Determine whether it is a safety sub window
             for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
@@ -1522,6 +1548,18 @@ void InputWindowsManager::PrintDisplayInfo()
     }
 }
 
+int32_t InputWindowsManager::ConvertToolType(int32_t toolType)
+{
+    CALL_DEBUG_ENTER;
+    int32_t toolTypeData = -1;
+    auto it = convertToolTypeMap_.find(toolType);
+
+    if (it != convertToolTypeMap_.end()) {
+        toolTypeData = it->second;
+    }
+    return toolTypeData;
+}
+
 const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
     for (const auto &it : displayGroupInfo_.displaysInfo) {
@@ -2631,6 +2669,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
         MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        pointerEvent->SetAncoDeal(true);
         SimulatePointerExt(pointerEvent);
         return RET_OK;
     }
@@ -2980,10 +3019,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             winMap.insert({item.id, item});
             continue;
         }
-
-        bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+        bool checkToolType = false;
+        if (extraData_.toolType == SourceTool::UNKNOWN) {
+            checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+                ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
+                pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+        } else {
+            checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+                (ConvertToolType(pointerItem.GetToolType()) == extraData_.toolType &&
+                extraData_.pointerId == pointerId);
+        }
         checkToolType = checkToolType || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
         if (checkToolType) {
             MMI_HILOG_DISPATCHD("Enter checkToolType");
@@ -3113,6 +3158,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
         MMI_HILOG_DISPATCHD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        std::vector<int32_t> windowIds;
+        GetTargetWindowIds(pointerId, pointerEvent->GetSourceType(), windowIds);
+        if (windowIds.size() <= 1) {
+            pointerEvent->SetAncoDeal(true);
+        }
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
         bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
@@ -3141,6 +3191,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (displayGroupInfo_.focusWindowId == touchWindow->id) {
             return RET_OK;
         }
+        pointerEvent->SetAncoDeal(false);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
@@ -3173,9 +3224,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+    bool checkExtraData = false;
+    if (extraData_.toolType == SourceTool::UNKNOWN) {
+        checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
+            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+    } else {
+        checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+            (ConvertToolType(pointerItem.GetToolType()) == extraData_.toolType && extraData_.pointerId == pointerId);
+    }
+
     checkExtraData = checkExtraData || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if ((pointerAction == PointerEvent::POINTER_ACTION_DOWN) && !checkExtraData) {
@@ -3547,7 +3605,10 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     pointerActionFlag_ = pointerEvent->GetPointerAction();
-    if (Rosen::DisplayManager::GetInstance().IsFoldable() && IgnoreTouchEvent(pointerEvent)) {
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    pointerEvent->SetAncoDeal(false);
+#endif // OHOS_BUILD_ENABLE_ANCO
+    if (IsFoldable_ && IgnoreTouchEvent(pointerEvent)) {
         MMI_HILOG_DISPATCHD("Ignore touch event, pointerAction:%{public}d", pointerActionFlag_);
         return RET_OK;
     };
@@ -3795,6 +3856,7 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
 {
     CALL_DEBUG_ENTER;
     extraData_.appended = extraData.appended;
+    extraData_.toolType = extraData.toolType;
     extraData_.buffer = extraData.buffer;
     extraData_.sourceType = extraData.sourceType;
     extraData_.pointerId = extraData.pointerId;
@@ -3805,6 +3867,7 @@ void InputWindowsManager::ClearExtraData()
 {
     CALL_DEBUG_ENTER;
     extraData_.appended = false;
+    extraData_.toolType = -1;
     extraData_.buffer.clear();
     extraData_.sourceType = -1;
     extraData_.pointerId = -1;
@@ -4358,12 +4421,14 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
 void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId)
 {
     CHKPV(keyEvent);
+    bool hasFound = false;
     for (const auto &item : windowsPerDisplay_) {
         if (item.second.focusWindowId == focusWindowId) {
             keyEvent->SetTargetDisplayId(item.second.displayId);
+            hasFound = true;
         }
     }
-    if (!displayGroupInfo_.displaysInfo.empty()) {
+    if (!hasFound && !displayGroupInfo_.displaysInfo.empty()) {
         keyEvent->SetTargetDisplayId(displayGroupInfo_.displaysInfo[0].id);
     }
 }
@@ -4381,6 +4446,11 @@ bool InputWindowsManager::OnDisplayRemoved(const DisplayGroupInfo &displayGroupI
 int32_t InputWindowsManager::GetCurrentUserId()
 {
     return currentUserId_;
+}
+
+void InputWindowsManager::SetFoldState()
+{
+    IsFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
 }
 } // namespace MMI
 } // namespace OHOS

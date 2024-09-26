@@ -163,6 +163,8 @@ public:
      */
     virtual void Reset();
 
+    virtual std::string ToString();
+
     /**
      * @brief Obtains the unique ID of an input event.
      * @return Returns the unique ID of the input event.

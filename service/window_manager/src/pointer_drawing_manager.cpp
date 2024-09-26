@@ -15,6 +15,8 @@
 
 #include "pointer_drawing_manager.h"
 
+#include <parameters.h>
+
 #include "image/bitmap.h"
 #include "image_source.h"
 #include "image_type.h"
@@ -48,6 +50,8 @@
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerDrawingManager"
+#define FOCUS_COORDINATES(FOCUS_COORDINATES_, CHANGE) float FOCUS_COORDINATES_##CHANGE
+#define CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) float CALCULATE_CANVAS_SIZE_##CHANGE
 
 namespace OHOS {
 namespace MMI {
@@ -60,6 +64,8 @@ const std::string POINTER_COLOR { "pointerColor" };
 const std::string POINTER_SIZE { "pointerSize" };
 const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
 const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
+const std::string POINTER_CURSOR_RENDER_RECEIVER_NAME { "PointerCursorReceiver" };
+const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
@@ -93,13 +99,21 @@ constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
 constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
+constexpr size_t RETRY_TIMES { 3 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 bool g_isRsRemoteDied { false };
+bool g_isHdiRemoteDied { false };
+bool g_isReStartVsync { false };
 constexpr uint64_t FOLD_SCREEN_ID_FULL { 0 };
 constexpr uint64_t FOLD_SCREEN_ID_MAIN { 5 };
-constexpr int32_t CANVAS_SIZE { 256 };
 constexpr float IMAGE_PIXEL { 0.0f };
+constexpr float CALCULATE_IMAGE_MIDDLE { 2.0f };
 constexpr int32_t QUEUE_SIZE { 5 };
+constexpr int32_t DYNAMIC_ROTATION_ANGLE { 12 };
+constexpr float CALCULATE_MOUSE_ICON_BAIS { 5.0f };
+constexpr int32_t SYNC_FENCE_WAIT_TIME { 3000 };
+float g_hardwareCanvasSize = { 512.0f };
+float g_focalPoint = { 256.0f };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -116,6 +130,8 @@ void RsRemoteDiedCallback()
 {
     CALL_INFO_TRACE;
     g_isRsRemoteDied = true;
+    g_isHdiRemoteDied = true;
+    g_isReStartVsync = true;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -153,6 +169,31 @@ void PointerDrawingManager::DestroyPointerWindow()
     });
 }
 
+static inline bool IsNum(const std::string &str)
+{
+    std::istringstream sin(str);
+    double num;
+    return (sin >> num) && sin.eof();
+}
+
+static float GetCanvasSize()
+{
+    auto ret = system::GetParameter("rosen.multimodalinput.pc.setcanvassize", "512.0");
+    if (IsNum(ret)) {
+        return g_hardwareCanvasSize;
+    }
+    return std::atoi(ret.c_str());
+}
+
+static float GetFocusCoordinates()
+{
+    auto ret = system::GetParameter("rosen.multimodalinput.pc.setfocuscoordinates", "256.0");
+    if (IsNum(ret)) {
+        return g_focalPoint;
+    }
+    return std::atoi(ret.c_str());
+}
+
 PointerDrawingManager::PointerDrawingManager()
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -163,6 +204,20 @@ PointerDrawingManager::PointerDrawingManager()
     InitStyle();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    g_hardwareCanvasSize = GetCanvasSize();
+    g_focalPoint = GetFocusCoordinates();
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+}
+
+PointerDrawingManager::~PointerDrawingManager()
+{
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (runner_ != nullptr) {
+        runner_->Stop();
+    }
+    if ((renderThread_ != nullptr) && renderThread_->joinable()) {
+        renderThread_->join();
+    }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
@@ -172,15 +227,146 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
     return lastMouseStyle_;
 }
 
-bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY)
+float PointerDrawingManager::CalculateHardwareXOffset(ICON_TYPE iconType)
 {
+    switch (iconType) {
+        case ANGLE_E:
+            return g_focalPoint;
+        case ANGLE_S:
+            return (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+        case ANGLE_W:
+            return (g_focalPoint - imageWidth_);
+        case ANGLE_N:
+            return (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+        case ANGLE_SE:
+            return (g_focalPoint - imageWidth_);
+        case ANGLE_NE:
+            return (g_focalPoint - imageWidth_);
+        case ANGLE_SW:
+            return g_focalPoint;
+        case ANGLE_NW:
+            return g_focalPoint;
+        case ANGLE_CENTER:
+            return (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+        case ANGLE_NW_RIGHT:
+            return g_focalPoint - CALCULATE_MOUSE_ICON_BAIS;
+        default:
+            MMI_HILOGW("No need calculate physicalX offset, iconType:%{public}d", iconType);
+            return g_focalPoint;
+    }
+}
+
+float PointerDrawingManager::CalculateHardwareYOffset(ICON_TYPE iconType)
+{
+    switch (iconType) {
+        case ANGLE_E:
+            return (g_focalPoint - (imageHeight_ / CALCULATE_IMAGE_MIDDLE));
+        case ANGLE_S:
+            return g_focalPoint;
+        case ANGLE_W:
+            return (g_focalPoint - imageHeight_);
+        case ANGLE_N:
+            return (g_focalPoint - imageHeight_);
+        case ANGLE_SE:
+            return (g_focalPoint - imageHeight_);
+        case ANGLE_NE:
+            return g_focalPoint;
+        case ANGLE_SW:
+            return (g_focalPoint - imageHeight_);
+        case ANGLE_NW:
+            return g_focalPoint;
+        case ANGLE_CENTER:
+            return (g_focalPoint - (imageHeight_ / CALCULATE_IMAGE_MIDDLE));
+        case ANGLE_NW_RIGHT:
+            return g_focalPoint;
+        default:
+            MMI_HILOGW("No need calculate physicalY offset, iconType:%{public}d", iconType);
+            return g_focalPoint;
+    }
+}
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+bool PointerDrawingManager::SetDynamicHardWareCursorLocation
+    (int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle)
+{
+    CHKPF(hardwareCursorPointerManager_);
+    CHKPF(surfaceNode_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    ICON_TYPE iconType = ICON_TYPE::ANGLE_NW;
+    if (mouseStyle == MOUSE_ICON::LOADING) {
+        iconType = ICON_TYPE::ANGLE_CENTER;
+    } else {
+        iconType = ICON_TYPE::ANGLE_NW;
+    }
+    if (hardwareCursorPointerManager_->IsSupported()) {
+    surfaceNode_->SetBounds((physicalX - CalculateHardwareXOffset(iconType)), (physicalY -
+        CalculateHardwareYOffset(iconType)), g_hardwareCanvasSize, g_hardwareCanvasSize);
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    return true;
+}
+
+void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physicalY)
+{
+    hardwareCanvasSize_ = g_hardwareCanvasSize;
+    PostTask([this, physicalX, physicalY]() -> void {
+        surfaceNode_->SetBounds(physicalX, physicalY, hardwareCanvasSize_, hardwareCanvasSize_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    });
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
+bool PointerDrawingManager::SetTraditionsHardWareCursorLocation(int32_t displayId, int32_t physicalX,
+    int32_t physicalY, ICON_TYPE iconType)
+{
+    bool magicCursorSetBounds = false;
+    if (UpdateSurfaceNodeBounds(physicalX, physicalY) == RET_OK) {
+        magicCursorSetBounds = true;
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPF(hardwareCursorPointerManager_);
+    CHKPF(surfaceNode_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (hardwareCursorPointerManager_->IsSupported() && (hasLoadingPointerStyle_ || hasHardwareCursorAnimate_)) {
+        if (hardwareCursorPointerManager_->SetPosition((physicalX -
+            CalculateHardwareXOffset(iconType)), (physicalY -
+            CalculateHardwareYOffset(iconType))) != RET_OK) {
+            MMI_HILOGE("Set hardware cursor position fail");
+            return false;
+        }
+        return true;
+    }
+    if (!magicCursorSetBounds) {
+        if (hardwareCursorPointerManager_->IsSupported()) {
+            // Change the coordinates issued by RS to asynchronous,
+            // without blocking the issuance of HardwareCursor coordinates.
+            PostTaskRSLocation((physicalX - CalculateHardwareXOffset(iconType)), (physicalY -
+                CalculateHardwareYOffset(iconType)));
+        } else {
+            surfaceNode_->SetBounds(physicalX, physicalY, surfaceNode_->GetStagingProperties().GetBounds().z_,
+                surfaceNode_->GetStagingProperties().GetBounds().w_);
+            Rosen::RSTransaction::FlushImplicitTransaction();
+        }
+    }
+#else
+    if (!magicCursorSetBounds) {
+        surfaceNode_->SetBounds(physicalX, physicalY,
+            surfaceNode_->GetStagingProperties().GetBounds().z_, surfaceNode_->GetStagingProperties().GetBounds().w_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hardwareCursorPointerManager_);
     hardwareCursorPointerManager_->SetTargetDevice(displayId);
     if (hardwareCursorPointerManager_->IsSupported()) {
-        if (hardwareCursorPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
+        if (hardwareCursorPointerManager_->SetPosition((physicalX - CalculateHardwareXOffset(
+            iconType)), (physicalY - CalculateHardwareYOffset(iconType))) != RET_OK) {
             MMI_HILOGE("Set hardware cursor position error");
-            return false;
         }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -194,16 +380,25 @@ void PointerDrawingManager::ForceClearPointerVisiableStatus()
     UpdatePointerVisible();
 }
 
+void PointerDrawingManager::SetSurfaceNodeVisible(bool visible)
+{
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    CHKPV(surfaceNode_);
+    if (!hardwareCursorPointerManager_->IsSupported()) {
+        surfaceNode_->SetVisible(visible);
+    }
+#else
+    surfaceNode_->SetVisible(visible);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+}
+
 int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
-    if (surfaceNode_ == nullptr) {
-        return RET_ERR;
-    }
-    if (!SetHardWareLocation(displayId, physicalX, physicalY)) {
-        return RET_ERR;
-    }
+    CHKPR(surfaceNode_, RET_ERR);
     MMI_HILOGD("Pointer window move success, pointerStyle id: %{public}d", pointerStyle.id);
+    displayId_ = displayId;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
     if (cursorEnlarged) {
@@ -218,8 +413,10 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     UpdateBindDisplayId(displayId);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
-        UpdateSurfaceNodeBounds(physicalX, physicalY);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        if (!SetTraditionsHardWareCursorLocation(displayId, physicalX, physicalY,
+            ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay))) {
+            return RET_ERR;
+        }
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle, id:%{public}d, size:%{public}d",
             pointerStyle.id, pointerStyle.size);
         return RET_OK;
@@ -229,16 +426,18 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         lastDirection_ = direction;
     }
     lastMouseStyle_ = pointerStyle;
-    surfaceNode_->SetVisible(false);
-    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    if (ret != RET_OK) {
+    SetSurfaceNodeVisible(false);
+    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         mouseIconUpdate_ = false;
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
-    UpdateSurfaceNodeBounds(physicalX, physicalY);
-    surfaceNode_->SetVisible(true);
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    SetSurfaceNodeVisible(true);
+    if (!SetTraditionsHardWareCursorLocation(displayId, physicalX, physicalY,
+        ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay))) {
+        MMI_HILOGE("Set traditions hardware cursor location error");
+        return RET_ERR;
+    }
     UpdatePointerVisible();
     mouseIconUpdate_ = false;
     MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
@@ -246,7 +445,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     return RET_OK;
 }
 
-void PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY)
+int32_t PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY)
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
@@ -257,28 +456,42 @@ void PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_t p
             surfaceNode_->SetBounds(physicalX, physicalY,
                 imageWidth_, imageHeight_);
         }
-    } else {
-        surfaceNode_->SetBounds(physicalX, physicalY,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
-            surfaceNode_->GetStagingProperties().GetBounds().w_);
+        return RET_OK;
     }
-#else
-    surfaceNode_->SetBounds(physicalX, physicalY,
-        surfaceNode_->GetStagingProperties().GetBounds().z_,
-        surfaceNode_->GetStagingProperties().GetBounds().w_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    return RET_ERR;
 }
 
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        surfaceNode_->SetBounds(physicalX, physicalY,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
-            surfaceNode_->GetStagingProperties().GetBounds().w_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        if (!SetTraditionsHardWareCursorLocation(displayId, physicalX, physicalY,
+            ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay))) {
+            return;
+        }
         MMI_HILOGD("Move pointer, physicalX:%d, physicalY:%d", physicalX, physicalY);
     }
+}
+
+void PointerDrawingManager::SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    PointerStyle pointerStyle)
+{
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    hardwareCursorPointerManager_->SetTargetDevice(displayId);
+    if (hardwareCursorPointerManager_->IsSupported() && lastMouseStyle_.id != MOUSE_ICON::LOADING &&
+            lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
+        if (hardwareCursorPointerManager_->SetPosition((physicalX - CalculateHardwareXOffset(ICON_TYPE(
+            mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay))), (physicalY - CalculateHardwareYOffset(
+                ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay)))) != RET_OK) {
+            MMI_HILOGE("Set hardware cursor position error");
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
@@ -292,18 +505,17 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
     currentDirection_ = direction;
-    std::map<MOUSE_ICON, IconStyle> iconPath = GetMouseIconPath();
-    if (pointerStyle.id == MOUSE_ICON::DEFAULT && iconPath[MOUSE_ICON(pointerStyle.id)].iconPath == CursorIconPath) {
-        AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
+    if (pointerStyle.id == MOUSE_ICON::DEFAULT && mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath == CursorIconPath) {
+        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
             physicalX, physicalY);
     } else {
-        AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
+        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay),
             physicalX, physicalY);
     }
     // Log printing only occurs when the mouse style changes
     if (currentMouseStyle_.id != lastMouseStyle_.id) {
         MMI_HILOGD("MagicCursor AdjustMouseFocus:%{public}d",
-            ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
+            ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay));
     }
     if (DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction) == RET_OK) {
         return;
@@ -320,12 +532,12 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     CHKPV(surfaceNode_);
     UpdateMouseStyle();
-    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    if (ret != RET_OK) {
+    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return;
     }
     UpdatePointerVisible();
+    SetHardwareCursorPosition(displayId, physicalX, physicalY, lastMouseStyle_);
     MMI_HILOGI("Leave, display:%{public}d, physicalX:%d, physicalY:%d", displayId, physicalX, physicalY);
 }
 
@@ -380,6 +592,7 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
         return ret;
     }
     UpdatePointerVisible();
+    SetHardwareCursorPosition(displayInfo_.id, physicalX, physicalY, lastMouseStyle_);
     return RET_OK;
 }
 
@@ -497,19 +710,129 @@ bool PointerDrawingManager::HasMagicCursor()
     return hasMagicCursor_.isShow;
 }
 
+void PointerDrawingManager::CreateDynamicCanvas()
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
+    if (dynamicBitmap_ == nullptr) {
+        dynamicBitmap_ = std::make_shared<OHOS::Rosen::Drawing::Bitmap>();
+    }
+    g_hardwareCanvasSize = GetCanvasSize();
+    dynamicBitmap_->Build(g_hardwareCanvasSize, g_hardwareCanvasSize, format);
+    if (dynamicCanvas_ == nullptr) {
+        dynamicCanvas_ = std::make_shared<OHOS::Rosen::Drawing::Canvas>();
+    }
+    dynamicCanvas_->Bind(*dynamicBitmap_);
+}
+
+int32_t PointerDrawingManager::ParsingDynamicImage(MOUSE_ICON mouseStyle)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelmap = nullptr;
+    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        MMI_HILOGD("Set mouseicon by userIcon_");
+        image_ = ExtractDrawingImage(userIcon_);
+    } else {
+        if (mouseStyle == MOUSE_ICON::RUNNING) {
+            pixelmap = DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_LEFT].iconPath);
+        } else {
+            pixelmap = DecodeImageToPixelMap(mouseIcons_[mouseStyle].iconPath);
+        }
+        CHKPR(pixelmap, RET_ERR);
+        if (mouseStyle == MOUSE_ICON::RUNNING_RIGHT) {
+            runningRightImage_ = ExtractDrawingImage(pixelmap);
+            CHKPR(runningRightImage_, RET_ERR);
+            return RET_OK;
+        }
+        image_ = ExtractDrawingImage(pixelmap);
+        CHKPR(image_, RET_ERR);
+    }
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void PointerDrawingManager::DrawTraditionsCursor(MOUSE_ICON mouseStyle)
+{
+    PostTask([this, mouseStyle]() -> void {
+        this->DrawCursor(mouseStyle);
+    });
+}
+
+int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
+{
+    if (ParsingDynamicImage(mouseStyle) != RET_OK) {
+        MMI_HILOGE("Parsing mouseStyle fail");
+        return RET_ERR;
+    }
+    if (ParsingDynamicImage(MOUSE_ICON::RUNNING_RIGHT) != RET_OK) {
+        MMI_HILOGE("Parsing mouse icon fail");
+        return RET_ERR;
+    }
+    if (mouseStyle == MOUSE_ICON::LOADING) {
+        hasLoadingPointerStyle_ = true;
+    } else if (mouseStyle == MOUSE_ICON::RUNNING) {
+        hasHardwareCursorAnimate_ = true;
+    }
+    CreateDynamicCanvas();
+    if (g_isReStartVsync) {
+        isRenderRuning_.store(true);
+        auto rsClient = std::static_pointer_cast<Rosen::RSRenderServiceClient>(
+            Rosen::RSIRenderClient::CreateRenderServiceClient());
+        CHKPR(rsClient, RET_ERR);
+        receiver_ = rsClient->CreateVSyncReceiver(POINTER_CURSOR_RENDER_RECEIVER_NAME, handler_);
+        if (receiver_ == nullptr || receiver_->Init() != VSYNC_ERROR_OK) {
+            MMI_HILOGE("Receiver init failed");
+            return RET_ERR;
+        }
+        g_isReStartVsync = false;
+    }
+    return RequestNextVSync();
+}
+
+bool PointerDrawingManager::RetryGetSurfaceBuffer(sptr<OHOS::SurfaceBuffer> buffer, sptr<OHOS::Surface> layer)
+{
+    bool ret = true;
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        for (size_t i = 0; i < RETRY_TIMES; i++) {
+            buffer = GetSurfaceBuffer(layer);
+            if (buffer != nullptr && buffer->GetVirAddr() != nullptr) {
+                ret = false;
+                break;
+            }
+        }
+    }
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor() && mouseStyle != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("magiccursor enter MAGIC_CURSOR->Initlayer");
         return MAGIC_CURSOR->InitLayer(mouseStyle);
-    } else {
-        MMI_HILOGD("magiccursor not enter MAGIC_CURSOR->Initlayer");
-        return DrawCursor(mouseStyle);
     }
-#else
-    return DrawCursor(mouseStyle);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPR(hardwareCursorPointerManager_, RET_ERR);
+    hasLoadingPointerStyle_ = false;
+    hasHardwareCursorAnimate_ = false;
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
+            return InitVsync(mouseStyle);
+        } else {
+            GetCanvasSize();
+            GetFocusCoordinates();
+            hardwareCanvasSize_ = g_hardwareCanvasSize;
+            // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
+            // repeatedly obtain the surfaceBuffer.
+            DrawTraditionsCursor(mouseStyle);
+            return RET_OK;
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    return DrawCursor(mouseStyle);
 }
 
 int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
@@ -533,12 +856,17 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     }
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
-        MMI_HILOGE("Init layer is failed, buffer or virAddr is nullptr");
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (RetryGetSurfaceBuffer(buffer, layer)) {
+            return RET_OK;
+        }
+#else
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
         return RET_ERR;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
@@ -562,6 +890,12 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
     CHKPV(surfaceNode_);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     Rosen::RSAnimationTimingProtocol protocol;
     if (mouseStyle != MOUSE_ICON::LOADING &&
         (mouseStyle != MOUSE_ICON::DEFAULT ||
@@ -681,15 +1015,178 @@ std::shared_ptr<Rosen::Drawing::Image> PointerDrawingManager::ExtractDrawingImag
     return image;
 }
 
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void PointerDrawingManager::PostTask(Rosen::RSTaskMessage::RSTask task)
+{
+    CHKPV(hardwareCursorPointerManager_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (handler_ != nullptr) {
+        handler_->PostTask(task);
+    }
+}
+
+void PointerDrawingManager::DoHardwareCursorDraw()
+{
+    CHKPV(hardwareCursorPointerManager_);
+    CHKPV(dynamicCanvas_);
+    CHKPV(dynamicBitmap_);
+    dynamicCanvas_->Save();
+    dynamicCanvas_->Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    FOCUS_COORDINATES(FOCUS_COORDINATES_, CHANGE) = GetFocusCoordinates();
+    CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) = GetCanvasSize();
+    if (hardwareCursorPointerManager_->IsSupported() && hasLoadingPointerStyle_) {
+        dynamicCanvas_->Rotate(DYNAMIC_ROTATION_ANGLE * currentFrame_, FOCUS_COORDINATES_CHANGE,
+            FOCUS_COORDINATES_CHANGE);
+        currentFrame_++;
+        if (currentFrame_ == frameCount_) {
+            currentFrame_ = 0;
+        }
+    }
+    DrawDynamicImage(*dynamicCanvas_, MOUSE_ICON(lastMouseStyle_.id));
+    if (hardwareCursorPointerManager_->IsSupported() && hasHardwareCursorAnimate_) {
+        dynamicCanvas_->Rotate(DYNAMIC_ROTATION_ANGLE * currentFrame_, (FOCUS_COORDINATES_CHANGE +
+            (imageWidth_ * RUNNING_X_RATIO)), (FOCUS_COORDINATES_CHANGE + (imageHeight_ * RUNNING_Y_RATIO)));
+        DrawDynamicImage(*dynamicCanvas_, MOUSE_ICON::RUNNING_RIGHT);
+        currentFrame_++;
+        if (currentFrame_ == frameCount_) {
+            currentFrame_ = 0;
+        }
+    }
+    dynamicCanvas_->Restore();
+    static constexpr uint32_t stride = 4;
+    uint32_t addrSize = buffer_->GetWidth() * buffer_->GetHeight() * stride;
+    CHKPV(addr_);
+    errno_t ret = memcpy_s(*addr_, addrSize, dynamicBitmap_->GetPixels(), addrSize);
+    if (ret != EOK) {
+        MMI_HILOGE("Memcpy data is error, ret:%{public}d", ret);
+    }
+}
+
+int32_t PointerDrawingManager::FlushBuffer()
+{
+    CHKPR(buffer_, RET_ERR);
+    CHKPR(layer_, RET_ERR);
+    OHOS::BufferFlushConfig flushConfig = {
+        .damage = {
+            .w = buffer_->GetWidth(),
+            .h = buffer_->GetHeight(),
+        },
+    };
+    OHOS::SurfaceError ret = layer_->FlushBuffer(buffer_, DEFAULT_VALUE, flushConfig);
+    if (ret != OHOS::SURFACE_ERROR_OK) {
+        MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
+    }
+    return ret;
+}
+
+int32_t PointerDrawingManager::GetSurfaceInformation()
+{
+    CHKPR(surfaceNode_, RET_ERR);
+    if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
+        MMI_HILOGE("Current mouse style is not equal to last mouse style");
+        return RET_ERR;
+    }
+    layer_ = GetLayer();
+    CHKPR(layer_, RET_ERR);
+    buffer_ = GetSurfaceBuffer(layer_);
+    if (buffer_ == nullptr || buffer_->GetVirAddr() == nullptr) {
+        MMI_HILOGE("Init layer is failed, buffer or virAddr is nullptr");
+        return RET_ERR;
+    }
+    addr_ = std::make_shared<uint8_t *>(static_cast<uint8_t *>(buffer_->GetVirAddr()));
+    CHKPR(addr_, RET_ERR);
+    return RET_OK;
+}
+
+void PointerDrawingManager::OnVsync(uint64_t timestamp)
+{
+    if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
+        MMI_HILOGE("Current mouse style is not equal to last mouse style");
+        return;
+    }
+    PostTask([this]() -> void {
+        if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
+            MMI_HILOGE("Current post task mouse style is not equal to last mouse style");
+            return;
+        }
+        if (GetSurfaceInformation() != RET_OK) {
+            MMI_HILOGE("OnVsync Get surface information fail");
+            return;
+        }
+        DoHardwareCursorDraw();
+        FlushBuffer();
+        UpdatePointerVisible();
+        mouseIconUpdate_ = false;
+        if (!SetDynamicHardWareCursorLocation(lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(lastMouseStyle_.id))) {
+            MMI_HILOGE("OnVsync set dynamic hardware cursor location error");
+            return;
+        }
+    });
+    RequestNextVSync();
+}
+
+int32_t PointerDrawingManager::RequestNextVSync()
+{
+    if (handler_ != nullptr) {
+        Rosen::VSyncReceiver::FrameCallback fcb = {
+            .userData_ = this,
+            .callback_ = [this] (uint64_t timestamp, void*) {
+                return this->OnVsync(timestamp);
+            },
+        };
+        if (receiver_ != nullptr) {
+            receiver_->RequestNextVSync(fcb);
+            return RET_OK;
+        }
+    }
+    return RET_ERR;
+}
+
+void PointerDrawingManager::RenderThreadLoop()
+{
+    isRenderRuning_.store(true);
+    runner_ = AppExecFwk::EventRunner::Create(false);
+    CHKPV(runner_);
+    handler_ = std::make_shared<AppExecFwk::EventHandler>(runner_);
+    CHKPV(handler_);
+    auto rsClient = std::static_pointer_cast<Rosen::RSRenderServiceClient>(
+        Rosen::RSIRenderClient::CreateRenderServiceClient());
+    CHKPV(rsClient);
+    receiver_ = rsClient->CreateVSyncReceiver(POINTER_CURSOR_RENDER_RECEIVER_NAME, handler_);
+    if (receiver_ == nullptr || receiver_->Init() != VSYNC_ERROR_OK) {
+        MMI_HILOGE("Receiver init failed");
+        return;
+    }
+    if (runner_ != nullptr) {
+        MMI_HILOGI("Runner is run");
+        runner_->Run();
+    }
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
 void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPV(surfaceNode_);
     CHKPV(canvasNode_);
-    if (mouseStyle != MOUSE_ICON::RUNNING &&
-        (mouseStyle != MOUSE_ICON::DEFAULT ||
+    if (mouseStyle != MOUSE_ICON::RUNNING && (mouseStyle != MOUSE_ICON::DEFAULT ||
             mouseIcons_[mouseStyle].iconPath != (IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg"))) {
         if (canvasNode_ != nullptr) {
+            Rosen::RSAnimationTimingProtocol protocol;
+            protocol.SetDuration(0);
+            Rosen::RSNode::Animate(
+                protocol,
+                Rosen::RSAnimationTimingCurve::LINEAR,
+                [this]() { canvasNode_->SetRotation(0); });
+            Rosen::RSTransaction::FlushImplicitTransaction();
             canvasNode_->SetVisible(false);
         }
         MMI_HILOGE("current pointer is not running");
@@ -704,21 +1201,15 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     MMI_HILOGD("Set mouseicon to OHOS system");
 
 #ifndef USE_ROSEN_DRAWING
-    auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->BeginRecording(CANVAS_SIZE, CANVAS_SIZE));
-    OHOS::Rosen::Drawing::Brush brush;
-    brush.SetColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    canvas->DrawBackground(brush);
+    auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
     canvas->DrawPixelMap(pixelmap, 0, 0, SkSamplingOptions(), nullptr);
 #else
     Rosen::Drawing::Brush brush;
     Rosen::Drawing::Rect src = Rosen::Drawing::Rect(0, 0, pixelmap->GetWidth(), pixelmap->GetHeight());
     Rosen::Drawing::Rect dst = Rosen::Drawing::Rect(src);
     auto canvas =
-        static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->BeginRecording(CANVAS_SIZE, CANVAS_SIZE));
-    OHOS::Rosen::Drawing::Brush brushBackGround;
-    brushBackGround.SetColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+        static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
     canvas->AttachBrush(brush);
-    canvas->DrawBackground(brushBackGround);
     canvas->DrawPixelMapRect(pixelmap, src, dst, Rosen::Drawing::SamplingOptions());
     canvas->DetachBrush();
 #endif // USE_ROSEN_DRAWING
@@ -968,6 +1459,43 @@ void PointerDrawingManager::AttachToDisplay()
     surfaceNode_->AttachToDisplay(screenId_);
 }
 
+void PointerDrawingManager::CreateCanvasNode()
+{
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    CHKPV(surfaceNode_);
+    if (!hardwareCursorPointerManager_->IsSupported()) {
+        canvasNode_ = Rosen::RSCanvasNode::Create();
+        CHKPV(canvasNode_);
+        canvasNode_->SetBounds(0, 0, canvasWidth_, canvasHeight_);
+        canvasNode_->SetFrame(0, 0, canvasWidth_, canvasHeight_);
+#ifndef USE_ROSEN_DRAWING
+        canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
+#else
+        canvasNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+#endif // USE_ROSEN_DRAWING
+        canvasNode_->SetCornerRadius(1);
+        canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
+        canvasNode_->SetRotation(0);
+        surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
+    }
+#else
+    canvasNode_ = Rosen::RSCanvasNode::Create();
+    CHKPV(canvasNode_);
+    canvasNode_->SetBounds(0, 0, canvasWidth_, canvasHeight_);
+    canvasNode_->SetFrame(0, 0, canvasWidth_, canvasHeight_);
+#ifndef USE_ROSEN_DRAWING
+    canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
+#else
+    canvasNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+#endif // USE_ROSEN_DRAWING
+    canvasNode_->SetCornerRadius(1);
+    canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
+    canvasNode_->SetRotation(0);
+    surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+}
+
 void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY,
     Direction direction)
 {
@@ -978,18 +1506,31 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     CHKPV(surfaceNode_);
-    surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    surfaceNode_->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPV(hardwareCursorPointerManager_);
     hardwareCursorPointerManager_->SetTargetDevice(displayId);
-    if (hardwareCursorPointerManager_->IsSupported()) {
-        if (hardwareCursorPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
-            MMI_HILOGE("Set hardware cursor position error");
-            return;
-        }
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        surfaceNode_->SetFrameGravity(Rosen::Gravity::TOP_LEFT);
+        g_isHdiRemoteDied = false;
+        CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) = GetCanvasSize();
+        surfaceNode_->SetBounds(
+            (physicalX - CalculateHardwareXOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(
+                lastMouseStyle_.id)].alignmentWay))),
+            (physicalY - CalculateHardwareYOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(
+                lastMouseStyle_.id)].alignmentWay))),
+            CALCULATE_CANVAS_SIZE_CHANGE,
+            CALCULATE_CANVAS_SIZE_CHANGE);
+    } else {
+        surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
+        surfaceNode_->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
+    }
+#else
+    surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
+    surfaceNode_->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
@@ -1003,19 +1544,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     lastDisplayId_ = displayId;
     RotateDegree(direction);
     lastDirection_ = direction;
-
-    canvasNode_ = Rosen::RSCanvasNode::Create();
-    canvasNode_->SetBounds(0, 0, canvasWidth_, canvasHeight_);
-    canvasNode_->SetFrame(0, 0, canvasWidth_, canvasHeight_);
-#ifndef USE_ROSEN_DRAWING
-    canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
-#else
-    canvasNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
-#endif
-    canvasNode_->SetCornerRadius(1);
-    canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    canvasNode_->SetRotation(0);
-    surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
+    CreateCanvasNode();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
@@ -1031,22 +1560,80 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
     CALL_DEBUG_ENTER;
     sptr<OHOS::SurfaceBuffer> buffer;
     int32_t releaseFence = -1;
+    int32_t width = 0;
+    int32_t height = 0;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPP(hardwareCursorPointerManager_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) = GetCanvasSize();
+        auto canvasSize = static_cast<int32_t>(CALCULATE_CANVAS_SIZE_CHANGE);
+        width = canvasSize;
+        height = canvasSize;
+    } else {
+        width = canvasWidth_;
+        height = canvasHeight_;
+    }
+#else
+    width = canvasWidth_;
+    height = canvasHeight_;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     OHOS::BufferRequestConfig config = {
-        .width = canvasWidth_,
-        .height = canvasHeight_,
+        .width = width,
+        .height = height,
         .strideAlignment = 0x8,
         .format = GRAPHIC_PIXEL_FMT_RGBA_8888,
         .usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA,
-        .timeout = 100,
+        .timeout = 150,
     };
 
     OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence, config);
-    close(releaseFence);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Request buffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
         return nullptr;
     }
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        sptr<OHOS::SyncFence> tempFence = new OHOS::SyncFence(releaseFence);
+        if (tempFence != nullptr && (tempFence->Wait(SYNC_FENCE_WAIT_TIME) < 0)) {
+            MMI_HILOGE("Failed to create surface, this buffer is not available");
+        }
+    }
+#else
+    close(releaseFence);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return buffer;
+}
+
+void PointerDrawingManager::DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Rosen::Drawing::Pen pen;
+    pen.SetAntiAlias(true);
+    pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
+    OHOS::Rosen::Drawing::scalar penWidth = 1;
+    pen.SetWidth(penWidth);
+    canvas.AttachPen(pen);
+    CHKPV(image_);
+    OHOS::Rosen::Drawing::Brush brush;
+    brush.SetColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    canvas.DrawBackground(brush);
+    ICON_TYPE iconType = ICON_TYPE::ANGLE_NW;
+    if (mouseStyle == MOUSE_ICON::LOADING) {
+        iconType = ICON_TYPE::ANGLE_CENTER;
+    } else {
+        iconType = ICON_TYPE::ANGLE_NW;
+    }
+    float physicalXOffset = CalculateHardwareXOffset(iconType);
+    float physicalYOffset = CalculateHardwareYOffset(iconType);
+    if (mouseStyle == MOUSE_ICON::RUNNING_RIGHT) {
+        CHKPV(runningRightImage_);
+        canvas.DrawImage(*runningRightImage_, physicalXOffset, physicalYOffset, Rosen::Drawing::SamplingOptions());
+    } else {
+        canvas.DrawImage(*image_, physicalXOffset, physicalYOffset, Rosen::Drawing::SamplingOptions());
+    }
 }
 
 void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle)
@@ -1058,8 +1645,8 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     OHOS::Rosen::Drawing::scalar penWidth = 1;
     pen.SetWidth(penWidth);
     canvas.AttachPen(pen);
-    std::shared_ptr<Rosen::Drawing::Image> image;
-    std::shared_ptr<OHOS::Media::PixelMap> pixelmap;
+    std::shared_ptr<Rosen::Drawing::Image> image = nullptr;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelmap = nullptr;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseicon by userIcon_");
         image = ExtractDrawingImage(userIcon_);
@@ -1079,13 +1666,25 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
             SetPixelMap(pixelmap);
         }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-        MMI_HILOGI("Set mouseicon to system");
     }
     CHKPV(image);
     OHOS::Rosen::Drawing::Brush brush;
     brush.SetColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
     canvas.DrawBackground(brush);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        float physicalXOffset = CalculateHardwareXOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(
+            lastMouseStyle_.id)].alignmentWay));
+        float physicalYOffset = CalculateHardwareYOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(
+            lastMouseStyle_.id)].alignmentWay));
+        canvas.DrawImage(*image, physicalXOffset, physicalYOffset, Rosen::Drawing::SamplingOptions());
+    } else {
+        canvas.DrawImage(*image, IMAGE_PIXEL, IMAGE_PIXEL, Rosen::Drawing::SamplingOptions());
+    }
+#else
     canvas.DrawImage(*image, IMAGE_PIXEL, IMAGE_PIXEL, Rosen::Drawing::SamplingOptions());
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGD("Canvas draw image, success");
 }
 
@@ -1114,11 +1713,12 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
+    currentFrame_ = 0;
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(width, height, format);
-    OHOS::Rosen::Drawing::Canvas canvas(CANVAS_SIZE, CANVAS_SIZE);
+    OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     DrawImage(canvas, mouseStyle);
@@ -1360,6 +1960,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         return RET_ERR;
     }
     UpdatePointerVisible();
+    SetHardwareCursorPosition(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, lastMouseStyle_);
     return RET_OK;
 }
 
@@ -1426,10 +2027,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
         return ret;
     }
 
-    if (surfaceNode_ == nullptr) {
-        MMI_HILOGI("surfaceNode_ is nullptr");
-        return RET_OK;
-    }
+    CHKPR(surfaceNode_, RET_OK);
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
@@ -1443,7 +2041,8 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     if (IsWindowRotation()) {
         direction = displayInfo_.direction;
     }
-    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
+    auto& iconPath = GetMouseIconPath();
+    AdjustMouseFocus(direction, ICON_TYPE(iconPath.at(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
         physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
@@ -1454,12 +2053,12 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #else
     CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    if (ret != RET_OK) {
+    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
     UpdatePointerVisible();
+    SetHardwareCursorPosition(displayInfo_.id, physicalX, physicalY, lastMouseStyle_);
     return RET_OK;
 }
 
@@ -1613,7 +2212,7 @@ bool PointerDrawingManager::IsPointerVisible()
             return info.visible;
         }
     }
-    if (!hapPidInfos_.empty() && (pidInfos_.empty() || pidInfos_.back().priority < DEFUALT_COOPERATE_PRIORITY)) {
+    if (!hapPidInfos_.empty()) {
         for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
                 MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
@@ -1621,14 +2220,20 @@ bool PointerDrawingManager::IsPointerVisible()
                 return item.visible;
             }
         }
+        if (!(INPUT_DEV_MGR->HasPointerDevice() || WIN_MGR->IsMouseSimulate()) || pid_ == 0) {
+            auto info = hapPidInfos_.back();
+            MMI_HILOGI("Only hap visible pid:%{public}d-visible:%{public}s",
+                info.pid, info.visible ? "true" : "false");
+            return info.visible;
+        }
     }
     if (pidInfos_.empty()) {
         MMI_HILOGD("Visible property is true");
         return true;
     }
     auto info = pidInfos_.back();
-    MMI_HILOGI("Visible property:%{public}zu.%{public}d-priority:%{public}d-visible:%{public}s",
-        pidInfos_.size(), info.pid, info.priority, info.visible ? "true" : "false");
+    MMI_HILOGI("Visible property:%{public}zu.%{public}d-visible:%{public}s",
+        pidInfos_.size(), info.pid, info.visible ? "true" : "false");
     return info.visible;
 }
 
@@ -1662,12 +2267,27 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 
 bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 {
+    bool ret = true;
+    int32_t count = 0;
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
-            return it->visible;
+            count++;
+            ret = it->visible;
+            break;
         }
     }
-    return true;
+    if (count == 0 && !hapPidInfos_.empty()) {
+        for (auto& item : hapPidInfos_) {
+            if (item.pid == pid_) {
+                MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
+                    item.pid, item.visible ? "true" : "false");
+                count++;
+                ret = item.visible;
+                break;
+            }
+        }
+    }
+    return ret;
 }
 
 void PointerDrawingManager::OnSessionLost(int32_t pid)
@@ -1703,33 +2323,19 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int3
         MMI_HILOGE("current is drag state, can not set pointer visible");
         return RET_ERR;
     }
-    DeletPidInfo(pid);
-    PidInfo info = { .pid = pid, .priority = priority, .visible = visible };
+    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            pidInfos_.erase(it);
+            break;
+        }
+    }
+    PidInfo info = { .pid = pid, .visible = visible };
     pidInfos_.push_back(info);
     if (pidInfos_.size() > VISIBLE_LIST_MAX_SIZE) {
         pidInfos_.pop_front();
     }
-    if (priority != DEFUALT_COOPERATE_PRIORITY) {
-        if (!visible) {
-            pidInfos_.sort([](const PidInfo &lpidInfo, const PidInfo &rpidInfo) -> bool {
-                return lpidInfo.priority < rpidInfo.priority;
-            });
-        } else {
-            DeletPidInfo(pid);
-        }
-    }
     UpdatePointerVisible();
     return RET_OK;
-}
-
-void PointerDrawingManager::DeletPidInfo(int32_t pid)
-{
-    for (auto it = hapPidInfos_.begin(); it != hapPidInfos_.end(); ++it) {
-        if (it->pid == pid) {
-            hapPidInfos_.erase(it);
-            break;
-        }
-    }
 }
 
 void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
@@ -1739,23 +2345,21 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
     MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
-    if (surfaceNode_ != nullptr) {
-        surfaceNode_->SetBounds(x,
-            y,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
-            surfaceNode_->GetStagingProperties().GetBounds().w_);
+    CHKPV(surfaceNode_);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        CHKPV(hardwareCursorPointerManager_);
-        if (hardwareCursorPointerManager_->IsSupported()) {
-            if (hardwareCursorPointerManager_->SetPosition(lastPhysicalX_, lastPhysicalY_) != RET_OK) {
-                MMI_HILOGE("Set hardware cursor position error.");
-                return;
-            }
-        }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("Pointer window move success");
+    CHKPV(hardwareCursorPointerManager_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        if (!SetTraditionsHardWareCursorLocation(displayId_, x, y,
+            ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay))) {
+            MMI_HILOGE("Set hardware cursor position fail");
+            return;
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    MMI_HILOGD("Pointer window move success");
 }
 
 int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
@@ -1778,7 +2382,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         if (pointerStyle.id == MOUSE_ICON::DEFAULT) {
             newIconPath = DefaultIconPath;
         } else {
-            newIconPath = iconPath[MOUSE_ICON(pointerStyle.id)].iconPath;
+            newIconPath = iconPath.at(MOUSE_ICON(pointerStyle.id)).iconPath;
         }
         MMI_HILOGD("default path has changed from %{public}s to %{public}s",
             it->second.iconPath.c_str(), newIconPath.c_str());
@@ -1788,7 +2392,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
     return RET_OK;
 }
 
-std::map<MOUSE_ICON, IconStyle> PointerDrawingManager::GetMouseIconPath()
+const std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIconPath()
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1879,7 +2483,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
             return RET_ERR;
         }
     }
-    auto iconPath = GetMouseIconPath();
+    auto& iconPath = GetMouseIconPath();
     if (iconPath.find(MOUSE_ICON(pointerStyle.id)) == iconPath.end()) {
         MMI_HILOGE("The param pointerStyle is invalid");
         return RET_ERR;
@@ -1902,7 +2506,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         return RET_OK;
     }
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        iconPath[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
+        iconPath.at(MOUSE_ICON(pointerStyle.id)).iconPath != DefaultIconPath)) {
         PointerStyle style;
         WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
         pointerStyle = style;
@@ -1986,9 +2590,14 @@ int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enabl
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPR(hardwareCursorPointerManager_, ERROR_NULL_POINTER);
-    if ((hardwareCursorPointerManager_->EnableStats(enable)) != RET_OK) {
-        MMI_HILOGE("Enable stats failed");
-        return RET_ERR;
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        if ((hardwareCursorPointerManager_->EnableStats(enable)) != RET_OK) {
+            MMI_HILOGE("Enable stats failed");
+            return RET_ERR;
+        }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGI("EnableHardwareCursorStats, enable:%{private}d", enable);
@@ -2000,9 +2609,14 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPR(hardwareCursorPointerManager_, ERROR_NULL_POINTER);
-    if ((hardwareCursorPointerManager_->GetCursorStats(frameCount, vsyncCount)) != RET_OK) {
-        MMI_HILOGE("Query stats failed");
-        return RET_ERR;
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        if ((hardwareCursorPointerManager_->GetCursorStats(frameCount, vsyncCount)) != RET_OK) {
+            MMI_HILOGE("Query stats failed");
+            return RET_ERR;
+        }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGI("GetHardwareCursorStats, frameCount:%{private}d, vsyncCount:%{private}d", frameCount, vsyncCount);
@@ -2063,6 +2677,12 @@ void PointerDrawingManager::InitStyle()
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
     };
     CheckMouseIconPath();
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
+    if (productType == DEVICE_TYPE_HARDEN) {
+        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::RotateDegree(Direction direction)
@@ -2088,42 +2708,53 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
     std::ostringstream oss;
     oss << std::endl;
 
-    auto displayTitles = std::make_tuple("ID", "X", "Y", "Width", "Height", "DPI", "Name", "Uniq",
-                                         "Direction", "Display Direction", "Display Mode");
+    std::vector<std::string> displayTitles = {"ID", "X", "Y", "Width", "Height", "DPI", "Name", "Uniq",
+                                              "Direction", "Display Direction", "Display Mode"};
     DisplayInfo &di = displayInfo_;
-    auto displayInfo = std::vector{std::make_tuple(di.id, di.x, di.y, di.width, di.height, di.dpi, di.name, di.uniq,
-                                                   di.direction, di.displayDirection,
-                                                   static_cast<int32_t>(di.displayMode))};
+    std::vector<std::vector<std::string>> displayInfo = {
+        {std::to_string(di.id), std::to_string(di.x), std::to_string(di.y), std::to_string(di.width),
+         std::to_string(di.height), std::to_string(di.dpi), di.name, di.uniq,
+         std::to_string(static_cast<int32_t>(di.direction)), std::to_string(static_cast<int32_t>(di.displayDirection)),
+         std::to_string(static_cast<int32_t>(di.displayMode))}};
+
     DumpFullTable(oss, "Display Info", displayTitles, displayInfo);
     oss << std::endl;
 
-    auto titles1 = std::make_tuple("hasDisplay", "hasPointerDevice", "lastPhysicalX", "lastPhysicalY",
-                                   "pid", "windowId", "imageWidth", "imageHeight", "canvasWidth", "canvasHeight");
-    auto data1 = std::vector{std::make_tuple(hasDisplay_, hasPointerDevice_, lastPhysicalX_, lastPhysicalY_,
-                                             pid_, windowId_, imageWidth_, imageHeight_, canvasWidth_, canvasHeight_)};
+    std::vector<std::string> titles1 = {"hasDisplay", "hasPointerDevice", "lastPhysicalX", "lastPhysicalY",
+                                        "pid", "windowId", "imageWidth", "imageHeight", "canvasWidth", "canvasHeight"};
+    std::vector<std::vector<std::string>> data1 = {
+        {std::to_string(hasDisplay_), std::to_string(hasPointerDevice_), std::to_string(lastPhysicalX_),
+         std::to_string(lastPhysicalY_), std::to_string(pid_), std::to_string(windowId_),
+         std::to_string(imageWidth_), std::to_string(imageHeight_), std::to_string(canvasWidth_),
+         std::to_string(canvasHeight_)}};
+
     DumpFullTable(oss, "Cursor Info", titles1, data1);
     oss << std::endl;
 
-    auto titles2 = std::make_tuple("mouseDisplayState", "mouseIconUpdate", "screenId", "userIconHotSpotX",
-                                   "userIconHotSpotY", "tempPointerColor", "lastDirection", "currentDirection");
-    auto data2 = std::vector{std::make_tuple(mouseDisplayState_, mouseIconUpdate_, screenId_, userIconHotSpotX_,
-                                             userIconHotSpotY_, tempPointerColor_, lastDirection_, currentDirection_)};
+    std::vector<std::string> titles2 = {"mouseDisplayState", "mouseIconUpdate", "screenId", "userIconHotSpotX",
+                                        "userIconHotSpotY", "tempPointerColor", "lastDirection", "currentDirection"};
+    std::vector<std::vector<std::string>> data2 = {
+        {std::to_string(mouseDisplayState_), std::to_string(mouseIconUpdate_), std::to_string(screenId_),
+         std::to_string(userIconHotSpotX_), std::to_string(userIconHotSpotY_), std::to_string(tempPointerColor_),
+         std::to_string(lastDirection_), std::to_string(currentDirection_)}};
 
     DumpFullTable(oss, "Cursor Info", titles2, data2);
     oss << std::endl;
 
-    auto styleTitles = std::make_tuple("name", "Size", "Color", "ID");
-    auto styleData = std::vector{
-            std::make_tuple("lastMouseStyle", lastMouseStyle_.size, lastMouseStyle_.color, lastMouseStyle_.id),
-            std::make_tuple("currentMouseStyle", currentMouseStyle_.size, currentMouseStyle_.color,
-                            currentMouseStyle_.id)};
+    std::vector<std::string> styleTitles = {"name", "Size", "Color", "ID"};
+    std::vector<std::vector<std::string>> styleData = {
+        {"lastMouseStyle", std::to_string(lastMouseStyle_.size), std::to_string(lastMouseStyle_.color),
+         std::to_string(lastMouseStyle_.id)},
+        {"currentMouseStyle", std::to_string(currentMouseStyle_.size), std::to_string(currentMouseStyle_.color),
+         std::to_string(currentMouseStyle_.id)}};
+
     DumpFullTable(oss, "Cursor Style Info", styleTitles, styleData);
     oss << std::endl;
 
-    auto pidTitles = std::make_tuple("pid", "visible");
-    std::vector<std::tuple<int32_t, bool>> pidInfos;
-    for (const auto &pidInfo: pidInfos_) {
-        pidInfos.emplace_back(pidInfo.pid, pidInfo.visible);
+    std::vector<std::string> pidTitles = {"pid", "visible"};
+    std::vector<std::vector<std::string>> pidInfos;
+    for (const auto &pidInfo : pidInfos_) {
+        pidInfos.push_back({std::to_string(pidInfo.pid), pidInfo.visible ? "true" : "false"});
     }
     DumpFullTable(oss, "Visible Info", pidTitles, pidInfos);
     oss << std::endl;
