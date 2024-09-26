@@ -33,6 +33,7 @@ public:
     virtual bool WriteInterfaceToken(std::u16string name) = 0;
     virtual std::u16string ReadInterfaceToken() = 0;
     virtual bool WriteInt32(int32_t value) = 0;
+    virtual bool WriteInt64(int64_t value) = 0;
     virtual int32_t ReadInt32() = 0;
     virtual bool ReadInt32(int32_t &value) = 0;
     virtual bool WriteRemoteObject(const Parcelable *object) = 0;
@@ -79,6 +80,7 @@ public:
     MOCK_METHOD1(WriteInterfaceToken, bool(std::u16string name));
     MOCK_METHOD0(ReadInterfaceToken, std::u16string());
     MOCK_METHOD1(WriteInt32, bool(int32_t value));
+    MOCK_METHOD1(WriteInt64, bool(int64_t value));
     MOCK_METHOD0(ReadInt32, int32_t());
     MOCK_METHOD1(ReadInt32, bool(int32_t &value));
     MOCK_METHOD1(WriteRemoteObject, bool(const Parcelable *object));

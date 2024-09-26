@@ -359,19 +359,20 @@ int32_t MultimodalInputConnectManager::GetKeyboardRepeatRate(int32_t &rate)
 }
 
 int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority, uint32_t deviceTags)
+    int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->AddInputHandler(handlerType, eventType, priority, deviceTags);
+    return multimodalInputConnectService_->AddInputHandler(handlerType, eventType, priority, deviceTags, actionsType);
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority, uint32_t deviceTags)
+    int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
+    return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priority, deviceTags,
+        actionsType);
 }
 
 int32_t MultimodalInputConnectManager::AddGestureMonitor(InputHandlerType handlerType,

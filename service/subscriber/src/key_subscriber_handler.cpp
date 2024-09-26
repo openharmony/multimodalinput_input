@@ -37,6 +37,7 @@
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
+#include "setting_datashare.h"
 #include "timer_manager.h"
 #include "util_ex.h"
 #include "want.h"
@@ -56,6 +57,11 @@ constexpr int32_t ACTIVE_EVENT { 2 };
 #ifdef CALL_MANAGER_SERVICE_ENABLED
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
 #endif // CALL_MANAGER_SERVICE_ENABLED
+const std::string CALL_BEHAVIOR_KEY { "incall_power_button_behavior" };
+const std::string SETTINGS_DATA_SYSTEM_URI {
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true" };
+const std::string SETTINGS_DATA_EXT_URI {
+    "datashare:///com.ohos.USER_SETTINGSDATA_100.DataAbility" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -503,6 +509,11 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     CHKPF(keyEvent);
     if (HandleRingMute(keyEvent)) {
         MMI_HILOGI("Mute Ring in subscribe keyEvent");
+        RemoveSubscriberTimer(keyEvent);
+        return true;
+    }
+    if (HandleCallEnded(keyEvent)) {
+        MMI_HILOGI("Call Ended in subscribe keyEvent");
         return true;
     }
     if (!IsEnableCombineKey(keyEvent)) {
@@ -881,7 +892,9 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+#ifdef SHORTCUT_KEY_RULES_ENABLED
     KEY_SHORTCUT_MGR->ResetCheckState();
+#endif // SHORTCUT_KEY_RULES_ENABLED
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -1193,6 +1206,140 @@ void KeySubscriberHandler::DumpSubscriber(int32_t fd, std::shared_ptr<Subscriber
             sPrekeys.str().c_str(), keyOption->GetFinalKey(), keyOption->GetFinalKeyDownDuration(),
             keyOption->IsFinalKeyDown() ? "true" : "false", keyOption->IsRepeat() ? "true" : "false",
             session->GetProgramName().c_str());
+}
+
+bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (!callBahaviorState_) {
+        MMI_HILOGE("CallBehaviorState is false");
+        return false;
+    }
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER ||
+        keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+        MMI_HILOGE("This key event no need to CallEnded");
+        return false;
+    }
+    int32_t ret = DEVICE_MONITOR->GetCallState();
+    MMI_HILOGE("Current call state:%{public}d", ret);
+
+    switch (ret) {
+        case StateType::CALL_STATUS_ALERTING:
+        case StateType::CALL_STATUS_ANSWERED:
+        case StateType::CALL_STATUS_ACTIVE:
+        case StateType::CALL_STATUS_DIALING: {
+            HangUpCallProcess();
+            needSkipPowerKeyUp_ = true;
+            return true;
+        }
+        case StateType::CALL_STATUS_WAITING:
+        case StateType::CALL_STATUS_INCOMING: {
+            RejectCallProcess();
+            needSkipPowerKeyUp_ = true;
+            return true;
+        }
+        case StateType::CALL_STATUS_IDLE:
+        case StateType::CALL_STATUS_DISCONNECTING:
+        case StateType::CALL_STATUS_DISCONNECTED:
+        default: {
+            MMI_HILOGE("This state no need to CallEnded");
+            return false;
+        }
+    }
+}
+
+void KeySubscriberHandler::HangUpCallProcess()
+{
+    if (callManagerClientPtr == nullptr) {
+        callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+        if (callManagerClientPtr == nullptr) {
+            MMI_HILOGE("CallManager init fail");
+            return;
+        }
+        callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    }
+    int32_t ret = -1;
+    ret = callManagerClientPtr->HangUpCall(0);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("HangUpCall fail, ret:%{public}d", ret);
+        return;
+    }
+    MMI_HILOGI("HangUpCall success");
+}
+
+void KeySubscriberHandler::RejectCallProcess()
+{
+    if (callManagerClientPtr == nullptr) {
+        callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+        if (callManagerClientPtr == nullptr) {
+            MMI_HILOGE("CallManagerClient GetInstance fail");
+            return;
+        }
+        callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    }
+    int32_t ret = -1;
+    ret = callManagerClientPtr->RejectCall(0, false, u"");
+    if (ret != ERR_OK) {
+        MMI_HILOGE("RejectCall fail, ret:%{public}d", ret);
+        return;
+    }
+    MMI_HILOGI("RejectCall success");
+}
+
+void KeySubscriberHandler::InitDataShareListener()
+{
+    SettingObserver::UpdateFunc func = [&](const std::string& key) {
+        bool statusValue = false;
+        int32_t ret = -1;
+        ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue,
+            SETTINGS_DATA_SYSTEM_URI);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get incall_power_button_behavior state fail:%{public}d", ret);
+            return;
+        }
+        MMI_HILOGE("Get incall_power_button_behavior state success:%{public}d", statusValue);
+        callBahaviorState_ = statusValue;
+    };
+
+    func(CALL_BEHAVIOR_KEY);
+
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    CHKPV(saManager);
+    auto remoteObj = saManager->GetSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
+    CHKPV(remoteObj);
+
+    std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
+        DataShare::DataShareHelper::Create(remoteObj, SETTINGS_DATA_SYSTEM_URI, SETTINGS_DATA_EXT_URI);
+    MMI_HILOGE("create data_share helper, ret=%{public}d", ret.first);
+
+    if (ret.first == ERR_OK) {
+        std::shared_ptr<DataShare::DataShareHelper> helper = ret.second;
+        auto uri = Uri(SETTINGS_DATA_SYSTEM_URI + "&key=" + CALL_BEHAVIOR_KEY);
+        sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
+            CreateObserver(CALL_BEHAVIOR_KEY, func);
+        CHKPV(statusObserver);
+        helper->RegisterObserver(uri, statusObserver);
+    }
+}
+
+void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_INFO_TRACE;
+    CHKPV(keyEvent);
+    auto keyCode = keyEvent->GetKeyCode();
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    RemoveKeyCode(keyCode, pressedKeys);
+    std::set<int32_t> pids;
+    GetForegroundPids(pids);
+    MMI_HILOGI("Foreground pid size:%{public}zu", pids.size());
+    for (auto &iter : subscriberMap_) {
+        auto keyOption = iter.first;
+        auto subscribers = iter.second;
+        PrintKeyOption(keyOption);
+        IsMatchForegroundPid(subscribers, pids);
+        ClearSubscriberTimer(subscribers);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

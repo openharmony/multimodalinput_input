@@ -39,6 +39,22 @@
             OHOS::MMI::kMsgLog*;
             "vtable for OHOS::MMI::CircleStreamBuffer";
             "vtable for OHOS::MMI::StreamBuffer";
+            OHOS::MMI::FormatLogTrace*;
+            OHOS::MMI::KeyEvent::*;
+            OHOS::MMI::EventLogHelper::betaFlag_;
+            OHOS::MMI::EventLogHelper::userType_;
+            OHOS::MMI::EventLogHelper::infoDictCount_;
+            OHOS::MMI::EventLogHelper::debugDictCount_;
+            OHOS::MMI::LogTracer::*;
+            OHOS::MMI::ResetLogTrace*;
+            OHOS::MMI::InputDevice::*;
+            OHOS::MMI::InputDeviceManager::*;
+            OHOS::MMI::InputEvent::*;
+            OHOS::MMI::KeyOption::*;
+            OHOS::MMI::EndLogTraceId*;
+            OHOS::MMI::PointerEvent::*;
+            OHOS::MMI::EventNormalizeHandler::*;
+            OHOS::MMI::StartLogTraceId*;
         };
     local:
         *;

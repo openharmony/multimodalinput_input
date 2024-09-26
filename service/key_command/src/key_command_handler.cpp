@@ -319,6 +319,17 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
+    if (!lastPointerDownTime_.empty()) {
+        int64_t lastPointerDownTime = touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ?
+            lastPointerDownTime_[SIMULATE_POINTER_ID] : lastPointerDownTime_[0];
+        int64_t diffTime = item.GetDownTime() - lastPointerDownTime;
+        if (diffTime > TWO_FINGERS_TIME_LIMIT) {
+            MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}" PRId64, diffTime);
+            return;
+        }
+    }
+    lastPointerDownTime_[id] = item.GetDownTime();
+
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
         MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
         return;
@@ -348,6 +359,12 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    int32_t id = touchEvent->GetPointerId();
+    auto it = lastPointerDownTime_.find(id);
+    if (it != lastPointerDownTime_.end()) {
+        lastPointerDownTime_.erase(it);
+    }
+
     previousUpTime_ = touchEvent->GetActionTime();
     size_t pointercnt = touchEvent->GetPointerIds().size();
     if ((pointercnt == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
@@ -944,6 +961,28 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
     intervalTime_ = tempDelay;
 }
 
+bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (item.keyCode != keyEvent->GetKeyCode()) {
+        return false;
+    }
+    if (item.keyCode != KeyEvent::KEYCODE_VOLUME_DOWN) {
+        return false;
+    }
+    std::string bundleName = item.ability.bundleName;
+    std::string matchName = ".camera";
+    if (bundleName.find(matchName) == std::string::npos) {
+        return false;
+    }
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    MMI_HILOGI("ScreenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
+        return false;
+    }
+    return true;
+}
+
 bool KeyCommandHandler::ParseJson(const std::string &configFile)
 {
     CALL_DEBUG_ENTER;
@@ -1335,6 +1374,10 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     bool waitRepeatKey = false;
 
     for (RepeatKey& item : repeatKeys_) {
+        if (CheckSpecialRepeatKey(item, keyEvent)) {
+            MMI_HILOGI("Skip repeatKey");
+            return false;
+        }
         if (HandleKeyUpCancel(item, keyEvent)) {
             return false;
         }

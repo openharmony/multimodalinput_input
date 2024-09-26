@@ -125,6 +125,9 @@ void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         HandlePinchMoveEvent(event);
     }
+    if (isRecognized_) {
+        lastTouchEvent_ = std::make_shared<PointerEvent>(*event);
+    }
 }
 
 void TouchGestureDetector::HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> event)
@@ -185,6 +188,10 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
     MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
         gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId);
     if (downPoint_.empty()) {
+        if (isRecognized_) {
+            lastTouchEvent_->SetActionTime(GetSysClockTime());
+            NotifyGestureEvent(lastTouchEvent_, GestureMode::ACTION_GESTURE_END);
+        }
         ReleaseData();
     }
 }
@@ -195,6 +202,7 @@ void TouchGestureDetector::ReleaseData()
     isRecognized_ = false;
     isFingerReady_ = false;
     haveLastDistance_ = false;
+    lastTouchEvent_ = nullptr;
     continuousCloseCount_ = 0;
     continuousOpenCount_ = 0;
     lastDistance_.clear();
@@ -229,8 +237,7 @@ bool TouchGestureDetector::WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent
 
 bool TouchGestureDetector::HandleFingerDown()
 {
-    int32_t fingersCount = downPoint_.size();
-    if (fingersCount < THREE_FINGER_COUNT) {
+    if (downPoint_.size() < THREE_FINGER_COUNT) {
         return false;
     }
     float maxDistance = GetMaxFingerSpacing();
@@ -459,6 +466,7 @@ void TouchGestureDetector::CalcAndStoreDistance(std::map<int32_t, Point> &points
     }
     int64_t interval = GetMaxDownInterval();
     if (interval > MAXIMUM_POINTER_INTERVAL) {
+        haveLastDistance_ = false;
         MMI_HILOGE("The pointers down time interval is too long");
         return;
     }
@@ -598,6 +606,8 @@ bool TouchGestureDetector::IsMatchGesture(GestureMode mode, int32_t count) const
         case GestureMode::ACTION_PINCH_OPENED:
         case GestureMode::ACTION_PINCH_CLOSED:
             return gestureType_ == TOUCH_GESTURE_TYPE_PINCH;
+        case GestureMode::ACTION_GESTURE_END:
+            return true;
         default:{
             MMI_HILOGW("Unknown mode:%{public}d", mode);
             return false;

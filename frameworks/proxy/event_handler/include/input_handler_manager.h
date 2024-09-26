@@ -51,6 +51,7 @@ public:
     HandleEventType GetEventType() const;
     int32_t GetPriority() const;
     uint32_t GetDeviceTags() const;
+    std::vector<int32_t> GetActionsType() const;
 
 protected:
     int32_t AddGestureMonitor(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
@@ -60,11 +61,14 @@ protected:
         HandleEventType eventType = HANDLE_EVENT_TYPE_KP, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     int32_t RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
+    int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+        std::vector<int32_t> actions);
 
 private:
     struct GestureHandler {
         TouchGestureType gestureType { TOUCH_GESTURE_TYPE_NONE };
         int32_t fingers { 0 };
+        bool gestureState { false };
     };
     struct Handler {
         int32_t handlerId_ { 0 };
@@ -74,6 +78,7 @@ private:
         uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
         GestureHandler gestureHandler_;
+        std::vector<int32_t> actionsType_;
     };
 
 private:
@@ -82,16 +87,21 @@ private:
     {
         return false;
     }
-    bool IsMatchGesture(const Handler &handler, int32_t action, int32_t count) const;
+    bool IsMatchGesture(const Handler &handler, int32_t action, int32_t count);
     int32_t AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
         TouchGestureType gestureType, int32_t fingers, std::shared_ptr<IInputEventConsumer> consumer);
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor);
+    int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, std::vector<int32_t> actionsType,
+        std::shared_ptr<IInputEventConsumer> monitor);
     int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-        uint32_t deviceTags);
+        uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>());
+    bool IsNeedAddToServer(std::vector<int32_t> actionsType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType, uint32_t &deviceTags);
+    void UpdateAddToServerActions();
+    int32_t RemoveLocalActions(int32_t handlerId, InputHandlerType handlerType);
     int32_t RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-        uint32_t deviceTags);
+        uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>());
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
@@ -108,12 +118,14 @@ private:
 private:
     std::list<Handler> interHandlers_;
     std::map<int32_t, Handler> monitorHandlers_;
+    std::map<int32_t, Handler> actionsMonitorHandlers_;
     std::map<int32_t, int32_t> processedEvents_;
     std::set<int32_t> mouseEventIds_;
     std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
     int32_t nextId_ { 1 };
     std::mutex mtxHandlers_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    std::vector<int32_t> addToServerActions_;
 };
 } // namespace MMI
 } // namespace OHOS

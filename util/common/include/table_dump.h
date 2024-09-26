@@ -28,30 +28,29 @@ namespace MMI {
 constexpr size_t EXTRA_CHARACTERS_COUNT { 3 };
 constexpr int32_t ELEMENT_SPACE_COUNT { 2 };
 
-template<typename T>
-inline size_t getElementLength(const T &element)
+inline size_t GetElementLength(const std::string &element)
 {
-    std::ostringstream oss;
-    oss << element;
-    return oss.str().size();
+    return element.size();
 }
 
-template<typename... Titles, typename... Args>
-inline std::vector<size_t> CalculateColumnWidths(const std::tuple<Titles...> &titles,
-                                                 const std::vector<std::tuple<Args...>> &rows,
+inline std::vector<size_t> CalculateColumnWidths(const std::vector<std::string> &titles,
+                                                 const std::vector<std::vector<std::string>> &rows,
                                                  size_t &lineWidth)
 {
-    std::vector<size_t> widths(sizeof...(Titles), 0);
-    auto updateWidths = [&widths](const auto &... field) {
-        size_t index = 0;
-        ((widths[index] = std::max(widths[index], getElementLength(field)), ++index), ...);
-    };
-    std::apply(updateWidths, titles);
-    for (const auto &row: rows) {
-        std::apply(updateWidths, row);
+    std::vector<size_t> widths(titles.size(), 0);
+    for (size_t i = 0; i < titles.size(); ++i) {
+        widths[i] = std::max(widths[i], GetElementLength(titles[i]));
     }
-    std::for_each(widths.begin(), widths.end(),
-                  [&lineWidth](size_t width) { lineWidth += width + EXTRA_CHARACTERS_COUNT; });
+
+    for (const auto &row : rows) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            widths[i] = std::max(widths[i], GetElementLength(row[i]));
+        }
+    }
+
+    for (size_t width : widths) {
+        lineWidth += width + EXTRA_CHARACTERS_COUNT;
+    }
     lineWidth += 1;
     return widths;
 }
@@ -59,64 +58,58 @@ inline std::vector<size_t> CalculateColumnWidths(const std::tuple<Titles...> &ti
 inline void PrintLine(std::ostream &os, const std::vector<size_t> &widths)
 {
     os << "+";
-    for (const size_t &width: widths) {
+    for (size_t width : widths) {
         os << std::setw(static_cast<int32_t>(width) + ELEMENT_SPACE_COUNT) << std::left << std::setfill('-')
            << "" << "+";
     }
     os << std::setfill(' ') << std::endl;
 }
 
-template<typename T>
-inline void PrintCentered(std::ostream &os, const T &value, size_t width)
+inline void PrintCentered(std::ostream &os, const std::string &value, size_t width)
 {
-    std::ostringstream oss;
-    oss << value;
-    std::string str = oss.str();
-    size_t padding_left = (width - str.size()) / 2;
-    size_t padding_right = width - str.size() - padding_left;
-    os << std::string(padding_left, ' ') << str << std::string(padding_right, ' ');
+    size_t padding_left = (width - value.size()) / 2;
+    size_t padding_right = width - value.size() - padding_left;
+    os << std::string(padding_left, ' ') << value << std::string(padding_right, ' ');
 }
 
-template<typename... Titles>
-inline void PrintHeader(std::ostream &os, const std::vector<size_t> &widths, Titles... titles)
+inline void PrintHeader(std::ostream &os, const std::vector<size_t> &widths, const std::vector<std::string> &titles)
 {
     os << "|";
-    size_t index = 0;
-    ((os << " ", PrintCentered(os, titles, widths[index++]), os << " |"), ...);
+    for (size_t i = 0; i < titles.size(); ++i) {
+        os << " ";
+        PrintCentered(os, titles[i], widths[i]);
+        os << " |";
+    }
     os << std::endl;
 }
 
-template<typename... Args>
-inline void PrintRow(std::ostream &os, const std::vector<size_t> &widths, Args... args)
+inline void PrintRow(std::ostream &os, const std::vector<size_t> &widths, const std::vector<std::string> &row)
 {
     os << "|";
-    size_t index = 0;
-    ((os << " ", PrintCentered(os, args, widths[index++]), os << " |"), ...);
+    for (size_t i = 0; i < row.size(); ++i) {
+        os << " ";
+        PrintCentered(os, row[i], widths[i]);
+        os << " |";
+    }
     os << std::endl;
 }
 
-template<typename... Titles, typename... Args>
-inline void DumpFullTable(std::ostream &os, const std::string &tableName, const std::tuple<Titles...> &titles,
-                          const std::vector<std::tuple<Args...>> &rows)
+inline void DumpFullTable(std::ostream &os, const std::string &tableName,
+                          const std::vector<std::string> &titles,
+                          const std::vector<std::vector<std::string>> &rows)
 {
-    static_assert(sizeof...(Titles) == sizeof...(Args), "Number of titles must match number of columns in each row");
-
-    // 计算每一列的最大宽度
     size_t lineWidth = 0;
     std::vector<size_t> widths = CalculateColumnWidths(titles, rows, lineWidth);
 
-    // 打印表名称
     PrintCentered(os, tableName, lineWidth);
     os << std::endl;
 
-    // 打印标题行
     PrintLine(os, widths);
-    std::apply([&os, &widths](auto &&... args) { PrintHeader(os, widths, args...); }, titles);
+    PrintHeader(os, widths, titles);
     PrintLine(os, widths);
 
-    // 打印每一行数据
-    for (const auto &row: rows) {
-        std::apply([&os, &widths](auto &&... args) { PrintRow(os, widths, args...); }, row);
+    for (const auto &row : rows) {
+        PrintRow(os, widths, row);
         PrintLine(os, widths);
     }
 }

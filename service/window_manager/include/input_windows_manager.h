@@ -84,6 +84,7 @@ public:
     std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
     int32_t GetCurrentUserId();
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
+    void SetFoldState ();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -187,6 +188,7 @@ private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
+    int32_t ConvertToolType(int32_t toolType);
     void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const std::vector<WindowInfo> &oldWindowsInfo,
@@ -382,6 +384,8 @@ private:
     int32_t windowStateNotifyPid_ { -1 };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
+    static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
+    bool IsFoldable_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

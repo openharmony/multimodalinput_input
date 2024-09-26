@@ -73,9 +73,9 @@ public:
     int32_t GetKeyboardRepeatDelay(int32_t &delay) override;
     int32_t GetKeyboardRepeatRate(int32_t &rate) override;
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) override;
+        int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) override;
+        int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
     int32_t AddGestureMonitor(InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
     int32_t RemoveGestureMonitor(InputHandlerType handlerType,

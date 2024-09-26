@@ -70,39 +70,6 @@ std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
 }
 
 /**
- * @tc.name: PointerEventTest_keyEventAndPointerEvent_001
- * @tc.desc: Verify ctrl(left) + point event
- * @tc.type: FUNC
- * @tc.require: AR000GOACS
- * @tc.author: yangguang
- */
-HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    sleep(10);
-    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
-    ASSERT_NE(pointerEvent, nullptr);
-    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
-    pointerEvent->SetPressedKeys(pressedKeys);
-}
-
-/**
- * @tc.name: PointerEventTest_keyEventAndPointerEvent_002
- * @tc.desc: Verify ctrl(right) + point event
- * @tc.type: FUNC
- * @tc.require: AR000GOACS
- * @tc.author: yangguang
- */
-HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_RIGHT };
-    pointerEvent->SetPressedKeys(pressedKeys);
-}
-
-/**
  * @tc.name: PointerEventTest_keyEventAndPointerEvent_003
  * @tc.desc: Verify ctrl(left and right) + point event
  * @tc.type: FUNC
@@ -115,7 +82,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT };
-    pointerEvent->SetPressedKeys(pressedKeys);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 

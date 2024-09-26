@@ -210,6 +210,8 @@ public:
 
     static constexpr int32_t TOUCH_ACTION_PINCH_CLOSEED = 105;
 
+    static constexpr int32_t TOUCH_ACTION_GESTURE_END = 106;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -1280,6 +1282,8 @@ public:
 
     virtual void Reset() override;
 
+    virtual std::string ToString() override;
+
     /**
      * @brief Obtains the pointer action in this event.
      * @return Returns the pointer action.
@@ -1760,6 +1764,9 @@ private:
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    bool ancoDeal_ { false };
+#endif // OHOS_BUILD_ENABLE_ANCO
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
