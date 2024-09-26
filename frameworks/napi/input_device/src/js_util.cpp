@@ -15,6 +15,8 @@
 
 #include "js_util.h"
 
+#include <unordered_map>
+
 #include <linux/input.h>
 
 #include "mmi_log.h"
@@ -27,7 +29,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-std::map<int32_t, std::string> axisType = {
+std::unordered_map<int32_t, std::string> axisType = {
     { ABS_MT_TOUCH_MAJOR, "touchmajor" },
     { ABS_MT_TOUCH_MINOR, "touchminor" },
     { ABS_MT_ORIENTATION, "orientation" },
