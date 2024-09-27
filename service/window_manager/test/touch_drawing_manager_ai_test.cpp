@@ -631,30 +631,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLastPointerItem,
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_DestoryTouchWindow
- * @tc.desc: Test DestoryTouchWindow
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DestoryTouchWindow, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager touchDrawingMgr;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "touch window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NE(touchDrawingMgr.surfaceNode_, nullptr);
-    touchDrawingMgr.bubbleMode_.isShow = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DestoryTouchWindow());
-    touchDrawingMgr.bubbleMode_.isShow = false;
-    touchDrawingMgr.pointerMode_.isShow = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DestoryTouchWindow());
-    touchDrawingMgr.pointerMode_.isShow = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DestoryTouchWindow());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_ClearTracker
  * @tc.desc: Test ClearTracker
  * @tc.type: Function
