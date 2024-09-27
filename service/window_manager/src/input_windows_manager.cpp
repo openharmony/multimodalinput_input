@@ -908,6 +908,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
         if (window.windowType == static_cast<int32_t>(Rosen::WindowType::WINDOW_TYPE_TRANSPARENT_VIEW)) {
             OnGestureSendEvent(lastPointerEventforGesture_);
             isSendGestureDown_ = false;
+            break;
         }
     }
 }
