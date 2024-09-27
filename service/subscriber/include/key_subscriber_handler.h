@@ -90,7 +90,6 @@ private:
     bool IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
     bool IsEnableCombineKeySwipe(const std::shared_ptr<KeyEvent> key);
-    bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
     void HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent, const std::shared_ptr<Subscriber> &subscriber);
     void PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber);
     void SubscriberNotifyNap(const std::shared_ptr<Subscriber> subscriber);
@@ -113,6 +112,7 @@ private:
     void ClearSubscriberTimer(std::list<std::shared_ptr<Subscriber>> subscribers);
     void GetForegroundPids(std::set<int32_t> &pidList);
     void PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent);
+    void RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     SubscriberCollection subscriberMap_;
@@ -130,4 +130,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // KEY_SUBSCRIBER_HANDLER_H
+#endif  // KEY_SUBSCRIBER_HANDLER_H
