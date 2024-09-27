@@ -67,6 +67,20 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnThread_02, TestSize.Level1)
 }
 
 /**
+ * @tc.name: MMIServerTest_OnThread_03
+ * @tc.desc: Test OnThread
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnThread_03, TestSize.Level1)
+{
+    MMIService mmiService;
+    EpollEventType epollType;
+    epollType = EPOLL_EVENT_SIGNAL;
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnThread());
+}
+
+/**
  * @tc.name: MMIServerTest_OnThread_04
  * @tc.desc: Test OnThread
  * @tc.type: FUNC
