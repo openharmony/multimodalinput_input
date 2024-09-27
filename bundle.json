@@ -83,7 +83,8 @@
         "call_manager",
         "libinput",
         "screenlock_mgr",
-	"player_framework"
+	      "player_framework",
+        "qos_manager"
       ],
       "third_party": [
         "cJSON",
