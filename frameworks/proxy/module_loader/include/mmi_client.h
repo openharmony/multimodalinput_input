@@ -59,6 +59,7 @@ private:
     const std::string& GetErrorStr(ErrCode code) const;
     void OnConnected() override;
     void OnDisconnected() override;
+    void SetScheduler();
 
 private:
     ClientMsgHandler msgHandler_;
