@@ -43,7 +43,7 @@ bool HardwareCursorPointerManager::IsSupported()
 
 int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 {
-    MMI_HILOGD("SetPosition, x:%{public}d, y:%{public}d", x, y);
+    MMI_HILOGD("SetPosition, x:%{private}d, y:%{private}d", x, y);
     return RET_OK;
 }
 
@@ -57,7 +57,7 @@ int32_t HardwareCursorPointerManager::EnableStats(bool enable)
 int32_t HardwareCursorPointerManager::GetCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Get hardware cursor stats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    MMI_HILOGD("Get hardware cursor stats, frameCount:%{private}d, vsyncCount:%{private}d", frameCount, vsyncCount);
     return RET_OK;
 }
 } // namespace MMI

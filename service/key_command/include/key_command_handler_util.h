@@ -85,7 +85,9 @@ enum SpecialType {
     KEY_DOWN_ACTION = 2
 };
 const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
-    { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION }
+    { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
+    { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::KEY_DOWN_ACTION },
+    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::KEY_DOWN_ACTION }
 };
 struct JsonParser {
     JsonParser() = default;

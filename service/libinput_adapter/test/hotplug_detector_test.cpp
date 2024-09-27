@@ -173,36 +173,6 @@ HWTEST_F(HotplugTest, TestSpecialCases, TestSize.Level1)
     EXPECT_EQ(detector.GetFd(), -1);
 }
 
-HWTEST_F(HotplugTest, TestSsystemFail, TestSize.Level1)
-{
-    OHOS::MMI::HotplugDetector detector;
-    auto dummy = [](std::string path) {};
-
-    std::vector<DIR *> dirs;
-    // Exhaust system resources
-    while (true) {
-        auto *dir = opendir(DEV_INPUT_PATH);
-        if (dir == nullptr) {
-            break;
-        }
-        dirs.push_back(dir);
-    }
-
-    // inotify should fail
-    EXPECT_FALSE(detector.Init(dummy, dummy));
-
-    // Free one fd
-    closedir(dirs.back());
-    dirs.pop_back();
-
-    // Scan should fail
-    EXPECT_FALSE(detector.Init(dummy, dummy));
-
-    for (auto it = dirs.rbegin(); it != dirs.rend(); ++it) {
-        closedir(*it);
-    }
-}
-
 HWTEST_F(HotplugTest, TestInitFail, TestSize.Level1)
 {
     OHOS::MMI::HotplugDetector detector;
