@@ -900,10 +900,10 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
         }
     }
 
+    windowsPerDisplay_ = windowsPerDisplay;
     if (!isSendGestureDown_) {
         return;
     }
-    windowsPerDisplay_ = windowsPerDisplay;
     for (const auto &window : displayGroupInfo.windowsInfo) {
         if (window.windowType == static_cast<int32_t>(Rosen::WindowType::WINDOW_TYPE_TRANSPARENT_VIEW)) {
             OnGestureSendEvent(lastPointerEventforGesture_);
