@@ -211,6 +211,11 @@ int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::fun
     return 0;
 }
 
+int32_t TimerManager::RemoveTimer(int32_t timerId)
+{
+    return 0;
+}
+
 void DfxHisysevent::OnFocusWindowChanged(int32_t oldFocusWindowId, int32_t newFocusWindowId,
     int32_t oldFocusWindowPid, int32_t newFocusWindowPid)
 {}
