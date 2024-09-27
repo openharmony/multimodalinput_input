@@ -384,6 +384,7 @@ private:
     int32_t windowStateNotifyPid_ { -1 };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
+    bool isSendGestureDown_ { false };
     static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
     bool IsFoldable_ { false };
 };
