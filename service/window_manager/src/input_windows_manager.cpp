@@ -45,6 +45,7 @@
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "magic_pointer_velocity_tracker.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#include "wm_common.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
@@ -847,6 +848,7 @@ void InputWindowsManager::OnGestureSendEvent(std::shared_ptr<PointerEvent> event
 {
     CALL_INFO_TRACE;
     CHKPV(event);
+    event->SetTargetWindowId(-1);
     auto pointerEvent = std::make_shared<PointerEvent>(*event);
     pointerEvent->RemoveAllPointerItems();
     auto items = event->GetAllPointerItems();
@@ -862,6 +864,7 @@ void InputWindowsManager::OnGestureSendEvent(std::shared_ptr<PointerEvent> event
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
 
         item.SetTargetWindowId(-1);
+        event->UpdatePointerItem(pointerId, item);
         pointerEvent->AddPointerItem(item);
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
@@ -897,10 +900,14 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
         }
     }
 
+    if (!isSendGestureDown_) {
+        return;
+    }
     windowsPerDisplay_ = windowsPerDisplay;
     for (const auto &window : displayGroupInfo.windowsInfo) {
-        if (window.windowInputType == WindowInputType::TRANSPARENT_VIEW) {
-            OnGestureSendEvent(lastTouchEvent_);
+        if (window.windowType == static_cast<int32_t>(Rosen::WindowType::WINDOW_TYPE_TRANSPARENT_VIEW)) {
+            OnGestureSendEvent(lastPointerEventforGesture_);
+            isSendGestureDown_ = false;
         }
     }
 }
@@ -3323,6 +3330,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     lastPointerEventforWindowChange_ = pointerEvent;
+    lastPointerEventforGesture_ = pointerEvent;
     pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
         pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER) {
@@ -3331,6 +3339,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowInfoEX.flag = true;
         touchItemDownInfos_[pointerId] = windowInfoEX;
         MMI_HILOG_FREEZEI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
+        isSendGestureDown_ = true;
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOG_DISPATCHD("Clear extra data");
         pointerEvent->ClearBuffer();
