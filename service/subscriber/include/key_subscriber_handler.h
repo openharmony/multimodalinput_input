@@ -49,9 +49,10 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
-            const std::shared_ptr<KeyOption> keyOption, bool isSystem);
-    int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId, bool isSystem);
+    int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption);
+    int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
+    int32_t SubscribeHotkey(SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption);
+    int32_t UnsubscribeHotkey(SessionPtr sess, int32_t subscribeId);
     void RemoveSubscriberKeyUpTimer(int32_t keyCode);
     int32_t EnableCombineKey(bool enable);
     void Dump(int32_t fd, const std::vector<std::string> &args);

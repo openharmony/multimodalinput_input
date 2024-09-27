@@ -374,6 +374,34 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
+int32_t InputManagerImpl::SubscribeHotkey(std::shared_ptr<KeyOption> keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    std::lock_guard guard(mtx_);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CHKPR(keyOption, RET_ERR);
+    CHKPR(callback, RET_ERR);
+    return KeyEventInputSubscribeMgr.SubscribeHotkey(keyOption, callback);
+#else
+    MMI_HILOGW("Keyboard device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+void InputManagerImpl::UnsubscribeHotkey(int32_t subscriberId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    std::lock_guard guard(mtx_);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    KeyEventInputSubscribeMgr.UnsubscribeHotkey(subscriberId);
+#else
+    MMI_HILOGW("Keyboard device does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
 int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
     std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {

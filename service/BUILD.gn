@@ -1567,7 +1567,10 @@ ohos_unittest("KeyEventValueTransformationTest") {
 ohos_unittest("KeyCommandTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+  include_dirs = [
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/test/unittest/common/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -1584,6 +1587,7 @@ ohos_unittest("KeyCommandTest") {
     "key_command/test/key_command_handler_test.cpp",
     "key_command/test/key_command_handler_util_test.cpp",
     "key_command/test/setting_datashare_test.cpp",
+    "subscriber/src/key_shortcut_manager.cpp",
   ]
 
   deps = [

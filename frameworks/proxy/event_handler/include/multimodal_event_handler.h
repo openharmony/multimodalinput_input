@@ -42,6 +42,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
+    int32_t SubscribeHotkey(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo);
+    int32_t UnsubscribeHotkey(int32_t subscribeId);
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH

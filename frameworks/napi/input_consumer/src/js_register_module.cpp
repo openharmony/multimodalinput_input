@@ -412,7 +412,7 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
     if (preSubscribeId < 0) {
         MMI_HILOGD("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
-        subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubHotkeyEventCallback);
+        subscribeId = InputManager::GetInstance()->SubscribeHotkey(keyOption, SubHotkeyEventCallback);
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_SYSTEM, "Hotkey occupied by system");
@@ -548,6 +548,8 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
             MMI_HILOGE("DelEventCallback failed");
             return nullptr;
         }
+        MMI_HILOGI("Unsubscribe hot key(%{public}d)", subscribeId);
+        InputManager::GetInstance()->UnsubscribeHotkey(subscribeId);
     } else {
         if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
             MMI_HILOGE("GetEventInfoAPI9 failed");
@@ -557,10 +559,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
             MMI_HILOGE("DelEventCallback failed");
             return nullptr;
         }
-    }
-
-    MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
-    if (subscribeId >= 0) {
+        MMI_HILOGI("Unsubscribe key event(%{public}d)", subscribeId);
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
     return nullptr;
