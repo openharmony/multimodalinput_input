@@ -1371,6 +1371,7 @@ ohos_unittest("KeyGestureManagerEXTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
   ]
 }
 
