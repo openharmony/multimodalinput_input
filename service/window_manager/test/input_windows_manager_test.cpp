@@ -5134,7 +5134,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindow
     bool isHotArea = true;
     const WindowInfo* touchWindow = nullptr;
     InputWindowsManager manager;
-    int32_t windowId;
     WindowInfo windowInfo;
     windowInfo.windowType = 2105;
     windowInfo.area.x = 10;
