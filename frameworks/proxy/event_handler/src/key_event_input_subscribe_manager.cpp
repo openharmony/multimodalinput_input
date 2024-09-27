@@ -134,13 +134,13 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return ret;
     }
 
-    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
+    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
         tIter->GetSubscribeId(), keyOption->GetFinalKey(),
         keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     for (const auto &preKey : preKeys) {
-        MMI_HILOGD("prekey:%{public}d", preKey);
+        MMI_HILOGD("prekey:%{private}d", preKey);
     }
     return tIter->GetSubscribeId();
 }
@@ -167,6 +167,78 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         if (it->GetSubscribeId() == subscribeId) {
             if (MMIEventHdl.UnsubscribeKeyEvent(subscribeId) != RET_OK) {
                 MMI_HILOGE("Leave, unsubscribe key event failed");
+                return RET_ERR;
+            }
+            subscribeInfos_.erase(it);
+            return RET_OK;
+        }
+    }
+    return RET_ERR;
+}
+
+int32_t KeyEventInputSubscribeManager::SubscribeHotkey(std::shared_ptr<KeyOption> keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
+    CHKPR(callback, INVALID_SUBSCRIBE_ID);
+    std::set<int32_t> preKeys = keyOption->GetPreKeys();
+    if (preKeys.size() > PRE_KEYS_NUM) {
+        MMI_HILOGE("PreKeys number invalid");
+        return INVALID_SUBSCRIBE_ID;
+    }
+
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return INVALID_SUBSCRIBE_ID;
+    }
+
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto [tIter, isOk] = subscribeInfos_.emplace(keyOption, callback);
+    if (!isOk) {
+        MMI_HILOGW("Subscription is duplicated");
+        return tIter->GetSubscribeId();
+    }
+    int32_t ret = MMIEventHdl.SubscribeHotkey(*tIter);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeHotkey fail, error:%{public}d", ret);
+        subscribeInfos_.erase(tIter);
+        return ret;
+    }
+
+    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{private}d,"
+        "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
+        tIter->GetSubscribeId(), keyOption->GetFinalKey(),
+        keyOption->IsFinalKeyDown() ? "true" : "false",
+        keyOption->GetFinalKeyDownDuration());
+    for (const auto &preKey : preKeys) {
+        MMI_HILOGD("prekey:%{private}d", preKey);
+    }
+    return tIter->GetSubscribeId();
+}
+
+int32_t KeyEventInputSubscribeManager::UnsubscribeHotkey(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    if (subscribeId < 0) {
+        MMI_HILOGE("Subscribe id is less than 0");
+        return RET_ERR;
+    }
+
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return INVALID_SUBSCRIBE_ID;
+    }
+    if (subscribeInfos_.empty()) {
+        MMI_HILOGE("Subscribe Infos is empty");
+        return RET_ERR;
+    }
+
+    for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
+        if (it->GetSubscribeId() == subscribeId) {
+            if (MMIEventHdl.UnsubscribeHotkey(subscribeId) != RET_OK) {
+                MMI_HILOGE("UnsubscribeHotkey fail");
                 return RET_ERR;
             }
             subscribeInfos_.erase(it);

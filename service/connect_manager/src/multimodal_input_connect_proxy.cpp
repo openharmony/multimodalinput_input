@@ -1222,6 +1222,56 @@ int32_t MultimodalInputConnectProxy::UnsubscribeKeyEvent(int32_t subscribeId)
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(keyOption, ERR_INVALID_VALUE);
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
+    if (!keyOption->WriteToParcel(data)) {
+        MMI_HILOGE("Failed to write key option");
+        return ERR_INVALID_VALUE;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_HOT_KEY),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, result:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::UnsubscribeHotkey(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_HOT_KEY),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, result:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CALL_DEBUG_ENTER;

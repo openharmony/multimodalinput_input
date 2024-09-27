@@ -130,6 +130,8 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_CLIENT_INFO = 104,
     ADD_GESTURE_MONITOR = 105,
     REMOVE_GESTURE_MONITOR = 106,
+    SUBSCRIBE_HOT_KEY = 303,
+    UNSUBSCRIBE_HOT_KEY = 304,
 };
 
 enum class MultimodalinputEventObserverCode {

@@ -66,11 +66,12 @@ public:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    int32_t SubscribeKeyEvent(
-        std::shared_ptr<KeyOption> keyOption,
-        std::function<void(std::shared_ptr<KeyEvent>)> callback
-    );
+    int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
     void UnsubscribeKeyEvent(int32_t subscriberId);
+    int32_t SubscribeHotkey(std::shared_ptr<KeyOption> keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    void UnsubscribeHotkey(int32_t subscriberId);
     int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
