@@ -44,6 +44,7 @@ public:
     bool CheckDispatchControl();
     bool VerifySystemApp();
     bool CheckInfraredEmmit();
+    bool CheckInjectPermission();
     bool RequestFromShell();
     bool CheckMouseCursor();
     bool CheckInputEventFilter();
@@ -59,4 +60,4 @@ private:
 #define PER_HELPER PermissionHelper::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // PERMISSION_HELPER_H
+#endif  // PERMISSION_HELPER_H

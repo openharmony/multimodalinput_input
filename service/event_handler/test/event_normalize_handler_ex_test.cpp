@@ -269,9 +269,9 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTouchPad
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchevent));
     MultiFingersTapHandler processor;
-    processor.multiFingersState_ = MulFingersTap::TRIPLETAP;
+    processor.multiFingersState_ = MulFingersTap::TRIPLE_TAP;
     ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(&event));
-    processor.multiFingersState_ = MulFingersTap::QUADTAP;
+    processor.multiFingersState_ = MulFingersTap::QUAD_TAP;
     ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(&event));
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
     ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(&event));

@@ -16,8 +16,8 @@
 #include "event_resample.h"
 
 #include "event_log_helper.h"
-#include "input_device_manager.h"
 #include "i_input_windows_manager.h"
+#include "input_device_manager.h"
 #include "mmi_log.h"
 #include "util.h"
 
@@ -185,7 +185,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             int32_t toolWindowX = item.GetToolWindowX();
             int32_t toolWindowY = item.GetToolWindowY();
             if (EventLogHelper::IsBetaVersion() && !pointerEvent_->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGD("Output event: toolWindowX:%{public}d, toolWindowY:%{public}d", toolWindowX, toolWindowY);
+                MMI_HILOGD("Output event: toolWindowX:%d, toolWindowY:%d", toolWindowX, toolWindowY);
             } else {
                 MMI_HILOGD("Output event: toolWindowX:%d, toolWindowY:%d", toolWindowX, toolWindowY);
             }
@@ -519,6 +519,5 @@ void EventResample::PrintfDeviceName()
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
         device->GetName().c_str());
 }
-
 } // namespace MMI
 } // namespace OHOS

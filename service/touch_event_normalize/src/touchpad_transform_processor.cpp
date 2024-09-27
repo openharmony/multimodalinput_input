@@ -171,7 +171,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *eve
 
     uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     pointerEvent_->SetActionTime(time);
-    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
+    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         SetTouchPadMultiTapData();
     } else {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
