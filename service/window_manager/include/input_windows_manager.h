@@ -289,8 +289,9 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
         const DisplayInfo& info, EventTouch& touchInfo);
     void SetAntiMisTake(bool state);
     void SetAntiMisTakeStatus(bool state);
-    void CheckUIExtentionWindowDefaultHotArea(int32_t logicalX, int32_t logicalY,
-        const std::vector<WindowInfo>& windowInfos, int32_t& windowId);
+    void CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t, int32_t> logicalXY, bool isHotArea,
+        const std::shared_ptr<PointerEvent> pointerEvent, const std::vector<WindowInfo>& windowInfos,
+        const WindowInfo* touchWindow);
     void GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
         WindowInfo **touchWindow, bool &isUiExtentionWindow);
 #endif // OHOS_BUILD_ENABLE_TOUCH
