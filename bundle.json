@@ -98,7 +98,8 @@
         "googletest",
         "skia",
         "player_framework",
-        "cJSON"
+        "cJSON",
+        "qos_manager"
       ],
       "third_party": [
         "cJSON",
