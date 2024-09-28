@@ -413,7 +413,6 @@ struct DisplayInfo {
      */
     DisplayMode displayMode { DisplayMode::UNKNOWN };
 
-
     /**
      * Number of transform in the screen which is used to calculate the display x and display y by logic x and logic y.
      * The value must be POINTER_CHANGEAREA_COUNT.
