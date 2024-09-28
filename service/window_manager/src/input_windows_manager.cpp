@@ -3526,12 +3526,14 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     if (knuckleDrawMgr_ == nullptr) {
         knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
     }
+#ifndef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     if (knuckleDynamicDrawingManager_ == nullptr) {
         knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
         if (knuckleDrawMgr_ != nullptr) {
             knuckleDynamicDrawingManager_->SetKnuckleDrawingManager(knuckleDrawMgr_);
         }
     }
+#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
@@ -3549,8 +3551,10 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     if (!knuckleSwitch && !isInMethodWindow) {
         knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
         knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
+#ifndef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
         knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
         knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY && OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
