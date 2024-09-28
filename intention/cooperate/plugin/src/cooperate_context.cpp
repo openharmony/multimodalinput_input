@@ -17,8 +17,6 @@
 
 #include <algorithm>
 
-#include "display_manager.h"
-
 #include "cooperate_hisysevent.h"
 #include "ddm_adapter.h"
 #include "devicestatus_define.h"
