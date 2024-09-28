@@ -122,7 +122,6 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
-    static void TearDownTestCase();
     std::string GetEventDump();
 
 private:
@@ -147,10 +146,6 @@ void InputManagerPointerTest::SetUpTestCase()
     ASSERT_TRUE(TestUtil->Init());
 }
 
-void InputManagerPointerTest::TearDownTestCase(void)
-{
-}
-
 void InputManagerPointerTest::SetUp()
 {
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_FOCUS);
@@ -168,8 +163,6 @@ void InputManagerPointerTest::SetUp()
     InputManager::GetInstance()->GetTouchpadRotateSwitch(preRotateSwitch_);
     InputManager::GetInstance()->GetPointerSize(prePointerSize_);
     InputManager::GetInstance()->GetPointerColor(prePointerColor_);
-    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
-    InputManager::GetInstance()->GetTouchpadScrollRows(preScrollRows_);
 }
 
 void InputManagerPointerTest::TearDown()
@@ -190,8 +183,6 @@ void InputManagerPointerTest::TearDown()
     InputManager::GetInstance()->SetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->SetPointerSize(prePointerSize_);
     InputManager::GetInstance()->SetPointerColor(prePointerColor_);
-    InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
-    InputManager::GetInstance()->SetTouchpadScrollRows(preScrollRows_);
 }
 
 std::string InputManagerPointerTest::GetEventDump()
@@ -213,7 +204,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
 #ifdef OHOS_BUILD_ENABLE_POINTER
     AccessToken accessToken;
     SimulateInputEventUtilTest(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif  // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -230,7 +221,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     AccessToken accessToken;
     SimulateInputEventUtilTest(keyEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -247,7 +238,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     AccessToken accessToken;
     SimulateInputEventUtilTest(keyEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -264,7 +255,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
 #ifdef OHOS_BUILD_ENABLE_POINTER
     AccessToken accessToken;
     SimulateInputEventUtilTest(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif  // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -282,7 +273,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_001, TestSi
     ASSERT_NE(monitorId, INVALID_HANDLER_ID);
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -301,7 +292,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_002, TestSi
     ASSERT_NE(monitorId, INVALID_HANDLER_ID);
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -324,7 +315,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_001
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -353,7 +344,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
 #else
         EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -367,7 +358,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002
         ASSERT_TRUE(!sPointerEs.empty());
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             InputManagerUtil::TestRemoveMonitor(id);
         }
@@ -398,12 +389,12 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_003
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 
     if (IsValidHandlerId(monitorId)) {
         InputManagerUtil::TestRemoveMonitor(monitorId);
@@ -442,7 +433,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -479,7 +470,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -516,7 +507,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -557,7 +548,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
 #else
         EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -570,7 +561,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
         ASSERT_TRUE(!sPointerEs.empty());
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             InputManagerUtil::TestRemoveMonitor(id);
         }
@@ -612,7 +603,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -635,7 +626,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_001, T
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     auto pointerEvent = InputManagerUtil::SetupPointerEvent005();
@@ -659,7 +650,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_003, T
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     auto pointerEvent = InputManagerUtil::SetupPointerEvent007();
@@ -710,7 +701,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_004, T
     ASSERT_EQ(maxMonitor, ids.size());
 #else
     ASSERT_EQ(maxMonitor, 0);
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -746,7 +737,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddKeyboardMonitor_0
         ASSERT_TRUE(!sPointerEs.empty());
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             InputManagerUtil::TestRemoveMonitor(id);
         }
@@ -827,7 +818,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetWindowInputEventCon
     EXPECT_EQ(runnerThreadId, consumerThreadId);
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif  // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -867,7 +858,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetWindowInputEventCon
     EXPECT_EQ(runnerThreadId, consumerThreadId);
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -1612,6 +1603,35 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickT
 }
 
 /**
+ * @tc.name: InputManagerPointerTest_SetTouchpadRotateSwitch_001
+ * @tc.desc: Set touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool rotateSwitch = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_GetTouchpadRotateSwitch_001
+ * @tc.desc: Get touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool rotateSwitch = true;
+    InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
+    bool newRotateSwitch = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
+    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
+}
+
+/**
  * @tc.name: InputManagerPointerTest_SetPointerSize_001
  * @tc.desc: Sets pointer size
  * @tc.type: FUNC
@@ -1841,48 +1861,5 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_005, T
         ASSERT_TRUE(false);
     }
 }
-
-/**
- * @tc.name: InputManagerPointerTest_SetTouchpadThreeFingersTapSwitch_001
- * @tc.desc: Set touchpad ThreeFingers Tap switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool flag = false;
-    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag) == RET_OK);
-}
-
-/**
- * @tc.name: InputManagerPointerTest_SetTouchpadScrollRows_001
- * @tc.desc: Sets touchpad scroll rows
- * @tc.type: FUNC
- * @tc.require: I530XS
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollRows_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t rows = 1;
-    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadScrollRows(rows) == RET_OK);
-}
-
-/**
- * @tc.name: InputManagerPointerTest_GetTouchpadScrollRows_001
- * @tc.desc: Sets touchpad scroll rows
- * @tc.type: FUNC
- * @tc.require: I530XS
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollRows_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t rows = 50;
-    int32_t newRows = 3;
-    if (InputManager::GetInstance()->SetTouchpadScrollRows(rows) == RET_OK) {
-        ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadScrollRows(newRows) == RET_OK);
-        ASSERT_EQ(rows, newRows);
-    }
-}
-} // namespace MMI
-} // namespace OHOS
+}  // namespace MMI
+}  // namespace OHOS
