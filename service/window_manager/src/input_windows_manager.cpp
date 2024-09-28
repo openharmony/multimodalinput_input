@@ -3119,7 +3119,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         } else {
             for (int32_t windowId : windowIds) {
                 auto windowInfo = GetWindowAndDisplayInfo(windowId, pointerEvent->GetTargetDisplayId());
-                if(!windowInfo) {
+                if (!windowInfo) {
                     continue;
                 }
                 isFirstSpecialWindow = isFirstSpecialWindow || HandleWindowInputType(*windowInfo, pointerEvent);
