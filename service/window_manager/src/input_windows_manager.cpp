@@ -3116,6 +3116,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         GetTargetWindowIds(pointerId, pointerEvent->GetSourceType(), windowIds);
         if (windowIds.size() <= 1) {
             pointerEvent->SetAncoDeal(true);
+        } else {
+            for (int32_t windowId : windowIds) {
+                auto windowInfo = GetWindowAndDisplayInfo(windowId, pointerEvent->GetTargetDisplayId());
+                if (!windowInfo) {
+                    continue;
+                }
+                isFirstSpecialWindow = isFirstSpecialWindow || HandleWindowInputType(*windowInfo, pointerEvent);
+            }
         }
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
