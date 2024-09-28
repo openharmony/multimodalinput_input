@@ -518,11 +518,16 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
+        MMI_HILOGI("Prepare to send a axis-end event");
+        CancelTwoFingerAxis(event);
+    }
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     PointerEventSetPressedKeys(pointerEvent);
     EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
-    auto type = libinput_event_get_type(event);
+    type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch pad event is up remove this finger");
@@ -803,6 +808,24 @@ void EventNormalizeHandler::RestoreTouchPadStatus()
     buttonIds_.clear();
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
+
+void EventNormalizeHandler::CancelTwoFingerAxis(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    auto type = libinput_event_get_type(event);
+    if (type != LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
+        MMI_HILOGI("Current event is not expected");
+        return;
+    }
+    bool result = MouseEventHdr->CheckAndPackageAxisEvent(event);
+    if (!result) {
+        MMI_HILOGI("Check or packet axis event failed");
+        return;
+    }
+    auto pointerEvent = MouseEventHdr->GetPointerEvent();
+    CHKPV(pointerEvent);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+}
 
 void EventNormalizeHandler::TerminateAxis(libinput_event* event)
 {
