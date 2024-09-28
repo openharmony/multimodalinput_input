@@ -446,7 +446,7 @@ bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInf
     CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER_MIDDLE) {
         MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return false;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
@@ -502,7 +502,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     }
     if (argc < INPUT_PARAMETER_MAX) {
         MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
     if (!GetEventType(env, info, event, keyType)) {
