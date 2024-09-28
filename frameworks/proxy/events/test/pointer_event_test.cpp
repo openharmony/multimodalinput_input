@@ -1823,5 +1823,23 @@ HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_003, TestSize.Level1)
     ret = inputEvent->WriteToParcel(out);
     ASSERT_TRUE(ret);
 }
+
+/**
+ * @tc.name: PointerEventTest_ToString
+ * @tc.desc: Test the funcation ToString
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ToString, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->ToString());
+
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(inputEvent->ToString());
+}
 } // namespace MMI
 } // namespace OHOS

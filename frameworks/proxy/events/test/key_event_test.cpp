@@ -565,5 +565,19 @@ HWTEST_F(KeyEventTest, KeyEventTest_Reset, TestSize.Level1)
     ASSERT_NE(keyEvent, nullptr);
     ASSERT_NO_FATAL_FAILURE(keyEvent->Reset());
 }
+
+/**
+ * @tc.name: KeyEventTest_ToString
+ * @tc.desc: Test the funcation ToString
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_ToString, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(keyEvent->ToString());
+}
 } // namespace MMI
 } // namespace OHOS
