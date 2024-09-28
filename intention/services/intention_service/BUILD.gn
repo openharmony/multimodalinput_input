@@ -63,7 +63,6 @@ ohos_shared_library("intention_service") {
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
-    "window_manager:libdm",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
