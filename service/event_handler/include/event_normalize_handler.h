@@ -83,6 +83,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_SWITCH
     void TerminateRotate(libinput_event* event);
     void TerminateAxis(libinput_event* event);
+    void CancelTwoFingerAxis(libinput_event* event);
 };
 } // namespace MMI
 } // namespace OHOS
