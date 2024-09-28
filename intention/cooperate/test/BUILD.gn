@@ -41,7 +41,7 @@ ohos_unittest("CooperateClientTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  
+
   configs = []
 
   deps = [
