@@ -52,6 +52,7 @@ declare_args() {
   input_feature_move_event_filters = false
   input_shortcut_key_manager_enabled = true
   input_shortcut_key_rules_enabled = true
+  input_new_knuckle_dynamic_enabled = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -291,6 +292,10 @@ print("input_feature_short_key = ${input_feature_short_key}")
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 
 input_default_defines = []
+
+if (input_new_knuckle_dynamic_enabled) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC" ]
+}
 
 if (input_feature_pointer_drawing) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
