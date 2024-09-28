@@ -242,8 +242,6 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent006()
     item.SetPressed(false);
     item.SetPointerId(0);
     item.SetDownTime(0);
-
-
     item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_4);
     item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_4);
     item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_3);
