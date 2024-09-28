@@ -174,22 +174,22 @@ typedef enum InputEvent_SourceType {
 } InputEvent_SourceType;
 
 /**
- * @brief 键盘输入设备的类型。
+ * @brief Enumerates keyboard types.
  *
  * @since 13
  */
 typedef enum Input_KeyboardType {
-    /** 表示无按键设备。 */
+    /** Keyboard without keys */
     KEYBOARD_TYPE_NONE = 0,
-    /** 表示未知按键设备。 */
+    /** Keyboard with unknown keys */
     KEYBOARD_TYPE_UNKNOWN = 1,
-    /** 表示全键盘设备。 */
+    /** Full keyboard */
     KEYBOARD_TYPE_ALPHABETIC = 2,
-    /** 表示数字键盘设备。 */
+    /** Digital keyboard */
     KEYBOARD_TYPE_DIGITAL = 3,
-    /** 表示手写笔设备。 */
+    /** Stylus */
     KEYBOARD_TYPE_STYLUS = 4,
-    /** 表示遥控器设备。 */
+    /** Remote control */
     KEYBOARD_TYPE_REMOTE_CONTROL = 5,
 } Input_KeyboardType;
 
@@ -246,19 +246,8 @@ typedef enum Input_Result {
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
     /** Interceptor repeatedly created for an application */
-    INPUT_REPEAT_INTERCEPTOR = 4200001,
-    /** @error Already occupied by the system */
-    INPUT_OCCUPIED_BY_SYSTEM = 4200002,
-    /** @error Already occupied by the other */
-    INPUT_OCCUPIED_BY_OTHER = 4200003
+    INPUT_REPEAT_INTERCEPTOR = 4200001
 } Input_Result;
-
-/**
- * @brief Defines the hot key structure.
- *
- * @since 13
- */
-typedef struct Input_Hotkey Input_Hotkey;
 
 /**
  * @brief Defines a lifecycle callback for **keyEvent**.
@@ -289,21 +278,15 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
 /**
- * @brief Callback used to return shortcut key events.
- * @since 13
- */
-typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
-
-/**
- * @brief 回调函数，用于回调输入设备的上线事件。
- * @param deviceId 设备的id。
+ * @brief Defines the callback for device addition events.
+ * @param deviceId Device ID.
  * @since 13
  */
 typedef void (*Input_DeviceAddedCallback)(int32_t deviceId);
 
 /**
- * @brief 回调函数，用于回调输入设备的下线事件。
- * @param deviceId 设备的id。
+ * @brief Defines the callback for device removal events.
+ * @param deviceId Device ID.
  * @since 13
  */
 typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId);
@@ -323,13 +306,13 @@ typedef struct Input_InterceptorEventCallback {
 } Input_InterceptorEventCallback;
 
 /**
- * @brief 定义一个结构体用于监听设备热插拔
+ * @brief Defines a listener for device insertion and removal events.
  * @since 13
  */
 typedef struct Input_DeviceListener {
-    /** 定义一个回调函数用于回调设备上线事件 */
+    /** Callback for device addition events */
     Input_DeviceAddedCallback deviceAddedCallback;
-    /** 定义一个回调函数用于回调设备下线事件 */
+    /** Callback for device removal events */
     Input_DeviceRemovedCallback deviceRemovedCallback;
 } Input_DeviceListener;
 
@@ -340,7 +323,7 @@ typedef struct Input_DeviceListener {
 typedef struct Input_InterceptorOptions Input_InterceptorOptions;
 
 /**
- * @brief 输入设备信息。
+ * @brief Represents information about the input device.
  *
  * @since 13
  */
@@ -1264,364 +1247,193 @@ Input_Result OH_Input_RemoveKeyEventInterceptor(void);
 Input_Result OH_Input_RemoveInputEventInterceptor(void);
 
 /**
- * @brief Obtains the interval since the last system input event.
+ * @brief Obtains the IDs of all input devices.
  *
- * @param timeInterval Interval, in microseconds.
- * @return OH_Input_GetIntervalSinceLastInput status code, specifically,
- *         {@Link INPUT_SUCCESS} if the Operation is successful;
- *         {@Link INPUT_SERVICE_EXCEPTION} otherwise.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-int32_t OH_Input_GetIntervalSinceLastInput(int64_t *timeInterval);
-
-/**
- * @brief Creates a hot key object.
- *
- * @return Returns an {@Link Input_Hotkey} pointer object if the operation is successful. Otherwise, a null pointer is
- * returned. The possible cause is memory allocation failure.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Hotkey *OH_Input_CreateHotkey(void);
-
-/**
- * @brief Destroys a hot key object.
- *
- * @param hotkey Hot key object.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-void OH_Input_DestroyHotkey(Input_Hotkey **hotkey);
-
-/**
- * @brief Sets a modifier key.
- *
- * @param hotkey Hotkey key object.
- * @param preKeys List of modifier keys.
- * @param size Number of modifier keys. One or two modifier keys are supported.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-void OH_Input_SetPreKeys(Input_Hotkey *hotkey, int32_t *preKeys, int32_t size);
-
-/**
- * @brief Obtains a modifier key.
- *
- * @param hotkey Hotkey key object.
- * @param preKeys List of modifier keys.
- * @param preKeyCount Number of modifier keys.
- * @return OH_Input_GetPreKeys status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} The hotkey is NULL or the pressedKeys is NULL or the pressedKeyCount
- *         is NULL.\n
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, int32_t *preKeyCount);
-
-/**
- * @brief Sets a modified key.
- *
- * @param hotkey Hotkey key object.
- * @param finalKey Modified key. Only one modified key is supported.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-void OH_Input_SetFinalKey(Input_Hotkey *hotkey, int32_t finalKey);
-
-/**
- * @brief Obtains a modified key.
- *
- * @param hotkey Hotkey key object.
- * @param finalKeyCode Returns the key value of the decorated key.
- * @return OH_Input_GetfinalKey status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} The hotkey is NULL or the finalKeyCode is NULL.\n
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyCode);
-
-/**
- * @brief Creates an array of {@Link Input_Hotkey} instances.
- *
- * @param count Number of {@Link Input_Hotkey} instances to be created. The count must be the same as the number of
- * system shortcut keys.
- * @return If the operation is successful, the pointer to an array of {@Link Input_Hotkey} instances is returned.
- * If the operation fails, a null pointer is returned. The possible cause is memory allocation failure or count is
- * not equal to the number of system hotkeys.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count);
-
-/**
- * @brief Destroys an array of {@link Input_Hotkey} instances and reclaims memory.
- *
- * @param hotkeys Pointer to an array of {@Link Input_Hotkey } instances created by the
- * {@Link OH_Input_CreateAllSystemHotkeys} method.
- * @param count Count of the array to be destroyed, which must be the same as the number of system shortcut keys.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
-
-/**
- * @brief Obtains all hot keys supported by the system.
- *
- * @param hotkey Array of {@Link Input_Hotkey} instances.
- * When calling this API for the first time, you can pass NULL to obtain the array length.
- * @param count Number of hot keys supported by the system.
- * @return OH_Input_GetAllSystemHotkeys status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} The hotkey or count is NULL, or the value of count does not match the number
- *         of system shortcut keys supported by the system.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
-
-/**
- * @brief 注册设备热插拔的监听器
- *
- * @param listener 指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
- *
- * @return OH_Input_RegisterDeviceListener 的返回值, 具体如下:
- *         {@link INPUT_SUCCESS} 调用成功;\n
- *         {@link INPUT_PARAMETER_ERROR} listener 为NULL
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
-
-/**
- * @brief 取消注册设备热插拔的监听
- *
- * @param listener  指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
- *
- * @return OH_Input_UnregisterDeviceListener 的返回值, 具体如下:
- *         {@link INPUT_SUCCESS} 调用成功;\n
- *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL 或者 listener 未被注册
- *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
-
-/**
- * @brief 取消注册所有的设备热插拔的监听
- *
- * @return OH_Input_UnregisterDeviceListeners 的返回值, 具体如下:
- *         {@link INPUT_SUCCESS} 调用成功;\n
- *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_UnregisterDeviceListeners();
-
-/**
- * @brief Specifies whether to report repeated key events.
- *
- * @param hotkey Shortcut key object.
- * @param isRepeat Whether to report repeated key events.
- * The value <b>true</b> means to report repeated key events, and the value <b>false</b> means the opposite.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
-
-/**
- * @brief Checks whether to report repeated key events.
- *
- * @param hotkey Shortcut key object.
- * @param isRepeat Whether a key event is repeated.
- * @return OH_Input_GetIsRepeat status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} otherwise.\n
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_GetRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
-
-/**
- * @brief Subscribes to shortcut key events.
- *
- * @param hotkey Shortcut key object.
- * @param callback Callback used to return shortcut key events.
- * @return OH_Input_AddHotkeyMonitor status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} if hotkey or callback is NULL;\n
- *         {@link INPUT_HOTKEY_ALREADY_REGISTER} Subscription has been enabled;\n
- *         {@link INPUT_REPEAT_INTERCEPTOR} The shortcut key has been occupied.
- *         You can use {@link getAllSystemHotkeys} to query all system shortcut keys.\n
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
-
-/**
- * @brief Unsubscribes from shortcut key events.
- *
- * @param hotkey Shortcut key object.
- * @param callback Callback used to return shortcut key events.
- * @return OH_Input_RemoveHotkeyMonitor status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} if hotkey or callback is NULL;\n
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
-
-/**
- * @brief 获取所有输入设备的id列表。
- *
- * @param deviceIds 用于保存输入设备id的数组。
- * @param inSize 用于保存输入设备id数组的大小。
- * @param outSize 出参，输出输入设备id列表的长度，该值不会大于inSize。
- * @return OH_Input_GetDeviceIds 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceIds或outSize为空指针或inSize小于0。
+ * @param deviceIds Array of input device IDs.
+ * @param inSize Size of the array of input device IDs.
+ * @param outSize Length of the list of input device IDs. The value cannot be greater than the value of inSize.
+ * @return OH_Input_GetDeviceIds result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceIds or outSize is a null pointer or inSize is less than 0.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *outSize);
 
 /**
- * @brief 获取输入设备信息。
+ * @brief Obtains the information about an input device.
  *
- * @param deviceId 设备id。
- * @param deviceInfo 出参，指向输入设备信息{@Link Input_DeviceInfo}的指针。
- * @return OH_Input_GetDevice 的返回值如下,
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} 如果deviceInfo为空指针或deviceId无效。
- * 可以通过{@Link OH_Input_GetDeviceIds}接口查询系统支持的设备id。
+ * @param deviceId Device ID.
+ * @param deviceInfo Pointer to an {@Link Input_DeviceInfo} object.
+ * @return OH_Input_GetDevice result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if the deviceInfo is a null pointer or the deviceId is invalid.
+ * You can use the {@Link OH_Input_GetDeviceIds} interface to query the device IDs supported by the system.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetDevice(int32_t deviceId, Input_DeviceInfo **deviceInfo);
 
 /**
- * @brief 创建输入设备信息的对象。
+ * @brief Creates a deviceInfo object.
  *
- * @return 如果操作成功，返回设备信息{@Link Input_DeviceInfo}实例的指针。否则返回空指针，可能的原因是分配内存失败。
+ * @return Pointer to an {@Link Input_DeviceInfo} object if the operation is successful;
+ * a null pointer otherwise (possibly because of a memory allocation failure).
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_DeviceInfo* OH_Input_CreateDeviceInfo(void);
 
 /**
- * @brief 销毁输入设备信息的对象。
+ * @brief Destroys a deviceInfo object.
  *
- * @param deviceInfo 设备信息的对象。
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 void OH_Input_DestroyDeviceInfo(Input_DeviceInfo **deviceInfo);
 
 /**
- * @brief 获取输入设备的键盘类型。
+ * @brief Obtains the keyboard type of an input device.
  *
- * @param deviceId 设备id。
- * @param keyboardType 出参，指向键盘输入设备类型的指针。
- * @return OH_Input_GetKeyboardType 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} 设备id为无效值或者keyboardType是空指针。
+ * @param deviceId Device ID.
+ * @param keyboardType Pointer to the keyboard type of the input device.
+ * @return OH_Input_GetKeyboardType result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if the device ID is invalid or keyboardType is a null pointer.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *keyboardType);
 
 /**
- * @brief 获取输入设备的id。
+ * @brief Obtains the ID of an input device.
  *
- * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
- * @param id 出参，指向输入设备id的指针。
- * @return OH_Input_GetDeviceId 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者id是空指针。
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param id Pointer to the ID of the input device.
+ * @return OH_Input_GetDeviceId result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or id is a null pointer.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetDeviceId(Input_DeviceInfo *deviceInfo, int32_t *id);
 
 /**
- * @brief 获取输入设备的名称。
+ * @brief Obtains the name of an input device.
  *
- * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
- * @param name 出参，指向输入设备名称的指针。
- * @return OH_Input_GetDeviceName 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者name是空指针。
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param name Pointer to the name of the input device.
+ * @return OH_Input_GetDeviceName result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or name is a null pointer.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetDeviceName(Input_DeviceInfo *deviceInfo, char **name);
 
 /**
- * @brief 获取有关输入设备能力信息，比如设备是触摸屏、触控板、键盘等，详情请参考示例代码。
+ * @brief Obtains the capabilities of an input device, for example, a touchscreen, touchpad, or keyboard.
  *
- * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
- * @param capabilities 出参，指向输入设备能力信息的指针。
- * @return OH_Input_GetCapabilities 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者capabilities是空指针。
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param capabilities Pointer to the capabilities of the input device.
+ * @return OH_Input_GetCapabilities result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or capabilities is a null pointer.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetCapabilities(Input_DeviceInfo *deviceInfo, int32_t *capabilities);
 
 /**
- * @brief 获取输入设备的版本信息。
+ * @brief Obtains the version information of an input device.
  *
- * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
- * @param version 出参，指向输入设备版本信息的指针。
- * @return OH_Input_GetDeviceVersion 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者version是空指针。
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param version Pointer to the version information of the input device.
+ * @return OH_Input_GetDeviceVersion result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or version is a null pointer.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetDeviceVersion(Input_DeviceInfo *deviceInfo, int32_t *version);
 
 /**
- * @brief 获取输入设备的产品信息。
+ * @brief Obtains the product information of an input device.
  *
- * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
- * @param product 出参，指向输入设备产品信息的指针。
- * @return OH_Input_GetDeviceProduct 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者product是空指针。
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param product Pointer to the product information of the input device.
+ * @return OH_Input_GetDeviceProduct result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or product is a null pointer.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetDeviceProduct(Input_DeviceInfo *deviceInfo, int32_t *product);
 
 /**
- * @brief 获取输入设备的厂商信息。
+ * @brief Obtains the vendor information of an input device.
  *
- * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
- * @param vendor 出参，指向输入设备厂商信息的指针。
- * @return OH_Input_GetDeviceVendor 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者vendor是空指针。
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param vendor Pointer to the vendor information of the input device.
+ * @return OH_Input_GetDeviceVendor result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or vendor is a null pointer.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *vendor);
 
 /**
- * @brief 获取输入设备的物理地址。
+ * @brief Obtains the physical address of an input device.
  *
- * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
- * @param address 出参，指向输入设备物理地址的指针。
- * @return OH_Input_GetDeviceAddress 的返回值如下，
- *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者address是空指针。
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param address Pointer to the physical address of the input device.
+ * @return OH_Input_GetDeviceAddress result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or address is a null pointer.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **address);
+
+/**
+ * @brief Registers a listener for device hot swap events.
+ *
+ * @param listener Pointer to an {@Link Input_DeviceListener} object.
+ *
+ * @return OH_Input_RegisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if listener is NULL;
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
+
+/**
+ * @brief Unregisters the listener for device hot swap events.
+ *
+ * @param listener Pointer to the listener for device hot swap events. For details, see {@Link Input_DeviceListener}.
+ *
+ * @return OH_Input_UnregisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if listener is NULL or no listener is registered;
+ *         {@link INPUT_SERVICE_EXCEPTION} if the service is abnormal.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
+
+/**
+ * @brief Unregisters the listener for all device hot swap events.
+ *
+ * @return OH_Input_UnregisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_SERVICE_EXCEPTION} if the service is abnormal.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_UnregisterDeviceListeners(void);
 #ifdef __cplusplus
 }
 #endif
