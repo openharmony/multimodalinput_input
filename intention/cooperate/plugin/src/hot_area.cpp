@@ -11,12 +11,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 #include "hot_area.h"
-
-#include "display_manager.h"
-
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
@@ -63,7 +60,7 @@ void HotArea::EnableCooperate(const EnableCooperateEvent &event)
     height_ = display->GetHeight();
 }
 
-int32_t HotArea::ProcessData(std::shared_ptrMMI::PointerEvent pointerEvent)
+int32_t HotArea::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
