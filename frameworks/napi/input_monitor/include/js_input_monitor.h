@@ -30,7 +30,6 @@
 
 #include "i_input_event_consumer.h"
 #include "js_touch_event.h"
-#include "js_joystick_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -116,19 +115,14 @@ private:
     int32_t TransformRotateEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformMultiTapEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformSwipeInwardEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    int32_t TransformJoystickPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t TransformFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    std::optional<int32_t> GetJoystickAction(int32_t action);
-    int32_t GetJoystickButton(int32_t button);
-    int32_t GetJoystickPointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     bool SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
         const PointerEvent::PointerItem& item, napi_value result);
     bool GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value element);
     bool GetPressedKeys(const std::vector<int32_t>& pressedKeys, napi_value result);
-    bool GetJoystickPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
     bool GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
     bool HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
     bool GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result);
@@ -140,11 +134,14 @@ private:
     bool IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
 private:
     std::shared_ptr<InputMonitor> monitor_ { nullptr };
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
+    std::queue<std::shared_ptr<PointerEvent>> pointerQueue_;
     napi_ref receiver_ { nullptr };
     napi_env jsEnv_ { nullptr };
     std::string typeName_;
@@ -152,6 +149,7 @@ private:
     int32_t fingers_ { 0 };
     bool isMonitoring_ { false };
     std::mutex mutex_;
+    std::mutex resourcesmutex_;
 };
 } // namespace MMI
 } // namespace OHOS
