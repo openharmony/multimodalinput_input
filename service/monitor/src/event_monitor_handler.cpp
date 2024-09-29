@@ -593,7 +593,7 @@ void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler
     if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
-            MMI_HILOGI("Swipe event sended in monitor!");
+            MMI_HILOGI("Swipe event sended in monitor! action type: %{public}d", pointerEvent->GetPointerAction());
         }
         if (monitor.session_) {
             monitor.SendToClient(pointerEvent, pkt);
