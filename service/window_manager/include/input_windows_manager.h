@@ -318,6 +318,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     bool OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
+    void OnGestureSendEvent(std::shared_ptr<PointerEvent> event);
 
 private:
     UDSServer* udsServer_ { nullptr };
@@ -382,6 +383,8 @@ private:
     bool isParseConfig_ { false };
     int32_t windowStateNotifyPid_ { -1 };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
+    std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
+    bool isSendGestureDown_ { false };
     bool IsFoldable_ { false };
 };
 } // namespace MMI
