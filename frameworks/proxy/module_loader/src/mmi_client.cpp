@@ -24,9 +24,9 @@
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "qos.h"
 #include "proto.h"
 #include "util.h"
-#include "xcollie/watchdog.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIClient"
@@ -35,10 +35,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string THREAD_NAME { "OS_mmi_EventHdr" };
-const std::string SCENEBOARD_NAME { "com.ohos.sceneboard" };
 } // namespace
 
 using namespace AppExecFwk;
+using namespace OHOS::QOS;
 MMIClient::~MMIClient()
 {
     CALL_DEBUG_ENTER;
@@ -102,12 +102,19 @@ bool MMIClient::Start()
     return true;
 }
 
+void MMIClient::SetScheduler()
+{
+    CALL_INFO_TRACE;
+    SetThreadQos(QosLevel::QOS_USER_INTERACTIVE);
+}
+
 bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    eventHandler_->PostTask([this] { this->SetScheduler(); });
     MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
 
     if (isConnected_ && fd_ >= 0) {
