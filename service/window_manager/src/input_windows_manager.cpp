@@ -3046,18 +3046,17 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     MMI_HILOG_DISPATCHD("the first special window status:%{public}d", isFirstSpecialWindow);
                 }
             }
+            std::pair<int32_t, int32_t> logicalXY(std::make_pair(static_cast<int32_t>(logicalX),
+                static_cast<int32_t>(logicalY)));
+            // Determine whether the landing point is a safety sub window
+            CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent, item.uiExtentionWindowInfo,
+                touchWindow);
             if (isSpecialWindow) {
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
                 isHotArea = true;
                 continue;
-            } else {
-                std::pair<int32_t, int32_t> logicalXY(std::make_pair(static_cast<int32_t>(logicalX),
-                    static_cast<int32_t>(logicalY)));
-                // Determine whether the landing point is a safety sub window
-                CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent, item.uiExtentionWindowInfo,
-                    touchWindow);
-                break;
             }
+            break;
         } else {
             winMap.insert({item.id, item});
         }
@@ -3310,27 +3309,28 @@ void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t
     bool isHotArea, const std::shared_ptr<PointerEvent> pointerEvent, const std::vector<WindowInfo>& windowInfos,
     const WindowInfo* touchWindow)
 {
-    int32_t uiExtentionWindowInfo = 0;
-    int32_t windowdId = touchWindow->id;
+    int32_t uiExtentionWindowId = 0;
+    int32_t windowId = touchWindow->id;
     int32_t logicalX = logicalXY.first;
     int32_t logicalY = logicalXY.second;
     for (const auto& it : windowInfos) {
         if (IsInHotArea(logicalX, logicalY, it.defaultHotAreas, it)) {
-            uiExtentionWindowInfo = it.id;
+            uiExtentionWindowId = it.id;
             break;
         }
     }
-    if (uiExtentionWindowInfo > 0) {
+    if (uiExtentionWindowId > 0) {
         for (auto &windowinfo : windowInfos) {
-            if (windowinfo.id == uiExtentionWindowInfo) {
+            if (windowinfo.id == uiExtentionWindowId) {
                 touchWindow = &windowinfo;
-                AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), uiExtentionWindowInfo);
+                MMI_HILOG_DISPATCHD("uiExtentionWindowid:%{public}d", uiExtentionWindowId);
+                AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), uiExtentionWindowId);
                 break;
             }
         }
     }
     if (isHotArea) {
-        AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), windowdId);
+        AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), windowId);
     }
 }
 
@@ -3370,6 +3370,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
                     "window:%{public}d, flags:%{public}d", item.id, item.flags);
+                continue;
+            }
+            if (item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
                 continue;
             }
             if (IsInHotArea(lastTouchLogicX_, lastTouchLogicY_, item.defaultHotAreas, item)) {
