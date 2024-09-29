@@ -90,7 +90,6 @@ config("libmmi_server_config") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/util/napi/include",
-    "${window_manager_path}/interfaces/innerkits/wm/",
   ]
 
   if (input_feature_fingerprint) {
