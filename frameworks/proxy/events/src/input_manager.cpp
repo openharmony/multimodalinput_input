@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace MMI {
 InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
+
 InputManager *InputManager::GetInstance()
 {
     return instance_;
@@ -500,16 +501,6 @@ int32_t InputManager::GetPointerSnapshot(void *pixelMapPtr)
     return InputMgrImpl.GetPointerSnapshot(pixelMapPtr);
 }
 
-int32_t InputManager::SetTouchpadScrollRows(int32_t rows)
-{
-    return InputMgrImpl.SetTouchpadScrollRows(rows);
-}
-
-int32_t InputManager::GetTouchpadScrollRows(int32_t &rows)
-{
-    return InputMgrImpl.GetTouchpadScrollRows(rows);
-}
-
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
@@ -585,21 +576,6 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
     return InputMgrImpl.SetCurrentUser(userId);
 }
 
-int32_t InputManager::SetMoveEventFilters(bool flag)
-{
-    return InputMgrImpl.SetMoveEventFilters(flag);
-}
-
-int32_t InputManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
-{
-    return InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag);
-}
-
-int32_t InputManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
-{
-    return InputMgrImpl.GetTouchpadThreeFingersTapSwitch(switchFlag);
-}
-
 int32_t InputManager::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
 {
     return InputMgrImpl.GetWinSyncBatchSize(maxAreasCount, displayCount);
@@ -618,6 +594,16 @@ int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer
 int32_t InputManager::SkipPointerLayer(bool isSkip)
 {
     return InputMgrImpl.SkipPointerLayer(isSkip);
+}
+
+int32_t InputManager::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
+{
+    return InputMgrImpl.RegisterWindowStateErrorCallback(callback);
+}
+
+int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    return InputMgrImpl.ConvertToCapiKeyAction(keyAction);
 }
 } // namespace MMI
 } // namespace OHOS
