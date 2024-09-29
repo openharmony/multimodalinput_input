@@ -91,18 +91,13 @@
         "bounds_checking_function",
         "call_manager",
         "libinput",
-        "libevdev",
-        "mtdev",
         "screenlock_mgr",
-        "FreeBSD",
         "googletest",
-        "skia",
         "player_framework",
         "cJSON",
         "qos_manager"
       ],
       "third_party": [
-        "cJSON",
         "node",
         "libuv",
         "libevdev",
