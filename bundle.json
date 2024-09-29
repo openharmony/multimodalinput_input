@@ -84,6 +84,7 @@
         "relational_store",
         "faultloggerd",
         "ffrt",
+        "graphic_2d_ext",
         "hdf_core",
         "qos_manager",
         "call_manager",
