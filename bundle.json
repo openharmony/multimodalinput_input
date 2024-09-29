@@ -35,7 +35,14 @@
       "input_feature_touchscreen",
       "input_feature_short_key",
       "input_feature_fingerprint",
-      "input_feature_crown"
+      "input_feature_crown",
+      "input_ext_feature_anco",
+      "input_ext_feature_fingersense",
+      "input_ext_feature_gesturesense",
+      "input_ext_feature_magiccursor",
+      "input_feature_infrared_emitter",
+      "input_feature_joystick",
+      "input_feature_coverage"
     ],
     "adapted_system_type": [
       "standard"
@@ -49,8 +56,8 @@
     "deps": {
       "components": [
         "window_manager",
-        "hisysevent",
         "start",
+        "hisysevent",
         "napi",
         "c_utils",
         "ipc",
@@ -77,14 +84,12 @@
         "relational_store",
         "faultloggerd",
         "ffrt",
-        "graphic_2d_ext",
         "hdf_core",
-        "bounds_checking_function",
+        "qos_manager",
         "call_manager",
-        "libinput",
+        "bounds_checking_function",
         "screenlock_mgr",
-        "player_framework",
-        "qos_manager"
+        "player_framework"
       ],
       "third_party": [
         "cJSON",
