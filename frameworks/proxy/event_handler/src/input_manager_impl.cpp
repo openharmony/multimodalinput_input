@@ -32,6 +32,7 @@
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "oh_input_manager.h"
 #include "pixel_map.h"
 #include "switch_event_input_subscribe_manager.h"
 
@@ -50,6 +51,12 @@ constexpr uint8_t LOOP_COND { 2 };
 constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
 constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
 constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
+constexpr int32_t INVALID_KEY_ACTION = -1;
+const std::map<int32_t, int32_t> g_keyActionMap = {
+    {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
+    {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
+    {KeyEvent::KEY_ACTION_CANCEL, KEY_ACTION_CANCEL}
+};
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -416,12 +423,12 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
@@ -471,12 +478,12 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
         lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
@@ -549,6 +556,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
             PrintWindowInfo(item.uiExtentionWindowInfo);
         }
+        pkt << item.rectChangeBySystem;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -582,7 +590,8 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform << item.windowInputType << item.privacyMode << item.windowType << item.privacyUIFlag;
+            << item.transform << item.windowInputType << item.privacyMode
+            << item.windowType << item.privacyUIFlag << item.rectChangeBySystem;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -612,6 +621,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanit
                 PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
                 PrintWindowInfo(item.uiExtentionWindowInfo);
             }
+            pkt << item.rectChangeBySystem;
             continue;
         }
         OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
@@ -629,6 +639,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanit
             PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
             PrintWindowInfo(item.uiExtentionWindowInfo);
         }
+        pkt << item.rectChangeBySystem;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -645,7 +656,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.dpi << item.name << item.uniq << item.direction
-            << item.displayDirection << item.displayMode;
+            << item.displayDirection << item.displayMode << item.transform;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -977,7 +988,15 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         return;
     }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
-    HandleSimulateInputEvent(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        HandleSimulateInputEvent(pointerEvent);
+    } else {
+        int32_t pointerAction = pointerEvent->GetPointerAction();
+        if (pointerAction < PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
+            pointerAction > PointerEvent::POINTER_ACTION_SWIPE_END) {
+            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+        }
+    }
     if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
@@ -1325,6 +1344,18 @@ void InputManagerImpl::OnConnected()
     SendEnhanceConfig();
     PrintEnhanceConfig();
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+    if (windowStatecallback_ != nullptr) {
+        MMIClientPtr client = MMIEventHdl.GetMMIClient();
+        if (client != nullptr) {
+            NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
+            if (!client->SendMessage(pkt)) {
+                MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+            }
+        } else {
+            MMI_HILOGE("Get client failed");
+        }
+    }
     if (anrObservers_.empty()) {
         return;
     }
@@ -1410,6 +1441,32 @@ int32_t InputManagerImpl::SendWindowInfo()
         MMI_HILOGE("Pack window group info failed");
         return ret;
     }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    const std::string sceneboard = "com.ohos.sceneboard";
+    const std::string programName(GetProgramName());
+    if (programName != sceneboard) {
+        MMI_HILOGE("Not sceneboard paogramName");
+        return RET_ERR;
+    }
+    CHKPR(callback, RET_ERR);
+    windowStatecallback_ = callback;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPR(client, RET_ERR);
+    NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
@@ -2006,7 +2063,7 @@ int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t 
 int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && (OHOS_BUILD_ENABLE_MAGICCURSOR)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerSnapshot(pixelMapPtr);
     if (ret != RET_OK) {
@@ -2016,39 +2073,7 @@ int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
 #else
     MMI_HILOGW("Pointer device module does not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
-}
-
-int32_t InputManagerImpl::SetTouchpadScrollRows(int32_t rows)
-{
-    CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetTouchpadScrollRows(rows);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set the number of touchpad scrolling rows failed, ret:%{public}d", ret);
-    }
-    return ret;
-#else
-    MMI_HILOGW("Pointer device module does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
-}
-
-int32_t InputManagerImpl::GetTouchpadScrollRows(int32_t &rows)
-{
-    CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadScrollRows(rows);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get the number of touchpad scrolling rows failed");
-    }
-    return ret;
-#else
-    MMI_HILOGW("Pointer device does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
 int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus)
@@ -2238,41 +2263,6 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     return ret;
 }
 
-int32_t InputManagerImpl::SetMoveEventFilters(bool flag)
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMoveEventFilters(flag);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set move event filters failed, ret:%{public}d", ret);
-    }
-    return ret;
-#else
-    MMI_HILOGW("Set move event filters does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-}
-
-int32_t InputManagerImpl::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetTouchpadThreeFingersTapSwitch(switchFlag);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t InputManagerImpl::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadThreeFingersTapSwitch(switchFlag);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
 int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
 {
     return (MAX_PKT_SIZE - GetDisplayMaxSize() * displayCount) / GetWindowMaxSize(maxAreasCount);
@@ -2332,6 +2322,25 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
 int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
+}
+
+void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
+{
+    if (windowStatecallback_ != nullptr) {
+        windowStatecallback_(pid, windowId);
+    } else {
+        MMI_HILOGE("windowStatecallback_ is nullptr");
+    }
+}
+
+int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    auto iter = g_keyActionMap.find(keyAction);
+    if (iter == g_keyActionMap.end()) {
+        MMI_HILOGE("Convert keyAction:%{public}d to capi failed", keyAction);
+        return INVALID_KEY_ACTION;
+    }
+    return iter->second;
 }
 } // namespace MMI
 } // namespace OHOS
