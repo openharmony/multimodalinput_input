@@ -19,7 +19,6 @@ module_output_path = "multimodalinput/mmi_unit_out"
 
 ohos_unittest("InputNativeTest") {
   module_out_path = module_output_path
-  defines = []
   include_dirs = [ "${mmi_path}/interfaces/kits/c/input" ]
 
   if (input_ext_feature_anco) {
@@ -42,17 +41,18 @@ ohos_unittest("InputNativeTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (input_ext_feature_anco && input_feature_product != "pc") {
-    external_deps += [
-      "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
-      "hdf_core:libhdi",
-    ]
-  }
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
   ]
+
+  if (input_ext_feature_anco && input_feature_product == "__other") {
+    external_deps += [
+      "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
+      "hdf_core:libhdi",
+    ]
+  }
 
   subsystem_name = "multimodalinput"
   part_name = "input"
