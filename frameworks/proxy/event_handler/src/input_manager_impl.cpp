@@ -51,11 +51,6 @@ constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
 constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
 constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
 constexpr int32_t INVALID_KEY_ACTION = -1;
-const std::map<int32_t, int32_t> g_keyActionMap = {
-    {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
-    {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
-    {KeyEvent::KEY_ACTION_CANCEL, KEY_ACTION_CANCEL}
-};
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
