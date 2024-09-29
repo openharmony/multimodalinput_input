@@ -405,7 +405,6 @@ void KnuckleDrawingManager::CreateObserver()
     if (!hasScreenReadObserver_) {
         screenReadState_.switchName = SCREEN_READING;
         CreateScreenReadObserver(screenReadState_);
-        hasScreenReadObserver_ = true;
     }
     MMI_HILOGD("screenReadState_.state: %{public}s", screenReadState_.state.c_str());
 }
@@ -430,7 +429,9 @@ void KnuckleDrawingManager::CreateScreenReadObserver(T &item)
     if (ret != ERR_OK) {
         MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
+        return;
     }
+    hasScreenReadObserver_ = true;
 }
 
 std::string KnuckleDrawingManager::GetScreenReadState()
