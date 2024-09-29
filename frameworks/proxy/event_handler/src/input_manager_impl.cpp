@@ -1339,18 +1339,6 @@ void InputManagerImpl::OnConnected()
     SendEnhanceConfig();
     PrintEnhanceConfig();
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-
-    if (windowStatecallback_ != nullptr) {
-        MMIClientPtr client = MMIEventHdl.GetMMIClient();
-        if (client != nullptr) {
-            NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
-            if (!client->SendMessage(pkt)) {
-                MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-            }
-        } else {
-            MMI_HILOGE("Get client failed");
-        }
-    }
     if (anrObservers_.empty()) {
         return;
     }
@@ -1436,32 +1424,6 @@ int32_t InputManagerImpl::SendWindowInfo()
         MMI_HILOGE("Pack window group info failed");
         return ret;
     }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return MSG_SEND_FAIL;
-    }
-    return RET_OK;
-}
-
-int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
-{
-    CALL_DEBUG_ENTER;
-    const std::string sceneboard = "com.ohos.sceneboard";
-    const std::string programName(GetProgramName());
-    if (programName != sceneboard) {
-        MMI_HILOGE("Not sceneboard paogramName");
-        return RET_ERR;
-    }
-    CHKPR(callback, RET_ERR);
-    windowStatecallback_ = callback;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Client init failed");
-        return RET_ERR;
-    }
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPR(client, RET_ERR);
-    NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
@@ -2317,25 +2279,6 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
 int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
-}
-
-void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
-{
-    if (windowStatecallback_ != nullptr) {
-        windowStatecallback_(pid, windowId);
-    } else {
-        MMI_HILOGE("windowStatecallback_ is nullptr");
-    }
-}
-
-int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
-{
-    auto iter = g_keyActionMap.find(keyAction);
-    if (iter == g_keyActionMap.end()) {
-        MMI_HILOGE("Convert keyAction:%{public}d to capi failed", keyAction);
-        return INVALID_KEY_ACTION;
-    }
-    return iter->second;
 }
 } // namespace MMI
 } // namespace OHOS
