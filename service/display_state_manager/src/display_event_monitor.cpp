@@ -57,7 +57,12 @@ public:
             return;
         }
         MMI_HILOGD("Received screen status:%{public}s", action.c_str());
-        if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        JudgeAction(action);
+    }
+
+    void JudgeAction(std::string &action)
+    {
+       if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGI("Display screen on");
             DISPLAY_MONITOR->SetScreenStatus(action);
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
@@ -90,9 +95,6 @@ public:
             if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
                 MMI_HILOGI("Data share has readyed");
                 IPointerDrawingManager::GetInstance()->InitPointerObserver();
-                auto keySubscriberHandler = InputHandler->GetSubscriberHandler();
-                CHKPV(keySubscriberHandler);
-                keySubscriberHandler->InitDataShareListener();
                 auto keyHandler = InputHandler->GetKeyCommandHandler();
                 if (keyHandler != nullptr) {
                     keyHandler->InitKeyObserver();
