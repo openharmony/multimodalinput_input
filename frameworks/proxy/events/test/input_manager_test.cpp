@@ -3115,8 +3115,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level
 }
 
 /**
- * @tc.name: InputManagerTest_ConvertToCapiKeyAction_001
- * @tc.desc: Test the funcation ConvertToCapiKeyAction
+ * @tc.name: InputManagerTest_GetPointerSnapshot
+ * @tc.desc: Test GetPointerSnapshot
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize.Level1)
