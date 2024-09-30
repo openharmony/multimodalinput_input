@@ -14,12 +14,14 @@
  */
 
 #include <cstdio>
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "libinput_mock.h"
 #include "define_multimodal.h"
+#include "libinput_mock.h"
 #include "tablet_tool_tranform_processor.h"
+
+#include "input_device_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TabletToolTranformProcessorTest"
@@ -156,7 +158,6 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_GetToo
     int32_t ret = processor.GetToolType(tabletEvent);
     EXPECT_EQ(ret, PointerEvent::TOOL_TYPE_PEN);
 }
-
 
 /**
  * @tc.name: TabletToolTranformProcessorTest_GetToolType_02
@@ -337,5 +338,5 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEven
     auto pointerEvent = processor.OnEvent(&event.base);
     ASSERT_TRUE(pointerEvent == nullptr);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
