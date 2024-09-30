@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,6 +42,8 @@ namespace {
 const std::string SETTING_COLUMN_KEYWORD { "KEYWORD" };
 const std::string SETTING_COLUMN_VALUE { "VALUE" };
 const std::string SETTING_URI_PROXY { "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true" };
+const std::string SETTING_URI_USER_PROXY {
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true" };
 const std::string SETTINGS_DATA_EXT_URI { "datashare:///com.ohos.settingsdata.DataAbility" };
 constexpr int32_t DECIMAL_BASE { 10 };
 constexpr const int32_t E_OK{ 0 };
@@ -265,6 +267,9 @@ bool SettingDataShare::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataSha
 Uri SettingDataShare::AssembleUri(const std::string& key, const std::string &strUri)
 {
     if (strUri.empty()) {
+        if (key == "close_fingerprint_nav_event_key" || key == "close_fingerprint_event_key") {
+            return Uri(SETTING_URI_USER_PROXY + "&key=" + key);
+        }
         return Uri(SETTING_URI_PROXY + "&key=" + key);
     } else {
         return Uri(strUri + "&key=" + key);

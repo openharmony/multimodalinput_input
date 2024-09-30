@@ -29,8 +29,8 @@ namespace OHOS {
 namespace MMI {
 enum class MulFingersTap : int32_t {
     NO_TAP = 0,
-    TRIPLETAP = 3,
-    QUADTAP = 4,
+    TRIPLE_TAP = 3,
+    QUAD_TAP = 4,
     QUINTTAP = 5,
 };
 

@@ -22,6 +22,7 @@
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SettingDatashareTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -191,7 +192,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutStringValue, TestSize.Lev
  */
 HWTEST_F(SettingObserverTest, SettingObserverTest_OnChange, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
+    CALL_DEBUG_ENTER;
     SettingObserver observer;
     std::string key = "SettingObserver";
     observer.SetKey(key);
