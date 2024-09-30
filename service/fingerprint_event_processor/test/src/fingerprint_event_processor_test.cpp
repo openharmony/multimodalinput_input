@@ -168,13 +168,18 @@ HWTEST_F(FingerprintEventProcessorTest,
     struct libinput_device device;
     struct libinput_event_keyboard keyBoardEvent;
     struct libinput_event_pointer rawPointerEvent;
-    InputHandler->BuildInputHandlerChain();
     EXPECT_CALL(mock, GetDevice)
-        .WillOnce(Return(&device));
+        .WillRepeatedly(Return(&device));
     EXPECT_CALL(mock, DeviceGetName)
-        .WillOnce(Return(const_cast<char*>("hw_fingerprint_mouse")));
+        .WillRepeatedly(Return(const_cast<char*>("hw_fingerprint_mouse")));
     EXPECT_CALL(mock, LibinputGetPointerEvent)
-        .WillOnce(Return(&rawPointerEvent));
+        .WillRepeatedly(Return(&rawPointerEvent));
+    EXPECT_CALL(mock, PointerGetDxUnaccelerated)
+        .WillRepeatedly(Return(0));
+    EXPECT_CALL(mock, PointerGetDyUnaccelerated)
+        .WillRepeatedly(Return(0));
+    EXPECT_EQ(FingerprintEventHdr->HandleFingerprintEvent(&event), RET_OK);
+    InputHandler->BuildInputHandlerChain();
     EXPECT_EQ(FingerprintEventHdr->HandleFingerprintEvent(&event), RET_OK);
 }
 
@@ -250,12 +255,12 @@ HWTEST_F(FingerprintEventProcessorTest,
 }
 
 /**
- * @tc.name: FingerprintEventProcessorTest_SetPowerAndVolumeKeyState_001
+ * @tc.name: FingerprintEventProcessorTest_SetPowerKeyState_001
  * @tc.desc: Test HandleFingerprintEvent (keyCode != KEY_POWER) Branch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerAndVolumeKeyState_001, TestSize.Level1)
+HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerKeyState_001, TestSize.Level1)
 {
     NiceMock<LibinputInterfaceMock> mock;
     struct libinput_event event;
@@ -267,16 +272,16 @@ HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerAn
         .WillOnce(Return(&keyBoardEvent));
     EXPECT_CALL(mock, LibinputEventKeyboardGetKey)
         .WillOnce(Return(100));
-    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerAndVolumeKeyState(&event));
+    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerKeyState(&event));
 }
 
 /**
- * @tc.name: FingerprintEventProcessorTest_SetPowerAndVolumeKeyState_002
+ * @tc.name: FingerprintEventProcessorTest_SetPowerKeyState_002
  * @tc.desc: Test HandleFingerprintEvent (keyAction == KeyEvent::KEY_ACTION_DOWN) Branch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerAndVolumeKeyState_002, TestSize.Level1)
+HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerKeyState_002, TestSize.Level1)
 {
     NiceMock<LibinputInterfaceMock> mock;
     struct libinput_event event;
@@ -290,16 +295,16 @@ HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerAn
         .WillOnce(Return(116));
     EXPECT_CALL(mock, LibinputEventKeyboardGetKeyState)
         .WillOnce(Return(LIBINPUT_KEY_STATE_PRESSED));
-    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerAndVolumeKeyState(&event));
+    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerKeyState(&event));
 }
 
 /**
- * @tc.name: FingerprintEventProcessorTest_SetPowerAndVolumeKeyState_003
+ * @tc.name: FingerprintEventProcessorTest_SetPowerKeyState_003
  * @tc.desc: Test HandleFingerprintEvent (keyAction != KeyEvent::KEY_ACTION_DOWN) Branch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerAndVolumeKeyState_003, TestSize.Level1)
+HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerKeyState_003, TestSize.Level1)
 {
     NiceMock<LibinputInterfaceMock> mock;
     struct libinput_event event;
@@ -313,7 +318,7 @@ HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerAn
         .WillOnce(Return(116));
     EXPECT_CALL(mock, LibinputEventKeyboardGetKeyState)
         .WillOnce(Return(LIBINPUT_KEY_STATE_RELEASED));
-    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerAndVolumeKeyState(&event));
+    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerKeyState(&event));
 }
 
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
