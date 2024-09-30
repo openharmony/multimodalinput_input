@@ -68,7 +68,6 @@ ohos_source_set("intention_stationary_server") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "input:libmmi-client",
-    "window_manager:libdm",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
