@@ -142,6 +142,10 @@ void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
+    if (!isDataShareReady_) {
+        MMI_HILOGI("Data share not ready!");
+        return RET_ERR;
+    }
     CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey(), strUri);
@@ -161,6 +165,10 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
+    if (!isDataShareReady_) {
+        MMI_HILOGI("Data share not ready!");
+        return RET_ERR;
+    }
     CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey(), strUri);
@@ -177,6 +185,10 @@ ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observ
 
 ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& value, const std::string &strUri)
 {
+    if (!isDataShareReady_) {
+        MMI_HILOGI("Data share not ready!");
+        return RET_ERR;
+    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
@@ -214,6 +226,10 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
 ErrCode SettingDataShare::PutStringValue(
     const std::string& key, const std::string& value, bool needNotify, const std::string &strUri)
 {
+    if (!isDataShareReady_) {
+        MMI_HILOGI("Data share not ready!");
+        return RET_ERR;
+    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
@@ -249,11 +265,13 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
             remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
         }
     }
+    std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
     if (strUri.empty()) {
-        return DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
+        ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
     } else {
-        return DataShare::DataShareHelper::Creator(remoteObj_, strUri);
+        ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, "");
     }
+    return ret.second;
 }
 
 bool SettingDataShare::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper>& helper)
@@ -281,6 +299,15 @@ bool SettingDataShare::CheckIfSettingsDataReady()
     if (isDataShareReady_) {
         return true;
     }
+    if (remoteObj_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (remoteObj_ == nullptr) {
+            auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+            CHKPF(sam);
+            remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
+        }
+    }
+    CHKPF(remoteObj_);
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
             DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
     MMI_HILOGD("create data_share helper, ret=%{public}d", ret.first);
