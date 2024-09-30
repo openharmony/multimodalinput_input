@@ -424,6 +424,140 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
 }
 
 /**
+ * @tc.name: InputDisplayBindHelperTest_AddInputDevice_02
+ * @tc.desc: Test AddInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceName_ = "mouse";
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddInputDevice_03
+ * @tc.desc: Test AddInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddInputDevice_04
+ * @tc.desc: Test AddInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddDisplay_01
+ * @tc.desc: Test AddDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddDisplay_02
+ * @tc.desc: Test AddDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.displayName_ = "hp 223";
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddDisplay_03
+ * @tc.desc: Test AddDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddDisplay_04
+ * @tc.desc: Test AddDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddDisplay_05
+ * @tc.desc: Test AddDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = -1;
+    bindInfo.displayName_ = "";
+    bool ret = bindInfo.AddDisplay(1, "hp 223");
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddDisplay_06
+ * @tc.desc: Test AddDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+
+    int32_t id = 3;
+    std::string name = "display";
+    std::string deviceName = inputDisplayBindHelper.GetInputDeviceById(id);
+    EXPECT_TRUE(deviceName.empty());
+    ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.AddDisplay(id, name));
+}
+
+/**
  * @tc.name: InputDisplayBindHelperTest_GetDesc_01
  * @tc.desc: Test GetDesc
  * @tc.type: FUNC
@@ -654,7 +788,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
     EXPECT_TRUE(inputNodeName.empty());
 
     std::string inputNode = inputDisplayBindHelper.GetInputNode(inputNodeName);
-    EXPECT_TRUE(inputNode.empty());
+    EXPECT_FALSE(inputNode.empty());
 
     std::string ret = inputDisplayBindHelper.GetInputDeviceById(id);
     EXPECT_EQ(ret, "");
