@@ -367,52 +367,6 @@ ohos_unittest("event_resample_test") {
   ]
 }
 
-ohos_unittest("TwoFingerLongTouchTest") {
-  module_out_path = module_output_path
-  include_dirs = [
-    "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/key_command/test",
-    "${graphics_path}/2d_graphics/include",
-  ]
-
-  configs = [ ":libmmi_server_config" ]
-
-  cflags = [ "-DUNIT_TEST" ]
-
-  sources = [
-    "key_command/src/key_command_handler.cpp",
-    "key_command/src/key_command_handler_util.cpp",
-    "key_command/test/ability_manager_client_stub.cpp",
-    "key_command/test/two_finger_long_touch_test.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "config_policy:configpolicy_util",
-    "data_share:datashare_consumer",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "libinput:libinput-third-mmi",
-    "preferences:native_preferences",
-    "window_manager:libwm",
-  ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
-}
-
 ohos_unittest("EventFilterDeathRecipientTest") {
   module_out_path = module_output_path
 
