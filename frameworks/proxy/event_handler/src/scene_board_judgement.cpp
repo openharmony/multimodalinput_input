@@ -27,7 +27,10 @@ bool MMISceneBoardJudgement::IsSceneBoardEnabled()
     static bool isSceneBoardEnabled = false;
     static bool initialized = false;
     if (!initialized) {
-        InitWithConfigFile("/etc/sceneboard.config", isSceneBoardEnabled);
+        if (!InitWithConfigFile("/etc/sceneboard.config", isSceneBoardEnabled)) {
+            MMI_HILOGE("Failed to init scene board judgement");
+            return false;
+        }
         initialized = true;
     }
     return isSceneBoardEnabled;
@@ -55,12 +58,12 @@ std::ifstream& MMISceneBoardJudgement::SafeGetLine(std::ifstream& configFile, st
     return configFile;
 }
 
-void MMISceneBoardJudgement::InitWithConfigFile(const char* filePath, bool& enabled)
+bool MMISceneBoardJudgement::InitWithConfigFile(const char* filePath, bool& enabled)
 {
     char checkPath[PATH_MAX] = { 0 };
     if (realpath(filePath, checkPath) == nullptr) {
         MMI_HILOGE("canonicalize failed. path:%{private}s", filePath);
-        return;
+        return false;
     }
     std::ifstream configFile(checkPath);
     std::string line;
@@ -68,6 +71,7 @@ void MMISceneBoardJudgement::InitWithConfigFile(const char* filePath, bool& enab
         enabled = true;
     }
     configFile.close();
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

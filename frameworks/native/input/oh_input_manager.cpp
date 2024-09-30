@@ -16,6 +16,7 @@
 #include "oh_input_manager.h"
 
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"
 #include "key_event.h"
@@ -75,12 +76,12 @@ struct Input_AxisEvent {
 
 constexpr int32_t SIZE_ARRAY = 64;
 struct Input_DeviceInfo {
-    int32_t id {-1};
+    int32_t id { -1 };
     char name[SIZE_ARRAY] {};
-    int32_t ability {-1};
-    int32_t product {-1};
-    int32_t vendor {-1};
-    int32_t version {-1};
+    int32_t ability { -1 };
+    int32_t product { -1 };
+    int32_t vendor { -1 };
+    int32_t version { -1 };
     char phys[SIZE_ARRAY] {};
 };
 
@@ -89,6 +90,14 @@ static constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
 static std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_mouseEvent = OHOS::MMI::PointerEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_touchEvent = OHOS::MMI::PointerEvent::Create();
+static const std::set<int32_t> g_keyCodeValueSet = {
+    KEYCODE_FN, KEYCODE_DPAD_UP, KEYCODE_DPAD_DOWN, KEYCODE_DPAD_LEFT, KEYCODE_DPAD_RIGHT, KEYCODE_ALT_LEFT,
+    KEYCODE_ALT_RIGHT, KEYCODE_SHIFT_LEFT, KEYCODE_SHIFT_RIGHT, KEYCODE_TAB, KEYCODE_ENTER, KEYCODE_DEL, KEYCODE_MENU,
+    KEYCODE_PAGE_UP, KEYCODE_PAGE_DOWN, KEYCODE_ESCAPE, KEYCODE_FORWARD_DEL, KEYCODE_CTRL_LEFT, KEYCODE_CTRL_RIGHT,
+    KEYCODE_CAPS_LOCK, KEYCODE_SCROLL_LOCK, KEYCODE_META_LEFT, KEYCODE_META_RIGHT, KEYCODE_SYSRQ, KEYCODE_BREAK,
+    KEYCODE_MOVE_HOME, KEYCODE_MOVE_END, KEYCODE_INSERT, KEYCODE_F1, KEYCODE_F2, KEYCODE_F3, KEYCODE_F4, KEYCODE_F5,
+    KEYCODE_F6, KEYCODE_F7, KEYCODE_F8, KEYCODE_F9, KEYCODE_F10, KEYCODE_F11, KEYCODE_F12, KEYCODE_NUM_LOCK
+};
 static std::set<Input_KeyEventCallback> g_keyMonitorCallbacks;
 static std::set<Input_MouseEventCallback> g_mouseMonitorCallbacks;
 static std::set<Input_TouchEventCallback> g_touchMonitorCallbacks;
@@ -103,31 +112,27 @@ static std::shared_ptr<OHOS::MMI::OHInputInterceptor> g_keyInterceptor =
     std::make_shared<OHOS::MMI::OHInputInterceptor>();
 static std::shared_ptr<OHOS::MMI::OHInputDeviceListener> g_deviceListener =
     std::make_shared<OHOS::MMI::OHInputDeviceListener>();
-static std::mutex g_mutex;
 static std::mutex g_DeviceListerCallbackMutex;
+static std::mutex g_mutex;
 static int32_t g_keyMonitorId = INVALID_MONITOR_ID;
 static int32_t g_pointerMonitorId = INVALID_MONITOR_ID;
 static int32_t g_keyInterceptorId = INVALID_INTERCEPTOR_ID;
 static int32_t g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
-static const std::set<int32_t> g_keyCodeValueSet = {
-    KEYCODE_FN, KEYCODE_DPAD_UP, KEYCODE_DPAD_DOWN, KEYCODE_DPAD_LEFT, KEYCODE_DPAD_RIGHT, KEYCODE_ALT_LEFT,
-    KEYCODE_ALT_RIGHT, KEYCODE_SHIFT_LEFT, KEYCODE_SHIFT_RIGHT, KEYCODE_TAB, KEYCODE_ENTER, KEYCODE_DEL, KEYCODE_MENU,
-    KEYCODE_PAGE_UP, KEYCODE_PAGE_DOWN, KEYCODE_ESCAPE, KEYCODE_FORWARD_DEL, KEYCODE_CTRL_LEFT, KEYCODE_CTRL_RIGHT,
-    KEYCODE_CAPS_LOCK, KEYCODE_SCROLL_LOCK, KEYCODE_META_LEFT, KEYCODE_META_RIGHT, KEYCODE_SYSRQ, KEYCODE_BREAK,
-    KEYCODE_MOVE_HOME, KEYCODE_MOVE_END, KEYCODE_INSERT, KEYCODE_F1, KEYCODE_F2, KEYCODE_F3, KEYCODE_F4, KEYCODE_F5,
-    KEYCODE_F6, KEYCODE_F7, KEYCODE_F8, KEYCODE_F9, KEYCODE_F10, KEYCODE_F11, KEYCODE_F12, KEYCODE_NUM_LOCK
-};
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyState->keyCode);
+        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGE("keyCode is invalid");
+        } else {
+            MMI_HILOGE("keyCode is invalid");
+        }
         return INPUT_PARAMETER_ERROR;
     }
     if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
-        MMI_HILOGE("keyCode is not within the query range, keyCode:%{private}d", keyState->keyCode);
+        MMI_HILOGE("keyCode is not within the query range, keyCode:%{public}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -172,7 +177,11 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 {
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyCode);
+        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGE("keyCode is invalid");
+        } else {
+            MMI_HILOGE("keyCode is invalid");
+        }
         return;
     }
     keyState->keyCode = keyCode;
@@ -217,8 +226,10 @@ static void HandleKeyAction(const struct Input_KeyEvent* keyEvent, OHOS::MMI::Ke
         std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = g_keyEvent->GetKeyItem(keyEvent->keyCode);
         if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
+        } else if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGW("Find pressed key failed");
         } else {
-            MMI_HILOGW("Find pressed key failed, keyCode:%{private}d", keyEvent->keyCode);
+            MMI_HILOGW("Find pressed key failed");
         }
         g_keyEvent->RemoveReleasedKeyItems(item);
         g_keyEvent->AddPressedKeyItems(item);
@@ -230,7 +241,11 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     MMI_HILOGI("Input_KeyEvent injectEvent");
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
-        MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyEvent->keyCode);
+        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGE("keyCode is less 0, can not process");
+        } else {
+            MMI_HILOGE("keyCode is less 0, can not process");
+        }
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(g_keyEvent, INPUT_PARAMETER_ERROR);
@@ -1636,7 +1651,7 @@ static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
         listener->deviceAddedCallback(deviceId);
     }
 }
-
+ 
 static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
 {
     CALL_DEBUG_ENTER;
@@ -1653,12 +1668,13 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
         listener->deviceRemovedCallback(deviceId);
     }
 }
-
+ 
 Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
 {
     CALL_DEBUG_ENTER;
-    if (listener == nullptr) {
-        MMI_HILOGE("listener is null");
+    if (listener == nullptr || listener->deviceAddedCallback == nullptr ||
+        listener->deviceRemovedCallback == nullptr) {
+        MMI_HILOGE("listener or callback is nullptr");
         return INPUT_PARAMETER_ERROR;
     }
     std::lock_guard guard(g_DeviceListerCallbackMutex);
@@ -1674,12 +1690,12 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
     g_ohDeviceListenerList.insert(listener);
     return INPUT_SUCCESS;
 }
-
+ 
 Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
 {
     CALL_DEBUG_ENTER;
     if (listener == nullptr) {
-        MMI_HILOGE("listener is null");
+        MMI_HILOGE("listener is nullptr");
         return INPUT_PARAMETER_ERROR;
     }
     std::lock_guard guard(g_DeviceListerCallbackMutex);
@@ -1698,7 +1714,7 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
     }
     return INPUT_SUCCESS;
 }
-
+ 
 Input_Result OH_Input_UnregisterDeviceListeners()
 {
     CALL_DEBUG_ENTER;
