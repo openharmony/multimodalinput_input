@@ -321,7 +321,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READUINT32(in, bitwise_);
     READBOOL(in, markEnabled_);
     READUINT32(in, extraDataLength_);
-
+    
     if (extraDataLength_ == 0) {
         return true;
     }
@@ -330,10 +330,6 @@ bool InputEvent::ReadFromParcel(Parcel &in)
         return false;
     }
     const uint8_t *buffer = in.ReadBuffer(extraDataLength_);
-    if (buffer == nullptr) {
-        extraDataLength_ = 0;
-        return false;
-    }
     std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_], [](uint8_t* ptr) { delete[] ptr; });
     if ((buffer == nullptr) || (sp == nullptr)) {
         extraDataLength_ = 0;

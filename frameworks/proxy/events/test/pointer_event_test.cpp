@@ -84,6 +84,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
     pointerEvent->SetPressedKeys(pressedKeys);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 
 /**
@@ -100,6 +101,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
     ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 
 /**
@@ -116,6 +118,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -364,7 +367,9 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.L
     item2.SetRawDy(100);
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(pointerEvent != nullptr);
-    ASSERT_FALSE(pointerEvent->IsValid());
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    SimulateInputEventUtilTest(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -1241,38 +1246,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: PointerEventTest_SetExtraData_003
- * @tc.desc: Verify SetExtraData
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
-    std::shared_ptr<const uint8_t[]> data;
-    uint32_t length = 0;
-    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(data, length));
-}
-
-/**
- * @tc.name: PointerEventTest_SetExtraData_004
- * @tc.desc: Verify SetExtraData
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
-    std::shared_ptr<const uint8_t[]> data;
-    uint32_t length = 2048;
-    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(data, length));
-}
-
-/**
  * @tc.name: PointerEventTest_GetExtraData_002
  * @tc.desc: Verify GetExtraData
  * @tc.type: FUNC
@@ -1286,25 +1259,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_002, TestSize.Level1)
     std::shared_ptr<const uint8_t[]> data;
     uint32_t length = 10;
     inputEvent->extraDataLength_ = 5;
-    std::shared_ptr<const uint8_t[]> extraData;
-    inputEvent->extraData_ = extraData;
-    ASSERT_NO_FATAL_FAILURE(inputEvent->GetExtraData(data, length));
-}
-
-/**
- * @tc.name: PointerEventTest_GetExtraData_003
- * @tc.desc: Verify GetExtraData
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
-    std::shared_ptr<const uint8_t[]> data;
-    uint32_t length = 10;
-    inputEvent->extraDataLength_ = 0;
     std::shared_ptr<const uint8_t[]> extraData;
     inputEvent->extraData_ = extraData;
     ASSERT_NO_FATAL_FAILURE(inputEvent->GetExtraData(data, length));
@@ -1330,25 +1284,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: PointerEventTest_WriteToParcel_002
- * @tc.desc: Verify WriteToParcel
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
-    Parcel out;
-    inputEvent->extraDataLength_ = 0;
-    std::shared_ptr<const uint8_t[]> extraData;
-    inputEvent->extraData_ = extraData;
-    bool ret = inputEvent->WriteToParcel(out);
-    ASSERT_TRUE(ret);
-}
-
-/**
  * @tc.name: PointerEventTest_ReadFromParcel_001
  * @tc.desc: Verify ReadFromParcel
  * @tc.type: FUNC
@@ -1364,49 +1299,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_001, TestSize.Level1)
     bool ret = inputEvent->ReadFromParcel(in);
     ASSERT_FALSE(ret);
     inputEvent->extraDataLength_ = 10;
-    ret = inputEvent->ReadFromParcel(in);
-    ASSERT_FALSE(ret);
-}
-
-/**
- * @tc.name: PointerEventTest_ReadFromParcel_002
- * @tc.desc: Verify ReadFromParcel
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
-    Parcel in;
-    inputEvent->extraDataLength_ = 0;
-    bool ret = inputEvent->ReadFromParcel(in);
-    ASSERT_FALSE(ret);
-
-    inputEvent->extraDataLength_ = 2048;
-    ret = inputEvent->ReadFromParcel(in);
-    ASSERT_FALSE(ret);
-}
-
-/**
- * @tc.name: PointerEventTest_ReadFromParcel_003
- * @tc.desc: Verify ReadFromParcel
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
-    Parcel in;
-    inputEvent->extraDataLength_ = 512;
-    bool ret = inputEvent->ReadFromParcel(in);
-    ASSERT_FALSE(ret);
-
-    const uint8_t *buffer = in.ReadBuffer(inputEvent->extraDataLength_);
-    EXPECT_TRUE(buffer == nullptr);
     ret = inputEvent->ReadFromParcel(in);
     ASSERT_FALSE(ret);
 }
@@ -1675,6 +1567,171 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetTiltY_001, TestSize.Level1)
     PointerEvent::PointerItem item;
     ASSERT_NO_FATAL_FAILURE(item.SetTiltY(y));
     ASSERT_EQ(item.GetTiltY(), y);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetRawDisplayX_001
+ * @tc.desc: Sets the raw X coordinate.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rawDisplayX = 60;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(8);
+    item.SetDownTime(1);
+    ASSERT_NO_FATAL_FAILURE(item.SetRawDisplayX(rawDisplayX));
+    ASSERT_EQ(item.GetRawDisplayX(), rawDisplayX);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetRawDisplayY_001
+ * @tc.desc: Sets the raw Y coordinate.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rawDisplayY = 60;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(8);
+    item.SetDownTime(1);
+    ASSERT_NO_FATAL_FAILURE(item.SetRawDisplayY(rawDisplayY));
+    ASSERT_EQ(item.GetRawDisplayY(), rawDisplayY);
+}
+
+/**
+ * @tc.name: PointerEventTest_EventTypeToString_001
+ * @tc.desc: Test the funcation EventTypeToString
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_EventTypeToString_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    int32_t eventType = InputEvent::EVENT_TYPE_BASE;
+    std::string ret = inputEvent->EventTypeToString(eventType);
+    ASSERT_EQ(ret, "base");
+    eventType = InputEvent::EVENT_TYPE_KEY;
+    ret = inputEvent->EventTypeToString(eventType);
+    ASSERT_EQ(ret, "key");
+    eventType = InputEvent::EVENT_TYPE_POINTER;
+    ret = inputEvent->EventTypeToString(eventType);
+    ASSERT_EQ(ret, "pointer");
+    eventType = InputEvent::EVENT_TYPE_AXIS;
+    ret = inputEvent->EventTypeToString(eventType);
+    ASSERT_EQ(ret, "axis");
+    eventType = InputEvent::EVENT_TYPE_FINGERPRINT;
+    ret = inputEvent->EventTypeToString(eventType);
+    ASSERT_EQ(ret, "fingerprint");
+    eventType = InputEvent::EVENT_FLAG_NO_INTERCEPT;
+    ret = inputEvent->EventTypeToString(eventType);
+    ASSERT_EQ(ret, "unknown");
+}
+
+/**
+ * @tc.name: PointerEventTest_MarkProcessed_002
+ * @tc.desc: Test the funcation MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    auto callback = [](int a, int b) {};
+    inputEvent->processedCallback_ = callback;
+    inputEvent->processedCallback_(10, 20);
+    inputEvent->markEnabled_ = false;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->MarkProcessed());
+    inputEvent->markEnabled_ = true;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->MarkProcessed());
+}
+
+/**
+ * @tc.name: PointerEventTest_SetExtraData_005
+ * @tc.desc: Set extra data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    uint32_t length = 5;
+    uint8_t data[5] = {1, 2, 3, 4, 5};
+    std::shared_ptr<const uint8_t[]> sharedData(data, [](const uint8_t*) {});
+    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(sharedData, length));
+    length = -5;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(sharedData, length));
+    length = 2000;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(sharedData, length));
+}
+
+/**
+ * @tc.name: PointerEventTest_GetExtraData_004
+ * @tc.desc: Verify GetExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    uint32_t length = 5;
+    inputEvent->extraDataLength_ = 5;
+    std::shared_ptr<const uint8_t[]> data;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->GetExtraData(data, length));
+    inputEvent->extraDataLength_ = 0;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->GetExtraData(data, length));
+    uint8_t datas[5] = {1, 2, 3, 4, 5};
+    std::shared_ptr<const uint8_t[]> sharedData(datas, [](const uint8_t*) {});
+    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(sharedData, length));
+    inputEvent->extraDataLength_ = 10;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->GetExtraData(data, length));
+    inputEvent->extraDataLength_ = 0;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->GetExtraData(data, length));
+}
+
+/**
+ * @tc.name: PointerEventTest_WriteToParcel_003
+ * @tc.desc: Verify WriteToParcel
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    Parcel out;
+    uint32_t length = 5;
+    inputEvent->extraDataLength_ = 0;
+    bool ret = inputEvent->WriteToParcel(out);
+    ASSERT_TRUE(ret);
+    inputEvent->extraDataLength_ = 5;
+    ret = inputEvent->WriteToParcel(out);
+    ASSERT_TRUE(ret);
+    uint8_t datas[5] = {1, 2, 3, 4, 5};
+    std::shared_ptr<const uint8_t[]> sharedData(datas, [](const uint8_t*) {});
+    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(sharedData, length));
+    inputEvent->extraDataLength_ = 0;
+    ret = inputEvent->WriteToParcel(out);
+    ASSERT_TRUE(ret);
+    inputEvent->extraDataLength_ = 5;
+    ret = inputEvent->WriteToParcel(out);
+    ASSERT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS

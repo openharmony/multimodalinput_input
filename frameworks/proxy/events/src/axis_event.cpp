@@ -43,21 +43,30 @@ int32_t AxisEvent::GetAxisAction()
     return 0;
 }
 
-void AxisEvent::SetAxisAction(int32_t axisAction) {}
+void AxisEvent::SetAxisAction(int32_t axisAction)
+{
+    axisAction_ = axisAction;
+}
 
 int32_t AxisEvent::GetAxisType() const
 {
     return 0;
 }
 
-void AxisEvent::SetAxisType(int32_t axisType) {}
+void AxisEvent::SetAxisType(int32_t axisType)
+{
+    axisType_ = axisType;
+}
 
 int32_t AxisEvent::GetAxisValue() const
 {
     return 0;
 }
 
-void AxisEvent::SetAxisValue(int32_t axisValue) {}
+void AxisEvent::SetAxisValue(int32_t axisValue)
+{
+    axisValue_ = axisValue;
+}
 
 std::string_view AxisEvent::ActionToShortStr(int32_t action)
 {

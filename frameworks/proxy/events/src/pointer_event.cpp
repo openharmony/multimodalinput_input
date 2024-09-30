@@ -351,6 +351,26 @@ void PointerEvent::PointerItem::SetRawDy(int32_t rawDy)
     rawDy_ = rawDy;
 }
 
+int32_t PointerEvent::PointerItem::GetRawDisplayX() const
+{
+    return rawDisplayX_;
+}
+ 
+void PointerEvent::PointerItem::SetRawDisplayX(int32_t rawDisplayX)
+{
+    rawDisplayX_ = rawDisplayX;
+}
+ 
+int32_t PointerEvent::PointerItem::GetRawDisplayY() const
+{
+    return rawDisplayY_;
+}
+ 
+void PointerEvent::PointerItem::SetRawDisplayY(int32_t rawDisplayY)
+{
+    rawDisplayY_ = rawDisplayY;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -378,12 +398,14 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_) &&
+        out.WriteInt32(rawDisplayX_) &&
+        out.WriteInt32(rawDisplayY_) &&
         out.WriteInt32(targetWindowId_) &&
+        out.WriteInt32(originPointerId_) &&
         out.WriteDouble(displayXPos_) &&
         out.WriteDouble(displayYPos_) &&
         out.WriteDouble(windowXPos_) &&
-        out.WriteDouble(windowYPos_) &&
-        out.WriteInt32(originPointerId_)
+        out.WriteDouble(windowYPos_)
     );
 }
 
@@ -414,12 +436,14 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
         in.ReadInt32(rawDy_) &&
+        in.ReadInt32(rawDisplayX_) &&
+        in.ReadInt32(rawDisplayY_) &&
         in.ReadInt32(targetWindowId_) &&
+        in.ReadInt32(originPointerId_) &&
         in.ReadDouble(displayXPos_) &&
         in.ReadDouble(displayYPos_) &&
         in.ReadDouble(windowXPos_) &&
-        in.ReadDouble(windowYPos_) &&
-        in.ReadInt32(originPointerId_)
+        in.ReadDouble(windowYPos_)
     );
 }
 
@@ -783,7 +807,7 @@ void PointerEvent::SetAxisEventType(int32_t axisEventType)
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-void PointerEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
+void PointerEvent::SetEnhanceData(const std::vector<uint8_t>& enhanceData)
 {
     enhanceData_ = enhanceData;
 }
@@ -843,7 +867,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
-    WRITEDOUBLE(out, velocity_);
 
     WRITEINT32(out, axisEventType_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -899,17 +922,20 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     READINT32(in, sourceType_);
+
     READINT32(in, pointerAction_);
+
     READINT32(in, originPointerAction_);
+
     READINT32(in, buttonId_);
+
     READINT32(in, fingerCount_);
+
     READFLOAT(in, zOrder_);
 
     if (!ReadAxisFromParcel(in)) {
         return false;
     }
-
-    READDOUBLE(in, velocity_);
 
     READINT32(in, axisEventType_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -1218,6 +1244,18 @@ HandleEventType PointerEvent::GetHandlerEventType() const
     return handleEventType_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
+void PointerEvent::SetAncoDeal(bool ancoDeal)
+{
+    ancoDeal_ = ancoDeal;
+}
+
+bool PointerEvent::GetAncoDeal() const
+{
+    return ancoDeal_;
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
+
 std::string_view PointerEvent::ActionToShortStr(int32_t action)
 {
     // 该函数逻辑简单，功能单一，考虑性能影响，使用switch-case而不是表驱动实现。
@@ -1286,6 +1324,8 @@ std::string_view PointerEvent::ActionToShortStr(int32_t action)
             return "P:FR:";
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK:
             return "P:FC:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL:
+            return "P:FCA:";
         case PointerEvent::POINTER_ACTION_UNKNOWN:
             return "P:UK:";
         default:
