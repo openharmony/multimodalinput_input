@@ -31,6 +31,7 @@ config("event_injection_public_config") {
     "include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
+    "//third_party/FreeBSD/sys/dev/evdev",
   ]
 }
 
@@ -54,7 +55,6 @@ ohos_source_set("event-injection") {
   ]
 
   external_deps = [
-    "FreeBSD:ld128_static",
     "cJSON:cjson",
     "c_utils:utils",
     "ipc:ipc_single",
@@ -156,7 +156,6 @@ ohos_executable("mmi-event-injection") {
     "${mmi_path}/util:libmmi-util",
   ]
   external_deps = [
-    "FreeBSD:ld128_static",
     "cJSON:cjson",
     "c_utils:utils",
     "libinput:libinput-third-mmi",
