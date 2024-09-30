@@ -102,32 +102,6 @@ enum PointerHotArea : int32_t {
     BOTTOM_RIGHT = 7,
 };
 
-enum SourceTool : int32_t {
-    UNKNOWN = 0,
-    FINGER = 1,
-    PEN = 2,
-    RUBBER = 3,
-    BRUSH = 4,
-    PENCIL = 5,
-    AIRBRUSH = 6,
-    MOUSE = 7,
-    LENS = 8,
-    TOUCHPAD = 9,
-    JOYSTICK = 10,
-};
-
-std::unordered_map<int32_t, int32_t> InputWindowsManager::convertToolTypeMap_ = {
-    {PointerEvent::TOOL_TYPE_FINGER, SourceTool::FINGER},
-    {PointerEvent::TOOL_TYPE_PEN, SourceTool::PEN},
-    {PointerEvent::TOOL_TYPE_RUBBER, SourceTool::RUBBER},
-    {PointerEvent::TOOL_TYPE_BRUSH, SourceTool::BRUSH},
-    {PointerEvent::TOOL_TYPE_PENCIL, SourceTool::PENCIL},
-    {PointerEvent::TOOL_TYPE_AIRBRUSH, SourceTool::AIRBRUSH},
-    {PointerEvent::TOOL_TYPE_MOUSE, SourceTool::MOUSE},
-    {PointerEvent::TOOL_TYPE_LENS, SourceTool::LENS},
-    {PointerEvent::TOOL_TYPE_TOUCHPAD, SourceTool::TOUCHPAD},
-};
-
 std::shared_ptr<IInputWindowsManager> IInputWindowsManager::instance_;
 std::mutex IInputWindowsManager::mutex_;
 
@@ -1554,18 +1528,6 @@ void InputWindowsManager::PrintDisplayInfo()
             item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
             item.uniq.c_str(), item.direction, item.displayDirection);
     }
-}
-
-int32_t InputWindowsManager::ConvertToolType(int32_t toolType)
-{
-    CALL_DEBUG_ENTER;
-    int32_t toolTypeData = -1;
-    auto it = convertToolTypeMap_.find(toolType);
-
-    if (it != convertToolTypeMap_.end()) {
-        toolTypeData = it->second;
-    }
-    return toolTypeData;
 }
 
 const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
@@ -3027,16 +2989,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             winMap.insert({item.id, item});
             continue;
         }
-        bool checkToolType = false;
-        if (extraData_.toolType == SourceTool::UNKNOWN) {
-            checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-                ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-                pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
-        } else {
-            checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-                (ConvertToolType(pointerItem.GetToolType()) == extraData_.toolType &&
-                extraData_.pointerId == pointerId);
-        }
+       
+        bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
+            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
         checkToolType = checkToolType || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
         if (checkToolType) {
             MMI_HILOG_DISPATCHD("Enter checkToolType");
@@ -3227,16 +3183,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    bool checkExtraData = false;
-    if (extraData_.toolType == SourceTool::UNKNOWN) {
-        checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
-    } else {
-        checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            (ConvertToolType(pointerItem.GetToolType()) == extraData_.toolType && extraData_.pointerId == pointerId);
-    }
-
+    bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
+        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
     checkExtraData = checkExtraData || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if ((pointerAction == PointerEvent::POINTER_ACTION_DOWN) && !checkExtraData) {
@@ -3882,7 +3831,6 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
 {
     CALL_DEBUG_ENTER;
     extraData_.appended = extraData.appended;
-    extraData_.toolType = extraData.toolType;
     extraData_.buffer = extraData.buffer;
     extraData_.sourceType = extraData.sourceType;
     extraData_.pointerId = extraData.pointerId;
@@ -3893,7 +3841,6 @@ void InputWindowsManager::ClearExtraData()
 {
     CALL_DEBUG_ENTER;
     extraData_.appended = false;
-    extraData_.toolType = -1;
     extraData_.buffer.clear();
     extraData_.sourceType = -1;
     extraData_.pointerId = -1;

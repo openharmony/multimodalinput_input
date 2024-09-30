@@ -188,7 +188,6 @@ private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
-    int32_t ConvertToolType(int32_t toolType);
     void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const std::vector<WindowInfo> &oldWindowsInfo,
@@ -386,7 +385,6 @@ private:
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
     bool isSendGestureDown_ { false };
-    static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
     bool IsFoldable_ { false };
 };
 } // namespace MMI
