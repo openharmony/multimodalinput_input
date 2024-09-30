@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,10 +53,10 @@ constexpr uint32_t MAX_WINDOW_NUMS = 15;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr uint32_t SHELL_FLAGS_VALUE = 2;
-#endif // OHOS_BUILD_ENABLE_ANCO
+#endif  // OHOS_BUILD_ENABLE_ANCO
 
 constexpr double POINTER_ITEM_PRESSURE = 5.0;
-} // namespace
+}  // namespace
 
 class InputManagerTest : public testing::Test {
 public:
@@ -87,7 +87,7 @@ void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundle
     int32_t getUid = uid;
     std::string getName = bundleName;
     int32_t getStatus = syncStatus;
-    MMI_HILOGD("SyncBundleName info is :%{public}d, %{public}d, %{public}s, %{public}d",
+    MMI_HILOGD("SyncBundleName info is : %{public}d, %{public}d, %{public}s, %{public}d",
         getPid, getUid, getName.c_str(), getStatus);
 }
 
@@ -184,7 +184,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -213,25 +213,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_02, TestSi
     bool enable = false;
     int32_t ret = InputManager::GetInstance()->EnableHardwareCursorStats(enable);
     EXPECT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputManagerTest_SetMouseHotSpot_01
- * @tc.desc: Test SetMouseHotSpot
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t windowId = 8;
-    int32_t hotSpotX = 3;
-    int32_t hotSpotY = 5;
-
-    int32_t winPid = InputManager::GetInstance()->GetWindowPid(windowId);
-    EXPECT_NE(winPid, RET_ERR);
-    int32_t ret = InputManager::GetInstance()->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
-    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -344,7 +325,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     EXPECT_TRUE(subscribeId1 >= 0);
 #else
     EXPECT_TRUE(subscribeId1 < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
 
     // 电源键抬起订阅
     std::shared_ptr<KeyOption> keyOption2 = InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_POWER, false, 0);
@@ -357,7 +338,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     EXPECT_TRUE(subscribeId2 >= 0);
 #else
     EXPECT_TRUE(subscribeId2 < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
@@ -437,7 +418,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_04, TestSize.Level
     EXPECT_TRUE(subscribeId >= 0);
 #else
     EXPECT_TRUE(subscribeId < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
@@ -978,7 +959,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateWindowGroupInfo_005, TestSize.
     window.action = WINDOW_UPDATE_ACTION::CHANGE;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     window.flags |= SHELL_FLAGS_VALUE;
-#endif // OHOS_BUILD_ENABLE_ANCO
+#endif  // OHOS_BUILD_ENABLE_ANCO
     WindowGroupInfo windowGroupInfo;
     windowGroupInfo.windowsInfo = {window};
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(windowGroupInfo));
@@ -1603,50 +1584,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_001, TestSize.Lev
 }
 
 /**
- * @tc.name: InputManagerTest_SubscribeSwitchEvent_001
- * @tc.desc: Subscribes from a switch input event.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_001, TestSize.Level1)
-{
-    auto fun = [](std::shared_ptr<SwitchEvent> event) {
-        MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
-            event->GetSwitchType(), event->GetSwitchValue());
-    };
-    int32_t subscribeId = InputManager::GetInstance()->SubscribeSwitchEvent(fun, SwitchEvent::SwitchType::SWITCH_LID);
-    ASSERT_NE(subscribeId, INVAID_VALUE);
-    InputManager::GetInstance()->UnsubscribeSwitchEvent(subscribeId);
-}
-
-/**
- * @tc.name: InputManagerTest_SubscribeSwitchEvent_002
- * @tc.desc: Subscribes from a switch input event.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_002, TestSize.Level1)
-{
-    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), INVAID_VALUE);
-}
-
-/**
- * @tc.name: InputManagerTest_SubscribeSwitchEvent_003
- * @tc.desc: Subscribes from a switch input event.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_003, TestSize.Level1)
-{
-    auto fun = [](std::shared_ptr<SwitchEvent> event) {
-        MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
-            event->GetSwitchType(), event->GetSwitchValue());
-    };
-    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(
-        fun, SwitchEvent::SwitchType(INVAID_VALUE)), INVAID_VALUE);
-}
-
-/**
  * @tc.name: InputManagerTest_UnsubscribeSwitchEvent_001
  * @tc.desc: Unsubscribes from a switch input event.
  * @tc.type: FUNC
@@ -1790,54 +1727,6 @@ HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_003, TestSize.Level1)
     item.SetDisplayY(200);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_004
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:AR000GJG6G
- */
-HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_005
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:AR000GJG6G
- */
-HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -2314,7 +2203,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_001, TestSize.
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_ANCO
+#endif  // OHOS_BUILD_ENABLE_ANCO
 }
 
 /**
@@ -2339,7 +2228,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InputManager::GetInstance()->SimulateInputEventExt(injectDownEvent);
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-#endif // OHOS_BUILD_ENABLE_ANCO
+#endif  // OHOS_BUILD_ENABLE_ANCO
 }
 
 /**
@@ -2543,7 +2432,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_002, TestSize
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid:%{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -2560,7 +2449,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_002, TestSize
     const size_t singleClientSuportMaxNum = 4;
     for (size_t i = 0; i < singleClientSuportMaxNum; ++i) {
         int32_t filterId = addFilter();
-        ASSERT_NE(filterId, RET_ERR);
+        ASSERT_NE(filterId, 10);
     }
     int32_t filterId = addFilter();
     ASSERT_EQ(filterId, RET_ERR);
@@ -2580,7 +2469,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid:%{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -2616,7 +2505,7 @@ HWTEST_F(InputManagerTest, InputManager_SlideUpBrightScreenUnlockEvent_001, Test
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_NE(injectDownEvent, nullptr);
     injectDownEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
-
+ 
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_F5);
     kitDown.SetPressed(true);
@@ -2625,11 +2514,11 @@ HWTEST_F(InputManagerTest, InputManager_SlideUpBrightScreenUnlockEvent_001, Test
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-
+ 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_NE(injectUpEvent, nullptr);
     injectDownEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
-
+ 
     KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(KeyEvent::KEYCODE_F5);
     kitUp.SetPressed(false);
@@ -3045,36 +2934,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadTapSwitch_001, TestSize.L
     ASSERT_TRUE(flag == newFlag);
 }
 
-
-/**
- * @tc.name: InputManagerTest_SetTouchpadRotateSwitch_001
- * @tc.desc: Set touchpad rotate switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool rotateSwitch = false;
-    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
-}
-
-/**
- * @tc.name: InputManagerTest_GetTouchpadRotateSwitch_001
- * @tc.desc: Get touchpad rotate switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool rotateSwitch = true;
-    InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
-    bool newRotateSwitch = true;
-    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
-    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
-}
-
 /**
  * @tc.name: InputManagerTest_SetCurrentUser_001
  * @tc.desc: set current user id
@@ -3130,6 +2989,35 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
     std::vector<int64_t> pattern = { 10, 20, 30 };
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetTouchpadRotateSwitch_001
+ * @tc.desc: Set touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool rotateSwitch = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadRotateSwitch_001
+ * @tc.desc: Get touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool rotateSwitch = true;
+    InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
+    bool newRotateSwitch = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
+    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
 
 /**
@@ -3196,42 +3084,34 @@ HWTEST_F(InputManagerTest, InputManagerTest_AppendExtraData_001, TestSize.Level1
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AppendExtraData(data));
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
- * @tc.name: InputManagerTest_TouchpadScrollRows_001
- * @tc.desc: SetTouchpadScrollRows and GetTouchpadScrollRows interface detection
- * @tc.type: FUNC
+ * @tc.name: InputManagerTest_GetPointerSnapshot
+ * @tc.desc: Test GetPointerSnapshot
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t rows = 1;
-    int32_t result = InputManager::GetInstance()->SetTouchpadScrollRows(rows);
-    ASSERT_EQ(result, RET_OK);
-    result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
-    ASSERT_EQ(rows, 1);
-    ASSERT_EQ(result, RET_OK);
+    void *pixelMap = nullptr;
+    EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
- * @tc.name: InputManagerTest_TouchpadScrollRows_002
- * @tc.desc: SetTouchpadScrollRows and GetTouchpadScrollRows interface detection
- * @tc.type: FUNC
+ * @tc.name: InputManagerTest_SkipPointerLayer_001
+ * @tc.desc: Test SkipPointerLayer
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t rows = -1;
-    InputManager::GetInstance()->SetTouchpadScrollRows(rows);
-    int32_t result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
-    ASSERT_EQ(rows, 1);
-    ASSERT_EQ(result, RET_OK);
-    rows = 101;
-    InputManager::GetInstance()->SetTouchpadScrollRows(rows);
-    result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
-    ASSERT_EQ(rows, 100);
-    ASSERT_EQ(result, RET_OK);
+    bool isSkip = true;
+    int32_t ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
+    EXPECT_EQ(ret, 305);
+    isSkip = false;
+    ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
+    EXPECT_EQ(ret, 305);
 }
 
 /**

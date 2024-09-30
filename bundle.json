@@ -49,8 +49,8 @@
     "deps": {
       "components": [
         "window_manager",
-        "hisysevent",
         "start",
+        "hisysevent",
         "napi",
         "c_utils",
         "ipc",
@@ -79,12 +79,12 @@
         "ffrt",
         "graphic_2d_ext",
         "hdf_core",
-        "bounds_checking_function",
+        "qos_manager",
         "call_manager",
         "libinput",
+        "bounds_checking_function",
         "screenlock_mgr",
-        "player_framework",
-        "qos_manager"
+        "player_framework"
       ],
       "third_party": [
         "cJSON",
