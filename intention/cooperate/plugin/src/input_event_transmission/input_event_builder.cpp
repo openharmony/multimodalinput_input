@@ -152,7 +152,7 @@ void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
         FI_HILOGE("Failed to deserialize key event");
         return;
     }
-    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{public}d,Action:%{public}d)",
+    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
         keyEvent_->GetId(), keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     env_->GetInput().SimulateInputEvent(keyEvent_);
 }

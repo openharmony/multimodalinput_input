@@ -36,6 +36,7 @@ CooperateOut::CooperateOut(IStateMachine &parent, IContext *env)
 
 CooperateOut::~CooperateOut()
 {
+    CHKPV(initial_);
     Initial::RemoveChains(initial_);
 }
 

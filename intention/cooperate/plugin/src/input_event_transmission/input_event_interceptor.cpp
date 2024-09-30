@@ -15,6 +15,8 @@
 
 #include "input_event_transmission/input_event_interceptor.h"
 
+#include <unordered_set>
+
 #include "cooperate_context.h"
 #include "devicestatus_define.h"
 #include "input_event_transmission/input_event_serialization.h"
@@ -27,14 +29,14 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-std::set<int32_t> InputEventInterceptor::filterKeys_ {
+std::unordered_set<int32_t> InputEventInterceptor::filterKeys_ {
     MMI::KeyEvent::KEYCODE_BACK,
     MMI::KeyEvent::KEYCODE_VOLUME_UP,
     MMI::KeyEvent::KEYCODE_VOLUME_DOWN,
     MMI::KeyEvent::KEYCODE_POWER,
 };
 
-std::set<int32_t> InputEventInterceptor::filterPointers_ {
+std::unordered_set<int32_t> InputEventInterceptor::filterPointers_ {
     MMI::PointerEvent::POINTER_ACTION_ENTER_WINDOW,
     MMI::PointerEvent::POINTER_ACTION_LEAVE_WINDOW,
     MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW,
@@ -93,15 +95,6 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGI("Reset to origin action:%{public}d", static_cast<int32_t>(originAction));
         pointerEvent->SetPointerAction(originAction);
     }
-    if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
-        timerId_ = env_->GetTimerManager().AddTimer(UP_WAIT_TIMEOUT, REPEAT_ONCE, [this]() {
-            if (env_->GetDragManager().GetCooperatePriv() & MOTION_DRAG_PRIV) {
-                FI_HILOGW("There is an up event when dragging");
-                env_->GetDragManager().SetAllowStartDrag(false);
-            }
-        });
-    }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 
     int32_t ret = InputEventSerialization::Marshalling(pointerEvent, packet);
@@ -109,7 +102,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGE("Failed to serialize pointer event");
         return;
     }
-    FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
+    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }
@@ -129,7 +122,7 @@ void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
         FI_HILOGE("Failed to serialize key event");
         return;
     }
-    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{public}d,Action:%{public}d)",
+    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }
