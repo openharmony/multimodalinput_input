@@ -62,7 +62,7 @@ public:
 
     void JudgeAction(std::string &action)
     {
-       if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGI("Display screen on");
             DISPLAY_MONITOR->SetScreenStatus(action);
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
