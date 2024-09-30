@@ -272,14 +272,12 @@ void TouchDrawingManager::CreateObserver()
     if (!hasBubbleObserver_) {
         bubbleMode_.SwitchName = showCursorSwitchName;
         CreateBubbleObserver(bubbleMode_);
-        hasBubbleObserver_ = true;
     }
     if (!hasPointerObserver_) {
         pointerMode_.SwitchName = pointerPositionSwitchName;
         CreatePointerObserver(pointerMode_);
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
             GetBoolValue(pointerPositionSwitchName, pointerMode_.isShow);
-        hasPointerObserver_ = true;
     }
     MMI_HILOGD("bubbleMode_: %{public}d, pointerMode_: %{public}d", bubbleMode_.isShow, pointerMode_.isShow);
 }
@@ -306,7 +304,9 @@ void TouchDrawingManager::CreateBubbleObserver(T &item)
     if (ret != ERR_OK) {
         MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
+        return;
     }
+    hasBubbleObserver_ = true;
 }
 
 template <class T>
@@ -330,7 +330,9 @@ void TouchDrawingManager::CreatePointerObserver(T &item)
     if (ret != ERR_OK) {
         MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
+        return;
     }
+    hasPointerObserver_ = true;
 }
 
 template <class T>

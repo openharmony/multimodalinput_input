@@ -639,6 +639,7 @@ void PointerDrawingManager::UpdateStyleOptions()
 
 void PointerDrawingManager::InitPointerObserver()
 {
+    CALL_INFO_TRACE;
     if (hasInitObserver_) {
         MMI_HILOGI("Settingdata observer has init");
         return;
