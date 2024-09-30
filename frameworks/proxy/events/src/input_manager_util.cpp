@@ -34,88 +34,87 @@ constexpr int32_t INDEX_FIRST { 1 };
 constexpr int32_t INDEX_SECOND { 2 };
 constexpr int32_t INDEX_THIRD { 3 };
 constexpr int32_t MOUSE_ICON_SIZE { 64 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_TWO { 50 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_THREE { 53 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_FOUR { 200 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_FIVE { 503 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_SIX { 520 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_SEVEN { 523 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_EIGHT { 550 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_NINE { 593 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_TEN { 600 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_ELEVEN { 610 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_TWELVE { 623 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_THIRTEEN { 10 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_FIFTEEN  { 40 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_SIXTEEN { 546 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_SEVENTEEN { 555 };
-constexpr int32_t POINTER_ITEM_DISPLAY_X_EIGHTEEN { 888 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_ONE { 10 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_TWO { 50 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_THREE { 60 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOUR { 68 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_FIVE { 80 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_SIX { 200 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_SEVEN { 504 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_EIGHT { 530 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_NINE { 555 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_TEN { 610 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_ELEVEN { 650 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_TWELVE { 703 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_THIRTEEN { 723 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOURTEEN { 733 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_FIFTEEN { 777 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_SIXTEEN { 783 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_SEVENTEEN { 823 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_EIGHTEEN { 910 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_NINETEEN { 999 };
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_TWENTY { 1259 };
-constexpr int32_t POINTER_ITEM_WIDTH_ONE { 20 };
-constexpr int32_t POINTER_ITEM_WIDTH_TWO { 50 };
-constexpr int32_t POINTER_ITEM_WIDTH_THREE { 80 };
-constexpr int32_t POINTER_ITEM_HEIGHT_ONE { 60 };
-constexpr int32_t POINTER_ITEM_HEIGHT_TWO { 80 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_ONE { 20 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_TWO { 55 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_THREE { 67 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_FOUR { 70 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_FIVE { 80 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_SIX { 120 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_SEVEN { 300 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_EIGHT { 323 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_NINE { 701 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_TEN { 720 };
-constexpr int32_t POINTER_ITEM_WINDOW_X_ELEVEN { 740 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_ONE { 45 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_TWO { 66 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_THREE { 70 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_FOUR { 90 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_FIVE { 99 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_SIX { 106 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_SEVEN { 300 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_EIGHT { 453 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_NINE { 702 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_TEN { 730 };
-constexpr int32_t POINTER_ITEM_WINDOW_Y_ELEVEN { 750 };
-constexpr double POINTER_ITEM_PRESSURE_ONE { 5.0 };
-constexpr double POINTER_ITEM_PRESSURE_TWO { 7.0 };
-constexpr double POINTER_ITEM_PRESSURE_THREE { 0.15 };
-constexpr double POINTER_ITEM_PRESSURE_FOUR { 0.45 };
-constexpr double POINTER_ITEM_PRESSURE_FIVE { 0.7 };
-constexpr double POINTER_AXIS_VALUE_ONE { -1.0000 };
-constexpr double POINTER_AXIS_VALUE_TWO { 30.0 };
-constexpr double POINTER_AXIS_VALUE_THREE { 40.0 };
-constexpr double POINTER_ITEM_TITLE_X_ONE { 2.12 };
-constexpr double POINTER_ITEM_TITLE_X_TWO { 12.22 };
-constexpr double POINTER_ITEM_TITLE_X_THREE { 10.0 };
-constexpr double POINTER_ITEM_TITLE_Y_ONE { 5.43 };
-constexpr double POINTER_ITEM_TITLE_Y_TWO { 15.33 };
-constexpr double POINTER_ITEM_TITLE_Y_THREE { -9.0 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_2 { 50 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_3 { 53 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_4 { 200 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_5 { 503 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_6 { 520 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_7 { 523 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_8 { 550 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_9 { 593 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_10 { 600 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_11 { 610 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_12 { 623 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_13 { 10 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_15 { 40 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_16 { 546 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_17 { 555 };
+constexpr int32_t POINTER_ITEM_DISPLAY_X_OFFSET_18 { 888 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_1 { 10 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_2 { 50 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_3 { 60 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_4 { 68 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_5 { 80 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_6 { 200 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_7 { 504 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_8 { 530 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_9 { 555 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_10 { 610 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_11 { 650 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_12 { 703 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_13 { 723 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_14 { 733 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_15 { 777 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_16 { 783 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_17 { 823 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_18 { 910 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_19 { 999 };
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_OFFSET_20 { 1259 };
+constexpr int32_t POINTER_ITEM_WIDTH_OFFSET_1 { 20 };
+constexpr int32_t POINTER_ITEM_WIDTH_OFFSET_2 { 50 };
+constexpr int32_t POINTER_ITEM_WIDTH_OFFSET_3 { 80 };
+constexpr int32_t POINTER_ITEM_HEIGHT_OFFSET_1 { 60 };
+constexpr int32_t POINTER_ITEM_HEIGHT_OFFSET_2 { 80 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_1 { 20 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_2 { 55 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_3 { 67 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_4 { 70 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_5 { 80 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_6 { 120 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_7 { 300 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_8 { 323 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_9 { 701 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_10 { 720 };
+constexpr int32_t POINTER_ITEM_WINDOW_X_OFFSET_11 { 740 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_1 { 45 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_2 { 66 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_3 { 70 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_4 { 90 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_5 { 99 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_6 { 106 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_7 { 300 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_8 { 453 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_9 { 702 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_10 { 730 };
+constexpr int32_t POINTER_ITEM_WINDOW_Y_OFFSET_11 { 750 };
+constexpr double POINTER_ITEM_PRESSURE_OFFSET_1 { 5.0 };
+constexpr double POINTER_ITEM_PRESSURE_OFFSET_2 { 7.0 };
+constexpr double POINTER_ITEM_PRESSURE_OFFSET_3 { 0.15 };
+constexpr double POINTER_ITEM_PRESSURE_OFFSET_4 { 0.45 };
+constexpr double POINTER_ITEM_PRESSURE_OFFSET_5 { 0.7 };
+constexpr double POINTER_AXIS_VALUE_OFFSET_1 { -1.0000 };
+constexpr double POINTER_AXIS_VALUE_OFFSET_2 { 30.0 };
+constexpr double POINTER_AXIS_VALUE_OFFSET_3 { 40.0 };
+constexpr double POINTER_ITEM_TITLE_X_OFFSET_1 { 2.12 };
+constexpr double POINTER_ITEM_TITLE_X_OFFSET_2 { 12.22 };
+constexpr double POINTER_ITEM_TITLE_X_OFFSET_3 { 10.0 };
+constexpr double POINTER_ITEM_TITLE_Y_OFFSET_1 { 5.43 };
+constexpr double POINTER_ITEM_TITLE_Y_OFFSET_2 { 15.33 };
+constexpr double POINTER_ITEM_TITLE_Y_OFFSET_3 { -9.0 };
 constexpr int32_t POINTER_ITEM_ID_INVALID { -1 };
 constexpr int32_t POINTER_ITEM_ID_ONE { 1 };
 constexpr int32_t POINTER_ITEM_ID_TWO { 2 };
 constexpr int32_t POINTER_ITEM_ID_FOUR { 4 };
-
 } // namespace
 
 std::shared_ptr<KeyOption> InputManagerUtil::InitOption(
@@ -135,16 +134,16 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent001()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_7);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_13);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ELEVEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_EIGHTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_11);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_18);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_2);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
@@ -160,16 +159,16 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent002()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_NINE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_SIXTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_9);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_16);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_10);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_10);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_2);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
@@ -185,15 +184,15 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent003()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_THREE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOURTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_3);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_14);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWELVE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_SEVENTEEN);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_12);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_17);
     item.SetPressure(0);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
@@ -219,10 +218,10 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent005()
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SIX);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_EIGHT);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_ELEVEN);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_ELEVEN);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_6);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_8);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_11);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_11);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -243,16 +242,15 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent006()
     item.SetPressed(false);
     item.SetPointerId(0);
     item.SetDownTime(0);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_4);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_4);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_3);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_5);
 
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_THREE);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_FIVE);
-
-    item.SetWidth(POINTER_ITEM_WIDTH_TWO);
+    item.SetWidth(POINTER_ITEM_WIDTH_OFFSET_2);
     item.SetPressure(0);
     item.SetDeviceId(0);
-    item.SetHeight(POINTER_ITEM_HEIGHT_ONE);
+    item.SetHeight(POINTER_ITEM_HEIGHT_OFFSET_1);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
@@ -271,14 +269,14 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent007()
     item.SetPointerId(0);
     item.SetDownTime(downTime);
     item.SetPressed(false);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_EIGHT);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_TEN);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_TEN);
-    item.SetWidth(POINTER_ITEM_WIDTH_THREE);
-    item.SetHeight(POINTER_ITEM_HEIGHT_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_8);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_10);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_10);
+    item.SetWidth(POINTER_ITEM_WIDTH_OFFSET_3);
+    item.SetHeight(POINTER_ITEM_HEIGHT_OFFSET_2);
     item.SetPressure(0);
     item.SetDeviceId(0);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ELEVEN);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_11);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
@@ -290,18 +288,18 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent009()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent->SetPointerId(1);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, POINTER_AXIS_VALUE_ONE);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, POINTER_AXIS_VALUE_OFFSET_1);
     PointerEvent::PointerItem item;
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_SEVEN);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_7);
     item.SetDownTime(0);
     item.SetPressed(false);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FIVE);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_NINE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_5);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_9);
     item.SetPointerId(1);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_NINE);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_9);
     item.SetDeviceId(0);
-    item.SetWidth(POINTER_ITEM_WIDTH_ONE);
-    item.SetHeight(POINTER_ITEM_HEIGHT_ONE);
+    item.SetWidth(POINTER_ITEM_WIDTH_OFFSET_1);
+    item.SetHeight(POINTER_ITEM_HEIGHT_OFFSET_1);
     item.SetPressure(0);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
@@ -314,17 +312,17 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent010()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent->SetPointerId(1);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, POINTER_AXIS_VALUE_TWO);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, POINTER_AXIS_VALUE_THREE);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, POINTER_AXIS_VALUE_OFFSET_2);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, POINTER_AXIS_VALUE_OFFSET_3);
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_SIX);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_SEVEN);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_SEVEN);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_4);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_6);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_7);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_7);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -342,32 +340,32 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent011()
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetPointerId(1);
     PointerEvent::PointerItem item;
-    item.SetTiltY(POINTER_ITEM_TITLE_Y_ONE);
+    item.SetTiltY(POINTER_ITEM_TITLE_Y_OFFSET_1);
     item.SetPointerId(0);
     item.SetDownTime(0);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_EIGHT);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_EIGHT);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_8);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_7);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_8);
     item.SetHeight(0);
-    item.SetTiltX(POINTER_ITEM_TITLE_X_ONE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_THREE);
+    item.SetTiltX(POINTER_ITEM_TITLE_X_OFFSET_1);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_13);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_3);
     item.SetDeviceId(1);
     item.SetWidth(0);
     pointerEvent->AddPointerItem(item);
 
     item.SetDownTime(0);
     item.SetPointerId(1);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_FOUR);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_4);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_4);
     item.SetWidth(0);
     item.SetDeviceId(1);
     item.SetHeight(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
-    item.SetTiltX(POINTER_ITEM_TITLE_X_TWO);
-    item.SetTiltY(POINTER_ITEM_TITLE_Y_TWO);
-    item.SetPressure(POINTER_ITEM_PRESSURE_FOUR);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_THREE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_4);
+    item.SetTiltX(POINTER_ITEM_TITLE_X_OFFSET_2);
+    item.SetTiltY(POINTER_ITEM_TITLE_Y_OFFSET_2);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_4);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_3);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
@@ -381,30 +379,30 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent012()
     pointerEvent->SetPointerId(1);
     PointerEvent::PointerItem item;
     item.SetDeviceId(1);
-    item.SetTiltY(POINTER_ITEM_TITLE_Y_ONE);
+    item.SetTiltY(POINTER_ITEM_TITLE_Y_OFFSET_1);
     item.SetHeight(0);
     item.SetDownTime(0);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_EIGHT);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_EIGHT);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_13);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_8);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_7);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_8);
     item.SetWidth(0);
-    item.SetTiltX(POINTER_ITEM_TITLE_X_ONE);
-    item.SetPressure(POINTER_ITEM_PRESSURE_THREE);
+    item.SetTiltX(POINTER_ITEM_TITLE_X_OFFSET_1);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_3);
     item.SetPointerId(0);
     pointerEvent->AddPointerItem(item);
 
     item.SetDeviceId(1);
     item.SetDownTime(0);
-    item.SetTiltX(POINTER_ITEM_TITLE_X_TWO);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_FOUR);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_THREE);
+    item.SetTiltX(POINTER_ITEM_TITLE_X_OFFSET_2);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_4);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_3);
     item.SetWidth(0);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_4);
     item.SetHeight(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
-    item.SetTiltY(POINTER_ITEM_TITLE_Y_TWO);
-    item.SetPressure(POINTER_ITEM_PRESSURE_FOUR);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_4);
+    item.SetTiltY(POINTER_ITEM_TITLE_Y_OFFSET_2);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_4);
     item.SetPointerId(1);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
@@ -420,29 +418,29 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent013()
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_EIGHT);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_EIGHT);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_7);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_13);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_8);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_8);
     item.SetWidth(0);
     item.SetHeight(0);
-    item.SetTiltX(POINTER_ITEM_TITLE_X_ONE);
-    item.SetTiltY(POINTER_ITEM_TITLE_Y_ONE);
-    item.SetPressure(POINTER_ITEM_PRESSURE_THREE);
+    item.SetTiltX(POINTER_ITEM_TITLE_X_OFFSET_1);
+    item.SetTiltY(POINTER_ITEM_TITLE_Y_OFFSET_1);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_3);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);
     item.SetDownTime(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_FOUR);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_THREE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_4);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_4);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_4);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_3);
     item.SetWidth(0);
     item.SetHeight(0);
-    item.SetTiltX(POINTER_ITEM_TITLE_X_TWO);
-    item.SetTiltY(POINTER_ITEM_TITLE_Y_TWO);
-    item.SetPressure(POINTER_ITEM_PRESSURE_FOUR);
+    item.SetTiltX(POINTER_ITEM_TITLE_X_OFFSET_2);
+    item.SetTiltY(POINTER_ITEM_TITLE_Y_OFFSET_2);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_4);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
@@ -456,10 +454,10 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent014()
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetPointerId(0);
     PointerEvent::PointerItem item;
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_NINE);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_ONE);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_4);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_9);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_1);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_1);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -488,10 +486,10 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent015()
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWENTY);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_SIX);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_SIX);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_4);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_20);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_6);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_6);
 
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
@@ -505,7 +503,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent016()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     return pointerEvent;
 }
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
+#endif  // OHOS_BUILD_ENABLE_JOYSTICK
 
 std::shared_ptr<PointerEvent> InputManagerUtil::SetupMouseEvent001()
 {
@@ -516,14 +514,14 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupMouseEvent001()
     pointerEvent->SetPointerId(0);
     PointerEvent::PointerItem item;
 
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FIVE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_2);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_5);
     item.SetWidth(0);
     item.SetHeight(0);
     item.SetPressure(0);
     item.SetDeviceId(0);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_TWO);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_TWO);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_2);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_2);
     item.SetPointerId(0);
     item.SetDownTime(0);
     item.SetPressed(false);
@@ -542,12 +540,12 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupMouseEvent002()
     PointerEvent::PointerItem item;
     item.SetDownTime(0);
     item.SetPressed(false);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FIFTEEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THREE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_15);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_3);
     item.SetWidth(0);
     item.SetHeight(0);
-    item.SetWindowX(POINTER_ITEM_WINDOW_X_FIVE);
-    item.SetWindowY(POINTER_ITEM_WINDOW_Y_FOUR);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X_OFFSET_5);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y_OFFSET_4);
     item.SetPressure(0);
     item.SetPointerId(0);
     item.SetDeviceId(0);
@@ -561,9 +559,9 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupTouchScreenEvent001()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_THIRTEEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ONE);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_13);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_1);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -578,9 +576,9 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupTouchScreenEvent002()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_2);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_2);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -592,9 +590,9 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupTouchScreenEvent002()
 void InputManagerUtil::SetPointerItem(PointerEvent::PointerItem &item, int32_t pointerId)
 {
     item.SetPointerId(pointerId);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_2);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_2);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
 }
 
@@ -808,9 +806,9 @@ std::shared_ptr<PointerEvent> InputManagerUtil::TestMarkConsumedStep1()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_7);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_13);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
@@ -821,7 +819,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::TestMarkConsumedStep1()
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     return pointerEvent;
 }
@@ -832,9 +830,9 @@ std::shared_ptr<PointerEvent> InputManagerUtil::TestMarkConsumedStep2()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWELVE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_12);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_13);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
@@ -845,7 +843,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::TestMarkConsumedStep2()
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     return pointerEvent;
 }
@@ -865,9 +863,9 @@ void InputManagerUtil::TestMarkConsumedStep4()
     PointerEvent::PointerItem item;
     item.SetDeviceId(1);
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVENTEEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FIFTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_17);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_15);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -877,7 +875,7 @@ void InputManagerUtil::TestMarkConsumedStep4()
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -887,9 +885,9 @@ void InputManagerUtil::TestMarkConsumedStep5()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SIXTEEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWELVE);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_16);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_12);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
@@ -900,7 +898,7 @@ void InputManagerUtil::TestMarkConsumedStep5()
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -911,9 +909,9 @@ void InputManagerUtil::TestMarkConsumedStep6()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_EIGHTEEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_NINETEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_18);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_19);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_1);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
 
@@ -925,7 +923,7 @@ void InputManagerUtil::TestMarkConsumedStep6()
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_FOCUS);
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -969,7 +967,7 @@ void InputManagerUtil::TestMonitor(int32_t monitorId, std::shared_ptr<PointerEve
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
+#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
 
     if (IsValidHandlerId(monitorId)) {
         TestRemoveMonitor(monitorId);
@@ -984,12 +982,12 @@ void InputManagerUtil::TestInterceptorIdAndPointerEvent(
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     SimulateInputEventUtilTest(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
 
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
@@ -1016,11 +1014,11 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupTabletToolEvent001()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(DEFAULT_POINTER_ID);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
-    item.SetPressure(POINTER_ITEM_PRESSURE_FIVE);
-    item.SetTiltX(POINTER_ITEM_TITLE_X_THREE);
-    item.SetTiltY(POINTER_ITEM_TITLE_Y_THREE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_OFFSET_7);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_OFFSET_13);
+    item.SetPressure(POINTER_ITEM_PRESSURE_OFFSET_5);
+    item.SetTiltX(POINTER_ITEM_TITLE_X_OFFSET_3);
+    item.SetTiltY(POINTER_ITEM_TITLE_Y_OFFSET_3);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
     pointerEvent->AddPointerItem(item);
@@ -1030,5 +1028,5 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupTabletToolEvent001()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
-} // namespace MMI
-} // namespace OHOS
+}  // namespace MMI
+}  // namespace OHOS
