@@ -90,6 +90,9 @@ public:
             if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
                 MMI_HILOGI("Data share has readyed");
                 IPointerDrawingManager::GetInstance()->InitPointerObserver();
+                auto keySubscriberHandler = InputHandler->GetSubscriberHandler();
+                CHKPV(keySubscriberHandler);
+                keySubscriberHandler->InitDataShareListener();
                 auto keyHandler = InputHandler->GetKeyCommandHandler();
                 if (keyHandler != nullptr) {
                     keyHandler->InitKeyObserver();
