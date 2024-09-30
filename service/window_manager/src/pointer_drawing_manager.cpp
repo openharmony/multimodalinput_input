@@ -312,6 +312,7 @@ void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physic
 {
     hardwareCanvasSize_ = g_hardwareCanvasSize;
     PostTask([this, physicalX, physicalY]() -> void {
+        CHKPV(surfaceNode_);
         surfaceNode_->SetBounds(physicalX, physicalY, hardwareCanvasSize_, hardwareCanvasSize_);
         Rosen::RSTransaction::FlushImplicitTransaction();
     });
