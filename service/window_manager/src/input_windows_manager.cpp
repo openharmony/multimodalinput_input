@@ -903,17 +903,20 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
     });
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-        auto displayInfo = GetPhysicalDisplay(windowInfo.displayId);
-        CHKPR(displayInfo, action);
-        windowInfo.area.x += displayInfo->x;
-        windowInfo.area.y += displayInfo->y;
-        for (auto &area : windowInfo.defaultHotAreas) {
-            area.x += displayInfo->x;
-            area.y += displayInfo->y;
-        }
-        for (auto &area : windowInfo.pointerHotAreas) {
-            area.x += displayInfo->x;
-            area.y += displayInfo->y;
+        if (!WindowInfo.isDisplayCoord) {
+            auto displayInfo = GetPhysicalDisplay(windowInfo.displayId);
+            CHKPR(displayInfo, action);
+            windowInfo.area.x += displayInfo->x;
+            windowInfo.area.y += displayInfo->y;
+            for (auto &area : windowInfo.defaultHotAreas) {
+                area.x += displayInfo->x;
+                area.y += displayInfo->y;
+            }
+            for (auto &area : windowInfo.pointerHotAreas) {
+                area.x += displayInfo->x;
+                area.y += displayInfo->y;
+            }
+            WindowInfo.isDisplayCoord = true;
         }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
