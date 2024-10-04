@@ -331,6 +331,8 @@ struct WindowInfo {
     std::vector<WindowInfo> uiExtentionWindowInfo;
 
     bool rectChangeBySystem { false };
+
+    bool isDisplayCoord { false };
 };
 
 /**
