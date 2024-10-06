@@ -59,56 +59,6 @@ private:
     void CreateObserver();
     template <class T>
     void CreateScreenReadObserver(T& item);
-#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-    void CreateBrushWorkCanvasNode();
-    void CreateTrackCanvasNode();
-    void InitEmitter();
-    void UpdateEmitter();
-    void DrawTrackCanvas();
-    void DrawBrushCanvas();
-    int32_t ClearTrackCanvas();
-    int32_t ClearBrushCanvas();
-    void ActionUpAnimation();
-    uint32_t GetDeltaColor(uint32_t deltaSource, uint32_t deltaTarget);
-    uint32_t DrawTrackColorBlue(int32_t pathValue);
-    uint32_t DrawTrackColorPink(int32_t pathValue);
-    uint32_t DrawTrackColorOrangeRed(int32_t pathValue);
-    uint32_t DrawTrackColorYellow(int32_t pathValue);
-#else
-    void CreateCanvasNode();
-#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-
-private:
-    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
-#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-    std::shared_ptr<Rosen::RSCanvasDrawingNode> brushCanvasNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasDrawingNode> trackCanvasNode_ { nullptr };
-#else
-    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
-#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-    std::vector<PointerInfo> pointerInfos_;
-    Rosen::Drawing::Paint paint_;
-    Rosen::Drawing::Path path_;
-    DisplayInfo displayInfo_ {};
-    uint64_t screenId_ { 0 };
-    bool isActionUp_ { false };
-    PointerInfo lastDownPointer_ {};
-    int64_t lastUpTime_ { 0 };
-    bool isRotate_ { false };
-    int32_t scaleW_ { 0 };
-    int32_t scaleH_ { 0 };
-    int64_t firstDownTime_ { 0 };
-    bool hasScreenReadObserver_ { false };
-    ScreenReadState screenReadState_ { };
-    int32_t pointerNum_ { 0 };
-#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-    std::vector<Rosen::Drawing::Path> pathInfos_;
-    float pathLength_ { 0.0f };
-    float brushPathLength_ { 0.0f };
-    uint32_t trackColorR_ { 0x00 };
-    uint32_t trackColorG_ { 0x00 };
-    uint32_t trackColorB_ { 0x00 };
-#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 };
 } // namespace MMI
 } // namespace OHOS
