@@ -1873,11 +1873,11 @@ CALL_TEST_DEBUG;
 PointerDrawingManager pointerDrawMgr;
 pointerDrawMgr.dynamicBitmap_ = nullptr;
 ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
-pointerDrawMgr.dynamicBitmap_ = std::make_sharedOHOS::Rosen::Drawing::Bitmap();
+pointerDrawMgr.dynamicBitmap_ = std::make_shared<OHOS::Rosen::Drawing::Bitmap>();
 EXPECT_TRUE(pointerDrawMgr.dynamicBitmap_ != nullptr);
 pointerDrawMgr.dynamicCanvas_ = nullptr;
 ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
-pointerDrawMgr.dynamicCanvas_ = std::make_sharedOHOS::Rosen::Drawing::Canvas();
+pointerDrawMgr.dynamicCanvas_ = std::make_shared<OHOS::Rosen::Drawing::Canvas>();
 ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
 }
 
@@ -2028,7 +2028,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_DrawDynamicIma
 {
 CALL_TEST_DEBUG;
 PointerDrawingManager pointerDrawMgr;
-pointerDrawMgr.image_ = std::make_sharedRosen::Drawing::Image();
+pointerDrawMgr.image_ = std::make_shared<Rosen::Drawing::Image>();
 EXPECT_TRUE(pointerDrawMgr.image_ != nullptr);
 OHOS::Rosen::Drawing::Canvas canvas;
 MOUSE_ICON mouseStyle = MOUSE_ICON::LOADING;
