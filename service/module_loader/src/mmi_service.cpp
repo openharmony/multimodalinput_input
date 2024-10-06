@@ -2861,6 +2861,7 @@ int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
+    MMI_HILOGI("Get pointer snapshot from process(%{public}d)", GetCallingPid());
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(
         std::bind(&IPointerDrawingManager::GetPointerSnapshot, IPointerDrawingManager::GetInstance(), pixelMapPtr)));
     if (ret != RET_OK) {
