@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+#include "event_log_helper.h"
 #include "image_source.h"
 #include "input_device_manager.h"
 #include "input_windows_manager_mock.h"
@@ -53,6 +54,9 @@ constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+constexpr float CALCULATE_IMAGE_MIDDLE = { 2.0f };
+constexpr float CALCULATE_MOUSE_ICON_BAIS { 5.0f };
+float g_focalPoint = { 256.0f };
 } // namespace
 
 class PointerDrawingManagerExTest : public testing::Test {
@@ -1663,6 +1667,380 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpo
     int32_t hotSpotY = 100;
     pointerDrawMgr.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     EXPECT_EQ(pointerDrawMgr.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY), RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_CalculateHardwareXOffset_001
+ * @tc.desc: Test the funcation CalculateHardwareXOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_CalculateHardwareXOffset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t imageWidth_ = 0;
+    PointerDrawingManager pointerDrawMgr;
+    ICON_TYPE iconType = ANGLE_E;
+    float ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    float value = g_focalPoint;
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_S;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_W;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = (g_focalPoint - imageWidth_);
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_N;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_SE;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = (g_focalPoint - imageWidth_);
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_NE;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = (g_focalPoint - imageWidth_);
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_SW;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = g_focalPoint;
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_NW;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = g_focalPoint;
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_CENTER;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_NW_RIGHT;
+    ret = pointerDrawMgr.CalculateHardwareXOffset(iconType);
+    value = g_focalPoint - CALCULATE_MOUSE_ICON_BAIS;
+    EXPECT_EQ(ret, value);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_CalculateHardwareYOffset_001
+ * @tc.desc: Test the funcation CalculateHardwareYOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_CalculateHardwareYOffset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t imageHeight_ = 0;
+    PointerDrawingManager pointerDrawMgr;
+    ICON_TYPE iconType = ANGLE_E;
+    float ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    float value = (g_focalPoint - (imageHeight_ / CALCULATE_IMAGE_MIDDLE));
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_S;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = g_focalPoint;
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_W;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = (g_focalPoint - imageHeight_);
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_N;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = (g_focalPoint - imageHeight_);
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_SE;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = (g_focalPoint - imageHeight_);
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_NE;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = g_focalPoint;
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_SW;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = (g_focalPoint - imageHeight_);
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_NW;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = g_focalPoint;
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_CENTER;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = (g_focalPoint - (imageHeight_ / CALCULATE_IMAGE_MIDDLE));
+    EXPECT_EQ(ret, value);
+    iconType = ANGLE_NW_RIGHT;
+    ret = pointerDrawMgr.CalculateHardwareYOffset(iconType);
+    value = g_focalPoint;
+    EXPECT_EQ(ret, value);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_AttachToDisplay_001
+ * @tc.desc: Test the funcation AttachToDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_AttachToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, GetDisplayMode).WillRepeatedly(testing::Return(DisplayMode::MAIN));
+    PointerDrawingManager pointerDrawMgr;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    EXPECT_TRUE(pointerDrawMgr.surfaceNode_ != nullptr);
+    pointerDrawMgr.screenId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AttachToDisplay());
+    pointerDrawMgr.screenId_ = 10;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AttachToDisplay());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_AttachToDisplay_002
+ * @tc.desc: Test the funcation AttachToDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_AttachToDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, GetDisplayMode).WillRepeatedly(testing::Return(DisplayMode::SUB));
+    PointerDrawingManager pointerDrawMgr;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    EXPECT_TRUE(pointerDrawMgr.surfaceNode_ != nullptr);
+    pointerDrawMgr.screenId_ = 5;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AttachToDisplay());
+    pointerDrawMgr.screenId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AttachToDisplay());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_SkipPointerLayer_001
+ * @tc.desc: Test the funcation SkipPointerLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SkipPointerLayer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    bool isSkip = true;
+    pointerDrawMgr.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.SkipPointerLayer(isSkip));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawMgr.surfaceNode_ != nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.SkipPointerLayer(isSkip));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_SkipPointerLayer_002
+ * @tc.desc: Test the funcation SkipPointerLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SkipPointerLayer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    bool isSkip = false;
+    pointerDrawMgr.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.SkipPointerLayer(isSkip));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "SkipPointerLayer";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawMgr.surfaceNode_ != nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.SkipPointerLayer(isSkip));
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_CreateDynamicCanvas_001
+@tc.desc: Test the funcation CreateDynamicCanvas
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_CreateDynamicCanvas_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+PointerDrawingManager pointerDrawMgr;
+pointerDrawMgr.dynamicBitmap_ = nullptr;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
+pointerDrawMgr.dynamicBitmap_ = std::make_sharedOHOS::Rosen::Drawing::Bitmap();
+EXPECT_TRUE(pointerDrawMgr.dynamicBitmap_ != nullptr);
+pointerDrawMgr.dynamicCanvas_ = nullptr;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
+pointerDrawMgr.dynamicCanvas_ = std::make_sharedOHOS::Rosen::Drawing::Canvas();
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_ParsingDynamicImage_001
+@tc.desc: Test the funcation ParsingDynamicImage
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ParsingDynamicImage_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+PointerDrawingManager pointerDrawMgr;
+MOUSE_ICON mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ParsingDynamicImage(mouseStyle));
+mouseStyle = MOUSE_ICON::RUNNING;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ParsingDynamicImage(mouseStyle));
+mouseStyle = MOUSE_ICON::RUNNING_RIGHT;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ParsingDynamicImage(mouseStyle));
+mouseStyle = MOUSE_ICON::RUNNING_LEFT;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ParsingDynamicImage(mouseStyle));
+mouseStyle = MOUSE_ICON::LOADING;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ParsingDynamicImage(mouseStyle));
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_PixelFormatToColorType_001
+@tc.desc: Test the funcation PixelFormatToColorType
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_PixelFormatToColorType_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+PointerDrawingManager pointerDrawMgr;
+Media::PixelFormat pixelFormat = Media::PixelFormat::RGB_565;
+auto value = Rosen::Drawing::ColorType::COLORTYPE_RGB_565;
+Rosen::Drawing::ColorType ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::RGBA_8888;
+value = Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::BGRA_8888;
+value = Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::ALPHA_8;
+value = Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::RGBA_F16;
+value = Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::UNKNOWN;
+value = Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::ARGB_8888;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::RGB_888;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::NV21;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::NV12;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+pixelFormat = Media::PixelFormat::CMYK;
+ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+EXPECT_EQ(ret, value);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_AlphaTypeToAlphaType_001
+@tc.desc: Test the funcation AlphaTypeToAlphaType
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_AlphaTypeToAlphaType_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+PointerDrawingManager pointerDrawMgr;
+Media::AlphaType alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN;
+auto value = Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
+Rosen::Drawing::AlphaType ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
+EXPECT_EQ(ret, value);
+alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+value = Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE;
+ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
+EXPECT_EQ(ret, value);
+alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL;
+value = Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL;
+ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
+EXPECT_EQ(ret, value);
+alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
+value = Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL;
+ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
+EXPECT_EQ(ret, value);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_ClearWindowPointerStyle_001
+@tc.desc: Test the funcation ClearWindowPointerStyle
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ClearWindowPointerStyle_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+PointerDrawingManager pointerDrawMgr;
+int32_t pid = 2;
+int32_t windowId = 1;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ClearWindowPointerStyle(pid, windowId));
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_IsWindowRotation_001
+@tc.desc: Test the funcation IsWindowRotation
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_IsWindowRotation_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+PointerDrawingManager pointerDrawMgr;
+pointerDrawMgr.displayInfo_.displayMode = DisplayMode::MAIN;
+bool ret = pointerDrawMgr.IsWindowRotation();
+ASSERT_TRUE(ret);
+pointerDrawMgr.displayInfo_.displayMode = DisplayMode::FULL;
+ret = pointerDrawMgr.IsWindowRotation();
+ASSERT_TRUE(ret);
+pointerDrawMgr.displayInfo_.displayMode = DisplayMode::SUB;
+ret = pointerDrawMgr.IsWindowRotation();
+ASSERT_TRUE(ret);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_DrawDynamicImage_001
+@tc.desc: Test the funcation DrawDynamicImage
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_DrawDynamicImage_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+PointerDrawingManager pointerDrawMgr;
+pointerDrawMgr.image_ = std::make_sharedRosen::Drawing::Image();
+EXPECT_TRUE(pointerDrawMgr.image_ != nullptr);
+OHOS::Rosen::Drawing::Canvas canvas;
+MOUSE_ICON mouseStyle = MOUSE_ICON::LOADING;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.DrawDynamicImage(canvas, mouseStyle));
+mouseStyle = MOUSE_ICON::RUNNING_RIGHT;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.DrawDynamicImage(canvas, mouseStyle));
+mouseStyle = MOUSE_ICON::RUNNING_LEFT;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.DrawDynamicImage(canvas, mouseStyle));
+mouseStyle = MOUSE_ICON::RUNNING;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.DrawDynamicImage(canvas, mouseStyle));
+mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.DrawDynamicImage(canvas, mouseStyle));
 }
 } // namespace MMI
 } // namespace OHOS
