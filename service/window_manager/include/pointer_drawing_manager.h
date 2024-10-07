@@ -192,7 +192,7 @@ private:
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
     void UpdateBindDisplayId(int32_t displayId);
-    void PostTaskRSLocation(int32_t physicalX, int32_t physicalY);
+    void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     void DrawTraditionsCursor(MOUSE_ICON mouseStyle);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -216,6 +216,8 @@ private:
     int32_t imageHeight_ { 0 };
     int32_t canvasWidth_ = 64;
     int32_t canvasHeight_ = 64;
+    int32_t cursorWidth_ { 0 };
+    int32_t cursorHeight_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     std::list<PidInfo> hapPidInfos_;

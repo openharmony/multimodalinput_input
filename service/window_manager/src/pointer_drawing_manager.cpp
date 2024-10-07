@@ -229,25 +229,34 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
 
 float PointerDrawingManager::CalculateHardwareXOffset(ICON_TYPE iconType)
 {
+    int32_t width = imageWidth_;
+    int32_t userIconHotSpotX = 0;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (hardwareCursorPointerManager_->IsSupported() &&
+        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        width = cursorWidth_;
+        userIconHotSpotX = userIconHotSpotX_;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_E:
             return g_focalPoint;
         case ANGLE_S:
-            return (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+            return (g_focalPoint - (width / CALCULATE_IMAGE_MIDDLE));
         case ANGLE_W:
-            return (g_focalPoint - imageWidth_);
+            return (g_focalPoint - width);
         case ANGLE_N:
-            return (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+            return (g_focalPoint - (width / CALCULATE_IMAGE_MIDDLE));
         case ANGLE_SE:
-            return (g_focalPoint - imageWidth_);
+            return (g_focalPoint - width);
         case ANGLE_NE:
-            return (g_focalPoint - imageWidth_);
+            return (g_focalPoint - width);
         case ANGLE_SW:
             return g_focalPoint;
         case ANGLE_NW:
-            return g_focalPoint;
+            return g_focalPoint - userIconHotSpotX;
         case ANGLE_CENTER:
-            return (g_focalPoint - (imageWidth_ / CALCULATE_IMAGE_MIDDLE));
+            return (g_focalPoint - (width / CALCULATE_IMAGE_MIDDLE));
         case ANGLE_NW_RIGHT:
             return g_focalPoint - CALCULATE_MOUSE_ICON_BAIS;
         default:
@@ -258,25 +267,34 @@ float PointerDrawingManager::CalculateHardwareXOffset(ICON_TYPE iconType)
 
 float PointerDrawingManager::CalculateHardwareYOffset(ICON_TYPE iconType)
 {
+    int32_t height = imageHeight_;
+    int32_t userIconHotSpotY = 0;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (hardwareCursorPointerManager_->IsSupported() &&
+        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        height = cursorHeight_;
+        userIconHotSpotY = userIconHotSpotY_;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_E:
-            return (g_focalPoint - (imageHeight_ / CALCULATE_IMAGE_MIDDLE));
+            return (g_focalPoint - (height / CALCULATE_IMAGE_MIDDLE));
         case ANGLE_S:
             return g_focalPoint;
         case ANGLE_W:
-            return (g_focalPoint - imageHeight_);
+            return (g_focalPoint - height);
         case ANGLE_N:
-            return (g_focalPoint - imageHeight_);
+            return (g_focalPoint - height);
         case ANGLE_SE:
-            return (g_focalPoint - imageHeight_);
+            return (g_focalPoint - height);
         case ANGLE_NE:
             return g_focalPoint;
         case ANGLE_SW:
-            return (g_focalPoint - imageHeight_);
+            return (g_focalPoint - height);
         case ANGLE_NW:
-            return g_focalPoint;
+            return g_focalPoint - userIconHotSpotY;
         case ANGLE_CENTER:
-            return (g_focalPoint - (imageHeight_ / CALCULATE_IMAGE_MIDDLE));
+            return (g_focalPoint - (height / CALCULATE_IMAGE_MIDDLE));
         case ANGLE_NW_RIGHT:
             return g_focalPoint;
         default:
@@ -308,12 +326,13 @@ bool PointerDrawingManager::SetDynamicHardWareCursorLocation
     return true;
 }
 
-void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physicalY)
+void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physicalY,
+    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode)
 {
     hardwareCanvasSize_ = g_hardwareCanvasSize;
-    PostTask([this, physicalX, physicalY]() -> void {
-        CHKPV(surfaceNode_);
-        surfaceNode_->SetBounds(physicalX, physicalY, hardwareCanvasSize_, hardwareCanvasSize_);
+    PostTask([this, physicalX, physicalY, surfaceNode]() -> void {
+        CHKPV(surfaceNode);
+        surfaceNode->SetBounds(physicalX, physicalY, hardwareCanvasSize_, hardwareCanvasSize_);
         Rosen::RSTransaction::FlushImplicitTransaction();
     });
 }
@@ -1262,14 +1281,24 @@ void PointerDrawingManager::AdjustMouseFocus(Direction direction, ICON_TYPE icon
 void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
 {
     CALL_DEBUG_ENTER;
+    int32_t height = imageHeight_;
+    int32_t width = imageWidth_;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (hardwareCursorPointerManager_->IsSupported() &&
+        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        height = cursorHeight_;
+        width = cursorWidth_;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_SW: {
-            physicalY -= imageHeight_;
+            physicalY -= height;
             break;
         }
         case ANGLE_CENTER: {
-            physicalX -= imageWidth_ / CALCULATE_MIDDLE;
-            physicalY -= imageHeight_ / CALCULATE_MIDDLE;
+            physicalX -= width / CALCULATE_MIDDLE;
+            physicalY -= height / CALCULATE_MIDDLE;
             break;
         }
         case ANGLE_NW_RIGHT: {
@@ -1293,14 +1322,24 @@ void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int
 void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
 {
     CALL_DEBUG_ENTER;
+    int32_t height = imageHeight_;
+    int32_t width = imageWidth_;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (hardwareCursorPointerManager_->IsSupported() &&
+        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        height = cursorHeight_;
+        width = cursorWidth_;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_SW: {
-            physicalY += imageHeight_;
+            physicalY += height;
             break;
         }
         case ANGLE_CENTER: {
-            physicalX -= imageWidth_ / CALCULATE_MIDDLE;
-            physicalY += imageHeight_ / CALCULATE_MIDDLE;
+            physicalX -= width / CALCULATE_MIDDLE;
+            physicalY += height / CALCULATE_MIDDLE;
             break;
         }
         case ANGLE_NW_RIGHT: {
@@ -1324,14 +1363,24 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
 void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
 {
     CALL_DEBUG_ENTER;
+    int32_t height = imageHeight_;
+    int32_t width = imageWidth_;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (hardwareCursorPointerManager_->IsSupported() &&
+        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        height = cursorHeight_;
+        width = cursorWidth_;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_SW: {
-            physicalY += imageHeight_;
+            physicalY += height;
             break;
         }
         case ANGLE_CENTER: {
-            physicalX += imageWidth_ / CALCULATE_MIDDLE;
-            physicalY += imageHeight_ / CALCULATE_MIDDLE;
+            physicalX += width / CALCULATE_MIDDLE;
+            physicalY += height / CALCULATE_MIDDLE;
             break;
         }
         case ANGLE_NW_RIGHT: {
@@ -1355,14 +1404,24 @@ void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, i
 void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
 {
     CALL_DEBUG_ENTER;
+    int32_t height = imageHeight_;
+    int32_t width = imageWidth_;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (hardwareCursorPointerManager_->IsSupported() &&
+        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        height = cursorHeight_;
+        width = cursorWidth_;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_SW: {
-            physicalY -= imageHeight_;
+            physicalY -= height;
             break;
         }
         case ANGLE_CENTER: {
-            physicalX += imageWidth_ / CALCULATE_MIDDLE;
-            physicalY -= imageHeight_ / CALCULATE_MIDDLE;
+            physicalX += width / CALCULATE_MIDDLE;
+            physicalY -= height / CALCULATE_MIDDLE;
             break;
         }
         case ANGLE_NW_RIGHT: {
@@ -1802,21 +1861,21 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
     int32_t cursorSize = GetPointerSize();
-    int32_t cursorWidth =
+    int32_t cursorWidth_ =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
-    int32_t cursorHeight =
+    int32_t cursorHeight_ =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
-    cursorWidth = cursorWidth < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorWidth;
-    cursorHeight = cursorHeight < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorHeight;
-    float xAxis = (float)cursorWidth / (float)imageInfo.size.width;
-    float yAxis = (float)cursorHeight / (float)imageInfo.size.height;
+    cursorWidth_ = cursorWidth_ < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorWidth_;
+    cursorHeight_ = cursorHeight_ < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorHeight_;
+    float xAxis = (float)cursorWidth_ / (float)imageInfo.size.width;
+    float yAxis = (float)cursorHeight_ / (float)imageInfo.size.height;
     newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
     userIcon_.reset(newPixelMap);
     userIconHotSpotX_ = static_cast<int32_t>((float)focusX * xAxis);
     userIconHotSpotY_ = static_cast<int32_t>((float)focusY * yAxis);
     MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
         "focusX:%{public}d, focuxY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"
-        "userIconHotSpotY_:%{public}d", cursorWidth, cursorHeight, imageInfo.size.width, imageInfo.size.height,
+        "userIconHotSpotY_:%{public}d", cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
         focusX, focusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
     return RET_OK;
 }
@@ -2515,7 +2574,14 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
     }
     if (windowId == windowId_ || windowId == GLOBAL_WINDOW_ID) {
         // Draw mouse style only when the current window is the top-level window
-        DrawPointerStyle(pointerStyle);
+        if (!WIN_MGR->SelectPointerChangeArea(windowId, lastPhysicalX_, lastPhysicalY_)) {
+            DrawPointerStyle(pointerStyle);
+        } else {
+            currentMouseStyle_ = pointerStyle;
+            lastMouseStyle_ = pointerStyle;
+            mouseIconUpdate_ = false;
+            MMI_HILOGW("skip the pointerstyle");
+        }
     } else {
         MMI_HILOGW("set windowid:%{public}d, top windowid:%{public}d, dont draw pointer", windowId, windowId_);
     }
