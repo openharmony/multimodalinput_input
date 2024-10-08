@@ -213,7 +213,7 @@ void ProcessingGamePadDevice::TransformDirectionKeyEvent(const DeviceEvent& padE
         SetSynReport(inputEventArray);
         SetEvAbsHat0Y(inputEventArray, padEvent.blockTime, 0);
         SetSynReport(inputEventArray);
-    }  else {
+    } else {
         MMI_HILOGW("Unknown direction type");
     }
 }

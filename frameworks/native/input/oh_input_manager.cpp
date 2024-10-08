@@ -1835,7 +1835,7 @@ void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat)
 {
     CALL_DEBUG_ENTER;
     CHKPV(hotkey);
-    hotkey->isRepeat  = isRepeat;
+    hotkey->isRepeat = isRepeat;
 }
 
 Input_Result OH_Input_GetRepeat(const Input_Hotkey* hotkey, bool *isRepeat)
