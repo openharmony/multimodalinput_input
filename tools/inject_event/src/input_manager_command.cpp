@@ -2213,7 +2213,7 @@ std::shared_ptr<PointerEvent> InputManagerCommand::CreateEvent(
     int32_t fingerCount)
 {
     auto pointerEvent = PointerEvent::Create();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPP(pointerEvent);
     pointerEvent->SetId(id);
     pointerEvent->SetOriginPointerAction(type);
     pointerEvent->SetPointerAction(type);
