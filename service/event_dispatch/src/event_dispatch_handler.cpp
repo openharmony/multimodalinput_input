@@ -173,7 +173,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP &&
             windowInfo->windowInputType == WindowInputType::TRANSMIT_ALL && windowIds.size() > 1) {
             MMI_HILOGD("When the drag is finished, the multi-window distribution is canceled. window:%{public}d,"
-                "windowInputType:%{public}d", windowId, static_cast<int32_t>(windowInfo->->windowInputType));
+                "windowInputType:%{public}d", windowId, static_cast<int32_t>(windowInfo->windowInputType));
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         }
         auto fd = WIN_MGR->GetClientFd(pointerEvent, windowInfo->id);
