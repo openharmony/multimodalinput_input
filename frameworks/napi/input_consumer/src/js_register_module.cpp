@@ -487,7 +487,6 @@ bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInf
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(sCallBacksMutex);
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
     CHKPP(event);
     event->env = env;
