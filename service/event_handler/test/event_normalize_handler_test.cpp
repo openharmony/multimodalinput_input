@@ -256,7 +256,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_001, T
     event->type = LIBINPUT_EVENT_TOUCH_FRAME;
     ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
     event->type = LIBINPUT_EVENT_POINTER_TAP;
-    processor.multiFingersState_ = MulFingersTap::TRIPLETAP;
+    processor.multiFingersState_ = MulFingersTap::TRIPLE_TAP;
     ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
     processor.multiFingersState_ = MulFingersTap::NO_TAP;
     ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
