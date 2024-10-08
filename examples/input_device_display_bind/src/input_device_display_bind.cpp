@@ -24,7 +24,7 @@
 
 #include "input_manager.h"
 
-constexpr int32_t INVALID_ID = -1;
+constexpr int32_t INVALID_ID { -1 };
 enum Option {
     QUERY = 'q',
     SET = 's',
