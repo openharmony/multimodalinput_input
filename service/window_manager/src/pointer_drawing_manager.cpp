@@ -1861,9 +1861,9 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
     int32_t cursorSize = GetPointerSize();
-    int32_t cursorWidth_ =
+    cursorWidth_ =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
-    int32_t cursorHeight_ =
+    cursorHeight_ =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     cursorWidth_ = cursorWidth_ < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorWidth_;
     cursorHeight_ = cursorHeight_ < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorHeight_;
