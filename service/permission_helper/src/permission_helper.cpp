@@ -142,7 +142,7 @@ int32_t PermissionHelper::GetTokenType()
         return TokenType::TOKEN_HAP;
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return TokenType::TOKEN_NATIVE;
-    }  else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
         return TokenType::TOKEN_SHELL;
     } else {
         MMI_HILOGW("Unsupported token type:%{public}d", tokenType);

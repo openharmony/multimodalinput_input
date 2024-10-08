@@ -161,7 +161,7 @@ void ProcessingJoystickDevice::TransformDirectionKeyEvent(const DeviceEvent& joy
         SetSynReport(inputEventArray);
         SetEvAbsHat0Y(inputEventArray, 0, 0);
         SetSynReport(inputEventArray);
-    }  else {
+    } else {
         MMI_HILOGW("Unknown direction type");
     }
 }

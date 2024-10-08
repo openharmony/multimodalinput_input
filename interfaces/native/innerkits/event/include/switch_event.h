@@ -35,11 +35,11 @@ public:
     enum SwitchType {
         /** Default, used to be compatible with calls to previously none switch type parameter */
         SWITCH_DEFAULT = 0,
-        /** Lid switch type  */
+        /** Lid switch type */
         SWITCH_LID,
-        /** Tablet switch type  */
+        /** Tablet switch type */
         SWITCH_TABLET,
-        /** Privacy switch type  */
+        /** Privacy switch type */
         SWITCH_PRIVACY
     };
 
