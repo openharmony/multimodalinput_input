@@ -68,6 +68,7 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
 
 constexpr size_t EXPECTED_N_SUBMATCHES{ 2 };
 constexpr size_t EXPECTED_SUBMATCH{ 1 };
+constexpr size_t RESERVE_LEN { 5 };
 } // namespace
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
@@ -208,7 +209,7 @@ bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType
 {
     CALL_DEBUG_ENTER;
     if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
-        MMI_HILOGD("Failed to search for the deviceID");
+        MMI_HILOGE("Failed to search for the deviceID");
         return false;
     }
     auto deviceConfig = KeyRepeat->GetDeviceConfig();
@@ -288,7 +289,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     int32_t tempKeyboardType = KEYBOARD_TYPE_NONE;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        MMI_HILOGE("Failed to search for the deviceID");
+        MMI_HILOGD("Failed to search for the deviceID");
         return COMMON_PARAMETER_ERROR;
     }
     if (!iter->second.enable) {
@@ -424,6 +425,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[deviceId] = info;
+    MMI_HILOGI("Device added successfully, deviceId:%{public}s, system uid:%{private}s",
+        GetMaskedDeviceId(std::to_string(deviceId)).c_str(), info.sysUid.c_str());
     if (info.enable) {
         for (const auto& item : devListeners_) {
             CHKPC(item);
@@ -432,24 +435,24 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     NotifyDevCallback(deviceId, info);
     if (!hasPointer && info.isPointerDevice) {
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         if (HasTouchDevice()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
         NotifyPointerDevice(true, true, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "true");
         MMI_HILOGI("Set para input.pointer.device true");
     }
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (IsPointerDevice(inputDevice)) {
+        WIN_MGR->UpdatePointerChangeAreas();
+    }
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
-        WIN_MGR->UpdatePointerChangeAreas();
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
-#endif // OHOS_BUILD_ENABLE_POINTER
     }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
@@ -479,6 +482,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             break;
         }
     }
+    MMI_HILOGI("Device added successfully, deviceId:%{public}s", GetMaskedDeviceId(std::to_string(deviceId)).c_str());
     std::string sysUid = GetInputIdentification(inputDevice);
     if (!sysUid.empty()) {
         CHKPV(devCallbacks_);
@@ -487,14 +491,12 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             deviceId, sysUid.c_str());
     }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-#endif // OHOS_BUILD_ENABLE_POINTER
     }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (enable) {
         for (const auto& item : devListeners_) {
             CHKPV(item);
@@ -532,9 +534,15 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device *device) const
     if (name == "hw_fingerprint_mouse") {
         return false;
     }
-    if (name.find("TouchPad") == std::string::npos) {
-        return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
-            EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
+    if (name.find("HUAWEI Magnetic Keyboard") != std::string::npos) {
+        if (name.find("TouchPad") == std::string::npos) {
+            return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
+                EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
+        }
+        return false;
+    }
+    if (name.find("HUAWEI M-Pencil") != std::string::npos) {
+        return false;
     }
     return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
         EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
@@ -854,23 +862,6 @@ void InputDeviceManager::OnSessionLost(SessionPtr session)
     devListeners_.remove(session);
 }
 
-std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
-{
-    CALL_DEBUG_ENTER;
-    std::vector<int32_t> ids;
-    for (const auto &item : inputDevice_) {
-        auto inputDevice = item.second.inputDeviceOrigin;
-        if (inputDevice == nullptr) {
-            continue;
-        }
-        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
-        if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
-            ids.push_back(item.first);
-        }
-    }
-    return ids;
-}
-
 bool InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
     CHKPR(inputDevice, false);
@@ -887,6 +878,36 @@ bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevi
 {
     CHKPR(inputDevice, false);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+}
+
+std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> ids;
+    for (const auto &item : inputDevice_) {
+        auto inputDevice = item.second.inputDeviceOrigin;
+        if (inputDevice == nullptr) {
+            continue;
+        }
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
+        if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
+            ids.push_back(item.first);
+        }
+    }
+    return ids;
+}
+std::string InputDeviceManager::GetMaskedDeviceId(const std::string& str)
+{
+    return GetMaskedStr(str, RESERVE_LEN);
+}
+
+std::string InputDeviceManager::GetMaskedStr(const std::string& str, size_t reserveLen)
+{
+    std::string mask("**");
+    if (static_cast<size_t>(str.length()) < reserveLen + reserveLen) {
+        return "";
+    }
+    return str.substr(0, reserveLen) + mask + str.substr(str.length() - reserveLen);
 }
 } // namespace MMI
 } // namespace OHOS
