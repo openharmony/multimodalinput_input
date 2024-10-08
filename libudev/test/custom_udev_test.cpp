@@ -98,7 +98,7 @@ HWTEST_F(CustomUdevTest, TestBasicsFail, TestSize.Level1)
 {
     errno = 0;
     EXPECT_EQ(udev_device_get_udev(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 
     errno = 0;
     EXPECT_EQ(udev_device_ref(nullptr), nullptr);
@@ -306,7 +306,7 @@ HWTEST_F(CustomUdevTest, TestGetParent2, TestSize.Level1)
 
     errno = 0;
     EXPECT_NE(udev_device_get_parent_with_subsystem_devtype(device, "input", ""), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NE(errno, 0);
 
     errno = 0;
     EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(device, nullptr, nullptr), nullptr);

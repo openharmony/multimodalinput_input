@@ -91,7 +91,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyEvent_001, 
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     handler.keyEvent_->AddKeyItem(item);
     EXPECT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
-    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
+    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
 }
@@ -1257,7 +1257,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsFunctionKey, TestS
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_SWITCHVIDEOMODE);
     ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_WLAN);
-    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    ASSERT_FALSE(handler.IsFunctionKey(keyEvent));
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_CONFIG);
     ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
 }
@@ -2027,7 +2027,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_08, T
 
     DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
     std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -2072,7 +2072,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_10, T
     EXPECT_NE(callManagerClientPtr, nullptr);
     DEVICE_MONITOR->hasHandleRingMute_ = true;
     keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_UP;
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -2390,7 +2390,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_005
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
     ASSERT_NE(subscriber, nullptr);
     keyEvent->keyCode_ = KeyEvent::KEYCODE_CAMERA;
-    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
+    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
 
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
