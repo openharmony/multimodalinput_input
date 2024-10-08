@@ -271,6 +271,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool SkipAnnotationWindow(uint32_t flag, int32_t toolType);
     bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
+    void HandleGestureInjection(bool gestureInject);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -386,6 +387,7 @@ private:
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
     bool isSendGestureDown_ { false };
     bool IsFoldable_ { false };
+    int32_t timerId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
