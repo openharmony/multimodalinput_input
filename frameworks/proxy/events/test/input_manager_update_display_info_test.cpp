@@ -29,10 +29,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t TIME_MS = 20;
-constexpr int32_t DISPLAYINFO_WIDTH = 2;
-constexpr int32_t DISPLAYINFO_HEIGHT = 2;
-constexpr int32_t DISPLAYINFO_DPI = 240;
+constexpr int32_t TIME_MS { 20 };
+constexpr int32_t DISPLAYINFO_WIDTH { 2 };
+constexpr int32_t DISPLAYINFO_HEIGHT { 2 };
+constexpr int32_t DISPLAYINFO_DPI { 240 };
 } // namespace
 
 class InputManagerUpdateDisplayInfoTest : public testing::Test {
