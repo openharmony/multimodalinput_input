@@ -59,7 +59,7 @@ void MMISceneBoardJudgement::InitWithConfigFile(const char* filePath, bool& enab
 {
     char checkPath[PATH_MAX] = { 0 };
     if (realpath(filePath, checkPath) == nullptr) {
-        MMI_HILOGE("canonicalize failed. path:%{private}s", filePath);
+        MMI_HILOGD("canonicalize failed. path:%{private}s", filePath);
         return;
     }
     std::ifstream configFile(checkPath);

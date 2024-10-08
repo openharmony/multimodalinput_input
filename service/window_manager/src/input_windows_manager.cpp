@@ -39,6 +39,7 @@
 #include "parameters.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
+#include "timer_manager.h"
 #include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -89,6 +90,9 @@ const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotat
 [[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 [[ maybe_unused ]] constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
+constexpr int32_t REPEAT_COOLING_TIME { 100 };
+constexpr int32_t REPEAT_ONCE { 1 };
+constexpr int32_t DEFAULT_VALUE { -1 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -2535,6 +2539,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     PointerStyle pointerStyle;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        if (timerId_ != DEFAULT_VALUE) {
+            TimerMgr->RemoveTimer(timerId_);
+            timerId_ = DEFAULT_VALUE;
+        }
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
             IsMouseDrawing(pointerEvent->GetPointerAction())) {
             MMI_HILOGD("Turn the mouseDisplay from false to true");
@@ -2547,6 +2555,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     } else {
+        if (timerId_ != DEFAULT_VALUE) {
+            TimerMgr->RemoveTimer(timerId_);
+            timerId_ = DEFAULT_VALUE;
+        }
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
@@ -2917,6 +2929,12 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+void InputWindowsManager::HandleGestureInjection(bool gestureInject) {
+    if (!gestureInject) {
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    }
+}
+
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -3270,9 +3288,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
             MMI_HILOG_DISPATCHD("PointerAction is to leave the window");
-            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-            if (!gestureInject) {
-                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            if (timerId_ == DEFAULT_VALUE) {
+                timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
+                    DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+                    HandleGestureInjection(gestureInject);
+                    timerId_ = DEFAULT_VALUE;
+                });
             }
         }
     }
