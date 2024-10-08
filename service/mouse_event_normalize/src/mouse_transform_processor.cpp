@@ -332,6 +332,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         if (!isAxisBegin_) {
             return RET_ERR;
         }
+        MMI_HILOGD("Axis event type is update");
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
     } else {
