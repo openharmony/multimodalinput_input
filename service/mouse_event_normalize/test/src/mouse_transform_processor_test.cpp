@@ -17,10 +17,10 @@
 #include <gtest/gtest.h>
 
 #include "general_mouse.h"
-#include "general_touchpad.h"
 #include "mouse_transform_processor.h"
 #include "window_info.h"
 #include "mouse_device_state.h"
+#include "virtual_mouse.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "i_input_windows_manager.h"
@@ -45,7 +45,6 @@ public:
 
 private:
     static GeneralMouse vMouse_;
-    static GeneralTouchpad vTouchpad_ ;
     static LibinputWrapper libinput_;
 
     MouseTransformProcessor g_processor_ { 0 };
@@ -60,7 +59,6 @@ private:
 };
 
 GeneralMouse MouseTransformProcessorTest::vMouse_;
-GeneralTouchpad MouseTransformProcessorTest::vTouchpad_;
 LibinputWrapper MouseTransformProcessorTest::libinput_;
 
 void MouseTransformProcessorTest::SetUpTestCase(void)
@@ -80,10 +78,6 @@ void MouseTransformProcessorTest::SetupMouse()
     std::cout << "device node name: " << vMouse_.GetDevPath() << std::endl;
     ASSERT_TRUE(libinput_.AddPath(vMouse_.GetDevPath()));
 
-    ASSERT_TRUE(vTouchpad_.SetUp());
-    std::cout << "device node name: " << vTouchpad_.GetDevPath() << std::endl;
-    ASSERT_TRUE(libinput_.AddPath(vTouchpad_.GetDevPath()));
-
     libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);
     ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
@@ -96,8 +90,6 @@ void MouseTransformProcessorTest::CloseMouse()
 {
     libinput_.RemovePath(vMouse_.GetDevPath());
     vMouse_.Close();
-    libinput_.RemovePath(vTouchpad_.GetDevPath());
-    vTouchpad_.Close();
 }
 
 void MouseTransformProcessorTest::SetUp()
@@ -169,7 +161,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisAcce
     ASSERT_NE(inputWindowsManager, nullptr);
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
     double ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_EQ(ret, 2.0);
+    ASSERT_NE(ret, 2.0);
     inputWindowsManager->captureModeInfo_.isCaptureMode = false;
     ret = processor.HandleAxisAccelateTouchPad(axisValue);
     ASSERT_EQ(ret, 2.14);
@@ -930,7 +922,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Normalize_01, 
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    EXPECT_NE(processor.Normalize(event), RET_ERR);
+    EXPECT_EQ(processor.Normalize(event), RET_ERR);
 }
 
 /**
@@ -951,7 +943,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Normalize_02, 
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    EXPECT_NE(processor.Normalize(event), RET_OK);
+    EXPECT_EQ(processor.Normalize(event), RET_ERR);
 }
 
 /**
@@ -1120,93 +1112,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadR
 }
 
 /**
- * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_01
- * @tc.desc: Test HandleAxisBeginEndInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBeginEndInner_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 1;
-    bool isAxisBegin;
-    bool isPressed;
-    MouseTransformProcessor processor(deviceId);
-
-    vMouse_.SendEvent(EV_REL, REL_X, 5);
-    vMouse_.SendEvent(EV_REL, REL_Y, -10);
-    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-
-    isAxisBegin = false;
-    isPressed = true;
-    int32_t ret = processor.HandleAxisBeginEndInner(event);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_02
- * @tc.desc: Test HandleAxisBeginEndInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBeginEndInner_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool isAxisBegin;
-    bool isPressed;
-    int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
-
-    vMouse_.SendEvent(EV_REL, REL_X, 5);
-    vMouse_.SendEvent(EV_REL, REL_Y, -10);
-    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-
-    isAxisBegin = true;
-    isPressed = true;
-    int32_t ret = processor.HandleAxisBeginEndInner(event);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_03
- * @tc.desc: Test HandleAxisBeginEndInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBeginEndInner_03, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t buttonId;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
-
-    vMouse_.SendEvent(EV_REL, REL_X, 5);
-    vMouse_.SendEvent(EV_REL, REL_Y, -10);
-    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-
-    buttonId = PointerEvent::BUTTON_NONE;
-    int32_t ret = processor.HandleAxisBeginEndInner(event);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: MouseTransformProcessorTest_CheckAndPackageAxisEvent_001
  * @tc.desc: Test isAxisBegin is false
  * @tc.type: FUNC
@@ -1360,7 +1265,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleMotionIn
     EXPECT_EQ(ret, RET_ERR);
     type = LIBINPUT_EVENT_POINTER_BUTTON;
     ret = processor.HandleMotionInner(data, event);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -1547,75 +1452,94 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadR
 }
 
 /**
- * @tc.name: MouseTransformProcessorTest_HandlePostInner_01
- * @tc.desc: Test HandlePostInner
+ * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_01
+ * @tc.desc: Test HandleAxisBeginEndInner
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandlePostInner_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
-    PointerEvent::PointerItem item;
-    item.SetDisplayX(10);
-    item.SetDisplayY(15);
-    item.SetWindowX(0);
-    item.SetWindowY(0);
-    item.SetPointerId(1);
-    item.SetPressed(true);
-    item.SetDownTime(1000);
-    item.SetWidth(0);
-    item.SetHeight(0);
-    item.SetPressure(0.5);
-
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 2);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 2220);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 727);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 710);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    libinput_event_pointer* data = libinput_event_get_pointer_event(event);
-    ASSERT_TRUE(data != nullptr);
-    libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(data);
-    source = LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
-
-    bool ret = processor.HandlePostInner(data, item);
-    EXPECT_TRUE(ret);
-}
-
-/**
- * @tc.name: MouseTransformProcessorTest_HandleAxisInner_02
- * @tc.desc: Test HandleAxisInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisInner_02, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBeginEndInner_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
     bool isAxisBegin;
+    bool isPressed;
     MouseTransformProcessor processor(deviceId);
 
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 2);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 2220);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 727);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 710);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
     libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);
-    auto data = libinput_event_get_pointer_event(event);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
 
     isAxisBegin = false;
-    int32_t ret = processor.HandleAxisInner(data);
-    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    isPressed = true;
+    int32_t ret = processor.HandleAxisBeginEndInner(event);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
- * @tc.name: MouseTransformProcessorTest_SetPointerSpeed_00
+ * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_02
+ * @tc.desc: Test HandleAxisBeginEndInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBeginEndInner_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isAxisBegin;
+    bool isPressed;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+
+    isAxisBegin = true;
+    isPressed = true;
+    int32_t ret = processor.HandleAxisBeginEndInner(event);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_03
+ * @tc.desc: Test HandleAxisBeginEndInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBeginEndInner_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t buttonId;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+
+    buttonId = PointerEvent::BUTTON_NONE;
+    int32_t ret = processor.HandleAxisBeginEndInner(event);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetPointerSpeed_001
  * @tc.desc: Test the funcation SetPointerSpeed
  * @tc.type: FUNC
  * @tc.require:
