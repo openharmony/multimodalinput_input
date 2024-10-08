@@ -504,6 +504,8 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     if (buttonIds_.empty()) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault(false);
     }
+    MMI_HILOGD("Button ids count:%{public}d, action:%{public}d",
+        static_cast<int32_t>(buttonIds_.size(), pointerEvent->GetPointerAction()));
     return RET_OK;
 #else
     MMI_HILOGW("Pointer device does not support");
