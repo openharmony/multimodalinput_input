@@ -2946,7 +2946,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         physicalX = pointerItem.GetDisplayXPos();
         physicalY = pointerItem.GetDisplayYPos();
     }
-    AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
+    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
+    }
     int32_t logicalX1 = 0;
     int32_t logicalY1 = 0;
 
