@@ -27,9 +27,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t INVAID_VALUE = -1;
-constexpr int32_t SUBSCRIBER_ID = 0;
-constexpr int32_t MIN_SUBSCRIBER_ID = 0;
+constexpr int32_t INVAID_VALUE { -1 };
+constexpr int32_t SUBSCRIBER_ID { 0 };
+constexpr int32_t MIN_SUBSCRIBER_ID { 0 };
 } // namespace
 
 class SwitchEventInputSubscribeManagerTest : public testing::Test {
