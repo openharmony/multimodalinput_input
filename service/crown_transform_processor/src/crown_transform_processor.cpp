@@ -113,7 +113,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
                 auto pointerEvent = sharedProcessor->GetPointerEvent();
                 CHKPV(pointerEvent);
                 sharedProcessor->HandleCrownRotateEnd();
-#ifndef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER
                 auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
                 CHKPV(inputEventNormalizeHandler);
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
@@ -123,12 +123,12 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
             HandleCrownRotateBegin(rawPointerEvent);
         }
 
-#ifndef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
         inputEventNormalizeHandler->HandlePointerEvent(pointerEvent_);
-        DumpInner();
 #endif // OHOS_BUILD_ENABLE_POINTER
+        DumpInner();
         return RET_OK;
     } else {
         MMI_HILOGE("The source is invalid, source:%{public}d", source);
@@ -192,7 +192,7 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double velocity, double
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
 
-#ifndef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER
     auto mouseInfo = WIN_MGR->GetMouseInfo();
 
     PointerEvent::PointerItem pointerItem;
