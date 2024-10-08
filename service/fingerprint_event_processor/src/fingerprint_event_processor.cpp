@@ -104,7 +104,7 @@ void FingerprintEventProcessor::SetPowerAndVolumeKeyState(struct libinput_event*
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     MMI_HILOGD("current keycode is %{private}d, keyaction is %{private}d", keyCode, keyAction);
-    if (keyAction ==  KeyEvent::KEY_ACTION_DOWN) {
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         iter->second.first = KEY_DOWN;
         SendFingerprintCancelEvent();
     } else {
@@ -136,7 +136,7 @@ void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
     ChangeScreenMissTouchFlag(screenState_, cancelState_);
 }
  
-// 屏幕down 智xxdown 屏幕up 智xx up  ==> 直接操作智xx 无响应
+// 屏幕down 智xxdown 屏幕up 智xx up ==> 直接操作智xx 无响应
  
 /*
 * This is a poorly designed state machine for handling screen touch errors, SAD :(
