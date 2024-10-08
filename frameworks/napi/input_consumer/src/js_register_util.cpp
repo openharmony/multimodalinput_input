@@ -146,6 +146,7 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
 int32_t GetPreSubscribeId(Callbacks &callbacks, sptr<KeyEventMonitorInfo> event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
+    std::lock_guard guard(sCallBacksMutex);
     auto it = callbacks.find(event->eventType);
     if (it == callbacks.end() || it->second.empty()) {
         MMI_HILOGE("The callbacks is empty");
