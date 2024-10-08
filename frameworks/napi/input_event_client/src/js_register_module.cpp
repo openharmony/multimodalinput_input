@@ -395,7 +395,7 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if (sourceType == TOUCH_SCREEN || sourceType == PEN) {
         sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     }
-    int32_t screenId = 0;
+    int32_t screenId = -1;
     if (GetNamedPropertyInt32(env, touchHandle, "screenId", screenId) != RET_OK) {
         MMI_HILOGE("Get screenId failed");
     }
