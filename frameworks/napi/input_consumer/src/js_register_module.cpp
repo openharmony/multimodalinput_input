@@ -526,38 +526,40 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(sCallBacksMutex);
+    
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
     CHKPP(event);
     event->env = env;
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
-    if (!GetEventType(env, info, event, keyType)) {
-        MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
-        return nullptr;
-    }
-    event->name = keyType;
     int32_t subscribeId = -1;
-    if (keyType == HOTKEY_SUBSCRIBE_TYPE) {
-        if (GetHotkeyEventInfo(env, info, event, keyOption) == nullptr) {
-            MMI_HILOGE("GetHotkeyEventInfo failed");
+    {
+        std::lock_guard guard(sCallBacksMutex);
+        if (!GetEventType(env, info, event, keyType)) {
+            MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
             return nullptr;
         }
-        if (DelEventCallback(env, hotkeyCallbacks, event, subscribeId) < 0) {
-            MMI_HILOGE("DelEventCallback failed");
-            return nullptr;
-        }
-    } else {
-        if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
-            MMI_HILOGE("GetEventInfoAPI9 failed");
-            return nullptr;
-        }
-        if (DelEventCallback(env, callbacks, event, subscribeId) < 0) {
-            MMI_HILOGE("DelEventCallback failed");
-            return nullptr;
+        event->name = keyType;
+        if (keyType == HOTKEY_SUBSCRIBE_TYPE) {
+            if (GetHotkeyEventInfo(env, info, event, keyOption) == nullptr) {
+                MMI_HILOGE("GetHotkeyEventInfo failed");
+                return nullptr;
+            }
+            if (DelEventCallback(env, hotkeyCallbacks, event, subscribeId) < 0) {
+                MMI_HILOGE("DelEventCallback failed");
+                return nullptr;
+            }
+        } else {
+            if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+                MMI_HILOGE("GetEventInfoAPI9 failed");
+                return nullptr;
+            }
+            if (DelEventCallback(env, callbacks, event, subscribeId) < 0) {
+                MMI_HILOGE("DelEventCallback failed");
+                return nullptr;
+            }
         }
     }
-
     MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
     if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
