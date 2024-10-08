@@ -2065,6 +2065,28 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
     MMI_HILOGD("pointerStyle after switch ID is :%{public}d", pointerStyle.id);
     return findFlag;
 }
+
+bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const
+{
+    bool findFlag = false;
+    for (const auto &item : rects) {
+        int32_t displayMaxX = 0;
+        int32_t displayMaxY = 0;
+        if (!AddInt32(item.x, item.width, displayMaxX)) {
+            MMI_HILOGE("The addition of displayMaxX overflows");
+            return findFlag;
+        }
+        if (!AddInt32(item.y, item.height, displayMaxY)) {
+            MMI_HILOGE("The addition of displayMaxY overflows");
+            return findFlag;
+        }
+        if (((x > item.x) && (x <= displayMaxX)) && (y > item.y) && (y <= displayMaxY)) {
+            findFlag = true;
+            break;
+        }
+    }
+    return findFlag;
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -2282,6 +2304,19 @@ bool InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, 
         MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d",
             windowHotAreas.size(), windowId);
         findFlag = InWhichHotArea(logicalX, logicalY, windowHotAreas, pointerStyle);
+    }
+    return findFlag;
+}
+
+bool InputWindowsManager::SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY)
+{
+    CALL_DEBUG_ENTER;
+    bool findFlag = false;
+    if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
+        std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
+        MMI_HILOGE("windowHotAreas size:%{public}zu, windowId:%{public}d",
+            windowHotAreas.size(), windowId);
+        findFlag = InWhichHotArea(logicalX, logicalY, windowHotAreas);
     }
     return findFlag;
 }

@@ -73,6 +73,7 @@ public:
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
     MOCK_METHOD(bool, IsMouseSimulate, (), (const));
+    MOCK_METHOD(bool, SelectPointerChangeArea, (int32_t, int32_t, int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
