@@ -537,13 +537,13 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     event->env = env;
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
-    int32_t subscribeId = -1;
     if (!GetEventType(env, info, event, keyType)) {
         MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
         delete event;
         return nullptr;
     }
     event->name = keyType;
+    int32_t subscribeId = -1;
     {
         std::lock_guard guard(sCallBacksMutex);
         if (keyType == HOTKEY_SUBSCRIBE_TYPE) {
