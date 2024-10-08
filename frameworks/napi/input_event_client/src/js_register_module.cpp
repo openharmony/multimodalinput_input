@@ -395,6 +395,10 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if (sourceType == TOUCH_SCREEN || sourceType == PEN) {
         sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     }
+    int32_t screenId = 0;
+    if (GetNamedPropertyInt32(env, touchHandle, "screenId", screenId) != RET_OK) {
+        MMI_HILOGE("Get screenId failed");
+    }
     napi_value touchProperty = HandleTouchProperty(env, touchHandle);
     CHKPV(touchProperty);
     int32_t screenX = 0;
@@ -426,6 +430,7 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetSourceType(sourceType);
     pointerEvent->SetActionTime(pressedTime);
+    pointerEvent->SetTargetDisplayId(screenId);
     if ((action == JS_CALLBACK_TOUCH_ACTION_MOVE) || (action == JS_CALLBACK_TOUCH_ACTION_UP)) {
         pointerEvent->UpdatePointerItem(0, item);
     }
