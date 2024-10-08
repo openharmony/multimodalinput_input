@@ -108,6 +108,6 @@ public:
     CommonEventSupport();
     virtual ~CommonEventSupport();
 };
-}  // namespace EventFwk
+} // namespace EventFwk
 } // namespace OHOS
 #endif // ABILITY_MANAGER_CLIENT_STUB_H

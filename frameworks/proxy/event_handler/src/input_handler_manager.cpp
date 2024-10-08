@@ -677,7 +677,7 @@ bool InputHandlerManager::HasHandler(int32_t handlerId)
     bool hasHandler = false;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         auto iter = monitorHandlers_.find(handlerId);
-        hasHandler =  (iter != monitorHandlers_.end()) ? true : false;
+        hasHandler = (iter != monitorHandlers_.end()) ? true : false;
         if (!hasHandler) {
             auto iter = actionsMonitorHandlers_.find(handlerId);
             return (iter != actionsMonitorHandlers_.end());
