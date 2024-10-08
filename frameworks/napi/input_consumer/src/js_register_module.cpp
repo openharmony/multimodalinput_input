@@ -441,6 +441,7 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
 bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event, std::string &keyType)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(sCallBacksMutex);
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -502,21 +503,25 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     if (argc < INPUT_PARAMETER_MAX) {
         MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        delete event;
         return nullptr;
     }
     if (!GetEventType(env, info, event, keyType)) {
         MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
+        delete event;
         return nullptr;
     }
     event->name = keyType;
     if (keyType == HOTKEY_SUBSCRIBE_TYPE) {
         if (SubscribeHotkey(env, info, event, keyOption) == nullptr) {
             MMI_HILOGE("SubscribeHotkey failed");
+            delete event;
             return nullptr;
         }
     } else {
         if (SubscribeKey(env, info, event, keyOption) == nullptr) {
             MMI_HILOGE("SubscribeKey failed");
+            delete event;
             return nullptr;
         }
     }
@@ -533,29 +538,34 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
     int32_t subscribeId = -1;
+    if (!GetEventType(env, info, event, keyType)) {
+        MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
+        delete event;
+        return nullptr;
+    }
+    event->name = keyType;
     {
         std::lock_guard guard(sCallBacksMutex);
-        if (!GetEventType(env, info, event, keyType)) {
-            MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
-            return nullptr;
-        }
-        event->name = keyType;
         if (keyType == HOTKEY_SUBSCRIBE_TYPE) {
             if (GetHotkeyEventInfo(env, info, event, keyOption) == nullptr) {
                 MMI_HILOGE("GetHotkeyEventInfo failed");
+                delete event;
                 return nullptr;
             }
             if (DelEventCallback(env, hotkeyCallbacks, event, subscribeId) < 0) {
                 MMI_HILOGE("DelEventCallback failed");
+                delete event;
                 return nullptr;
             }
         } else {
             if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
                 MMI_HILOGE("GetEventInfoAPI9 failed");
+                delete event;
                 return nullptr;
             }
             if (DelEventCallback(env, callbacks, event, subscribeId) < 0) {
                 MMI_HILOGE("DelEventCallback failed");
+                delete event;
                 return nullptr;
             }
         }
@@ -564,6 +574,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
+    delete event;
     return nullptr;
 }
 
