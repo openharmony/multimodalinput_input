@@ -104,6 +104,8 @@ private:
     bool IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const;
+    std::string GetMaskedDeviceId(const std::string& str);
+    std::string GetMaskedStr(const std::string& str, size_t reserveLen);
 
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
