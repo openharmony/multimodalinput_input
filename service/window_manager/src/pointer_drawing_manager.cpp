@@ -1699,7 +1699,7 @@ void PointerDrawingManager::DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canva
 
 void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle)
 {
-    CALL_DEBUG_ENTER;
+    MMI_HILOGI("Draw mouse icon of style(%{public}d)", static_cast<int32_t>(mouseStyle));
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
@@ -1723,7 +1723,7 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
         CHKPV(pixelmap);
         image = ExtractDrawingImage(pixelmap);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        if (mouseStyle == MOUSE_ICON::DEFAULT) {
+        if ((mouseStyle == MOUSE_ICON::DEFAULT) || (mouseStyle == MOUSE_ICON::CURSOR_CIRCLE)) {
             SetPixelMap(pixelmap);
         }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1752,15 +1752,15 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 void PointerDrawingManager::SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
+    MMI_HILOGI("Set pointer snapshot");
     pixelMap_ = pixelMap;
 }
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
+    MMI_HILOGI("Get pointer snapshot");
     *newPixelMapPtr = pixelMap_;
     if (HasMagicCursor()) {
         MMI_HILOGE("magic pixelmap");
