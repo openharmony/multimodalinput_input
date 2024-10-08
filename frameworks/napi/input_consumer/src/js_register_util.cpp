@@ -30,6 +30,8 @@
 namespace OHOS {
 namespace MMI {
 
+static std::mutex sCallBacksMutex;
+
 bool TypeOf(napi_env env, napi_value value, napi_valuetype type)
 {
     napi_valuetype valueType = napi_undefined;
@@ -195,6 +197,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEven
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
+    std::lock_guard guard(sCallBacksMutex);
     if (callbacks.find(event->eventType) == callbacks.end()) {
         MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
         callbacks[event->eventType] = {};
