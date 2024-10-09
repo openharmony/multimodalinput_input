@@ -469,7 +469,14 @@ PointerEvent::PointerEvent(const PointerEvent& other)
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-      dispatchTimes_(other.dispatchTimes_)
+      dispatchTimes_(other.dispatchTimes_),
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+      enhanceData_(other.enhanceData_),
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_ANCO
+      ancoDeal_(other.ancoDeal_),
+#endif // OHOS_BUILD_ENABLE_ANCO
+      handleEventType_(HANDLE_EVENT_TYPE_POINTER)
       {}
 
 PointerEvent::~PointerEvent() {}
