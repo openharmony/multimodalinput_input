@@ -3444,10 +3444,10 @@ private:
     bool numLock_ { false };
     bool capsLock_ { false };
     bool scrollLock_ { false };
-    bool repeat_ { false };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    bool repeat_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
