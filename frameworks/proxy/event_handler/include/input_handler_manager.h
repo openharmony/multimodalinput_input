@@ -122,7 +122,7 @@ private:
     std::map<int32_t, Handler> actionsMonitorHandlers_;
     std::set<int32_t> mouseEventIds_;
     std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
-    std::function<void(int32_t, int64_t)> motitorCallbackConsume_ { nullptr };
+    std::function<void(int32_t, int64_t)> monitorCallbackConsume_ { nullptr };
     int32_t nextId_ { 1 };
     std::mutex mtxHandlers_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
