@@ -212,8 +212,7 @@ void EventMonitorHandler::InitSessionLostCallback()
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback([this] (SessionPtr session) {
         return this->OnSessionLost(session);
-    }
-    );
+    });
     sessionLostCallbackInitialized_ = true;
     MMI_HILOGD("The callback on session deleted is registered successfully");
 }
@@ -292,28 +291,28 @@ int32_t EventMonitorHandler::MonitorCollection::UpdateEventTypeMonitor(const std
     const SessionHandler &monitor, SessionHandler &handler, bool isFound)
 {
     if (iter->eventType_ == monitor.eventType_ &&
-            ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
-            MMI_HILOGD("Monitor with event type (%{public}u) already exists", monitor.eventType_);
-            return RET_OK;
-        }
-        if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
-            auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
-            gestureHandler.AddGestureMonitor(monitor.gestureType_, monitor.fingers_);
-            handler(gestureHandler);
-        }
- 
-        monitors_.erase(iter);
-        auto [sIter, isOk] = monitors_.insert(handler);
-        if (!isOk) {
-            if (isFound) {
-                MMI_HILOGE("Internal error: monitor has been removed");
-            } else {
-                MMI_HILOGE("Failed to add monitor");
-            }
-            return RET_ERR;
-        }
-        MMI_HILOGD("Event type is updated:%{public}u", monitor.eventType_);
+        ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
+        MMI_HILOGD("Monitor with event type (%{public}u) already exists", monitor.eventType_);
         return RET_OK;
+    }
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+        auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
+        gestureHandler.AddGestureMonitor(monitor.gestureType_, monitor.fingers_);
+        handler(gestureHandler);
+    }
+
+    monitors_.erase(iter);
+    auto [sIter, isOk] = monitors_.insert(handler);
+    if (!isOk) {
+        if (isFound) {
+            MMI_HILOGE("Internal error: monitor has been removed");
+        } else {
+            MMI_HILOGE("Failed to add monitor");
+        }
+        return RET_ERR;
+    }
+    MMI_HILOGD("Event type is updated:%{public}u", monitor.eventType_);
+    return RET_OK;
 }
 
 int32_t EventMonitorHandler::MonitorCollection::UpdateActionsTypeMonitor(const std::set<SessionHandler>::iterator &iter,
