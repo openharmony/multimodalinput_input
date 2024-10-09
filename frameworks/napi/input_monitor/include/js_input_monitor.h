@@ -133,7 +133,6 @@ private:
     bool IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent);
-    bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
