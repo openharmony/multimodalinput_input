@@ -353,6 +353,88 @@ std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupFourFingerTapEvent()
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_01
+ * @tc.desc: Test CheckAndUpdateTappingCountAtDown
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->actionTime_ = 10000;
+    handler.lastDownTime_ = 15000;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(pointerEvent));
+
+    pointerEvent->actionTime_ = 800000;
+    handler.lastDownTime_ = 200000;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(pointerEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_02
+ * @tc.desc: Test CheckAndUpdateTappingCountAtDown
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    pointerEvent->actionTime_ = 800000;
+    handler.lastDownTime_ = 500000;
+    handler.previousUpTime_ = 850000;
+    handler.downToPrevUpTimeConfig_ = 0;
+    handler.tappingCount_ = 2;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(pointerEvent));
+
+    handler.tappingCount_ = 5;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(pointerEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_002
+ * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    std::vector<ShortcutKey> upAbilities;
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = -1;
+    shortcutKey.keyDownDuration = 0;
+    EXPECT_FALSE(handler.IsKeyMatch(shortcutKey, keyEvent));
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+
+    shortcutKey.businessId = "V1";
+    int32_t delay = handler.GetKeyDownDurationFromXml(shortcutKey.businessId);
+    delay = 100;
+    EXPECT_TRUE(delay >= MIN_SHORT_KEY_DOWN_DURATION);
+    EXPECT_TRUE(delay <= MAX_SHORT_KEY_DOWN_DURATION);
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+
+    delay = 5000;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_UP;
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+    EXPECT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    shortcutKey.keyDownDuration = 100;
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_TouchPadKnuckleDoubleClickProcess_01
  * @tc.desc: Test the funcation TouchPadKnuckleDoubleClickProcess
  * @tc.type: FUNC
