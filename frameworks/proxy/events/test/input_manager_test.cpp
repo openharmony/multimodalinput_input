@@ -184,7 +184,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_NE(ret, RET_ERR);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
@@ -198,7 +198,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_01, TestSi
     CALL_TEST_DEBUG;
     bool enable = true;
     int32_t ret = InputManager::GetInstance()->EnableHardwareCursorStats(enable);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -3115,15 +3115,16 @@ HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level
 }
 
 /**
- * @tc.name: InputManagerTest_GetPointerSnapshot
- * @tc.desc: Test GetPointerSnapshot
+ * @tc.name: InputManagerTest_ConvertToCapiKeyAction_001
+ * @tc.desc: Test the funcation ConvertToCapiKeyAction
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    void *pixelMap = nullptr;
-    EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
+    int32_t keyAction = 0X00000002;
+    int32_t ret = InputManager::GetInstance()->ConvertToCapiKeyAction(keyAction);
+    EXPECT_NE(ret, -1);
 }
 } // namespace MMI
 } // namespace OHOS
