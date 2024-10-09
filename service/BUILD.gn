@@ -1348,6 +1348,7 @@ ohos_unittest("KeyGestureManagerEXTest") {
   ]
 
   sources = [
+    "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
     "subscriber/src/key_gesture_manager.cpp",
     "subscriber/test/key_gesture_manager_ex_test.cpp",
     "subscriber/test/src/timer_manager.cpp",
@@ -1373,6 +1374,13 @@ ohos_unittest("KeyGestureManagerEXTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
   ]
+
+  if (input_feature_switch) {
+    external_deps += [
+      "graphic_2d:2d_graphics",
+      "graphic_2d:librender_service_client",
+    ]
+  }
 }
 
 ohos_unittest("NapProcessTest") {

@@ -18,6 +18,7 @@
 
 #include "key_gesture_manager.h"
 
+#include "event_log_helper.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -186,6 +187,285 @@ HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_ShowHandlers, TestSize
     std::string prefix = "prefix";
     std::set<int32_t> foregroundPids = { 100, 200 };
     EXPECT_NO_FATAL_FAILURE(myKeyGesture->ShowHandlers(prefix, foregroundPids));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressSingleKey_Intercept
+ * @tc.desc: Test the funcation Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressSingleKey_Intercept, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    longPressSingleKey.active_ = true;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(longPressSingleKey.Intercept(keyEvent));
+    longPressSingleKey.active_ = false;
+    EXPECT_TRUE(longPressSingleKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressSingleKey_Intercept_001
+ * @tc.desc: Test the funcation Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressSingleKey_Intercept_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    longPressSingleKey.active_ = true;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_B);
+    EXPECT_FALSE(longPressSingleKey.Intercept(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    longPressSingleKey.active_ = false;
+    EXPECT_FALSE(longPressSingleKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_Intercept
+ * @tc.desc: Test the funcation Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_Intercept, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->bitwise_ = 0x00000000;
+    longPressCombinationKey.active_ = true;
+    EXPECT_TRUE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_Intercept_001
+ * @tc.desc: Test the funcation Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_Intercept_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->bitwise_ = 0x00000000;
+    longPressCombinationKey.active_ = false;
+    EXPECT_FALSE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_Intercept_002
+ * @tc.desc: Test the funcation Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_Intercept_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    KeyGestureManager::Handler handler1(1, 10, 500, myCallback);
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    longPressCombinationKey.handlers_.push_back(handler1);
+    longPressCombinationKey.active_ = false;
+    EXPECT_FALSE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_Intercept_003
+ * @tc.desc: Test the funcation Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_Intercept_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_D);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    longPressCombinationKey.active_ = true;
+    EXPECT_FALSE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_Intercept_004
+ * @tc.desc: Test the funcation Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_Intercept_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    longPressCombinationKey.active_ = false;
+    EXPECT_FALSE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressSingleKey_Dump
+ * @tc.desc: Test the funcation LongPressSingleKey_Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressSingleKey_Dump, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    std::ostringstream output;
+    EXPECT_NO_FATAL_FAILURE(longPressSingleKey.Dump(output));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressSingleKey_Dump_001
+ * @tc.desc: Test the funcation LongPressSingleKey_Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressSingleKey_Dump_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    std::ostringstream output;
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    KeyGestureManager::Handler handler1(1, 10, 500, myCallback);
+    KeyGestureManager::Handler handler2(2, 20, 1000, myCallback);
+    longPressSingleKey.handlers_.push_back(handler1);
+    longPressSingleKey.handlers_.push_back(handler2);
+    EXPECT_NO_FATAL_FAILURE(longPressSingleKey.Dump(output));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_Dump
+ * @tc.desc: Test the funcation LongPressCombinationKey_Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_Dump, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    KeyGestureManager::Handler handler1(1, 10, 500, myCallback);
+    KeyGestureManager::Handler handler2(2, 20, 1000, myCallback);
+    longPressCombinationKey.handlers_.push_back(handler1);
+    longPressCombinationKey.handlers_.push_back(handler2);
+    std::ostringstream output;
+    EXPECT_NO_FATAL_FAILURE(longPressCombinationKey.Dump(output));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_Dump_001
+ * @tc.desc: Test the funcation LongPressCombinationKey_Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_Dump_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = {};
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    std::ostringstream output;
+    EXPECT_NO_FATAL_FAILURE(longPressCombinationKey.Dump(output));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_RecognizeGesture
+ * @tc.desc: Test the funcation LongPressCombinationKey_RecognizeGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_RecognizeGesture, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem item;
+    item.SetPressed(true);
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->AddKeyItem(item);
+    EXPECT_NO_FATAL_FAILURE(longPressCombinationKey.RecognizeGesture(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_RecognizeGesture_01
+ * @tc.desc: Test the funcation LongPressCombinationKey_RecognizeGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_RecognizeGesture_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem item;
+    item.SetPressed(true);
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->AddKeyItem(item);
+    item.SetPressed(true);
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    keyEvent->AddKeyItem(item);
+    EXPECT_NO_FATAL_FAILURE(longPressCombinationKey.RecognizeGesture(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerEXTest_LongPressCombinationKey_TriggerAll
+ * @tc.desc: Test the funcation LongPressCombinationKey_TriggerAll
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerEXTest, KeyGestureManagerEXTest_LongPressCombinationKey_TriggerAll, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B, KeyEvent::KEYCODE_C };
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->bitwise_ = 0x00000000;
+    EXPECT_NO_FATAL_FAILURE(longPressCombinationKey.TriggerAll(keyEvent));
 }
 } // namespace MMI
 } // namespace OHOS
