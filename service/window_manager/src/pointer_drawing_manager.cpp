@@ -366,7 +366,7 @@ bool PointerDrawingManager::SetTraditionsHardWareCursorLocation(int32_t displayI
             // Change the coordinates issued by RS to asynchronous,
             // without blocking the issuance of HardwareCursor coordinates.
             PostTaskRSLocation((physicalX - CalculateHardwareXOffset(iconType)), (physicalY -
-                CalculateHardwareYOffset(iconType)));
+                CalculateHardwareYOffset(iconType)), surfaceNode_);
         } else {
             surfaceNode_->SetBounds(physicalX, physicalY, surfaceNode_->GetStagingProperties().GetBounds().z_,
                 surfaceNode_->GetStagingProperties().GetBounds().w_);
