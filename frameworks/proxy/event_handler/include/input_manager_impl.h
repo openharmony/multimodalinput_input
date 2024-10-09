@@ -268,7 +268,7 @@ private:
     std::shared_ptr<IWindowChecker> winChecker_ { nullptr };
     DisplayGroupInfo displayGroupInfo_ {};
     WindowGroupInfo windowGroupInfo_ {};
-    std::mutex mtx_;
+    std::recursive_mutex mtx_;
     std::mutex handleMtx_;
     mutable std::mutex resourceMtx_;
     std::condition_variable cv_;
