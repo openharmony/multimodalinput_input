@@ -39,6 +39,8 @@ InputHandlerManager::InputHandlerManager()
 {
     monitorCallback_ =
         [this] (int32_t eventId, int64_t actionTime) { return this->OnDispatchEventProcessed(eventId, actionTime); };
+    monitorCallbackConsume_ =
+        [this] (int32_t eventId, int64_t actionTime) { return this->OnDispatchEventProcessed(eventId, actionTime, true); };
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
@@ -536,21 +538,12 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
         return;
     }
     AddMouseEventId(pointerEvent);
-    AddProcessedEventId(pointerEvent, consumerCount);
 }
 
 void InputHandlerManager::AddMouseEventId(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         mouseEventIds_.emplace(pointerEvent->GetId());
-    }
-}
-
-void InputHandlerManager::AddProcessedEventId(std::shared_ptr<PointerEvent> pointerEvent, int32_t consumerCount)
-{
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
-        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
     }
 }
 
@@ -603,18 +596,23 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> consumerInfos;
     GetConsumerInfos(pointerEvent, deviceTags, consumerInfos);
-    for (const auto &iter : consumerInfos) {
+    for (auto iter = consumerInfos.begin(); iter != consumerInfos.end(); ++iter) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
+        if (std::next(iter) == consumerInfos.end()) {
+            tempEvent->SetProcessedCallback(monitorCallbackConsume_);
+        } else {
+            tempEvent->SetProcessedCallback(monitorCallback_);
+        }
         tempEvent->SetProcessedCallback(monitorCallback_);
         if (tempEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
             tempEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
             MMI_HILOGI("Swipe event sended to handler! action type: %{public}d", tempEvent->GetPointerAction());
         }
-        CHKPV(iter.second);
-        auto consumer = iter.second;
+        CHKPV(iter->second);
+        auto consumer = iter->second;
         consumer->OnInputEvent(tempEvent);
         MMI_HILOG_DISPATCHD("Pointer event id:%{public}d pointerId:%{public}d",
-            iter.first, pointerEvent->GetPointerId());
+            iter->first, pointerEvent->GetPointerId());
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -762,17 +760,11 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
         mouseEventIds_.erase(eventId);
         return;
     }
-    auto iter = processedEvents_.find(eventId);
-    if (iter == processedEvents_.end()) {
-        return;
-    }
-    int32_t count = iter->second;
-    processedEvents_.erase(iter);
-    count--;
-    if (count > 0) {
-        processedEvents_.emplace(eventId, count);
-        return;
-    }
+}
+
+void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime, bool isNeedConsume)
+{
+    OnDispatchEventProcessed(eventId, actionTime);
     ANRHDL->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
 }
 

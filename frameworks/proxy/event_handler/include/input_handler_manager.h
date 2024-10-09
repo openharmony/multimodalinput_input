@@ -19,6 +19,7 @@
 #include <limits>
 #include <map>
 #include <mutex>
+#include <iterator>
 
 #include "input_device.h"
 #include "input_handler_type.h"
@@ -105,8 +106,8 @@ private:
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
+    void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime, bool isNeedConsume);
     void AddMouseEventId(std::shared_ptr<PointerEvent> pointerEvent);
-    void AddProcessedEventId(std::shared_ptr<PointerEvent> pointerEvent, int32_t consumerCount);
     int32_t GetMonitorConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
         std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -119,9 +120,9 @@ private:
     std::list<Handler> interHandlers_;
     std::map<int32_t, Handler> monitorHandlers_;
     std::map<int32_t, Handler> actionsMonitorHandlers_;
-    std::map<int32_t, int32_t> processedEvents_;
     std::set<int32_t> mouseEventIds_;
     std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
+    std::function<void(int32_t, int64_t)> motitorCallbackConsume_ { nullptr };
     int32_t nextId_ { 1 };
     std::mutex mtxHandlers_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
