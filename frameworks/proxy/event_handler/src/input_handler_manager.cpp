@@ -40,7 +40,9 @@ InputHandlerManager::InputHandlerManager()
     monitorCallback_ =
         [this] (int32_t eventId, int64_t actionTime) { return this->OnDispatchEventProcessed(eventId, actionTime); };
     monitorCallbackConsume_ =
-        [this] (int32_t eventId, int64_t actionTime) { return this->OnDispatchEventProcessed(eventId, actionTime, true); };
+        [this] (int32_t eventId, int64_t actionTime) {
+            return this->OnDispatchEventProcessed(eventId, actionTime, true);
+        };
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
@@ -603,7 +605,6 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         } else {
             tempEvent->SetProcessedCallback(monitorCallback_);
         }
-        tempEvent->SetProcessedCallback(monitorCallback_);
         if (tempEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
             tempEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
             MMI_HILOGI("Swipe event sended to handler! action type: %{public}d", tempEvent->GetPointerAction());
