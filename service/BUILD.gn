@@ -2371,7 +2371,10 @@ ohos_unittest("EventDumpTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "event_dump/test/event_dump_test.cpp" ]
+  sources = [
+    "event_dump/test/event_dump_test.cpp",
+    "event_dump/test/event_statistic_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
