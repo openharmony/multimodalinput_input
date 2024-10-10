@@ -180,7 +180,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         if (fd < 0) {
             auto udsServer = InputHandler->GetUDSServer();
             CHKPV(udsServer);
-            udsServer->GetClientFd(windowInfo->pid);
+            fd = udsServer->GetClientFd(windowInfo->pid);
+            MMI_HILOGI("Window:%{public}d exit front desk, windowfd:%{public}d", windowId, fd);
         }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
