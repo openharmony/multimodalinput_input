@@ -109,7 +109,9 @@ HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_001, Test
     OH_Input_SetPreKeys(hotkey, prekeys, 1);
     OH_Input_SetFinalKey(hotkey, KEYCODE_Z);
     OH_Input_SetRepeat(hotkey, false);
-    int32_t ret = OH_Input_AddHotkeyMonitor(hotkey, Input_HotkeyCallback);
+    int32_t ret = OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
+    EXPECT_EQ(ret, INPUT_SERVICE_EXCEPTION);
+    ret = OH_Input_AddHotkeyMonitor(hotkey, Input_HotkeyCallback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
     OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
     OH_Input_DestroyHotkey(&hotkey);
@@ -583,6 +585,52 @@ HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_021, Test
     EXPECT_EQ(isRepeat, false);
 
     OH_Input_DestroyHotkey(&hotkey);
+}
+
+/**
+ * @tc.name: InputNativeHotkeyTest_AddHotkeyMonitor_022
+ * @tc.desc: Subscribe ctrl + tab
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_022, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey *hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+
+    int32_t prekeys[1] = { KEYCODE_CTRL_LEFT };
+    OH_Input_SetPreKeys(hotkey, prekeys, 1);
+    OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
+    OH_Input_SetRepeat(hotkey, false);
+    int32_t ret = OH_Input_AddHotkeyMonitor(hotkey, Input_HotkeyCallback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
+    OH_Input_DestroyHotkey(&hotkey);
+    EXPECT_EQ(hotkey, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeHotkeyTest_AddHotkeyMonitor_023
+ * @tc.desc: Subscribe alt + tab
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_023, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey *hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+
+    int32_t prekeys[1] = { KEYCODE_ALT_LEFT };
+    OH_Input_SetPreKeys(hotkey, prekeys, 1);
+    OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
+    OH_Input_SetRepeat(hotkey, false);
+    int32_t ret = OH_Input_AddHotkeyMonitor(hotkey, Input_HotkeyCallback);
+    EXPECT_EQ(ret, INPUT_OCCUPIED_BY_OTHER);
+    OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
+    OH_Input_DestroyHotkey(&hotkey);
+    EXPECT_EQ(hotkey, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
