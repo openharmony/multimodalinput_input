@@ -3362,6 +3362,8 @@ void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t
     bool isHotArea, const std::shared_ptr<PointerEvent> pointerEvent, const std::vector<WindowInfo>& windowInfos,
     const WindowInfo* touchWindow)
 {
+    CHKPV(pointerEvent);
+    CHKPV(touchWindow);
     int32_t uiExtentionWindowId = 0;
     int32_t windowId = touchWindow->id;
     int32_t logicalX = logicalXY.first;
