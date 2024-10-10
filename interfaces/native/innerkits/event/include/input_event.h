@@ -449,9 +449,9 @@ private:
     int32_t agentWindowId_ { -1 };
     uint32_t bitwise_ { 0 };
     bool markEnabled_ { true };
-    std::function<void(int32_t, int64_t)> processedCallback_;
     std::shared_ptr<const uint8_t[]> extraData_;
     uint32_t extraDataLength_ { 0 };
+    std::function<void(int32_t, int64_t)> processedCallback_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -469,7 +469,14 @@ PointerEvent::PointerEvent(const PointerEvent& other)
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-      dispatchTimes_(other.dispatchTimes_)
+      dispatchTimes_(other.dispatchTimes_),
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+      enhanceData_(other.enhanceData_),
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_ANCO
+      ancoDeal_(other.ancoDeal_),
+#endif // OHOS_BUILD_ENABLE_ANCO
+      handleEventType_(other.handleEventType_)
       {}
 
 PointerEvent::~PointerEvent() {}
@@ -900,6 +907,12 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         WRITEINT32(out, item);
     }
 
+    WRITEINT32(out, static_cast<int32_t>(pressedKeys_.size()));
+
+    for (const auto &item : pressedKeys_) {
+        WRITEINT32(out, item);
+    }
+
     WRITEINT32(out, sourceType_);
 
     WRITEINT32(out, pointerAction_);
@@ -976,6 +989,14 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         SetButtonPressed(buttonId);
     }
 
+    int32_t nPressedKeys = 0;
+    READINT32(in, nPressedKeys);
+
+    for (int32_t i = 0; i < nPressedKeys; i++) {
+        int32_t val = 0;
+        READINT32(in, val);
+        pressedKeys_.emplace_back(val);
+    }
     READINT32(in, sourceType_);
     READINT32(in, pointerAction_);
     READINT32(in, originPointerAction_);

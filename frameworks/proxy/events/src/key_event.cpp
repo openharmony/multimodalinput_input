@@ -949,6 +949,9 @@ KeyEvent::KeyEvent(const KeyEvent& other)
       numLock_(other.numLock_),
       capsLock_(other.capsLock_),
       scrollLock_(other.scrollLock_),
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+      enhanceData_(other.enhanceData_),
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
       repeat_(other.repeat_) {}
 
 KeyEvent::~KeyEvent() {}
