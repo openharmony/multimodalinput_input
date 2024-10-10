@@ -68,12 +68,19 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_StartTouchDraw, Te
     KnuckleDrawingManager kceDrawMgr;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+    kceDrawMgr.trackCanvasNode_ = nullptr;
+    kceDrawMgr.StartTouchDraw(pointerEvent);
+    EXPECT_EQ(kceDrawMgr.trackCanvasNode_, nullptr);
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+#else
     kceDrawMgr.canvasNode_ = nullptr;
     kceDrawMgr.StartTouchDraw(pointerEvent);
     EXPECT_EQ(kceDrawMgr.canvasNode_, nullptr);
-
     kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     kceDrawMgr.isActionUp_ = true;
     kceDrawMgr.displayInfo_.width = 200;
@@ -310,11 +317,19 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsSingleKnuckle, T
     item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
+#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+    kceDrawMgr.trackCanvasNode_ = nullptr;
+    ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+#else
     kceDrawMgr.canvasNode_ = nullptr;
     ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
 
     kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
 }
 
@@ -364,6 +379,56 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_GetPointerPos, Tes
  * @tc.type: Function
  * @tc.require:
  */
+#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(500);
+    item.SetDisplayY(500);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
+
+    kceDrawMgr.displayInfo_.width = 200;
+    kceDrawMgr.displayInfo_.height = 200;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
+
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerInfo.x = 150;
+    pointerInfo.y = 150;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 200;
+    pointerInfo.y = 200;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 300;
+    pointerInfo.y = 300;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
+}
+#else
 HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -410,6 +475,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
     kceDrawMgr.pointerInfos_.push_back(pointerInfo);
     ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
 }
+#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 
 /**
  * @tc.name: KnuckleDrawingManagerTest_DestoryWindow_001
@@ -421,7 +487,11 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_001,
 {
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
+#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+    kceDrawMgr.trackCanvasNode_ = nullptr;
+#else
     kceDrawMgr.canvasNode_ = nullptr;
+#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_ERR);
 }
 
@@ -431,6 +501,22 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_001,
  * @tc.type: Function
  * @tc.require:
  */
+#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.trackCanvasNode_ = nullptr;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_OK);
+}
+#else
 HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -445,6 +531,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002,
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
     ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_OK);
 }
+#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 
 /**
  * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_007
@@ -585,8 +672,13 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsSingleKnuckle_00
     kceDrawMgr.isRotate_ = false;
     PointerInfo pointerInfo;
     kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+#else
     kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "knuckle window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
