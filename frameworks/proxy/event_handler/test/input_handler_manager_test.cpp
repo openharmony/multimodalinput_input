@@ -126,26 +126,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
 }
 
 /**
- * @tc.name: InputHandlerManagerTest_AddProcessedEventId_001
- * @tc.desc:Test the funcation AddProcessedEventId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddProcessedEventId_001, TestSize.Level1)
-{
-    MyInputHandlerManager manager;
-    int32_t consumerCount = 1;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
-}
-
-/**
  * @tc.name: InputHandlerManagerTest_OnDispatchEventProcessed_002
  * @tc.desc: Test the funcation OnDispatchEventProcessed
  * @tc.type: FUNC
@@ -159,10 +139,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
     manager.mouseEventIds_.insert(10);
     ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
     eventId = 10;
-    ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
-    manager.processedEvents_.insert(std::make_pair(10, 10));
-    ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
-    manager.processedEvents_.insert(std::make_pair(5, 8));
     ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
 }
 
@@ -261,26 +237,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_005, TestS
 }
 
 /**
- * @tc.name: InputHandlerManagerTest_AddProcessedEventId_002
- * @tc.desc: Verify AddProcessedEventId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddProcessedEventId_002, TestSize.Level1)
-{
-    MyInputHandlerManager manager;
-    int32_t consumerCount = 1;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_CROWN);
-    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
-}
-
-/**
  * @tc.name: InputHandlerManagerTest_OnDispatchEventProcessed_003
  * @tc.desc: Verify OnDispatchEventProcessed
  * @tc.type: FUNC
@@ -294,10 +250,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
     manager.mouseEventIds_.insert(1);
     manager.mouseEventIds_.insert(2);
     manager.mouseEventIds_.insert(3);
-    manager.processedEvents_[1] = 100;
-    manager.processedEvents_[2] = 200;
-    manager.processedEvents_[3] = 300;
-    manager.processedEvents_[4] = 400;
     ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
 }
 
@@ -315,10 +267,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
     manager.mouseEventIds_.insert(1);
     manager.mouseEventIds_.insert(2);
     manager.mouseEventIds_.insert(3);
-    manager.processedEvents_[1] = 100;
-    manager.processedEvents_[2] = 200;
-    manager.processedEvents_[3] = 300;
-    manager.processedEvents_[4] = 400;
     ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
 }
 
@@ -335,9 +283,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
     int64_t actionTime = 2;
     manager.mouseEventIds_.insert(2);
     manager.mouseEventIds_.insert(3);
-    manager.processedEvents_[2] = 200;
-    manager.processedEvents_[3] = 300;
-    manager.processedEvents_[4] = 400;
     ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
 }
 
