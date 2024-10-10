@@ -2577,9 +2577,6 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         if (!WIN_MGR->SelectPointerChangeArea(windowId, lastPhysicalX_, lastPhysicalY_)) {
             DrawPointerStyle(pointerStyle);
         } else {
-            currentMouseStyle_ = pointerStyle;
-            lastMouseStyle_ = pointerStyle;
-            mouseIconUpdate_ = false;
             MMI_HILOGW("skip the pointerstyle");
         }
     } else {
