@@ -977,7 +977,9 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         }
     }
     PrintDisplayInfo();
-    UpdateDisplayIdAndName();
+    if (!displayGroupInfo_.displaysInfo.empty()) {
+        UpdateDisplayIdAndName();
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() && INPUT_DEV_MGR->HasPointerDevice()) {
