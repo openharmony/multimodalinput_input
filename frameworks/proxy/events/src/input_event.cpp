@@ -46,7 +46,7 @@ InputEvent::InputEvent(const InputEvent& other)
       sensorInputTime_(other.sensorInputTime_), action_(other.action_), actionStartTime_(other.actionStartTime_),
       deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
       targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
-      bitwise_(other.bitwise_), markEnabled_(other.markEnabled_), processedCallback_(other.processedCallback_),
+      bitwise_(other.bitwise_), markEnabled_(other.markEnabled_),
       extraData_(other.extraData_), extraDataLength_(other.extraDataLength_) {}
 
 InputEvent::~InputEvent() {}
