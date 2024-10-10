@@ -476,7 +476,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
 #ifdef OHOS_BUILD_ENABLE_ANCO
       ancoDeal_(other.ancoDeal_),
 #endif // OHOS_BUILD_ENABLE_ANCO
-      handleEventType_(HANDLE_EVENT_TYPE_POINTER)
+      handleEventType_(other.handleEventType_)
       {}
 
 PointerEvent::~PointerEvent() {}
