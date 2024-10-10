@@ -1715,12 +1715,10 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
-    bool isSystem = PER_HELPER->VerifySystemApp();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, subscribeId, option, isSystem] {
-            return sMsgHandler_.OnSubscribeKeyEvent(this, pid, subscribeId, option, isSystem);
-        }
-        );
+        [this, pid, subscribeId, option] {
+            return sMsgHandler_.OnSubscribeKeyEvent(this, pid, subscribeId, option);
+        });
     if (ret != RET_OK) {
         MMI_HILOGE("The subscribe key event processed failed, ret:%{public}d", ret);
         return ret;
@@ -1749,12 +1747,10 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
-    bool isSystem = PER_HELPER->VerifySystemApp();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, subscribeId, isSystem] {
-            return sMsgHandler_.OnUnsubscribeKeyEvent(this, pid, subscribeId, isSystem);
-        }
-        );
+        [this, pid, subscribeId] {
+            return sMsgHandler_.OnUnsubscribeKeyEvent(this, pid, subscribeId);
+        });
     if (ret != RET_OK) {
         MMI_HILOGE("The unsubscribe key event processed failed, ret:%{public}d", ret);
         return ret;
@@ -1769,6 +1765,70 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
         int32_t syncState = UNSUBSCRIBED;
         MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
+        if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+            NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t MMIService::SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId, option] {
+            return sMsgHandler_.OnSubscribeHotkey(this, pid, subscribeId, option);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("ServerMsgHandler::OnSubscribeHotkey fail, error:%{public}d", ret);
+        return ret;
+    }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        napData.pid = GetCallingPid();
+        napData.uid = GetCallingUid();
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        napData.bundleName = sess->GetProgramName();
+        int32_t syncState = SUBSCRIBED;
+        MMI_HILOGD("SubscribeHotkey info to observer : pid:%{public}d, bundleName:%{public}s",
+            napData.pid, napData.bundleName.c_str());
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
+        if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+            NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribeHotkey(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId] {
+            return sMsgHandler_.OnUnsubscribeHotkey(this, pid, subscribeId);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("ServerMsgHandler::OnUnsubscribeHotkey fail, error:%{public}d", ret);
+        return ret;
+    }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        napData.pid = GetCallingPid();
+        napData.uid = GetCallingUid();
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        napData.bundleName = sess->GetProgramName();
+        int32_t syncState = UNSUBSCRIBED;
+        MMI_HILOGD("UnsubscribeHotkey info to observer : pid:%{public}d, bundleName:%{public}s",
+            napData.pid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
             NapProcess::GetInstance()->NotifyBundleName(napData, syncState);

@@ -70,6 +70,10 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
 
+    int32_t SubscribeHotkey(std::shared_ptr<KeyOption> keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    int32_t UnsubscribeHotkey(int32_t subscriberId);
+
     int32_t OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
     void OnConnected();
 

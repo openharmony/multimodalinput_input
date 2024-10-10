@@ -145,6 +145,10 @@ public:
      */
     void UnsubscribeKeyEvent(int32_t subscriberId);
 
+    int32_t SubscribeHotkey(std::shared_ptr<KeyOption> keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    void UnsubscribeHotkey(int32_t subscriberId);
+
     /**
      * @brief Subscribes to the switch input event that meets a specific condition. When such an event occurs,
      * the <b>callback</b> specified is invoked to process the event.

@@ -221,6 +221,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_EVENT):
             ret = StubUnsubscribeKeyEvent(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_HOT_KEY):
+            ret = StubSubscribeHotkey(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_HOT_KEY):
+            ret = StubUnsubscribeHotkey(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_SWITCH_EVENT):
             ret = StubSubscribeSwitchEvent(data, reply);
             break;
@@ -1343,7 +1349,10 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t subscribeId = 0;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
 
@@ -1377,6 +1386,47 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSubscribeHotkey(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t subscribeId = 0;
+    READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    auto keyOption = std::make_shared<KeyOption>();
+    if (!keyOption->ReadFromParcel(data)) {
+        MMI_HILOGE("Read keyOption failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = SubscribeHotkey(subscribeId, keyOption);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeHotkey failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubUnsubscribeHotkey(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t subscribeId = 0;
+    READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = UnsubscribeHotkey(subscribeId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnsubscribeHotkey failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply)
@@ -1450,9 +1500,8 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
     int32_t ret = MoveMouseEvent(offsetX, offsetY);
     if (ret != RET_OK) {
         MMI_HILOGE("MoveMouseEvent failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply)
@@ -1481,9 +1530,8 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
     int32_t ret = InjectKeyEvent(event, isNativeInject);
     if (ret != RET_OK) {
         MMI_HILOGE("InjectKeyEvent failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply)
@@ -1508,9 +1556,8 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
     int32_t ret = InjectPointerEvent(pointerEvent, isNativeInject);
     if (ret != RET_OK) {
         MMI_HILOGE("Call InjectPointerEvent failed ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, MessageParcel& reply)

@@ -95,6 +95,8 @@ protected:
     int32_t StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSubscribeHotkey(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnsubscribeHotkey(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
