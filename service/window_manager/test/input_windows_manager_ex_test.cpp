@@ -3227,5 +3227,275 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
     EXPECT_TRUE(inputWindowsManager.TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo
+ * @tc.desc: Test the funcation UpdateDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, HasPointerDevice()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    InputWindowsManager inputWindowsManager;
+    DisplayGroupInfo displayGroupInfo;
+    DisplayInfo displayInfo;
+    WindowInfo winInfo;
+    winInfo.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    displayGroupInfo.currentUserId = 100;
+    inputWindowsManager.currentUserId_ = 200;
+    inputWindowsManager.pointerDrawFlag_ = true;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_001
+ * @tc.desc: Test the funcation UpdateDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, HasPointerDevice()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    InputWindowsManager inputWindowsManager;
+    DisplayGroupInfo displayGroupInfo;
+    DisplayInfo displayInfo;
+    WindowInfo winInfo;
+    winInfo.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    displayGroupInfo.currentUserId = 100;
+    inputWindowsManager.currentUserId_ = 200;
+    inputWindowsManager.pointerDrawFlag_ = true;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPointerStyleByArea
+ * @tc.desc: Test the funcation GetPointerStyleByArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyleByArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowArea area = static_cast<WindowArea>(100);
+    int32_t pid = 100;
+    int32_t winId = 100;
+    PointerStyle pointerStyle;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetPointerStyleByArea(area, pid, winId, pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle
+ * @tc.desc: Test the funcation SetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    int32_t pid = 100;
+    int32_t windowId = 100;
+    PointerStyle pointerStyle;
+    bool isUiExtension = false;
+    EXPECT_NE(inputWindowsManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInHotArea
+ * @tc.desc: Test the funcation IsInHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 10;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 1000, 1000 } };
+    WindowInfo window;
+    EXPECT_FALSE(inputWindowsManager.IsInHotArea(x, y, rects, window));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInHotArea_001
+ * @tc.desc: Test the funcation IsInHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 100, 1000 } };
+    WindowInfo window;
+    EXPECT_FALSE(inputWindowsManager.IsInHotArea(x, y, rects, window));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInHotArea_002
+ * @tc.desc: Test the funcation IsInHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 10;
+    std::vector<Rect> rects = { { 100, 100, 1000, 1000 } };
+    WindowInfo window;
+    EXPECT_FALSE(inputWindowsManager.IsInHotArea(x, y, rects, window));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInHotArea_003
+ * @tc.desc: Test the funcation IsInHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 100, 1000 } };
+    WindowInfo window;
+    EXPECT_FALSE(inputWindowsManager.IsInHotArea(x, y, rects, window));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 50;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 1000, 1000 } };
+    PointerStyle pointerStyle;
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_001
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 100, 1000 } };
+    PointerStyle pointerStyle;
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_002
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 50;
+    std::vector<Rect> rects = { { 100, 100, 1000, 1000 } };
+    PointerStyle pointerStyle;
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_003
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 1000, 100 } };
+    PointerStyle pointerStyle;
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerChangeAreas
+ * @tc.desc: Test the funcation UpdatePointerChangeAreas
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerChangeAreas, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayGroupInfo displayGroupInfo;
+    WindowInfo winInfo;
+    winInfo.id = 100;
+    winInfo.area;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerChangeAreas(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerChangeAreas_001
+ * @tc.desc: Test the funcation UpdatePointerChangeAreas
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerChangeAreas_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerChangeAreas());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWidthAndHeight
+ * @tc.desc: Test the funcation GetWidthAndHeight
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWidthAndHeight, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    int32_t width = 300;
+    int32_t height = 300;
+    displayInfo.direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWidthAndHeight(&displayInfo, width, height));
+}
 } // namespace MMI
 } // namespace OHOS
