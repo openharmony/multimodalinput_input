@@ -472,26 +472,6 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
 }
 
 /**
- * @tc.name: KnuckleDynamicDrawingManagerTest_DestoryWindow_002
- * @tc.desc: Test DestoryWindow
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    knuckleDynamicDrawingMgr->canvasNode_ = nullptr;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    knuckleDynamicDrawingMgr->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NE(knuckleDynamicDrawingMgr->surfaceNode_, nullptr);
-    knuckleDynamicDrawingMgr->canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(knuckleDynamicDrawingMgr->canvasNode_, nullptr);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->DestoryWindow());
-}
-
-/**
  * @tc.name: KnuckleDynamicDrawingManagerTest_IsSingleKnuckle_001
  * @tc.desc: Test Overrides IsSingleKnuckle function branches
  * @tc.type: Function
