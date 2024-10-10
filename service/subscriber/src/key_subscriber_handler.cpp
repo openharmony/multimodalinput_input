@@ -72,7 +72,7 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
         } else {
-            MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%d", keyEvent->GetKeyCode());
+            MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
         }
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         return;
@@ -103,8 +103,8 @@ void KeySubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> 
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t KeySubscriberHandler::SubscribeKeyEvent(SessionPtr sess,
-    int32_t subscribeId, std::shared_ptr<KeyOption> keyOption, bool isSystem)
+int32_t KeySubscriberHandler::SubscribeKeyEvent(
+    SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
@@ -120,9 +120,9 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(SessionPtr sess,
     }
 
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        MMI_HILOGD("keyOption->prekey:%d", keyCode);
+        MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
     }
-    MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d,"
+    MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{private}d,"
         "isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
@@ -134,7 +134,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(SessionPtr sess,
             return ret;
         }
     } else {
-        auto ret = AddSubscriber(subscriber, keyOption, isSystem);
+        auto ret = AddSubscriber(subscriber, keyOption, true);
         if (ret != RET_OK) {
             MMI_HILOGE("AddSubscriber fail, error:%{public}d", ret);
             return ret;
@@ -144,11 +144,11 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(SessionPtr sess,
     return RET_OK;
 }
 
-int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId, bool isSystem)
+int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
-    int32_t ret = RemoveSubscriber(sess, subscribeId, isSystem);
+    int32_t ret = RemoveSubscriber(sess, subscribeId, true);
     if (ret != RET_OK) {
         ret = RemoveKeyGestureSubscriber(sess, subscribeId);
     }
@@ -172,7 +172,7 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                     KEY_SHORTCUT_MGR->UnregisterHotKey((*it)->shortcutId_);
                 }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
-                MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
+                MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{private}d, isFinalKeyDown:%{public}s,"
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
                 subscribers.erase(it);
@@ -224,7 +224,7 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
             MMI_HILOGI("Removing handler(%{public}d) of key gesture", subscriber->timerId_);
             keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
             auto option = subscriber->keyOption_;
-            MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
+            MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{private}d, isFinalKeyDown:%{public}s,"
                 "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
                 option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
             subscribers.erase(innerIter);
@@ -267,12 +267,12 @@ void KeySubscriberHandler::UnregisterSystemKey(int32_t shortcutId)
 {
     KEY_SHORTCUT_MGR->UnregisterSystemKey(shortcutId);
 }
- 
+
 void KeySubscriberHandler::UnregisterHotKey(int32_t shortcutId)
 {
     KEY_SHORTCUT_MGR->UnregisterHotKey(shortcutId);
 }
- 
+
 void KeySubscriberHandler::DeleteShortcutId(std::shared_ptr<Subscriber> subscriber)
 {
     if (subscriber->isSystem) {
@@ -282,6 +282,44 @@ void KeySubscriberHandler::DeleteShortcutId(std::shared_ptr<Subscriber> subscrib
     }
 }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
+
+int32_t KeySubscriberHandler::SubscribeHotkey(
+    SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(keyOption, ERROR_NULL_POINTER);
+    uint32_t preKeySize = keyOption->GetPreKeys().size();
+    if (preKeySize > MAX_PRE_KEY_COUNT) {
+        MMI_HILOGE("Leave, preKeySize:%{public}u", preKeySize);
+        return RET_ERR;
+    }
+    for (const auto &keyCode : keyOption->GetPreKeys()) {
+        MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
+    }
+    MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{private}d,"
+        "isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
+        subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
+        keyOption->GetFinalKeyDownDuration(), sess->GetPid());
+    auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
+    auto ret = AddSubscriber(subscriber, keyOption, false);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AddSubscriber fail, error:%{public}d", ret);
+        return ret;
+    }
+    InitSessionDeleteCallback();
+    return RET_OK;
+}
+
+int32_t KeySubscriberHandler::UnsubscribeHotkey(SessionPtr sess, int32_t subscribeId)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
+    int32_t ret = RemoveSubscriber(sess, subscribeId, false);
+    if (ret != RET_OK) {
+        MMI_HILOGW("No hot key subscription(%{public}d, No.%{public}d)", sess->GetPid(), subscribeId);
+    }
+    return ret;
+}
 
 int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscriber,
     std::shared_ptr<KeyOption> option, bool isSystem)
@@ -413,7 +451,7 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
         } else {
-            MMI_HILOGD("Subscriber mulit swipe keycode is:%d", keyEvent->GetKeyCode());
+            MMI_HILOGD("Subscriber mulit swipe keycode is:%{private}d", keyEvent->GetKeyCode());
         }
         return IsEnableCombineKeySwipe(keyEvent);
     }
@@ -534,7 +572,8 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
             KeyEvent::ActionToString(keyAction));
     } else {
-        MMI_HILOGD("keyCode:%d, keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
+        MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}s",
+            keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     }
     if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
         && keyAction == KeyEvent::KEY_ACTION_UP) {
@@ -546,7 +585,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Pressed KeyCode:%{private}d", keyCode);
         } else {
-            MMI_HILOGD("Pressed KeyCode:%d", keyCode);
+            MMI_HILOGD("Pressed KeyCode:%{private}d", keyCode);
         }
     }
     bool handled = false;
@@ -591,7 +630,7 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
                     subscriber->timerId_, sess->GetPid());
                 keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
                 auto option = subscriber->keyOption_;
-                MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
+                MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{private}d, isFinalKeyDown:%{public}s,"
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscriber->id_, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
                 inner = subscribers.erase(inner);
@@ -770,7 +809,7 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
             MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{private}d, pid:%{public}d",
                 subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
         } else {
-            MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%d, pid:%{public}d",
+            MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{private}d, pid:%{public}d",
                 subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
         }
     }
@@ -1020,7 +1059,7 @@ bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trriger
     for (const auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
-        MMI_HILOGD("keyOption->finalKey:%{public}d, keyOption->isFinalKeyDown:%{public}s, "
+        MMI_HILOGD("keyOption->finalKey:%{private}d, keyOption->isFinalKeyDown:%{public}s, "
             "keyOption->finalKeyDownDuration:%{public}d",
             keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
@@ -1123,12 +1162,12 @@ void KeySubscriberHandler::HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEve
 void KeySubscriberHandler::PrintKeyOption(const std::shared_ptr<KeyOption> keyOption)
 {
     CHKPV(keyOption);
-    MMI_HILOGD("keyOption->finalKey:%{public}d,keyOption->isFinalKeyDown:%{public}s, "
+    MMI_HILOGD("keyOption->finalKey:%{private}d,keyOption->isFinalKeyDown:%{public}s, "
         "keyOption->finalKeyDownDuration:%{public}d, keyOption->isRepeat:%{public}s",
         keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), keyOption->IsRepeat() ? "true" : "false");
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        MMI_HILOGD("keyOption->prekey:%d", keyCode);
+        MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
     }
 }
 
@@ -1136,13 +1175,13 @@ void KeySubscriberHandler::PrintKeyUpLog(const std::shared_ptr<Subscriber> &subs
 {
     CHKPV(subscriber);
     auto &keyOption = subscriber->keyOption_;
-    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
+    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d,"
         "keyOption->finalKeyUpDelay:%{public}d",
         subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), keyOption->GetFinalKeyUpDelay());
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        MMI_HILOGD("keyOption->prekey:%d", keyCode);
+        MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
     }
 }
 

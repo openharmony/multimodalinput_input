@@ -412,6 +412,20 @@ int32_t MultimodalInputConnectManager::UnsubscribeKeyEvent(int32_t subscribeId)
     return multimodalInputConnectService_->UnsubscribeKeyEvent(subscribeId);
 }
 
+int32_t MultimodalInputConnectManager::SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SubscribeHotkey(subscribeId, option);
+}
+
+int32_t MultimodalInputConnectManager::UnsubscribeHotkey(int32_t subscribeId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->UnsubscribeHotkey(subscribeId);
+}
+
 int32_t MultimodalInputConnectManager::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     std::lock_guard<std::mutex> guard(lock_);

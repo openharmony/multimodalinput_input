@@ -107,6 +107,17 @@ void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeKeyEvent(subscriberId);
 }
 
+int32_t InputManager::SubscribeHotkey(std::shared_ptr<KeyOption> keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    return InputMgrImpl.SubscribeHotkey(keyOption, callback);
+}
+
+void InputManager::UnsubscribeHotkey(int32_t subscriberId)
+{
+    InputMgrImpl.UnsubscribeHotkey(subscriberId);
+}
+
 int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
     SwitchEvent::SwitchType switchType)
 {

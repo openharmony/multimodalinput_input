@@ -79,6 +79,20 @@ int32_t MultimodalEventHandler::UnsubscribeKeyEvent(int32_t subscribeId)
     return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeKeyEvent(subscribeId);
 }
 
+int32_t MultimodalEventHandler::SubscribeHotkey(
+    const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
+{
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeHotkey(
+        subscribeInfo.GetSubscribeId(), subscribeInfo.GetKeyOption());
+}
+
+int32_t MultimodalEventHandler::UnsubscribeHotkey(int32_t subscribeId)
+{
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeHotkey(subscribeId);
+}
+
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
