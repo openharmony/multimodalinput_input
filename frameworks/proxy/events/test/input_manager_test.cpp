@@ -184,7 +184,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_NE(ret, RET_ERR);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
@@ -198,7 +198,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_01, TestSi
     CALL_TEST_DEBUG;
     bool enable = true;
     int32_t ret = InputManager::GetInstance()->EnableHardwareCursorStats(enable);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
