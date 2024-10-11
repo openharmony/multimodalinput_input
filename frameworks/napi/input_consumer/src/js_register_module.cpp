@@ -487,7 +487,6 @@ bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInf
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(sCallBacksMutex);
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
     CHKPP(event);
     event->env = env;
@@ -497,7 +496,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     napi_value argv[3] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_HILOGE("GET_CB_INFO failed");
-        delete event;
         return nullptr;
     }
     if (argc < INPUT_PARAMETER_MAX) {
@@ -527,7 +525,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(sCallBacksMutex);
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
     CHKPP(event);
     event->env = env;
