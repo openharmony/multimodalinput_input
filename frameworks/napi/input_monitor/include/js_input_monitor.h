@@ -155,6 +155,7 @@ private:
     int32_t fingers_ { 0 };
     bool isMonitoring_ { false };
     std::mutex mutex_;
+    std::mutex resourcemutex_;
 };
 } // namespace MMI
 } // namespace OHOS

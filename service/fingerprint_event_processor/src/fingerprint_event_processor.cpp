@@ -442,6 +442,7 @@ void FingerprintEventProcessor::ProcessClickEvent()
 
 void FingerprintEventProcessor::ReportResSched(uint32_t resType, int64_t value)
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     std::unordered_map<std::string, std::string> payload { {"msg", ""} };
     ResourceSchedule::ResSchedClient::GetInstance().ReportData(resType, value, payload);
 }
