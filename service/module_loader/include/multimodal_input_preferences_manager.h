@@ -57,14 +57,9 @@ private:
     bool touchpadPinchSwitch_ { true };
     bool touchpadSwipeSwitch_ { true };
     bool hoverScrollState_ { true };
-#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-    bool moveEventFilterFlag_ { false };
-#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-    bool touchpadThreeFingerTapSwitch_ {false};
     int32_t pointerColor_ { -1 };
     int32_t pointerSize_ { 1 };
     int32_t pointerStyle_ { 0 };
-    int32_t touchpadScrollRows_ { 3 };
     const std::string strKeyboardRepeatRate_ = "keyboardRepeatRate";
     const std::string strKeyboardRepeatDelay_ = "keyboardRepeatDelay";
     const std::string strMouseScrollRows_ = "rows";
@@ -78,14 +73,9 @@ private:
     const std::string strTouchpadPinchSwitch_ = "touchpadPinch";
     const std::string strTouchpadSwipeSwitch_ = "touchpadSwipe";
     const std::string strHoverScrollState_ = "isEnableHoverScroll";
-#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-    const std::string strMoveEventFilterFlag_ = "moveEventFilterFlag";
-#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     const std::string strPointerColor_ = "pointerColor";
     const std::string strPointerSize_ = "pointerSize";
     const std::string strPointerStyle_ = "pointerStyle";
-    const std::string strTouchpadThreeFingerTapSwitch_ = "touchpadThreeFingerTap";
-    const std::string strTouchpadScrollRows_ = "touchpadScrollRows";
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t magicPointerColor_ { -1 };
     int32_t magicPointerSize_ { 1 };
