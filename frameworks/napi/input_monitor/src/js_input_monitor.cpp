@@ -393,7 +393,6 @@ void JsInputMonitor::MarkConsumed(int32_t eventId)
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value callback)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPR(callback, ERROR_NULL_POINTER);
     if (jsEnv_ == jsEnv) {
         napi_value handlerTemp = nullptr;
@@ -1533,7 +1532,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             pointerQueue_.push(pointerEvent);
         }
     }
-    std::lock_guard<std::mutex> guard(mutex_);
+    std::lock_guard<std::mutex> guard(resourcemutex_);
     while (!pointerQueue_.empty()) {
         auto pointerEventItem = pointerQueue_.front();
         pointerQueue_.pop();
