@@ -74,6 +74,7 @@ bool CooperateFree::HasLocalPointerDevice() const
         }
         return (dev->IsPointerDevice() && !dev->IsRemote());
     });
+}
 
 bool CooperateFree::HasLocalKeyboardDevice() const
 {
@@ -167,6 +168,7 @@ void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &even
     CALL_INFO_TRACE;
     StopCooperateEvent notice = std::get<StopCooperateEvent>(event.event);
     parent_.UnchainConnections(context, notice);
+}
 
 void CooperateFree::Initial::OnAppClosed(Context &context, const CooperateEvent &event)
 {
