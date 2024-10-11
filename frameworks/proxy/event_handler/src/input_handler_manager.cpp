@@ -624,6 +624,7 @@ bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
 {
     CALL_INFO_TRACE;
     CHKPF(lastPointerEvent_);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
