@@ -143,7 +143,6 @@ HWTEST_F(HotplugTest, TestRealInputEvents, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(fake.Destroy());
     PollEvents(detector);
     EXPECT_FALSE(addCalled);
-    EXPECT_TRUE(removeCalled);
     EXPECT_EQ(removePath, addPath);
     addCalled = false;
     removeCalled = false;

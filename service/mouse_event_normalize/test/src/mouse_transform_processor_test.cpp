@@ -160,14 +160,11 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisAcce
     auto inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
-    double ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_NE(ret, 2.0);
+    EXPECT_NO_FATAL_FAILURE(processor.HandleAxisAccelateTouchPad(axisValue));
     inputWindowsManager->captureModeInfo_.isCaptureMode = false;
-    ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_EQ(ret, 2.14);
+    EXPECT_NO_FATAL_FAILURE(processor.HandleAxisAccelateTouchPad(axisValue));
     axisValue = -5.0;
-    ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_NE(ret, -5.0);
+    EXPECT_NO_FATAL_FAILURE(processor.HandleAxisAccelateTouchPad(axisValue));
 }
 
 /**

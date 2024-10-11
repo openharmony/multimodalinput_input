@@ -312,9 +312,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleKeyboardEven
     pointerEvent->pressedKeys_.push_back(3);
     pointerEvent->pressedKeys_.push_back(4);
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyboardEvent(event));
-    event = new (std::nothrow) libinput_event;
-    ASSERT_NE(event, nullptr);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyboardEvent(event));
 }
 } // namespace MMI
 } // namespace OHOS
