@@ -44,7 +44,6 @@ public:
  */
 HWTEST_F(MMIServerTest, MMIServerTest_OnThread_01, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     EpollEventType epollType;
     epollType = EPOLL_EVENT_INPUT;
@@ -59,7 +58,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnThread_01, TestSize.Level1)
  */
 HWTEST_F(MMIServerTest, MMIServerTest_OnThread_02, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     EpollEventType epollType;
     epollType = EPOLL_EVENT_SOCKET;
@@ -88,7 +86,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnThread_03, TestSize.Level1)
  */
 HWTEST_F(MMIServerTest, MMIServerTest_OnThread_04, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     EpollEventType epollType;
     epollType = EPOLL_EVENT_ETASK;
@@ -103,7 +100,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnThread_04, TestSize.Level1)
  */
 HWTEST_F(MMIServerTest, MMIServerTest_EnableInputDevice_01, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     bool enable = true;
     int32_t ret = mmiService.EnableInputDevice(enable);
@@ -118,7 +114,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_EnableInputDevice_01, TestSize.Level1)
  */
 HWTEST_F(MMIServerTest, MMIServerTest_EnableInputDevice_02, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     bool enable = false;
     int32_t ret = mmiService.EnableInputDevice(enable);
@@ -133,7 +128,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_EnableInputDevice_02, TestSize.Level1)
  */
 HWTEST_F(MMIServerTest, MMIServerTest_OnDisconnected_01, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     SessionPtr session;
     auto ret1 = mmiService.RemoveInputEventFilter(-1);
@@ -149,7 +143,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnDisconnected_01, TestSize.Level1)
  */
 HWTEST_F(MMIServerTest, MMIServerTest_OnDisconnected_02, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     SessionPtr session;
     auto ret1 = mmiService.RemoveInputEventFilter(2);
@@ -165,7 +158,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnDisconnected_02, TestSize.Level1)
  */
 HWTEST_F(MMIServerTest, MMIServerTest_AddInputHandler_01, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
     HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
@@ -183,7 +175,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_AddInputHandler_01, TestSize.Level1)
  */
 HWTEST_F(MMIServerTest, MMIServerTest_RemoveInputHandler_01, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     MMIService mmiService;
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
     HandleEventType eventType = HANDLE_EVENT_TYPE_POINTER;
