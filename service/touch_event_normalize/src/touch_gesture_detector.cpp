@@ -31,6 +31,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int32_t MAX_PHYSCAL_POINTER_NUM { 10 };
 constexpr int32_t ANGLE_PI = 180;
 
 constexpr double ANGLE_RIGHT_DOWN = -45.0;
@@ -93,7 +94,7 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
     int32_t x = item.GetDisplayX();
     int32_t y = item.GetDisplayY();
     int64_t time = item.GetDownTime();
-    auto iter = downPoint_.insert(std::make_pair(pointerId, Point(x, y, time)));
+    auto iter = downPoint_.insert_or_assign(pointerId, Point(x, y, time));
     if (!iter.second) {
         MMI_HILOGE("Insert value failed, duplicated pointerId:%{public}d", pointerId);
     }
@@ -196,6 +197,15 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
     }
 }
 
+bool TouchGestureDetector::IsPhysicalPointer(std::shared_ptr<PointerEvent> event) const
+{
+    if (event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        return false;
+    }
+    const int32_t pointerId = event->GetPointerId();
+    return ((pointerId >= 0) && (pointerId < MAX_PHYSCAL_POINTER_NUM));
+}
+
 void TouchGestureDetector::ReleaseData()
 {
     CALL_INFO_TRACE;
@@ -217,6 +227,9 @@ bool TouchGestureDetector::WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent
         return true;
     }
     if (!gestureEnable_) {
+        return true;
+    }
+    if (!IsPhysicalPointer(event)) {
         return true;
     }
     int32_t displayId = event->GetTargetDisplayId();
