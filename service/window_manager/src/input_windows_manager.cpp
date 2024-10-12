@@ -908,7 +908,7 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     for (auto &windowInfo : displayGroupInfo.windowsInfo) {
         if (!windowInfo.isDisplayCoord) {
-            auto displayInfo = GetPhysicalDisplay(windowInfo.displayId);
+            auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
             CHKPR(displayInfo, action);
             windowInfo.area.x += displayInfo->x;
             windowInfo.area.y += displayInfo->y;
@@ -4498,6 +4498,17 @@ int32_t InputWindowsManager::GetCurrentUserId()
 void InputWindowsManager::SetFoldState()
 {
     IsFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
+}
+
+const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id, const DisplayGroupInfo &displayGroupInfo) const
+{
+    for (const auto &it : displayGroupInfo.displaysInfo) {
+        if (it.id == id) {
+            return &it;
+        }
+    }
+    MMI_HILOGW("Failed to obtain physical(%{public}d) display", id);
+    return nullptr;
 }
 } // namespace MMI
 } // namespace OHOS
