@@ -79,8 +79,12 @@ ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value, c
 {
     std::string valueStr;
     ErrCode ret = GetStringValue(key, valueStr, strUri);
+    if (ret == ERR_NAME_NOT_FOUND) {
+        MMI_HILOGW("Not found this property");
+        return ERR_OK;
+    }
     if (ret != ERR_OK) {
-        MMI_HILOGE("Get long value fail");
+        MMI_HILOGE("Get long value fail, ret:%{public}d", ret);
         return ret;
     }
     value = static_cast<int64_t>(strtoll(valueStr.c_str(), nullptr, DECIMAL_BASE));
@@ -91,8 +95,12 @@ ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, cons
 {
     std::string valueStr;
     ErrCode ret = GetStringValue(key, valueStr, strUri);
+    if (ret == ERR_NAME_NOT_FOUND) {
+        MMI_HILOGW("Not found this property");
+        return ERR_OK;
+    }
     if (ret != ERR_OK) {
-        MMI_HILOGE("Get bool value fail");
+        MMI_HILOGE("Get bool value fail, ret:%{public}d", ret);
         return ret;
     }
     value = ((valueStr == "true") || (valueStr == "1"));
