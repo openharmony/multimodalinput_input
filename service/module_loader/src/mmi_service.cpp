@@ -1306,8 +1306,9 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    bool isRegisterCaptureCb = false;
     if (!PER_HELPER->VerifySystemApp() && handlerType == InputHandlerType::MONITOR) {
-        RegisterScreenCaptureCallback();
+        isRegisterCaptureCb = true;
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -1315,13 +1316,23 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
     int32_t ret = RET_ERR;
     if (actionsType.empty()) {
         ret = delegateTasks_.PostSyncTask(
-            [this, pid, handlerType, eventType, priority, deviceTags] {
+            [this, pid, handlerType, eventType, priority, deviceTags, isRegisterCaptureCb] {
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+                if (isRegisterCaptureCb) {
+                    RegisterScreenCaptureCallback();
+                }
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
                 return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
             }
             );
     } else {
         ret = delegateTasks_.PostSyncTask(
-            [this, pid, handlerType, actionsType] {
+            [this, pid, handlerType, actionsType, isRegisterCaptureCb] {
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+                if (isRegisterCaptureCb) {
+                    RegisterScreenCaptureCallback();
+                }
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
                 return this->CheckAddInput(pid, handlerType, actionsType);
             }
             );
@@ -1330,20 +1341,10 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return ret;
     }
-    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
-        OHOS::MMI::NapProcess::NapStatusData napData;
-        napData.pid = GetCallingPid();
-        napData.uid = GetCallingUid();
-        auto sess = GetSessionByPid(pid);
-        CHKPR(sess, ERROR_NULL_POINTER);
-        napData.bundleName = sess->GetProgramName();
-        int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%d, bundleName:%{public}s",
-            napData.pid, napData.uid, napData.bundleName.c_str());
-        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
-        if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
-            NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
-        }
+    ret = ObserverAddInputHandler(pid);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AddInputHandler info to observer failed, ret:%{public}d", ret);
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
@@ -1363,6 +1364,27 @@ int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, 
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, actionsType);
+}
+
+int32_t MMIService::ObserverAddInputHandler(int32_t pid)
+{
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        napData.pid = GetCallingPid();
+        napData.uid = GetCallingUid();
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        napData.bundleName = sess->GetProgramName();
+        int32_t syncState = SUBSCRIBED;
+        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%d, bundleName:%{public}s",
+            napData.pid, napData.uid, napData.bundleName.c_str());
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
+        if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+            NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
+        }
+    }
+    return RET_OK;
+}
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
@@ -1695,9 +1717,15 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
 void MMIService::ScreenCaptureCallback(int32_t pid, bool isStart)
 {
-    auto monitorHandler = InputHandler->GetMonitorHandler();
-    CHKPV(monitorHandler);
-    monitorHandler->ProcessScreenCapture(pid, isStart);
+    auto service = MMIService::GetInstance();
+    CHKPV(service);
+    int32_t ret = service->delegateTasks_.PostSyncTask(
+        [pid, isStart] {
+            auto monitorHandler = InputHandler->GetMonitorHandler();
+            CHKPR(monitorHandler, RET_ERR);
+            monitorHandler->ProcessScreenCapture(pid, isStart);
+            return RET_OK;
+        });
 }
 
 void MMIService::RegisterScreenCaptureCallback()
