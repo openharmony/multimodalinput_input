@@ -102,7 +102,7 @@ static std::string GetThisThreadIdOfString()
 uint64_t GetThisThreadId()
 {
     std::string stid = GetThisThreadIdOfString();
-    auto tid = std::atoll(stid);
+    auto tid = std::atoll(stid.c_str());
     return tid;
 }
 
