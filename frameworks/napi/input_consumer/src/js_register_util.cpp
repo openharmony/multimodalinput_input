@@ -30,8 +30,6 @@
 namespace OHOS {
 namespace MMI {
 
-static std::mutex sCallBacksMutex;
-
 bool TypeOf(napi_env env, napi_value value, napi_valuetype type)
 {
     napi_valuetype valueType = napi_undefined;
