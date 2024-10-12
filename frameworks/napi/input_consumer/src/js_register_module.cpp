@@ -40,7 +40,7 @@ constexpr int32_t OCCUPIED_BY_OTHER { -4 };
 
 static Callbacks callbacks = {};
 static Callbacks hotkeyCallbacks = {};
-static std::mutex sCallBacksMutex;
+std::mutex sCallBacksMutex;
 static const std::vector<int32_t> pressKeyCodes = {
     KeyEvent::KEYCODE_ALT_LEFT,
     KeyEvent::KEYCODE_ALT_RIGHT,
