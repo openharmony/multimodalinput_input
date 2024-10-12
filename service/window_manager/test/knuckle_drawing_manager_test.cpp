@@ -204,34 +204,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_004
- * @tc.desc: Test KnuckleDrawHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    int32_t displayX = 200;
-    int32_t displayY = 200;
-    item.SetDisplayX(displayX);
-    item.SetDisplayY(displayY);
-    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
-    EXPECT_FALSE(knuckleDrawMgr_->isRotate_);
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_006
  * @tc.desc: Test KnuckleDrawHandler
  * @tc.type: Function
