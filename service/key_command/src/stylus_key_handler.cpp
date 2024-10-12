@@ -81,15 +81,15 @@ void StylusKeyHandler::CreateStatusConfigObserver(T& item)
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
     }
-    bool configVlaue = true;
+    bool configValue = true;
     ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .GetBoolValue(item.statusConfig, configVlaue);
+        .GetBoolValue(item.statusConfig, configValue);
     if (ret != RET_OK) {
         MMI_HILOGE("Get value from setting date fail");
         return;
     }
-    MMI_HILOGI("Get value success key:%{public}s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
-    item.statusConfigValue = configVlaue;
+    MMI_HILOGI("Get value success key:%{public}s, value:%{public}d", item.statusConfig.c_str(), configValue);
+    item.statusConfigValue = configValue;
     isShortHandConfig_ = true;
 }
 
