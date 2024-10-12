@@ -144,7 +144,6 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
 int32_t GetPreSubscribeId(Callbacks &callbacks, sptr<KeyEventMonitorInfo> event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    std::lock_guard guard(sCallBacksMutex);
     auto it = callbacks.find(event->eventType);
     if (it == callbacks.end() || it->second.empty()) {
         MMI_HILOGE("The callbacks is empty");
@@ -195,7 +194,6 @@ int32_t DelEventCallbackRef(const napi_env &env, std::list<sptr<KeyEventMonitorI
 int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEventMonitorInfo> event)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(sCallBacksMutex);
     CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.find(event->eventType) == callbacks.end()) {
         MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
@@ -234,7 +232,6 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEven
     int32_t &subscribeId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(sCallBacksMutex);
     CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.count(event->eventType) <= 0) {
         MMI_HILOGE("Callback doesn't exists");
