@@ -160,6 +160,7 @@ public:
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
+    const DisplayInfo* GetPhysicalDisplay(int32_t id, const DisplayGroupInfo &displayGroupInfo) const;
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerChangeAreas();
