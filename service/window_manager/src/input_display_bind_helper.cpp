@@ -482,7 +482,7 @@ std::string InputDisplayBindHelper::GetInputNodeNameByCfg(int32_t id)
             std::string inputNodeName = line.substr(pos + delim.length());
             if (!displayId.empty() && !inputNodeName.empty()
                 && std::all_of(displayId.begin(), displayId.end(), ::isdigit)
-                && std::atoi(displayId) == id) {
+                && std::atoi(displayId.c_str()) == id) {
                 res = inputNodeName;
                 break;
             }
