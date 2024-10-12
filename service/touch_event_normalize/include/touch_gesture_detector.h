@@ -68,6 +68,7 @@ private:
         DIRECTION_RIGHT
     };
 
+    bool IsPhysicalPointer(std::shared_ptr<PointerEvent> event) const;
     void ReleaseData();
     bool IsMatchGesture(int32_t count) const;
     bool IsMatchGesture(GestureMode action, int32_t count) const;
