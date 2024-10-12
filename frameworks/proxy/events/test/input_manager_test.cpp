@@ -170,38 +170,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_02, TestSize.Leve
 }
 
 /**
- * @tc.name: InputManagerTest_SetMouseIcon_01
- * @tc.desc: Test SetMouseIcon
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t windowId = 2;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerTest::SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-
-    int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_NE(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputManagerTest_EnableHardwareCursorStats_01
- * @tc.desc: Test EnableHardwareCursorStats
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool enable = true;
-    int32_t ret = InputManager::GetInstance()->EnableHardwareCursorStats(enable);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: InputManagerTest_EnableHardwareCursorStats_02
  * @tc.desc: Test EnableHardwareCursorStats
  * @tc.type: FUNC

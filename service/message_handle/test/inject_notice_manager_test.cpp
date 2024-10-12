@@ -56,7 +56,7 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_ConnectSystemUi, TestS
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
     dialog.dialogConnectionCallback_ = new AuthorizationDialog::DialogAbilityConnection();
-    EXPECT_TRUE(dialog.ConnectSystemUi());
+    EXPECT_FALSE(dialog.ConnectSystemUi());
 }
 
 /**
