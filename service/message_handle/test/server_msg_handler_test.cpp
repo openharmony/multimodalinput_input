@@ -1168,16 +1168,16 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
 }
 
 /**
