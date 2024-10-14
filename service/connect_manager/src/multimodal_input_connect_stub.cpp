@@ -19,7 +19,9 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "ipc_skeleton.h"
 #include "string_ex.h"
+#include "tokenid_kit.h"
 
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
@@ -42,10 +44,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_AXIS_INFO { 64 };
-constexpr int32_t MIN_ROWS { 1 };
-constexpr int32_t MAX_ROWS { 100 };
-constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
+const std::string SCENEBOARD_NAME { "com.ohos.sceneboard" };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -103,7 +103,6 @@ const int32_t TUPLE_UID { 1 };
 const int32_t TUPLE_NAME { 2 };
 const int32_t DEFAULT_POINTER_COLOR { 0x000000 };
 constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
-
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
 {
@@ -335,10 +334,10 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubGetTouchpadRightClickType(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_ROTATE_SWITCH):
-            ret = StubSetTouchpadRotateSwitch(data, reply);
+            return StubSetTouchpadRotateSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_ROTATE_SWITCH):
-            ret = StubGetTouchpadRotateSwitch(data, reply);
+            return StubGetTouchpadRotateSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_DELAY):
             ret = StubGetKeyboardRepeatDelay(data, reply);
@@ -364,6 +363,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION):
             ret = StubCancelInjection(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
+            ret = StubSetPixelMapData(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN):
             ret = StubHasIrEmitter(data, reply);
             break;
@@ -373,44 +375,26 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT):
             ret = StubTransmitInfrared(data, reply);
             break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
-            ret = StubSetPixelMapData(data, reply);
-            break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOVE_EVENT_FILTERS):
-            ret = StubSetMoveEventFilters(data, reply);
-            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
             ret = StubSetCurrentUser(data, reply);
             break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_HARDWARE_CURSOR_STATS):
-            ret = StubEnableHardwareCursorStats(data, reply);
-            break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
-            ret = StubGetHardwareCursorStats(data, reply);
-            break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TOUCHPAD_SCROLL_ROWS):
-            ret = StubSetTouchpadScrollRows(data, reply);
-            break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_SCROLL_ROWS):
-            ret = StubGetTouchpadScrollRows(data, reply);
-            break;
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT):
-            ret = StubGetPointerSnapshot(data, reply);
-            break;
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
             ret = StubAddVirtualInputDevice(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE):
             ret = StubRemoveVirtualInputDevice(data, reply);
             break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH):
-            ret = StubSetTouchpadThreeFingersTapSwitch(data, reply);
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_HARDWARE_CURSOR_STATS):
+            return StubEnableHardwareCursorStats(data, reply);
             break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH):
-            ret = StubGetTouchpadThreeFingersTapSwitch(data, reply);
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
+            return StubGetHardwareCursorStats(data, reply);
             break;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT):
+            ret = StubGetPointerSnapshot(data, reply);
+            break;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_ANCO
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_ANCO_CHANNEL):
             ret = StubAncoAddChannel(data, reply);
@@ -966,6 +950,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     READINT32(data, pointerStyle.id, RET_ERR);
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
+    if (windowId == -1 && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("can not set global winid, because this is not sys app");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t ret = SetPointerStyle(windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
@@ -1695,17 +1683,8 @@ int32_t MultimodalInputConnectStub::StubEnableCombineKey(MessageParcel& data, Me
 int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    bool enable;
-    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = EnableInputDevice(enable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call EnableInputDevice failed, ret:%{public}d", ret);
-    }
-    return ret;
+    MMI_HILOGW("EnableInputDevice is not supported yet");
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply)
@@ -2358,26 +2337,6 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("StubSetMoveEventFilters Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    bool flag = false;
-    READBOOL(data, flag, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetMoveEventFilters(flag);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call SetMoveEventFilters failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
 int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2387,6 +2346,14 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     }
     int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::string callingTokenName;
+    Security::AccessToken::HapTokenInfo callingTokenInfo;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, callingTokenInfo) != 0) {
+        MMI_HILOGE("GetHapTokenInfo failed");
+        return RET_ERR;
+    }
+    callingTokenName = callingTokenInfo.bundleName;
     int32_t callingUid = GetCallingUid();
     if (callingUid < UID_TRANSFORM_DIVISOR) {
         MMI_HILOGE("CallingUid is not within the range:%{public}d", callingUid);
@@ -2394,6 +2361,10 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     }
     if (callingUid / UID_TRANSFORM_DIVISOR != userId) {
         MMI_HILOGE("Invalid CallingUid:%{public}d", callingUid);
+        return RET_ERR;
+    }
+    if (callingTokenName != SCENEBOARD_NAME) {
+        MMI_HILOGE("Invalid Caller:%{public}s", callingTokenName.c_str());
         return RET_ERR;
     }
     int32_t ret = SetCurrentUser(userId);
@@ -2404,143 +2375,6 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     WRITEINT32(reply, ret);
     return RET_OK;
 }
-
-int32_t MultimodalInputConnectStub::StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("StubSetTouchpadThreeFingersTapSwitch Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-    bool threeFingersTapSwitch = true;
-    READBOOL(data, threeFingersTapSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetTouchpadThreeFingersTapSwitch(threeFingersTapSwitch);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to call StubSetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-    bool switchFlag = true;
-    int32_t ret = GetTouchpadThreeFingersTapSwitch(switchFlag);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to call StubGetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
-    } else {
-        WRITEBOOL(reply, switchFlag);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    bool enable = false;
-    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = EnableHardwareCursorStats(enable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
-        return ret;
-    }
-    MMI_HILOGD("Success enable:%{public}d, pid:%{public}d", enable, GetCallingPid());
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    uint32_t frameCount = 0;
-    uint32_t vsyncCount = 0;
-    int32_t ret = GetHardwareCursorStats(frameCount, vsyncCount);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call GetHardwareCursorStats failed ret:%{public}d", ret);
-        return ret;
-    }
-    MMI_HILOGD("Success frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
-        vsyncCount, GetCallingPid());
-    WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
-    WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectStub::StubSetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-    int32_t rows = TOUCHPAD_SCROLL_ROWS;
-    READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
-    int32_t ret = SetTouchpadScrollRows(newRows);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call SetTouchpadScrollRows failed ret:%{public}d, pid:%{public}d", ret, GetCallingPid());
-    }
-    MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", newRows, GetCallingPid());
-    return ret;
-}
-
-int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-    int32_t rows = TOUCHPAD_SCROLL_ROWS;
-    int32_t ret = GetTouchpadScrollRows(rows);
-    if (rows < MIN_ROWS || rows > MAX_ROWS) {
-        MMI_HILOGD("Invalid touchpad scroll rows:%{public}d, ret:%{public}d", rows, ret);
-        return ret;
-    }
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call GetTouchpadScrollRows failed, ret:%{public}d", ret);
-        return ret;
-    }
-    WRITEINT32(reply, rows, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad scroll rows:%{public}d, ret:%{public}d", rows, ret);
-    return RET_OK;
-}
-
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    std::shared_ptr<Media::PixelMap> pixelMap;
-    int32_t ret = GetPointerSnapshot(&pixelMap);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call GetPointerSnapshot failed ret:%{public}d", ret);
-        return ret;
-    }
-    CHKPR(pixelMap, ERR_INVALID_VALUE);
-    if (pixelMap->GetCapacity() == 0) {
-        MMI_HILOGE("pixelMap is empty, we dont have to pass it to the server");
-        return ERR_INVALID_VALUE;
-    }
-    pixelMap->Marshalling(reply);
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
 {
@@ -2581,6 +2415,62 @@ int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& 
     WRITEINT32(reply, ret);
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool enable = false;
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = EnableHardwareCursorStats(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    uint32_t frameCount = 0;
+    uint32_t vsyncCount = 0;
+    int32_t ret = GetHardwareCursorStats(frameCount, vsyncCount);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetHardwareCursorStats failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap;
+    int32_t ret = GetPointerSnapshot(&pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetPointerSnapshot failed ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(pixelMap, ERR_INVALID_VALUE);
+    if (pixelMap->GetCapacity() == 0) {
+        MMI_HILOGE("pixelMap is empty, we dont have to pass it to the server");
+        return ERR_INVALID_VALUE;
+    }
+    pixelMap->Marshalling(reply);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MultimodalInputConnectStub::StubAncoAddChannel(MessageParcel& data, MessageParcel& reply)

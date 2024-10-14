@@ -132,18 +132,18 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
-    int32_t SetMoveEventFilters(bool flag) override;
+#ifdef OHOS_RSS_CLIENT
+    void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
+#endif // OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
     int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies);
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
-    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
-    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override;
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
@@ -152,8 +152,6 @@ public:
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
-    int32_t SetTouchpadScrollRows(int32_t rows) override;
-    int32_t GetTouchpadScrollRows(int32_t &rows) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -190,7 +188,6 @@ protected:
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
     int32_t ReadTouchpadRightMenuType(int32_t &type);
     int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
-    int32_t ReadTouchpadScrollRows(int32_t &rows);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
@@ -210,14 +207,15 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, bool isNativeInject, bool isShell);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
     bool InitDelegateTasks();
     int32_t Init();
-    void InitPreferences();
 
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
@@ -239,15 +237,18 @@ private:
     ~MMIService();
 private:
     int32_t CheckPidPermission(int32_t pid);
-    void PrintLog(const std::string &flag, int32_t duration);
+    void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
-    bool isCesStart_ { false };
+    std::atomic<bool> isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t shellAssitentPid_ { -1 };
+#endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
-#endif // OHOS_RSS_CLIENT
+#endif
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;

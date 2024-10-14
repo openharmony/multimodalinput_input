@@ -109,6 +109,10 @@ config("libmmi_server_config") {
     ]
   }
 
+  if (input_ext_feature_anco && input_feature_product == "__other") {
+    include_dirs += [ "infrared_emitter/include" ]
+  }
+
   if (input_ext_feature_magiccursor) {
     include_dirs += [
       "${mmi_ext_path}/magic_cursor/include",
@@ -277,7 +281,6 @@ ohos_shared_library("libmmi-server") {
   external_deps += [
     "ability_base:want",
     "ability_base:zuri",
-    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
@@ -290,6 +293,8 @@ ohos_shared_library("libmmi-server") {
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "faultloggerd:libbacktrace_local",
+    "faultloggerd:libdfx_dumpcatcher",
+    "faultloggerd:libjson_stack_formatter",
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",
@@ -321,6 +326,11 @@ ohos_shared_library("libmmi-server") {
 
   part_name = "input"
   subsystem_name = "multimodalinput"
+
+  if (!input_feature_coverage && is_ohos && is_clang &&
+      (target_cpu == "arm" || target_cpu == "arm64") && enhanced_opt) {
+    ldflags = [ "-Wl,-Bsymbolic" ]
+  }
 }
 
 import("//build/test.gni")
