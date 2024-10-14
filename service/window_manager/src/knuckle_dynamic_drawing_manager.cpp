@@ -38,7 +38,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_PENTAGRAM_PATH = "/system/etc/multimodalinput/mouse_icon/";
-const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
+const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Knuckle_Sprite_360.png";
 constexpr int32_t DENSITY_BASELINE { 160 };
 constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
 constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
@@ -85,10 +85,9 @@ std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImage
         .width = DESIRED_SIZE,
         .height = DESIRED_SIZE
     };
- 
+
     decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
     decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
-
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
     CHKPL(pixelMap);
     return pixelMap;
@@ -257,6 +256,7 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
 void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
     pointCounter_++;
     if (pointCounter_ >= POINT_TOTAL_SIZE) {
         MMI_HILOGE("traceControlPoints_ index out of size");
@@ -361,6 +361,8 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     CHKPV(surfaceNode_);
+
+    surfaceNode_->SetSkipLayer(true);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, scaleW_, scaleH_);
@@ -427,9 +429,11 @@ void KnuckleDynamicDrawingManager::DestoryWindow()
     CHKPV(canvas);
     canvas->Clear();
     canvasNode_->FinishRecording();
+    CHKPV(surfaceNode_);
+    surfaceNode_->DetachToDisplay(screenId_);
+    surfaceNode_->RemoveChild(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     canvasNode_.reset();
-    CHKPV(surfaceNode_);
     surfaceNode_.reset();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }

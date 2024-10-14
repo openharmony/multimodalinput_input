@@ -394,9 +394,11 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_SCROLL_ROWS):
             ret = StubGetTouchpadScrollRows(data, reply);
             break;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT):
             ret = StubGetPointerSnapshot(data, reply);
             break;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
             ret = StubAddVirtualInputDevice(data, reply);
             break;
@@ -2516,6 +2518,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& dat
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
@@ -2537,6 +2540,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, 
     pixelMap->Marshalling(reply);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
 {
