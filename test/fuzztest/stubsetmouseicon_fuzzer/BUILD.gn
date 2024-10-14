@@ -87,9 +87,6 @@ ohos_fuzztest("StubSetMouseIconFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    # deps file
-    #    ":StubSetMouseIconFuzzTest",
-  ]
+  deps += []
 }
 ###############################################################################

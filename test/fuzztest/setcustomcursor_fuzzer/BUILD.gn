@@ -87,9 +87,6 @@ ohos_fuzztest("SetCustomCursorFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    # deps file
-    #    ":SetCustomCursorFuzzTest",
-  ]
+  deps += []
 }
 ###############################################################################
