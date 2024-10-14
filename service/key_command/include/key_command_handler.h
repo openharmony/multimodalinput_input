@@ -275,6 +275,8 @@ private:
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+        PointerEvent::PointerItem pointerItem);
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);

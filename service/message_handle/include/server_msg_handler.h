@@ -87,7 +87,7 @@ public:
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell);
     int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
-    int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
+    int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell, bool isStoreWindowId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags,
@@ -125,6 +125,7 @@ private:
     void CalculateOffset(Direction direction, Offset &offset);
     bool CloseInjectNotice(int32_t pid);
     int32_t OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info);
+    bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
