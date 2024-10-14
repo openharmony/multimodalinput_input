@@ -3225,7 +3225,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
-        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
+        auto windowXY = TransformWindowXY(*touchWindow, physicalX, physicalY);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
