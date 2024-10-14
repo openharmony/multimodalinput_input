@@ -6793,5 +6793,54 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel_
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(10, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointerCancel(displayId));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnGestureSendEvent
+ * @tc.desc: Test the funcation OnGestureSendEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnGestureSendEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    item.SetPressed(true);
+    item.SetPointerId(100);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.OnGestureSendEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateWindowsInfoPerDisplay
+ * @tc.desc: Test the funcation UpdateWindowsInfoPerDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowsInfoPerDisplay, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayGroupInfo displayGroupInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    int32_t displayId = 100;
+    winInfo.displayId = 100;
+    winInfo.id = 200;
+    winInfo.windowType = -1;
+    displayGroupInfo.focusWindowId = 300;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, winGroupInfo));
+    inputWindowsManager.isSendGestureDown_ = true;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateWindowsInfoPerDisplay(displayGroupInfo));
+
+    winInfo.windowType = static_cast<int32_t>(Rosen::WindowType::WINDOW_TYPE_TRANSPARENT_VIEW);
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateWindowsInfoPerDisplay(displayGroupInfo));
+}
 } // namespace MMI
 } // namespace OHOS
