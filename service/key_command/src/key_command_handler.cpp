@@ -610,6 +610,20 @@ bool KeyCommandHandler::IsValidAction(int32_t action)
     return false;
 }
 
+std::pair<int32_t, int32_t> KeyCommandHandler::CalcDrawCoordinate(const DisplayInfo& displayInfo,
+    PointerEvent::PointerItem pointerItem)
+{
+    CALL_DEBUG_ENTER;
+    double physicalX = pointerItem.GetRawDisplayX();
+    double physicalY = pointerItem.GetRawDisplayY();
+    if (!displayInfo.transform.empty()) {
+        auto displayXY = WIN_MGR->TransformDisplayXY(displayInfo, physicalX, physicalY);
+        physicalX = displayXY.first;
+        physicalY = displayXY.second;
+    }
+    return {static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY)};
+}
+
 void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -619,8 +633,11 @@ void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEve
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
 
-    gestureLastX_ = item.GetDisplayX();
-    gestureLastY_ = item.GetDisplayY();
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
+    CHKPV(displayInfo);
+    auto displayXY = CalcDrawCoordinate(*displayInfo, item);
+    gestureLastX_ = displayXY.first;
+    gestureLastY_ = displayXY.second;
 
     gesturePoints_.emplace_back(gestureLastX_);
     gesturePoints_.emplace_back(gestureLastY_);
@@ -633,8 +650,11 @@ void KeyCommandHandler::HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEve
     CHKPV(touchEvent);
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
-    float eventX = item.GetDisplayX();
-    float eventY = item.GetDisplayY();
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
+    CHKPV(displayInfo);
+    auto displayXY = CalcDrawCoordinate(*displayInfo, item);
+    float eventX = displayXY.first;
+    float eventY = displayXY.second;
     float dx = std::abs(eventX - gestureLastX_);
     float dy = std::abs(eventY - gestureLastY_);
     if (dx >= MOVE_TOLERANCE || dy >= MOVE_TOLERANCE) {
