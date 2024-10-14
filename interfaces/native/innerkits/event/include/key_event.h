@@ -3384,6 +3384,10 @@ public:
      */
     void SetRepeat(bool repeat);
 
+    bool IsRepeatKey() const;
+
+    void SetRepeatKey(bool repeatKey);
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.
@@ -3448,6 +3452,7 @@ private:
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     bool repeat_ { false };
+    bool repeatKey_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

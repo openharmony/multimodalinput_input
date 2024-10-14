@@ -952,7 +952,8 @@ KeyEvent::KeyEvent(const KeyEvent& other)
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
       enhanceData_(other.enhanceData_),
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-      repeat_(other.repeat_) {}
+      repeat_(other.repeat_),
+      repeatKey_(other.repeatKey_) {}
 
 KeyEvent::~KeyEvent() {}
 
@@ -973,6 +974,7 @@ void KeyEvent::Reset()
     capsLock_ = false;
     scrollLock_ = false;
     repeat_ = false;
+    repeatKey_ = false;
     keys_.clear();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     enhanceData_.clear();
@@ -1220,6 +1222,7 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     WRITEBOOL(out, capsLock_);
     WRITEBOOL(out, scrollLock_);
     WRITEBOOL(out, repeat_);
+    WRITEBOOL(out, repeatKey_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
     for (uint32_t i = 0; i < enhanceData_.size(); i++) {
@@ -1252,6 +1255,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     READBOOL(in, capsLock_);
     READBOOL(in, scrollLock_);
     READBOOL(in, repeat_);
+    READBOOL(in, repeatKey_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
         return false;
@@ -1358,6 +1362,16 @@ bool KeyEvent::IsRepeat() const
 void KeyEvent::SetRepeat(bool repeat)
 {
     repeat_ = repeat;
+}
+
+bool KeyEvent::IsRepeatKey() const
+{
+    return repeatKey_;
+}
+
+void KeyEvent::SetRepeatKey(bool repeatKey)
+{
+    repeatKey_ = repeatKey;
 }
 
 std::string_view KeyEvent::ActionToShortStr(int32_t action)
