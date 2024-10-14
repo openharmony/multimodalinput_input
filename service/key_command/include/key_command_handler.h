@@ -34,6 +34,7 @@
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
