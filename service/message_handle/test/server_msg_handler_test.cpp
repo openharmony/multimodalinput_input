@@ -843,22 +843,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_002, Test
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_004
- * @tc.desc: Test the function SaveTargetWindowId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, false);
-    EXPECT_EQ(ret, RET_OK);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_003
  * @tc.desc: Test the function SaveTargetWindowId
  * @tc.type: FUNC
@@ -895,7 +879,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_004, Test
     ServerMsgHandler handler;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, false);
     EXPECT_EQ(ret, RET_OK);
 }
 
