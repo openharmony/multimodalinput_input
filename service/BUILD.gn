@@ -1173,8 +1173,10 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager/test/mock.cpp",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/service:libmmi-server" ]
+  deps = [
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service:libmmi-server"
+  ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
