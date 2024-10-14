@@ -3395,5 +3395,35 @@ HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_003, TestSize.Level1)
     ASSERT_TRUE(ret == ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
+
+/**
+@tc.name: InputManagerTest_SubscribeHotkey_001
+@tc.desc: Test the funcation SubscribeHotkey
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeHotkey_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+std::set<int32_t> preKeys;
+std::shared_ptr keyOption =
+    InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_POWER, true, 0);
+int32_t response = INVAID_VALUE;
+response = InputManager::GetInstance()->SubscribeHotkey(keyOption, nullptr);
+EXPECT_TRUE(response < 0);
+}
+
+/**
+@tc.name: InputManagerTest_UnsubscribeHotkey_001
+@tc.desc: Test the funcation UnsubscribeHotkey
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeHotkey_001, TestSize.Level1)
+{
+CALL_TEST_DEBUG;
+int32_t subscriberId = 1;
+ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeHotkey(subscriberId));
+}
 } // namespace MMI
 } // namespace OHOS
