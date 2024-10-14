@@ -503,6 +503,7 @@ bool InputHandlerManager::CheckInputDeviceSource(
 void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
 {
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t consumerCount = 0;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
