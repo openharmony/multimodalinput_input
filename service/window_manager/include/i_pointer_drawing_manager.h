@@ -24,6 +24,7 @@
 #include "pointer_style.h"
 #include "window_info.h"
 #include "struct_multimodal.h"
+#include "delegate_interface.h"
 
 namespace OHOS {
 namespace MMI {
@@ -73,7 +74,7 @@ public:
     {
         return 0;
     }
-    virtual void DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate = false) {}
+    virtual void DrawPointerStyle(const PointerStyle& pointerStyle) {}
     virtual bool IsPointerVisible()
     {
         return false;
@@ -108,10 +109,6 @@ public:
     {
         return {};
     }
-    virtual IconStyle GetIconStyle(const MOUSE_ICON mouseStyle)
-    {
-        return {};
-    }
     virtual std::map<MOUSE_ICON, IconStyle> GetMouseIconPath()
     {
         return {};
@@ -122,7 +119,8 @@ public:
     }
     virtual void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) {}
-    virtual void InitPointerCallback() {}
+    virtual void ForceClearPointerVisiableStatus() {}
+    virtual void InitPointerCallback() {};
     virtual int32_t EnableHardwareCursorStats(int32_t pid, bool enable)
     {
         return 0;
@@ -131,17 +129,20 @@ public:
     {
         return 0;
     }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual int32_t GetPointerSnapshot(void *pixelMapPtr)
     {
         return 0;
     }
-    virtual void ForceClearPointerVisiableStatus();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual void InitPointerObserver() {}
     virtual void OnSessionLost(int32_t pid) {}
     virtual int32_t SkipPointerLayer(bool isSkip)
     {
         return 0;
     }
+    virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
+    virtual void DestroyPointerWindow() {}
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

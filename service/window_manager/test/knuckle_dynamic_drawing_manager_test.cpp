@@ -472,6 +472,26 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
 }
 
 /**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_DestoryWindow_002
+ * @tc.desc: Test DestoryWindow
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDynamicDrawingMgr->canvasNode_ = nullptr;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    knuckleDynamicDrawingMgr->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(knuckleDynamicDrawingMgr->surfaceNode_, nullptr);
+    knuckleDynamicDrawingMgr->canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(knuckleDynamicDrawingMgr->canvasNode_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->DestoryWindow());
+}
+
+/**
  * @tc.name: KnuckleDynamicDrawingManagerTest_IsSingleKnuckle_001
  * @tc.desc: Test Overrides IsSingleKnuckle function branches
  * @tc.type: Function
@@ -570,6 +590,27 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Chec
     EXPECT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     EXPECT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_ProcessUpAndCancelEvent
+ * @tc.desc: Test Overrides ProcessUpAndCancelEvent function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_ProcessUpAndCancelEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    auto pixelMap = DecodeImageToPixelMap(imagePath);
+    knuckleDynamicDrawMgr.glowTraceSystem_ = std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE,
+        pixelMap, MAX_DIVERGENCE_NUM);
+    pointerEvent->SetPointerId(10);
+    pointerEvent->SetActionTime(1000);
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessUpAndCancelEvent(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS

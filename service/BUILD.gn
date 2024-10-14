@@ -786,6 +786,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager/test",
     "${mmi_path}/libudev/include",
     "${mmi_path}/test/facility/libinput_interface/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
   configs = [
@@ -852,6 +853,10 @@ ohos_unittest("InputWindowsManagerEXTest") {
 
   if (call_manager_service_enabled) {
     external_deps += [ "call_manager:tel_call_manager_api" ]
+  }
+
+  if (resource_schedule_service_enabled) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
   }
 
   if (enable_player_framework) {

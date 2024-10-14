@@ -2673,6 +2673,7 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_INFO_TRACE;
@@ -2686,6 +2687,7 @@ int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
 {
