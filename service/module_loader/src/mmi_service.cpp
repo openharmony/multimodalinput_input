@@ -1385,7 +1385,6 @@ int32_t MMIService::ObserverAddInputHandler(int32_t pid)
     }
     return RET_OK;
 }
-}
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
