@@ -90,7 +90,10 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void UpdatePointerChangeAreas() override {}
 #endif // OHOS_BUILD_ENABLE_POINTER
-
+    void SetWindowStateNotifyPid(int32_t pid) override {}
+    int32_t GetWindowStateNotifyPid() override { return 0; }
+    int32_t GetPidByWindowId(int32_t pid) override { return 0; }
+    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
 
     void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}

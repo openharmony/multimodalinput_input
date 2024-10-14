@@ -250,6 +250,24 @@ const std::vector<WindowInfo> &InputWindowsManager::GetWindowGroupInfoByDisplayI
     return iter->second.windowsInfo;
 }
 
+bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+        if (iter != touchItemDownInfos_.end()) {
+            return iter->second.flag;
+        }
+        return true;
+    } else if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        if (mouseDownInfo_.pid != -1) {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -3779,6 +3797,28 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
         vecWhiteList_.push_back(switchFocusKey);
     }
     return true;
+}
+
+void InputWindowsManager::SetWindowStateNotifyPid(int32_t pid)
+{
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        windowStateNotifyPid_ = pid;
+    }
+}
+
+int32_t InputWindowsManager::GetWindowStateNotifyPid()
+{
+    return windowStateNotifyPid_;
+}
+
+int32_t InputWindowsManager::GetPidByWindowId(int32_t id)
+{
+    for (auto item : displayGroupInfo_.windowsInfo) {
+        if (item.id== id) {
+            return item.pid;
+        }
+    }
+    return RET_ERR;
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

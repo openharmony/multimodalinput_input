@@ -16,6 +16,7 @@
 #include "server_msg_handler.h"
 
 #include <cinttypes>
+#include "ipc_skeleton.h"
 
 #include "ability_manager_client.h"
 #include "anr_manager.h"
@@ -74,6 +75,8 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
             return this->OnWindowAreaInfo(sess, pkt); }},
         {MmiMessageId::WINDOW_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnWindowGroupInfo(sess, pkt); }},
+        {MmiMessageId::WINDOW_STATE_ERROR_CALLBACK, [this] (SessionPtr sess, NetPacket &pkt) {
+            return this->RegisterWindowStateErrorCallback(sess, pkt); }},
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         {MmiMessageId::SCINFO_CONFIG, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnEnhanceConfig(sess, pkt); }},
@@ -571,6 +574,15 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         }
     }
     WIN_MGR->UpdateWindowInfo(windowGroupInfo);
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = sess->GetPid();
+    WIN_MGR->SetWindowStateNotifyPid(pid);
+    MMI_HILOGI("pid:%{public}d", pid);
     return RET_OK;
 }
 
