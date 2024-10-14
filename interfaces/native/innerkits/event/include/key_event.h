@@ -3384,8 +3384,19 @@ public:
      */
     void SetRepeat(bool repeat);
 
+    /**
+     * @brief Gets the real-time operation keystroke repeat status.
+     * @return bool
+     * @since 13
+     */
     bool IsRepeatKey() const;
 
+    /**
+     * @brief Sets the injection key to repeat practical real-time operation.
+     * @param repeat Key injection automatic repeat identification.
+     * @return void
+     * @since 13
+     */
     void SetRepeatKey(bool repeatKey);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
