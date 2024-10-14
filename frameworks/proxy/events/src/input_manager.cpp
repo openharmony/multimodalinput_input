@@ -591,6 +591,11 @@ int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer
     return InputMgrImpl.AncoRemoveChannel(consumer);
 }
 
+int32_t InputManager::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
+{
+    return InputMgrImpl.RegisterWindowStateErrorCallback(callback);
+}
+
 int32_t InputManager::SkipPointerLayer(bool isSkip)
 {
     return InputMgrImpl.SkipPointerLayer(isSkip);
