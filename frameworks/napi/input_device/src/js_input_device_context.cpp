@@ -35,6 +35,13 @@ constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
 constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
 constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
+#ifdef OHOS_BUILD_ENABLE_HOPPER
+constexpr uint32_t SET_VK_AREA_NUMBER_PARAMETERS { 4 };
+#endif // OHOS_BUILD_ENABLE_HOPPER
+enum class VKResult : int32_t {
+    FAILED = 0,
+    SUCCEED = 1,
+};
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -652,6 +659,58 @@ napi_value JsInputDeviceContext::GetIntervalSinceLastInput(napi_env env, napi_ca
     return jsInputDeviceMgr->GetIntervalSinceLastInput(env);
 }
 
+napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+#ifdef OHOS_BUILD_ENABLE_HOPPER
+    bool isSuccess = true;
+    size_t argc = SET_VK_AREA_NUMBER_PARAMETERS;
+    napi_value argv[SET_VK_AREA_NUMBER_PARAMETERS] = { nullptr };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc != SET_VK_AREA_NUMBER_PARAMETERS) {
+        MMI_HILOGE("SetVKeyboardArea parameter number error");
+        result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+        return result;
+    }
+    double topLeftX = 0;
+    if (!JsUtil::ParseDouble(env, argv[0], topLeftX)) {
+        MMI_HILOGE("ParseDouble failed. property name: topLeftX");
+        isSuccess = false;
+    }
+    double topLeftY = 0;
+    if (!JsUtil::ParseDouble(env, argv[1], topLeftY)) {
+        MMI_HILOGE("ParseDouble failed. property name: topLeftX");
+        isSuccess = false;
+    }
+    double bottomRightX = 0;
+    if (!JsUtil::ParseDouble(env, argv[2], bottomRightX)) {
+        MMI_HILOGE("ParseDouble failed. property name: bottomRightX");
+        isSuccess = false;
+    }
+    double bottomRightY = 0;
+    if (!JsUtil::ParseDouble(env, argv[3], bottomRightY)) {
+        MMI_HILOGE("ParseDouble failed. property name: bottomRightY");
+        isSuccess = false;
+    }
+    if (isSuccess) {
+        int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+        if (ret == RET_OK) {
+            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
+        } else {
+            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+            MMI_HILOGE("SetVKeyboardArea failed with ret: %{public}d", (int)ret);
+        }
+    } else {
+        result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+    }
+#else
+    result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+    THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "SetVKeyboardArea", "Not support");
+#endif
+    return result;
+}
+
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -693,6 +752,21 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
     return exports;
 }
 
+napi_value JsInputDeviceContext::CreateEnumVKResult(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("FAILED", JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("SUCCEED", JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED))),
+    };
+
+    napi_value result = nullptr;
+    CHKRP(napi_define_class(env, "VKResult", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "VKResult", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -714,9 +788,11 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatDelay", GetKeyboardRepeatDelay),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatRate", GetKeyboardRepeatRate),
         DECLARE_NAPI_STATIC_FUNCTION("getIntervalSinceLastInput", GetIntervalSinceLastInput),
+        DECLARE_NAPI_STATIC_FUNCTION("setVKeyboardArea", SetVKeyboardArea),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     CHKPP(CreateEnumKeyboardType(env, exports));
+    CHKPP(CreateEnumVKResult(env, exports));
     return exports;
 }
 } // namespace MMI

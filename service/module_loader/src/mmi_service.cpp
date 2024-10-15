@@ -2780,6 +2780,20 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_HOPPER
+int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
+{
+    GaussianKeyboard::SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+
+    // Init the shared key event used by later key injection module and set common fields.
+    sharedKeyEvent = KeyEvent::Create();
+    CHKPR(sharedKeyEvent, ERROR_NULL_POINTER);
+    sharedKeyEvent->SetId(1234);
+    sharedKeyEvent->SetDeviceId(99);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_HOPPER
+
 int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 {
     hasIrEmitter = false;
