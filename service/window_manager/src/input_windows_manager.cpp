@@ -4215,6 +4215,7 @@ int32_t InputWindowsManager::GetPidByWindowId(int32_t id)
     }
     return RET_ERR;
 }
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InputWindowsManager::IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems)
 {
