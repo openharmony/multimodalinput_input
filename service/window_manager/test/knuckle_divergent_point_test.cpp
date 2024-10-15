@@ -173,6 +173,23 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_002, TestSize
 }
 
 /**
+ * @tc.name: KnuckleDivergentPointTest_Draw_003
+ * @tc.desc: Test Draw
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDivergentPoint->lifespan_ = 1;
+    knuckleDivergentPoint->pointX_ = 1;
+    knuckleDivergentPoint->pointY_ = 1;
+    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
+    auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
+    ASSERT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(canvas));
+}
+
+/**
  * @tc.name: KnuckleDivergentPointTest_Reset_001
  * @tc.desc: Test Reset
  * @tc.type: Function

@@ -26,14 +26,13 @@
 #include "mmi_log.h"
 #include "table_dump.h"
 
-#undef MMI_LOG_DOMAIN
-#define MMI_LOG_DOMAIN MMI_LOG_CURSOR
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchDrawingManager"
 
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr const OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchDrawingManager" };
 const static Rosen::Drawing::Color LABELS_DEFAULT_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(192, 255, 255, 255);
 const static Rosen::Drawing::Color LABELS_RED_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(192, 255, 0, 0);
 const static Rosen::Drawing::Color TRACKER_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 96, 255);
@@ -360,6 +359,7 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     } else {
         canvasNode->SetRotation(0);
     }
+
 #ifndef USE_ROSEN_DRAWING
     canvasNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -440,8 +440,6 @@ void TouchDrawingManager::CreateTouchWindow()
     uint64_t screenId = static_cast<uint64_t>(displayInfo_.id);
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId = FOLD_SCREEN_MAIN_ID;
-    } else if (displayInfo_.displayMode == DisplayMode::FULL) {
-        screenId = FOLD_SCREEN_FULL_ID;
     }
     surfaceNode_->AttachToDisplay(screenId);
     MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId, surfaceNode_->GetId());
@@ -604,9 +602,9 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
         return;
     }
     CHKPV(trackerCanvasNode_);
-    BytraceAdapter::StartHandleTracker(pointerId);
     auto canvas = static_cast<RosenCanvas *>(trackerCanvasNode_->BeginRecording(scaleW_, scaleH_));
     CHKPV(canvas);
+    BytraceAdapter::StartHandleTracker(pointerId);
     Rosen::Drawing::Pen pen;
     if (find) {
         pen.SetColor(TRACKER_COLOR);
@@ -780,6 +778,8 @@ void TouchDrawingManager::DestoryTouchWindow()
     if (bubbleMode_.isShow || pointerMode_.isShow) {
         return;
     }
+    MMI_HILOGI("Destory touch window success, bubbleMode:%{public}d, pointerMode:%{public}d",
+        bubbleMode_.isShow, pointerMode_.isShow);
     CHKPV(surfaceNode_);
     surfaceNode_->ClearChildren();
     surfaceNode_.reset();
@@ -823,10 +823,10 @@ void TouchDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
     CALL_DEBUG_ENTER;
     std::ostringstream oss;
     auto titles1 = std::make_tuple("currentPointerId", "maxPointerCount", "currentPointerCount",
-                                   "lastActionTime", "xVelocity", "yVelocity");
+        "lastActionTime", "xVelocity", "yVelocity");
 
     auto data1 = std::vector{std::make_tuple(currentPointerId_, maxPointerCount_, currentPointerCount_,
-                                             lastActionTime_, xVelocity_, yVelocity_)};
+        lastActionTime_, xVelocity_, yVelocity_)};
     DumpFullTable(oss, "Touch Location Info", titles1, data1);
     oss << std::endl;
 
