@@ -22,6 +22,7 @@
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi.h"
+#include "util_napi_error.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsUtil"
@@ -217,6 +218,93 @@ void JsUtil::DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback)
         CHKRV(napi_delete_reference(callback->env, callback->ref), DELETE_REFERENCE);
         callback->env = nullptr;
     }
+}
+
+bool JsUtil::CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type)
+{
+    napi_valuetype valuetype = napi_undefined;
+    napi_typeof(env, value, &valuetype);
+    return valuetype == type;
+}
+
+bool JsUtil::ParseDouble(const napi_env& env, const napi_value& value, double& result)
+{
+    if (!CheckType(env, value, napi_number)) {
+        MMI_HILOGE("ParseDouble type not number");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "parameter", "Number");
+        return false;
+    }
+    if (napi_get_value_double(env, value, &result) != napi_ok) {
+        MMI_HILOGE("ParseDouble cannot get value double");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "parameter", "double");
+        return false;
+    }
+    return true;
+}
+
+bool JsUtil::IsArray(const napi_env& env, const napi_value& value)
+{
+    bool isArray = false;
+    if (napi_is_array(env, value, &isArray) != napi_ok) {
+        MMI_HILOGE("napi_is_array failed");
+        return false;
+    }
+    return isArray;
+}
+
+bool JsUtil::ParseInt32(const napi_env& env, const napi_value& value, int32_t& result)
+{
+    if (!CheckType(env, value, napi_number)) {
+        MMI_HILOGE("ParseInt32 type not number");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element", "number");
+        return false;
+    }
+    if (napi_get_value_int32(env, value, &result) != napi_ok) {
+        MMI_HILOGE("ParseInt32 cannot get value int32");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element", "int32");
+        return false;
+    }
+    return true;
+}
+
+bool JsUtil::ParseString(const napi_env& env, const napi_value& value, char* result)
+{
+    if (!CheckType(env, value, napi_string)) {
+        MMI_HILOGE("ParseString type not string");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element", "string");
+        return false;
+    }
+
+    size_t len = 0;
+    if (napi_get_value_string_utf8(env, value, result, MAX_STRING_LEN - 1, &len) != napi_ok) {
+        MMI_HILOGE("ParseString cannot get value string");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element", "char[]");
+        return false;
+    }
+    return true;
+}
+
+bool JsUtil::ParseBool(const napi_env& env, const napi_value& value, bool& result)
+{
+    if (!CheckType(env, value, napi_boolean)) {
+        MMI_HILOGE("ParseBool type not boolean");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element", "boolean");
+        return false;
+    }
+    if (napi_get_value_bool(env, value, &result) != napi_ok) {
+        MMI_HILOGE("ParseBool cannot get value bool");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element", "bool");
+        return false;
+    }
+    return true;
+}
+
+napi_value JsUtil::GetNapiInt32(napi_env env, int32_t code)
+{
+    CALL_DEBUG_ENTER;
+    napi_value ret = nullptr;
+    CHKRP(napi_create_int32(env, code, &ret), CREATE_INT32);
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS
