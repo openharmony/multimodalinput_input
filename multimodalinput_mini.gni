@@ -53,6 +53,7 @@ declare_args() {
   input_shortcut_key_manager_enabled = true
   input_shortcut_key_rules_enabled = true
   input_new_knuckle_dynamic_enabled = false
+  input_feature_hopper = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -427,4 +428,8 @@ if (defined(global_parts_info) &&
     defined(global_parts_info.hiviewdfx_hitrace)) {
   hitrace_enabled = true
   input_default_defines += [ "HITRACE_ENABLED" ]
+}
+
+if (input_feature_hopper) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_HOPPER" ]
 }
