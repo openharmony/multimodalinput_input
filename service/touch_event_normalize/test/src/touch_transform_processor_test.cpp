@@ -122,6 +122,8 @@ HWTEST_F(TouchTransformProcessorTest, UpdatePointerItemProperties_001, TestSize.
     ASSERT_EQ(item.GetDisplayY(), touchInfo.point.y);
     ASSERT_EQ(item.GetDisplayXPos(), touchInfo.point.x);
     ASSERT_EQ(item.GetDisplayYPos(), touchInfo.point.y);
+    ASSERT_EQ(item.GetRawDisplayX(), touchInfo.point.x);
+    ASSERT_EQ(item.GetRawDisplayY(), touchInfo.point.y);
     ASSERT_EQ(item.GetToolDisplayX(), touchInfo.toolRect.point.x);
     ASSERT_EQ(item.GetToolDisplayY(), touchInfo.toolRect.point.y);
     ASSERT_EQ(item.GetToolWidth(), touchInfo.toolRect.width);
