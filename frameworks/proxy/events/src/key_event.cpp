@@ -1027,6 +1027,11 @@ void KeyEvent::AddKeyItem(const KeyItem& keyItem)
     keys_.push_back(keyItem);
 }
 
+void KeyEvent::SetKeyItem(std::vector<KeyItem> keyItem)
+{
+    keys_ = keyItem;
+}
+
 std::vector<KeyEvent::KeyItem> KeyEvent::GetKeyItems() const
 {
     return keys_;
