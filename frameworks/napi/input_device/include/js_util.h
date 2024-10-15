@@ -76,6 +76,13 @@ public:
             ptr = nullptr;
         }
     }
+    static bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type);
+    static bool ParseDouble(const napi_env& env, const napi_value& value, double& result);
+    static bool IsArray(const napi_env& env, const napi_value& value);
+    static bool ParseInt32(const napi_env& env, const napi_value& value, int32_t& result);
+    static bool ParseString(const napi_env& env, const napi_value& value, char* result);
+    static bool ParseBool(const napi_env& env, const napi_value& value, bool& result);
+    static napi_value GetNapiInt32(napi_env env, int32_t code);
 };
 } // namespace MMI
 } // namespace OHOS
