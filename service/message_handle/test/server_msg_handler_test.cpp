@@ -847,7 +847,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_001, Test
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -872,7 +872,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_002, Test
     pointerEvent->SetPointerId(0);
     DisplayInfo displayInfo;
     displayInfo.id = 1;
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -897,7 +897,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_003, Test
     pointerEvent->SetPointerId(0);
     DisplayInfo displayInfo;
     displayInfo.id = 1;
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -913,7 +913,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_004, Test
     ServerMsgHandler handler;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, false);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
     EXPECT_EQ(ret, RET_OK);
 }
 
