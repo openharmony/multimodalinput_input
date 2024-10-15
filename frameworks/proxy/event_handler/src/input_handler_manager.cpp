@@ -623,6 +623,7 @@ template<typename T>
 bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
     CALL_INFO_TRACE;
+    std::unique_lock<std::mutex> lock(mtxHandlers_);
     CHKPF(lastPointerEvent_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
@@ -637,8 +638,10 @@ bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
             item.SetPressed(false);
             lastPointerEvent_->UpdatePointerItem(pointerId, item);
             lastPointerEvent_->SetPointerAction(pointerActionEvent);
+            auto copiedPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+            lock.unlock();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-            OnInputEvent(lastPointerEvent_, DEVICE_TAGS);
+            OnInputEvent(copiedPointerEvent, DEVICE_TAGS);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
             return true;
         }
