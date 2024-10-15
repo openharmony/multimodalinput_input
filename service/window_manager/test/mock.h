@@ -51,6 +51,8 @@ public:
     virtual bool GetBoolValue(const std::string &key, bool defaultValue) = 0;
     virtual bool SendMsg(NetPacket &pkt) = 0;
     virtual bool IsSceneBoardEnabled() = 0;
+    virtual bool IsWindowRotation() = 0;
+    virtual int32_t GetDisplayId() = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -65,6 +67,8 @@ public:
     MOCK_METHOD2(GetBoolValue, bool(const std::string &key, bool defaultValue));
     MOCK_METHOD1(SendMsg, bool(NetPacket &pkt));
     MOCK_METHOD0(IsSceneBoardEnabled, bool());
+    MOCK_METHOD0(IsWindowRotation, bool());
+    MOCK_METHOD0(GetDisplayId, int32_t());
 };
 } // namespace MMI
 } // namespace OHOS

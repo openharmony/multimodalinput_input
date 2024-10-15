@@ -259,6 +259,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
 
     CHKPV(surfaceNode_);
+    surfaceNode_->SetSkipLayer(true);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, scaleW_, scaleH_);
@@ -388,9 +389,11 @@ int32_t KnuckleDrawingManager::DestoryWindow()
     CHKPR(canvas, RET_ERR);
     canvas->Clear();
     canvasNode_->FinishRecording();
+    CHKPR(surfaceNode_, RET_ERR);
+    surfaceNode_->DetachToDisplay(screenId_);
+    surfaceNode_->RemoveChild(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     canvasNode_.reset();
-    CHKPR(surfaceNode_, RET_ERR);
     surfaceNode_.reset();
     Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
@@ -402,7 +405,6 @@ void KnuckleDrawingManager::CreateObserver()
     if (!hasScreenReadObserver_) {
         screenReadState_.switchName = SCREEN_READING;
         CreateScreenReadObserver(screenReadState_);
-        hasScreenReadObserver_ = true;
     }
     MMI_HILOGD("screenReadState_.state: %{public}s", screenReadState_.state.c_str());
 }
@@ -427,7 +429,9 @@ void KnuckleDrawingManager::CreateScreenReadObserver(T &item)
     if (ret != ERR_OK) {
         MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
+        return;
     }
+    hasScreenReadObserver_ = true;
 }
 
 std::string KnuckleDrawingManager::GetScreenReadState()

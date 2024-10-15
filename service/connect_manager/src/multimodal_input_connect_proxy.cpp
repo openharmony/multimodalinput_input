@@ -2230,6 +2230,7 @@ int32_t MultimodalInputConnectProxy::GetTouchpadThreeFingersTapSwitch(bool &swit
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t MultimodalInputConnectProxy::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
@@ -2253,6 +2254,7 @@ int32_t MultimodalInputConnectProxy::GetPointerSnapshot(void *pixelMapPtr)
     CHKPR(*newPixelMapPtr, RET_ERR);
     return ret;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MultimodalInputConnectProxy::AncoAddChannel(sptr<IAncoChannel> channel)

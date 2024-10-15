@@ -32,8 +32,10 @@ namespace {
 using namespace testing::ext;
 using namespace testing;
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
 constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
@@ -367,6 +369,7 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_OnRemo
     EXPECT_NO_FATAL_FAILURE(recipient.OnRemoteDied(remoteObjectWptr));
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: MultimodalInputConnectProxyTest_GetPointerSnapshot
  * @tc.desc: Test the function GetPointerSnapshot
@@ -382,5 +385,6 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPoi
     std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
     EXPECT_EQ(proxy.GetPointerSnapshot((void *)pixelMapPtr.get()), ERR_INVALID_VALUE);
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // namespace MMI
 } // namespace OHOS
