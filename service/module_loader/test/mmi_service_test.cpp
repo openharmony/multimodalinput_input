@@ -20,7 +20,6 @@
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "mmi_service.h"
-#include "udp_wrap.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIServerTest"

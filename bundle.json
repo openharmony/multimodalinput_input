@@ -98,7 +98,6 @@
         "qos_manager"
       ],
       "third_party": [
-        "node",
         "libuv",
         "libevdev",
         "mtdev",
