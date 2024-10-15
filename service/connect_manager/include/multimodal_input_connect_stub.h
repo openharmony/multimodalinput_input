@@ -126,8 +126,6 @@ protected:
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
@@ -135,8 +133,6 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t StubSetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t StubAncoAddChannel(MessageParcel& data, MessageParcel& reply);
     int32_t StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply);

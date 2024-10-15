@@ -36,6 +36,7 @@ namespace {
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t DRIVER_NUMBER { 8 };
+constexpr uint32_t TOUCH_CANCEL_MASK { 1U << 29U };
 } // namespace
 
 TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
@@ -69,6 +70,11 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     PointerEvent::PointerItem item;
     double pressure = libinput_event_touch_get_pressure(touch);
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+    // we clean up pointerItem's cancel mark at down stage to ensure newer event
+    // always starts with a clean and inital state
+    if (pointerItemCancelMarks_.find(seatSlot) != pointerItemCancelMarks_.end()) {
+        pointerItemCancelMarks_.erase(seatSlot);
+    }
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
     item.SetPressure(pressure);
@@ -107,8 +113,8 @@ void TouchTransformProcessor::UpdatePointerItemProperties(PointerEvent::PointerI
 }
 
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-__attribute__((no_sanitize("cfi")))
-void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem, int32_t &toolType)
+void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem,
+    int32_t &toolType)__attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     TransformTouchProperties(rawTouch_, pointerItem);
@@ -158,6 +164,9 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     }
     double pressure = libinput_event_touch_get_pressure(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
+    if (static_cast<uint32_t>(longAxis) & TOUCH_CANCEL_MASK) {
+        pointerItemCancelMarks_.emplace(seatSlot, true);
+    }
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
@@ -177,8 +186,8 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     return true;
 }
-__attribute__((no_sanitize("cfi")))
-bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
+
+bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
@@ -186,9 +195,15 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
     CHKPF(touch);
     uint64_t time = libinput_event_touch_get_time_usec(touch);
     pointerEvent_->SetActionTime(time);
-    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    PointerEvent::PointerItem item;
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+    if (pointerItemCancelMarks_.find(seatSlot) != pointerItemCancelMarks_.end()) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        pointerItemCancelMarks_.erase(seatSlot);
+    } else {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    }
+    
+    PointerEvent::PointerItem item;
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
@@ -246,6 +261,7 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
+    pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_GENERATE_FROM_REAL);
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);

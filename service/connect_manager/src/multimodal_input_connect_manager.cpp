@@ -771,25 +771,18 @@ int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
     return multimodalInputConnectService_->SetCurrentUser(userId);
 }
 
-int32_t MultimodalInputConnectManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+int32_t MultimodalInputConnectManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetTouchpadThreeFingersTapSwitch(switchFlag);
+    return multimodalInputConnectService_->AddVirtualInputDevice(device, deviceId);
 }
 
-int32_t MultimodalInputConnectManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+int32_t MultimodalInputConnectManager::RemoveVirtualInputDevice(int32_t deviceId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->GetTouchpadThreeFingersTapSwitch(switchFlag);
-}
-
-int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetMoveEventFilters(flag);
+    return multimodalInputConnectService_->RemoveVirtualInputDevice(deviceId);
 }
 
 int32_t MultimodalInputConnectManager::EnableHardwareCursorStats(bool enable)
@@ -812,32 +805,6 @@ int32_t MultimodalInputConnectManager::GetPointerSnapshot(void *pixelMapPtr)
     return multimodalInputConnectService_->GetPointerSnapshot(pixelMapPtr);
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-
-int32_t MultimodalInputConnectManager::SetTouchpadScrollRows(int32_t rows)
-{
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetTouchpadScrollRows(rows);
-}
-
-int32_t MultimodalInputConnectManager::GetTouchpadScrollRows(int32_t &rows)
-{
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->GetTouchpadScrollRows(rows);
-}
-
-int32_t MultimodalInputConnectManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->AddVirtualInputDevice(device, deviceId);
-}
-
-int32_t MultimodalInputConnectManager::RemoveVirtualInputDevice(int32_t deviceId)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->RemoveVirtualInputDevice(deviceId);
-}
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MultimodalInputConnectManager::AncoAddChannel(sptr<IAncoChannel> channel)

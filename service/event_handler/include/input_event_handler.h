@@ -32,8 +32,9 @@
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #include "mouse_event_normalize.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
-
+// #ifdef OHOS_BUILD_ENABLE_SWITCH
 #include "switch_subscriber_handler.h"
+// #endif // OHOS_BUILD_ENABLE_SWITCH
 
 namespace OHOS {
 namespace MMI {
