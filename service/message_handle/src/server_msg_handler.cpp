@@ -254,11 +254,9 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-    bool isStoreWindowId = true;
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-            isStoreWindowId = pointerEvent->GetTargetWindowId() <= 0;
             if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell)) {
                 return RET_ERR;
             }
@@ -301,7 +299,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             break;
         }
     }
-    return SaveTargetWindowId(pointerEvent, isShell, isStoreWindowId);
+    return SaveTargetWindowId(pointerEvent, isShell);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -399,13 +397,9 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
     pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
 }
 
-int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
-    bool isStoreWindowId)
+int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (!isStoreWindowId) {
-        return RET_OK;
-    }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -418,6 +412,8 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         if (isShell) {
             shellTargetWindowIds_[pointerId] = targetWindowId;
+        } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+            accessTargetWindowIds_[pointerId] = targetWindowId;
         } else {
             nativeTargetWindowIds_[pointerId] = targetWindowId;
         }
@@ -428,6 +424,8 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t pointerId = pointerEvent->GetPointerId();
         if (isShell) {
             shellTargetWindowIds_.erase(pointerId);
+        } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+            accessTargetWindowIds_.erase(pointerId);
         } else {
             nativeTargetWindowIds_.erase(pointerId);
         }
@@ -454,6 +452,11 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     if (isShell) {
         auto iter = shellTargetWindowIds_.find(pointerEvent->GetPointerId());
         if (iter != shellTargetWindowIds_.end()) {
+            targetWindowId = iter->second;
+        }
+    } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        auto iter = accessTargetWindowIds_.find(pointerEvent->GetPointerId());
+        if (iter != accessTargetWindowIds_.end()) {
             targetWindowId = iter->second;
         }
     } else {
