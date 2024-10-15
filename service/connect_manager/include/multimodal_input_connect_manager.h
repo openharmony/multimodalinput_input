@@ -125,22 +125,17 @@ public:
     int32_t HasIrEmitter(bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
-    int32_t SetMoveEventFilters(bool flag);
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
-    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
+    int32_t RemoveVirtualInputDevice(int32_t deviceId);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
-    int32_t RemoveVirtualInputDevice(int32_t deviceId);
-    int32_t SetTouchpadScrollRows(int32_t rows);
-    int32_t GetTouchpadScrollRows(int32_t &rows);
     int32_t SkipPointerLayer(bool isSkip);
 
 #ifdef OHOS_BUILD_ENABLE_ANCO

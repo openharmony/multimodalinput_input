@@ -30,11 +30,11 @@
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
+#include "window_info.h"
 
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
-#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -139,10 +139,6 @@ struct KnuckleGesture {
     } lastDownPointer;
 };
 
-struct MultiFingersTap {
-    Ability ability;
-};
-
 struct RepeatKey {
     int32_t keyCode { -1 };
     int32_t keyAction { 0 };
@@ -151,6 +147,10 @@ struct RepeatKey {
     int64_t delay { 0 };
     std::string statusConfig;
     bool statusConfigValue { true };
+    Ability ability;
+};
+
+struct MultiFingersTap {
     Ability ability;
 };
 
@@ -182,23 +182,19 @@ public:
     void HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
     bool GetKnuckleSwitchValue();
     bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
-#endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef UNIT_TEST
-public:
-#else
+    void InitKeyObserver();
 private:
-#endif // UNIT_TEST
     void Print();
     void PrintSeq();
     void PrintExcludeKeys();
@@ -266,12 +262,15 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
-
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
     bool CheckTwoFingerGestureAction() const;
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
@@ -286,6 +285,9 @@ private:
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
+    bool CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent);
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -301,6 +303,7 @@ private:
     void ReportRegionGesture();
     void ReportLetterGesture();
     void ReportGestureInfo();
+    bool IsMatchedAbility(std::vector<float> gesturePoints_, float gestureLastX, float gestureLastY);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent);
 
@@ -351,6 +354,9 @@ private:
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
     int32_t lastKeyEventCode_ { -1 };
+    int32_t screenRecordingSuccessCount_ { 0 };
+    std::string sessionKey_ { };
+    bool isStartBase_ { false };
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     bool isGesturing_ { false };
     bool isLetterGesturing_ { false };
@@ -362,10 +368,12 @@ private:
     std::vector<int64_t> gestureTimeStamps_;
     int64_t drawOFailTimestamp_ { 0 };
     int64_t drawOSuccTimestamp_ { 0 };
+    Direction lastDirection_ { DIRECTION0 };
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     int64_t lastDownTime_ { 0 };
     int64_t previousUpTime_ { 0 };
     int32_t tappingCount_ { 0 };
+    std::map<int32_t, int64_t> lastPointerDownTime_;
 };
 } // namespace MMI
 } // namespace OHOS
