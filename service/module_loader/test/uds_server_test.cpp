@@ -17,7 +17,6 @@
 
 #include "mmi_log.h"
 #include "proto.h"
-#include "udp_wrap.h"
 #include "uds_server.h"
 
 #undef MMI_LOG_TAG
