@@ -86,8 +86,6 @@ public:
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
     virtual bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
-    virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
-        double logicX, double logicY) const = 0;
     virtual bool CheckPidInSession(int32_t pid) = 0;
     virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
         double logicX, double logicY) const = 0;
