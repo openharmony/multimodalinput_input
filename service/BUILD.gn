@@ -1175,7 +1175,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
 
   deps = [
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/service:libmmi-server"
+    "${mmi_path}/service:libmmi-server",
   ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {

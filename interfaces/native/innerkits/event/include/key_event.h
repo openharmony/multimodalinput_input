@@ -3284,6 +3284,14 @@ public:
     void AddKeyItem(const KeyItem& keyItem);
 
     /**
+     * @brief Set key item.
+     * @param keyItem Indicates the key item to set.
+     * @return void
+     * @since 13
+     */
+    void SetKeyItem(std::vector<KeyItem> keyItem);
+
+    /**
      * @brief Obtains the key item.
      * @return Returns the key item.
      * @since 9

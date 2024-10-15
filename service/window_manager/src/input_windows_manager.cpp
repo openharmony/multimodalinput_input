@@ -517,23 +517,14 @@ void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32
 {
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_CANCEL && focusWindowId_ != -1 &&
         focusWindowId_ != focusWindowId && keyEvent->IsRepeatKey()) {
-        auto keyEventReissue = KeyEvent::Create();
-        keyEventReissue->SetKeyCode(keyEvent->GetKeyCode());
-        std::vector<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItems();
+        auto keyEventReissue = std::make_shared<KeyEvent>(*keyEvent);
+        auto keyItem = keyEventReissue->GetKeyItems();
         for (auto item = keyItem.begin(); item != keyItem.end(); ++item) {
             item->SetPressed(false);
-            keyEventReissue->AddKeyItem(*item);
         }
+        keyEventReissue->SetKeyItem(keyItem);
+        keyEventReissue->UpdateId();
         keyEventReissue->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
-        keyEventReissue->SetKeyIntention(keyEvent->GetKeyIntention());
-        keyEventReissue->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY,
-            keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
-        keyEventReissue->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY,
-            keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
-        keyEventReissue->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY,
-            keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
-        keyEventReissue->SetRepeat(keyEvent->IsRepeat());
-        keyEventReissue->SetId(keyEvent->GetId());
         keyEventReissue->SetTargetWindowId(focusWindowId_);
         keyEventReissue->SetAgentWindowId(focusWindowId_);
 
@@ -541,7 +532,6 @@ void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32
         auto udServer = InputHandler->GetUDSServer();
         auto fd = udServer->GetClientFd(GetWindowPid(focusWindowId_));
         if (eventDispatchHandler != nullptr && udServer != nullptr) {
-            keyEvent->UpdateId();
             eventDispatchHandler->DispatchKeyEvent(fd, *udServer, keyEventReissue);
         }
     }
