@@ -90,9 +90,16 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
+    if (eventData.GetWant().GetIntParam("slotId", -1) != -1) {
+        int32_t state = eventData.GetWant().GetIntParam("state", -1);
+        if (hasHandleRingMute_ && (state == CALL_STATUS_INCOMING || state == CALL_STATUS_DISCONNECTED)) {
+            hasHandleRingMute_ = false;
+        }
+        return;
+    }
     callState = eventData.GetWant().GetIntParam("state", -1);
     MMI_HILOGI("state %{public}d", callState);
-    if (hasHandleRingMute_ && callState_ == CALL_STATUS_INCOMING && callState != CALL_STATUS_INCOMING) {
+    if (hasHandleRingMute_ && (callState_ == CALL_STATUS_INCOMING || callState_ == CALL_STATUS_WAITING)) {
         MMI_HILOGI("Mute reply success");
         hasHandleRingMute_ = false;
     }
