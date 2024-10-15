@@ -638,9 +638,9 @@ bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
             item.SetPressed(false);
             lastPointerEvent_->UpdatePointerItem(pointerId, item);
             lastPointerEvent_->SetPointerAction(pointerActionEvent);
+            auto copiedPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
             lock.unlock();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-            auto copiedPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
             OnInputEvent(copiedPointerEvent, DEVICE_TAGS);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
             return true;
