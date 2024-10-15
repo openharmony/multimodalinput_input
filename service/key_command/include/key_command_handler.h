@@ -34,6 +34,7 @@
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -275,6 +276,8 @@ private:
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+        PointerEvent::PointerItem pointerItem);
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
