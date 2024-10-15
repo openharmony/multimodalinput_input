@@ -84,7 +84,6 @@ public:
     bool CheckPidInSession(int32_t pid);
     std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
     int32_t GetCurrentUserId();
-    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
     void SetFoldState ();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -94,6 +93,7 @@ public:
     void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
+    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MouseLocation GetMouseInfo();
