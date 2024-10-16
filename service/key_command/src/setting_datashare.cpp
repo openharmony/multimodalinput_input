@@ -318,18 +318,18 @@ bool SettingDataShare::CheckIfSettingsDataReady()
     CHKPF(remoteObj_);
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
             DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
-    MMI_HILOGD("create data_share helper, ret=%{public}d", ret.first);
+    MMI_HILOGD("Create data_share helper, ret=%{public}d", ret.first);
     if (ret.first == E_OK) {
-        MMI_HILOGD("create data_share helper success");
+        MMI_HILOGD("Create data_share helper success");
         auto helper = ret.second;
         if (helper != nullptr) {
             bool releaseRet = helper->Release();
-            MMI_HILOGD("release data_share helper, releaseRet=%{public}d", releaseRet);
+            MMI_HILOGD("Release data_share helper, releaseRet=%{public}d", releaseRet);
         }
         isDataShareReady_ = true;
         return true;
     } else if (ret.first == E_DATA_SHARE_NOT_READY) {
-        MMI_HILOGE("create data_share helper failed");
+        MMI_HILOGE("Create data_share helper failed");
         isDataShareReady_ = false;
         return false;
     }
