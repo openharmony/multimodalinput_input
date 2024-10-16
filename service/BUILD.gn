@@ -228,7 +228,10 @@ ohos_shared_library("libmmi-server") {
     sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
   }
   if (input_feature_monitor) {
-    sources += [ "monitor/src/event_monitor_handler.cpp" ]
+    sources += [
+      "monitor/src/event_monitor_handler.cpp",
+      "monitor/src/gesture_monitor_handler.cpp",
+    ]
   }
   if (input_feature_interceptor) {
     sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
