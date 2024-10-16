@@ -1802,7 +1802,7 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     pen.SetWidth(penWidth);
     canvas.AttachPen(pen);
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-        MMI_HILOGD("set mouseicon by userIcon_");
+        MMI_HILOGD("Set mouseicon by userIcon_");
         OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *userIcon_, 0, 0);
     } else {
         std::shared_ptr<OHOS::Media::PixelMap> pixelmap;
@@ -1823,15 +1823,15 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, RET_ERR);
     if (pid == -1) {
-        MMI_HILOGE("pid is invalid");
+        MMI_HILOGE("The pid is invalid");
         return RET_ERR;
     }
     if (windowId < 0) {
-        MMI_HILOGE("windowId is invalid, windowId:%{public}d", windowId);
+        MMI_HILOGE("The windowId is invalid, windowId:%{public}d", windowId);
         return RET_ERR;
     }
     if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
-        MMI_HILOGE("windowId not in right pid");
+        MMI_HILOGE("The windowId not in right pid");
         return RET_ERR;
     }
     int32_t ret = UpdateCursorProperty(pixelMap, focusX, focusY);
@@ -1890,7 +1890,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     }
     CHKPR(pixelMap, RET_ERR);
     if (windowId < 0) {
-        MMI_HILOGE("get invalid windowId, %{public}d", windowId);
+        MMI_HILOGE("Get invalid windowId, %{public}d", windowId);
         return RET_ERR;
     }
     if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
