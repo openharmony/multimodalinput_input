@@ -6842,5 +6842,97 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowsInfoPerDi
     displayGroupInfo.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateWindowsInfoPerDisplay(displayGroupInfo));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_004
+ * @tc.desc: Test SelectWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 150;
+    int32_t logicalX = 200;
+    int32_t logicalY = 200;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    Rect rect {
+        .x = 100,
+        .y = 100,
+        .width = 1000,
+        .height = 1000,
+    };
+    WindowInfo windowInfo;
+    WindowGroupInfo windowGroupInfo;
+    pointerEvent->bitwise_ = 0x00000000;
+    pointerEvent->SetZOrder(15.5f);
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetTargetWindowId(100);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
+    windowInfo.id = 150;
+    windowInfo.displayId = 300;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas.push_back(rect);
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    inputWindowsManager.extraData_.appended = true;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    windowInfo.uiExtentionWindowInfo.push_back(windowInfo);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    windowInfo.windowInputType = WindowInputType::NORMAL;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 150;
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
+    EXPECT_NE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_005
+ * @tc.desc: Test SelectWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 50;
+    int32_t logicalX = 200;
+    int32_t logicalY = 200;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    Rect rect {
+        .x = 100,
+        .y = 100,
+        .width = 1000,
+        .height = 1000,
+    };
+    WindowInfo windowInfo;
+    WindowGroupInfo windowGroupInfo;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = -1;
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetTargetWindowId(-1);
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
+    windowInfo.id = 150;
+    windowInfo.displayId = 300;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas.push_back(rect);
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    windowInfo.uiExtentionWindowInfo.push_back(windowInfo);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
+    EXPECT_EQ(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
+    pointerEvent->SetButtonPressed(2024);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    EXPECT_EQ(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    EXPECT_EQ(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    EXPECT_EQ(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
+}
 } // namespace MMI
 } // namespace OHOS
