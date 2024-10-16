@@ -3284,6 +3284,14 @@ public:
     void AddKeyItem(const KeyItem& keyItem);
 
     /**
+     * @brief Set key item.
+     * @param keyItem Indicates the key item to set.
+     * @return void
+     * @since 13
+     */
+    void SetKeyItem(std::vector<KeyItem> keyItem);
+
+    /**
      * @brief Obtains the key item.
      * @return Returns the key item.
      * @since 9
@@ -3384,6 +3392,21 @@ public:
      */
     void SetRepeat(bool repeat);
 
+    /**
+     * @brief Gets the real-time operation keystroke repeat status.
+     * @return bool
+     * @since 13
+     */
+    bool IsRepeatKey() const;
+
+    /**
+     * @brief Sets the injection key to repeat practical real-time operation.
+     * @param repeat Key injection automatic repeat identification.
+     * @return void
+     * @since 13
+     */
+    void SetRepeatKey(bool repeatKey);
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.
@@ -3448,6 +3471,7 @@ private:
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     bool repeat_ { false };
+    bool repeatKey_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

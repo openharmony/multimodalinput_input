@@ -952,7 +952,8 @@ KeyEvent::KeyEvent(const KeyEvent& other)
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
       enhanceData_(other.enhanceData_),
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-      repeat_(other.repeat_) {}
+      repeat_(other.repeat_),
+      repeatKey_(other.repeatKey_) {}
 
 KeyEvent::~KeyEvent() {}
 
@@ -973,6 +974,7 @@ void KeyEvent::Reset()
     capsLock_ = false;
     scrollLock_ = false;
     repeat_ = false;
+    repeatKey_ = false;
     keys_.clear();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     enhanceData_.clear();
@@ -1023,6 +1025,11 @@ void KeyEvent::SetKeyAction(int32_t keyAction)
 void KeyEvent::AddKeyItem(const KeyItem& keyItem)
 {
     keys_.push_back(keyItem);
+}
+
+void KeyEvent::SetKeyItem(std::vector<KeyItem> keyItem)
+{
+    keys_ = keyItem;
 }
 
 std::vector<KeyEvent::KeyItem> KeyEvent::GetKeyItems() const
@@ -1358,6 +1365,16 @@ bool KeyEvent::IsRepeat() const
 void KeyEvent::SetRepeat(bool repeat)
 {
     repeat_ = repeat;
+}
+
+bool KeyEvent::IsRepeatKey() const
+{
+    return repeatKey_;
+}
+
+void KeyEvent::SetRepeatKey(bool repeatKey)
+{
+    repeatKey_ = repeatKey;
 }
 
 std::string_view KeyEvent::ActionToShortStr(int32_t action)
