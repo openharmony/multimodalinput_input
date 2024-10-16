@@ -2342,13 +2342,13 @@ int32_t InputManagerImpl::CancelInjection()
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t InputManagerImpl::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
     CALL_INFO_TRACE;
     return MULTIMODAL_INPUT_CONNECT_MGR->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
 }
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
 {

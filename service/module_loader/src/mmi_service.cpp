@@ -2780,7 +2780,7 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
     GaussianKeyboard::SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
@@ -2792,7 +2792,7 @@ int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bo
     sharedKeyEvent->SetDeviceId(99);
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 {

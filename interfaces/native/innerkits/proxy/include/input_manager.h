@@ -916,9 +916,9 @@ public:
      */
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
 
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     int32_t SetCurrentUser(int32_t userId);
     

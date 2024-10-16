@@ -2052,7 +2052,7 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t MultimodalInputConnectProxy::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
     CALL_DEBUG_ENTER;
@@ -2078,7 +2078,7 @@ int32_t MultimodalInputConnectProxy::SetVKeyboardArea(double topLeftX, double to
     }
     return ret;
 }
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)
     __attribute__((no_sanitize("cfi")))
