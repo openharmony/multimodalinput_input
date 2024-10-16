@@ -52,7 +52,7 @@ declare_args() {
   input_feature_move_event_filters = false
   input_shortcut_key_manager_enabled = true
   input_shortcut_key_rules_enabled = true
-  input_new_knuckle_dynamic_enabled = false
+  input_new_knuckle_dynamic_enabled = true
   input_feature_virtual_keyboard = false
 
   if (defined(global_parts_info) &&
