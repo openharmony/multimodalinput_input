@@ -1784,15 +1784,15 @@ bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGE("failed to do swipe inward, wrong source: %{public}d ", pointerEvent->GetSourceType());
+        MMI_HILOGE("Failed to do swipe inward, wrong source: %{public}d ", pointerEvent->GetSourceType());
         return false;
     } else if (pointerEvent->GetPointerCount() != ONE_FINGERS) {
-        MMI_HILOGE("failed to do swipe inward, more than one finger");
+        MMI_HILOGE("Failed to do swipe inward, more than one finger");
         return false;
     } else if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
-        MMI_HILOGE("failed to do swipe inward, wrong action");
+        MMI_HILOGE("Failed to do swipe inward, wrong action");
         return false;
     }
     return true;
@@ -1807,7 +1807,7 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL)) {
         return true;
     }
-    MMI_HILOGD("not fingerprint event");
+    MMI_HILOGD("Not fingerprint event");
     return false;
 }
 } // namespace MMI
