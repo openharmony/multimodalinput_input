@@ -159,29 +159,29 @@ int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t&
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &serverBufferSize, sizeof(bufferSize)) != 0) {
-        MMI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
+        MMI_HILOGE("Setsockopt serverFd failed, errno:%{public}d", errno);
         return RET_ERR;
     }
     if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &serverBufferSize, sizeof(bufferSize)) != 0) {
-        MMI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
+        MMI_HILOGE("Setsockopt serverFd failed, errno:%{public}d", errno);
         return RET_ERR;
     }
     if (tokenType == TokenType::TOKEN_NATIVE) {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
+            MMI_HILOGE("Setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             return RET_ERR;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
+            MMI_HILOGE("Setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             return RET_ERR;
         }
     } else {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
+            MMI_HILOGE("Setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             return RET_ERR;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
+            MMI_HILOGE("Setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             return RET_ERR;
         }
     }
