@@ -34,6 +34,9 @@
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_shortcut_manager.h"
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "libinput_adapter.h"
 #include "mmi_log.h"
 #include "multimodal_input_preferences_manager.h"
@@ -352,6 +355,9 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
+#ifdef SHORTCUT_KEY_RULES_ENABLED
+    KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
+#endif // SHORTCUT_KEY_RULES_ENABLED
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {

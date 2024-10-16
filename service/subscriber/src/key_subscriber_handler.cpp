@@ -79,9 +79,6 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
-#ifdef SHORTCUT_KEY_RULES_ENABLED
-    KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
-#endif // SHORTCUT_KEY_RULES_ENABLED
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
