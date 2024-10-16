@@ -222,6 +222,16 @@ void EventMonitorHandler::OnSessionLost(SessionPtr session)
     monitors_.OnSessionLost(session);
 }
 
+bool EventMonitorHandler::SessionHandler::Expect(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    if (GestureMonitorHandler::IsTouchGestureEvent(pointerEvent->GetPointerAction())) {
+        return (((eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) &&
+            gesture_.IsMatchGesture(pointerEvent->GetPointerAction(), pointerEvent->GetPointerCount()));
+    } else {
+        return ((eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER);
+    }
+}
+
 void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const
 {
     CHKPV(keyEvent);
@@ -240,10 +250,6 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
-    if (((eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) &&
-        !GestureMonitorHandler::IsMatchGesture(pointerEvent->GetPointerAction(), pointerEvent->GetPointerCount())) {
-        return;
-    }
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d, TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
     if (!session_->SendMsg(pkt)) {
@@ -296,8 +302,8 @@ int32_t EventMonitorHandler::MonitorCollection::UpdateEventTypeMonitor(const std
         return RET_OK;
     }
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
-        auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
-        gestureHandler.AddGestureMonitor(monitor.gestureType_, monitor.fingers_);
+        auto gestureHandler = iter->gesture_;
+        gestureHandler.AddGestureMonitor(monitor.gesture_.gestureType_, monitor.gesture_.fingers_);
         handler(gestureHandler);
     }
 
@@ -347,7 +353,6 @@ bool EventMonitorHandler::MonitorCollection::IsNeedInsertToMonitors(std::vector<
     return isNeedInsertToMonitors;
 }
 
-
 void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
     SessionHandler handler = monitor;
@@ -358,8 +363,8 @@ void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler&
     }
 
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
-        auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
-        gestureHandler.RemoveGestureMonitor(monitor.gestureType_, monitor.fingers_);
+        auto gestureHandler = iter->gesture_;
+        gestureHandler.RemoveGestureMonitor(monitor.gesture_.gestureType_, monitor.gesture_.fingers_);
         handler(gestureHandler);
     }
     monitors_.erase(iter);
@@ -589,7 +594,7 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
 void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler &monitor,
     std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt)
 {
-    if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
+    if (monitor.Expect(pointerEvent)) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
             MMI_HILOGI("Swipe event sended in monitor! action type: %{public}d", pointerEvent->GetPointerAction());
@@ -726,6 +731,6 @@ void EventMonitorHandler::ProcessScreenCapture(int32_t pid, bool isStart)
         monitors_.RemoveScreenCaptureMonitor(session);
     }
 }
-#endif
+#endif // PLAYER_FRAMEWORK_EXISTS
 } // namespace MMI
 } // namespace OHOS
