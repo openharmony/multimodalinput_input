@@ -76,10 +76,10 @@ private:
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static bool ParseBMSArray(const napi_env& env, const napi_value& value,
         std::vector<ButtonMotionSpace*>& bmsArray);
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateEnumKeyboardType(napi_env env, napi_value exports);
     static napi_value CreateEnumVKResult(napi_env env, napi_value exports);
