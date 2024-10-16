@@ -37,6 +37,7 @@ constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
 #ifdef OHOS_BUILD_ENABLE_HOPPER
 constexpr uint32_t SET_VK_AREA_NUMBER_PARAMETERS { 4 };
+constexpr uint32_t UPDATE_VK_MS_NUMBER_PARAMETERS { 1 };
 #endif // OHOS_BUILD_ENABLE_HOPPER
 enum class VKResult : int32_t {
     FAILED = 0,
@@ -707,7 +708,233 @@ napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_in
 #else
     result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "SetVKeyboardArea", "Not support");
-#endif
+#endif // OHOS_BUILD_ENABLE_HOPPER
+    return result;
+}
+
+#ifdef OHOS_BUILD_ENABLE_HOPPER
+bool JsInputDeviceContext::ParseBMSArray(const napi_env& env, const napi_value& value,
+    std::vector<ButtonMotionSpace*>& bmsArray)
+{
+    uint32_t length = 0;
+    if (!JsUtil::IsArray(env, value)) {
+        MMI_HILOGE("ParseBMSArray first parameter is not array");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "ButtonMotionSpace", "Array");
+        return false;
+    }
+    napi_get_array_length(env, value, &length);
+    bool isSuccess = true;
+    for (uint32_t i = 0; i < length; i++) {
+        napi_value napiBms = nullptr;
+        if (napi_get_element(env, value, i, &napiBms) != napi_ok) {
+            MMI_HILOGE("ParseBMSArray napi_get_element failed. index:%{public}d", i);
+            isSuccess = false;
+            break;
+        }
+
+        ButtonMotionSpace* bms = new (std::nothrow) ButtonMotionSpace();
+
+        napi_value napiKeyName = nullptr;
+        if (napi_get_named_property(env, napiBms, "keyName", &napiKeyName) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: keyName");
+            isSuccess = false;
+            break;
+        }
+        char keyName[MAX_STRING_LEN] = { 0 };
+        if (!JsUtil::ParseString(env, napiKeyName, keyName)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseSeting failed. property name: keyName");
+            isSuccess = false;
+            break;
+        }
+        std::string keyNameStr(keyName);
+        bms->keyName = keyNameStr;
+
+        napi_value napiKeyCode = nullptr;
+        if (napi_get_named_property(env, napiBms, "keyCode", &napiKeyCode) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: keyCode");
+            isSuccess = false;
+            break;
+        }
+        int32_t keyCode = 0;
+        if (!JsUtil::ParseInt32(env, napiKeyCode, keyCode)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: keyCode");
+            isSuccess = false;
+            break;
+        }
+        bms->keyCode = keyCode;
+
+        napi_value napiLocX = nullptr;
+        if (napi_get_named_property(env, napiBms, "locX", &napiLocX) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: locX");
+            isSuccess = false;
+            break;
+        }
+        double locX = 0;
+        if (!JsUtil::ParseDouble(env, napiLocX, locX)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: locX");
+            isSuccess = false;
+            break;
+        }
+        bms->locX = locX;
+
+        napi_value napiLocY = nullptr;
+        if (napi_get_named_property(env, napiBms, "locY", &napiLocY) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: locY");
+            isSuccess = false;
+            break;
+        }
+        double locY = 0;
+        if (!JsUtil::ParseDouble(env, napiLocY, locY)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: locY");
+            isSuccess = false;
+            break;
+        }
+        bms->locY = locY;
+
+        napi_value napiWidth = nullptr;
+        if (napi_get_named_property(env, napiBms, "width", &napiWidth) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: width");
+            isSuccess = false;
+            break;
+        }
+        double width = 0;
+        if (!JsUtil::ParseDouble(env, napiWidth, width)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: width");
+            isSuccess = false;
+            break;
+        }
+        bms->width = width;
+
+        napi_value napiHeight = nullptr;
+        if (napi_get_named_property(env, napiBms, "height", &napiHeight) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: height");
+            isSuccess = false;
+            break;
+        }
+        double height = 0;
+        if (!JsUtil::ParseDouble(env, napiHeight, height)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: height");
+            isSuccess = false;
+            break;
+        }
+        bms->height = height;
+
+        napi_value napiUseShift = nullptr;
+        if (napi_get_named_property(env, napiBms, "useShift", &napiUseShift) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: useShift");
+            isSuccess = false;
+            break;
+        }
+        bool useShift = false;
+        if (!JsUtil::ParseBool(env, napiUseShift, useShift)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseBool failed. property name: useShift");
+            isSuccess = false;
+            break;
+        }
+        bms->useShift = useShift;
+
+        napi_value napiMotionSpaceTypeId = nullptr;
+        if (napi_get_named_property(env, napiBms, "motionSpaceTypeId", &napiMotionSpaceTypeId) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: motionSpaceTypeId");
+            isSuccess = false;
+            break;
+        }
+        int32_t motionSpaceTypeId = 0;
+        if (!JsUtil::ParseInt32(env, napiMotionSpaceTypeId, motionSpaceTypeId)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: motionSpaceTypeId");
+            isSuccess = false;
+            break;
+        }
+        bms->motionSpaceTypeId = static_cast<MotionSpaceType>(motionSpaceTypeId);
+
+        napi_value napiPageTypeId = nullptr;
+        if (napi_get_named_property(env, napiBms, "pageTypeId", &napiPageTypeId) != napi_ok) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: pageTypeId");
+            isSuccess = false;
+            break;
+        }
+        int32_t pageTypeId = 0;
+        if (!JsUtil::ParseInt32(env, napiPageTypeId, pageTypeId)) {
+            delete bms;
+            MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: pageTypeId");
+            isSuccess = false;
+            break;
+        }
+        bms->pageTypeId = static_cast<PageType>(pageTypeId);
+
+        bmsArray.push_back(bms);
+    }
+
+    if (!isSuccess) {
+        while (!bmsArray.empty()) {
+            ButtonMotionSpace* bms = bmsArray.back();
+            delete bms;
+            bmsArray.pop_back();
+        }
+    }
+
+    return isSuccess;
+}
+#endif // OHOS_BUILD_ENABLE_HOPPER
+
+napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+#ifdef OHOS_BUILD_ENABLE_HOPPER
+    size_t argc = UPDATE_VK_MS_NUMBER_PARAMETERS;
+    napi_value argv[UPDATE_VK_MS_NUMBER_PARAMETERS] = { nullptr };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    std::vector<ButtonMotionSpace*> bmsArray;
+    if (!ParseBMSArray(env, argv[0], bmsArray)) {
+        MMI_HILOGE("ParseBMSArray parse ButtonMotionSpace array fail");
+        result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+    } else {
+        int32_t ret = RET_OK;
+        for (std::vector<ButtonMotionSpace*>::iterator ite = bmsArray.begin(); ite != bmsArray.end(); ite++) {
+            std::vector<int32_t> pattern;
+            pattern.push_back(static_cast<int32_t>((*ite)->locX));
+            pattern.push_back(static_cast<int32_t>((*ite)->locY));
+            pattern.push_back(static_cast<int32_t>((*ite)->width));
+            pattern.push_back(static_cast<int32_t>((*ite)->height));
+            pattern.push_back((*ite)->keyCode);
+            pattern.push_back(static_cast<int32_t>((*ite)->motionSpaceTypeId));
+            pattern.push_back(static_cast<int32_t>((*ite)->pageTypeId));
+            ret = InputManager::GetInstance()->SetMotionSpace((*ite)->keyName, (*ite)->useShift, pattern);
+        }
+        if (ret == RET_OK) {
+            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
+        } else {
+            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+            MMI_HILOGE("UpdateMotionSpace failed with ret: %{public}d", (int)ret);
+        }
+        while (!bmsArray.empty()) {
+            ButtonMotionSpace* bms = bmsArray.back();
+            delete bms;
+            bmsArray.pop_back();
+        }
+    }
+#else
+    result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+    THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "UpdateMotionSpace", "Not support");
+#endif // OHOS_BUILD_ENABLE_HOPPER
     return result;
 }
 
@@ -767,6 +994,49 @@ napi_value JsInputDeviceContext::CreateEnumVKResult(napi_env env, napi_value exp
     return exports;
 }
 
+napi_value JsInputDeviceContext::CreateEnumMotionSpaceType(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("NARROW",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(MotionSpaceType::NARROW))),
+        DECLARE_NAPI_STATIC_PROPERTY("WIDE",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(MotionSpaceType::WIDE))),
+        DECLARE_NAPI_STATIC_PROPERTY("FLOATING",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(MotionSpaceType::FLOATING))),
+        DECLARE_NAPI_STATIC_PROPERTY("TRACKPAD",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(MotionSpaceType::TRACKPAD))),
+        DECLARE_NAPI_STATIC_PROPERTY("OTHERS",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(MotionSpaceType::OTHERS))),
+    };
+
+    napi_value result = nullptr;
+    CHKRP(napi_define_class(env, "MotionSpaceType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "MotionSpaceType", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
+napi_value JsInputDeviceContext::CreateEnumPageType(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("FIRST_PAGE",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(PageType::FIRST_PAGE))),
+        DECLARE_NAPI_STATIC_PROPERTY("SECOND_PAGE_CN",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(PageType::SECOND_PAGE_CN))),
+        DECLARE_NAPI_STATIC_PROPERTY("SECOND_PAGE_EN",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(PageType::SECOND_PAGE_EN))),
+        DECLARE_NAPI_STATIC_PROPERTY("OTHERS", JsUtil::GetNapiInt32(env, static_cast<int32_t>(PageType::OTHERS))),
+    };
+
+    napi_value result = nullptr;
+    CHKRP(napi_define_class(env, "PageType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "PageType", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -789,10 +1059,13 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatRate", GetKeyboardRepeatRate),
         DECLARE_NAPI_STATIC_FUNCTION("getIntervalSinceLastInput", GetIntervalSinceLastInput),
         DECLARE_NAPI_STATIC_FUNCTION("setVKeyboardArea", SetVKeyboardArea),
+        DECLARE_NAPI_STATIC_FUNCTION("updateMotionSpace", UpdateMotionSpace),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     CHKPP(CreateEnumKeyboardType(env, exports));
     CHKPP(CreateEnumVKResult(env, exports));
+    CHKPP(CreateEnumMotionSpaceType(env, exports));
+    CHKPP(CreateEnumPageType(env, exports));
     return exports;
 }
 } // namespace MMI

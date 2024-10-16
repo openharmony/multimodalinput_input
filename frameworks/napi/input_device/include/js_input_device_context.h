@@ -44,14 +44,47 @@ public:
     static napi_value GetIntervalSinceLastInput(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
     static napi_value SetVKeyboardArea(napi_env env, napi_callback_info info);
+    static napi_value UpdateMotionSpace(napi_env env, napi_callback_info info);
+
+public:
+    enum class MotionSpaceType : int32_t {
+        NARROW = 0,
+        WIDE = 1,
+        FLOATING = 2,
+        TRACKPAD = 3,
+        OTHERS = 10,
+    };
+    enum class PageType : int32_t {
+        FIRST_PAGE = 0,
+        SECOND_PAGE_CN = 1,
+        SECOND_PAGE_EN = 2,
+        OTHERS = 10,
+    };
+    struct ButtonMotionSpace {
+        std::string keyName;
+        int32_t keyCode;
+        double locX;
+        double locY;
+        double width;
+        double height;
+        bool useShift;
+        MotionSpaceType motionSpaceTypeId;
+        PageType pageTypeId;
+    };
 
 private:
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
+#ifdef OHOS_BUILD_ENABLE_HOPPER
+    static bool ParseBMSArray(const napi_env& env, const napi_value& value,
+        std::vector<ButtonMotionSpace*>& bmsArray);
+#endif // OHOS_BUILD_ENABLE_HOPPER
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateEnumKeyboardType(napi_env env, napi_value exports);
     static napi_value CreateEnumVKResult(napi_env env, napi_value exports);
+    static napi_value CreateEnumMotionSpaceType(napi_env env, napi_value exports);
+    static napi_value CreateEnumPageType(napi_env env, napi_value exports);
     std::shared_ptr<JsInputDeviceManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
     std::mutex mtx_;
