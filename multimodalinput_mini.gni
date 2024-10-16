@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -41,14 +41,13 @@ declare_args() {
   input_feature_joystick = true
   input_feature_touchscreen = true
   input_feature_input_device = true
-  input_feature_short_key = true
   input_feature_coverage = false
+  input_feature_short_key = true
   input_ext_feature_anco = false
   input_ext_feature_fingersense = true
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
   input_feature_crown = true
-  input_feature_move_event_filters = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_call_manager)) {
@@ -287,7 +286,6 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
-print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 
 input_default_defines = []
 
@@ -354,10 +352,6 @@ if (input_ext_feature_gesturesense) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER" ]
 }
 
-if (input_feature_move_event_filters) {
-  input_default_defines += [ "OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS" ]
-}
-
 if (input_ext_feature_anco) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
@@ -370,7 +364,7 @@ if (input_ext_feature_anco) {
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
   ]
 
-  if (input_feature_product != "pc") {
+  if (input_feature_product == "__other") {
     libmmi_service_sources += [ "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp" ]
   }
 }

@@ -89,11 +89,11 @@ public:
     int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
     int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell, bool isStoreWindowId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags,
         int32_t clientPid);
     int32_t RemoveInputEventFilter(int32_t clientPid, int32_t filterId);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH || OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
@@ -109,7 +109,9 @@ public:
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t OnWindowAreaInfo(SessionPtr sess, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t OnEnhanceConfig(SessionPtr sess, NetPacket& pkt);
@@ -121,11 +123,17 @@ private:
     bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, bool isShell);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
     void CalculateOffset(Direction direction, Offset &offset);
-    bool CloseInjectNotice(int32_t pid);
+#endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info);
+    bool CloseInjectNotice(int32_t pid);
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     UDSServer *udsServer_ { nullptr };

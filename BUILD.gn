@@ -88,7 +88,6 @@ group("input_jsapi_group") {
     deps += [
       "frameworks/napi/gesture_event:gestureevent",
       "frameworks/napi/intention_code:intentioncode",
-      "frameworks/napi/joystick_event:joystickevent",
       "frameworks/napi/key_code:keycode",
       "frameworks/napi/key_event:keyevent",
       "frameworks/napi/mouse_event:mouseevent",
@@ -112,6 +111,7 @@ group("input_jsapi_group") {
     if (input_feature_short_key) {
       deps += [ "frameworks/napi/short_key:shortkey" ]
     }
+    deps += [ "frameworks/napi/infrared_emitter:infraredemitter" ]
   }
 }
 
@@ -168,17 +168,12 @@ group("mmi_tests") {
     "service:event_resample_test",
     "service:mmi-service-tests",
     "service/crown_transform_processor/test:CrownTransformProcessorTest",
-    "service/fingerprint_event_processor/test:FingerprintEventProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
     "service/touch_event_normalize/test:TouchEventNormalizeTests",
     "test/fuzztest:test",
     "test/unittest/interfaces:InputNativeTest",
     "tools/inject_event:InjectEventTest",
   ]
-
-  if (input_feature_switch) {
-    deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
-  }
 
   if (!use_clang_coverage) {
     deps += [

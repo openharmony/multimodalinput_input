@@ -35,7 +35,9 @@ public:
     void UpdateDisplayInfo(DisplayGroupInfo&) override {}
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo&, bool) override {}
     void UpdateWindowInfo(const WindowGroupInfo&) override {}
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     void SetWindowPointerStyle(WindowArea area, int32_t, int32_t) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     MOCK_METHOD(int32_t, ClearWindowPointerStyle, (int32_t, int32_t));
     void Dump(int32_t, const std::vector<std::string>&) override {}
     MOCK_METHOD(int32_t, GetWindowPid, (int32_t), (const));
@@ -61,18 +63,27 @@ public:
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));
     MOCK_METHOD(void, SetFoldState, ());
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(MouseLocation, GetMouseInfo, ());
     MOCK_METHOD(CursorPosition, GetCursorPos, ());
     MOCK_METHOD(CursorPosition, ResetCursorPos, ());
     void UpdateAndAdjustMouseLocation(int32_t&, double&, double&, bool) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(bool, IsMouseSimulate, (), (const));
     MOCK_METHOD(int32_t, SetPointerStyle, (int32_t, int32_t, PointerStyle, bool));
     MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
     void SendPointerEvent(int32_t pointerAction) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     MOCK_METHOD(bool, IsNeedRefreshLayer, (int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -92,9 +103,10 @@ public:
     MOCK_METHOD(const DisplayInfo*, GetPhysicalDisplay, (int32_t), (const));
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerChangeAreas() override {}
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
     void SetWindowStateNotifyPid(int32_t pid) override {}
     int32_t GetWindowStateNotifyPid() override { return 0; }
