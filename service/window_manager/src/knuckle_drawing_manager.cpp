@@ -373,7 +373,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGD("surfaceNode_ is already exist");
+        MMI_HILOGD("The surfaceNode_ is already exist");
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -419,7 +419,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGD("surfaceNode_ is already exist");
+        MMI_HILOGD("The surfaceNode_ is already exist");
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -849,7 +849,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         canvas->DrawPath(path_);
         canvas->DetachPaint();
     } else {
-        MMI_HILOGD("isActionUp_ is true");
+        MMI_HILOGD("The isActionUp_ is true");
         isActionUp_ = false;
         return DestoryWindow();
     }
