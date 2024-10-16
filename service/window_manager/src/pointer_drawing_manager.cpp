@@ -694,7 +694,7 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
             CHKPV(surfaceNode_);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-            MMI_HILOGD("switch pointer style");
+            MMI_HILOGD("Switch pointer style");
             int64_t nodeId = surfaceNode_->GetId();
             if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
                 surfaceNode_->DetachToDisplay(screenId_);
@@ -1802,7 +1802,7 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     pen.SetWidth(penWidth);
     canvas.AttachPen(pen);
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-        MMI_HILOGD("set mouseicon by userIcon_");
+        MMI_HILOGD("Set mouseicon by userIcon_");
         OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *userIcon_, 0, 0);
     } else {
         std::shared_ptr<OHOS::Media::PixelMap> pixelmap;
@@ -2211,7 +2211,7 @@ void PointerDrawingManager::DrawManager()
         MMI_HILOGD("Draw pointer begin");
         PointerStyle pointerStyle;
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
-        MMI_HILOGD("get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
+        MMI_HILOGD("Get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
         Direction direction = DIRECTION0;
         if (IsWindowRotation()) {
             direction = displayInfo_.direction;
@@ -2445,7 +2445,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         } else {
             newIconPath = iconPath.at(MOUSE_ICON(pointerStyle.id)).iconPath;
         }
-        MMI_HILOGD("default path has changed from %{public}s to %{public}s",
+        MMI_HILOGD("Default path has changed from %{public}s to %{public}s",
             it->second.iconPath.c_str(), newIconPath.c_str());
         UpdateIconPath(MOUSE_ICON(MOUSE_ICON::DEFAULT), newIconPath);
     }
