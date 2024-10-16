@@ -512,6 +512,31 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
         }
     }
 }
+
+void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId)
+{
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_CANCEL && focusWindowId_ != -1 &&
+        focusWindowId_ != focusWindowId && keyEvent->IsRepeatKey()) {
+        auto keyEventReissue = std::make_shared<KeyEvent>(*keyEvent);
+        auto keyItem = keyEventReissue->GetKeyItems();
+        for (auto item = keyItem.begin(); item != keyItem.end(); ++item) {
+            item->SetPressed(false);
+        }
+        keyEventReissue->SetKeyItem(keyItem);
+        keyEventReissue->UpdateId();
+        keyEventReissue->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+        keyEventReissue->SetTargetWindowId(focusWindowId_);
+        keyEventReissue->SetAgentWindowId(focusWindowId_);
+
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        auto udServer = InputHandler->GetUDSServer();
+        auto fd = udServer->GetClientFd(GetWindowPid(focusWindowId_));
+        if (eventDispatchHandler != nullptr && udServer != nullptr) {
+            eventDispatchHandler->DispatchKeyEvent(fd, *udServer, keyEventReissue);
+        }
+    }
+    focusWindowId_ = focusWindowId;
+}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const
@@ -603,6 +628,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
         MMI_HILOG_DISPATCHE("windowInfo is nullptr");
         return secSubWindows;
     }
+    ReissueEvent(keyEvent, focusWindowId);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window", focusWindowId);
@@ -1329,6 +1355,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     LogTracer lt1(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         pointerEvent->SetBuffer(extraData_.buffer);
+        pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
     } else {
         pointerEvent->ClearBuffer();
@@ -1409,6 +1436,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     pointerEvent->SetDeviceId(lastPointerEvent_->GetDeviceId());
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         pointerEvent->SetBuffer(extraData_.buffer);
+        pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
     } else {
         pointerEvent->ClearBuffer();
@@ -2680,6 +2708,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if ((extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) ||
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
         pointerEvent->SetBuffer(extraData_.buffer);
+        pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
     } else {
         pointerEvent->ClearBuffer();
@@ -3256,6 +3285,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     if (checkExtraData) {
         pointerEvent->SetBuffer(extraData_.buffer);
+        pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
@@ -3469,6 +3499,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     pointerEvent->AddPointerItem(currentPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetBuffer(extraData_.buffer);
+    pointerEvent->SetPullId(extraData_.pullId);
     pointerEvent->SetSourceType(lastTouchEvent_->GetSourceType());
     int64_t time = GetSysClockTime();
     pointerEvent->SetActionTime(time);
@@ -3903,6 +3934,7 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.buffer = extraData.buffer;
     extraData_.sourceType = extraData.sourceType;
     extraData_.pointerId = extraData.pointerId;
+    extraData_.pullId = extraData.pullId;
     return RET_OK;
 }
 
@@ -3913,6 +3945,7 @@ void InputWindowsManager::ClearExtraData()
     extraData_.buffer.clear();
     extraData_.sourceType = -1;
     extraData_.pointerId = -1;
+    extraData_.pullId = -1;
 }
 
 ExtraData InputWindowsManager::GetExtraData() const
