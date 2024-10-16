@@ -103,6 +103,7 @@ ohos_unittest("GestureTransformTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
   if (input_ext_feature_anco) {
@@ -214,10 +215,7 @@ ohos_unittest("GestureTransformTest") {
 ohos_unittest("TabletToolTranformTest") {
   module_out_path = module_output_path
 
-  configs = [
-    "${mmi_path}:coverage_flags",
-    "${mmi_path}/service:libmmi_server_config",
-  ]
+  configs = [ "${mmi_path}:coverage_flags" ]
 
   cflags = [
     "-Dprivate=public",
@@ -262,11 +260,8 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
-  }
 
   sources = [
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
@@ -291,12 +286,15 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
     "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
     "${mmi_path}/service/touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
-    "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
     "${mmi_path}/service/window_manager/src/i_pointer_drawing_manager.cpp",
     "${mmi_path}/service/window_manager/src/input_display_bind_helper.cpp",
     "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
     "src/tablet_tool_tranform_processor_test.cpp",
   ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
 
   if (input_ext_feature_magiccursor) {
     include_dirs += [
@@ -402,6 +400,13 @@ ohos_unittest("TransformPointTest") {
 ohos_unittest("TouchTransformProcessorTestWithMock") {
   module_out_path = module_output_path
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   configs = [ "${mmi_path}:coverage_flags" ]
 
   cflags = [
@@ -425,6 +430,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/fingersense_wrapper/include",
     "${mmi_path}/service/gesturesense_wrapper/include",
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/service/interceptor/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
@@ -470,6 +476,8 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "src/touch_transform_processor_test_with_mock.cpp",
   ]
 
+  defines = input_default_defines
+
   if (input_ext_feature_magiccursor) {
     include_dirs += [
       "${mmi_ext_path}/magic_cursor/include",
@@ -486,7 +494,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
   }
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
-    defines = [ "USE_ROSEN_DRAWING" ]
+    defines += [ "USE_ROSEN_DRAWING" ]
   }
 
   deps = [
@@ -510,6 +518,8 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",
@@ -545,6 +555,13 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
 ohos_unittest("TouchpadGestureTest") {
   module_out_path = module_output_path
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   configs = [ "${mmi_path}:coverage_flags" ]
 
   cflags = [
@@ -568,6 +585,7 @@ ohos_unittest("TouchpadGestureTest") {
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/fingersense_wrapper/include",
     "${mmi_path}/service/gesturesense_wrapper/include",
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/service/interceptor/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
@@ -613,6 +631,8 @@ ohos_unittest("TouchpadGestureTest") {
     "src/touchpad_gesture_test.cpp",
   ]
 
+  defines = input_default_defines
+
   if (input_ext_feature_magiccursor) {
     include_dirs += [
       "${mmi_ext_path}/magic_cursor/include",
@@ -628,8 +648,17 @@ ohos_unittest("TouchpadGestureTest") {
     ]
   }
 
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+
+    sources += [
+      "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
+      "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
+    ]
+  }
+
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
-    defines = [ "USE_ROSEN_DRAWING" ]
+    defines += [ "USE_ROSEN_DRAWING" ]
   }
 
   deps = [
@@ -647,12 +676,15 @@ ohos_unittest("TouchpadGestureTest") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
+    "audio_framework:audio_client",
     "cJSON:cjson",
     "c_utils:utils",
     "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",
