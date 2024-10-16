@@ -285,8 +285,9 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetButtonId(tField);
     pkt >> tField;
     event->SetFingerCount(tField);
-    pkt >> tField;
-    event->SetZOrder(tField);
+    float zOrder;
+    pkt >> zOrder;
+    event->SetZOrder(zOrder);
     pkt >> tField;
     event->SetDispatchTimes(tField);
     uint32_t type = 0u;
