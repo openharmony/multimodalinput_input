@@ -240,6 +240,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     for (const auto &buf : buffer) {
         pkt << buf;
     }
+    pkt << event->GetPullId();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Marshalling pointer event failed");
         return RET_ERR;
@@ -367,11 +368,13 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         pkt >> buff;
         buffer.push_back(buff);
     }
+    pkt >> tField;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Unmarshalling pointer event failed");
         return RET_ERR;
     }
     event->SetBuffer(buffer);
+    event->SetPullId(tField);
     return RET_OK;
 }
 

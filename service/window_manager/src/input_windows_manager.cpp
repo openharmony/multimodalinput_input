@@ -1329,6 +1329,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     LogTracer lt1(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         pointerEvent->SetBuffer(extraData_.buffer);
+        pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
     } else {
         pointerEvent->ClearBuffer();
@@ -1409,6 +1410,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     pointerEvent->SetDeviceId(lastPointerEvent_->GetDeviceId());
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         pointerEvent->SetBuffer(extraData_.buffer);
+        pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
     } else {
         pointerEvent->ClearBuffer();
@@ -2680,6 +2682,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if ((extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) ||
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
         pointerEvent->SetBuffer(extraData_.buffer);
+        pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
     } else {
         pointerEvent->ClearBuffer();
@@ -3256,6 +3259,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     if (checkExtraData) {
         pointerEvent->SetBuffer(extraData_.buffer);
+        pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
@@ -3469,6 +3473,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     pointerEvent->AddPointerItem(currentPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetBuffer(extraData_.buffer);
+    pointerEvent->SetPullId(extraData_.pullId);
     pointerEvent->SetSourceType(lastTouchEvent_->GetSourceType());
     int64_t time = GetSysClockTime();
     pointerEvent->SetActionTime(time);
@@ -3903,6 +3908,7 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.buffer = extraData.buffer;
     extraData_.sourceType = extraData.sourceType;
     extraData_.pointerId = extraData.pointerId;
+    extraData_.pullId = extraData.pullId;
     return RET_OK;
 }
 
@@ -3913,6 +3919,7 @@ void InputWindowsManager::ClearExtraData()
     extraData_.buffer.clear();
     extraData_.sourceType = -1;
     extraData_.pointerId = -1;
+    extraData_.pullId = -1;
 }
 
 ExtraData InputWindowsManager::GetExtraData() const
