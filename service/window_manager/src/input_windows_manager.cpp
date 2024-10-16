@@ -512,6 +512,31 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
         }
     }
 }
+
+void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId)
+{
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_CANCEL && focusWindowId_ != -1 &&
+        focusWindowId_ != focusWindowId && keyEvent->IsRepeatKey()) {
+        auto keyEventReissue = std::make_shared<KeyEvent>(*keyEvent);
+        auto keyItem = keyEventReissue->GetKeyItems();
+        for (auto item = keyItem.begin(); item != keyItem.end(); ++item) {
+            item->SetPressed(false);
+        }
+        keyEventReissue->SetKeyItem(keyItem);
+        keyEventReissue->UpdateId();
+        keyEventReissue->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+        keyEventReissue->SetTargetWindowId(focusWindowId_);
+        keyEventReissue->SetAgentWindowId(focusWindowId_);
+
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        auto udServer = InputHandler->GetUDSServer();
+        auto fd = udServer->GetClientFd(GetWindowPid(focusWindowId_));
+        if (eventDispatchHandler != nullptr && udServer != nullptr) {
+            eventDispatchHandler->DispatchKeyEvent(fd, *udServer, keyEventReissue);
+        }
+    }
+    focusWindowId_ = focusWindowId;
+}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const
@@ -603,6 +628,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
         MMI_HILOG_DISPATCHE("windowInfo is nullptr");
         return secSubWindows;
     }
+    ReissueEvent(keyEvent, focusWindowId);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window", focusWindowId);

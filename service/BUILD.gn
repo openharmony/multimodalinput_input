@@ -1154,6 +1154,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager/test",
     "${mmi_path}/libudev/include",
     "${mmi_path}/test/facility/libinput_interface/include",
+    "${mmi_path}/common/anco/comm/include",
   ]
 
   configs = [
@@ -1172,7 +1173,10 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager/test/mock.cpp",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
