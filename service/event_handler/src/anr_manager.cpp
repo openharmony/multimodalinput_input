@@ -60,7 +60,7 @@ int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventI
     if (sess == nullptr) {
         if (pid_ != pid) {
             pid_ = pid;
-            MMI_HILOGE("sess is null, return value is %{public}d", RET_ERR);
+            MMI_HILOGE("The sess is null, return value is %{public}d", RET_ERR);
         }
         return RET_ERR;
     }
@@ -99,7 +99,7 @@ void ANRManager::RemoveTimersByType(SessionPtr sess, int32_t type)
 {
     CHKPV(sess);
     if (type != ANR_DISPATCH && type != ANR_MONITOR) {
-        MMI_HILOGE("remove times failed, your input parm is %{public}d, which is not legal", type);
+        MMI_HILOGE("Remove times failed, your input parm is %{public}d, which is not legal", type);
         return;
     }
     std::vector<int32_t> timerIds = sess->GetTimerIds(ANR_MONITOR);
