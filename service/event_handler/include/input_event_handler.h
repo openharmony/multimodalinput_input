@@ -17,6 +17,7 @@
 #define INPUT_EVENT_HANDLER_H
 
 #include <memory>
+#include <vector>
 
 #include "singleton.h"
 
@@ -61,8 +62,19 @@ public:
 
 private:
     int32_t BuildInputHandlerChain();
-    bool IsTouchpadMistouch(libinput_event* event);
-    bool IsTouchpadTapMistouch(libinput_event* event);
+
+    // disable-while-typing
+    void UpdateDwtRecord(libinput_event *event);
+    void UpdateDwtTouchpadRecord(libinput_event *event);
+    void UpdateDwtKeyboardRecord(libinput_event *event);
+    bool IsStandaloneFunctionKey(uint32_t keycode);
+    bool IsModifierKey(uint32_t keycode);
+    void RefreshDwtActingState();
+    bool IsTouchpadMistouch(libinput_event *event);
+    bool IsTouchpadButtonMistouch(libinput_event *event);
+    bool IsTouchpadTapMistouch(libinput_event *event);
+    bool IsTouchpadMotionMistouch(libinput_event *event);
+    bool IsTouchpadPointerMotionMistouch(libinput_event *event);
 
     UDSServer *udsServer_ { nullptr };
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
@@ -75,10 +87,29 @@ private:
     std::shared_ptr<EventDispatchHandler> eventDispatchHandler_ { nullptr };
 
     uint64_t idSeed_ { 0 };
-    bool isTyping_ { false };
-    int32_t timerId_ { -1 };
+    
+    // assumption:
+    // 1. LIBINPUT_EVENT_TOUCHPAD_* and LIBINPUT_EVENT_POINTER_*_TOUCHPAD are in pairs
+    // 2. LIBINPUT_EVENT_POINTER_*_TOUCHPAD always comes after LIBINPUT_EVENT_TOUCHPAD_*
+    double touchpadEventDownAbsX_ { 0.0 };
+    double touchpadEventDownAbsY_ { 0.0 };
+    double touchpadEventAbsX_ { 0.0 };
+    double touchpadEventAbsY_ { 0.0 };
+    // disable-while-typing
+    bool isDwtEdgeAreaForTouchpadMotionActing_ { false };
+    bool isDwtEdgeAreaForTouchpadButtonActing_ { false };
+    bool isDwtEdgeAreaForTouchpadTapActing_ { false };
+    bool isButtonMistouch_ { false };
     bool isTapMistouch_ { false };
+    int modifierPressedCount_ { 0 };
+    static constexpr uint32_t TOUCHPAD_KEY_CNT = 0x300;
+    std::vector<bool> isKeyPressedWithAnyModifiers_ = std::vector<bool>(TOUCHPAD_KEY_CNT, false); // keycode as index
+
     int64_t lastEventBeginTime_ { 0 };
+
+    static constexpr double TOUCHPAD_EDGE_WIDTH = 15.0;
+    static constexpr double TOUCHPAD_EDGE_WIDTH_FOR_BUTTON = 15.0;
+    static constexpr double TOUCHPAD_EDGE_WIDTH_FOR_TAP = 25.0;
 };
 #define InputHandler ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()
 } // namespace MMI
