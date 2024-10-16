@@ -35,10 +35,10 @@ constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
 constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
 constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t SET_VK_AREA_NUMBER_PARAMETERS { 4 };
 constexpr uint32_t UPDATE_VK_MS_NUMBER_PARAMETERS { 1 };
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 enum class VKResult : int32_t {
     FAILED = 0,
     SUCCEED = 1,
@@ -664,7 +664,7 @@ napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_in
 {
     CALL_DEBUG_ENTER;
     napi_value result = nullptr;
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool isSuccess = true;
     size_t argc = SET_VK_AREA_NUMBER_PARAMETERS;
     napi_value argv[SET_VK_AREA_NUMBER_PARAMETERS] = { nullptr };
@@ -708,11 +708,11 @@ napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_in
 #else
     result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "SetVKeyboardArea", "Not support");
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     return result;
 }
 
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 bool JsInputDeviceContext::ParseBMSArray(const napi_env& env, const napi_value& value,
     std::vector<ButtonMotionSpace*>& bmsArray)
 {
@@ -892,13 +892,13 @@ bool JsInputDeviceContext::ParseBMSArray(const napi_env& env, const napi_value& 
 
     return isSuccess;
 }
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     napi_value result = nullptr;
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     size_t argc = UPDATE_VK_MS_NUMBER_PARAMETERS;
     napi_value argv[UPDATE_VK_MS_NUMBER_PARAMETERS] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -934,7 +934,7 @@ napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_i
 #else
     result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "UpdateMotionSpace", "Not support");
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     return result;
 }
 

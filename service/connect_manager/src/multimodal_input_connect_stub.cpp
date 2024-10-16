@@ -386,14 +386,14 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT):
             ret = StubTransmitInfrared(data, reply);
             break;
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_VKEYBOARD_AREA):
             ret = StubSetVKeyboardArea(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOTION_SPACE):
             ret = StubSetMotionSpace(data, reply);
             break;
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             ret = StubSetPixelMapData(data, reply);
             break;
@@ -2464,7 +2464,7 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t MultimodalInputConnectStub::StubSetVKeyboardArea(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2515,7 +2515,7 @@ int32_t MultimodalInputConnectStub::StubSetMotionSpace(MessageParcel& data, Mess
     WRITEINT32(reply, ret);
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, MessageParcel& reply)
 {
