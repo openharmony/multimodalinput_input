@@ -107,7 +107,6 @@ constexpr int32_t SCALE_CHANGE_END_MILLIS { 700 };
 constexpr float ALPHA_RANGE_BEGIN { 1.0f };
 constexpr float ALPHA_RANGE_END { 0.0f };
 constexpr float EMIT_RADIUS { 40.0f };
-constexpr float BRUSH_FILTER_SCALAR { 60.0f };
 constexpr float TRACK_FILTER_SCALAR { 20.0f };
 constexpr int32_t TRACK_PATH_LENGTH_400 { 400 };
 constexpr int32_t TRACK_PATH_LENGTH_500 { 500 };
@@ -721,19 +720,6 @@ void KnuckleDrawingManager::DrawBrushCanvas()
             BeginRecording(scaleW_, scaleH_));
 #endif // USE_ROSEN_DRAWING
         CHKPV(canvas);
-        for (size_t i = 0; i < pathInfos_.size(); ++i) {
-            Rosen::Drawing::Pen pen;
-            Rosen::Drawing::Filter filter;
-            filter.SetMaskFilter(
-                Rosen::Drawing::MaskFilter::CreateBlurMaskFilter(Rosen::Drawing::BlurType::OUTER, BRUSH_FILTER_SCALAR));
-            pen.SetFilter(filter);
-            pen.SetWidth(TRACK_WIDTH_THIRTY);
-            pen.SetColor(TRACK_COLOR_YELLOW);
-            canvas->AttachPen(pen);
-            canvas->DrawPath(pathInfos_[i]);
-            canvas->DetachPen();
-        }
-
         for (size_t i = 0; (i < pathInfos_.size()) && (pathInfos_.size() != 1); ++i) {
             Rosen::Drawing::Paint paint;
             paint.SetAntiAlias(true);
