@@ -240,6 +240,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     for (const auto &buf : buffer) {
         pkt << buf;
     }
+    pkt << event->GetPullId();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Marshalling pointer event failed");
         return RET_ERR;
@@ -285,8 +286,9 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetButtonId(tField);
     pkt >> tField;
     event->SetFingerCount(tField);
-    pkt >> tField;
-    event->SetZOrder(tField);
+    float zOrder;
+    pkt >> zOrder;
+    event->SetZOrder(zOrder);
     pkt >> tField;
     event->SetDispatchTimes(tField);
     uint32_t type = 0u;
@@ -367,11 +369,13 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         pkt >> buff;
         buffer.push_back(buff);
     }
+    pkt >> tField;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Unmarshalling pointer event failed");
         return RET_ERR;
     }
     event->SetBuffer(buffer);
+    event->SetPullId(tField);
     return RET_OK;
 }
 
