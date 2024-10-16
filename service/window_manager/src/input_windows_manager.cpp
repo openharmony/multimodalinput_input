@@ -1053,7 +1053,7 @@ void InputWindowsManager::UpdateDisplayMode()
         MMI_HILOGD("send fingersense display mode is nullptr");
         return;
     }
-    MMI_HILOGI("Update fingersense display mode, displayMode:%{public}d", displayMode_);
+    MMI_HILOGI("update fingersense display mode, displayMode:%{public}d", displayMode_);
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -1350,7 +1350,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     CHKPV(udsServer_);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-        MMI_HILOGI("The mouse is hide");
+        MMI_HILOGI("the mouse is hide");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1873,12 +1873,12 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
         MMI_HILOG_CURSORD("Setting global pointer style");
         return RET_OK;
     }
-    MMI_HILOG_CURSORD("Start to get pid by window %{public}d", windowId);
+    MMI_HILOG_CURSORD("start to get pid by window %{public}d", windowId);
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         return UpdatePoinerStyle(pid, windowId, pointerStyle);
     }
     if (!isUiExtension && uiExtensionPointerStyle_.count(pid) != 0) {
-        MMI_HILOG_CURSORI("Clear the uiextension mouse style for pid %{public}d", pid);
+        MMI_HILOG_CURSORI("clear the uiextension mouse style for pid %{public}d", pid);
         uiExtensionPointerStyle_.erase(pid);
     }
     SetUiExtensionInfo(isUiExtension, pid, windowId);
@@ -1933,7 +1933,7 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
             pointerStyle.id = globalStyle_.id;
             return RET_OK;
         }
-        MMI_HILOG_CURSORI("Window type:%{public}d, get pointer style:%{public}d success", windowId, iter->second.id);
+        MMI_HILOG_CURSORI("window type:%{public}d, get pointer style:%{public}d success", windowId, iter->second.id);
         pointerStyle = iter->second;
         return RET_OK;
     }
