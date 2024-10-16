@@ -395,7 +395,7 @@ bool PointerDrawingManager::SetTraditionsHardWareCursorLocation(int32_t displayI
 
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {
-    MMI_HILOGI("force clear all pointer visiable status");
+    MMI_HILOGI("Force clear all pointer visiable status");
     pidInfos_.clear();
     UpdatePointerVisible();
 }
