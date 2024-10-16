@@ -791,7 +791,7 @@ int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vec
     return multimodalInputConnectService_->TransmitInfrared(number, pattern);
 }
 
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t MultimodalInputConnectManager::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -806,7 +806,7 @@ int32_t MultimodalInputConnectManager::SetMotionSpace(std::string& keyName, bool
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMotionSpace(keyName, useShift, pattern);
 }
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)
 {

@@ -142,10 +142,10 @@ protected:
     int32_t StubHasIrEmitter(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetInfraredFrequencies(MessageParcel& data, MessageParcel& reply);
     int32_t StubTransmitInfrared(MessageParcel& data, MessageParcel& reply);
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t StubSetVKeyboardArea(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMotionSpace(MessageParcel& data, MessageParcel& reply);
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);

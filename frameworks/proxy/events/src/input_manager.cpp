@@ -614,7 +614,7 @@ int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pat
     return InputMgrImpl.TransmitInfrared(number, pattern);
 }
 
-#ifdef OHOS_BUILD_ENABLE_HOPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t InputManager::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
     return InputMgrImpl.SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
@@ -624,7 +624,7 @@ int32_t InputManager::SetMotionSpace(std::string& keyName, bool useShift, std::v
 {
     return InputMgrImpl.SetMotionSpace(keyName, useShift, pattern);
 }
-#endif // OHOS_BUILD_ENABLE_HOPPER
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t InputManager::SetCurrentUser(int32_t userId)
 {
