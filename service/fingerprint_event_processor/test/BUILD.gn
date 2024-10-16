@@ -47,6 +47,7 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/util/socket/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
   sources = [
