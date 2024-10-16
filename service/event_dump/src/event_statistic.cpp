@@ -117,10 +117,10 @@ void EventStatistic::WriteEventFile()
         if (fileSize >= FILE_MAX_SIZE) {
             if (access(EVENT_FILE_NAME_HISTORY.c_str(), F_OK) == FUNC_EXE_OK &&
                 remove(EVENT_FILE_NAME_HISTORY.c_str()) != FUNC_EXE_OK) {
-                MMI_HILOGE("remove history file failed");
+                MMI_HILOGE("Remove history file failed");
             }
             if (rename(EVENT_FILE_NAME.c_str(), EVENT_FILE_NAME_HISTORY.c_str()) != FUNC_EXE_OK) {
-                MMI_HILOGE("rename file failed");
+                MMI_HILOGE("Rename file failed");
             }
         }
         std::ofstream file(EVENT_FILE_NAME, std::ios::app);
@@ -128,7 +128,7 @@ void EventStatistic::WriteEventFile()
             file << eventStr << std::endl;
             file.close();
         } else {
-            MMI_HILOGE("open file failed");
+            MMI_HILOGE("Open file failed");
         }
     }
 }
