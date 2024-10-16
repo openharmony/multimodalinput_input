@@ -527,18 +527,18 @@ bool KeyShortcutManager::CheckGlobalKey(const HotKey &key, KeyShortcut &shortcut
 
 bool KeyShortcutManager::HaveRegisteredGlobalKey(const KeyShortcut &key) const
 {
-    return (
-        std::any_of(shortcuts_.cbegin(), shortcuts_.cend(),
-            [&key](const auto &item) {
-                return ((item.second.modifiers == key.modifiers) &&
-                        (item.second.finalKey == key.finalKey));
-            }) ||
-        std::any_of(systemKeys_.cbegin(), systemKeys_.cend(),
-            [&key](const auto &item) {
-                return ((item.modifiers == key.modifiers) &&
-                        (item.finalKey == key.finalKey));
-            })
-    );
+    auto iter = std::find_if(shortcuts_.cbegin(), shortcuts_.cend(),
+        [&key](const auto &item) {
+            return ((item.second.modifiers == key.modifiers) &&
+                    (item.second.finalKey == key.finalKey));
+        });
+    // We met the problem: key-shortcut does not differentiate left/right CTRL/SHIFT/ALT/LOGO.
+    // but the implementation of key-shortcut reuse the logic of key-subscription, which
+    // treat left/right CTRL/SHIFT/ALT/LOGO as different keys. That means, for 'CTRL+A' etc
+    // to work as expected, we have to subscribe both 'LEFT-CTRL+A' and 'RIGHT-CTRL+A'.
+    // But duplicate global key registration will fail according to key-shortcut rules.
+    // We relax this retriction here to allow duplicate global key registration from same application.
+    return (iter != shortcuts_.cend() ? (iter->second.session != key.session) : false);
 }
 
 std::string KeyShortcutManager::FormatPressedKeys(std::shared_ptr<KeyEvent> keyEvent) const

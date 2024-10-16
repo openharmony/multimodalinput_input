@@ -1736,9 +1736,9 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     CHKPV(hardwareCursorPointerManager_);
     if (hardwareCursorPointerManager_->IsSupported()) {
         float physicalXOffset = CalculateHardwareXOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(
-            lastMouseStyle_.id)].alignmentWay));
+            mouseStyle)].alignmentWay));
         float physicalYOffset = CalculateHardwareYOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(
-            lastMouseStyle_.id)].alignmentWay));
+            mouseStyle)].alignmentWay));
         canvas.DrawImage(*image, physicalXOffset, physicalYOffset, Rosen::Drawing::SamplingOptions());
     } else {
         canvas.DrawImage(*image, IMAGE_PIXEL, IMAGE_PIXEL, Rosen::Drawing::SamplingOptions());
