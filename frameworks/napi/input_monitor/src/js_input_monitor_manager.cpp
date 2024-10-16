@@ -171,6 +171,20 @@ void JsInputMonitorManager::OnPointerEventByMonitorId(int32_t id, int32_t finger
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+void JsInputMonitorManager::OnKeyEventByMonitorId(int32_t id, int32_t fingers,
+    std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if ((item != nullptr) && (item->GetId() == id && item->GetFingers() == fingers)) {
+            item->OnKeyEvent(keyEvent);
+        }
+    }
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 const std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id, int32_t fingers)
 {
     CALL_DEBUG_ENTER;
