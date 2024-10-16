@@ -301,7 +301,7 @@ void WaitPointerEnd(sem_t &sem)
 HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Enter HandlePointerEventFilter_001");
+    MMI_HILOGI("enter HandlePointerEventFilter_001");
     sem_t sem;
     int32_t ret = sem_init(&sem, 0, 0);
     ASSERT_EQ(ret, 0);
@@ -402,7 +402,7 @@ void SimulateKeyEvent(bool &resultA, bool &resultB, const int32_t KEYCODE, bool 
 HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Enter HandlePointerEventFilter_002");
+    MMI_HILOGI("enter HandlePointerEventFilter_002");
     ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
 
     sem_t semA;
@@ -447,7 +447,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
 HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Enter HandlePointerEventFilter_003");
+    MMI_HILOGI("enter HandlePointerEventFilter_003");
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
@@ -538,7 +538,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
 HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Enter HandleKeyEventFilter_005");
+    MMI_HILOGI("enter HandleKeyEventFilter_005");
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
