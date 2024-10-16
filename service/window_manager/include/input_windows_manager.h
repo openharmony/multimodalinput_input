@@ -87,10 +87,12 @@ public:
     void SetFoldState ();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
+    void ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     bool IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems);
     bool IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent);
     void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t focusWindowId_ { -1 };
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
 
