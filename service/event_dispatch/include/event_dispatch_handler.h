@@ -37,13 +37,6 @@ class EventDispatchHandler final : public IInputEventHandler {
         int32_t value { PointerEvent::POINTER_ACTION_UNKNOWN };
     };
 public:
-    class CancelCmp {
-    public:
-        bool operator()(const std::shared_ptr<WindowInfo> &windowX, const std::shared_ptr<WindowInfo> &windowY)
-        {
-            return windowX->id < windowY->id;
-        }
-    };
     EventDispatchHandler() = default;
     DISALLOW_COPY_AND_MOVE(EventDispatchHandler);
     ~EventDispatchHandler() override = default;
@@ -73,16 +66,17 @@ private:
         PointerEvent::PointerItem pointerItem);
     bool ReissueEvent(std::shared_ptr<PointerEvent> &point, int32_t windowId, std::optional<WindowInfo> &windowInfo);
     std::shared_ptr<WindowInfo> SearchCancelList(int32_t pointerId, int32_t windowId);
+    bool SearchWindow(std::vector<std::shared_ptr<WindowInfo>> &windowList, std::shared_ptr<WindowInfo> targetWindow);
 
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
     bool enableMark_ { true };
+    std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>> cancelEventList_;
     struct {
         int32_t pid { -1 };
         int32_t windowId { -1 };
         int64_t startTime { -1 };
     } windowStateErrorInfo_;
-    std::map<int32_t, std::set<std::shared_ptr<WindowInfo>, CancelCmp>> cancelEventList_;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void FilterInvalidPointerItem(const std::shared_ptr<PointerEvent> pointEvent, int32_t fd);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

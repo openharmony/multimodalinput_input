@@ -23,6 +23,7 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "${mmi_path}/interfaces/kits/c/input",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
@@ -79,10 +80,7 @@ if (is_arkui_x) {
   ohos_source_set("libmmi-client-crossplatform") {
     sources = libmmi_common_sources
     public_configs = [ ":libmmi_public_client_config" ]
-    include_dirs = [
-      "${c_utils_root}/base/include",
-      "${mmi_path}/frameworks/proxy/events/include",
-    ]
+    include_dirs = [ "${c_utils_root}/base/include" ]
 
     if (target_os == "android") {
       defines += [ "ANDROID_PLATFORM" ]
@@ -146,6 +144,7 @@ ohos_shared_library("libmmi-client") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "image_framework:image_native",
@@ -323,7 +322,6 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
 ohos_unittest("InputManagerImplTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",
@@ -331,10 +329,11 @@ ohos_unittest("InputManagerImplTest") {
     "${mmi_path}/frameworks/proxy/event_handler/include",
   ]
 
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
+
   sources = [
-    "${mmi_path}/common/anco/comm/src/anco_channel.cpp",
-    "${mmi_path}/common/anco/comm/src/anco_channel_stub.cpp",
-    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
@@ -350,6 +349,10 @@ ohos_unittest("InputManagerImplTest") {
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
     "event_handler/test/input_manager_impl_test.cpp",
   ]
+
+  if (input_ext_feature_anco) {
+    sources += [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
+  }
 
   configs = [
     "${mmi_path}:coverage_flags",

@@ -249,11 +249,13 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
             remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
         }
     }
+    std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
     if (strUri.empty()) {
-        return DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
+        ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
     } else {
-        return DataShare::DataShareHelper::Creator(remoteObj_, strUri);
+        ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, "");
     }
+    return ret.second;
 }
 
 bool SettingDataShare::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper>& helper)
@@ -281,6 +283,15 @@ bool SettingDataShare::CheckIfSettingsDataReady()
     if (isDataShareReady_) {
         return true;
     }
+    if (remoteObj_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (remoteObj_ == nullptr) {
+            auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+            CHKPF(sam);
+            remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
+        }
+    }
+    CHKPF(remoteObj_);
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
             DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
     MMI_HILOGD("create data_share helper, ret=%{public}d", ret.first);
