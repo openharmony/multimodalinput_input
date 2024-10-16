@@ -144,6 +144,7 @@ protected:
     int32_t StubTransmitInfrared(MessageParcel& data, MessageParcel& reply);
 #ifdef OHOS_BUILD_ENABLE_HOPPER
     int32_t StubSetVKeyboardArea(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetMotionSpace(MessageParcel& data, MessageParcel& reply);
 #endif // OHOS_BUILD_ENABLE_HOPPER
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply);

@@ -798,6 +798,14 @@ int32_t MultimodalInputConnectManager::SetVKeyboardArea(double topLeftX, double 
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
 }
+
+int32_t MultimodalInputConnectManager::SetMotionSpace(std::string& keyName, bool useShift,
+    std::vector<int32_t>& pattern)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMotionSpace(keyName, useShift, pattern);
+}
 #endif // OHOS_BUILD_ENABLE_HOPPER
 
 int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)

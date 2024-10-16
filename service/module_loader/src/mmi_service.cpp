@@ -2792,6 +2792,28 @@ int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bo
     sharedKeyEvent->SetDeviceId(99);
     return RET_OK;
 }
+
+int32_t MMIService::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
+{
+    std::string result;
+    for (const auto &item : pattern) {
+        result.append(std::to_string(item));
+        result.append(", ");
+    }
+    if (pattern.size() == MotionSpacePatternIndex::PATTERN_SIZE) {
+        auto motionSpaceType = static_cast<MotionSpaceType>(pattern[MotionSpacePatternIndex::PATTERN_MST_ID]);
+        if (motionSpaceType != MotionSpaceType::TRACKPAD) {
+            // keyboard related.
+            GaussianKeyboard::UpdateMotionSpace(keyName, useShift, pattern);
+        } else {
+            // store the dimensions of trackpad.
+            TrackPadEngine::SetVTrackpadArea(keyName, pattern);
+        }
+        return RET_OK;
+    } else {
+        return COMMON_PARAMETER_ERROR;
+    }
+}
 #endif // OHOS_BUILD_ENABLE_HOPPER
 
 int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
