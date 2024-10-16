@@ -74,34 +74,37 @@ private:
     void OnSessionLost(SessionPtr session);
 
 private:
-    class SessionHandler : public GestureMonitorHandler {
+    class SessionHandler {
     public:
         SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
             SessionPtr session, std::shared_ptr<IInputEventConsumer> cb = nullptr)
             : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
               session_(session), callback_(cb) {}
+
         SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
             SessionPtr session, TouchGestureType gestureType, int32_t fingers)
             : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
               session_(session)
         {
-            AddGestureMonitor(gestureType, fingers);
+            gesture_.AddGestureMonitor(gestureType, fingers);
         }
+
         SessionHandler(InputHandlerType handlerType, uint32_t eventType, SessionPtr session,
             std::vector<int32_t> actionsType, std::shared_ptr<IInputEventConsumer> cb = nullptr)
             : handlerType_(handlerType), eventType_(eventType), session_(session), actionsType_(actionsType),
               callback_(cb) {}
+
         SessionHandler(const SessionHandler& other)
         {
             handlerType_ = other.handlerType_;
             eventType_ = other.eventType_;
             session_ = other.session_;
             callback_ = other.callback_;
-            gestureType_ = other.gestureType_;
-            fingers_ = other.fingers_;
-            touchGestureInfo_ = other.touchGestureInfo_;
+            gesture_ = other.gesture_;
             actionsType_ = other.actionsType_;
         }
+
+        bool Expect(std::shared_ptr<PointerEvent> pointerEvent) const;
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const;
         bool operator<(const SessionHandler& other) const
@@ -110,14 +113,14 @@ private:
         }
         void operator()(const GestureMonitorHandler& other)
         {
-            gestureType_ = other.gestureType_;
-            fingers_ = other.fingers_;
-            touchGestureInfo_ = other.touchGestureInfo_;
+            gesture_ = other;
         }
+
         InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ { nullptr };
         std::vector<int32_t> actionsType_;
+        GestureMonitorHandler gesture_;
         std::shared_ptr<IInputEventConsumer> callback_ { nullptr };
     };
 
