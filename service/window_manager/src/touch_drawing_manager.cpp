@@ -302,7 +302,7 @@ void TouchDrawingManager::CreateBubbleObserver(T &item)
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
         RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
         return;
     }
@@ -328,7 +328,7 @@ void TouchDrawingManager::CreatePointerObserver(T &item)
         .CreateObserver(item.SwitchName, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
         return;
     }
