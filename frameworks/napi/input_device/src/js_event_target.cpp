@@ -440,7 +440,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
-            MMI_HILOGE("callResult is nullptr");
+            MMI_HILOGE("The callResult is nullptr");
             napi_close_handle_scope(cb->env, scope);
             return;
         }
@@ -492,7 +492,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult[0] == nullptr) {
-            MMI_HILOGE("callResult[0] is nullptr");
+            MMI_HILOGE("The callResult[0] is nullptr");
             napi_close_handle_scope(cb->env, scope);
             return;
         }
@@ -672,7 +672,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
-            MMI_HILOGE("callResult is nullptr");
+            MMI_HILOGE("The callResult is nullptr");
             napi_close_handle_scope(cb->env, scope);
             return;
         }
@@ -1042,7 +1042,7 @@ void JsEventTarget::CallKeyboardRepeatDelayPromise(uv_work_t *work, int32_t stat
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
-            MMI_HILOGE("callResult is nullptr");
+            MMI_HILOGE("The callResult is nullptr");
             napi_close_handle_scope(cb->env, scope);
             return;
         }
@@ -1213,7 +1213,7 @@ void JsEventTarget::CallKeyboardRepeatRatePromise(uv_work_t *work, int32_t statu
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
-            MMI_HILOGE("callResult is nullptr");
+            MMI_HILOGE("The callResult is nullptr");
             napi_close_handle_scope(cb->env, scope);
             return;
         }
