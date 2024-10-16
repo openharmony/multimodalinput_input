@@ -138,7 +138,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
-        MMI_HILOGE("visible parameter type is invalid");
+        MMI_HILOGE("Visible parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
         return nullptr;
     }
@@ -152,7 +152,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
         return jsPointerMgr->SetPointerVisible(env, visible);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -171,7 +171,7 @@ napi_value JsPointerContext::SetPointerVisibleSync(napi_env env, napi_callback_i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
-        MMI_HILOGE("visible parameter type is invalid");
+        MMI_HILOGE("Visible parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
         return nullptr;
     }
@@ -198,7 +198,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
         return jsPointerMgr->IsPointerVisible(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1690,7 +1690,7 @@ napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_i
         return jsPointerMgr->SetTouchpadScrollRows(env, newRows);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1710,7 +1710,7 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
         return jsPointerMgr->GetTouchpadScrollRows(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
