@@ -32,6 +32,7 @@
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "oh_input_manager.h"
 #include "pixel_map.h"
 #include "switch_event_input_subscribe_manager.h"
 
@@ -51,6 +52,11 @@ constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
 constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
 constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
 constexpr int32_t INVALID_KEY_ACTION = -1;
+const std::map<int32_t, int32_t> g_keyActionMap = {
+    {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
+    {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
+    {KeyEvent::KEY_ACTION_CANCEL, KEY_ACTION_CANCEL}
+};
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -550,6 +556,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
             PrintWindowInfo(item.uiExtentionWindowInfo);
         }
+        pkt << item.rectChangeBySystem;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -583,7 +590,8 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform << item.windowInputType << item.privacyMode << item.windowType << item.privacyUIFlag;
+            << item.transform << item.windowInputType << item.privacyMode
+            << item.windowType << item.privacyUIFlag << item.rectChangeBySystem;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -613,6 +621,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanit
                 PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
                 PrintWindowInfo(item.uiExtentionWindowInfo);
             }
+            pkt << item.rectChangeBySystem;
             continue;
         }
         OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
@@ -630,6 +639,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanit
             PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
             PrintWindowInfo(item.uiExtentionWindowInfo);
         }
+        pkt << item.rectChangeBySystem;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -1334,6 +1344,7 @@ void InputManagerImpl::OnConnected()
     SendEnhanceConfig();
     PrintEnhanceConfig();
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
     if (windowStatecallback_ != nullptr) {
         MMIClientPtr client = MMIEventHdl.GetMMIClient();
         if (client != nullptr) {
@@ -2308,16 +2319,28 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
     return ERROR_UNSUPPORT;
 }
 
-void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
-{
-    if (windowStatecallback_ == nullptr) {
-        windowStatecallback_(pid, windowId);
-    }
-}
-
 int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
+}
+
+void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
+{
+    if (windowStatecallback_ != nullptr) {
+        windowStatecallback_(pid, windowId);
+    } else {
+        MMI_HILOGE("windowStatecallback_ is nullptr");
+    }
+}
+
+int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    auto iter = g_keyActionMap.find(keyAction);
+    if (iter == g_keyActionMap.end()) {
+        MMI_HILOGE("Convert keyAction:%{public}d to capi failed", keyAction);
+        return INVALID_KEY_ACTION;
+    }
+    return iter->second;
 }
 } // namespace MMI
 } // namespace OHOS

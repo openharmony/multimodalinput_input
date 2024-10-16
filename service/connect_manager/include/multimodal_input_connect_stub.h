@@ -120,11 +120,11 @@ protected:
     int32_t StubGetKeyState(MessageParcel& data, MessageParcel& reply);
     int32_t StubAuthorize(MessageParcel& data, MessageParcel& reply);
     int32_t StubCancelInjection(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
+
     int32_t StubHasIrEmitter(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetInfraredFrequencies(MessageParcel& data, MessageParcel& reply);
     int32_t StubTransmitInfrared(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
