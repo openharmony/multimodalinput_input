@@ -778,7 +778,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         DrawTrackCanvas();
         DrawBrushCanvas();
     } else {
-        MMI_HILOGE("isActionUp_ is true");
+        MMI_HILOGE("The isActionUp_ is true");
         isActionUp_ = false;
         pathInfos_.clear();
         pathLength_ = 0.0f;
@@ -962,7 +962,7 @@ void KnuckleDrawingManager::CreateScreenReadObserver(T &item)
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
         RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
         return;
     }
