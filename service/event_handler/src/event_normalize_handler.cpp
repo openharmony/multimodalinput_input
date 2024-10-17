@@ -91,6 +91,7 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_JOYSTICK_AXIS),
     static_cast<int32_t>(LIBINPUT_EVENT_SWITCH_TOGGLE)
 };
+constexpr int32_t MAX_N_PRESSED_KEYS { 10 };
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
