@@ -164,11 +164,11 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     CALL_DEBUG_ENTER;
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyState->keyCode);
+        MMI_HILOGE("The keyCode is invalid, keyCode:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
-        MMI_HILOGE("keyCode is not within the query range, keyCode:%{private}d", keyState->keyCode);
+        MMI_HILOGE("The keyCode is not within the query range, keyCode:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -213,7 +213,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 {
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyCode);
+        MMI_HILOGE("The keyCode is invalid, keyCode:%{private}d", keyCode);
         return;
     }
     keyState->keyCode = keyCode;
@@ -271,7 +271,7 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     MMI_HILOGI("Input_KeyEvent injectEvent");
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
-        MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyEvent->keyCode);
+        MMI_HILOGE("The keyCode:%{private}d is less 0, can not process", keyEvent->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(g_keyEvent, INPUT_PARAMETER_ERROR);
@@ -671,7 +671,7 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     int32_t screenX = touchEvent->displayX;
     int32_t screenY = touchEvent->displayY;
     if (screenX < 0 || screenY < 0) {
-        MMI_HILOGE("touch parameter is less 0, can not process");
+        MMI_HILOGE("Touch parameter is less 0, can not process");
         return INPUT_PARAMETER_ERROR;
     }
     item.SetDisplayX(screenX);
