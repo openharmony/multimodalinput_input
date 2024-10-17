@@ -2997,7 +2997,9 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputWindowsManager::HandleGestureInjection(bool gestureInject) {
     if (!gestureInject) {
+#ifndef OHOS_BUILD_ENABLE_VKEYBOARD
         IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
 }
 
