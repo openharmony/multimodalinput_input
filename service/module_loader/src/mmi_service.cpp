@@ -2786,10 +2786,12 @@ int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bo
     GaussianKeyboard::SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
 
     // Init the shared key event used by later key injection module and set common fields.
+    int32_t vKeyId = 1234;
+    int32_t vKeyDeviceId = 99;
     sharedKeyEvent = KeyEvent::Create();
     CHKPR(sharedKeyEvent, ERROR_NULL_POINTER);
-    sharedKeyEvent->SetId(1234);
-    sharedKeyEvent->SetDeviceId(99);
+    sharedKeyEvent->SetId(vKeyId);
+    sharedKeyEvent->SetDeviceId(vKeyDeviceId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
