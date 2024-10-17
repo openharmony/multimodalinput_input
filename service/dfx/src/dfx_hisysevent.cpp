@@ -469,7 +469,7 @@ void DfxHisysevent::ReportPowerInfo(std::shared_ptr<KeyEvent> key, OHOS::HiviewD
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
-        MMI_HILOGW("press power key is error");
+        MMI_HILOGW("Press power key is error");
     }
 }
 

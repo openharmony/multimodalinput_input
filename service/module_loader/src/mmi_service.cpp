@@ -566,7 +566,7 @@ void MMIService::OnConnected(SessionPtr s)
             continue;
         }
         if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
-            MMI_HILOGW("record client processes pid %{public}d", item.pid_);
+            MMI_HILOGW("Record client processes pid %{public}d", item.pid_);
             shellAssitentPid_ = item.pid_;
         }
     }
@@ -583,7 +583,7 @@ void MMIService::OnDisconnected(SessionPtr s)
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (s->GetProgramName() == SHELL_ASSISTANT && shellAssitentPid_ == s->GetPid()) {
-        MMI_HILOGW("clean all shell windows pid: %{public}d", s->GetPid());
+        MMI_HILOGW("Clean all shell windows pid: %{public}d", s->GetPid());
         shellAssitentPid_ = -1;
         IInputWindowsManager::GetInstance()->CleanShellWindowIds();
     }
