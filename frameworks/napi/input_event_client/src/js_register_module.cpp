@@ -374,7 +374,7 @@ static napi_value HandleTouchProperty(napi_env env, napi_value touchHandle)
         return nullptr;
     }
     if (tmpType != napi_object) {
-        MMI_HILOGE("touch is not napi_object");
+        MMI_HILOGE("Touch is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touch", "object");
         return nullptr;
     }
