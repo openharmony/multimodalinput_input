@@ -577,7 +577,7 @@ bool KeyCommandHandler::CheckTwoFingerGestureAction() const
         firstFinger.y <= topLimit || firstFinger.y >= bottomLimit ||
         secondFinger.x <= leftLimit || secondFinger.x >= rightLimit ||
         secondFinger.y <= topLimit || secondFinger.y >= bottomLimit) {
-        MMI_HILOGI("any finger out of region");
+        MMI_HILOGI("Any finger out of region");
         return false;
     }
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -886,7 +886,7 @@ bool KeyCommandHandler::IsMatchedAbility(std::vector<float> gesturePoints,
     float gestureLastX, float gestureLastY)
 {
     if (gesturePoints.size() < POINTER_NUMBER) {
-        MMI_HILOGI("gesturePoints_ is empty");
+        MMI_HILOGI("The gesturePoints_ is empty");
         return false;
     }
     float gestureFirstX = gesturePoints[0];
@@ -1911,12 +1911,12 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
     }
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
         if (bundleName == matchName) {
-            MMI_HILOGI("screen off, screenshot invalid");
+            MMI_HILOGI("Screen off, screenshot invalid");
             return false;
         }
     } else {
         if (bundleName == matchName && isScreenLocked) {
-            MMI_HILOGI("screen locked, screenshot delay 2000 milisecond");
+            MMI_HILOGI("Screen locked, screenshot delay 2000 milisecond");
             return HandleScreenLocked(sequence, isLaunchAbility);
         }
     }
@@ -2239,7 +2239,7 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
-        MMI_HILOGI("force make pointer visible");
+        MMI_HILOGI("Force make pointer visible");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         IPointerDrawingManager::GetInstance()->ForceClearPointerVisiableStatus();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
