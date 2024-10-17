@@ -34,6 +34,7 @@ constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_BUFFER_SIZE { 512 };
+constexpr size_t MAX_N_PRESSED_KEYS { 10 };
 } // namespace
 
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
@@ -991,6 +992,9 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     int32_t nPressedKeys = 0;
     READINT32(in, nPressedKeys);
+    if (nPressedKeys > static_cast<int32_t>(MAX_N_PRESSED_KEYS)) {
+        return false;
+    }
 
     for (int32_t i = 0; i < nPressedKeys; i++) {
         int32_t val = 0;
