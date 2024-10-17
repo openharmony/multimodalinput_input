@@ -600,8 +600,15 @@ void EventNormalizeHandler::PointerEventSetPressedKeys(std::shared_ptr<PointerEv
     if (KeyEventHdr != nullptr) {
         const auto &keyEvent = KeyEventHdr->GetKeyEvent();
         if (keyEvent != nullptr && pointerEvent != nullptr) {
+            std::vector<int32_t> setPressedKeys;
             std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-            pointerEvent->SetPressedKeys(pressedKeys);
+            if (pressedKeys.size() > MAX_N_PRESSED_KEYS) {
+                setPressedKeys.insert(setPressedKeys.begin(), pressedKeys.begin(),
+                    pressedKeys.begin() + MAX_N_PRESSED_KEYS);
+            } else {
+                setPressedKeys = pressedKeys;
+            }
+            pointerEvent->SetPressedKeys(setPressedKeys);
         }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
