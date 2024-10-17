@@ -44,7 +44,7 @@ public:
         CALL_DEBUG_ENTER;
         std::string action = eventData.GetWant().GetAction();
         if (action.empty()) {
-            MMI_HILOGE("action is empty");
+            MMI_HILOGE("The action is empty");
             return;
         }
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED) {
@@ -74,7 +74,7 @@ void DeviceEventMonitor::InitCommonEventSubscriber()
 {
     CALL_DEBUG_ENTER;
     if (hasInit_) {
-        MMI_HILOGE("current common event has subscribered");
+        MMI_HILOGE("Current common event has subscribered");
         return;
     }
     EventFwk::MatchingSkills matchingSkills;
