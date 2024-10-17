@@ -541,7 +541,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatDelay(napi_env env, napi_callb
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("delay parameter type is invalid");
+        MMI_HILOGE("The delay parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "delay", "number");
         return nullptr;
     }
@@ -559,7 +559,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatDelay(napi_env env, napi_callb
         return jsInputDeviceMgr->SetKeyboardRepeatDelay(env, repeatDelay);
     }
     if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -578,7 +578,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatRate(napi_env env, napi_callba
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("rate parameter type is invalid");
+        MMI_HILOGE("The rate parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rate", "number");
         return nullptr;
     }
