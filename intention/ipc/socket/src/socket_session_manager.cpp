@@ -94,10 +94,10 @@ int32_t SocketSessionManager::AllocSocketFd(const std::string& programName, int3
 
 CLOSE_SOCK:
     if (::close(sockFds[0]) != 0) {
-        FI_HILOGE("close(%{public}d) failed:%{public}s", sockFds[0], ::strerror(errno));
+        FI_HILOGE("Close(%{public}d) failed:%{public}s", sockFds[0], ::strerror(errno));
     }
     if (::close(sockFds[1]) != 0) {
-        FI_HILOGE("close(%{public}d) failed:%{public}s", sockFds[1], ::strerror(errno));
+        FI_HILOGE("Close(%{public}d) failed:%{public}s", sockFds[1], ::strerror(errno));
     }
     return RET_ERR;
 }
@@ -105,11 +105,11 @@ CLOSE_SOCK:
 bool SocketSessionManager::SetBufferSize(int32_t sockFd, int32_t bufSize)
 {
     if (::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &bufSize, sizeof(bufSize)) != 0) {
-        FI_HILOGE("setsockopt(%{public}d) failed:%{public}s", sockFd, ::strerror(errno));
+        FI_HILOGE("Set sockopt(%{public}d) failed:%{public}s", sockFd, ::strerror(errno));
         return false;
     }
     if (::setsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &bufSize, sizeof(bufSize)) != 0) {
-        FI_HILOGE("setsockopt(%{public}d) failed:%{public}s", sockFd, ::strerror(errno));
+        FI_HILOGE("Set sockopt(%{public}d) failed:%{public}s", sockFd, ::strerror(errno));
         return false;
     }
     return true;
