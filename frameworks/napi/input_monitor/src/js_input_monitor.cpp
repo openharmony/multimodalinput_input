@@ -1473,7 +1473,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             },
             &JsInputMonitor::JsCallback, uv_qos_user_initiated);
         if (ret != 0) {
-            MMI_HILOGE("add uv_queue failed, ret is %{public}d", ret);
+            MMI_HILOGE("Add uv_queue failed, ret is %{public}d", ret);
             CleanData(&monitorInfo, &work);
         }
     }
@@ -1524,7 +1524,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             CHKPV(scope);
             auto pointerEvent = evQueue_.front();
             if (pointerEvent == nullptr) {
-                MMI_HILOGE("scope is nullptr");
+                MMI_HILOGE("Scope is nullptr");
                 napi_close_handle_scope(jsEnv_, scope);
                 continue;
             }
@@ -1784,15 +1784,15 @@ bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGE("failed to do swipe inward, wrong source: %{public}d ", pointerEvent->GetSourceType());
+        MMI_HILOGE("Failed to do swipe inward, wrong source: %{public}d ", pointerEvent->GetSourceType());
         return false;
     } else if (pointerEvent->GetPointerCount() != ONE_FINGERS) {
-        MMI_HILOGE("failed to do swipe inward, more than one finger");
+        MMI_HILOGE("Failed to do swipe inward, more than one finger");
         return false;
     } else if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
-        MMI_HILOGE("failed to do swipe inward, wrong action");
+        MMI_HILOGE("Failed to do swipe inward, wrong action");
         return false;
     }
     return true;
