@@ -411,7 +411,7 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
     if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
-        MMI_HILOGE("switch type error, switchType:%{public}d", switchType);
+        MMI_HILOGE("Switch type error, switchType:%{public}d", switchType);
         return RET_ERR;
     }
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(switchType, callback);
@@ -1118,7 +1118,7 @@ int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, int32_t focusX, int3
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t winPid = GetWindowPid(windowId);
     if (winPid == -1) {
-        MMI_HILOGE("winPid is invalid");
+        MMI_HILOGE("The winPid is invalid");
         return RET_ERR;
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(winPid, windowId, focusX, focusY, pixelMap);
@@ -1153,7 +1153,7 @@ int32_t InputManagerImpl::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, in
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t winPid = GetWindowPid(windowId);
     if (winPid == -1) {
-        MMI_HILOGE("winPid is invalid return -1");
+        MMI_HILOGE("The winPid is invalid return -1");
         return RET_ERR;
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMouseHotSpot(winPid, windowId, hotSpotX, hotSpotY);
