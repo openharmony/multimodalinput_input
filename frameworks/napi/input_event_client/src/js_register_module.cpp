@@ -172,20 +172,20 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     napi_valuetype tmpType = napi_undefined;
     CHKRP(napi_typeof(env, argv[0], &tmpType), TYPEOF);
     if (tmpType != napi_object) {
-        MMI_HILOGE("keyEvent is not napi_object");
+        MMI_HILOGE("KeyEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyEvent", "object");
         return nullptr;
     }
     napi_value keyHandle = nullptr;
     CHKRP(napi_get_named_property(env, argv[0], "keyEvent", &keyHandle), GET_NAMED_PROPERTY);
     if (keyHandle == nullptr) {
-        MMI_HILOGE("keyEvent is nullptr");
+        MMI_HILOGE("KeyEvent is nullptr");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyEvent not found");
         return nullptr;
     }
     CHKRP(napi_typeof(env, keyHandle, &tmpType), TYPEOF);
     if (tmpType != napi_object) {
-        MMI_HILOGE("keyEvent is not napi_object");
+        MMI_HILOGE("KeyEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyEvent", "object");
         return nullptr;
     }
