@@ -128,11 +128,11 @@ VendorConfig DeviceConfigManagement::GetVendorConfig(struct libinput_device *dev
     }
     auto configList = ReadConfigFile(path);
     if (configList.empty()) {
-        MMI_HILOGE("configList is empty");
+        MMI_HILOGE("The configList is empty");
         return vendorConfigTmp;
     }
     if (configList.find(ConfigFileItem::POINTER_SPEED) == configList.end()) {
-        MMI_HILOGE("configList not find POINTER_SPEED");
+        MMI_HILOGE("The configList not find POINTER_SPEED");
         return vendorConfigTmp;
     }
     vendorConfigTmp.pointerSpeed = configList[ConfigFileItem::POINTER_SPEED];
