@@ -393,10 +393,6 @@ ohos_unittest("InputManagerImplTest") {
     "window_manager:libwsutils",
   ]
 
-  if (input_feature_switch) {
-    sources += [ "event_handler/src/switch_event_input_subscribe_manager.cpp" ]
-  }
-
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
