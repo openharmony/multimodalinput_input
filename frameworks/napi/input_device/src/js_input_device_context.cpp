@@ -669,7 +669,7 @@ napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_in
     size_t argc = SET_VK_AREA_NUMBER_PARAMETERS;
     napi_value argv[SET_VK_AREA_NUMBER_PARAMETERS] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc >= SET_VK_AREA_NUMBER_PARAMETERS) {
+    if (argc != SET_VK_AREA_NUMBER_PARAMETERS) {
         MMI_HILOGE("SetVKeyboardArea parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
