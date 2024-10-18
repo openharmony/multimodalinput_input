@@ -36,8 +36,8 @@ constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
 constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-constexpr uint32_t SET_VK_AREA_NUMBER_PARAMETERS { 4 };
-constexpr uint32_t UPDATE_VK_MS_NUMBER_PARAMETERS { 1 };
+constexpr int32_t SET_VK_AREA_NUMBER_PARAMETERS { 4 };
+constexpr int32_t UPDATE_VK_MS_NUMBER_PARAMETERS { 1 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 enum class VKResult : int32_t {
     FAILED = 0,
@@ -669,29 +669,34 @@ napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_in
     size_t argc = SET_VK_AREA_NUMBER_PARAMETERS;
     napi_value argv[SET_VK_AREA_NUMBER_PARAMETERS] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc != SET_VK_AREA_NUMBER_PARAMETERS) {
+    if (argc >= SET_VK_AREA_NUMBER_PARAMETERS) {
         MMI_HILOGE("SetVKeyboardArea parameter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
         return result;
     }
-    double topLeftX = 0;
+    double topLeftX = 0.0;
     if (!JsUtil::ParseDouble(env, argv[0], topLeftX)) {
         MMI_HILOGE("ParseDouble failed. property name: topLeftX");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "topLeftX", "number");
         isSuccess = false;
     }
-    double topLeftY = 0;
+    double topLeftY = 0.0;
     if (!JsUtil::ParseDouble(env, argv[1], topLeftY)) {
-        MMI_HILOGE("ParseDouble failed. property name: topLeftX");
+        MMI_HILOGE("ParseDouble failed. property name: topLeftY");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "topLeftY", "number");
         isSuccess = false;
     }
-    double bottomRightX = 0;
+    double bottomRightX = 0.0;
     if (!JsUtil::ParseDouble(env, argv[2], bottomRightX)) {
         MMI_HILOGE("ParseDouble failed. property name: bottomRightX");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "bottomRightX", "number");
         isSuccess = false;
     }
-    double bottomRightY = 0;
+    double bottomRightY = 0.0;
     if (!JsUtil::ParseDouble(env, argv[3], bottomRightY)) {
         MMI_HILOGE("ParseDouble failed. property name: bottomRightY");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "bottomRightY", "number");
         isSuccess = false;
     }
     if (isSuccess) {
@@ -700,7 +705,7 @@ napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_in
             result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
         } else {
             result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
-            MMI_HILOGE("SetVKeyboardArea failed with ret: %{public}d", (int)ret);
+            MMI_HILOGE("SetVKeyboardArea failed with ret: %{public}d", ret);
         }
     } else {
         result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
@@ -923,7 +928,7 @@ napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_i
             result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
         } else {
             result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
-            MMI_HILOGE("UpdateMotionSpace failed with ret: %{public}d", (int)ret);
+            MMI_HILOGE("UpdateMotionSpace failed with ret: %{public}d", ret);
         }
         while (!bmsArray.empty()) {
             ButtonMotionSpace* bms = bmsArray.back();
