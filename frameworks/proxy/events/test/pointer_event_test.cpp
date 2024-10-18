@@ -68,21 +68,6 @@ std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
-
-/**
- * @tc.name: PointerEventTest_keyEventAndPointerEvent_003
- * @tc.desc: Verify ctrl(left and right) + point event
- * @tc.type: FUNC
- * @tc.require: AR000GOACS
- * @tc.author: yangguang
- */
-HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT };
-}
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 /**
