@@ -94,6 +94,7 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_JOYSTICK_AXIS),
     static_cast<int32_t>(LIBINPUT_EVENT_SWITCH_TOGGLE)
 };
+constexpr int32_t MAX_N_PRESSED_KEYS { 10 };
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -606,8 +607,15 @@ void EventNormalizeHandler::PointerEventSetPressedKeys(std::shared_ptr<PointerEv
     if (KeyEventHdr != nullptr) {
         const auto &keyEvent = KeyEventHdr->GetKeyEvent();
         if (keyEvent != nullptr && pointerEvent != nullptr) {
+            std::vector<int32_t> setPressedKeys;
             std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-            pointerEvent->SetPressedKeys(pressedKeys);
+            if (pressedKeys.size() > MAX_N_PRESSED_KEYS) {
+                setPressedKeys.insert(setPressedKeys.begin(), pressedKeys.begin(),
+                    pressedKeys.begin() + MAX_N_PRESSED_KEYS);
+            } else {
+                setPressedKeys = pressedKeys;
+            }
+            pointerEvent->SetPressedKeys(setPressedKeys);
         }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
