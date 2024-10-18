@@ -116,7 +116,10 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
         }
         int32_t errNo = errno;
-        MMI_HILOGWK("Libinput .open_restricted path:%{private}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+        std::string pathStr(path);
+        size_t pos = pathStr.rfind('/');
+        std::string event = pathStr.substr(pos + 1);
+        MMI_HILOGWK("Libinput .open_restricted path:***/%{public}s,fd:%{public}d,errno:%{public}d", event.c_str(), fd, errNo);
         return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
@@ -211,7 +214,10 @@ void LibinputAdapter::ReloadDevice()
 
 void LibinputAdapter::OnDeviceAdded(std::string path)
 {
-    CALL_DEBUG_ENTER;
+    std::string pathStr(path);
+    size_t locations  = pathStr.rfind('/');
+    std::string event = pathStr.substr(locations + 1);
+    MMI_HILOGI("OnDeviceAdded path:***/%{public}s", event.c_str());
     auto pos = devices_.find(path);
     if (pos != devices_.end()) {
         MMI_HILOGD("Path is found");
@@ -227,7 +233,10 @@ void LibinputAdapter::OnDeviceAdded(std::string path)
 
 void LibinputAdapter::OnDeviceRemoved(std::string path)
 {
-    CALL_DEBUG_ENTER;
+    std::string pathStr(path);
+    size_t locations  = pathStr.rfind('/');
+    std::string event = pathStr.substr(locations + 1);
+    MMI_HILOGI("OnDeviceRemoved path:***/%{public}s", event.c_str());
     auto pos = devices_.find(path);
     if (pos != devices_.end()) {
         libinput_path_remove_device(pos->second);
