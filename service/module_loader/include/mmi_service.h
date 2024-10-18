@@ -148,6 +148,7 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY) override;
+    int32_t OnSetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
     int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern) override;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
@@ -295,6 +296,9 @@ private:
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     bool hasRegisterListener_ { false };
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    std::atomic_bool isHopper_ { false };
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 };
 } // namespace MMI
 } // namespace OHOS

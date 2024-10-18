@@ -663,58 +663,49 @@ napi_value JsInputDeviceContext::GetIntervalSinceLastInput(napi_env env, napi_ca
 napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    napi_value result = nullptr;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    bool isSuccess = true;
     size_t argc = SET_VK_AREA_NUMBER_PARAMETERS;
     napi_value argv[SET_VK_AREA_NUMBER_PARAMETERS] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != SET_VK_AREA_NUMBER_PARAMETERS) {
         MMI_HILOGE("SetVKeyboardArea parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
-        result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
-        return result;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     }
     double topLeftX = 0.0;
     if (!JsUtil::ParseDouble(env, argv[0], topLeftX)) {
         MMI_HILOGE("ParseDouble failed. property name: topLeftX");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "topLeftX", "number");
-        isSuccess = false;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     }
     double topLeftY = 0.0;
     if (!JsUtil::ParseDouble(env, argv[1], topLeftY)) {
         MMI_HILOGE("ParseDouble failed. property name: topLeftY");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "topLeftY", "number");
-        isSuccess = false;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     }
     double bottomRightX = 0.0;
     if (!JsUtil::ParseDouble(env, argv[2], bottomRightX)) {
         MMI_HILOGE("ParseDouble failed. property name: bottomRightX");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "bottomRightX", "number");
-        isSuccess = false;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     }
     double bottomRightY = 0.0;
     if (!JsUtil::ParseDouble(env, argv[3], bottomRightY)) {
         MMI_HILOGE("ParseDouble failed. property name: bottomRightY");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "bottomRightY", "number");
-        isSuccess = false;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     }
-    if (isSuccess) {
-        int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
-        if (ret == RET_OK) {
-            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
-        } else {
-            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
-            MMI_HILOGE("SetVKeyboardArea failed with ret: %{public}d", ret);
-        }
-    } else {
-        result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+    int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetVKeyboardArea failed with ret: %{public}d", ret);
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     }
+    return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
 #else
-    result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "SetVKeyboardArea", "Not support");
+    return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    return result;
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD

@@ -2071,8 +2071,7 @@ int32_t MultimodalInputConnectProxy::SetVKeyboardArea(double topLeftX, double to
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-                                      MultimodalinputConnectInterfaceCode::SET_VKEYBOARD_AREA),
-                                      data, reply, option);
+        MultimodalinputConnectInterfaceCode::SET_VKEYBOARD_AREA), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::SetVKeyboardArea Send request fail, ret:%{public}d", ret);
     }

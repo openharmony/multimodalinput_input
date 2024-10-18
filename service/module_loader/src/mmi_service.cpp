@@ -133,6 +133,10 @@ const std::set<int32_t> g_keyCodeValueSet = {
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t DEFAULT_USER_ID { 100 };
 #endif // OHOS_BUILD_ENABLE_ANCO
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+const std::string DEVICE_TYPE_HOPPER { "HPR" };
+const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
@@ -408,6 +412,9 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+isHopper_ = PRODUCT_TYPE == DEVICE_TYPE_HOPPER;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -2783,15 +2790,24 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
-    GaussianKeyboard::SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+    CALL_DEBUG_ENTER;
+    if (!isHopper_) {
+        return RET_ERR;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, topLeftX, topLeftY, bottomRightX, bottomRightY] {
+            return this->OnSetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set virtual keyboard area, ret:%{public}d", ret);
+    }
+    return ret;
+}
 
-    // Init the shared key event used by later key injection module and set common fields.
-    int32_t vKeyId = 1234;
-    int32_t vKeyDeviceId = 99;
-    sharedKeyEvent = KeyEvent::Create();
-    CHKPR(sharedKeyEvent, ERROR_NULL_POINTER);
-    sharedKeyEvent->SetId(vKeyId);
-    sharedKeyEvent->SetDeviceId(vKeyDeviceId);
+int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
+{
+    GaussianKeyboard::SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
     return RET_OK;
 }
 
