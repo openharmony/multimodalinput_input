@@ -112,7 +112,7 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
     OH_Input_SetKeyEventAction(keyEventNative, keyAction);
     OH_Input_SetKeyEventKeyCode(keyEventNative, keyCode);
     OH_Input_SetKeyEventActionTime(keyEventNative, static_cast<int64_t>(keyDownDuration));
-    Input_Result result = static_cast<Input_Result>(OH_Input_InjectKeyEventNonNative(keyEventNative));
+    Input_Result result = static_cast<Input_Result>(OH_Input_InjectKeyEvent(keyEventNative));
     if (result != INPUT_SUCCESS) {
         THROWERR_CUSTOM(env, result, "Error while injecting KeyEvent with native api");
     }
