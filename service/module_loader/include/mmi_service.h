@@ -150,6 +150,7 @@ public:
     int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY) override;
     int32_t OnSetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
     int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern) override;
+    int32_t OnSetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
