@@ -231,7 +231,7 @@ bool JsUtil::ParseDouble(napi_env env, napi_value value, double& result)
 {
     if (!CheckType(env, value, napi_number)) {
         MMI_HILOGE("ParseDouble type not number");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "parameter", "Number");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "parameter", "number");
         return false;
     }
     if (napi_get_value_double(env, value, &result) != napi_ok) {
@@ -260,8 +260,8 @@ bool JsUtil::ParseInt32(napi_env env, napi_value value, int32_t& result)
         return false;
     }
     if (napi_get_value_int32(env, value, &result) != napi_ok) {
-        MMI_HILOGE("ParseInt32 cannot get value int32");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element", "int32");
+        MMI_HILOGE("ParseInt32 cannot get value int32_t");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element", "int32_t");
         return false;
     }
     return true;
