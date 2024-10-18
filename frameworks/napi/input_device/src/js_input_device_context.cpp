@@ -37,7 +37,7 @@ constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr int32_t SET_VK_AREA_NUMBER_PARAMETERS { 4 };
-constexpr uint32_t UPDATE_VK_MS_NUMBER_PARAMETERS { 1 };
+constexpr int32_t UPDATE_VK_MS_NUMBER_PARAMETERS { 1 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 enum class VKResult : int32_t {
     FAILED = 0,
@@ -928,7 +928,7 @@ napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_i
             result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
         } else {
             result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
-            MMI_HILOGE("UpdateMotionSpace failed with ret: %{public}d", (int)ret);
+            MMI_HILOGE("UpdateMotionSpace failed with ret: %{public}d", ret);
         }
         while (!bmsArray.empty()) {
             ButtonMotionSpace* bms = bmsArray.back();
