@@ -2813,19 +2813,28 @@ int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double 
 
 int32_t MMIService::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
 {
-    std::string result;
-    for (const auto &item : pattern) {
-        result.append(std::to_string(item));
-        result.append(", ");
+    CALL_DEBUG_ENTER;
+    if (!isHopper_) {
+        return RET_ERR;
     }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &keyName, useShift, &pattern] {
+            return this->OnSetMotionSpace(keyName, useShift, pattern);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set motion space, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::OnSetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
+{
     if (pattern.size() == MotionSpacePatternIndex::PATTERN_SIZE) {
         auto motionSpaceType = static_cast<MotionSpaceType>(pattern[MotionSpacePatternIndex::PATTERN_MST_ID]);
         if (motionSpaceType != MotionSpaceType::TRACKPAD) {
-            // keyboard related.
+            // Keyboard related.
             GaussianKeyboard::UpdateMotionSpace(keyName, useShift, pattern);
-        } else {
-            // store the dimensions of trackpad.
-            TrackPadEngine::SetVTrackpadArea(keyName, pattern);
         }
         return RET_OK;
     } else {
