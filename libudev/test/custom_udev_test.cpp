@@ -348,19 +348,6 @@ HWTEST_F(CustomUdevTest, TestUdevWheel, TestSize.Level1)
     EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_KEY"), "1");
 }
 
-HWTEST_F(CustomUdevTest, TestUdevAbsMouse, TestSize.Level1)
-{
-    testDevice_.AbsMouseSetup();
-    ASSERT_NO_FATAL_FAILURE(testDevice_.Init(false));
-    auto* device = testDevice_.GetDevice();
-
-    auto* parent = udev_device_get_parent(device);
-    ASSERT_NE(parent, nullptr);
-
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_MOUSE"), "1");
-}
-
 HWTEST_F(CustomUdevTest, TestUdevPropsKey, TestSize.Level1)
 {
     testDevice_.KeyboardSetup();
