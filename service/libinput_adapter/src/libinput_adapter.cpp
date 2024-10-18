@@ -119,7 +119,8 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         std::string pathStr(path);
         size_t pos = pathStr.rfind('/');
         std::string event = pathStr.substr(pos + 1);
-        MMI_HILOGWK("Libinput .open_restricted path:***/%{public}s,fd:%{public}d,errno:%{public}d", event.c_str(), fd, errNo);
+        MMI_HILOGWK("Libinput .open_restricted path:***/%{public}s, fd:%{public}d, errno:%{public}d",
+            event.c_str(), fd, errNo);
         return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
