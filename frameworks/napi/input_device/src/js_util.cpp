@@ -220,14 +220,14 @@ void JsUtil::DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback)
     }
 }
 
-bool JsUtil::CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type)
+bool JsUtil::CheckType(napi_env env, napi_value value, napi_valuetype type)
 {
     napi_valuetype valuetype = napi_undefined;
     napi_typeof(env, value, &valuetype);
     return valuetype == type;
 }
 
-bool JsUtil::ParseDouble(const napi_env& env, const napi_value& value, double& result)
+bool JsUtil::ParseDouble(napi_env env, napi_value value, double& result)
 {
     if (!CheckType(env, value, napi_number)) {
         MMI_HILOGE("ParseDouble type not number");
@@ -242,7 +242,7 @@ bool JsUtil::ParseDouble(const napi_env& env, const napi_value& value, double& r
     return true;
 }
 
-bool JsUtil::IsArray(const napi_env& env, const napi_value& value)
+bool JsUtil::IsArray(napi_env env, napi_value value)
 {
     bool isArray = false;
     if (napi_is_array(env, value, &isArray) != napi_ok) {
@@ -252,7 +252,7 @@ bool JsUtil::IsArray(const napi_env& env, const napi_value& value)
     return isArray;
 }
 
-bool JsUtil::ParseInt32(const napi_env& env, const napi_value& value, int32_t& result)
+bool JsUtil::ParseInt32(napi_env env, napi_value value, int32_t& result)
 {
     if (!CheckType(env, value, napi_number)) {
         MMI_HILOGE("ParseInt32 type not number");
@@ -267,7 +267,7 @@ bool JsUtil::ParseInt32(const napi_env& env, const napi_value& value, int32_t& r
     return true;
 }
 
-bool JsUtil::ParseString(const napi_env& env, const napi_value& value, char* result)
+bool JsUtil::ParseString(napi_env env, napi_value value, char* result)
 {
     if (!CheckType(env, value, napi_string)) {
         MMI_HILOGE("ParseString type not string");
@@ -284,7 +284,7 @@ bool JsUtil::ParseString(const napi_env& env, const napi_value& value, char* res
     return true;
 }
 
-bool JsUtil::ParseBool(const napi_env& env, const napi_value& value, bool& result)
+bool JsUtil::ParseBool(napi_env env, napi_value value, bool& result)
 {
     if (!CheckType(env, value, napi_boolean)) {
         MMI_HILOGE("ParseBool type not boolean");
