@@ -82,7 +82,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateEnumKeyboardType(napi_env env, napi_value exports);
-    static napi_value CreateEnumVKResult(napi_env env, napi_value exports);
+    static napi_value CreateEnumVKeyResult(napi_env env, napi_value exports);
     static napi_value CreateEnumMotionSpaceType(napi_env env, napi_value exports);
     static napi_value CreateEnumPageType(napi_env env, napi_value exports);
     std::shared_ptr<JsInputDeviceManager> mgr_ { nullptr };
