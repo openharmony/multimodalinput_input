@@ -1002,6 +1002,11 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
             HandleWindowPositionChange();
         }
     }
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (isDisplayRemoved) {
+        ResetCursorPos();
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     PrintDisplayInfo();
     if (!displayGroupInfo_.displaysInfo.empty()) {
         UpdateDisplayIdAndName();
@@ -4516,7 +4521,6 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
 bool InputWindowsManager::OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo)
 {
     if (displayGroupInfo.displaysInfo.size() < displayGroupInfo_.displaysInfo.size()) {
-        ResetCursorPos();
         return true;
     }
     return false;
