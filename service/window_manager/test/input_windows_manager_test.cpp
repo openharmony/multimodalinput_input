@@ -6510,7 +6510,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_001, 
     windowInfo.flags = 1;
     windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     windowInfo.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
-    windowInfo1.action = WINDOW_UPDATE_ACTION::ADD;
+    windowInfo.action = WINDOW_UPDATE_ACTION::ADD;
     displayGroupInfo.windowsInfo.push_back(windowInfo);
 
     WINDOW_UPDATE_ACTION ret = WIN_MGR->UpdateWindowInfo(displayGroupInfo);
