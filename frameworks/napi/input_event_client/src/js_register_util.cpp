@@ -47,7 +47,8 @@ int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, cons
     return RET_OK;
 }
 
-int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name, int32_t& ret)
+int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object,
+    const std::string& name, int32_t& ret, bool required)
 {
     napi_value napiValue = {};
     if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
@@ -56,7 +57,9 @@ int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, con
     }
     if (napiValue == nullptr) {
         MMI_HILOGE("The value is null");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid KeyEvent");
+        if (required) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid KeyEvent");
+        }
         return RET_ERR;
     }
     napi_valuetype tmpType = napi_undefined;
@@ -66,7 +69,9 @@ int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, con
     }
     if (tmpType != napi_number) {
         MMI_HILOGE("The value is not int32_t");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "int");
+        if (required) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid KeyEvent");
+        }
         return RET_ERR;
     }
     if (napi_get_value_int32(env, napiValue, &ret) != napi_ok) {
