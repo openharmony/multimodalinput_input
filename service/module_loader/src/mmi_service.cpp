@@ -142,7 +142,7 @@ const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 // Define vkeyboard functions from vendor
 const std::string VKEYBOARD_PATH { "libvkeyboard.z.so" };
-void* vkeyboardHandle_ = nullptr;
+void* g_VKeyboardHandle = nullptr;
 typedef void (*ALGORITHM_KEYDOWN_TYPE)(
     double screenX, double screenY, int touchId, bool tipDown, string buttonName);
 ALGORITHM_KEYDOWN_TYPE algorithm_keydown_ = nullptr;
@@ -175,12 +175,12 @@ typedef bool (*GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)();
 GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE gaussiankeyboard_isVKeyboardVisible_ = nullptr;
 typedef bool (*ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)(int touchId);
 ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE algorithm_isKeyDownInKeyboard_ = nullptr;
-std::vector<int32_t> keyDownSet;
-std::unordered_set<int32_t> modifiersDownSet;
+std::vector<int32_t> g_VKeyDownSet;
+std::unordered_set<int32_t> g_VKeyModifiersDownSet;
 // Shared key event for key injection for printing.
-std::shared_ptr<KeyEvent> sharedKeyEvent { nullptr };
+std::shared_ptr<KeyEvent> g_VKeySharedKeyEvent { nullptr };
 // Shared key event for UI rendering.
-std::shared_ptr<KeyEvent> sharedUIKeyEvent { nullptr };
+std::shared_ptr<KeyEvent> g_VKeySharedUIKeyEvent { nullptr };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
@@ -425,38 +425,38 @@ int32_t MMIService::Init()
 bool IsEightFingersDown(int32_t pointerId, int32_t pointerAction)
 {
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_UP) {
-        std::vector<int32_t>::iterator ite = std::find(keyDownSet.begin(), keyDownSet.end(), pointerId);
-        if (ite != keyDownSet.end()) {
-            keyDownSet.erase(ite);
+        std::vector<int32_t>::iterator ite = std::find(g_VKeyDownSet.begin(), g_VKeyDownSet.end(), pointerId);
+        if (ite != g_VKeyDownSet.end()) {
+            g_VKeyDownSet.erase(ite);
         }
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN) {
-        if (std::find(keyDownSet.begin(), keyDownSet.end(), pointerId) == keyDownSet.end()) {
-            keyDownSet.push_back(pointerId);
+        if (std::find(g_VKeyDownSet.begin(), g_VKeyDownSet.end(), pointerId) == g_VKeyDownSet.end()) {
+            g_VKeyDownSet.push_back(pointerId);
         }
     }
-    return keyDownSet.size() == 8;
+    return g_VKeyDownSet.size() == 8;
 }
 
 void HandleKeyActionHelper(int32_t action, int32_t keyCode, OHOS::MMI::KeyEvent::KeyItem &item)
 {
     if (action == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
-        sharedKeyEvent->AddPressedKeyItems(item);
+        g_VKeySharedKeyEvent->AddPressedKeyItems(item);
     }
     if (action == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
-        std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = sharedKeyEvent->GetKeyItem(keyCode);
+        std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = g_VKeySharedKeyEvent->GetKeyItem(keyCode);
         if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
             MMI_HILOGW("Find pressed key failed");
         }
-        sharedKeyEvent->RemoveReleasedKeyItems(item);
-        sharedKeyEvent->AddPressedKeyItems(item);
+        g_VKeySharedKeyEvent->RemoveReleasedKeyItems(item);
+        g_VKeySharedKeyEvent->AddPressedKeyItems(item);
     }
 }
 
 // Ref: oh_input_manager.
 // Receive: action and keyCode.
-// send out modified global sharedKeyEvent to the event normalizer.
+// send out modified global g_VKeySharedKeyEvent to the event normalizer.
 int32_t HandleKeyInjectEventHelper(std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler,
     int32_t action, int32_t keyCode)
 {
@@ -465,28 +465,28 @@ int32_t HandleKeyInjectEventHelper(std::shared_ptr<EventNormalizeHandler> eventN
         MMI_HILOGE("keyCode is less 0, can not process");
         return COMMON_PARAMETER_ERROR;
     }
-    CHKPR(sharedKeyEvent, ERROR_NULL_POINTER);
-    sharedKeyEvent->ClearFlag();
-    if (sharedKeyEvent->GetAction() == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
-        std::optional<OHOS::MMI::KeyEvent::KeyItem> preUpKeyItem = sharedKeyEvent->GetKeyItem();
+    CHKPR(g_VKeySharedKeyEvent, ERROR_NULL_POINTER);
+    g_VKeySharedKeyEvent->ClearFlag();
+    if (g_VKeySharedKeyEvent->GetAction() == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        std::optional<OHOS::MMI::KeyEvent::KeyItem> preUpKeyItem = g_VKeySharedKeyEvent->GetKeyItem();
         if (preUpKeyItem) {
-            sharedKeyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
+            g_VKeySharedKeyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
             MMI_HILOGE("The preUpKeyItem is nullopt");
         }
     }
     int64_t time = OHOS::MMI::GetSysClockTime();
-    sharedKeyEvent->SetActionTime(time);
-    sharedKeyEvent->SetRepeat(true);
-    sharedKeyEvent->SetKeyCode(keyCode);
+    g_VKeySharedKeyEvent->SetActionTime(time);
+    g_VKeySharedKeyEvent->SetRepeat(true);
+    g_VKeySharedKeyEvent->SetKeyCode(keyCode);
     bool isKeyPressed = false;
     if (action == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
-        sharedKeyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
-        sharedKeyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+        g_VKeySharedKeyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+        g_VKeySharedKeyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
         isKeyPressed = true;
     } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
-        sharedKeyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
-        sharedKeyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+        g_VKeySharedKeyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+        g_VKeySharedKeyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
         isKeyPressed = false;
     }
     OHOS::MMI::KeyEvent::KeyItem item;
@@ -494,9 +494,9 @@ int32_t HandleKeyInjectEventHelper(std::shared_ptr<EventNormalizeHandler> eventN
     item.SetKeyCode(keyCode);
     item.SetPressed(isKeyPressed);
     HandleKeyActionHelper(action, keyCode, item);
-    sharedKeyEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
+    g_VKeySharedKeyEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
     
-    eventNormalizeHandler->HandleKeyEvent(sharedKeyEvent);
+    eventNormalizeHandler->HandleKeyEvent(g_VKeySharedKeyEvent);
     return RET_OK;
 }
 
@@ -508,11 +508,11 @@ int32_t SendCombinationKeyPress(std::vector<int32_t>& toggleKeyCodes, int32_t tr
     CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
     // Trigger all modifier(s), if not done already.
     for (auto& toggleCode: toggleKeyCodes) {
-        if (modifiersDownSet.count(toggleCode) == 0) {
+        if (g_VKeyModifiersDownSet.count(toggleCode) == 0) {
             // Not exist, then trigger the modifier.
             HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_DOWN,
                 toggleCode);
-            modifiersDownSet.insert(toggleCode);
+            g_VKeyModifiersDownSet.insert(toggleCode);
         }
     }
     // Trigger key.
@@ -532,7 +532,7 @@ int32_t SendKeyRelease(int32_t keyCode)
     // Release key.
     HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_UP,
         keyCode);
-    modifiersDownSet.erase(keyCode);
+    g_VKeyModifiersDownSet.erase(keyCode);
     return RET_OK;
 }
 
@@ -547,7 +547,7 @@ int32_t SendKeyPress(int32_t keyCode)
     // Release key.
     HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_UP,
         keyCode);
-    modifiersDownSet.erase(keyCode);
+    g_VKeyModifiersDownSet.erase(keyCode);
     return RET_OK;
 }
 
@@ -556,44 +556,44 @@ int32_t ToggleKeyVisualState(std::string& keyName, int32_t keyCode, bool visualP
 {
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
-    sharedUIKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    g_VKeySharedUIKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
     // If this shared event's previous action is up, it means there is a key up event left in the pressed seq. remove it now.
-    if (sharedUIKeyEvent->GetVKeyboardAction() == KeyEvent::VKeyboardAction::VKEY_UP) {
-        std::optional<OHOS::MMI::KeyEvent::KeyItem> preUpKeyItem = sharedUIKeyEvent->GetKeyItem();
+    if (g_VKeySharedUIKeyEvent->GetVKeyboardAction() == KeyEvent::VKeyboardAction::VKEY_UP) {
+        std::optional<OHOS::MMI::KeyEvent::KeyItem> preUpKeyItem = g_VKeySharedUIKeyEvent->GetKeyItem();
         if (preUpKeyItem) {
-            sharedUIKeyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
+            g_VKeySharedUIKeyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
             MMI_HILOGE("The preUpKeyItem is nullopt");
         }
     }
     int64_t time = OHOS::MMI::GetSysClockTime();
-    sharedUIKeyEvent->SetActionTime(time);
+    g_VKeySharedUIKeyEvent->SetActionTime(time);
 
     KeyEvent::KeyItem keyItem;
     keyItem.SetDownTime(time);
     keyItem.SetKeyCode(keyCode);
     keyItem.SetPressed(visualPressed);
 
-    sharedUIKeyEvent->SetKeyCode(keyCode);
-    sharedUIKeyEvent->SetKeyName(keyName);
+    g_VKeySharedUIKeyEvent->SetKeyCode(keyCode);
+    g_VKeySharedUIKeyEvent->SetKeyName(keyName);
 
     if (visualPressed){
-        sharedUIKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_DOWN);
-        sharedUIKeyEvent->AddPressedKeyItems(keyItem);
+        g_VKeySharedUIKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_DOWN);
+        g_VKeySharedUIKeyEvent->AddPressedKeyItems(keyItem);
     } else {
-        sharedUIKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_UP);
+        g_VKeySharedUIKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_UP);
         // Get the correct down time from pressed keys (when it is down)
-        std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = sharedUIKeyEvent->GetKeyItem(keyCode);
+        std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = g_VKeySharedUIKeyEvent->GetKeyItem(keyCode);
         if (pressedKeyItem) {
             keyItem.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
             MMI_HILOGW("Find pressed key failed");
         }
         // Remove the old ones (down key item) and add the new one (up key item)
-        sharedUIKeyEvent->RemoveReleasedKeyItems(keyItem);
-        sharedUIKeyEvent->AddPressedKeyItems(keyItem);
+        g_VKeySharedUIKeyEvent->RemoveReleasedKeyItems(keyItem);
+        g_VKeySharedUIKeyEvent->AddPressedKeyItems(keyItem);
     }
-    eventNormalizeHandler->HandleKeyEvent(sharedUIKeyEvent);
+    eventNormalizeHandler->HandleKeyEvent(g_VKeySharedUIKeyEvent);
     return RET_OK;
 }
 
@@ -919,28 +919,28 @@ void MMIService::OnStart()
         delegateInterface_->AddHandler(InputHandlerType::MONITOR, summary);
 
         // Initialize vkeyboard handler
-        vkeyboardHandle_ = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
-        if (vkeyboardHandle_ != nullptr) {
-            algorithm_keydown_ = (ALGORITHM_KEYDOWN_TYPE)dlsym(vkeyboardHandle_, "AlgorithmKeyDown");
-            algorithm_keyup_ = (ALGORITHM_KEYUP_TYPE)dlsym(vkeyboardHandle_, "AlgorithmKeyUp");
+        g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
+        if (g_VKeyboardHandle != nullptr) {
+            algorithm_keydown_ = (ALGORITHM_KEYDOWN_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyDown");
+            algorithm_keyup_ = (ALGORITHM_KEYUP_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyUp");
             gaussiankeyboard_getKeyCodeByKeyName_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)dlsym(
-                vkeyboardHandle_, "GaussianKeyboardGetKeyCodeByKeyName");
+                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyName");
             gaussiankeyboard_getKeyCodeByKeyNameAndShift_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE)dlsym(
-                vkeyboardHandle_, "GaussianKeyboardGetKeyCodeByKeyNameAndShift");
+                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyNameAndShift");
             gaussiankeyboard_updateMotionSpace_ = (GAUSSIANKEYBOARD_UPDATEMOTIONSPACE_TYPE)dlsym(
-                vkeyboardHandle_, "GaussianKeyboardUpdateMotionSpace");
+                g_VKeyboardHandle, "GaussianKeyboardUpdateMotionSpace");
             gaussiankeyboard_setVKeyboardArea_ = (GAUSSIANKEYBOARD_SETVKEYBOARDAREA_TYPE)dlsym(
-                vkeyboardHandle_, "GaussianKeyboardSetVKeyboardArea");
+                g_VKeyboardHandle, "GaussianKeyboardSetVKeyboardArea");
             bayesianengine_mapTouchToButton_ = (BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE)dlsym(
-                vkeyboardHandle_, "BayesianEngineMapTouchToButton");
+                g_VKeyboardHandle, "BayesianEngineMapTouchToButton");
             statemachineMessageQueue_getMessage_ = (STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)dlsym(
-                vkeyboardHandle_, "StateMachineMessageQueueGetMessage");
+                g_VKeyboardHandle, "StateMachineMessageQueueGetMessage");
             gaussiankeyboard_isInsideVKeyboardArea_ = (GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)dlsym(
-                vkeyboardHandle_, "GaussianKeyboardIsInsideVKeyboardArea");
+                g_VKeyboardHandle, "GaussianKeyboardIsInsideVKeyboardArea");
             gaussiankeyboard_isVKeyboardVisible_ = (GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)dlsym(
-                vkeyboardHandle_, "GaussianKeyboardIsVKeyboardVisible");
+                g_VKeyboardHandle, "GaussianKeyboardIsVKeyboardVisible");
             algorithm_isKeyDownInKeyboard_ = (ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)dlsym(
-                vkeyboardHandle_, "AlgorithmIsKeyDownInKeyboard");
+                g_VKeyboardHandle, "AlgorithmIsKeyDownInKeyboard");
         }
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -3341,15 +3341,15 @@ int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double 
     int32_t sKeyEventID = 1234;
     int32_t sKeyEventDeviceId = 99;
     // Init the shared key event used by later key injection module and set common fields.
-    sharedKeyEvent = KeyEvent::Create();
-    CHKPR(sharedKeyEvent, ERROR_NULL_POINTER);
-    sharedKeyEvent->SetId(sKeyEventID);
-    sharedKeyEvent->SetDeviceId(sKeyEventDeviceId);
+    g_VKeySharedKeyEvent = KeyEvent::Create();
+    CHKPR(g_VKeySharedKeyEvent, ERROR_NULL_POINTER);
+    g_VKeySharedKeyEvent->SetId(sKeyEventID);
+    g_VKeySharedKeyEvent->SetDeviceId(sKeyEventDeviceId);
     // Init the shared UI key event for UI rendering.
-    sharedUIKeyEvent = KeyEvent::Create();
-    CHKPR(sharedUIKeyEvent, ERROR_NULL_POINTER);
-    sharedUIKeyEvent->SetId(sKeyEventID);
-    sharedUIKeyEvent->SetDeviceId(sKeyEventDeviceId);
+    g_VKeySharedUIKeyEvent = KeyEvent::Create();
+    CHKPR(g_VKeySharedUIKeyEvent, ERROR_NULL_POINTER);
+    g_VKeySharedUIKeyEvent->SetId(sKeyEventID);
+    g_VKeySharedUIKeyEvent->SetDeviceId(sKeyEventDeviceId);
     return RET_OK;
 }
 
