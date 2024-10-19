@@ -298,7 +298,7 @@ private:
     bool hasRegisterListener_ { false };
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    std::atomic_bool isHopper_ { false };
+    std::atomic_bool isHPR_ { false };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 };
 } // namespace MMI
