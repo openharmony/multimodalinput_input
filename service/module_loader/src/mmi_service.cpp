@@ -628,7 +628,7 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOG_DISPATCHE("VKeyboard can't find pointer item, pointer:%{private}d", pointerId);
+        MMI_HILOGE("VKeyboard can't find pointer item");
         return RET_ERR;
     }
     // Note: make sure this logic happens before the range-checking logic.
@@ -680,14 +680,12 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
         if (!tp.ButtonName.empty()) {
             MMI_HILOGI("VKeyboard touch name %{private}s", buttonName.c_str());
         } else {
-            MMI_HILOGW("VKeyboard button name null");
+            MMI_HILOGE("VKeyboard button name null");
             return RET_ERR;
         }
     }
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN) {
-        MMI_HILOGW("VKeyboard key down: %{private}s, touch id: %{private}d", buttonName.c_str(), pointerId);
         algorithm_keydown_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
-        MMI_HILOGW("VKeyboard key down: %{private}s", buttonName.c_str());
         if (insideVKeyboardArea) {
             int keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
             if (keyCode >= 0) {
@@ -697,8 +695,6 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
             }
         }
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_UP) {
-        MMI_HILOGW("VKeyboard key up: %{private}s, touch id: %{private}d", buttonName.c_str(), pointerId);
-        // AlogrithmEngine::KeyUp(tp);
         algorithm_keyup_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
         int keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
         if (keyCode >= 0) {
@@ -709,8 +705,6 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
         }
     } else {
         // New touch move logic: turn to touch down to support gestures.
-        MMI_HILOGW("VKeyboard key move treated as key down for gestures: %{private}s, touch id: %{private}d", buttonName.c_str(), pointerId);
-        // AlogrithmEngine::KeyDown(tp);
         algorithm_keydown_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
     }
 
@@ -727,12 +721,9 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
         }
         switch (type) {
             case StateMachineMessageType::KeyPressed: {
-                MMI_HILOGW("VKeyboard key up: %{private}s", buttonName.c_str());
-
-                // see if this key can be directly printed or not.
+                // See if this key can be directly printed or not.
                 bool useShift = false;
                 int code = gaussiankeyboard_getKeyCodeByKeyNameAndShift_(buttonName, useShift);
-
                 if (code >= 0) {
                     if (!useShift) {
                         SendKeyPress(code);
@@ -752,13 +743,10 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 break;
             }
             case StateMachineMessageType::ResetButtonColor: {
-                MMI_HILOGI("VKeyboard reset button color");
                 SendKeyboardAction(KeyEvent::VKeyboardAction::RESET_BUTTON_COLOR);
                 break;
             }
-			case StateMachineMessageType::CombinationKeyPressed: {
-                MMI_HILOGW("VKeyboard combination key pressed: %{private}s, toggle button: %{private}s",
-                    buttonName.c_str(), toggleButtonName.c_str());
+            case StateMachineMessageType::CombinationKeyPressed: {
                 toggleKeyCodes.clear();
                 std::string remainStr = toggleButtonName;
                 int32_t toggleCode(-1), triggerCode(-1);
@@ -788,7 +776,6 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 break;
             }
             case StateMachineMessageType::BackSwipeLeft: {
-                MMI_HILOGW("VKeyboard backspace swipe to left");
                 // Send Shift+Left.
                 toggleKeyCodes.clear();
                 toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
@@ -796,7 +783,6 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 break;
             }
             case StateMachineMessageType::BackSwipeRight: {
-                MMI_HILOGW("VKeyboard backspace swipe to right");
                 // Send Shift+Right
                 toggleKeyCodes.clear();
                 toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
@@ -804,20 +790,14 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 break;
             }
             case StateMachineMessageType::BackspaceSwipeRelease: {
-                MMI_HILOGW("VKeyboard backspace swipe released");
                 SendKeyRelease(KeyEvent::KEYCODE_SHIFT_LEFT);
                 int swipeCharCounter(buttonMode);
                 if (swipeCharCounter < 0) {
                     // Backspace character
                     SendKeyPress(KeyEvent::KEYCODE_DEL);
-                    MMI_HILOGI("VKeyboard GestureDetection, SendSwipeDeleteMsg, swipeCharCounter = %{private}d. Send Backspace and Release Shift.",
-                        swipeCharCounter);
                 } else if (swipeCharCounter > 0) {
                     // del character. (note: actually there is no difference when the text is selected)
                     SendKeyPress(KeyEvent::KEYCODE_FORWARD_DEL);
-
-                    MMI_HILOGI("VKeyboard GestureDetection, SendSwipeDeleteMsg, swipeCharCounter = %{private}d. Send Delete and Release Shift.",
-                        swipeCharCounter);
                 } else {
                     // No char deleted. just release the shift if it was pressed down before.
                     MMI_HILOGI("VKeyboard GestureDetection, SendSwipeDeleteMsg, swipeCharCounter = %{private}d. Release Shift.",
