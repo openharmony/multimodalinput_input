@@ -3323,7 +3323,7 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!isHPR_) {
         MMI_HILOGE("Failed to set virtual keyboard area, feature not supported");
         return RET_ERR;
@@ -3359,7 +3359,7 @@ int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double 
 
 int32_t MMIService::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!isHPR_) {
         MMI_HILOGE("Failed to set motion space, feature not supported");
         return RET_ERR;
