@@ -17,6 +17,7 @@
 #define TOUCH_GESTURE_DETECTOR_H
 
 #include <map>
+#include <unordered_set>
 #include <vector>
 
 #include "pointer_event.h"
@@ -78,11 +79,13 @@ private:
     bool NotifyGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode);
     bool WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent> event);
 
+    Point CalcClusterCenter(std::map<int32_t, Point> &points) const;
     Point CalcGravityCenter(std::map<int32_t, Point> &map);
-    double CalcTwoPointsDistance(const Point &p1, const Point &p2);
+    double CalcTwoPointsDistance(const Point &p1, const Point &p2) const;
     void CalcAndStoreDistance(std::map<int32_t, Point> &map);
     int32_t CalcMultiFingerMovement(std::map<int32_t, Point> &map);
     void HandlePinchMoveEvent(std::shared_ptr<PointerEvent> event);
+    bool InOppositeDirections(const std::unordered_set<SlideState> &directions) const;
     GestureMode JudgeOperationMode(std::map<int32_t, Point> &movePoint);
     bool AntiJitter(std::shared_ptr<PointerEvent> event, GestureMode mode);
     std::vector<std::pair<int32_t, Point>> SortPoints(std::map<int32_t, Point> &points);
@@ -93,7 +96,7 @@ private:
     GestureMode ChangeToGestureMode(SlideState state);
     SlideState GetSlidingDirection(double angle);
     void HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> event);
-    bool IsFingerMove(float startX, float startY, float endX, float endY);
+    bool IsFingerMove(const Point &downPt, const Point &movePt) const;
     double GetAngle(float startX, float startY, float endX, float endY);
     SlideState ClacFingerMoveDirection(std::shared_ptr<PointerEvent> event);
 
@@ -107,6 +110,7 @@ private:
     int32_t gestureDisplayId_ { INT32_MAX };
     int32_t continuousCloseCount_ { 0 };
     int32_t continuousOpenCount_ { 0 };
+    int32_t gestureTimer_ { -1 };
     std::map<int32_t, Point> downPoint_;
     std::map<int32_t, Point> movePoint_;
     std::map<int32_t, double> lastDistance_;
