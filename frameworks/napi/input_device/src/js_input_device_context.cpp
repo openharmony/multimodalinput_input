@@ -36,10 +36,11 @@ constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
 constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-constexpr int32_t SET_VK_AREA_NUMBER_PARAMETERS { 4 };
-constexpr int32_t UPDATE_VK_MS_NUMBER_PARAMETERS { 1 };
+constexpr int32_t SET_VKEY_AREA_NUMBER_PARAMETERS { 4 };
+constexpr int32_t UPDATE_VKEY_MS_NUMBER_PARAMETERS { 1 };
+constexpr uint32_t VKEY_MS_ARRAY_MAX_SIZE { 300 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-enum class VKResult : int32_t {
+enum class VKeyResult : int32_t {
     FAILED = 0,
     SUCCEED = 1,
 };
@@ -663,284 +664,232 @@ napi_value JsInputDeviceContext::GetIntervalSinceLastInput(napi_env env, napi_ca
 napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    napi_value result = nullptr;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    bool isSuccess = true;
-    size_t argc = SET_VK_AREA_NUMBER_PARAMETERS;
-    napi_value argv[SET_VK_AREA_NUMBER_PARAMETERS] = { nullptr };
+    size_t argc = SET_VKEY_AREA_NUMBER_PARAMETERS;
+    napi_value argv[SET_VKEY_AREA_NUMBER_PARAMETERS] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc != SET_VK_AREA_NUMBER_PARAMETERS) {
+    if (argc != SET_VKEY_AREA_NUMBER_PARAMETERS) {
         MMI_HILOGE("SetVKeyboardArea parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
-        result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
-        return result;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
     }
     double topLeftX = 0.0;
     if (!JsUtil::ParseDouble(env, argv[0], topLeftX)) {
         MMI_HILOGE("ParseDouble failed. property name: topLeftX");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "topLeftX", "number");
-        isSuccess = false;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
     }
     double topLeftY = 0.0;
     if (!JsUtil::ParseDouble(env, argv[1], topLeftY)) {
         MMI_HILOGE("ParseDouble failed. property name: topLeftY");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "topLeftY", "number");
-        isSuccess = false;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
     }
     double bottomRightX = 0.0;
     if (!JsUtil::ParseDouble(env, argv[2], bottomRightX)) {
         MMI_HILOGE("ParseDouble failed. property name: bottomRightX");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "bottomRightX", "number");
-        isSuccess = false;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
     }
     double bottomRightY = 0.0;
     if (!JsUtil::ParseDouble(env, argv[3], bottomRightY)) {
         MMI_HILOGE("ParseDouble failed. property name: bottomRightY");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "bottomRightY", "number");
-        isSuccess = false;
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
     }
-    if (isSuccess) {
-        int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
-        if (ret == RET_OK) {
-            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
-        } else {
-            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
-            MMI_HILOGE("SetVKeyboardArea failed with ret: %{public}d", ret);
-        }
-    } else {
-        result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+    int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetVKeyboardArea failed with ret: %{public}d", ret);
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
     }
+    return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::SUCCEED));
 #else
-    result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "SetVKeyboardArea", "Not support");
+    return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    return result;
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-bool JsInputDeviceContext::ParseBMSArray(const napi_env& env, const napi_value& value,
-    std::vector<ButtonMotionSpace*>& bmsArray)
+bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
+    std::vector<std::shared_ptr<ButtonMotionSpace>>& bmsArray)
 {
     uint32_t length = 0;
     if (!JsUtil::IsArray(env, value)) {
         MMI_HILOGE("ParseBMSArray first parameter is not array");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "ButtonMotionSpace", "Array");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "ButtonMotionSpace", "array");
         return false;
     }
     napi_get_array_length(env, value, &length);
-    bool isSuccess = true;
+    if (length > VKEY_MS_ARRAY_MAX_SIZE) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size of motion space", "must be less than or equal 300");
+        return false;
+    }
     for (uint32_t i = 0; i < length; i++) {
-        napi_value napiBms = nullptr;
-        if (napi_get_element(env, value, i, &napiBms) != napi_ok) {
+        napi_value resBms = nullptr;
+        if (napi_get_element(env, value, i, &resBms) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_element failed. index:%{public}d", i);
-            isSuccess = false;
-            break;
+            return false;
         }
 
-        ButtonMotionSpace* bms = new (std::nothrow) ButtonMotionSpace();
+        auto bms = std::make_shared<ButtonMotionSpace>();
+        CHKPR(bms, false);
 
-        napi_value napiKeyName = nullptr;
-        if (napi_get_named_property(env, napiBms, "keyName", &napiKeyName) != napi_ok) {
-            delete bms;
+        napi_value resKeyName = nullptr;
+        if (napi_get_named_property(env, resBms, "keyName", &resKeyName) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: keyName");
-            isSuccess = false;
-            break;
+            return false;
         }
         char keyName[MAX_STRING_LEN] = { 0 };
-        if (!JsUtil::ParseString(env, napiKeyName, keyName)) {
-            delete bms;
+        if (!JsUtil::ParseString(env, resKeyName, keyName)) {
             MMI_HILOGE("ParseBMSArray ParseSeting failed. property name: keyName");
-            isSuccess = false;
-            break;
+            return false;
         }
-        std::string keyNameStr(keyName);
-        bms->keyName = keyNameStr;
+        bms->keyName = std::string(keyName);
 
-        napi_value napiKeyCode = nullptr;
-        if (napi_get_named_property(env, napiBms, "keyCode", &napiKeyCode) != napi_ok) {
-            delete bms;
+        napi_value resKeyCode = nullptr;
+        if (napi_get_named_property(env, resBms, "keyCode", &resKeyCode) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: keyCode");
-            isSuccess = false;
-            break;
+            return false;
         }
         int32_t keyCode = 0;
-        if (!JsUtil::ParseInt32(env, napiKeyCode, keyCode)) {
-            delete bms;
+        if (!JsUtil::ParseInt32(env, resKeyCode, keyCode)) {
             MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: keyCode");
-            isSuccess = false;
-            break;
+            return false;
         }
         bms->keyCode = keyCode;
 
-        napi_value napiLocX = nullptr;
-        if (napi_get_named_property(env, napiBms, "locX", &napiLocX) != napi_ok) {
-            delete bms;
+        napi_value resLocX = nullptr;
+        if (napi_get_named_property(env, resBms, "locX", &resLocX) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: locX");
-            isSuccess = false;
-            break;
+            return false;
         }
-        double locX = 0;
-        if (!JsUtil::ParseDouble(env, napiLocX, locX)) {
-            delete bms;
+        double locX = 0.0;
+        if (!JsUtil::ParseDouble(env, resLocX, locX)) {
             MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: locX");
-            isSuccess = false;
-            break;
+            return false;
         }
         bms->locX = locX;
 
-        napi_value napiLocY = nullptr;
-        if (napi_get_named_property(env, napiBms, "locY", &napiLocY) != napi_ok) {
-            delete bms;
+        napi_value resLocY = nullptr;
+        if (napi_get_named_property(env, resBms, "locY", &resLocY) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: locY");
-            isSuccess = false;
-            break;
+            return false;
         }
-        double locY = 0;
-        if (!JsUtil::ParseDouble(env, napiLocY, locY)) {
-            delete bms;
+        double locY = 0.0;
+        if (!JsUtil::ParseDouble(env, resLocY, locY)) {
             MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: locY");
-            isSuccess = false;
-            break;
+            return false;
         }
         bms->locY = locY;
 
-        napi_value napiWidth = nullptr;
-        if (napi_get_named_property(env, napiBms, "width", &napiWidth) != napi_ok) {
-            delete bms;
+        napi_value resWidth = nullptr;
+        if (napi_get_named_property(env, resBms, "width", &resWidth) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: width");
-            isSuccess = false;
-            break;
+            return false;
         }
-        double width = 0;
-        if (!JsUtil::ParseDouble(env, napiWidth, width)) {
-            delete bms;
+        double width = 0.0;
+        if (!JsUtil::ParseDouble(env, resWidth, width)) {
             MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: width");
-            isSuccess = false;
-            break;
+            return false;
         }
         bms->width = width;
 
-        napi_value napiHeight = nullptr;
-        if (napi_get_named_property(env, napiBms, "height", &napiHeight) != napi_ok) {
-            delete bms;
+        napi_value resHeight = nullptr;
+        if (napi_get_named_property(env, resBms, "height", &resHeight) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: height");
-            isSuccess = false;
-            break;
+            return false;
         }
-        double height = 0;
-        if (!JsUtil::ParseDouble(env, napiHeight, height)) {
-            delete bms;
+        double height = 0.0;
+        if (!JsUtil::ParseDouble(env, resHeight, height)) {
             MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: height");
-            isSuccess = false;
-            break;
+            return false;
         }
         bms->height = height;
 
-        napi_value napiUseShift = nullptr;
-        if (napi_get_named_property(env, napiBms, "useShift", &napiUseShift) != napi_ok) {
-            delete bms;
+        napi_value resUseShift = nullptr;
+        if (napi_get_named_property(env, resBms, "useShift", &resUseShift) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: useShift");
-            isSuccess = false;
-            break;
+            return false;
         }
         bool useShift = false;
-        if (!JsUtil::ParseBool(env, napiUseShift, useShift)) {
-            delete bms;
+        if (!JsUtil::ParseBool(env, resUseShift, useShift)) {
             MMI_HILOGE("ParseBMSArray ParseBool failed. property name: useShift");
-            isSuccess = false;
-            break;
+            return false;
         }
         bms->useShift = useShift;
 
-        napi_value napiMotionSpaceTypeId = nullptr;
-        if (napi_get_named_property(env, napiBms, "motionSpaceTypeId", &napiMotionSpaceTypeId) != napi_ok) {
-            delete bms;
+        napi_value resMotionSpaceTypeId = nullptr;
+        if (napi_get_named_property(env, resBms, "motionSpaceTypeId", &resMotionSpaceTypeId) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: motionSpaceTypeId");
-            isSuccess = false;
-            break;
+            return false;
         }
         int32_t motionSpaceTypeId = 0;
-        if (!JsUtil::ParseInt32(env, napiMotionSpaceTypeId, motionSpaceTypeId)) {
-            delete bms;
+        if (!JsUtil::ParseInt32(env, resMotionSpaceTypeId, motionSpaceTypeId)) {
             MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: motionSpaceTypeId");
-            isSuccess = false;
-            break;
+            return false;
         }
         bms->motionSpaceTypeId = static_cast<MotionSpaceType>(motionSpaceTypeId);
 
-        napi_value napiPageTypeId = nullptr;
-        if (napi_get_named_property(env, napiBms, "pageTypeId", &napiPageTypeId) != napi_ok) {
-            delete bms;
+        napi_value resPageTypeId = nullptr;
+        if (napi_get_named_property(env, resBms, "pageTypeId", &resPageTypeId) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: pageTypeId");
-            isSuccess = false;
-            break;
+            return false;
         }
         int32_t pageTypeId = 0;
-        if (!JsUtil::ParseInt32(env, napiPageTypeId, pageTypeId)) {
-            delete bms;
+        if (!JsUtil::ParseInt32(env, resPageTypeId, pageTypeId)) {
             MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: pageTypeId");
-            isSuccess = false;
-            break;
+            return false;
         }
         bms->pageTypeId = static_cast<PageType>(pageTypeId);
 
         bmsArray.push_back(bms);
     }
 
-    if (!isSuccess) {
-        while (!bmsArray.empty()) {
-            ButtonMotionSpace* bms = bmsArray.back();
-            delete bms;
-            bmsArray.pop_back();
-        }
-    }
-
-    return isSuccess;
+    return true;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    napi_value result = nullptr;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    size_t argc = UPDATE_VK_MS_NUMBER_PARAMETERS;
-    napi_value argv[UPDATE_VK_MS_NUMBER_PARAMETERS] = { nullptr };
+    size_t argc = UPDATE_VKEY_MS_NUMBER_PARAMETERS;
+    napi_value argv[UPDATE_VKEY_MS_NUMBER_PARAMETERS] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    std::vector<ButtonMotionSpace*> bmsArray;
+    if (argc != UPDATE_VKEY_MS_NUMBER_PARAMETERS) {
+        MMI_HILOGE("UpdateMotionSpace parameter number error");
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
+    }
+    std::vector<std::shared_ptr<ButtonMotionSpace>> bmsArray;
     if (!ParseBMSArray(env, argv[0], bmsArray)) {
         MMI_HILOGE("ParseBMSArray parse ButtonMotionSpace array fail");
-        result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
     } else {
         int32_t ret = RET_OK;
-        for (std::vector<ButtonMotionSpace*>::iterator ite = bmsArray.begin(); ite != bmsArray.end(); ite++) {
+        for (auto item : bmsArray) {
+            if (item == nullptr) {
+                return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
+            }
             std::vector<int32_t> pattern;
-            pattern.push_back(static_cast<int32_t>((*ite)->locX));
-            pattern.push_back(static_cast<int32_t>((*ite)->locY));
-            pattern.push_back(static_cast<int32_t>((*ite)->width));
-            pattern.push_back(static_cast<int32_t>((*ite)->height));
-            pattern.push_back((*ite)->keyCode);
-            pattern.push_back(static_cast<int32_t>((*ite)->motionSpaceTypeId));
-            pattern.push_back(static_cast<int32_t>((*ite)->pageTypeId));
-            ret = InputManager::GetInstance()->SetMotionSpace((*ite)->keyName, (*ite)->useShift, pattern);
+            pattern.push_back(static_cast<int32_t>(item->locX));
+            pattern.push_back(static_cast<int32_t>(item->locY));
+            pattern.push_back(static_cast<int32_t>(item->width));
+            pattern.push_back(static_cast<int32_t>(item->height));
+            pattern.push_back(item->keyCode);
+            pattern.push_back(static_cast<int32_t>(item->motionSpaceTypeId));
+            pattern.push_back(static_cast<int32_t>(item->pageTypeId));
+            ret = InputManager::GetInstance()->SetMotionSpace(item->keyName, item->useShift, pattern);
+            if (ret != RET_OK) {
+                MMI_HILOGE("UpdateMotionSpace failed with ret: %{public}d", ret);
+                return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
+            }
         }
-        if (ret == RET_OK) {
-            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED));
-        } else {
-            result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
-            MMI_HILOGE("UpdateMotionSpace failed with ret: %{public}d", ret);
-        }
-        while (!bmsArray.empty()) {
-            ButtonMotionSpace* bms = bmsArray.back();
-            delete bms;
-            bmsArray.pop_back();
-        }
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::SUCCEED));
     }
 #else
-    result = JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "UpdateMotionSpace", "Not support");
+    return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    return result;
 }
 
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
@@ -984,18 +933,18 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
     return exports;
 }
 
-napi_value JsInputDeviceContext::CreateEnumVKResult(napi_env env, napi_value exports)
+napi_value JsInputDeviceContext::CreateEnumVKeyResult(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("FAILED", JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED))),
-        DECLARE_NAPI_STATIC_PROPERTY("SUCCEED", JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::SUCCEED))),
+        DECLARE_NAPI_STATIC_PROPERTY("FAILED", JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("SUCCEED", JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::SUCCEED))),
     };
 
     napi_value result = nullptr;
-    CHKRP(napi_define_class(env, "VKResult", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "VKeyResult", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
-    CHKRP(napi_set_named_property(env, exports, "VKResult", result), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "VKeyResult", result), SET_NAMED_PROPERTY);
     return exports;
 }
 
@@ -1068,7 +1017,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     CHKPP(CreateEnumKeyboardType(env, exports));
-    CHKPP(CreateEnumVKResult(env, exports));
+    CHKPP(CreateEnumVKeyResult(env, exports));
     CHKPP(CreateEnumMotionSpaceType(env, exports));
     CHKPP(CreateEnumPageType(env, exports));
     return exports;
