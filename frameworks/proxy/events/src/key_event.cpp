@@ -1434,9 +1434,9 @@ void KeyEvent::SetVKeyboardAction(VKeyboardAction vkAction)
     vkeyboardAction_ = vkAction;
 }
 
-const char* KeyEvent::VKeyboardActionToStr(VKeyboardAction vkAction)
+const char* KeyEvent::VKeyboardActionToStr(VKeyboardAction vKeyAction)
 {
-    switch (vkAction) {
+    switch (vKeyAction) {
         case VKeyboardAction::ACTIVATE_KEYBOARD:
             return "ACTIVATE_KEYBOARD";
         case VKeyboardAction::VKEY_DOWN:
@@ -1454,6 +1454,7 @@ const char* KeyEvent::VKeyboardActionToStr(VKeyboardAction vkAction)
         case VKeyboardAction::TWO_HANDS_DOWN:
             return "TWO_HANDS_DOWN";
         default:
+            MMI_HILOGW("Unknown virtual keyboard action:%{public}d", (int)vKeyAction);
             return "UNKNOWN";
     }
 }
