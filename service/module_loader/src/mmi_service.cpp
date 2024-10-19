@@ -577,7 +577,7 @@ int32_t ToggleKeyVisualState(std::string& keyName, int32_t keyCode, bool visualP
     g_VKeySharedUIKeyEvent->SetKeyCode(keyCode);
     g_VKeySharedUIKeyEvent->SetKeyName(keyName);
 
-    if (visualPressed){
+    if (visualPressed) {
         g_VKeySharedUIKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_DOWN);
         g_VKeySharedUIKeyEvent->AddPressedKeyItems(keyItem);
     } else {
