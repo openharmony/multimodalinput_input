@@ -1537,7 +1537,6 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGD("OnKeyEvent is called");
     CALL_DEBUG_ENTER;
     if (!isMonitoring_) {
         MMI_HILOGE("Js monitor stop");
@@ -1545,10 +1544,8 @@ void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     }
     CHKPV(monitor_);
     CHKPV(keyEvent);
-    {
-        std::lock_guard<std::mutex> guard(mutex_);
-        keyEventQueue_.push(keyEvent);
-    }
+    std::lock_guard<std::mutex> guard(mutex_);
+    keyEventQueue_.push(keyEvent);
  
     if (!keyEventQueue_.empty()) {
         uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -1557,7 +1554,6 @@ void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
         if (monitorInfo == nullptr) {
             MMI_HILOGE("monitorInfo is nullptr");
             delete work;
-            work = nullptr;
             return;
         }
         monitorInfo->monitorId = monitorId_;
