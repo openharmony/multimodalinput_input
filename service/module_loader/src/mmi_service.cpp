@@ -175,8 +175,6 @@ typedef bool (*GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)();
 GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE gaussiankeyboard_isVKeyboardVisible_ = nullptr;
 typedef bool (*ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)(int touchId);
 ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE algorithm_isKeyDownInKeyboard_ = nullptr;
-typedef bool (*KEYBOARDSTATEMACHINE_ISIDLE_TYPE)();
-KEYBOARDSTATEMACHINE_ISIDLE_TYPE keyboardStateMachine_isIdle_ = nullptr;
 std::vector<int32_t> keyDownSet;
 std::unordered_set<int32_t> modifiersDownSet;
 // Shared key event for key injection for printing.
@@ -554,7 +552,7 @@ int32_t SendKeyPress(int32_t keyCode)
 }
 
 // @brief Only toggle visual state on UI without changing key event handler.
-int32_t ToggleKeyVisualState(std::string keyName, int32_t keyCode, bool visualPressed)
+int32_t ToggleKeyVisualState(std::string& keyName, int32_t keyCode, bool visualPressed)
 {
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
@@ -943,8 +941,6 @@ void MMIService::OnStart()
                 vkeyboardHandle_, "GaussianKeyboardIsVKeyboardVisible");
             algorithm_isKeyDownInKeyboard_ = (ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)dlsym(
                 vkeyboardHandle_, "AlgorithmIsKeyDownInKeyboard");
-            keyboardStateMachine_isIdle_ = (KEYBOARDSTATEMACHINE_ISIDLE_TYPE)dlsym(
-                vkeyboardHandle_, "KeyboardStateMachineIsIdle");
         }
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
