@@ -2815,7 +2815,8 @@ int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double 
 int32_t MMIService::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
 {
     CALL_DEBUG_ENTER;
-    if (!isHopper_) {
+    if (!isHPR_) {
+        MMI_HILOGE("Failed to set motion space, feature not supported");
         return RET_ERR;
     }
     int32_t ret = delegateTasks_.PostSyncTask(

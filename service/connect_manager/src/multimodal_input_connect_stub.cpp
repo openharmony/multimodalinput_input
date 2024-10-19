@@ -2509,7 +2509,7 @@ int32_t MultimodalInputConnectStub::StubSetMotionSpace(MessageParcel& data, Mess
     }
     int32_t ret = SetMotionSpace(keyName, useShift, pattern);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StubSetMotionSpace failed returnCode:%{public}d", ret);
+        MMI_HILOGE("Call StubSetMotionSpace failed ret:%{public}d", ret);
         return ret;
     }
     WRITEINT32(reply, ret);

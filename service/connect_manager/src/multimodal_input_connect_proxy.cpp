@@ -2100,7 +2100,7 @@ int32_t MultimodalInputConnectProxy::SetMotionSpace(std::string& keyName, bool u
                                       MultimodalinputConnectInterfaceCode::SET_MOTION_SPACE),
                                       data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("MultimodalInputConnectProxy::SetMotionSpace Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("SetMotionSpace Send request fail, ret:%{public}d", ret);
     }
     return ret;
 }
