@@ -134,7 +134,7 @@ const std::set<int32_t> g_keyCodeValueSet = {
 constexpr int32_t DEFAULT_USER_ID { 100 };
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-const std::string DEVICE_TYPE_HOPPER { "HPR" };
+const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
@@ -413,7 +413,7 @@ void MMIService::OnStart()
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-isHopper_ = PRODUCT_TYPE == DEVICE_TYPE_HOPPER;
+    isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
@@ -2791,7 +2791,8 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
 int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
     CALL_DEBUG_ENTER;
-    if (!isHopper_) {
+    if (!isHPR_) {
+        MMI_HILOGE("Failed to set virtual keyboard area, feature not supported");
         return RET_ERR;
     }
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -2814,7 +2815,8 @@ int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double 
 int32_t MMIService::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
 {
     CALL_DEBUG_ENTER;
-    if (!isHopper_) {
+    if (!isHPR_) {
+        MMI_HILOGE("Failed to set motion space, feature not supported");
         return RET_ERR;
     }
     int32_t ret = delegateTasks_.PostSyncTask(
