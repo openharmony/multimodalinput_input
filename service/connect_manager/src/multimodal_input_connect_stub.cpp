@@ -2475,10 +2475,10 @@ int32_t MultimodalInputConnectStub::StubSetVKeyboardArea(MessageParcel& data, Me
         MMI_HILOGE("StubSetVKeyboardArea Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    double topLeftX = 0;
-    double topLeftY = 0;
-    double bottomRightX = 0;
-    double bottomRightY = 0;
+    double topLeftX = 0.0;
+    double topLeftY = 0.0;
+    double bottomRightX = 0.0;
+    double bottomRightY = 0.0;
     READDOUBLE(data, topLeftX, IPC_PROXY_DEAD_OBJECT_ERR);
     READDOUBLE(data, topLeftY, IPC_PROXY_DEAD_OBJECT_ERR);
     READDOUBLE(data, bottomRightX, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -2486,7 +2486,7 @@ int32_t MultimodalInputConnectStub::StubSetVKeyboardArea(MessageParcel& data, Me
 
     int32_t ret = SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StubSetVKeyboardArea failed returnCode:%{public}d", ret);
+        MMI_HILOGE("Call StubSetVKeyboardArea failed ret:%{public}d", ret);
     }
     return ret;
 }
@@ -2516,7 +2516,7 @@ int32_t MultimodalInputConnectStub::StubSetMotionSpace(MessageParcel& data, Mess
     }
     int32_t ret = SetMotionSpace(keyName, useShift, pattern);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StubSetMotionSpace failed returnCode:%{public}d", ret);
+        MMI_HILOGE("Call StubSetMotionSpace failed ret:%{public}d", ret);
         return ret;
     }
     WRITEINT32(reply, ret);
