@@ -46,6 +46,9 @@ constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+constexpr int32_t VKEY_MOTION_SPACE_PATTERN_MAX_SIZE { 10 };
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
@@ -2501,6 +2504,10 @@ int32_t MultimodalInputConnectStub::StubSetMotionSpace(MessageParcel& data, Mess
     READBOOL(data, useShift, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t patternLen = 0;
     READINT32(data, patternLen, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (patternLen > VKEY_MOTION_SPACE_PATTERN_MAX_SIZE || patternLen <= 0) {
+        MMI_HILOGE("Virtual keyboard set motion space pattern len is invalid");
+        return RET_ERR;
+    }
     std::vector<int32_t> pattern;
     for (int32_t i = 0; i < patternLen; i++) {
         int32_t value = 0;
