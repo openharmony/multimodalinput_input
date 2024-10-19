@@ -94,7 +94,7 @@ constexpr int32_t REPEAT_COOLING_TIME { 100 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t DEFAULT_VALUE { -1 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-const std::string DEVICE_TYPE_HOPPER { "HPR" };
+const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
@@ -3002,7 +3002,7 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
 void InputWindowsManager::HandleGestureInjection(bool gestureInject) {
     if (!gestureInject) {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        if (PRODUCT_TYPE != DEVICE_TYPE_HOPPER) {
+        if (PRODUCT_TYPE != DEVICE_TYPE_HPR) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         }
 #else
