@@ -3471,7 +3471,7 @@ public:
      * @return void
      * @since 13
      */
-    void SetKeyName(std::string& keyName);
+    void SetKeyName(const std::string& keyName);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 public:
     /**
@@ -3534,7 +3534,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     VKeyboardAction vkeyboardAction_ { VKeyboardAction::UNKNOWN };
-    std::string keyName_ { "" };
+    std::string keyName_;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     bool repeat_ { false };
     bool repeatKey_ { false };

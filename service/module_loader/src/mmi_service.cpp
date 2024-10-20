@@ -90,6 +90,10 @@
 #include "input_screen_capture_agent.h"
 #endif // PLAYER_FRAMEWORK_EXISTS
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+#include "vkeyboard.h"
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -136,6 +140,47 @@ constexpr int32_t DEFAULT_USER_ID { 100 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+// Define vkeyboard functions from vendor
+const std::string VKEYBOARD_PATH { "libvkeyboard.z.so" };
+void* g_VKeyboardHandle = nullptr;
+typedef void (*ALGORITHM_KEYDOWN_TYPE)(
+    double screenX, double screenY, int touchId, bool tipDown, string buttonName);
+ALGORITHM_KEYDOWN_TYPE algorithm_keydown_ = nullptr;
+typedef void (*ALGORITHM_KEYUP_TYPE)(
+    double screenX, double screenY, int touchId, bool tipDown, string buttonName);
+ALGORITHM_KEYUP_TYPE algorithm_keyup_ = nullptr;
+typedef int32_t (*GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)(string keyName);
+GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE gaussiankeyboard_getKeyCodeByKeyName_ = nullptr;
+typedef int32_t (*GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE)(string keyName, bool& useShift);
+GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE gaussiankeyboard_getKeyCodeByKeyNameAndShift_ = nullptr;
+typedef void (*GAUSSIANKEYBOARD_UPDATEMOTIONSPACE_TYPE)(
+    string keyName, bool useShift, std::vector<int32_t>& pattern);
+GAUSSIANKEYBOARD_UPDATEMOTIONSPACE_TYPE gaussiankeyboard_updateMotionSpace_ = nullptr;
+typedef void (*GAUSSIANKEYBOARD_SETVKEYBOARDAREA_TYPE)(
+    double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
+GAUSSIANKEYBOARD_SETVKEYBOARDAREA_TYPE gaussiankeyboard_setVKeyboardArea_ = nullptr;
+typedef void (*BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE)(
+    double screenX, double screenY, int touchId, bool tipDown, string& buttonName,
+    long long timestamp, bool updateDynamicGaussian, vector<pair<string, double>>& sortedNegLogProb);
+BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE bayesianengine_mapTouchToButton_ = nullptr;
+// Return message type.
+typedef int32_t (*STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)(
+    string& buttonName, string& toggleButtonName, int& buttonMode, string& RestList);
+STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE statemachineMessageQueue_getMessage_ = nullptr;
+typedef void (*STATEMACINEMESSAGQUEUE_CLEARMESSAGE_TYPE)();
+STATEMACINEMESSAGQUEUE_CLEARMESSAGE_TYPE statemachineMessageQueue_clearMessage_ = nullptr;
+typedef bool (*GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)(double x, double y);
+GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE gaussiankeyboard_isInsideVKeyboardArea_ = nullptr;
+typedef bool (*GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)();
+GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE gaussiankeyboard_isVKeyboardVisible_ = nullptr;
+typedef bool (*ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)(int touchId);
+ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE algorithm_isKeyDownInKeyboard_ = nullptr;
+std::vector<int32_t> g_VKeyDownSet;
+std::unordered_set<int32_t> g_VKeyModifiersDownSet;
+// Shared key event for key injection for printing.
+std::shared_ptr<KeyEvent> g_VKeySharedKeyEvent { nullptr };
+// Shared key event for UI rendering.
+std::shared_ptr<KeyEvent> g_VKeySharedUIKeyEvent { nullptr };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
@@ -376,6 +421,440 @@ int32_t MMIService::Init()
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+bool IsEightFingersDown(int32_t pointerId, int32_t pointerAction)
+{
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_UP) {
+        std::vector<int32_t>::iterator ite = std::find(g_VKeyDownSet.begin(), g_VKeyDownSet.end(), pointerId);
+        if (ite != g_VKeyDownSet.end()) {
+            g_VKeyDownSet.erase(ite);
+        }
+    } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN) {
+        if (std::find(g_VKeyDownSet.begin(), g_VKeyDownSet.end(), pointerId) == g_VKeyDownSet.end()) {
+            g_VKeyDownSet.push_back(pointerId);
+        }
+    }
+    const int32_t totalFingerNum = 8;
+    return g_VKeyDownSet.size() == totalFingerNum;
+}
+
+void HandleKeyActionHelper(int32_t action, int32_t keyCode, OHOS::MMI::KeyEvent::KeyItem &item)
+{
+    if (action == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        g_VKeySharedKeyEvent->AddPressedKeyItems(item);
+    }
+    if (action == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = g_VKeySharedKeyEvent->GetKeyItem(keyCode);
+        if (pressedKeyItem) {
+            item.SetDownTime(pressedKeyItem->GetDownTime());
+        } else {
+            MMI_HILOGW("VKeyboard find pressed key failed");
+        }
+        g_VKeySharedKeyEvent->RemoveReleasedKeyItems(item);
+        g_VKeySharedKeyEvent->AddPressedKeyItems(item);
+    }
+}
+
+// Ref: oh_input_manager.
+// Receive: action and keyCode.
+// send out modified global g_VKeySharedKeyEvent to the event normalizer.
+int32_t HandleKeyInjectEventHelper(std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler,
+    int32_t action, int32_t keyCode)
+{
+    MMI_HILOGI("VKeyboard HandleKeyInjectEventHelper, injectEvent");
+    if (keyCode < 0) {
+        MMI_HILOGE("VKeyboard keyCode is less 0, can not process");
+        return COMMON_PARAMETER_ERROR;
+    }
+    CHKPR(g_VKeySharedKeyEvent, ERROR_NULL_POINTER);
+    g_VKeySharedKeyEvent->ClearFlag();
+    if (g_VKeySharedKeyEvent->GetAction() == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        std::optional<OHOS::MMI::KeyEvent::KeyItem> preUpKeyItem = g_VKeySharedKeyEvent->GetKeyItem();
+        if (preUpKeyItem) {
+            g_VKeySharedKeyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
+        } else {
+            MMI_HILOGE("VKeyboard the preUpKeyItem is nullopt");
+        }
+    }
+    int64_t time = OHOS::MMI::GetSysClockTime();
+    g_VKeySharedKeyEvent->SetActionTime(time);
+    g_VKeySharedKeyEvent->SetRepeat(true);
+    g_VKeySharedKeyEvent->SetKeyCode(keyCode);
+    bool isKeyPressed = false;
+    if (action == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        g_VKeySharedKeyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+        g_VKeySharedKeyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+        isKeyPressed = true;
+    } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        g_VKeySharedKeyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+        g_VKeySharedKeyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+        isKeyPressed = false;
+    }
+    OHOS::MMI::KeyEvent::KeyItem item;
+    item.SetDownTime(time);
+    item.SetKeyCode(keyCode);
+    item.SetPressed(isKeyPressed);
+    HandleKeyActionHelper(action, keyCode, item);
+    g_VKeySharedKeyEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
+    
+    eventNormalizeHandler->HandleKeyEvent(g_VKeySharedKeyEvent);
+    return RET_OK;
+}
+
+// @brief Send out combination key press.
+// Note that toggleBtn may contain more than one modifiers, like Ctrl+Shift.
+int32_t SendCombinationKeyPress(std::vector<int32_t>& toggleKeyCodes, int32_t triggerKeyCode)
+{
+    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
+    // Trigger all modifier(s), if not done already.
+    for (auto& toggleCode: toggleKeyCodes) {
+        if (g_VKeyModifiersDownSet.count(toggleCode) == 0) {
+            // Not exist, then trigger the modifier.
+            HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_DOWN,
+                toggleCode);
+            g_VKeyModifiersDownSet.insert(toggleCode);
+        }
+    }
+    // Trigger key.
+    HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_DOWN,
+        triggerKeyCode);
+    // Release key.
+    HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_UP,
+        triggerKeyCode);
+    return RET_OK;
+}
+
+// @brief Release (remove from key event handler) and reset visual state on UI.
+int32_t SendKeyRelease(int32_t keyCode)
+{
+    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
+    // Release key.
+    HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_UP,
+        keyCode);
+    g_VKeyModifiersDownSet.erase(keyCode);
+    return RET_OK;
+}
+
+// @brief Print (inject key code) and reset visual state on UI.
+int32_t SendKeyPress(int32_t keyCode)
+{
+    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
+    // Trigger key.
+    HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_DOWN,
+        keyCode);
+    // Release key.
+    HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_UP,
+        keyCode);
+    g_VKeyModifiersDownSet.erase(keyCode);
+    return RET_OK;
+}
+
+// @brief Only toggle visual state on UI without changing key event handler.
+int32_t ToggleKeyVisualState(std::string& keyName, int32_t keyCode, bool visualPressed)
+{
+    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
+    g_VKeySharedUIKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    // If this shared event's previous action is up, it means
+    // there is a key up event left in the pressed seq. remove it now.
+    if (g_VKeySharedUIKeyEvent->GetVKeyboardAction() == KeyEvent::VKeyboardAction::VKEY_UP) {
+        std::optional<OHOS::MMI::KeyEvent::KeyItem> preUpKeyItem = g_VKeySharedUIKeyEvent->GetKeyItem();
+        if (preUpKeyItem) {
+            g_VKeySharedUIKeyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
+        } else {
+            MMI_HILOGE("VKeyboard the preUpKeyItem is nullopt");
+        }
+    }
+    int64_t time = OHOS::MMI::GetSysClockTime();
+    g_VKeySharedUIKeyEvent->SetActionTime(time);
+
+    KeyEvent::KeyItem keyItem;
+    keyItem.SetDownTime(time);
+    keyItem.SetKeyCode(keyCode);
+    keyItem.SetPressed(visualPressed);
+
+    g_VKeySharedUIKeyEvent->SetKeyCode(keyCode);
+    g_VKeySharedUIKeyEvent->SetKeyName(keyName);
+
+    if (visualPressed) {
+        g_VKeySharedUIKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_DOWN);
+        g_VKeySharedUIKeyEvent->AddPressedKeyItems(keyItem);
+    } else {
+        g_VKeySharedUIKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_UP);
+        // Get the correct down time from pressed keys (when it is down)
+        std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = g_VKeySharedUIKeyEvent->GetKeyItem(keyCode);
+        if (pressedKeyItem) {
+            keyItem.SetDownTime(pressedKeyItem->GetDownTime());
+        } else {
+            MMI_HILOGW("VKeyboard find pressed key failed");
+        }
+        // Remove the old ones (down key item) and add the new one (up key item)
+        g_VKeySharedUIKeyEvent->RemoveReleasedKeyItems(keyItem);
+        g_VKeySharedUIKeyEvent->AddPressedKeyItems(keyItem);
+    }
+    eventNormalizeHandler->HandleKeyEvent(g_VKeySharedUIKeyEvent);
+    return RET_OK;
+}
+
+// Use temporary events for vk-UI related communications.
+int32_t SendKeyboardAction(KeyEvent::VKeyboardAction action)
+{
+    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t keyEventId = 1234;
+    int32_t keyEventDeviceId = 99;
+    keyEvent->SetId(keyEventId);
+    keyEvent->SetDeviceId(keyEventDeviceId);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    keyEvent->SetVKeyboardAction(action);
+    KeyEvent::KeyItem keyItem;
+    keyEvent->AddKeyItem(keyItem);
+    eventNormalizeHandler->HandleKeyEvent(keyEvent);
+    return RET_OK;
+}
+
+int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    if (pointerAction != MMI::PointerEvent::POINTER_ACTION_UP &&
+        pointerAction != MMI::PointerEvent::POINTER_ACTION_DOWN &&
+        pointerAction != MMI::PointerEvent::POINTER_ACTION_MOVE) {
+        return 0;
+    }
+    // Set touch point
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("VKeyboard can't find pointer item");
+        return RET_ERR;
+    }
+    // Note: make sure this logic happens before the range-checking logic.
+    // Check if pointer action is not POINTER_ACTION_MOVE and 8 fingers down
+    if (pointerAction != MMI::PointerEvent::POINTER_ACTION_MOVE && IsEightFingersDown(pointerId, pointerAction)) {
+        SendKeyboardAction(KeyEvent::VKeyboardAction::ACTIVATE_KEYBOARD);
+        return RET_OK;
+    }
+    double physicalX = pointerItem.GetDisplayXPos();
+    double physicalY = pointerItem.GetDisplayYPos();
+    // Note:
+    // for delete gestures, it must begin from the backspace key, but stops when the finger moves out of range.
+    // for pinch gestures, we allow out-of-range gestures (e.g., for floating -> full,
+    // it's okay if the fingers are moving out of the boundary during the gestures since the kbd is very small)
+    bool insideVKeyboardArea = gaussiankeyboard_isInsideVKeyboardArea_(physicalX, physicalY);
+    bool isVkeyboardVisible = gaussiankeyboard_isVKeyboardVisible_();
+    bool isTouchInVKeyboard = algorithm_isKeyDownInKeyboard_(pointerId);
+    // Note: during layout switch, it's possible that a continuous movement
+    // happens outside of keyboard (e.g., keyboard already switched)
+    // or happens when kbd is not visible (e.g., when the prev layout dismissed but new one hasn't shown yet).
+    // if (!isTouchInVKeyboard && (!isVkeyboardVisible || (!insideVKeyboardArea && !insideVTrackpadArea)))
+    if (!isTouchInVKeyboard && (!isVkeyboardVisible || !insideVKeyboardArea)) {
+        // no unhanded touch points AND (kbd not visible) OR (kbd visible and out of range).
+        // i.e., we still want to process the touch move outside of
+        // kbd range if at least one point is already on the kbd.
+        return RET_OK;
+    }
+
+    TOUCHPOINT tp;
+    tp.InKeyboard = insideVKeyboardArea;
+    // When track pad is integrated the tp should be set as tp.InTrackpad = insideVTrackPadArea;
+    tp.ScreenX = physicalX;
+    tp.ScreenY = physicalY;
+    tp.TouchId = pointerId;
+    // Note: Down & Move treated as down.
+    tp.TipDown = (pointerAction != MMI::PointerEvent::POINTER_ACTION_UP);
+
+    std::vector<pair<string, double>> sortedNegLogProb;
+    string buttonName = "";
+    // Note: only Down will update dynamic gaussian.
+    bool updateDynamicGaussian = (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN);
+
+    // NOTE: we don't run MapTouchToButton for all touchpoints -- only if the touchpoints fall within the kbd range.
+    // for out-of-range points, we still continue to process potential out-of-range
+    // gestures (e.g., fingers move out of range during pinch or move up/down gesture)
+    // in such case, isTouchInVKeyboard == true means it origins from inside kbd so a cache has been found.
+    if (insideVKeyboardArea || isTouchInVKeyboard) {
+        // Need to add valid time here.
+        bayesianengine_mapTouchToButton_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, buttonName,
+            0, updateDynamicGaussian, sortedNegLogProb);
+        tp.ButtonName = buttonName;
+        if (!tp.ButtonName.empty()) {
+            MMI_HILOGI("VKeyboard touch name %{private}s", buttonName.c_str());
+        } else {
+            MMI_HILOGE("VKeyboard button name null");
+            return RET_ERR;
+        }
+    }
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN) {
+        algorithm_keydown_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
+        if (insideVKeyboardArea) {
+            int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
+            if (keyCode >= 0) {
+                ToggleKeyVisualState(buttonName, keyCode, true);
+            } else {
+                MMI_HILOGW("VKeyboard PointerEventHandler, key code not found for %{private}s", buttonName.c_str());
+            }
+        }
+    } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_UP) {
+        algorithm_keyup_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
+        int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
+        if (keyCode >= 0) {
+            SendKeyRelease(keyCode);
+            ToggleKeyVisualState(buttonName, keyCode, false);
+        } else {
+            MMI_HILOGW("VKeyboard PointerEventHandler, key code not found for %{private}s", buttonName.c_str());
+        }
+    } else {
+        // New touch move logic: turn to touch down to support gestures.
+        algorithm_keydown_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
+    }
+
+    std::vector<int32_t> toggleKeyCodes;
+
+    while (true) {
+        string buttonName;
+        string toggleButtonName;
+        int buttonMode;
+        string restList;
+        StateMachineMessageType type = (StateMachineMessageType)statemachineMessageQueue_getMessage_(
+            buttonName, toggleButtonName, buttonMode, restList);
+        if (type == StateMachineMessageType::NoMessage) {
+            break;
+        }
+        switch (type) {
+            case StateMachineMessageType::KeyPressed: {
+                // See if this key can be directly printed or not.
+                bool useShift = false;
+                int32_t code = gaussiankeyboard_getKeyCodeByKeyNameAndShift_(buttonName, useShift);
+                if (code >= 0) {
+                    if (!useShift) {
+                        SendKeyPress(code);
+                    } else {
+                        toggleKeyCodes.clear();
+                        toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
+                        SendCombinationKeyPress(toggleKeyCodes, code);
+                        // If this key is triggered with use shift ON, then it shall be resumed after use.
+                        SendKeyRelease(KeyEvent::KEYCODE_SHIFT_LEFT);
+                    }
+                } else {
+                    MMI_HILOGW("VKeyboard key code not found.");
+                }
+                break;
+            }
+            case StateMachineMessageType::ButtonSound: {
+                break;
+            }
+            case StateMachineMessageType::ResetButtonColor: {
+                SendKeyboardAction(KeyEvent::VKeyboardAction::RESET_BUTTON_COLOR);
+                break;
+            }
+            case StateMachineMessageType::CombinationKeyPressed: {
+                toggleKeyCodes.clear();
+                std::string remainStr = toggleButtonName;
+                int32_t toggleCode(-1), triggerCode(-1);
+                while (remainStr.find(';') != std::string::npos) {
+                    // still has more than one 
+                    size_t pos = remainStr.find(';');
+                    toggleCode = gaussiankeyboard_getKeyCodeByKeyName_(remainStr.substr(0, pos));
+                    if (toggleCode >= 0) {
+                        toggleKeyCodes.push_back(toggleCode);
+                    }
+                    remainStr = remainStr.substr(pos + 1);
+                }
+                // Add the last piece.
+                toggleCode = gaussiankeyboard_getKeyCodeByKeyName_(remainStr);
+                if (toggleCode >= 0) {
+                    toggleKeyCodes.push_back(toggleCode);
+                }
+                // Trigger code:
+                triggerCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
+                if (toggleKeyCodes.size() > 0 && triggerCode >= 0) {
+                    // valid toggle key code(s) and trigger key code
+                    SendCombinationKeyPress(toggleKeyCodes, triggerCode);
+                } else {
+                    MMI_HILOGW("VKeyboard combination keycodes not found for %{private}s + %{private}s",
+                        toggleButtonName.c_str(), buttonName.c_str());
+                }
+                break;
+            }
+            case StateMachineMessageType::BackSwipeLeft: {
+                // Send Shift+Left.
+                toggleKeyCodes.clear();
+                toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
+                SendCombinationKeyPress(toggleKeyCodes, KeyEvent::KEYCODE_DPAD_LEFT);
+                break;
+            }
+            case StateMachineMessageType::BackSwipeRight: {
+                // Send Shift+Right
+                toggleKeyCodes.clear();
+                toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
+                SendCombinationKeyPress(toggleKeyCodes, KeyEvent::KEYCODE_DPAD_RIGHT);
+                break;
+            }
+            case StateMachineMessageType::BackspaceSwipeRelease: {
+                SendKeyRelease(KeyEvent::KEYCODE_SHIFT_LEFT);
+                int swipeCharCounter(buttonMode);
+                if (swipeCharCounter < 0) {
+                    // Backspace character
+                    SendKeyPress(KeyEvent::KEYCODE_DEL);
+                } else if (swipeCharCounter > 0) {
+                    // del character. (note: actually there is no difference when the text is selected)
+                    SendKeyPress(KeyEvent::KEYCODE_FORWARD_DEL);
+                } else {
+                    // No char deleted. just release the shift if it was pressed down before.
+                    MMI_HILOGI("VKeyboard SendSwipeDeleteMsg, swipeCharCounter = %{private}d. Release Shift.",
+                        swipeCharCounter);
+                }
+                break;
+            }
+            case StateMachineMessageType::SwitchLayout: {
+                int gestureId = buttonMode;
+                auto gestureType = static_cast<VGestureMode>(gestureId);
+                // Note: this LayoutAction is used within backend algorithm,
+                // which may be different from the protocol with front end (VKeyboardAction)
+                switch (gestureType) {
+                    case VGestureMode::TWO_HANDS_UP: {
+                        MMI_HILOGI("VKeyboard 8-finger move up to enable trackpad (not linked yet).");
+                        // If we are sure that only full keyboard is kept, then we no longer need this move up/down gesture.
+                        break;
+                    }
+                    case VGestureMode::TWO_HANDS_DOWN: {
+                        MMI_HILOGI("VKeyboard 8-finger move down to disable trackpad (not linked yet).");
+                        // If we are sure that only full keyboard is kept, then we no longer need this move up/down gesture.
+                        break;
+                    }
+                    case VGestureMode::TWO_HANDS_INWARDS: {
+                        MMI_HILOGI("VKeyboard 2-finger move inwards to switch to floating kbd.");
+                        SendKeyboardAction(KeyEvent::VKeyboardAction::TWO_FINGERS_IN);
+                        break;
+                    }
+                    case VGestureMode::TWO_HANDS_OUTWARDS: {
+                        MMI_HILOGI("VKeyboard 2-finger move outwards to switch to standard/full kbd.");
+                        // Note: if we have both standard and full kdb, then the front
+                        // end shall track and resume user's previous choice of layout.
+                        SendKeyboardAction(KeyEvent::VKeyboardAction::TWO_FINGERS_OUT);
+                        break;
+                    }
+                    default: {
+                        // other gestures not implemented/supported yet.
+                        MMI_HILOGW("VKeyboard gesture not implemented or supported, gestureId: %{private}d", gestureId);
+                    }
+                }
+                SendKeyboardAction(KeyEvent::VKeyboardAction::RESET_BUTTON_COLOR);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 void MMIService::OnStart()
 {
     CHK_PID_AND_TID();
@@ -414,6 +893,41 @@ void MMIService::OnStart()
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
+    if (isHPR_) {
+        DelegateInterface::HandlerSummary summary = {};
+        summary.handlerName = "VKeyboard";
+        summary.eventType = HANDLE_EVENT_TYPE_POINTER;
+        summary.mode = HandlerMode::SYNC;
+        summary.priority = 0;
+        summary.deviceTags = 0;
+        summary.cb = PointerEventHandler;
+        delegateInterface_->AddHandler(InputHandlerType::MONITOR, summary);
+
+        // Initialize vkeyboard handler
+        g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
+        if (g_VKeyboardHandle != nullptr) {
+            algorithm_keydown_ = (ALGORITHM_KEYDOWN_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyDown");
+            algorithm_keyup_ = (ALGORITHM_KEYUP_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyUp");
+            gaussiankeyboard_getKeyCodeByKeyName_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyName");
+            gaussiankeyboard_getKeyCodeByKeyNameAndShift_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyNameAndShift");
+            gaussiankeyboard_updateMotionSpace_ = (GAUSSIANKEYBOARD_UPDATEMOTIONSPACE_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardUpdateMotionSpace");
+            gaussiankeyboard_setVKeyboardArea_ = (GAUSSIANKEYBOARD_SETVKEYBOARDAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardSetVKeyboardArea");
+            bayesianengine_mapTouchToButton_ = (BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE)dlsym(
+                g_VKeyboardHandle, "BayesianEngineMapTouchToButton");
+            statemachineMessageQueue_getMessage_ = (STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "StateMachineMessageQueueGetMessage");
+            gaussiankeyboard_isInsideVKeyboardArea_ = (GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardIsInsideVKeyboardArea");
+            gaussiankeyboard_isVKeyboardVisible_ = (GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardIsVKeyboardVisible");
+            algorithm_isKeyDownInKeyboard_ = (ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)dlsym(
+                g_VKeyboardHandle, "AlgorithmIsKeyDownInKeyboard");
+        }
+    }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
@@ -2790,7 +3304,7 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!isHPR_) {
         MMI_HILOGE("Failed to set virtual keyboard area, feature not supported");
         return RET_ERR;
@@ -2808,13 +3322,25 @@ int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bo
 
 int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
-    GaussianKeyboard::SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+    gaussiankeyboard_setVKeyboardArea_(topLeftX, topLeftY, bottomRightX, bottomRightY);
+    int32_t sKeyEventID = 1234;
+    int32_t sKeyEventDeviceId = 99;
+    // Init the shared key event used by later key injection module and set common fields.
+    g_VKeySharedKeyEvent = KeyEvent::Create();
+    CHKPR(g_VKeySharedKeyEvent, ERROR_NULL_POINTER);
+    g_VKeySharedKeyEvent->SetId(sKeyEventID);
+    g_VKeySharedKeyEvent->SetDeviceId(sKeyEventDeviceId);
+    // Init the shared UI key event for UI rendering.
+    g_VKeySharedUIKeyEvent = KeyEvent::Create();
+    CHKPR(g_VKeySharedUIKeyEvent, ERROR_NULL_POINTER);
+    g_VKeySharedUIKeyEvent->SetId(sKeyEventID);
+    g_VKeySharedUIKeyEvent->SetDeviceId(sKeyEventDeviceId);
     return RET_OK;
 }
 
 int32_t MMIService::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!isHPR_) {
         MMI_HILOGE("Failed to set motion space, feature not supported");
         return RET_ERR;
@@ -2835,8 +3361,7 @@ int32_t MMIService::OnSetMotionSpace(std::string& keyName, bool useShift, std::v
     if (pattern.size() == MotionSpacePatternIndex::PATTERN_SIZE) {
         auto motionSpaceType = static_cast<MotionSpaceType>(pattern[MotionSpacePatternIndex::PATTERN_MST_ID]);
         if (motionSpaceType != MotionSpaceType::TRACKPAD) {
-            // Keyboard related.
-            GaussianKeyboard::UpdateMotionSpace(keyName, useShift, pattern);
+            gaussiankeyboard_updateMotionSpace_(keyName, useShift, pattern);
         }
         return RET_OK;
     } else {
