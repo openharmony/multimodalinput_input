@@ -722,6 +722,7 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
     }
     napi_get_array_length(env, value, &length);
     if (length > VKEY_MS_ARRAY_MAX_SIZE) {
+        MMI_HILOGE("ParseBMSArray the size of array is larger than maximum size");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size of motion space", "must be less than or equal 300");
         bmsArray.clear();
         return false;
