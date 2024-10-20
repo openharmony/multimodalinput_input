@@ -386,6 +386,11 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT):
             ret = StubTransmitInfrared(data, reply);
             break;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_VKEYBOARD_AREA):
+            ret = StubSetVKeyboardArea(data, reply);
+            break;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             ret = StubSetPixelMapData(data, reply);
             break;
@@ -2455,6 +2460,31 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     WRITEINT32(reply, ret);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+int32_t MultimodalInputConnectStub::StubSetVKeyboardArea(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetVKeyboardArea Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    double topLeftX = 0.0;
+    double topLeftY = 0.0;
+    double bottomRightX = 0.0;
+    double bottomRightY = 0.0;
+    READDOUBLE(data, topLeftX, IPC_PROXY_DEAD_OBJECT_ERR);
+    READDOUBLE(data, topLeftY, IPC_PROXY_DEAD_OBJECT_ERR);
+    READDOUBLE(data, bottomRightX, IPC_PROXY_DEAD_OBJECT_ERR);
+    READDOUBLE(data, bottomRightY, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StubSetVKeyboardArea failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, MessageParcel& reply)
 {
