@@ -2811,6 +2811,38 @@ int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double 
     GaussianKeyboard::SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
     return RET_OK;
 }
+
+int32_t MMIService::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
+{
+    CALL_DEBUG_ENTER;
+    if (!isHPR_) {
+        MMI_HILOGE("Failed to set motion space, feature not supported");
+        return RET_ERR;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &keyName, useShift, &pattern] {
+            return this->OnSetMotionSpace(keyName, useShift, pattern);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set motion space, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::OnSetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
+{
+    if (pattern.size() == MotionSpacePatternIndex::PATTERN_SIZE) {
+        auto motionSpaceType = static_cast<MotionSpaceType>(pattern[MotionSpacePatternIndex::PATTERN_MST_ID]);
+        if (motionSpaceType != MotionSpaceType::TRACKPAD) {
+            // Keyboard related.
+            GaussianKeyboard::UpdateMotionSpace(keyName, useShift, pattern);
+        }
+        return RET_OK;
+    } else {
+        return COMMON_PARAMETER_ERROR;
+    }
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
