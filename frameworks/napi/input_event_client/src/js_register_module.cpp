@@ -20,6 +20,9 @@
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "napi_constants.h"
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+#include "oh_input_manager.h"
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #include "util_napi.h"
 #include "util_napi_error.h"
 
@@ -77,6 +80,44 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
 };
 } // namespace
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* keyEventNative, napi_value keyHandle)
+{
+    bool isPressed = false;
+    if (GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed) != RET_OK) {
+        MMI_HILOGE("Get isPressed failed");
+    }
+    int32_t keyDownDuration = 0;
+    if (GetNamedPropertyInt32(env, keyHandle, "keyDownDuration", keyDownDuration) != RET_OK) {
+        MMI_HILOGE("Get keyDownDuration failed");
+    }
+    if (keyDownDuration < 0) {
+        MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
+    }
+    int32_t keyCode = 0;
+    if (GetNamedPropertyInt32(env, keyHandle, "keyCode", keyCode) != RET_OK) {
+        MMI_HILOGE("Get keyCode failed");
+    }
+    if (keyCode < 0) {
+        if (!EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGE("keyCode is less 0, can not process");
+        } else {
+            MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyCode);
+        }
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
+    }
+    CHKPV(keyEventNative);
+    auto keyAction = isPressed ? Input_KeyEventAction::KEY_ACTION_DOWN : Input_KeyEventAction::KEY_ACTION_UP;
+    OH_Input_SetKeyEventAction(keyEventNative, keyAction);
+    OH_Input_SetKeyEventKeyCode(keyEventNative, keyCode);
+    OH_Input_SetKeyEventActionTime(keyEventNative, static_cast<int64_t>(keyDownDuration));
+    Input_Result result = static_cast<Input_Result>(OH_Input_InjectKeyEvent(keyEventNative));
+    if (result != INPUT_SUCCESS) {
+        THROWERR_CUSTOM(env, result, "Error while injecting KeyEvent with native api");
+    }
+}
+#else
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
 {
     CHKPV(keyEvent);
@@ -117,6 +158,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(keyDownDuration));
 }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
@@ -150,9 +192,16 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "object");
         return nullptr;
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
+    CHKPP(keyEventNative);
+    GetInjectionEventDataNative(env, keyEventNative, keyHandle);
+    OH_Input_DestroyKeyEvent(&keyEventNative);
+#else
     auto keyEvent = KeyEvent::Create();
     CHKPP(keyEvent);
     GetInjectionEventData(env, keyEvent, keyHandle);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
@@ -189,9 +238,16 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyEvent", "object");
         return nullptr;
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
+    CHKPP(keyEventNative);
+    GetInjectionEventDataNative(env, keyEventNative, keyHandle);
+    OH_Input_DestroyKeyEvent(&keyEventNative);
+#else
     auto keyEvent = KeyEvent::Create();
     CHKPP(keyEvent);
     GetInjectionEventData(env, keyEvent, keyHandle);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }

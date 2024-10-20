@@ -20,6 +20,7 @@ config("inputeventclient_config") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/frameworks/napi/input_event_client/include",
     "${mmi_path}/tools/event_inject/include",
+    "${mmi_path}/interfaces/kits/c/input",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/frameworks/napi/joystick_event/include",
     "${mmi_path}/util/napi/include",
@@ -49,6 +50,7 @@ ohos_shared_library("inputeventclient") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
   ]

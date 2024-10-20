@@ -3505,7 +3505,7 @@ public:
      * @return Returns the string converted from the virtual keyboard action.
      * @since 13
      */
-    static const char* VKeyboardActionToStr(VKeyboardAction vkAction);
+    static const char* VKeyboardActionToStr(VKeyboardAction vKeyAction);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 protected:
     /**
