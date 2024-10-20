@@ -1454,7 +1454,7 @@ const char* KeyEvent::VKeyboardActionToStr(VKeyboardAction vKeyAction)
         case VKeyboardAction::TWO_HANDS_DOWN:
             return "TWO_HANDS_DOWN";
         default:
-            MMI_HILOGW("Unknown virtual keyboard action:%{public}d", (int)vKeyAction);
+            MMI_HILOGW("Unknown virtual keyboard action:%{public}d", static_cast<int>(vKeyAction));
             return "UNKNOWN";
     }
 }
@@ -1464,7 +1464,7 @@ std::string KeyEvent::GetKeyName() const
     return keyName_;
 }
 
-void KeyEvent::SetKeyName(std::string& keyName)
+void KeyEvent::SetKeyName(const std::string& keyName)
 {
     keyName_ = keyName;
 }

@@ -893,6 +893,7 @@ napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_i
         int32_t ret = RET_OK;
         for (auto item : bmsArray) {
             if (item == nullptr) {
+                MMI_HILOGE("ParseBMSArray ButtonMotionSpace array has invalid element");
                 return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
             }
             std::vector<int32_t> pattern;
