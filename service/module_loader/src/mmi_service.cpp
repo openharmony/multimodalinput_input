@@ -149,9 +149,9 @@ ALGORITHM_KEYDOWN_TYPE algorithm_keydown_ = nullptr;
 typedef void (*ALGORITHM_KEYUP_TYPE)(
     double screenX, double screenY, int touchId, bool tipDown, string buttonName);
 ALGORITHM_KEYUP_TYPE algorithm_keyup_ = nullptr;
-typedef int (*GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)(string keyName);
+typedef int32_t (*GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)(string keyName);
 GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE gaussiankeyboard_getKeyCodeByKeyName_ = nullptr;
-typedef int (*GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE)(string keyName, bool& useShift);
+typedef int32_t (*GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE)(string keyName, bool& useShift);
 GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE gaussiankeyboard_getKeyCodeByKeyNameAndShift_ = nullptr;
 typedef void (*GAUSSIANKEYBOARD_UPDATEMOTIONSPACE_TYPE)(
     string keyName, bool useShift, std::vector<int32_t>& pattern);
@@ -164,7 +164,7 @@ typedef void (*BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE)(
     long long timestamp, bool updateDynamicGaussian, vector<pair<string, double>>& sortedNegLogProb);
 BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE bayesianengine_mapTouchToButton_ = nullptr;
 // Return message type.
-typedef int (*STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)(
+typedef int32_t (*STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)(
     string& buttonName, string& toggleButtonName, int& buttonMode, string& RestList);
 STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE statemachineMessageQueue_getMessage_ = nullptr;
 typedef void (*STATEMACINEMESSAGQUEUE_CLEARMESSAGE_TYPE)();
@@ -434,7 +434,7 @@ bool IsEightFingersDown(int32_t pointerId, int32_t pointerAction)
             g_VKeyDownSet.push_back(pointerId);
         }
     }
-    int32_t totalFingerNum = 8;
+    const int32_t totalFingerNum = 8;
     return g_VKeyDownSet.size() == totalFingerNum;
 }
 
@@ -692,7 +692,7 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN) {
         algorithm_keydown_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
         if (insideVKeyboardArea) {
-            int keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
+            int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
             if (keyCode >= 0) {
                 ToggleKeyVisualState(buttonName, keyCode, true);
             } else {
@@ -701,7 +701,7 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
         }
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_UP) {
         algorithm_keyup_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
-        int keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
+        int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
         if (keyCode >= 0) {
             SendKeyRelease(keyCode);
             ToggleKeyVisualState(buttonName, keyCode, false);
@@ -729,7 +729,7 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
             case StateMachineMessageType::KeyPressed: {
                 // See if this key can be directly printed or not.
                 bool useShift = false;
-                int code = gaussiankeyboard_getKeyCodeByKeyNameAndShift_(buttonName, useShift);
+                int32_t code = gaussiankeyboard_getKeyCodeByKeyNameAndShift_(buttonName, useShift);
                 if (code >= 0) {
                     if (!useShift) {
                         SendKeyPress(code);
