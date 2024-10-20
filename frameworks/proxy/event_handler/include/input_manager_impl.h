@@ -212,6 +212,9 @@ public:
     int32_t HasIrEmitter(bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
     int32_t SetMoveEventFilters(bool flag);
