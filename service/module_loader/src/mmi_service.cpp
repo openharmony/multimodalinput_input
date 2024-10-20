@@ -434,7 +434,8 @@ bool IsEightFingersDown(int32_t pointerId, int32_t pointerAction)
             g_VKeyDownSet.push_back(pointerId);
         }
     }
-    return g_VKeyDownSet.size() == 8;
+    int32_t totalFingerNum = 8;
+    return g_VKeyDownSet.size() == totalFingerNum;
 }
 
 void HandleKeyActionHelper(int32_t action, int32_t keyCode, OHOS::MMI::KeyEvent::KeyItem &item)
@@ -557,7 +558,8 @@ int32_t ToggleKeyVisualState(std::string& keyName, int32_t keyCode, bool visualP
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
     g_VKeySharedUIKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
-    // If this shared event's previous action is up, it means there is a key up event left in the pressed seq. remove it now.
+    // If this shared event's previous action is up, it means
+    // there is a key up event left in the pressed seq. remove it now.
     if (g_VKeySharedUIKeyEvent->GetVKeyboardAction() == KeyEvent::VKeyboardAction::VKEY_UP) {
         std::optional<OHOS::MMI::KeyEvent::KeyItem> preUpKeyItem = g_VKeySharedUIKeyEvent->GetKeyItem();
         if (preUpKeyItem) {
@@ -640,18 +642,20 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
     double physicalX = pointerItem.GetDisplayXPos();
     double physicalY = pointerItem.GetDisplayYPos();
     // Note:
-    // for delete gestures, it must begin from the backspace key, but stops when the finger moves out of range. 
-    // for pinch gestures, we allow out-of-range gestures (e.g., for floating -> full, 
+    // for delete gestures, it must begin from the backspace key, but stops when the finger moves out of range.
+    // for pinch gestures, we allow out-of-range gestures (e.g., for floating -> full,
     // it's okay if the fingers are moving out of the boundary during the gestures since the kbd is very small)
     bool insideVKeyboardArea = gaussiankeyboard_isInsideVKeyboardArea_(physicalX, physicalY);
     bool isVkeyboardVisible = gaussiankeyboard_isVKeyboardVisible_();
     bool isTouchInVKeyboard = algorithm_isKeyDownInKeyboard_(pointerId);
-    // Note: during layout switch, it's possible that a continuous movement happens outside of keyboard (e.g., keyboard already switched)
+    // Note: during layout switch, it's possible that a continuous movement
+    // happens outside of keyboard (e.g., keyboard already switched)
     // or happens when kbd is not visible (e.g., when the prev layout dismissed but new one hasn't shown yet).
     // if (!isTouchInVKeyboard && (!isVkeyboardVisible || (!insideVKeyboardArea && !insideVTrackpadArea)))
     if (!isTouchInVKeyboard && (!isVkeyboardVisible || !insideVKeyboardArea)) {
         // no unhanded touch points AND (kbd not visible) OR (kbd visible and out of range).
-        // i.e., we still want to process the touch move outside of kbd range if at least one point is already on the kbd.
+        // i.e., we still want to process the touch move outside of
+        // kbd range if at least one point is already on the kbd.
         return RET_OK;
     }
 
@@ -670,10 +674,11 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
     bool updateDynamicGaussian = (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN);
 
     // NOTE: we don't run MapTouchToButton for all touchpoints -- only if the touchpoints fall within the kbd range.
-    // for out-of-range points, we still continue to process potential out-of-range gestures (e.g., fingers move out of range during pinch or move up/down gesture)
+    // for out-of-range points, we still continue to process potential out-of-range
+    // gestures (e.g., fingers move out of range during pinch or move up/down gesture)
     // in such case, isTouchInVKeyboard == true means it origins from inside kbd so a cache has been found.
     if (insideVKeyboardArea || isTouchInVKeyboard) {
-        // TODO: need to add valid time here.
+        // Need to add valid time here.
         bayesianengine_mapTouchToButton_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, buttonName,
             0, updateDynamicGaussian, sortedNegLogProb);
         tp.ButtonName = buttonName;
@@ -715,7 +720,8 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
         string toggleButtonName;
         int buttonMode;
         string restList;
-        StateMachineMessageType type = (StateMachineMessageType)statemachineMessageQueue_getMessage_(buttonName, toggleButtonName, buttonMode, restList);
+        StateMachineMessageType type = (StateMachineMessageType)statemachineMessageQueue_getMessage_(
+            buttonName, toggleButtonName, buttonMode, restList);
         if (type == StateMachineMessageType::NoMessage) {
             break;
         }
@@ -800,7 +806,7 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                     SendKeyPress(KeyEvent::KEYCODE_FORWARD_DEL);
                 } else {
                     // No char deleted. just release the shift if it was pressed down before.
-                    MMI_HILOGI("VKeyboard GestureDetection, SendSwipeDeleteMsg, swipeCharCounter = %{private}d. Release Shift.",
+                    MMI_HILOGI("VKeyboard SendSwipeDeleteMsg, swipeCharCounter = %{private}d. Release Shift.",
                         swipeCharCounter);
                 }
                 break;
@@ -808,18 +814,16 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
             case StateMachineMessageType::SwitchLayout: {
                 int gestureId = buttonMode;
                 auto gestureType = static_cast<VGestureMode>(gestureId);
-                // Note: this LayoutAction is used within backend algorithm, 
+                // Note: this LayoutAction is used within backend algorithm,
                 // which may be different from the protocol with front end (VKeyboardAction)
                 switch (gestureType) {
                     case VGestureMode::TWO_HANDS_UP: {
                         MMI_HILOGI("VKeyboard 8-finger move up to enable trackpad (not linked yet).");
-                        // TODO: wait for final decesion if we want to keep the standard and full layout.
                         // If we are sure that only full keyboard is kept, then we no longer need this move up/down gesture.
                         break;
                     }
                     case VGestureMode::TWO_HANDS_DOWN: {
                         MMI_HILOGI("VKeyboard 8-finger move down to disable trackpad (not linked yet).");
-                        // TODO: wait for final decesion if we want to keep the standard and full layout.
                         // If we are sure that only full keyboard is kept, then we no longer need this move up/down gesture.
                         break;
                     }
@@ -830,7 +834,8 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                     }
                     case VGestureMode::TWO_HANDS_OUTWARDS: {
                         MMI_HILOGI("VKeyboard 2-finger move outwards to switch to standard/full kbd.");
-                        // Note: if we have both standard and full kdb, then the front end shall track and resume user's previous choice of layout.
+                        // Note: if we have both standard and full kdb, then the front
+                        // end shall track and resume user's previous choice of layout.
                         SendKeyboardAction(KeyEvent::VKeyboardAction::TWO_FINGERS_OUT);
                         break;
                     }
