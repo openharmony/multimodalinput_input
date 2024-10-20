@@ -717,30 +717,40 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
     if (!JsUtil::IsArray(env, value)) {
         MMI_HILOGE("ParseBMSArray first parameter is not array");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "ButtonMotionSpace", "array");
+        bmsArray.clear();
         return false;
     }
     napi_get_array_length(env, value, &length);
     if (length > VK_MS_ARRAY_MAX_SIZE) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size of motion space", "must be less than or equal 300");
+        bmsArray.clear();
         return false;
     }
     for (uint32_t i = 0; i < length; i++) {
         napi_value napiBms = nullptr;
         if (napi_get_element(env, value, i, &napiBms) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_element failed. index:%{public}d", i);
+            bmsArray.clear();
             return false;
         }
 
         auto bms = std::make_shared<ButtonMotionSpace>();
+        if (bms == nullptr) {
+            MMI_HILOGE("ParseBMSArray create button motion space failed");
+            bmsArray.clear();
+            return false;
+        }
 
         napi_value napiKeyName = nullptr;
         if (napi_get_named_property(env, napiBms, "keyName", &napiKeyName) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: keyName");
+            bmsArray.clear();
             return false;
         }
         char keyName[MAX_STRING_LEN] = { 0 };
         if (!JsUtil::ParseString(env, napiKeyName, keyName)) {
             MMI_HILOGE("ParseBMSArray ParseSeting failed. property name: keyName");
+            bmsArray.clear();
             return false;
         }
         std::string keyNameStr(keyName);
@@ -749,11 +759,13 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
         napi_value napiKeyCode = nullptr;
         if (napi_get_named_property(env, napiBms, "keyCode", &napiKeyCode) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: keyCode");
+            bmsArray.clear();
             return false;
         }
         int32_t keyCode = 0;
         if (!JsUtil::ParseInt32(env, napiKeyCode, keyCode)) {
             MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: keyCode");
+            bmsArray.clear();
             return false;
         }
         bms->keyCode = keyCode;
@@ -761,11 +773,13 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
         napi_value napiLocX = nullptr;
         if (napi_get_named_property(env, napiBms, "locX", &napiLocX) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: locX");
+            bmsArray.clear();
             return false;
         }
         double locX = 0.0;
         if (!JsUtil::ParseDouble(env, napiLocX, locX)) {
             MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: locX");
+            bmsArray.clear();
             return false;
         }
         bms->locX = locX;
@@ -773,11 +787,13 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
         napi_value napiLocY = nullptr;
         if (napi_get_named_property(env, napiBms, "locY", &napiLocY) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: locY");
+            bmsArray.clear();
             return false;
         }
         double locY = 0.0;
         if (!JsUtil::ParseDouble(env, napiLocY, locY)) {
             MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: locY");
+            bmsArray.clear();
             return false;
         }
         bms->locY = locY;
@@ -785,11 +801,13 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
         napi_value napiWidth = nullptr;
         if (napi_get_named_property(env, napiBms, "width", &napiWidth) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: width");
+            bmsArray.clear();
             return false;
         }
         double width = 0.0;
         if (!JsUtil::ParseDouble(env, napiWidth, width)) {
             MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: width");
+            bmsArray.clear();
             return false;
         }
         bms->width = width;
@@ -797,11 +815,13 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
         napi_value napiHeight = nullptr;
         if (napi_get_named_property(env, napiBms, "height", &napiHeight) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: height");
+            bmsArray.clear();
             return false;
         }
         double height = 0.0;
         if (!JsUtil::ParseDouble(env, napiHeight, height)) {
             MMI_HILOGE("ParseBMSArray ParseDouble failed. property name: height");
+            bmsArray.clear();
             return false;
         }
         bms->height = height;
@@ -809,11 +829,13 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
         napi_value napiUseShift = nullptr;
         if (napi_get_named_property(env, napiBms, "useShift", &napiUseShift) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: useShift");
+            bmsArray.clear();
             return false;
         }
         bool useShift = false;
         if (!JsUtil::ParseBool(env, napiUseShift, useShift)) {
             MMI_HILOGE("ParseBMSArray ParseBool failed. property name: useShift");
+            bmsArray.clear();
             return false;
         }
         bms->useShift = useShift;
@@ -821,11 +843,13 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
         napi_value napiMotionSpaceTypeId = nullptr;
         if (napi_get_named_property(env, napiBms, "motionSpaceTypeId", &napiMotionSpaceTypeId) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: motionSpaceTypeId");
+            bmsArray.clear();
             return false;
         }
         int32_t motionSpaceTypeId = 0;
         if (!JsUtil::ParseInt32(env, napiMotionSpaceTypeId, motionSpaceTypeId)) {
             MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: motionSpaceTypeId");
+            bmsArray.clear();
             return false;
         }
         bms->motionSpaceTypeId = static_cast<MotionSpaceType>(motionSpaceTypeId);
@@ -833,18 +857,19 @@ bool JsInputDeviceContext::ParseBMSArray(napi_env env, napi_value value,
         napi_value napiPageTypeId = nullptr;
         if (napi_get_named_property(env, napiBms, "pageTypeId", &napiPageTypeId) != napi_ok) {
             MMI_HILOGE("ParseBMSArray napi_get_named_property failed. property name: pageTypeId");
+            bmsArray.clear();
             return false;
         }
         int32_t pageTypeId = 0;
         if (!JsUtil::ParseInt32(env, napiPageTypeId, pageTypeId)) {
             MMI_HILOGE("ParseBMSArray ParseInt32 failed. property name: pageTypeId");
+            bmsArray.clear();
             return false;
         }
         bms->pageTypeId = static_cast<PageType>(pageTypeId);
 
         bmsArray.push_back(bms);
     }
-
     return true;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -856,7 +881,7 @@ napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_i
     size_t argc = UPDATE_VK_MS_NUMBER_PARAMETERS;
     napi_value argv[UPDATE_VK_MS_NUMBER_PARAMETERS] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc != UPDATE_VK_MS_NUMBER_PARAMETERS) {
+    if (argc < UPDATE_VK_MS_NUMBER_PARAMETERS) {
         MMI_HILOGE("UpdateMotionSpace parameter number error");
         return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKResult::FAILED));
     }

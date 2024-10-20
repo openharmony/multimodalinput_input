@@ -1413,8 +1413,8 @@ int32_t JsInputMonitor::TransformKeyEvent(std::shared_ptr<KeyEvent> keyEvent, na
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    KeyEventNapi napi;
-    if (napi.CreateKeyEvent(jsEnv_, keyEvent, result) != napi_ok) {
+    KeyEventNapi keyEventHelper;
+    if (keyEventHelper.CreateKeyEvent(jsEnv_, keyEvent, result) != napi_ok) {
         MMI_HILOGW("Write KeyEvent into a JS object failed");
         return RET_ERR;
     }
@@ -1545,10 +1545,8 @@ void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     }
     CHKPV(monitor_);
     CHKPV(keyEvent);
-    {
-        std::lock_guard<std::mutex> guard(mutex_);
-        keyEventQueue_.push(keyEvent);
-    }
+    std::lock_guard<std::mutex> guard(mutex_);
+    keyEventQueue_.push(keyEvent);
  
     if (!keyEventQueue_.empty()) {
         uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -1788,12 +1786,12 @@ void JsInputMonitor::OnKeyEventInJsThread(const std::string &typeName, const int
     }
     CHKPV(jsEnv_);
     CHKPV(receiver_);
+    napi_handle_scope scope = nullptr;
     while (!keyEventQueue_.empty()) {
         if (!isMonitoring_) {
             MMI_HILOGE("Js monitor stop handle callback");
             break;
         }
-        napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
         auto keyEvent = keyEventQueue_.front();
