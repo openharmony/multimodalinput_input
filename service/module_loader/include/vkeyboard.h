@@ -120,10 +120,10 @@ struct TOUCHPOINT
 
 struct MMITouchpoint
 {
-	int PointerId;
-	double X;
-	double Y;
-	string ButtonName;
+    int PointerId;
+    double X;
+    double Y;
+    string ButtonName;
 };
 
 enum StateMachineMessageType
@@ -168,26 +168,38 @@ public:
 };
 
 enum class MotionSpaceType : int32_t {
-    NARROW = 0, 	// full keyboard with narrow key gap.
-    WIDE = 1, 		// full keyboard with wide key gap.
-    FLOATING = 2,	// floating keyboard
-    TRACKPAD = 3,	// trackpad UI-related motion space.
-    OTHERS = 10, 	// init value.
+    // Full keyboard with narrow key gap.
+    NARROW = 0,
+    // Full keyboard with wide key gap.
+    WIDE = 1,
+    // Floating keyboard
+    FLOATING = 2,
+    // Trackpad UI-related motion space.
+    TRACKPAD = 3,
+    // Init value.
+    OTHERS = 10,
 };
 
 class MotionSpacePatternIndex {
 public:
-	// access to inside values from IPC package motion space pattern.
-	static const int PATTERN_X = 0; // top left x.
-    static const int PATTERN_Y = 1; // top left y.
-    static const int PATTERN_WIDTH = 2; // width.
-    static const int PATTERN_HEIGHT = 3; // height.
-    static const int PATTERN_KEYCODE = 4; // key code.
-    static const int PATTERN_MST_ID = 5; // motion space type id.
-    static const int PATTERN_PT_ID = 6; // page type id.
-    static const size_t PATTERN_SIZE = 7; // size of the entire motion space pattern.
+	// Access to inside values from IPC package motion space pattern.
+    // Top left x.
+	static const int PATTERN_X = 0;
+    // Top left y.
+    static const int PATTERN_Y = 1;
+    // Width.
+    static const int PATTERN_WIDTH = 2;
+    // Height.
+    static const int PATTERN_HEIGHT = 3;
+    // Key code.
+    static const int PATTERN_KEYCODE = 4;
+    // Motion space type id.
+    static const int PATTERN_MST_ID = 5;
+    // Page type id.
+    static const int PATTERN_PT_ID = 6;
+    // Size of the entire motion space pattern.
+    static const size_t PATTERN_SIZE = 7;
 };
-
 
 enum TouchMode {
     NO_TOUCH = 0,
@@ -206,25 +218,25 @@ enum TouchMode {
 /// </summary>
 enum class VGestureMode : int32_t {
     NO_GESTURE = 0,
-    MOTION_MODE = 1,   // generic mode
-
-    // gestures in detailed defines
-    WINDOW_GESTURE_BEGIN = 2,   // start of window operation gesture
+    // Generic mode
+    MOTION_MODE = 1,
+    // Gestures in detailed defines
+    // Gtart of window operation gesture
+    WINDOW_GESTURE_BEGIN = 2,
     ONE_HAND_TAP = 2,
-    ONE_HAND_UP = 3, //
-    ONE_HAND_DOWN = 4, //
+    ONE_HAND_UP = 3,
+    ONE_HAND_DOWN = 4,
     TWO_HANDS_LOWER_TAP = 5,
     TWO_HANDS_UPPER_TAP = 6,
-    TWO_HANDS_UP = 7, //
-    TWO_HANDS_DOWN = 8, //
+    TWO_HANDS_UP = 7,
+    TWO_HANDS_DOWN = 8,
     TWO_HANDS_INWARDS = 9,
     TWO_HANDS_OUTWARDS = 10,
-    WINDOW_GESTURE_END = 10,   // end of window operation gesture
-
+    // End of window operation gesture
+    WINDOW_GESTURE_END = 10,
     PINCHING_MODE = 11,
     PANNING_MODE = 12,
     SWIPING_MODE = 13,
-
     SWIPE_BACKSPACE_LEFT = 14,
     SWIPE_BACKSPACE_RIGHT = 15,
 };
