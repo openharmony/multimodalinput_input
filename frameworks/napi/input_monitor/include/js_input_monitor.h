@@ -100,7 +100,7 @@ public:
     void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void OnKeyEventInJsThread(const std::string &typeName, const int32_t fingers);
-    void CheckKeyEventConsumed(bool retValue, std::shared_ptr<KeyEvent> keyEvent);
+    void CheckKeyEventConsumed(bool isConsumed, std::shared_ptr<KeyEvent> keyEvent);
     void OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     std::string GetTypeName() const;
