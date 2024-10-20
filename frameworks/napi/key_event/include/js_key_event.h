@@ -27,6 +27,7 @@ public:
     JsKeyEvent() = default;
     ~JsKeyEvent() = default;
     DISALLOW_COPY_AND_MOVE(JsKeyEvent);
+    static napi_value ExportVKeyboardAction(napi_env env, napi_value exports);
     static napi_value Export(napi_env env, napi_value exports);
 private:
     static napi_value GetNapiInt32(napi_env env, int32_t code);

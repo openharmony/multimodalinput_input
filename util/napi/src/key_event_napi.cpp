@@ -47,6 +47,14 @@ napi_status KeyEventNapi::CreateKeyEvent(napi_env env, const std::shared_ptr<Key
     status = WriteFunctionKeyStatusToJs(env, in, out);
     CHKRR(status, "set function key property", status);
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    status = SetNameProperty(env, out, "vkeyboardAction", in->GetVKeyboardAction());
+    CHKRR(status, "set vkeyboardAction property", status);
+
+    status = SetNameProperty(env, out, "keyName", in->GetKeyName());
+    CHKRR(status, "set keyName property", status);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
     return napi_ok;
 }
 
@@ -76,6 +84,14 @@ napi_status KeyEventNapi::GetKeyEvent(napi_env env, napi_value in, std::shared_p
     out->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, lock);
     lock = GetNamePropertyBool(env, in, "scrollLock");
     out->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, lock);
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t vkeyboardAction = GetNamePropertyInt32(env, in, "vkeyboardAction");
+    out->SetVKeyboardAction(static_cast<KeyEvent::VKeyboardAction>(vkeyboardAction));
+
+    std::string keyName = GetNamePropertyString(env, in, "keyName");
+    out->SetKeyName(keyName);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     return napi_ok;
 }
