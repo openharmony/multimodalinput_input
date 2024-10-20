@@ -390,6 +390,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_VKEYBOARD_AREA):
             ret = StubSetVKeyboardArea(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOTION_SPACE):
+            ret = StubSetMotionSpace(data, reply);
+            break;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             ret = StubSetPixelMapData(data, reply);
@@ -2483,6 +2486,34 @@ int32_t MultimodalInputConnectStub::StubSetVKeyboardArea(MessageParcel& data, Me
         MMI_HILOGE("Call StubSetVKeyboardArea failed ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMotionSpace(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetMotionSpace Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    std::string keyName;
+    READSTRING(data, keyName, IPC_PROXY_DEAD_OBJECT_ERR);
+    bool useShift = false;
+    READBOOL(data, useShift, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t patternLen = 0;
+    READINT32(data, patternLen, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::vector<int32_t> pattern;
+    for (int32_t i = 0; i < patternLen; i++) {
+        int32_t value = 0;
+        READINT32(data, value);
+        pattern.push_back(value);
+    }
+    int32_t ret = SetMotionSpace(keyName, useShift, pattern);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StubSetMotionSpace failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, ret);
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
