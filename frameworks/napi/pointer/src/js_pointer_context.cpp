@@ -1722,7 +1722,7 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
     CALL_DEBUG_ENTER;
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
-        THROWERR(env, "failed to create instance");
+        THROWERR(env, "Failed to create instance");
         return nullptr;
     }
     napi_property_descriptor desc[] = {
