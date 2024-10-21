@@ -80,7 +80,7 @@ void JsEventTarget::EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData)
             scope);
         BytraceAdapter::StartDevListener(ADD_EVENT, reportData->deviceId);
         MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d",
-            REMOVE_EVENT.c_str(), reportData->deviceId);
+            ADD_EVENT.c_str(), reportData->deviceId);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
             scope);
