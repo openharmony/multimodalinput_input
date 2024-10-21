@@ -149,7 +149,7 @@ void UDSSession::ReportSocketBufferFull() const
         "REMOTE_PID",
         pid_);
     if (ret != 0) {
-        MMI_HILOGE("save input event socket timeout failed, ret:%{public}d", ret);
+        MMI_HILOGE("Save input event socket timeout failed, ret:%{public}d", ret);
     }
 }
 
