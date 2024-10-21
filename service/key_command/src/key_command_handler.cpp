@@ -1634,9 +1634,9 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     }
     if (currentLaunchAbilityKey_.timerId >= 0 && IsKeyMatch(currentLaunchAbilityKey_, keyEvent)) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("repeat, current key %{public}d has launched ability", currentLaunchAbilityKey_.finalKey);
+            MMI_HILOGD("Repeat, current key %{public}d has launched ability", currentLaunchAbilityKey_.finalKey);
         } else {
-            MMI_HILOGD("repeat, current key %d has launched ability", currentLaunchAbilityKey_.finalKey);
+            MMI_HILOGD("Repeat, current key %d has launched ability", currentLaunchAbilityKey_.finalKey);
         }
         return true;
     }
