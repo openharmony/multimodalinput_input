@@ -1085,7 +1085,7 @@ void InputWindowsManager::UpdateDisplayMode()
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void InputWindowsManager::DrawPointer()
+void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
 {
     if (DISPLAY_MONITOR->GetScreenStatus() != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
         if (!isDisplayRemoved) {
@@ -1140,7 +1140,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragFlag_ = false;
             isDragBorder_ = false;
         }
-        DrawPointer();
+        DrawPointer(isDisplayRemoved);
     }
 }
 
