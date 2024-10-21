@@ -1075,20 +1075,20 @@ void InputWindowsManager::UpdateDisplayMode()
 {
     CALL_DEBUG_ENTER;
     if (displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGE("displaysInfo is empty");
+        MMI_HILOGE("DisplaysInfo is empty");
         return;
     }
     DisplayMode mode = displayGroupInfo_.displaysInfo[0].displayMode;
     if (mode == displayMode_) {
-        MMI_HILOGD("displaymode not change, mode:%{public}d, diaplayMode_:%{public}d", mode, displayMode_);
+        MMI_HILOGD("Displaymode not change, mode:%{public}d, diaplayMode_:%{public}d", mode, displayMode_);
         return;
     }
     displayMode_ = mode;
     if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
-        MMI_HILOGD("send fingersense display mode is nullptr");
+        MMI_HILOGD("Send fingersense display mode is nullptr");
         return;
     }
-    MMI_HILOGI("update fingersense display mode, displayMode:%{public}d", displayMode_);
+    MMI_HILOGI("Update fingersense display mode, displayMode:%{public}d", displayMode_);
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -1132,13 +1132,13 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
         GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
-        MMI_HILOGD("get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
+        MMI_HILOGD("Get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
             info.windowPid, info.windowId, pointerStyle.id);
         if (!dragFlag_) {
             SetMouseFlag(lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
             isDragBorder_ = SelectPointerChangeArea(*windowInfo, pointerStyle, logicX, logicY);
             dragPointerStyle_ = pointerStyle;
-            MMI_HILOGD("not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
+            MMI_HILOGD("Not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
         JudgMouseIsDownOrUp(dragFlag_);
         if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
