@@ -1917,12 +1917,12 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
         MMI_HILOG_CURSORD("Setting global pointer style");
         return RET_OK;
     }
-    MMI_HILOG_CURSORD("start to get pid by window %{public}d", windowId);
+    MMI_HILOG_CURSORD("Start to get pid by window %{public}d", windowId);
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         return UpdatePoinerStyle(pid, windowId, pointerStyle);
     }
     if (!isUiExtension && uiExtensionPointerStyle_.count(pid) != 0) {
-        MMI_HILOG_CURSORI("clear the uiextension mouse style for pid %{public}d", pid);
+        MMI_HILOG_CURSORI("Clear the uiextension mouse style for pid %{public}d", pid);
         uiExtensionPointerStyle_.erase(pid);
     }
     SetUiExtensionInfo(isUiExtension, pid, windowId);
@@ -1932,7 +1932,7 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
 bool InputWindowsManager::IsMouseSimulate() const
 {
     if (lastPointerEvent_ == nullptr) {
-        MMI_HILOG_CURSORD("lastPointerEvent is nullptr");
+        MMI_HILOG_CURSORD("The lastPointerEvent is nullptr");
         return false;
     }
     return lastPointerEvent_->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
