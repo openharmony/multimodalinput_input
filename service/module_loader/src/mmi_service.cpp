@@ -237,7 +237,7 @@ MMIService* MMIService::GetInstance()
     if (g_MMIService == nullptr) {
         std::lock_guard<std::mutex> lock(g_instanceMutex);
         if (g_MMIService == nullptr) {
-            MMI_HILOGI("new MMIService");
+            MMI_HILOGI("New MMIService");
             g_MMIService = new MMIService();
         }
     }
@@ -1087,7 +1087,7 @@ void MMIService::OnConnected(SessionPtr s)
             continue;
         }
         if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
-            MMI_HILOGW("record client processes pid %{public}d", item.pid_);
+            MMI_HILOGW("Record client processes pid %{public}d", item.pid_);
             shellAssitentPid_ = item.pid_;
         }
     }
@@ -1104,7 +1104,7 @@ void MMIService::OnDisconnected(SessionPtr s)
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (s->GetProgramName() == SHELL_ASSISTANT && shellAssitentPid_ == s->GetPid()) {
-        MMI_HILOGW("clean all shell windows pid: %{public}d", s->GetPid());
+        MMI_HILOGW("Clean all shell windows pid: %{public}d", s->GetPid());
         shellAssitentPid_ = -1;
         IInputWindowsManager::GetInstance()->CleanShellWindowIds();
     }
@@ -3263,7 +3263,7 @@ int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
 int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("start get infrared frequency");
+    MMI_HILOGI("Start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
     if (!InfraredEmitterController::GetInstance()->GetFrequencies(infos)) {
         MMI_HILOGE("Failed to get frequencies");
@@ -3281,7 +3281,7 @@ int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
         context = context + "frequencies[" + std::to_string(i) + "]. max=" + std::to_string(frequencies[i].max_) +
         ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
-    MMI_HILOGD("data from hdf context:%{public}s", context.c_str());
+    MMI_HILOGD("Data from hdf context:%{public}s", context.c_str());
     return RET_OK;
 }
 
