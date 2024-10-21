@@ -860,7 +860,7 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
             return FINGERPRINT_CANCEL;
         }
         default: {
-            MMI_HILOGE("wrong action is %{public}d", action);
+            MMI_HILOGE("Wrong action is %{public}d", action);
             return RET_ERR;
         }
     }
@@ -2002,7 +2002,7 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL)) {
         return true;
     }
-    MMI_HILOGD("not fingerprint event");
+    MMI_HILOGD("Not fingerprint event");
     return false;
 }
 
