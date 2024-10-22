@@ -3425,5 +3425,70 @@ CALL_TEST_DEBUG;
 int32_t subscriberId = 1;
 ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeHotkey(subscriberId));
 }
+
+/*
+ * @tc.name: InputManagerTest_SetTouchpadScrollRows_001
+ * @tc.desc: Test the funcation SetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 1;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadScrollRows(rows);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_GetTouchpadScrollRows_001
+ * @tc.desc: Test the funcation GetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 2;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/*
+ * @tc.name: InputManagerTest_SetVKeyboardArea_001
+ * @tc.desc: Test the funcation SetVKeyboardArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetVKeyboardArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double topLeftX = 1.0;
+    double topLeftY = 2.0;
+    double bottomRightX = 5.0;
+    double bottomRightY = 10.0;
+    int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/*
+ * @tc.name: InputManagerTest_SetMotionSpace_001
+ * @tc.desc: Test the funcation SetMotionSpace
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMotionSpace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string keyName = "Enter";
+    bool useShift = true;
+    std::vector<int32_t> pattern;
+    pattern.push_back(50);
+    pattern.push_back(100);
+    int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(keyName, useShift, pattern);
+    ASSERT_EQ(ret, RET_ERR);
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS
