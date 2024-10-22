@@ -24,6 +24,8 @@
 #endif // CALL_MANAGER_SERVICE_ENABLED
 #include "common_event_data.h"
 #include "common_event_manager.h"
+#include "common_event_support.h"
+#include "display_event_monitor.h"
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
@@ -1258,10 +1260,16 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("This key event no need to CallEnded");
         return false;
     }
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    if (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        MMI_HILOGI("The current screen is not on, so not allow end call");
+        return false;
+    }
     int32_t ret = DEVICE_MONITOR->GetCallState();
     MMI_HILOGE("Current call state:%{public}d", ret);
 
     switch (ret) {
+        case StateType::CALL_STATUS_HOLDING:
         case StateType::CALL_STATUS_ALERTING:
         case StateType::CALL_STATUS_ANSWERED:
         case StateType::CALL_STATUS_ACTIVE:
