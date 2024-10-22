@@ -143,8 +143,8 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    if (displayGroupInfo.windowInfo.size() < MAX_WINDOW_SIZE) {
-        windowGroupInfo_.windowInfo.clear();
+    if (displayGroupInfo.windowsInfo.size() < MAX_WINDOW_SIZE) {
+        windowGroupInfo_.windowsInfo.clear();
     }
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Failed to initialize MMI client");
