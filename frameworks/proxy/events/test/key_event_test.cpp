@@ -579,5 +579,153 @@ HWTEST_F(KeyEventTest, KeyEventTest_ToString, TestSize.Level1)
     ASSERT_NE(keyEvent, nullptr);
     ASSERT_NO_FATAL_FAILURE(keyEvent->ToString());
 }
+
+/**
+ * @tc.name: KeyEventTest_SetKeyItem_001
+ * @tc.desc: Test the funcation SetKeyItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_SetKeyItem_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    std::vector<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItems();
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetKeyItem(keyItem));
+}
+
+/**
+ * @tc.name: KeyEventTest_IsRepeatKey_001
+ * @tc.desc: Test the funcation IsRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_IsRepeatKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_FALSE(keyEvent->IsRepeatKey());
+}
+
+/**
+ * @tc.name: KeyEventTest_SetRepeatKey_001
+ * @tc.desc: Test the funcation SetRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_SetRepeatKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    bool repeatKey = true;
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetRepeatKey(repeatKey));
+    repeatKey = false;
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetRepeatKey(repeatKey));
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/**
+ * @tc.name: KeyEventTest_GetVKeyboardAction_001
+ * @tc.desc: Test the funcation GetVKeyboardAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetVKeyboardAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(keyEvent->GetVKeyboardAction());
+}
+
+/**
+ * @tc.name: KeyEventTest_SetVKeyboardAction_001
+ * @tc.desc: Test the funcation SetVKeyboardAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_SetVKeyboardAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    VKeyboardAction vkAction = VKeyboardAction::ACTIVATE_KEYBOARD;
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetVKeyboardAction(vkAction));
+}
+
+/**
+ * @tc.name: KeyEventTest_GetKeyName_001
+ * @tc.desc: Test the funcation GetKeyName
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetKeyName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->keyName_ = "keyName";
+    std::string ret = keyEvent->GetKeyName();
+    ASSERT_EQ(ret, "keyName");
+}
+
+/**
+ * @tc.name: KeyEventTest_SetKeyName_001
+ * @tc.desc: Test the funcation SetKeyName
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_SetKeyName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    std::string keyName = "keyName";
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetKeyName(keyName));
+}
+
+/**
+ * @tc.name: KeyEventTest_VKeyboardActionToStr_001
+ * @tc.desc: Test the funcation VKeyboardActionToStr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_VKeyboardActionToStr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    VKeyboardAction vKeyAction = VKeyboardAction::ACTIVATE_KEYBOARD;
+    const char* ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "ACTIVATE_KEYBOARD");
+    vKeyAction = VKeyboardAction::VKEY_DOWN;
+    ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "VKEY_DOWN");
+    vKeyAction = VKeyboardAction::VKEY_UP;
+    ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "VKEY_UP");
+    vKeyAction = VKeyboardAction::RESET_BUTTON_COLOR;
+    ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "RESET_BUTTON_COLOR");
+    vKeyAction = VKeyboardAction::TWO_FINGERS_IN;
+    ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "TWO_FINGERS_IN");
+    vKeyAction = VKeyboardAction::TWO_FINGERS_OUT;
+    ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "TWO_FINGERS_OUT");
+    vKeyAction = VKeyboardAction::TWO_HANDS_UP;
+    ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "TWO_HANDS_UP");
+    vKeyAction = VKeyboardAction::TWO_HANDS_DOWN;
+    ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "TWO_HANDS_DOWN");
+    vKeyAction = VKeyboardAction::UNKNOWN;
+    ret = keyEvent->VKeyboardActionToStr(vKeyAction);
+    ASSERT_EQ(ret, "UNKNOWN");
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS
