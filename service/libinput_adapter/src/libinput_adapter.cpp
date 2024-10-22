@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <climits>
+#include <regex>
 
 #include <dirent.h>
 #include <fcntl.h>
@@ -116,11 +117,17 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
         }
         int32_t errNo = errno;
-        std::string pathStr(path);
-        size_t pos = pathStr.rfind('/');
-        std::string event = pathStr.substr(pos + 1);
-        MMI_HILOGWK("Libinput .open_restricted path:***/%{public}s, fd:%{public}d, errno:%{public}d",
-            event.c_str(), fd, errNo);
+        std::regex re("(\\d+)");
+        std::string str_path(path);
+        std::smatch match;
+        int32_t id;
+        if (std::regex_search(str_path, match, re)) {
+            id = std::stoi(match[0]);
+        } else {
+            id = -1;
+        }
+        MMI_HILOGWK("Libinput .open_restricted id:%{public}d, fd:%{public}d, errno:%{public}d",
+            id, fd, errNo);
         return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
@@ -215,10 +222,16 @@ void LibinputAdapter::ReloadDevice()
 
 void LibinputAdapter::OnDeviceAdded(std::string path)
 {
-    std::string pathStr(path);
-    size_t locations  = pathStr.rfind('/');
-    std::string event = pathStr.substr(locations + 1);
-    MMI_HILOGI("OnDeviceAdded path:***/%{public}s", event.c_str());
+    std::regex re("(\\d+)");
+    std::string str_path(path);
+    std::smatch match;
+    int32_t id;
+    if (std::regex_search(str_path, match, re)) {
+        id = std::stoi(match[0]);
+    } else {
+        id = -1;
+    }
+    MMI_HILOGI("OnDeviceAdded id:%{public}d", id);
     auto pos = devices_.find(path);
     if (pos != devices_.end()) {
         MMI_HILOGD("Path is found");
@@ -234,10 +247,16 @@ void LibinputAdapter::OnDeviceAdded(std::string path)
 
 void LibinputAdapter::OnDeviceRemoved(std::string path)
 {
-    std::string pathStr(path);
-    size_t locations  = pathStr.rfind('/');
-    std::string event = pathStr.substr(locations + 1);
-    MMI_HILOGI("OnDeviceRemoved path:***/%{public}s", event.c_str());
+    std::regex re("(\\d+)");
+    std::string str_path(path);
+    std::smatch match;
+    int32_t id;
+    if (std::regex_search(str_path, match, re)) {
+        id = std::stoi(match[0]);
+    } else {
+        id = -1;
+    }
+    MMI_HILOGI("OnDeviceRemoved id:%{public}d", id);
     auto pos = devices_.find(path);
     if (pos != devices_.end()) {
         libinput_path_remove_device(pos->second);
