@@ -1008,7 +1008,8 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     }
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (isDisplayRemoved) {
-        ResetCursorPos();
+        CursorPosition cursorPos = ResetCursorPos();
+        UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     PrintDisplayInfo();
