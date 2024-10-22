@@ -1274,6 +1274,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         return false;
     } else {
         if (HandleRepeatKeys(key)) {
+            MMI_HILOGI("Handle power key lifting event");
             return true;
         }
     }
@@ -1379,6 +1380,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
             return false;
         }
         if (HandleKeyUpCancel(item, keyEvent)) {
+            MMI_HILOGI("Cancel repeatKey");
             return false;
         }
         if (HandleRepeatKeyCount(item, keyEvent)) {
@@ -1392,7 +1394,8 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
             waitRepeatKey = true;
         }
     }
-
+    MMI_HILOGI("Handle repeat key, isLaunched:%{public}d, waitRepeatKey:%{public}d",
+        isLaunched, waitRepeatKey);
     return isLaunched || waitRepeatKey;
 }
 
