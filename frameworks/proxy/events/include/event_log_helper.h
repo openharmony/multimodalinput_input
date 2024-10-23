@@ -49,6 +49,18 @@ static constexpr std::string_view DebugTrackingDict =
         "TAV-ThrottleAbsValue, TX-TiltX, TY-TiltY, VAV-VerticalAxisValue, W-Width, WX-WindowX, WY-WindowY,"
         " XAV-XAbsValue, YAV-YAbsValue, ZAV-ZAbsValue, RAV-RotateAxisValue";
 
+const std::set<int32_t> g_keyCodeValue = {
+    KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
+    KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_TAB, KeyEvent::KEYCODE_ENTER,
+    KeyEvent::KEYCODE_DEL, KeyEvent::KEYCODE_MENU, KeyEvent::KEYCODE_PAGE_UP, KeyEvent::KEYCODE_PAGE_DOWN,
+    KeyEvent::KEYCODE_ESCAPE, KeyEvent::KEYCODE_FORWARD_DEL, KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT,
+    KeyEvent::KEYCODE_CAPS_LOCK, KeyEvent::KEYCODE_SCROLL_LOCK, KeyEvent::KEYCODE_META_LEFT,
+    KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SYSRQ, KeyEvent::KEYCODE_BREAK, KeyEvent::KEYCODE_MOVE_HOME,
+    KeyEvent::KEYCODE_MOVE_END, KeyEvent::KEYCODE_INSERT, KeyEvent::KEYCODE_F1, KeyEvent::KEYCODE_F2,
+    KeyEvent::KEYCODE_F3, KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_F5, KeyEvent::KEYCODE_F6, KeyEvent::KEYCODE_F7,
+    KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
+    KeyEvent::KEYCODE_NUM_LOCK, KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP, KeyEvent::KEYCODE_POWER
+};
 class EventLogHelper final {
 public:
     template<class T>
@@ -103,18 +115,13 @@ private:
         }
     }
 
-    static bool JudgeMode(const std::shared_ptr<KeyEvent> event)
-    {
-        return event->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
-               event->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP || event->GetKeyCode() == KeyEvent::KEYCODE_POWER;
-    }
-
     static void PrintInfoLog(const std::shared_ptr<KeyEvent> event, const LogHeader &lh)
     {
         PrintInfoDict();
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         std::string isRepeat = event->IsRepeat() ? "true" : "false";
+        bool isJudgeMode = g_keyCodeValue.find(event->GetKeyCode()) != g_keyCodeValue.end();
         if (!IsBetaVersion()) {
             MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d" ", ET:%{public}s,"
                 "KA:%{public}s, KIC:%{public}zu, DI:%{public}d, IR:%{public}s, SI:%{public}s",
@@ -122,7 +129,7 @@ private:
                 KeyEvent::ActionToString(event->GetKeyAction()), eventItems.size(),
                 event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         } else {
-            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) && !isJudgeMode) {
                 MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%d, AT:%{public}" PRId64
                     ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%d, SL:%d, KIC:%zu, "
                     "DI:%{public}d, IR:%{public}s, SI:%{public}s",
@@ -184,13 +191,14 @@ private:
         PrintDebugDict();
         PrintInfoDict();
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
+        bool isJudgeMode = g_keyCodeValue.find(event->GetKeyCode()) != g_keyCodeValue.end();
         if (!IsBetaVersion()) {
             MMI_HILOG_HEADER(LOG_DEBUG, lh, "KI:%{public}d, " "ET:%{public}s, F:%{public}d, KA:%{public}s, "
                 "EN:%{public}d , KIC:%{public}zu",
                 event->GetKeyIntention(), InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                 KeyEvent::ActionToString(event->GetKeyAction()), event->GetId(), eventItems.size());
         } else {
-            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) && !JudgeMode(event)) {
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) && !isJudgeMode) {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%d, KI:%{public}d, AT:%{public}" PRId64 ", AST:%{public}" PRId64
                         ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
                         ", EN:%{public}d, KIC:%{public}zu",
@@ -235,7 +243,7 @@ private:
                 tmpStr += ("," + std::to_string(*cItr));
             }
             if (IsBetaVersion()) {
-                if (JudgeMode(event) || !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                if (isJudgeMode || !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                         MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
                 }
             }
