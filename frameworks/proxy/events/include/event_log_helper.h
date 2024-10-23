@@ -133,7 +133,7 @@ private:
                 KeyEvent::ActionToString(event->GetKeyAction()), eventItems.size(),
                 event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         } else {
-            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) && !isJudgeMode) {
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || !isJudgeMode) {
                 MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%d, AT:%{public}" PRId64
                     ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%d, SL:%d, KIC:%zu, "
                     "DI:%{public}d, IR:%{public}s, SI:%{public}s",
@@ -202,7 +202,7 @@ private:
                 event->GetKeyIntention(), InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                 KeyEvent::ActionToString(event->GetKeyAction()), event->GetId(), eventItems.size());
         } else {
-            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) && !isJudgeMode) {
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || !isJudgeMode) {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%d, KI:%{public}d, AT:%{public}" PRId64 ", AST:%{public}" PRId64
                         ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
                         ", EN:%{public}d, KIC:%{public}zu",
