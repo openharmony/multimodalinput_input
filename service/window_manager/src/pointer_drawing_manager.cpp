@@ -2149,7 +2149,9 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
     MouseEventHdr->OnDisplayLost(displayInfo_.id);
     if (surfaceNode_ != nullptr) {
         surfaceNode_->DetachToDisplay(screenId_);
+#ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         surfaceNode_ = nullptr;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
     }
