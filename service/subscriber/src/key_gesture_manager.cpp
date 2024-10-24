@@ -102,6 +102,7 @@ bool KeyGestureManager::KeyGesture::RemoveHandler(int32_t id)
 {
     for (auto iter = handlers_.begin(); iter != handlers_.end(); ++iter) {
         if (iter->GetId() == id) {
+            iter->ResetTimer();
             handlers_.erase(iter);
             MMI_HILOGI("Handler(%{public}d) of key gesture was removed", iter->GetId());
             return true;
