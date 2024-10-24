@@ -1120,6 +1120,8 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         DispatchPointerCancel(displayId);
         int32_t logicX = mouseLocation.physicalX + displayInfo->x;
         int32_t logicY = mouseLocation.physicalY + displayInfo->y;
+        lastLogicX_ = logicX;
+        lastLogicY_ = logicY;
         std::optional<WindowInfo> windowInfo;
         if (lastPointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
             lastPointerEvent_->GetPressedButtons().empty()) {
@@ -1333,8 +1335,10 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     pointerEvent->UpdateId();
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerAction);
     MouseLocation mouseLocation = GetMouseInfo();
-    lastLogicX_ = mouseLocation.physicalX;
-    lastLogicY_ = mouseLocation.physicalY;
+    auto displayInfo = GetPhysicalDisplay(mouseLocation.displayId);
+    CHKPV(displayInfo);
+    lastLogicX_ = mouseLocation.physicalX + displayInfo->x;
+    lastLogicY_ = mouseLocation.physicalY + displayInfo->y;
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
         Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         auto touchWindow = GetWindowInfo(lastLogicX_, lastLogicY_);
@@ -1347,8 +1351,8 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
     pointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
-    pointerItem.SetDisplayX(lastLogicX_);
-    pointerItem.SetDisplayY(lastLogicY_);
+    pointerItem.SetDisplayX(mouseLocation.physicalX);
+    pointerItem.SetDisplayY(mouseLocation.physicalY);
     pointerItem.SetPointerId(0);
 
     pointerEvent->SetTargetDisplayId(-1);
