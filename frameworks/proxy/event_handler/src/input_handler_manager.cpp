@@ -607,7 +607,9 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         }
         if (tempEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
             tempEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
-            MMI_HILOGI("Swipe event sended to handler! action type: %{public}d", tempEvent->GetPointerAction());
+            MMI_HILOGI("Swipe event sended to handler! action type: %{public}d finger count: %{public}d",
+                tempEvent->GetPointerAction(),
+                tempEvent->GetFingerCount());
         }
         CHKPV(iter->second);
         auto consumer = iter->second;
