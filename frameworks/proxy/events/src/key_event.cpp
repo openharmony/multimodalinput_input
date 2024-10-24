@@ -1214,6 +1214,21 @@ bool KeyEvent::IsValid() const
     return true;
 }
 
+void KeyEvent::SetPowerFlag()
+{
+    powerFlag_ = true;
+}
+
+bool KeyEvent::GetPowerFlag()
+{
+    return powerFlag_;
+}
+
+void KeyEvent::RestorePowerFlag()
+{
+    powerFlag_ = false;
+}
+
 bool KeyEvent::WriteToParcel(Parcel &out) const
 {
     if (!InputEvent::WriteToParcel(out)) {

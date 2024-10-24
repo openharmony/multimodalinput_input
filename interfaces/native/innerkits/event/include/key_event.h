@@ -3515,6 +3515,11 @@ protected:
      */
     explicit KeyEvent(int32_t eventType);
 
+public:
+    void SetPowerFlag();
+    bool GetPowerFlag();
+    void RestorePowerFlag();
+
 private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     bool ReadEnhanceDataFromParcel(Parcel &in);
@@ -3538,6 +3543,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     bool repeat_ { false };
     bool repeatKey_ { false };
+    bool powerFlag_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
