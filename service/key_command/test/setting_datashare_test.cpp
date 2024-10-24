@@ -198,5 +198,65 @@ HWTEST_F(SettingObserverTest, SettingObserverTest_OnChange, TestSize.Level1)
     observer.update_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(observer.OnChange());
 }
+
+/**
+ * @tc.name: SettingDatashareTest_GetStringValue_001
+ * @tc.desc: Test the funcation GetStringValue
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDatashareTest, SettingDatashareTest_GetStringValue_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare observer;
+    std::string key = "SettingObserver";
+    std::string value = "valueObj";
+    std::string strUri = "strUri";
+    observer.isDataShareReady_ = false;
+    ASSERT_NO_FATAL_FAILURE(observer.GetStringValue(key, value, strUri));
+    observer.isDataShareReady_ = true;
+    observer.remoteObj_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(observer.GetStringValue(key, value, strUri));
+    observer.CreateDataShareHelper(strUri);
+    ASSERT_NO_FATAL_FAILURE(observer.GetStringValue(key, value, strUri));
+}
+
+/**
+ * @tc.name: SettingDatashareTest_CreateDataShareHelper_001
+ * @tc.desc: Test the funcation CreateDataShareHelper
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDatashareTest, SettingDatashareTest_CreateDataShareHelper_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare observer;
+    std::string strUri = "";
+    observer.remoteObj_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(observer.CreateDataShareHelper(strUri));
+    observer.CreateDataShareHelper(strUri);
+    ASSERT_NO_FATAL_FAILURE(observer.CreateDataShareHelper(strUri));
+    strUri = "strUri";
+    ASSERT_NO_FATAL_FAILURE(observer.CreateDataShareHelper(strUri));
+}
+
+/**
+ * @tc.name: SettingDatashareTest_AssembleUri_001
+ * @tc.desc: Test the funcation AssembleUri
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDatashareTest, SettingDatashareTest_AssembleUri_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare observer;
+    std::string key = "close_fingerprint_nav_event_key";
+    std::string strUri = "strUri";
+    ASSERT_NO_FATAL_FAILURE(observer.AssembleUri(key, strUri));
+    key = "close_fingerprint_event_key";
+    ASSERT_NO_FATAL_FAILURE(observer.AssembleUri(key, strUri));
+    strUri = "";
+    ASSERT_NO_FATAL_FAILURE(observer.AssembleUri(key, strUri));
+}
 } // namespace MMI
 } // namespace OHOS
