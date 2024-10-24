@@ -53,6 +53,7 @@ constexpr int32_t RIGHT { 2 };
 constexpr int32_t MOUSE_FLOW { 10 };
 constexpr int32_t ONE_FINGERS { 1 };
 constexpr int32_t THREE_FINGERS { 3 };
+constexpr int32_t INJECTION_EVENT_FLAG { 10000 };
 constexpr int32_t FOUR_FINGERS { 4 };
 constexpr int32_t GESTURE_BEGIN { 1 };
 constexpr int32_t GESTURE_UPDATE { 2 };
@@ -726,6 +727,9 @@ int32_t JsInputMonitor::TransformSwipeEvent(std::shared_ptr<PointerEvent> pointe
     }
     PointerEvent::PointerItem pointeritem;
     int32_t pointerId = 0;
+    if (INJECTION_EVENT_FLAG <= pointerEvent->GetPointerId()) {
+        pointerId = pointerEvent->GetPointerId();
+    }
     if (!pointerEvent->GetPointerItem(pointerId, pointeritem)) {
         MMI_HILOGE("Can't find this pointerItem");
         return RET_ERR;

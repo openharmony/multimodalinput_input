@@ -2153,7 +2153,7 @@ int32_t InputManagerCommand::SwipeActionEvent(int32_t startX, int32_t startY, in
     }
     actionType[times - 1] = PointerEvent::POINTER_ACTION_SWIPE_END;
     for (int32_t i = 0; i < times; i++) {
-        auto pointerEvent = CreateEvent(0, actionType[i], fingerCount - 1, sourceType, fingerCount);
+        auto pointerEvent = CreateEvent(0, actionType[i], 0, sourceType, fingerCount);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         pointerEvent->SetActionTime(actionTime[i]);
         pointerEvent->SetActionStartTime(actionStartTime[i]);
