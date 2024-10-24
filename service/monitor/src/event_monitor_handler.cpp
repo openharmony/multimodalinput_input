@@ -15,10 +15,13 @@
 
 #include "event_monitor_handler.h"
 
+#include "common_event_support.h"
+
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "display_event_monitor.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
@@ -174,6 +177,10 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
+    if (DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
+        keyEvent->GetPowerFlag() && monitors_.HandleEvent(keyEvent)) {
+        MMI_HILOGD("Key Event was consumed by power");
+    }
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {
