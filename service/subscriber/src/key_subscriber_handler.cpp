@@ -246,6 +246,10 @@ int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> optio
         .session = session,
         .callback = callback,
     };
+    if (KeyShortcutManager::IsModifier(sysKey.finalKey)) {
+        sysKey.modifiers.insert(sysKey.finalKey);
+        sysKey.finalKey = KeyShortcutManager::SHORTCUT_PURE_MODIFIERS;
+    }
     return KEY_SHORTCUT_MGR->RegisterSystemKey(sysKey);
 }
 

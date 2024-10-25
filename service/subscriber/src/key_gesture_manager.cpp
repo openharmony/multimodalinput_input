@@ -55,7 +55,7 @@ void KeyGestureManager::Handler::ResetTimer()
 
 void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGI("[Handler] Handler will run after %{public}dms", GetLongPressTime());
+    MMI_HILOGI("[Handler] Handler(%{public}d) will run after %{public}dms", GetId(), GetLongPressTime());
     keyEvent_ = KeyEvent::Clone(keyEvent);
     timerId_ = TimerMgr->AddTimer(GetLongPressTime(), REPEAT_ONCE,
         [this]() {
@@ -72,6 +72,7 @@ void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
 void KeyGestureManager::Handler::Run(std::shared_ptr<KeyEvent> keyEvent) const
 {
     if (callback_ != nullptr) {
+        MMI_HILOGI("[Handler] Run handler(%{public}d)", GetId());
         callback_(keyEvent);
     }
 }
@@ -104,7 +105,7 @@ bool KeyGestureManager::KeyGesture::RemoveHandler(int32_t id)
         if (iter->GetId() == id) {
             iter->ResetTimer();
             handlers_.erase(iter);
-            MMI_HILOGI("Handler(%{public}d) of key gesture was removed", iter->GetId());
+            MMI_HILOGI("Handler(%{public}d) of key gesture was removed", id);
             return true;
         }
     }
