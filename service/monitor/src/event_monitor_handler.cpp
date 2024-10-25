@@ -451,7 +451,7 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
         if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
             continue;
         }
-        if (!keyEvent.GetFourceMonitorFlag()) {
+        if (!keyEvent->GetFourceMonitorFlag()) {
             mon.SendToClient(keyEvent, pkt);
         } else if (mon.session_ != nullptr && mon.session_->GetUid() == POWER_UID) {
             mon.SendToClient(keyEvent, pkt);
