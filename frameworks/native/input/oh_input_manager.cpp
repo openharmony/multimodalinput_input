@@ -2059,7 +2059,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     if (preSubscribeId == INPUT_PARAMETER_ERROR) {
         MMI_HILOGD("HotkeyId:%{private}s", hotkeyInfo->hotkeyId.c_str());
         int32_t subscribeId = -1;
-        subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, HandleKeyEvent);
+        subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeHotkey(keyOption, HandleKeyEvent);
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             delete hotkeyInfo;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
@@ -2158,7 +2158,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     }
     MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
     if (subscribeId >= 0) {
-        OHOS::MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+        OHOS::MMI::InputManager::GetInstance()->UnsubscribeHotkey(subscribeId);
     }
     delete hotkeyInfo;
     return INPUT_SUCCESS;

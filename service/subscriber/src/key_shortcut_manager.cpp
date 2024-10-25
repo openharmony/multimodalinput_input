@@ -415,7 +415,7 @@ bool KeyShortcutManager::IsExceptionalSystemKey(const ExceptionalSystemKey &sysK
     return (exceptSysKeys_.find(sysKey) != exceptSysKeys_.cend());
 }
 
-bool KeyShortcutManager::IsModifier(int32_t keyCode) const
+bool KeyShortcutManager::IsModifier(int32_t keyCode)
 {
     return (modifiers_.find(keyCode) != modifiers_.cend());
 }

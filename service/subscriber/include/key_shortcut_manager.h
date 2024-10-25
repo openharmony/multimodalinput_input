@@ -91,6 +91,7 @@ public:
     void MarkShortcutConsumed(const KeyOption &shortcut);
 
     static std::shared_ptr<KeyShortcutManager> GetInstance();
+    static bool IsModifier(int32_t keyCode);
 
 private:
     struct SystemKey {
@@ -136,7 +137,6 @@ private:
     std::string FormatModifiers(const std::set<int32_t> &modifiers) const;
     int32_t GenerateId() const;
     bool IsExceptionalSystemKey(const ExceptionalSystemKey &sysKey) const;
-    bool IsModifier(int32_t keyCode) const;
     bool CheckSystemKey(const SystemShortcutKey &key, KeyShortcut &shortcut) const;
     bool IsValid(const ShortcutTriggerType triggerType) const;
     bool IsReservedSystemKey(const KeyShortcut &shortcut) const;
