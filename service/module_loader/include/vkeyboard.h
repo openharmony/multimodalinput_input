@@ -240,6 +240,15 @@ enum class VGestureMode : int32_t {
     SWIPE_BACKSPACE_LEFT = 14,
     SWIPE_BACKSPACE_RIGHT = 15,
 };
+
+enum class VTPStateMachineMessageType : int32_t {
+    UNKNOWN = 0,
+    POINTER_MOVE = 1,
+    LEFT_CLICK_DOWN = 2,
+    LEFT_CLICK_UP = 3,
+    RIGHT_CLICK_DOWN = 4,
+    RIGHT_CLICK_UP = 5,
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // MMI_VKEYBOARD_H
