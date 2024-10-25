@@ -1214,19 +1214,14 @@ bool KeyEvent::IsValid() const
     return true;
 }
 
-void KeyEvent::SetPowerFlag()
+void KeyEvent::SetFourceMonitorFlag(bool fourceMonitorFlag)
 {
-    powerFlag_ = true;
+    fourceMonitorFlag_ = fourceMonitorFlag;
 }
 
-bool KeyEvent::GetPowerFlag()
+bool KeyEvent::GetFourceMonitorFlag()
 {
-    return powerFlag_;
-}
-
-void KeyEvent::RestorePowerFlag()
-{
-    powerFlag_ = false;
+    return fourceMonitorFlag_;
 }
 
 bool KeyEvent::WriteToParcel(Parcel &out) const

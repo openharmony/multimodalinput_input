@@ -95,9 +95,9 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
         if (DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             auto monitorHandler = InputHandler->GetMonitorHandler();
             CHKPV(monitorHandler);
-            keyEvent->SetPowerFlag();
+            keyEvent->SetFourceMonitorFlag(true);
             monitorHandler->OnHandleEvent(keyEvent);
-            keyEvent->RestorePowerFlag();
+            keyEvent->SetFourceMonitorFlag(false);
         }
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);

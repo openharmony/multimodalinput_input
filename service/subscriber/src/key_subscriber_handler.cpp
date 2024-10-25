@@ -77,9 +77,9 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
         if (DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             auto monitorHandler = InputHandler->GetMonitorHandler();
             CHKPV(monitorHandler);
-            keyEvent->SetPowerFlag();
+            keyEvent->SetFourceMonitorFlag(true);
             monitorHandler->OnHandleEvent(keyEvent);
-            keyEvent->RestorePowerFlag();
+            keyEvent->SetFourceMonitorFlag(false);
         }
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());

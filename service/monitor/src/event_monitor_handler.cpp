@@ -44,6 +44,7 @@ constexpr size_t MAX_EVENTIDS_SIZE { 1000 };
 constexpr int32_t ACTIVE_EVENT { 2 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t POWER_UID { 5528 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -177,10 +178,6 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
-    if (DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
-        keyEvent->GetPowerFlag() && monitors_.HandleEvent(keyEvent)) {
-        MMI_HILOGD("Key Event was consumed by power");
-    }
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {
@@ -451,7 +448,12 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
         return false;
     }
     for (const auto &mon : monitors_) {
-        if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
+        if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+            continue;
+        }
+        if (!keyEvent.GetFourceMonitorFlag()) {
+            mon.SendToClient(keyEvent, pkt);
+        } else if (mon.session_ != nullptr && mon.session_->GetUid() == POWER_UID) {
             mon.SendToClient(keyEvent, pkt);
         }
     }
