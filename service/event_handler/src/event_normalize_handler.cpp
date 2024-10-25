@@ -422,6 +422,13 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     TerminateAxis(event);
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    if (MouseEventHdr->CheckFilterMouseEvent(event)) {
+        MMI_HILOGD("Mouse motion event have been filtered");
+        BytraceAdapter::StopPackageEvent();
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
         BytraceAdapter::StopPackageEvent();

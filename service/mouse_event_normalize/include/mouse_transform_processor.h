@@ -73,6 +73,17 @@ public:
         TOUCHPAD = 2,
     };
 
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    struct FilterInsertionPoint {
+        double filterX{ 0.0 };
+        double filterY{ 0.0 };
+        uint64_t filterPrePointTime{ 0 };
+        uint64_t filterDeltaTime{ 0 };
+        bool filterFlag{ false };
+        static constexpr int32_t FILTER_THRESHOLD_US = 909; // <=1ms
+    };
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+
 public:
     DISALLOW_COPY_AND_MOVE(MouseTransformProcessor);
     explicit MouseTransformProcessor(int32_t deviceId);
@@ -85,6 +96,11 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    void HandleFilterMouseEvent(Offset* offset);
+    bool CheckFilterMouseEvent(struct libinput_event *event);
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event *event);
@@ -154,6 +170,9 @@ private:
                 return TimerMgr->ResetTimer(timerId);
             }
     };
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    struct FilterInsertionPoint filterInsertionPoint_;
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 };
 } // namespace MMI
 } // namespace OHOS
