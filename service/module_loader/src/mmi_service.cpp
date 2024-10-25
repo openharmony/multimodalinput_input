@@ -885,19 +885,21 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                     buttonMode);
 
                 int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
-                if (keyCode >= 0) {
-                    ToggleKeyVisualState(buttonName, keyCode, true);
 
-                    if (buttonMode == 1) {
-                        // flag for turning it off now.
-                        ToggleKeyVisualState(buttonName, keyCode, false);
-                    }
-
-                    if (keyCode == KeyEvent::KEYCODE_FN) {
-                        g_FnKeyState = !g_FnKeyState;
-                    }
-                } else {
+                if (keyCode < 0) {
                     MMI_HILOGW("VKeyboard key code not found for %{public}s", buttonName.c_str());
+                    break;
+                }
+
+                ToggleKeyVisualState(buttonName, keyCode, true);
+
+                if (buttonMode == 1) {
+                    // flag for turning it off now.
+                    ToggleKeyVisualState(buttonName, keyCode, false);
+                }
+
+                if (keyCode == KeyEvent::KEYCODE_FN) {
+                    g_FnKeyState = !g_FnKeyState;
                 }
 
                 break;
