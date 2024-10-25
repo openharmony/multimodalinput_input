@@ -122,6 +122,9 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+        #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+        HandleFilterMouseEvent(&offset);
+        #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
         ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, static_cast<int32_t>(deviceType));
     }
@@ -1031,5 +1034,52 @@ void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_
     int32_t defaultValue = value;
     value = PREFERENCES_MGR->GetIntValue(key, defaultValue);
 }
+
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+void MouseTransformProcessor::HandleFilterMouseEvent(Offset* offset)
+{
+    if (filterInsertionPoint_.filterFlag) {
+        offset->dx = filterInsertionPoint_.filterX;
+        offset->dy = filterInsertionPoint_.filterY;
+        filterInsertionPoint_.filterDeltaTime = 0;
+        filterInsertionPoint_.filterX = 0.0;
+        filterInsertionPoint_.filterY = 0.0;
+        filterInsertionPoint_.filterFlag = false;
+        MMI_HILOGD("x:%.2f, y:%.2f", offset->dx, offset->dy);
+    }
+}
+
+bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event)
+{
+    CHKPF(event);
+    if (libinput_event_get_type(event) != LIBINPUT_EVENT_POINTER_MOTION) {
+        return false;
+    }
+
+    auto data = libinput_event_get_pointer_event(event);
+    CHKPF(data);
+    uint64_t currentTime = libinput_event_pointer_get_time_usec(data);
+    if ((!filterInsertionPoint_.filterPrePointTime) ||
+        (currentTime < filterInsertionPoint_.filterPrePointTime)) {
+        filterInsertionPoint_.filterPrePointTime = currentTime;
+    }
+
+    double dx = libinput_event_pointer_get_dx_unaccelerated(data);
+    double dy = libinput_event_pointer_get_dy_unaccelerated(data);
+
+    filterInsertionPoint_.filterDeltaTime += currentTime - filterInsertionPoint_.filterPrePointTime;
+    filterInsertionPoint_.filterX += dx;
+    filterInsertionPoint_.filterY += dy;
+
+    filterInsertionPoint_.filterPrePointTime = currentTime;
+    if (filterInsertionPoint_.filterDeltaTime < FilterInsertionPoint::FILTER_THRESHOLD_US) {
+        MMI_HILOGD("Mouse motion event delta time is too short");
+        return true;
+    }
+
+    filterInsertionPoint_.filterFlag = true;
+    return false;
+}
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 } // namespace MMI
 } // namespace OHOS

@@ -263,5 +263,14 @@ void MouseEventNormalize::GetTouchpadRightClickType(int32_t &type) const
 {
     MouseTransformProcessor::GetTouchpadRightClickType(type);
 }
+
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+bool MouseEventNormalize::CheckFilterMouseEvent(struct libinput_event *event)
+{
+    auto processor = GetCurrentProcessor();
+    CHKPF(processor);
+    return processor->CheckFilterMouseEvent(event);
+}
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 } // namespace MMI
 } // namespace OHOS
