@@ -175,12 +175,28 @@ typedef bool (*GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)();
 GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE gaussiankeyboard_isVKeyboardVisible_ = nullptr;
 typedef bool (*ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)(int touchId);
 ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE algorithm_isKeyDownInKeyboard_ = nullptr;
+typedef void (*ALGORITHM_INITIALIZE_TYPE)(bool forceReset);
+ALGORITHM_INITIALIZE_TYPE algorithm_initialize_ = nullptr;
 std::vector<int32_t> g_VKeyDownSet;
 std::unordered_set<int32_t> g_VKeyModifiersDownSet;
 // Shared key event for key injection for printing.
 std::shared_ptr<KeyEvent> g_VKeySharedKeyEvent { nullptr };
 // Shared key event for UI rendering.
 std::shared_ptr<KeyEvent> g_VKeySharedUIKeyEvent { nullptr };
+std::unordered_map<int32_t, int32_t> g_VKeyFunctionKeyMapping = {
+    {MMI::KeyEvent::KEYCODE_F1, MMI::KeyEvent::KEYCODE_BRIGHTNESS_DOWN},
+    {MMI::KeyEvent::KEYCODE_F2, MMI::KeyEvent::KEYCODE_BRIGHTNESS_UP},
+    {MMI::KeyEvent::KEYCODE_F4, MMI::KeyEvent::KEYCODE_VOLUME_MUTE},
+    {MMI::KeyEvent::KEYCODE_F5, MMI::KeyEvent::KEYCODE_VOLUME_DOWN},
+    {MMI::KeyEvent::KEYCODE_F6, MMI::KeyEvent::KEYCODE_VOLUME_UP},
+    {MMI::KeyEvent::KEYCODE_F7, MMI::KeyEvent::KEYCODE_MUTE},
+    {MMI::KeyEvent::KEYCODE_F8, MMI::KeyEvent::KEYCODE_F8},
+    {MMI::KeyEvent::KEYCODE_F9, MMI::KeyEvent::KEYCODE_SEARCH},
+    {MMI::KeyEvent::KEYCODE_F10, MMI::KeyEvent::KEYCODE_F10},
+    {MMI::KeyEvent::KEYCODE_F11, MMI::KeyEvent::KEYCODE_SYSRQ},
+    {MMI::KeyEvent::KEYCODE_F12, MMI::KeyEvent::KEYCODE_INSERT},
+};
+bool g_FnKeyState = false;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
@@ -481,15 +497,32 @@ int32_t HandleKeyInjectEventHelper(std::shared_ptr<EventNormalizeHandler> eventN
     g_VKeySharedKeyEvent->SetRepeat(true);
     g_VKeySharedKeyEvent->SetKeyCode(keyCode);
     bool isKeyPressed = false;
+
+    // get keyboard CAPS state.
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    bool capsLockState = keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+
     if (action == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
         g_VKeySharedKeyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
         g_VKeySharedKeyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
         isKeyPressed = true;
+
+        // set the CAPS key.
+        if (keyCode == KeyEvent::KEYCODE_CAPS_LOCK) {
+            // flip the flag.
+            capsLockState = !capsLockState;
+            keyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, static_cast<int32_t>(capsLockState));
+        }
     } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
         g_VKeySharedKeyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
         g_VKeySharedKeyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
         isKeyPressed = false;
     }
+
+    // sync the latest CAPS lock state anyways.
+    g_VKeySharedKeyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, static_cast<int32_t>(capsLockState));
+
     OHOS::MMI::KeyEvent::KeyItem item;
     item.SetDownTime(time);
     item.SetKeyCode(keyCode);
@@ -691,14 +724,6 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
     }
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN) {
         algorithm_keydown_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
-        if (insideVKeyboardArea) {
-            int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
-            if (keyCode >= 0) {
-                ToggleKeyVisualState(buttonName, keyCode, true);
-            } else {
-                MMI_HILOGW("VKeyboard PointerEventHandler, key code not found for %{private}s", buttonName.c_str());
-            }
-        }
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_UP) {
         algorithm_keyup_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
         int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
@@ -731,7 +756,14 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 bool useShift = false;
                 int32_t code = gaussiankeyboard_getKeyCodeByKeyNameAndShift_(buttonName, useShift);
                 if (code >= 0) {
+                    // VKErrorTool: NonToggableKeyPress.
+                    MMI_HILOGI("NonToggableButtonClick, KeyPress: %{public}s", buttonName.c_str());
+
                     if (!useShift) {
+                        // standard kbd, fn key off, and first row is pressed.
+                        if (!g_FnKeyState && g_VKeyFunctionKeyMapping.find(code) != g_VKeyFunctionKeyMapping.end()) {
+                            code = g_VKeyFunctionKeyMapping.find(code)->second;
+                        }
                         SendKeyPress(code);
                     } else {
                         toggleKeyCodes.clear();
@@ -847,6 +879,29 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 SendKeyboardAction(KeyEvent::VKeyboardAction::RESET_BUTTON_COLOR);
                 break;
             }
+            case StateMachineMessageType::DelayUpdateButtonTouchDownVisual: {
+                MMI_HILOGI("VKeyboard key down (delayed): %{public}s, mode: %{public}d",
+                    buttonName.c_str(),
+                    buttonMode);
+
+                int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
+                if (keyCode >= 0) {
+                    ToggleKeyVisualState(buttonName, keyCode, true);
+
+                    if (buttonMode == 1) {
+                        // flag for turning it off now.
+                        ToggleKeyVisualState(buttonName, keyCode, false);
+                    }
+
+                    if (keyCode == KeyEvent::KEYCODE_FN) {
+                        g_FnKeyState = !g_FnKeyState;
+                    }
+                } else {
+                    MMI_HILOGW("VKeyboard key code not found for %{public}s", buttonName.c_str());
+                }
+
+                break;
+            }
             default:
                 break;
         }
@@ -926,6 +981,8 @@ void MMIService::OnStart()
                 g_VKeyboardHandle, "GaussianKeyboardIsVKeyboardVisible");
             algorithm_isKeyDownInKeyboard_ = (ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)dlsym(
                 g_VKeyboardHandle, "AlgorithmIsKeyDownInKeyboard");
+            algorithm_initialize_ = (ALGORITHM_INITIALIZE_TYPE)dlsym(
+                g_VKeyboardHandle, "AlgorithmInitialize");
         }
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -3322,6 +3379,7 @@ int32_t MMIService::SetVKeyboardArea(double topLeftX, double topLeftY, double bo
 
 int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
 {
+    algorithm_initialize_(false);
     gaussiankeyboard_setVKeyboardArea_(topLeftX, topLeftY, bottomRightX, bottomRightY);
     int32_t sKeyEventID = 1234;
     int32_t sKeyEventDeviceId = 99;
