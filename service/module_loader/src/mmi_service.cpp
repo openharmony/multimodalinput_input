@@ -3509,7 +3509,7 @@ int32_t MMIService::OnSetMotionSpace(std::string& keyName, bool useShift, std::v
     }
 }
 
-void MMIService::OnVKeyTrackPadMessage(std::vector<std::vector<int32_t>>& msgList)
+void MMIService::OnVKeyTrackPadMessage(const std::vector<std::vector<int32_t>>& msgList)
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     CHKPRV(pointerEvent, "Virtual TrackPad not able to create pointer event");
@@ -3522,38 +3522,28 @@ void MMIService::OnVKeyTrackPadMessage(std::vector<std::vector<int32_t>>& msgLis
         auto msgType = static_cast<VTPStateMachineMessageType>(msgItem[VKEY_TP_SM_MSG_TYPE_IDX]);
         switch (msgType) {
             case VTPStateMachineMessageType::POINTER_MOVE:
-                if (HandleVKeyTrackPadPointerMove(pointerEvent, msgItem)) {
-                    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-                    CHKPRV(eventNormalizeHandler, "Virtual TrackPad not able to get event normalize handler");
-                    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+                if (!HandleVKeyTrackPadPointerMove(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad pointer move event cannot be handled");
                 }
                 break;
             case VTPStateMachineMessageType::LEFT_CLICK_DOWN:
-                if (HandleVKeyTrackPadLeftBtnDown(pointerEvent, msgItem)) {
-                    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-                    CHKPRV(eventNormalizeHandler, "Virtual TrackPad not able to get event normalize handler");
-                    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+                if (!HandleVKeyTrackPadLeftBtnDown(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad left button down event cannot be handled");
                 }
                 break;
             case VTPStateMachineMessageType::LEFT_CLICK_UP:
-                if (HandleVKeyTrackPadLeftBtnUp(pointerEvent, msgItem)) {
-                    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-                    CHKPRV(eventNormalizeHandler, "Virtual TrackPad not able to get event normalize handler");
-                    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+                if (!HandleVKeyTrackPadLeftBtnUp(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad left button up event cannot be handled");
                 }
                 break;
             case VTPStateMachineMessageType::RIGHT_CLICK_DOWN:
-                if (HandleVKeyTrackPadRightBtnDown(pointerEvent, msgItem)) {
-                    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-                    CHKPRV(eventNormalizeHandler, "Virtual TrackPad not able to get event normalize handler");
-                    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+                if (!HandleVKeyTrackPadRightBtnDown(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad right button down event cannot be handled");
                 }
                 break;
             case VTPStateMachineMessageType::RIGHT_CLICK_UP:
-                if (HandleVKeyTrackPadRightBtnUp(pointerEvent, msgItem)) {
-                    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-                    CHKPRV(eventNormalizeHandler, "Virtual TrackPad not able to get event normalize handler");
-                    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+                if (!HandleVKeyTrackPadRightBtnUp(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad right button up event cannot be handled");
                 }
                 break;
             default:
@@ -3587,6 +3577,9 @@ bool MMIService::HandleVKeyTrackPadPointerMove(
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
     pointerEvent->SetButtonPressed(PointerEvent::BUTTON_NONE);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
     return true;
 }
 
@@ -3618,6 +3611,9 @@ bool MMIService::HandleVKeyTrackPadLeftBtnDown(
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
     return true;
 }
 
@@ -3649,6 +3645,9 @@ bool MMIService::HandleVKeyTrackPadLeftBtnUp(
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
     return true;
 }
 
@@ -3680,6 +3679,9 @@ bool MMIService::HandleVKeyTrackPadRightBtnDown(
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
     return true;
 }
 
@@ -3711,6 +3713,9 @@ bool MMIService::HandleVKeyTrackPadRightBtnUp(
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
     return true;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
