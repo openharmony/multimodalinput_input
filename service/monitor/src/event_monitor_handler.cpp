@@ -15,10 +15,13 @@
 
 #include "event_monitor_handler.h"
 
+#include "common_event_support.h"
+
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "display_event_monitor.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
@@ -41,6 +44,7 @@ constexpr size_t MAX_EVENTIDS_SIZE { 1000 };
 constexpr int32_t ACTIVE_EVENT { 2 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t POWER_UID { 5528 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -444,7 +448,12 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
         return false;
     }
     for (const auto &mon : monitors_) {
-        if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
+        if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+            continue;
+        }
+        if (!keyEvent->GetFourceMonitorFlag()) {
+            mon.SendToClient(keyEvent, pkt);
+        } else if (mon.session_ != nullptr && mon.session_->GetUid() == POWER_UID) {
             mon.SendToClient(keyEvent, pkt);
         }
     }

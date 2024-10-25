@@ -17,6 +17,8 @@
 
 #include <sstream>
 
+#include "common_event_support.h"
+
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
 #ifdef CALL_MANAGER_SERVICE_ENABLED
@@ -29,6 +31,7 @@
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
+#include "display_event_monitor.h"
 #include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
@@ -71,6 +74,13 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
 {
     CHKPV(keyEvent);
     if (OnSubscribeKeyEvent(keyEvent)) {
+        if (DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+            auto monitorHandler = InputHandler->GetMonitorHandler();
+            CHKPV(monitorHandler);
+            keyEvent->SetFourceMonitorFlag(true);
+            monitorHandler->OnHandleEvent(keyEvent);
+            keyEvent->SetFourceMonitorFlag(false);
+        }
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
         } else {

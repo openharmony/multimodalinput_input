@@ -1214,6 +1214,16 @@ bool KeyEvent::IsValid() const
     return true;
 }
 
+void KeyEvent::SetFourceMonitorFlag(bool fourceMonitorFlag)
+{
+    fourceMonitorFlag_ = fourceMonitorFlag;
+}
+
+bool KeyEvent::GetFourceMonitorFlag()
+{
+    return fourceMonitorFlag_;
+}
+
 bool KeyEvent::WriteToParcel(Parcel &out) const
 {
     if (!InputEvent::WriteToParcel(out)) {
