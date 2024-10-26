@@ -29,6 +29,8 @@ static RET_OK: i32 = 0;
 static RET_ERR: i32 = -1;
 static mut COMPENSATE_VALUEX: f64 = 0.0;
 static mut COMPENSATE_VALUEY: f64 = 0.0;
+static MOUSE_DPI: f64 = 800.0;
+static MS_2_US: f64 = 1000.0;
 
 struct CurveItem {
     pub speeds: Vec<f64>,
@@ -624,6 +626,58 @@ extern {
     fn fmin(a: f64, b: f64) -> f64;
 }
 
+fn get_speed_dynamic_gain_mouse(vin: f64, gain: *mut f64, speed: i32, delta_time: u64, display_ppi: f64) -> bool {
+    debug!(LOG_LABEL, "get_speed_gain_mouse enter vin is set to {} speed {}, delta_time {}, display_ppi {}",
+    @public(vin), @public(speed), @public(delta_time), @public(display_ppi));
+    if delta_time < 1 {
+        error!(LOG_LABEL, "{} The delta_time can't be less than 0", @public(delta_time));
+        return false;
+    }
+    if display_ppi < 1.0 {
+        error!(LOG_LABEL, "{} The display_ppi can't be less than 1", @public(display_ppi));
+        return false;
+    }
+    unsafe {
+        if fabs(vin) < DOUBLE_ZERO {
+            error!(LOG_LABEL, "{} less that the limit", DOUBLE_ZERO);
+            return false;
+        }
+    }
+    if speed < 1 {
+        error!(LOG_LABEL, "{} The speed value can't be less than 1", @public(speed));
+        return false;
+    }
+    let speeds_radio = [0.1, 0.2, 0.3, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.7, 2.0];
+    let standard_slopes = [2.9394, 3.7879, 8.2121, 13.1515];
+    let vins = [0.50, 1.30, 2.20, 16.17];
+    unsafe {
+        let vin_new: f64 = vin * MS_2_US / delta_time as f64;
+        let speed_radio = speeds_radio[speed as usize - 1];
+        let mut slopes = Vec::new();
+        let mut diff_nums = Vec::new();
+        for i in 0..4 {
+            slopes.push(standard_slopes[i] * display_ppi / MOUSE_DPI);
+            if i < 1 {
+                diff_nums.push(0.0);
+                continue;
+            }
+            diff_nums.push((slopes[i - 1] - slopes[i]) * vins[i - 1] + diff_nums[i - 1]);
+        }
+        let num: f64 = fabs(vin_new);
+        for i in 0..4 {
+            if num <= vins[i] {
+                *gain = (slopes[i] * vin_new + diff_nums[i]) * speed_radio / vin_new;
+                debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin_new - diff_nums[i]) / speed_radio / vin_new));
+                return true;
+            }
+        }
+        *gain = (slopes[3] * vin_new + diff_nums[3]) * speed_radio / vin_new;
+        debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin_new - diff_nums[3]) / speed_radio / vin_new));
+    }
+    debug!(LOG_LABEL, "get_speed_gain_mouse leave");
+    true
+}
+
 fn get_speed_gain_mouse(vin: f64, gain: *mut f64, speed: i32, device_type: i32) -> bool {
     debug!(LOG_LABEL, "get_speed_gain_mouse enter vin is set to {} speed {}, device_type {}",
         @public(vin), @public(speed), @public(device_type));
@@ -729,6 +783,53 @@ fn get_axis_gain_touchpad(gain: *mut f64, axis_speed: f64, device_type: i32) -> 
 pub struct Offset {
     dx: f64,
     dy: f64,
+}
+
+/// # Safety
+/// HandleMotionDynamicAccelerateMouse is the origin C++ function name
+/// C++ will call for rust realization using this name
+#[no_mangle]
+pub unsafe extern "C" fn HandleMotionDynamicAccelerateMouse (
+    offset: *const Offset,
+    mode: bool,
+    abs_x: *mut f64,
+    abs_y: *mut f64,
+    speed: i32,
+    delta_time: u64,
+    display_ppi: f64
+) -> i32 {
+    let mut gain = 0.0;
+    let vin: f64;
+    let dx: f64;
+    let dy: f64;
+    unsafe {
+        dx = (*offset).dx;
+        dy = (*offset).dy;
+        vin = (fmax(fabs(dx), fabs(dy))) + (fmin(fabs(dx), fabs(dy))) / 2.0;
+        debug!(
+            LOG_LABEL,
+            "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
+            @private(*abs_x),
+            @private(*abs_y),
+            @public(mode),
+            @private(dx),
+            @private(dy),
+            @public(gain)
+        );
+        if !get_speed_dynamic_gain_mouse(vin, &mut gain as *mut f64, speed, delta_time, display_ppi) {
+            error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
+            return RET_ERR;
+        }
+        if !mode {
+            *abs_x += dx * gain;
+            *abs_y += dy * gain;
+        }
+        debug!(
+            LOG_LABEL,
+            "abs_x {} and abs_y {}", @private(*abs_x), @private(*abs_y)
+        );
+    }
+    RET_OK
 }
 
 /// # Safety
