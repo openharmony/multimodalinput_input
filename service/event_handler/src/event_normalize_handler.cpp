@@ -386,7 +386,7 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    currentHandleKeyCode_ = keyEvent-<>GetKeyCode();
+    currentHandleKeyCode_ = keyEvent->GetKeyCode();
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
