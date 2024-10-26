@@ -626,7 +626,6 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetRepeatKey_001, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(keyEvent->SetRepeatKey(repeatKey));
 }
 
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 /**
  * @tc.name: KeyEventTest_GetVKeyboardAction_001
  * @tc.desc: Test the funcation GetVKeyboardAction
@@ -638,7 +637,9 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetVKeyboardAction_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
+    #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     ASSERT_NO_FATAL_FAILURE(keyEvent->GetVKeyboardAction());
+    #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 /**
@@ -652,8 +653,10 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetVKeyboardAction_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
+    #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     VKeyboardAction vkAction = VKeyboardAction::ACTIVATE_KEYBOARD;
     ASSERT_NO_FATAL_FAILURE(keyEvent->SetVKeyboardAction(vkAction));
+    #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 /**
@@ -667,9 +670,11 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetKeyName_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
+    #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     keyEvent->keyName_ = "keyName";
     std::string ret = keyEvent->GetKeyName();
     ASSERT_EQ(ret, "keyName");
+    #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 /**
@@ -683,8 +688,10 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetKeyName_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
+    #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     std::string keyName = "keyName";
     ASSERT_NO_FATAL_FAILURE(keyEvent->SetKeyName(keyName));
+    #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 /**
@@ -698,6 +705,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_VKeyboardActionToStr_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
+    #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     VKeyboardAction vKeyAction = VKeyboardAction::ACTIVATE_KEYBOARD;
     const char* ret = keyEvent->VKeyboardActionToStr(vKeyAction);
     ASSERT_EQ(ret, "ACTIVATE_KEYBOARD");
@@ -725,7 +733,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_VKeyboardActionToStr_001, TestSize.Level1)
     vKeyAction = VKeyboardAction::UNKNOWN;
     ret = keyEvent->VKeyboardActionToStr(vKeyAction);
     ASSERT_EQ(ret, "UNKNOWN");
+    #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS
