@@ -397,7 +397,11 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         }
         return RET_OK;
     }
-
+    auto keyHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(keyHandler, RET_ERR);
+    if (key->GetKeyCode() != keyHandler->GetCurrentHandleKeyCode()) {
+        MMI_HILOGW("Keycode has been changed");
+    }
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
