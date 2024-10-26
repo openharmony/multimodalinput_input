@@ -122,11 +122,16 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
-        HandleFilterMouseEvent(&offset);
-        #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+        #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE // OHOS_BUILD_MOUSE_REPORTING_RATE
+        uint64_t dalta_time = pointFilterInsert_.filterDeltaTime;
+        HandleMousePointerFilter(&offset);
+        ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, dalta_time,
+            static_cast<double>(displayInfo->ppi));
+        #else
         ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, static_cast<int32_t>(deviceType));
+        #endif
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");

@@ -422,6 +422,13 @@ struct DisplayInfo {
      * @since 12
      */
     std::vector<float> transform;
+
+    /**
+     * Orientation of the physical display
+     *
+     * @since 12
+     */
+    float ppi;
 };
 
 /**
