@@ -3454,7 +3454,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadScrollRows_001, TestSize.
     ASSERT_EQ(ret, RET_OK);
 }
 
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 /*
  * @tc.name: InputManagerTest_SetVKeyboardArea_001
  * @tc.desc: Test the funcation SetVKeyboardArea
@@ -3464,12 +3463,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadScrollRows_001, TestSize.
 HWTEST_F(InputManagerTest, InputManagerTest_SetVKeyboardArea_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     double topLeftX = 1.0;
     double topLeftY = 2.0;
     double bottomRightX = 5.0;
     double bottomRightY = 10.0;
     int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
     ASSERT_EQ(ret, RET_ERR);
+    #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 /*
@@ -3481,6 +3482,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetVKeyboardArea_001, TestSize.Level
 HWTEST_F(InputManagerTest, InputManagerTest_SetMotionSpace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     std::string keyName = "Enter";
     bool useShift = true;
     std::vector<int32_t> pattern;
@@ -3488,7 +3490,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMotionSpace_001, TestSize.Level1)
     pattern.push_back(100);
     int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(keyName, useShift, pattern);
     ASSERT_EQ(ret, RET_ERR);
+    #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS
