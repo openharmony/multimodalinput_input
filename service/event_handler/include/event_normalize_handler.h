@@ -31,7 +31,7 @@ public:
     void HandleEvent(libinput_event* event, int64_t frameTime);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
-    int32 GetCurrentHandleKeyCode()
+    int32_t GetCurrentHandleKeyCode()
     {
         return currentHandleKeyCode_;
     }
