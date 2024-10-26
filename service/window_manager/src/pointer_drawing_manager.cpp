@@ -332,8 +332,9 @@ void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physic
     hardwareCanvasSize_ = g_hardwareCanvasSize;
     PostTask([this, physicalX, physicalY, surfaceNode]() -> void {
         CHKPV(surfaceNode);
-        surfaceNode->SetBounds(physicalX, physicalY, hardwareCanvasSize_, hardwareCanvasSize_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        int64_t nodeId = surfaceNode->GetId();
+        Rosen::RSInterfaces::GetInstance().SetHwcNodeBounds(nodeId,
+            physicalX, physicalY, hardwareCanvasSize_, hardwareCanvasSize_);
     });
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
