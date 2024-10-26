@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +31,10 @@ public:
     void HandleEvent(libinput_event* event, int64_t frameTime);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t GetCurrentHandleKeyCode()
+    {
+        return currentHandleKeyCode_;
+    }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
@@ -75,6 +80,7 @@ private:
     int32_t timerId_ { -1 };
     bool isShield_ { false };
     std::set<int32_t> buttonIds_ {};
+    int32_t currentHandleKeyCode_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     bool moveEventFilterFlag_ { false };
     std::list<PointerEvent::PointerItem> lastTouchDownItems_;
