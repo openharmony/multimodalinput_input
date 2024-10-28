@@ -151,6 +151,7 @@ public:
     int32_t OnSetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
     int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern) override;
     int32_t OnSetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern);
+    void OnVKeyTrackPadMessage(const std::vector<std::vector<int32_t>>& msgList);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
@@ -260,6 +261,18 @@ protected:
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
     void InitPrintClientInfo();
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool HandleVKeyTrackPadPointerMove(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadLeftBtnDown(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadLeftBtnUp(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRightBtnDown(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRightBtnUp(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 private:
     MMIService();
     ~MMIService();

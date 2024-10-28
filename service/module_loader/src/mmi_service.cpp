@@ -142,6 +142,11 @@ const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 // Define vkeyboard functions from vendor
 const std::string VKEYBOARD_PATH { "libvkeyboard.z.so" };
+constexpr int32_t VKEY_TP_SM_MSG_SIZE { 4 };
+constexpr int32_t VKEY_TP_SM_MSG_TYPE_IDX { 0 };
+constexpr int32_t VKEY_TP_SM_MSG_POINTER_ID_IDX { 1 };
+constexpr int32_t VKEY_TP_SM_MSG_POS_X_IDX { 2 };
+constexpr int32_t VKEY_TP_SM_MSG_POS_Y_IDX { 3 };
 void* g_VKeyboardHandle = nullptr;
 typedef void (*ALGORITHM_KEYDOWN_TYPE)(
     double screenX, double screenY, int touchId, bool tipDown, string buttonName);
@@ -177,6 +182,29 @@ typedef bool (*ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)(int touchId);
 ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE algorithm_isKeyDownInKeyboard_ = nullptr;
 typedef void (*ALGORITHM_INITIALIZE_TYPE)(bool forceReset);
 ALGORITHM_INITIALIZE_TYPE algorithm_initialize_ = nullptr;
+typedef bool (*TRACKPADENGINE_ISINSIDEVTRACKPADAREA_TYPE)(double x, double y);
+TRACKPADENGINE_ISINSIDEVTRACKPADAREA_TYPE trackPadEngine_isInsideVTrackPadArea_ = nullptr;
+typedef bool (*TRACKPADENGINE_ISVTRACKPADVISIBLE_TYPE)();
+TRACKPADENGINE_ISVTRACKPADVISIBLE_TYPE trackPadEngine_isVTrackPadVisible_ = nullptr;
+typedef int32_t (*TRACKPADENGINE_INTERPRETPOINTEREVENT_TYPE)(
+    std::vector<int32_t>& pInfo, std::vector<double>& pPos);
+TRACKPADENGINE_INTERPRETPOINTEREVENT_TYPE trackPadEngine_interpretPointerEvent_ = nullptr;
+typedef void (*TRACKPADENGINE_SETVTRACKPADAREA_TYPE)(
+    std::string areaName, std::vector<int32_t>& pattern);
+TRACKPADENGINE_SETVTRACKPADAREA_TYPE trackPadEngine_setVTrackPadArea_ = nullptr;
+typedef void (*TRACKPADENGINE_SETSCREENAREA_TYPE)(
+    int32_t topLeftX, int32_t topLeftY, int32_t width, int32_t height);
+TRACKPADENGINE_SETSCREENAREA_TYPE trackPadEngine_setScreenArea_ = nullptr;
+typedef void (*TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)(
+    std::vector<std::vector<int32_t>>& retMsgList);
+TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE trackPadEngine_getAllTouchMessage_ = nullptr;
+typedef void (*TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE)();
+TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE trackPadEngine_clearTouchMessage_ = nullptr;
+typedef void (*TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)(
+    std::vector<std::vector<int32_t>>& retMsgList);
+TRACKPADENGINE_GETALLKEYMESSAGE_TYPE trackPadEngine_getAllKeyMessage_ = nullptr;
+typedef void (*TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)();
+TRACKPADENGINE_CLEARKEYMESSAGE_TYPE trackPadEngine_clearKeyMessage_ = nullptr;
 std::vector<int32_t> g_VKeyDownSet;
 std::unordered_set<int32_t> g_VKeyModifiersDownSet;
 // Shared key event for key injection for printing.
@@ -681,11 +709,37 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
     bool insideVKeyboardArea = gaussiankeyboard_isInsideVKeyboardArea_(physicalX, physicalY);
     bool isVkeyboardVisible = gaussiankeyboard_isVKeyboardVisible_();
     bool isTouchInVKeyboard = algorithm_isKeyDownInKeyboard_(pointerId);
-    // Note: during layout switch, it's possible that a continuous movement
-    // happens outside of keyboard (e.g., keyboard already switched)
+    // Check the range of trackpad here
+    bool isVTrackPadVisible = trackPadEngine_isVTrackPadVisible_();
+    bool insideVTrackPadArea = trackPadEngine_isInsideVTrackPadArea_(physicalX, physicalY);
+    if (isVTrackPadVisible && isVkeyboardVisible && insideVTrackPadArea) {
+        if (pointerEvent == nullptr) {
+            MMI_HILOGE("PointerEvent is null");
+            return RET_ERR;
+        }
+        std::vector<int32_t> pointerInfo;
+        pointerInfo.push_back(pointerId);
+        pointerInfo.push_back(pointerAction);
+        std::vector<double> pointerPos;
+        pointerPos.push_back(physicalX);
+        pointerPos.push_back(physicalY);
+        int32_t ret = trackPadEngine_interpretPointerEvent_(pointerInfo, pointerPos);
+        // Handle all track pad key messages
+        std::vector<std::vector<int32_t>> keyMsgList;
+        trackPadEngine_getAllKeyMessage_(keyMsgList);
+        trackPadEngine_clearKeyMessage_();
+        MMIService::GetInstance()->OnVKeyTrackPadMessage(keyMsgList);
+        // Handle all track pad touch messages
+        std::vector<std::vector<int32_t>> touchMsgList;
+        trackPadEngine_getAllTouchMessage_(touchMsgList);
+        trackPadEngine_clearTouchMessage_();
+        MMIService::GetInstance()->OnVKeyTrackPadMessage(touchMsgList);
+        return ret;
+    }
+    // Note: during layout switch, it's possible that a continuous movement happens
+    // outside of keyboard (e.g., keyboard already switched)
     // or happens when kbd is not visible (e.g., when the prev layout dismissed but new one hasn't shown yet).
-    // if (!isTouchInVKeyboard && (!isVkeyboardVisible || (!insideVKeyboardArea && !insideVTrackpadArea)))
-    if (!isTouchInVKeyboard && (!isVkeyboardVisible || !insideVKeyboardArea)) {
+    if (!isTouchInVKeyboard && (!isVkeyboardVisible || (!insideVKeyboardArea && !insideVTrackPadArea))) {
         // no unhanded touch points AND (kbd not visible) OR (kbd visible and out of range).
         // i.e., we still want to process the touch move outside of
         // kbd range if at least one point is already on the kbd.
@@ -694,7 +748,7 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
 
     TOUCHPOINT tp;
     tp.InKeyboard = insideVKeyboardArea;
-    // When track pad is integrated the tp should be set as tp.InTrackpad = insideVTrackPadArea;
+    tp.InTrackpad = insideVTrackPadArea;
     tp.ScreenX = physicalX;
     tp.ScreenY = physicalY;
     tp.TouchId = pointerId;
@@ -984,6 +1038,24 @@ void MMIService::OnStart()
                 g_VKeyboardHandle, "AlgorithmIsKeyDownInKeyboard");
             algorithm_initialize_ = (ALGORITHM_INITIALIZE_TYPE)dlsym(
                 g_VKeyboardHandle, "AlgorithmInitialize");
+            trackPadEngine_isInsideVTrackPadArea_ = (TRACKPADENGINE_ISINSIDEVTRACKPADAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineIsInsideVTrackPadArea");
+            trackPadEngine_isVTrackPadVisible_ = (TRACKPADENGINE_ISVTRACKPADVISIBLE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineIsVTrackPadVisible");
+            trackPadEngine_interpretPointerEvent_ = (TRACKPADENGINE_INTERPRETPOINTEREVENT_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineInterpretPointerEvent");
+            trackPadEngine_setVTrackPadArea_ = (TRACKPADENGINE_SETVTRACKPADAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineSetVTrackPadArea");
+            trackPadEngine_setScreenArea_ = (TRACKPADENGINE_SETSCREENAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineSetScreenArea");
+            trackPadEngine_getAllTouchMessage_ = (TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineGetAllTouchMessage");
+            trackPadEngine_clearTouchMessage_ = (TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineClearTouchMessage");
+            trackPadEngine_getAllKeyMessage_ = (TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineGetAllKeyMessage");
+            trackPadEngine_clearKeyMessage_ = (TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
         }
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -3394,6 +3466,13 @@ int32_t MMIService::OnSetVKeyboardArea(double topLeftX, double topLeftY, double 
     CHKPR(g_VKeySharedUIKeyEvent, ERROR_NULL_POINTER);
     g_VKeySharedUIKeyEvent->SetId(sKeyEventID);
     g_VKeySharedUIKeyEvent->SetDeviceId(sKeyEventDeviceId);
+
+    auto defaultDisplay = WIN_MGR->GetDefaultDisplayInfo();
+    CHKPR(defaultDisplay, ERROR_NULL_POINTER);
+    int32_t width = defaultDisplay->width;
+    int32_t height = defaultDisplay->height;
+    // Use this information to estimate the valid range of cursor, assuming single display.
+    trackPadEngine_setScreenArea_(0, 0, width, height);
     return RET_OK;
 }
 
@@ -3421,11 +3500,223 @@ int32_t MMIService::OnSetMotionSpace(std::string& keyName, bool useShift, std::v
         auto motionSpaceType = static_cast<MotionSpaceType>(pattern[MotionSpacePatternIndex::PATTERN_MST_ID]);
         if (motionSpaceType != MotionSpaceType::TRACKPAD) {
             gaussiankeyboard_updateMotionSpace_(keyName, useShift, pattern);
+        } else {
+            trackPadEngine_setVTrackPadArea_(keyName, pattern);
         }
         return RET_OK;
     } else {
         return COMMON_PARAMETER_ERROR;
     }
+}
+
+void MMIService::OnVKeyTrackPadMessage(const std::vector<std::vector<int32_t>>& msgList)
+{
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    CHKPRV(pointerEvent, "Virtual TrackPad not able to create pointer event");
+    for (auto msgItem : msgList) {
+        if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+            MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+                static_cast<int32_t>(msgItem.size()));
+            continue;
+        }
+        auto msgType = static_cast<VTPStateMachineMessageType>(msgItem[VKEY_TP_SM_MSG_TYPE_IDX]);
+        switch (msgType) {
+            case VTPStateMachineMessageType::POINTER_MOVE:
+                if (!HandleVKeyTrackPadPointerMove(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad pointer move event cannot be handled");
+                }
+                break;
+            case VTPStateMachineMessageType::LEFT_CLICK_DOWN:
+                if (!HandleVKeyTrackPadLeftBtnDown(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad left button down event cannot be handled");
+                }
+                break;
+            case VTPStateMachineMessageType::LEFT_CLICK_UP:
+                if (!HandleVKeyTrackPadLeftBtnUp(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad left button up event cannot be handled");
+                }
+                break;
+            case VTPStateMachineMessageType::RIGHT_CLICK_DOWN:
+                if (!HandleVKeyTrackPadRightBtnDown(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad right button down event cannot be handled");
+                }
+                break;
+            case VTPStateMachineMessageType::RIGHT_CLICK_UP:
+                if (!HandleVKeyTrackPadRightBtnUp(pointerEvent, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad right button up event cannot be handled");
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+bool MMIService::HandleVKeyTrackPadPointerMove(
+    std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem)
+{
+    CHKPF(pointerEvent);
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t pDeviceId = 99;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(msgPId);
+    item.SetDisplayX(msgPPosX);
+    item.SetDisplayY(msgPPosY);
+    item.SetPressure(0);
+    item.SetDeviceId(pDeviceId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(msgPId);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
+    pointerEvent->SetButtonPressed(PointerEvent::BUTTON_NONE);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+    return true;
+}
+
+bool MMIService::HandleVKeyTrackPadLeftBtnDown(
+    std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem)
+{
+    CHKPF(pointerEvent);
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t pDeviceId = 99;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(msgPId);
+    item.SetDisplayX(msgPPosX);
+    item.SetDisplayY(msgPPosY);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressed(true);
+    item.SetPressure(0);
+    item.SetDeviceId(pDeviceId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerId(msgPId);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+    return true;
+}
+
+bool MMIService::HandleVKeyTrackPadLeftBtnUp(
+    std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem)
+{
+    CHKPF(pointerEvent);
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t pDeviceId = 99;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(msgPId);
+    item.SetDisplayX(msgPPosX);
+    item.SetDisplayY(msgPPosY);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressed(false);
+    item.SetPressure(0);
+    item.SetDeviceId(pDeviceId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    pointerEvent->SetPointerId(msgPId);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+    return true;
+}
+
+bool MMIService::HandleVKeyTrackPadRightBtnDown(
+    std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem)
+{
+    CHKPF(pointerEvent);
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t pDeviceId = 99;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(msgPId);
+    item.SetDisplayX(msgPPosX);
+    item.SetDisplayY(msgPPosY);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressed(true);
+    item.SetPressure(0);
+    item.SetDeviceId(pDeviceId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerId(msgPId);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+    return true;
+}
+
+bool MMIService::HandleVKeyTrackPadRightBtnUp(
+    std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem)
+{
+    CHKPF(pointerEvent);
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t pDeviceId = 99;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(msgPId);
+    item.SetDisplayX(msgPPosX);
+    item.SetDisplayY(msgPPosY);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressed(false);
+    item.SetPressure(0);
+    item.SetDeviceId(pDeviceId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    pointerEvent->SetPointerId(msgPId);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(eventNormalizeHandler);
+    eventNormalizeHandler->HandlePointerEvent(pointerEvent);
+    return true;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
