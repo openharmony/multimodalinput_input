@@ -78,7 +78,9 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
             auto monitorHandler = InputHandler->GetMonitorHandler();
             CHKPV(monitorHandler);
             keyEvent->SetFourceMonitorFlag(true);
+#ifndef OHOS_BUILD_EMULATOR
             monitorHandler->OnHandleEvent(keyEvent);
+#endif // OHOS_BUILD_EMULATOR
             keyEvent->SetFourceMonitorFlag(false);
         }
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
