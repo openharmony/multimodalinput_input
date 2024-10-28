@@ -422,7 +422,6 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    TerminateAxis(event);
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
     if (MouseEventHdr->CheckFilterMouseEvent(event)) {
         MMI_HILOGD("Mouse motion event have been filtered");
@@ -511,9 +510,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     buttonIds_.insert(seatSlot);
     if (buttonIds_.size() == FINGER_NUM &&
         (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP)) {
-        MMI_HILOGD("Handle mouse axis event");
         g_isSwipeInward = false;
-        HandleMouseEvent(event);
     }
     if (buttonIds_.size() == SWIPE_INWARD_FINGER_ONE && JudgeIfSwipeInward(pointerEvent, type, event)) {
         nextHandler_->HandlePointerEvent(pointerEvent);
@@ -547,16 +544,11 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
-        MMI_HILOGI("Prepare to send a axis-end event");
-        CancelTwoFingerAxis(event);
-    }
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     PointerEventSetPressedKeys(pointerEvent);
     EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
-    type = libinput_event_get_type(event);
+    auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch pad event is up remove this finger");
