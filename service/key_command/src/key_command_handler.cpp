@@ -96,7 +96,9 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
             auto monitorHandler = InputHandler->GetMonitorHandler();
             CHKPV(monitorHandler);
             keyEvent->SetFourceMonitorFlag(true);
+#ifndef OHOS_BUILD_EMULATOR
             monitorHandler->OnHandleEvent(keyEvent);
+#endif // OHOS_BUILD_EMULATOR
             keyEvent->SetFourceMonitorFlag(false);
         }
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{private}d", keyEvent->GetKeyCode());
