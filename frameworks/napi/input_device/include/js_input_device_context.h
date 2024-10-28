@@ -45,6 +45,7 @@ public:
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
     static napi_value SetVKeyboardArea(napi_env env, napi_callback_info info);
     static napi_value UpdateMotionSpace(napi_env env, napi_callback_info info);
+    static napi_value GetVKeyboardFuncKeySwitchState(napi_env env, napi_callback_info info);
 
 public:
     enum class MotionSpaceType : int32_t {
@@ -85,6 +86,7 @@ private:
     static napi_value CreateEnumVKeyResult(napi_env env, napi_value exports);
     static napi_value CreateEnumMotionSpaceType(napi_env env, napi_value exports);
     static napi_value CreateEnumPageType(napi_env env, napi_value exports);
+    static napi_value CreateEnumVKeySwitchState(napi_env env, napi_value exports);
     std::shared_ptr<JsInputDeviceManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
     std::mutex mtx_;

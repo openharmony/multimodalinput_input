@@ -17,6 +17,7 @@
 
 #include "mmi_log.h"
 #include "napi_constants.h"
+#include "oh_input_manager.h"
 #include "util_napi_error.h"
 
 #undef MMI_LOG_TAG
@@ -38,11 +39,17 @@ constexpr size_t INPUT_PARAMETER { 2 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr int32_t SET_VKEY_AREA_NUMBER_PARAMETERS { 4 };
 constexpr int32_t UPDATE_VKEY_MS_NUMBER_PARAMETERS { 1 };
+constexpr int32_t GET_VKEY_FUNC_KEY_SWITCH_STATE_NUM_PARAMETERS { 1 };
 constexpr uint32_t VKEY_MS_ARRAY_MAX_SIZE { 300 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 enum class VKeyResult : int32_t {
     FAILED = 0,
     SUCCEED = 1,
+};
+enum class VKeySwitchState : int32_t {
+    UNKNOWN = -1,
+    KEY_SWITCH_OFF = 0,
+    KEY_SWITCH_ON = 1,
 };
 } // namespace
 
@@ -918,6 +925,42 @@ napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_i
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
+napi_value JsInputDeviceContext::GetVKeyboardFuncKeySwitchState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    size_t argc = GET_VKEY_FUNC_KEY_SWITCH_STATE_NUM_PARAMETERS;
+    napi_value argv[GET_VKEY_FUNC_KEY_SWITCH_STATE_NUM_PARAMETERS] = { nullptr };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < GET_VKEY_FUNC_KEY_SWITCH_STATE_NUM_PARAMETERS) {
+        MMI_HILOGE("GetVKeyboardFuncKeySwitchState parameter number error");
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::UNKNOWN));
+    }
+    int32_t keyCode = 0;
+    if (!JsUtil::ParseInt32(env, argv[0], keyCode)) {
+        MMI_HILOGE("ParseDouble failed. property name: keyCode");
+        return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::UNKNOWN));
+    }
+    struct Input_KeyState *keyState = OH_Input_CreateKeyState();
+    OH_Input_SetKeyCode(keyState, keyCode);
+    OH_Input_GetKeyState(keyState);
+    int32_t resKeySwitch = OH_Input_GetKeySwitch(keyState);
+    OH_Input_DestroyKeyState(&keyState);
+    switch (resKeySwitch) {
+        case Input_KeyStateAction::KEY_SWITCH_OFF:
+            return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::KEY_SWITCH_OFF));
+        case Input_KeyStateAction::KEY_SWITCH_ON:
+            return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::KEY_SWITCH_ON));
+        default:
+            MMI_HILOGE("GetVKeyboardFuncKeySwitchState failed, unknown switch state");
+            return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::UNKNOWN));
+    }
+#else
+    THROWERR_API9(env, COMMON_CAPABILITY_NOT_SUPPORTED, "GetVKeyboardFuncKeySwitchState", "Not support");
+    return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::UNKNOWN));
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+}
+
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1017,6 +1060,25 @@ napi_value JsInputDeviceContext::CreateEnumPageType(napi_env env, napi_value exp
     return exports;
 }
 
+napi_value JsInputDeviceContext::CreateEnumVKeySwitchState(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_SWITCH_OFF",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::KEY_SWITCH_OFF))),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_SWITCH_ON",
+            JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeySwitchState::KEY_SWITCH_ON))),
+    };
+
+    napi_value result = nullptr;
+    CHKRP(napi_define_class(env, "VKeySwitchState", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "VKeySwitchState", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1040,12 +1102,14 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getIntervalSinceLastInput", GetIntervalSinceLastInput),
         DECLARE_NAPI_STATIC_FUNCTION("setVKeyboardArea", SetVKeyboardArea),
         DECLARE_NAPI_STATIC_FUNCTION("updateMotionSpace", UpdateMotionSpace),
+        DECLARE_NAPI_STATIC_FUNCTION("getVKeyboardFuncKeySwitchState", GetVKeyboardFuncKeySwitchState),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     CHKPP(CreateEnumKeyboardType(env, exports));
     CHKPP(CreateEnumVKeyResult(env, exports));
     CHKPP(CreateEnumMotionSpaceType(env, exports));
     CHKPP(CreateEnumPageType(env, exports));
+    CHKPP(CreateEnumVKeySwitchState(env, exports));
     return exports;
 }
 } // namespace MMI
