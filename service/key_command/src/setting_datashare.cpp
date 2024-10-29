@@ -267,7 +267,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
 {
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPP(sam);
-    remoteObj = sam->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    auto remoteObj = sam->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
     if (remoteObj == nullptr) {
         MMI_HILOGI("Data share not start");
         return nullptr;
