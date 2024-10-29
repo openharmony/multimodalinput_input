@@ -4061,6 +4061,7 @@ void MMIService::InitPrintClientInfo()
     CALL_DEBUG_ENTER;
     TimerMgr->AddLongTimer(PRINT_INTERVAL_TIME, -1, [this]() {
         ffrt::submit([this] {
+            std::lock_guard<std::mutex> guard(mutex_);
             for (const auto &info : clientInfos_) {
                 if (static_cast<uint64_t>(info.second.pid) == info.second.readThreadId) {
                     MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
