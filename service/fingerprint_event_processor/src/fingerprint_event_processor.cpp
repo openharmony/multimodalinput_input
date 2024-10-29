@@ -136,7 +136,6 @@ void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
     ChangeScreenMissTouchFlag(screenState_, cancelState_);
 }
  
-// 屏幕down 智xxdown 屏幕up 智xx up ==> 直接操作智xx 无响应
  
 /*
 * This is a poorly designed state machine for handling screen touch errors, SAD :(
@@ -148,12 +147,10 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
     if (screenMissTouchFlag_ == false) {
         if (screen == true) {
             screenMissTouchFlag_ = true;
-            // 上报cancel的逻辑是手指按下屏幕
             SendFingerprintCancelEvent();
             return;
         }
     } else {
-        // 手指没有在屏幕，且目前为止收到cancel事件
         if (screen == false && cancel == true) {
             screenMissTouchFlag_ = false;
             return;
@@ -163,7 +160,6 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
  
 bool FingerprintEventProcessor::CheckMisTouchState()
 {
-    // 不太清楚
     if (CheckKeyMisTouchState() || CheckScreenMisTouchState()) {
         return true;
     }
