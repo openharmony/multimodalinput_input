@@ -672,7 +672,7 @@ fn get_speed_dynamic_gain_mouse(vin: f64, gain: *mut f64, speed: i32, delta_time
             }
         }
         *gain = (slopes[3] * vin_new + diff_nums[3]) * speed_radio / vin_new;
-        debug!(LOG_LABEL, "gain is set to {}", @public(slopes[i]);
+        debug!(LOG_LABEL, "gain is set to {}", @public(slopes[3]);
     }
     debug!(LOG_LABEL, "get_speed_gain_mouse leave");
     true
