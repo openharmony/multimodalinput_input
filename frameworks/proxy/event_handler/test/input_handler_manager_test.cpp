@@ -424,7 +424,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDisconnected, TestSi
 
 /**
  * @tc.name: InputHandlerManagerTest_IsMatchGesture_001
- * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.desc: Overrides the IsMatchGesture function branch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -433,31 +433,41 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsMatchGesture_001, Te
     CALL_TEST_DEBUG;
     MYInputHandlerManager inputHdlMgr;
     InputHandlerManager::Handler handler;
-    handler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
-    handler.gestureHandler_.gestureType = TOUCH_GESTURE_TYPE_SWIPE;
-    handler.gestureHandler_.fingers = 1;
+    handler.eventType_ = 0;
     int32_t action = PointerEvent::TOUCH_ACTION_SWIPE_DOWN;
     int32_t count = 1;
-    bool ret = inputHdlMgr.IsMatchGesture(handler, action, count);
-    ASSERT_FALSE(ret);
-    handler.gestureHandler_.gestureType = 10;
-    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
-    ASSERT_FALSE(ret);
+    EXPECT_TRUE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    handler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    handler.handlerId_ = 100;
+    handler.gestureHandler_.gestureType = TOUCH_GESTURE_TYPE_SWIPE;
+    handler.gestureHandler_.fingers = 1;
+    inputHdlMgr.monitorHandlers_.insert(std::make_pair(50, handler));
+    EXPECT_FALSE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    inputHdlMgr.monitorHandlers_.insert(std::make_pair(100, handler));
+    EXPECT_TRUE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    action = PointerEvent::TOUCH_ACTION_SWIPE_UP;
+    handler.gestureHandler_.fingers = ALL_FINGER_COUNT;
+    inputHdlMgr.monitorHandlers_[1] = handler;
+    EXPECT_TRUE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    action = PointerEvent::TOUCH_ACTION_SWIPE_RIGHT;
+    EXPECT_TRUE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    action = PointerEvent::TOUCH_ACTION_SWIPE_LEFT;
+    EXPECT_TRUE(inputHdlMgr.IsMatchGesture(handler, action, count));
     action = PointerEvent::TOUCH_ACTION_PINCH_OPENED;
     handler.gestureHandler_.gestureType = TOUCH_GESTURE_TYPE_PINCH;
-    handler.gestureHandler_.fingers == ALL_FINGER_COUNT;
-    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
-    ASSERT_FALSE(ret);
-    handler.gestureHandler_.gestureType = 10;
-    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
-    ASSERT_FALSE(ret);
-    handler.gestureHandler_.gestureType = TOUCH_GESTURE_TYPE_PINCH;
-    handler.gestureHandler_.fingers == 10;
-    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
-    ASSERT_FALSE(ret);
-    handler.eventType_ = 10;
-    ret = inputHdlMgr.IsMatchGesture(handler, action, count);
-    ASSERT_TRUE(ret);
+    handler.gestureHandler_.gestureState = false;
+    inputHdlMgr.monitorHandlers_[1] = handler;
+    EXPECT_FALSE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    action = PointerEvent::TOUCH_ACTION_PINCH_CLOSEED;
+    EXPECT_FALSE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    action = PointerEvent::TOUCH_ACTION_GESTURE_END;
+    EXPECT_TRUE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    action = PointerEvent::TOUCH_ACTION_GESTURE_END;
+    handler.gestureHandler_.gestureState = true;
+    inputHdlMgr.monitorHandlers_[1] = handler;
+    EXPECT_FALSE(inputHdlMgr.IsMatchGesture(handler, action, count));
+    action = 0;
+    EXPECT_FALSE(inputHdlMgr.IsMatchGesture(handler, action, count));
 }
 
 /**
