@@ -696,7 +696,7 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
             CHKPV(surfaceNode_);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
             MMI_HILOGD("Switch pointer style");
-            uint64_t nodeId = surfaceNode_->GetId();
+            int64_t nodeId = static_cast<int64_t>(this->SurfaceNode_->GetId());
             if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
                 surfaceNode_->DetachToDisplay(screenId_);
                 Rosen::RSTransaction::FlushImplicitTransaction();
@@ -1078,7 +1078,8 @@ void PointerDrawingManager::DoHardwareCursorDraw()
     }
     dynamicCanvas_->Restore();
     static constexpr uint32_t stride = 4;
-    int32_t addrSize = buffer_->GetWidth() * buffer_->GetHeight() * stride;
+    uint32_t addrSize =
+        static_cast<uint32_t>(this->buffer_->GetWidth()) * static_cast<uint32_t>(this->buffer_->GetHigh()) * stride;
     CHKPV(addr_);
     errno_t ret = memcpy_s(*addr_, addrSize, dynamicBitmap_->GetPixels(), addrSize);
     if (ret != EOK) {
