@@ -303,7 +303,9 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
                 item.GetMoveFlag(), item.GetDeviceId());
         }
     }
-    WIN_MGR->UpdateTargetPointer(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        WIN_MGR->UpdateTargetPointer(pointerEvent);
+    }
     nextHandler_->HandlePointerEvent(pointerEvent);
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
