@@ -26,6 +26,7 @@
 #include "ability_manager_client.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
 #include "display_event_monitor.h"
 #include "error_multimodal.h"
@@ -982,6 +983,10 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     std::string matchName = ".camera";
     if (bundleName.find(matchName) == std::string::npos) {
         return false;
+    }
+    auto callState = DEVICE_MONITOR->GetCallState();
+    if (callState == StateType::CALL_STATUS_ACTIVE) {
+        return true;
     }
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
