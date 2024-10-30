@@ -1543,6 +1543,7 @@ int32_t MultimodalInputConnectProxy::SetKeyDownDuration(const std::string &busin
     }
     WRITESTRING(data, businessId, ERR_INVALID_VALUE);
     WRITEINT32(data, delay, ERR_INVALID_VALUE);
+    WRITEINT32(data, extraData.pullId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
