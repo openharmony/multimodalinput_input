@@ -32,6 +32,10 @@ GestureMonitorHandler& GestureMonitorHandler::operator=(const GestureMonitorHand
 
 bool GestureMonitorHandler::CheckMonitorValid(TouchGestureType type, int32_t fingers)
 {
+    if (type == TOUCH_GESTURE_TYPE_NONE ||
+        (TOUCH_GESTURE_TYPE_ALL & type) != type) {
+        return false;
+    }
     TouchGestureType ret = TOUCH_GESTURE_TYPE_NONE;
     if (fingers == ALL_FINGER_COUNT) {
         return true;
