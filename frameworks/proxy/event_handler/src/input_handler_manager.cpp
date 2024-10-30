@@ -464,10 +464,13 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             int32_t handlerId = item.first;
             std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
-            auto iter = monitorHandlers_.find(handlerId);
-            if (iter == monitorHandlers_.end()) {
-                MMI_HILOGE("No handler with specified");
-                continue;
+            {
+                std::lock_guard<std::mutex> guard(mtxHandlers_);
+                auto iter = monitorHandlers_.find(handlerId);
+                if (iter == monitorHandlers_.end()) {
+                    MMI_HILOGE("No handler with specified");
+                    continue;
+                }
             }
             consumer->OnInputEvent(keyEvent);
             MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{private}d",
