@@ -72,6 +72,10 @@ void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 bool InputMonitorManager::CheckMonitorValid(TouchGestureType type, int32_t fingers)
 {
+    if (type == TOUCH_GESTURE_TYPE_NONE ||
+        (TOUCH_GESTURE_TYPE_ALL & type) != type) {
+        return false;
+    }
     TouchGestureType ret = TOUCH_GESTURE_TYPE_NONE;
     if (fingers == ALL_FINGER_COUNT) {
         return true;
