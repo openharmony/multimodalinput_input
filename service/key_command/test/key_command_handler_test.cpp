@@ -448,20 +448,20 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchPadKnuckleDoubleClick
     std::string abilityName = "abilityName";
     std::string action = "move";
 
-    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF;
+    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_OFF;
     DISPLAY_MONITOR->isScreenLocked_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, action));
 
 
-    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON;
+    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_ON;
     DISPLAY_MONITOR->isScreenLocked_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, action));
 
-    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF;
+    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_OFF;
     DISPLAY_MONITOR->isScreenLocked_ = false;
     ASSERT_NO_FATAL_FAILURE(handler.TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, action));
 
-    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON;
+    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_ON;
     DISPLAY_MONITOR->isScreenLocked_ = false;
     ASSERT_NO_FATAL_FAILURE(handler.TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, action));
 }

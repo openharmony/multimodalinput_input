@@ -111,9 +111,9 @@ void AbilityManagerClient::SetErrCode(ErrCode err)
 } // namespace AAFwk
 
 namespace EventFwk {
-    const std::string CommonEventSupport::COMMON_EVENT_SCREEN_OFF = "usual.event.SCREEN_OFF";
-    const std::string CommonEventSupport::COMMON_EVENT_SCREEN_ON = "usual.event.SCREEN_ON";
-    const std::string CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED = "usual.event.SCREEN_LOCKED";
-    const std::string CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED = "usual.event.SCREEN_UNLOCKED";
+    const std::string CommonEventSupportTest::COMMON_EVENT_SCREEN_OFF = "usual.event.SCREEN_OFF";
+    const std::string CommonEventSupportTest::COMMON_EVENT_SCREEN_ON = "usual.event.SCREEN_ON";
+    const std::string CommonEventSupportTest::COMMON_EVENT_SCREEN_LOCKED = "usual.event.SCREEN_LOCKED";
+    const std::string CommonEventSupportTest::COMMON_EVENT_SCREEN_UNLOCKED = "usual.event.SCREEN_UNLOCKED";
 } // namespace EventFwk
 } // namespace OHOS
