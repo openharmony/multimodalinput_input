@@ -51,6 +51,12 @@ struct ExtraData {
      * @since 9
      */
     int32_t pointerId { -1 };
+        /*
+     * 当前拖拽实例的标识
+     *
+     * @since 13
+     */
+    int32_t pullId { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
