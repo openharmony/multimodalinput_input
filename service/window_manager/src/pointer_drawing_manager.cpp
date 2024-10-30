@@ -696,7 +696,7 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
             CHKPV(surfaceNode_);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
             MMI_HILOGD("Switch pointer style");
-            int64_t nodeId = static_cast<int64_t>(this->SurfaceNode_->GetId());
+            int64_t nodeId = static_cast<int64_t>(this->surfaceNode_->GetId());
             if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
                 surfaceNode_->DetachToDisplay(screenId_);
                 Rosen::RSTransaction::FlushImplicitTransaction();
