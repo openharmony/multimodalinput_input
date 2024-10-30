@@ -124,7 +124,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
         uint64_t dalta_time = filterInsertionPoint_.filterDeltaTime;
-        HandleMousePointerFilter(&offset);
+        HandleFilterMouseEvent(&offset);
         ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, dalta_time,
             static_cast<double>(displayInfo->ppi));
