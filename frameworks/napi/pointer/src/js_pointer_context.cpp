@@ -1304,7 +1304,7 @@ napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_inf
 {
     CALL_DEBUG_ENTER;
     if (!func) {
-        MMI_HILOGE("func is nullptr");
+        MMI_HILOGE("The func is nullptr");
         return nullptr;
     }
     size_t argc = 2;
@@ -1676,7 +1676,7 @@ napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("rows parameter type is invalid");
+        MMI_HILOGE("Rows parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touchpadScrollRows", "number");
         return nullptr;
     }
