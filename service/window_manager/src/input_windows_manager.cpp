@@ -3160,7 +3160,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 static_cast<int32_t>(logicalY)));
             // Determine whether the landing point is a safety sub window
             CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent, item.uiExtentionWindowInfo,
-                touchWindow);
+                &touchWindow);
             if (isSpecialWindow) {
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
                 isHotArea = true;
@@ -3416,12 +3416,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 
 void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t, int32_t> logicalXY,
     bool isHotArea, const std::shared_ptr<PointerEvent> pointerEvent, const std::vector<WindowInfo>& windowInfos,
-    const WindowInfo* touchWindow)
+    const WindowInfo** touchWindow)
 {
     CHKPV(pointerEvent);
     CHKPV(touchWindow);
+    CHKPV(*touchWindow);
     int32_t uiExtentionWindowId = 0;
-    int32_t windowId = touchWindow->id;
+    int32_t windowId = (*touchWindow)->id;
     int32_t logicalX = logicalXY.first;
     int32_t logicalY = logicalXY.second;
     for (const auto& it : windowInfos) {
@@ -3433,7 +3434,7 @@ void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t
     if (uiExtentionWindowId > 0) {
         for (auto &windowinfo : windowInfos) {
             if (windowinfo.id == uiExtentionWindowId) {
-                touchWindow = &windowinfo;
+                *touchWindow = &windowinfo;
                 MMI_HILOG_DISPATCHD("uiExtentionWindowid:%{public}d", uiExtentionWindowId);
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), uiExtentionWindowId);
                 break;
