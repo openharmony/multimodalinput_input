@@ -453,7 +453,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), originPointerAction_(other.originPointerAction_),
-       buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), pullId_(other.pullId_), zOrder_(other.zOrder_),
+      buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), pullId_(other.pullId_), zOrder_(other.zOrder_),
       axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_), axisEventType_(other.axisEventType_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
