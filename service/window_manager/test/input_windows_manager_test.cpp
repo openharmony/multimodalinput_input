@@ -4867,8 +4867,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindow
     windowInfos.push_back(windowInfo);
     WindowInfo touchWindow;
     touchWindow.id = 100;
+    const WindowInfo* touchWindowInfo = &touchWindow;
     EXPECT_NO_FATAL_FAILURE(inputWinMgr.CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent,
-        windowInfos, &touchWindow));
+        windowInfos, &touchWindowInfo));
 }
 
 /**
@@ -4900,8 +4901,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindow
     windowInfos.push_back(windowInfo);
     WindowInfo touchWindow;
     touchWindow.id = 100;
+    const WindowInfo* touchWindowInfo = &touchWindow;
     EXPECT_NO_FATAL_FAILURE(inputWinMgr.CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent,
-        windowInfos, &touchWindow));
+        windowInfos, &touchWindowInfo));
 }
 
 /**
@@ -5144,14 +5146,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindow
     windows.push_back(windowInfo);
     WindowInfo touchWindow;
     touchWindow.id = 100;
+    const WindowInfo* touchWindowInfo = &touchWindow;
     std::pair<int32_t, int32_t> logicalXY(std::make_pair(15, 25));
     EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent,
-        windows, &touchWindow));
+        windows, &touchWindowInfo));
     std::pair<int32_t, int32_t> secondXY(std::make_pair(300, 300));
     EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowDefaultHotArea(secondXY, isHotArea, pointerEvent,
-        windows, &touchWindow));
+        windows, &touchWindowInfo));
     EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent,
-        {}, &touchWindow));
+        {}, &touchWindowInfo));
 }
 
 /**
