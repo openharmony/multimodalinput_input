@@ -349,7 +349,6 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
     EventStatistic::PushEvent(keyEvent);
-    WIN_MGR->HandleKeyEventWindowId(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -388,6 +387,7 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
+    WIN_MGR->HandleKeyEventWindowId(keyEvent);
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
