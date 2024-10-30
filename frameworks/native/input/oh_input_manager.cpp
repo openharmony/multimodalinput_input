@@ -1749,7 +1749,7 @@ Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
     }
     for (int32_t i = 0; i < hotkeyCount; ++i) {
         if (hotkey[i] == nullptr) {
-            MMI_HILOGE("hotkey is null, i:%{public}d", i);
+            MMI_HILOGE("Hotkey is null, i:%{public}d", i);
             return INPUT_PARAMETER_ERROR;
         }
         hotkey[i]->preKeys = keyOptions[i]->GetPreKeys();
@@ -1763,7 +1763,7 @@ Input_Hotkey* OH_Input_CreateHotkey(void)
     CALL_DEBUG_ENTER;
     Input_Hotkey* hotkey = new (std::nothrow) Input_Hotkey();
     if (hotkey == nullptr) {
-        MMI_HILOGE("hotkey is null");
+        MMI_HILOGE("Hotkey is null");
         return nullptr;
     }
     return hotkey;
