@@ -806,6 +806,16 @@ void PointerEvent::SetAxisEventType(int32_t axisEventType)
     axisEventType_ = axisEventType;
 }
 
+int32_t PointerEvent::GetPullId() const
+{
+    return pullId_;
+}
+
+void PointerEvent::SetPullId(int32_t pullId)
+{
+    pullId_ = pullId;
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void PointerEvent::SetEnhanceData(const std::vector<uint8_t>& enhanceData)
 {
