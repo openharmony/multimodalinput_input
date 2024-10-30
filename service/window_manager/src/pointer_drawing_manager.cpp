@@ -1079,7 +1079,7 @@ void PointerDrawingManager::DoHardwareCursorDraw()
     dynamicCanvas_->Restore();
     static constexpr uint32_t stride = 4;
     uint32_t addrSize =
-        static_cast<uint32_t>(this->buffer_->GetWidth()) * static_cast<uint32_t>(this->buffer_->GetHigh()) * stride;
+        static_cast<uint32_t>(this->buffer_->GetWidth()) * static_cast<uint32_t>(this->buffer_->GetHeight()) * stride;
     CHKPV(addr_);
     errno_t ret = memcpy_s(*addr_, addrSize, dynamicBitmap_->GetPixels(), addrSize);
     if (ret != EOK) {
