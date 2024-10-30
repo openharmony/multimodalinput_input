@@ -85,12 +85,12 @@ public:
     virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
-    virtual bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual bool CheckPidInSession(int32_t pid) = 0;
     virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
         double logicX, double logicY) const = 0;
     virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
     virtual int32_t GetCurrentUserId() = 0;
+    virtual bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual void SetFoldState () = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
@@ -150,7 +150,6 @@ public:
     virtual void SetWindowStateNotifyPid(int32_t pid) = 0;
     virtual int32_t GetWindowStateNotifyPid() = 0;
     virtual int32_t GetPidByWindowId(int32_t pid) = 0;
-
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;

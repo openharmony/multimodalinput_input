@@ -1991,6 +1991,7 @@ int32_t InputManagerCommand::SwipeActionEvent(int32_t startX, int32_t startY, in
     actionType[times - 1] = PointerEvent::POINTER_ACTION_SWIPE_END;
     for (int32_t i = 0; i < times; i++) {
         auto pointerEvent = CreateEvent(0, actionType[i], fingerCount - 1, sourceType, fingerCount);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
         pointerEvent->SetActionTime(actionTime[i]);
         pointerEvent->SetActionStartTime(actionStartTime[i]);
         PointerEvent::PointerItem item;
@@ -2049,6 +2050,7 @@ std::shared_ptr<PointerEvent> InputManagerCommand::CreateEvent(
     int32_t fingerCount)
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     pointerEvent->SetId(id);
     pointerEvent->SetOriginPointerAction(type);
     pointerEvent->SetPointerAction(type);
@@ -2104,6 +2106,7 @@ int32_t InputManagerCommand::ActionPinchEvent(int32_t centerX, int32_t centerY, 
             scalePinch = scalePinch + scalePinchChange;
         }
         auto pointerEvent = CreateEvent(0, actionType, 0, PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
         pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scalePinch);
         PointerEvent::PointerItem itemFirst;
         topY = topY + stepY;
@@ -2128,6 +2131,7 @@ void InputManagerCommand::SendTouchDownForPinch(int32_t topX, int32_t topY, int3
     int32_t itemId = 0;
     auto pointerEvent = CreateEvent(0, PointerEvent::POINTER_ACTION_DOWN, 0,
         PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
+    CHKPV(pointerEvent);
     pointerEvent->SetPointerId(itemId);
     PointerEvent::PointerItem itemFirst;
     FillPointerItem(itemFirst, topX, topY, itemId, true);
@@ -2137,6 +2141,7 @@ void InputManagerCommand::SendTouchDownForPinch(int32_t topX, int32_t topY, int3
     std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
     pointerEvent = CreateEvent(0, PointerEvent::POINTER_ACTION_DOWN, 0,
         PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
+    CHKPV(pointerEvent);
     itemId = itemId + 1;
     pointerEvent->SetPointerId(itemId);
     PointerEvent::PointerItem itemSecond;

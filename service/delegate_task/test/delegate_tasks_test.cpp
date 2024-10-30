@@ -17,6 +17,7 @@
 
 #include "delegate_tasks.h"
 #include "error_multimodal.h"
+#include "key_event_napi.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -178,6 +179,78 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostTask_002, TestSize.Level1)
     DelegateTasks::Promise promise;
     auto task = delegateTasks.PostTask(nullptr, &promise);
     EXPECT_EQ(task, nullptr);
+}
+
+/**
+ * @tc.name: DelegateTasksTest_CreateKeyEvent_001
+ * @tc.desc: Test the funcation CreateKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateTasksTest, DelegateTasksTest_CreateKeyEvent_001, TestSize.Level1)
+{
+    KeyEventNapi napi;
+    napi_env env = nullptr;
+    std::shared_ptr<KeyEvent> in = KeyEvent::Create();
+    ASSERT_NE(in, nullptr);
+    napi_value out = nullptr;
+    napi_status status = napi.CreateKeyEvent(env, in, out);
+    ASSERT_NE(status, napi_ok);
+}
+
+/**
+ * @tc.name: DelegateTasksTest_GetKeyEvent_001
+ * @tc.desc: Test the funcation GetKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateTasksTest, DelegateTasksTest_GetKeyEvent_001, TestSize.Level1)
+{
+    KeyEventNapi napi;
+    napi_env env = nullptr;
+    napi_value in = nullptr;
+    std::shared_ptr<KeyEvent> out = KeyEvent::Create();
+    ASSERT_NE(out, nullptr);
+    napi_status status = napi.GetKeyEvent(env, in, out);
+    ASSERT_NE(status, napi_ok);
+}
+
+/**
+ * @tc.name: DelegateTasksTest_CreateKeyItem_001
+ * @tc.desc: Test the funcation CreateKeyItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateTasksTest, DelegateTasksTest_CreateKeyItem_001, TestSize.Level1)
+{
+    KeyEventNapi napi;
+    napi_env env = nullptr;
+    KeyEvent::KeyItem item;
+    std::optional<KeyEvent::KeyItem> in;
+    item.SetKeyCode(2018);
+    item.SetPressed(false);
+    in.emplace(item);
+    napi_value out = nullptr;
+    napi_status status = napi.CreateKeyItem(env, in, out);
+    ASSERT_NE(status, napi_ok);
+}
+
+/**
+ * @tc.name: DelegateTasksTest_GetKeyItem_001
+ * @tc.desc: Test the funcation GetKeyItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateTasksTest, DelegateTasksTest_GetKeyItem_001, TestSize.Level1)
+{
+    KeyEventNapi napi;
+    napi_env env = nullptr;
+    napi_value in = nullptr;
+    KeyEvent::KeyItem out;
+    out.SetKeyCode(2018);
+    out.SetPressed(false);
+    napi_status status = napi.GetKeyItem(env, in, out);
+    ASSERT_EQ(status, napi_ok);
 }
 } // namespace MMI
 } // namespace OHOS
