@@ -241,7 +241,7 @@ void TouchTransformProcessor::DumpInner()
     auto nowId = pointerEvent_->GetDeviceId();
     if (lastDeviceId != nowId) {
         auto device = INPUT_DEV_MGR->GetInputDevice(nowId);
-        CHKPP(device);
+        CHKPV(device);
         lastDeviceId = nowId;
         lastDeviceName = device->GetName();
     }
