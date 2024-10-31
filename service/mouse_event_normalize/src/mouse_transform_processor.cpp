@@ -216,7 +216,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
         GetTouchpadRightClickType(switchTypeData);
-        RightClickType switchType = RightClickType(switchTypeData);    
+        RightClickType switchType = RightClickType(switchTypeData);
         if (type == LIBINPUT_EVENT_POINTER_TAP && switchType == RightClickType::TP_TWO_FINGER_TAP &&
             button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
             MMI_HILOGI("Right click up, do sleep");
