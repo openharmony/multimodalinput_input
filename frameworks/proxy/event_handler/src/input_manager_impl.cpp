@@ -1458,13 +1458,13 @@ template<typename T>
 bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
     CALL_INFO_TRACE;
-    std::shared_ptr<PointerEvent> currentPointerEvent = nullptr; 
+    std::shared_ptr<PointerEvent> currentPointerEvent = nullptr;
     {
         std::lock_guard<std::mutex> guard(resourceMtx_);
         CHKPF(lastPointerEvent_);
         currentPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     }
-    
+
     CHKPF(currentPointerEvent);
     int32_t pointerAction = currentPointerEvent->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
