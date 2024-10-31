@@ -152,6 +152,7 @@ enum StateMachineMessageType
     BackSwipeLeft,
     BackSwipeRight,
     BackspaceSwipeRelease,
+    Idle,
 };
 
 class StateMachineMessage

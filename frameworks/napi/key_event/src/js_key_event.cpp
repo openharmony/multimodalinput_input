@@ -40,6 +40,7 @@ enum VKeyboardAction : int32_t {
     TWO_FINGERS_OUT = 6,
     TWO_HANDS_UP = 7,
     TWO_HANDS_DOWN = 8,
+    IDLE = 9,
 };
 } // namespace
 
