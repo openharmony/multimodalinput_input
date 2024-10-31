@@ -717,10 +717,17 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
 
 void MouseTransformProcessor::DumpInner()
 {
+    static int32_t lastDeviceId = -1;
+    static std::string lastDeviceName("default");
+    auto nowId = pointerEvent_->GetDeviceId();
+    if (lastDeviceId != nowId) {
+        auto device = INPUT_DEV_MGR->GetInputDevice(nowId);
+        CHKPV(device);
+        lastDeviceId = nowId;
+        lastDeviceName = device->GetName();
+    }
     EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_FREEZE);
-    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
-    CHKPV(device);
-    aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
+    aggregator_.Record(MMI_LOG_FREEZE, lastDeviceName + ", TW: " +
         std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
 }
 
