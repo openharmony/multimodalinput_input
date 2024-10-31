@@ -1574,6 +1574,8 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         upActionTime_ = keyEvent->GetActionTime();
+        repeatKey_.keyCode = item.keyCode;
+        repeatKey_.keyAction = keyEvent->GetKeyAction();
         repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
         });
@@ -1587,11 +1589,20 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
         if (repeatKey_.keyCode != item.keyCode) {
             count_ = 1;
             repeatKey_.keyCode = item.keyCode;
+            repeatKey_.keyAction = keyEvent->GetKeyAction();
         } else {
-            count_++;
+            if (repeatKey_.keyAction == keyEvent->GetKeyAction()) {
+                MMI_HILOGD("Repeat key, reset down status");
+                count_ = 0;
+                isDownStart_ = false;
+                return true;
+            } else {
+                repeatKey_.keyAction = keyEvent->GetKeyAction();
+                count_++;
+                MMI_HILOGD("Repeat count:%{public}d", count_);
+            }
         }
         isDownStart_ = true;
-
         downActionTime_ = keyEvent->GetActionTime();
         if ((downActionTime_ - upActionTime_) < intervalTime_) {
             if (repeatTimerId_ >= 0) {
@@ -1608,6 +1619,7 @@ void KeyCommandHandler::SendKeyEvent()
 {
     CALL_DEBUG_ENTER;
     if (!isHandleSequence_) {
+        MMI_HILOGD("Launch ability count:%{public}d count:%{public}d", launchAbilityCount_, count_);
         for (int32_t i = launchAbilityCount_; i < count_; i++) {
             int32_t keycode = repeatKey_.keyCode;
             if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
