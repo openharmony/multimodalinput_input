@@ -1458,22 +1458,28 @@ template<typename T>
 bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(resourceMtx_);
-    CHKPF(lastPointerEvent_);
-    int32_t pointerAction = lastPointerEvent_->GetPointerAction();
+    std::shared_ptr<PointerEvent> currentPointerEvent = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPF(lastPointerEvent_);
+        currentPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    }
+
+    CHKPF(currentPointerEvent);
+    int32_t pointerAction = currentPointerEvent->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
             PointerEvent::PointerItem item;
-            int32_t pointerId = lastPointerEvent_->GetPointerId();
-            if (!lastPointerEvent_->GetPointerItem(pointerId, item)) {
+            int32_t pointerId = currentPointerEvent->GetPointerId();
+            if (!currentPointerEvent->GetPointerItem(pointerId, item)) {
                 MMI_HILOG_DISPATCHD("Get pointer item failed. pointer:%{public}d",
                     pointerId);
                 return false;
             }
             item.SetPressed(false);
-            lastPointerEvent_->UpdatePointerItem(pointerId, item);
-            lastPointerEvent_->SetPointerAction(pointerActionEvent);
-            OnPointerEvent(lastPointerEvent_);
+            currentPointerEvent->UpdatePointerItem(pointerId, item);
+            currentPointerEvent->SetPointerAction(pointerActionEvent);
+            OnPointerEvent(currentPointerEvent);
             return true;
         }
     }
