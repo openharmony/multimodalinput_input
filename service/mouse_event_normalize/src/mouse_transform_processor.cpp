@@ -888,6 +888,9 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
     // touchpad two finger button -> 273
     uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
     if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+        if (button == BTN_RIGHT_MENUE_CODE) {
+            button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+        }
         return;
     }
 
