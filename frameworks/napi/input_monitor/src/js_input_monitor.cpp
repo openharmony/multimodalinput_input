@@ -1510,7 +1510,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         CHKPV(work);
         MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
         if (monitorInfo == nullptr) {
-            MMI_HILOGE("monitorInfo is nullptr");
+            MMI_HILOGE("The monitorInfo is nullptr");
             delete work;
             work = nullptr;
             return;
@@ -1556,7 +1556,7 @@ void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
         CHKPV(work);
         MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
         if (monitorInfo == nullptr) {
-            MMI_HILOGE("monitorInfo is nullptr");
+            MMI_HILOGE("The monitorInfo is nullptr");
             delete work;
             return;
         }
@@ -1799,7 +1799,7 @@ void JsInputMonitor::OnKeyEventInJsThread(const std::string &typeName, const int
         auto keyEvent = keyEventQueue_.front();
         LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
         if (keyEvent == nullptr) {
-            MMI_HILOGE("scope is nullptr");
+            MMI_HILOGE("Scope is nullptr");
             napi_close_handle_scope(jsEnv_, scope);
             continue;
         }
