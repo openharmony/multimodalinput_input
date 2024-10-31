@@ -95,6 +95,7 @@ public:
     MOCK_METHOD(const DisplayInfo*, GetDefaultDisplayInfo, (), (const));
     MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
     MOCK_METHOD(void, SendCancelEventWhenLock, ());
+    MOCK_METHOD(void, FoldScreenRotation, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
