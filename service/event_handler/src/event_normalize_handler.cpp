@@ -592,6 +592,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         CHKPR(outputEvent, RET_OK);
         MMI_HILOGD("Output event received, SourceType:%{public}d, PointerAction:%{public}d, status:%{public}d",
             outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
+        CHKPR(pointerEvent, RET_ERR);
         EndLogTraceId(pointerEvent->GetId());
         pointerEvent = outputEvent;
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
