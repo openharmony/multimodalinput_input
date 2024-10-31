@@ -66,7 +66,6 @@ private:
     static void CallKeyboardRepeatDelayPromise(uv_work_t *work, int32_t status);
     static void CallKeyboardRepeatRateAsync(uv_work_t *work, int32_t status);
     static void CallKeyboardRepeatRatePromise(uv_work_t *work, int32_t status);
-    static void CallIntervalSinceLastInputAsync(uv_work_t *work, int32_t status);
     static void CallIntervalSinceLastInputPromise(uv_work_t *work, int32_t status);
     static void EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData);
     static void EmitRemoveDeviceEvent(sptr<JsUtil::ReportData> reportData);
