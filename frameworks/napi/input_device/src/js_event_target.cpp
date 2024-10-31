@@ -78,13 +78,13 @@ void JsEventTarget::EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData)
         CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, reportData->deviceId, &deviceId), CREATE_INT32, scope);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
             scope);
-        BytraceAdapter::StartDevListener(ADD_EVENT, reportData->deviceId);
-        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d",
-            ADD_EVENT.c_str(), reportData->deviceId);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
             scope);
         napi_close_handle_scope(item->env, scope);
+        BytraceAdapter::StartDevListener(ADD_EVENT, reportData->deviceId);
+        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d",
+            ADD_EVENT.c_str(), reportData->deviceId);
         BytraceAdapter::StopDevListener();
     }
 }
@@ -121,13 +121,13 @@ void JsEventTarget::EmitRemoveDeviceEvent(sptr<JsUtil::ReportData> reportData)
         napi_value handler = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
             scope);
-        BytraceAdapter::StartDevListener(REMOVE_EVENT, reportData->deviceId);
-        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d",
-            REMOVE_EVENT.c_str(), reportData->deviceId);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
             scope);
         napi_close_handle_scope(item->env, scope);
+        BytraceAdapter::StartDevListener(REMOVE_EVENT, reportData->deviceId);
+        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d",
+            REMOVE_EVENT.c_str(), reportData->deviceId);
         BytraceAdapter::StopDevListener();
     }
 }
@@ -269,7 +269,7 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret = 0;
+    int32_t ret = -1;
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
             ret = uv_queue_work_with_qos(
@@ -373,7 +373,7 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret = 0;
+    int32_t ret = -1;
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
             ret = uv_queue_work_with_qos(
@@ -531,7 +531,7 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret = 0;
+    int32_t ret = -1;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work,
@@ -567,7 +567,7 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret = 0;
+    int32_t ret = -1;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work,
@@ -898,7 +898,7 @@ void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, 
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret = 0;
+    int32_t ret = -1;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work,
@@ -934,7 +934,7 @@ void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret = 0;
+    int32_t ret = -1;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work,
@@ -1069,7 +1069,7 @@ void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, i
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret = 0;
+    int32_t ret = -1;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work,
@@ -1105,7 +1105,7 @@ void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int3
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret = 0;
+    int32_t ret = -1;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work,

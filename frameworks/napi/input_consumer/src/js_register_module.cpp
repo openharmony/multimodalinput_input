@@ -34,8 +34,8 @@ constexpr size_t EVENT_NAME_LEN { 64 };
 constexpr size_t PRE_KEYS_SIZE { 4 };
 constexpr size_t INPUT_PARAMETER_MIDDLE { 2 };
 constexpr size_t INPUT_PARAMETER_MAX { 3 };
-constexpr int32_t OCCUPIED_BY_SYSTEM { -3 };
-constexpr int32_t OCCUPIED_BY_OTHER { -4 };
+constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
+constexpr int32_t OCCUPIED_BY_OTHER = -4;
 } // namespace
 
 static Callbacks callbacks = {};
@@ -672,7 +672,17 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
 }
 
 KeyEventMonitorInfo::~KeyEventMonitorInfo()
-{}
+{
+    if (callback == nullptr) {
+        return;
+    }
+    uint32_t refcount = 0;
+    CHKRV(napi_reference_unref(env, callback, &refcount), REFERENCE_UNREF);
+    if (refcount == 0) {
+        CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
+    }
+    callback = nullptr;
+}
 
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)

@@ -48,7 +48,7 @@ napi_value JsShortKeyContext::CreateInstance(napi_env env)
     napi_value jsClass = nullptr;
     napi_property_descriptor desc[] = {};
     napi_status status = napi_define_class(env, className, sizeof(className), JsShortKeyContext::CreateJsObject,
-                                           nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
+        nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
     CHKRP(status, DEFINE_CLASS);
 
     status = napi_set_named_property(env, global, SHORT_KEY_CLASS.c_str(), jsClass);
@@ -81,7 +81,7 @@ napi_value JsShortKeyContext::CreateJsObject(napi_env env, napi_callback_info in
     JsShortKeyContext *jsContext = new (std::nothrow) JsShortKeyContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_HILOGI("Jsvm ends");
+        MMI_HILOGI("jsvm ends");
         JsShortKeyContext *context = static_cast<JsShortKeyContext*>(data);
         delete context;
     }, nullptr, nullptr);
@@ -172,12 +172,12 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     if (argc == paramsNum) {
         return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay);
     }
-    if (!JsCommon::TypeOf(env, argv[2], napi_function)) {
+    if (!JsCommon::TypeOf(env, argv[paramsNum], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay, argv[2]);
+    return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay, argv[paramsNum]);
 }
 
 napi_value JsShortKeyContext::GetNapiInt32(napi_env env, int32_t code)
