@@ -1084,7 +1084,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
     int32_t size = 0;
     READINT32(in, size);
     if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
-        MMI_HILOGE("enhanceData_ size is invalid");
+        MMI_HILOGE("The enhanceData_ size is invalid");
         return false;
     }
 
@@ -1117,19 +1117,19 @@ bool PointerEvent::IsValidCheckMouseFunc() const
 {
     CALL_DEBUG_ENTER;
     if (pointers_.size() != 1) {
-        MMI_HILOGE("Pointers_ is invalid");
+        MMI_HILOGE("The pointers_ is invalid");
         return false;
     }
 
     const size_t maxPressedButtons = 3;
     if (pressedButtons_.size() > maxPressedButtons) {
-        MMI_HILOGE("PressedButtons_.size is greater than three and is invalid");
+        MMI_HILOGE("The pressedButtons_.size is greater than three and is invalid");
         return false;
     }
 
     for (const auto &item : pressedButtons_) {
         if (item != MOUSE_BUTTON_LEFT && item != MOUSE_BUTTON_RIGHT && item != MOUSE_BUTTON_MIDDLE) {
-            MMI_HILOGE("PressedButtons_ is invalid");
+            MMI_HILOGE("The pressedButtons_ is invalid");
             return false;
         }
     }
