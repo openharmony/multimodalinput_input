@@ -4342,6 +4342,21 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLoc
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation
+ * @tc.desc: Test FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.FoldScreenRotation(pointerEvent));
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_PrintChangedWindowBySync
  * @tc.desc: Test PrintChangedWindowBySync
  * @tc.type: FUNC
