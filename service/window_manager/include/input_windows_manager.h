@@ -67,7 +67,6 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    void DumpDisplayInfo(int32_t fd);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
@@ -84,6 +83,7 @@ public:
     bool CheckPidInSession(int32_t pid);
     std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
     int32_t GetCurrentUserId();
+    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
     void SetFoldState ();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -93,7 +93,6 @@ public:
     void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
-    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MouseLocation GetMouseInfo();

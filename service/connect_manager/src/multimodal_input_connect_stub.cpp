@@ -23,6 +23,7 @@
 #include "string_ex.h"
 #include "tokenid_kit.h"
 
+
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
@@ -1374,7 +1375,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
     LogTracer lt(event->GetId(), event->GetEventType(), event->GetKeyAction());
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->CheckInjectPermission()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1404,7 +1405,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
     }
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->CheckInjectPermission()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
