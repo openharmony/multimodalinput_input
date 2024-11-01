@@ -949,7 +949,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     READINT32(in, axisEventType_);
-    WRITEINT32(in, pullId_);
+    READINT32(in, pullId_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
         return false;
