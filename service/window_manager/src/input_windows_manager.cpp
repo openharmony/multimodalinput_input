@@ -3761,7 +3761,7 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.buffer = extraData.buffer;
     extraData_.sourceType = extraData.sourceType;
     extraData_.pointerId = extraData.pointerId;
-    extraData_.pullId = extraData_.pullId;
+    extraData_.pullId = extraData.pullId;
     return RET_OK;
 }
 
