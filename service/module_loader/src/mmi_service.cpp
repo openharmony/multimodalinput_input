@@ -856,8 +856,7 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 } else if (!useShift) {
                     // regular key press without the need of using Shift to assist key injection.
                     SendKeyPress(code);
-                }
-                else {
+                } else {
                     // spefical floating keyboard symbol keys that need Shift to assist key injection.
                     toggleKeyCodes.clear();
                     toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
