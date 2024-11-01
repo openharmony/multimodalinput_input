@@ -2844,10 +2844,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         screenId_ = static_cast<uint64_t>(displayId);
         MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
         AttachToDisplay();
-        CHKPV(hardwareCursorPointerManager_);
-        if (!hardwareCursorPointerManager_->IsSupported()) {
-            DrawCursor(MOUSE_ICON(lastMouseStyle_.id));
-        }
+        DrawCursor(MOUSE_ICON(lastMouseStyle_.id));
         lastDisplayId_ = displayId;
     }
 }
