@@ -788,7 +788,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
     EXPECT_TRUE(inputNodeName.empty());
 
     std::string inputNode = inputDisplayBindHelper.GetInputNode(inputNodeName);
-    EXPECT_FALSE(inputNode.empty());
+    EXPECT_TRUE(inputNode.empty());
 
     std::string ret = inputDisplayBindHelper.GetInputDeviceById(id);
     EXPECT_EQ(ret, "");

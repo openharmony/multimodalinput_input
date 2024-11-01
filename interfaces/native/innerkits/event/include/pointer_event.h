@@ -1685,6 +1685,21 @@ public:
      */
     void SetAxisEventType(int32_t axisEventType);
 
+    /**
+     * @brief Obtains the drag id.
+     * @return Returns the drag id.
+     * @since 12
+     */
+    int32_t GetPullId() const;
+
+    /**
+     * @brief Sets drag id.
+     * @param pullId Indicates the drag id to set.
+     * @return void
+     * @since 12
+     */
+    void SetPullId(int32_t pullId);
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     /**
      * @brief Set the fingerprint distance X.
@@ -1765,6 +1780,7 @@ private:
     int32_t originPointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
+    int32_t pullId_ { -1 };
     float zOrder_{ -1.0f};
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
