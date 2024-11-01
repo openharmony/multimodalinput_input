@@ -36,6 +36,7 @@ constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT { 2 };
 
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
 {
+    CHKPV(keyEvent);
     keyEvent->SetRepeat(true);
     bool isPressed = false;
     if (GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed) != RET_OK) {
@@ -355,6 +356,10 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if (sourceType == TOUCH_SCREEN || sourceType == PEN) {
         sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     }
+    int32_t screenId = -1;
+    if (GetNamedPropertyInt32(env, touchHandle, "screenId", screenId, false) != RET_OK) {
+        MMI_HILOGI("Get screenId failed");
+    }
     napi_value touchProperty = HandleTouchProperty(env, touchHandle);
     CHKPV(touchProperty);
     int32_t screenX = 0;
@@ -386,6 +391,7 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetSourceType(sourceType);
     pointerEvent->SetActionTime(pressedTime);
+    pointerEvent->SetTargetDisplayId(screenId);
     if ((action == JS_CALLBACK_TOUCH_ACTION_MOVE) || (action == JS_CALLBACK_TOUCH_ACTION_UP)) {
         pointerEvent->UpdatePointerItem(0, item);
     }
