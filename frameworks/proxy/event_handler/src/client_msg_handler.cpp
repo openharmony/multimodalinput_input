@@ -190,7 +190,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
             std::to_string(pointerEvent->GetId()));
     }
-    if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
+    if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction() ||
+        PointerEvent::POINTER_ACTION_HOVER_CANCEL == pointerEvent->GetPointerAction() ||
+        PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
@@ -409,5 +411,6 @@ int32_t ClientMsgHandler::NotifyWindowStateError(const UDSClient& client, NetPac
     InputMgrImpl.OnWindowStateError(pid, windowId);
     return RET_OK;
 }
+
 } // namespace MMI
 } // namespace OHOS
