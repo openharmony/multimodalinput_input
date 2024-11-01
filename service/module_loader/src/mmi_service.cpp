@@ -897,6 +897,11 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 }
                 break;
             }
+            case StateMachineMessageType::Idle: {
+                MMI_HILOGI("VKeyboard Statemachine enters idle state.");
+                SendKeyboardAction(KeyEvent::VKeyboardAction::IDLE);
+                break;
+            }
             case StateMachineMessageType::SwitchLayout: {
                 int gestureId = buttonMode;
                 auto gestureType = static_cast<VGestureMode>(gestureId);
