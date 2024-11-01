@@ -207,6 +207,7 @@ typedef void (*TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)();
 TRACKPADENGINE_CLEARKEYMESSAGE_TYPE trackPadEngine_clearKeyMessage_ = nullptr;
 std::vector<int32_t> g_VKeyDownSet;
 std::unordered_set<int32_t> g_VKeyModifiersDownSet;
+std::unordered_set<int32_t> g_VKeyVisualsDownSet;
 // Shared key event for key injection for printing.
 std::shared_ptr<KeyEvent> g_VKeySharedKeyEvent { nullptr };
 // Shared key event for UI rendering.
@@ -218,9 +219,9 @@ std::unordered_map<int32_t, int32_t> g_VKeyFunctionKeyMapping = {
     {MMI::KeyEvent::KEYCODE_F5, MMI::KeyEvent::KEYCODE_VOLUME_DOWN},
     {MMI::KeyEvent::KEYCODE_F6, MMI::KeyEvent::KEYCODE_VOLUME_UP},
     {MMI::KeyEvent::KEYCODE_F7, MMI::KeyEvent::KEYCODE_MUTE},
-    {MMI::KeyEvent::KEYCODE_F8, MMI::KeyEvent::KEYCODE_F8},
+    {MMI::KeyEvent::KEYCODE_F8, MMI::KeyEvent::KEYCODE_SWITCHVIDEOMODE},
     {MMI::KeyEvent::KEYCODE_F9, MMI::KeyEvent::KEYCODE_SEARCH},
-    {MMI::KeyEvent::KEYCODE_F10, MMI::KeyEvent::KEYCODE_F10},
+    {MMI::KeyEvent::KEYCODE_F10, MMI::KeyEvent::KEYCODE_MEDIA_RECORD},
     {MMI::KeyEvent::KEYCODE_F11, MMI::KeyEvent::KEYCODE_SYSRQ},
     {MMI::KeyEvent::KEYCODE_F12, MMI::KeyEvent::KEYCODE_INSERT},
 };
@@ -505,7 +506,7 @@ void HandleKeyActionHelper(int32_t action, int32_t keyCode, OHOS::MMI::KeyEvent:
 int32_t HandleKeyInjectEventHelper(std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler,
     int32_t action, int32_t keyCode)
 {
-    MMI_HILOGI("VKeyboard HandleKeyInjectEventHelper, injectEvent");
+    MMI_HILOGD("VKeyboard HandleKeyInjectEventHelper, injectEvent, action=%{public}d", action);
     if (keyCode < 0) {
         MMI_HILOGE("VKeyboard keyCode is less 0, can not process");
         return COMMON_PARAMETER_ERROR;
@@ -586,19 +587,35 @@ int32_t SendCombinationKeyPress(std::vector<int32_t>& toggleKeyCodes, int32_t tr
     return RET_OK;
 }
 
-// @brief Release (remove from key event handler) and reset visual state on UI.
+// @brief Key Down (add to key event handler and modifiers down set).
+int32_t SendKeyDown(int32_t keyCode)
+{
+    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
+    // Trigger key.
+    HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_DOWN,
+        keyCode);
+    g_VKeyModifiersDownSet.insert(keyCode);
+    return RET_OK;
+}
+
+// @brief Key Release (remove from key event handler and modifiers down set).
 int32_t SendKeyRelease(int32_t keyCode)
 {
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
     // Release key.
-    HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_UP,
-        keyCode);
-    g_VKeyModifiersDownSet.erase(keyCode);
+    if (g_VKeyModifiersDownSet.count(keyCode) > 0) {
+        HandleKeyInjectEventHelper(eventNormalizeHandler, OHOS::MMI::KeyEvent::KEY_ACTION_UP, keyCode);
+        g_VKeyModifiersDownSet.erase(keyCode);
+    } else {
+        MMI_HILOGI("Skip key release as it is not added to down set before.");
+    }
+
     return RET_OK;
 }
 
-// @brief Print (inject key code) and reset visual state on UI.
+// @brief Print (inject key code), including key down and release.
 int32_t SendKeyPress(int32_t keyCode)
 {
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
@@ -632,6 +649,11 @@ int32_t ToggleKeyVisualState(std::string& keyName, int32_t keyCode, bool visualP
     int64_t time = OHOS::MMI::GetSysClockTime();
     g_VKeySharedUIKeyEvent->SetActionTime(time);
 
+    // get keyboard CAPS state.
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    bool capsLockState = keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+
     KeyEvent::KeyItem keyItem;
     keyItem.SetDownTime(time);
     keyItem.SetKeyCode(keyCode);
@@ -656,6 +678,10 @@ int32_t ToggleKeyVisualState(std::string& keyName, int32_t keyCode, bool visualP
         g_VKeySharedUIKeyEvent->RemoveReleasedKeyItems(keyItem);
         g_VKeySharedUIKeyEvent->AddPressedKeyItems(keyItem);
     }
+
+    // sync the latest CAPS lock state anyways.
+    g_VKeySharedUIKeyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, static_cast<int32_t>(capsLockState));
+
     eventNormalizeHandler->HandleKeyEvent(g_VKeySharedUIKeyEvent);
     return RET_OK;
 }
@@ -776,16 +802,19 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
             return RET_ERR;
         }
     }
+
+    int32_t keyCodeToRelease = -1;
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_DOWN) {
         algorithm_keydown_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_UP) {
         algorithm_keyup_(tp.ScreenX, tp.ScreenY, tp.TouchId, tp.TipDown, tp.ButtonName);
-        int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
-        if (keyCode >= 0) {
-            SendKeyRelease(keyCode);
-            ToggleKeyVisualState(buttonName, keyCode, false);
+        keyCodeToRelease = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
+        if (keyCodeToRelease >= 0 && g_VKeyVisualsDownSet.count(keyCodeToRelease) > 0) {
+            // turn off visuals only when it is still on.
+            ToggleKeyVisualState(buttonName, keyCodeToRelease, false);
+            g_VKeyVisualsDownSet.erase(keyCodeToRelease);
         } else {
-            MMI_HILOGW("VKeyboard PointerEventHandler, key code not found for %{private}s", buttonName.c_str());
+            MMI_HILOGD("VKeyboard PointerEventHandler, skip visual off %{private}s", buttonName.c_str());
         }
     } else {
         // New touch move logic: turn to touch down to support gestures.
@@ -809,26 +838,39 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 // See if this key can be directly printed or not.
                 bool useShift = false;
                 int32_t code = gaussiankeyboard_getKeyCodeByKeyNameAndShift_(buttonName, useShift);
-                if (code >= 0) {
-                    // VKErrorTool: NonToggableKeyPress.
-                    MMI_HILOGI("NonToggableButtonClick, KeyPress: %{public}s", buttonName.c_str());
-
-                    if (!useShift) {
-                        // standard kbd, fn key off, and first row is pressed.
-                        if (!g_FnKeyState && g_VKeyFunctionKeyMapping.find(code) != g_VKeyFunctionKeyMapping.end()) {
-                            code = g_VKeyFunctionKeyMapping.find(code)->second;
-                        }
-                        SendKeyPress(code);
-                    } else {
-                        toggleKeyCodes.clear();
-                        toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
-                        SendCombinationKeyPress(toggleKeyCodes, code);
-                        // If this key is triggered with use shift ON, then it shall be resumed after use.
-                        SendKeyRelease(KeyEvent::KEYCODE_SHIFT_LEFT);
-                    }
-                } else {
+                if (code < 0) {
                     MMI_HILOGW("VKeyboard key code not found.");
+                    break;
                 }
+
+                // VKErrorTool: NonToggableKeyPress.
+                MMI_HILOGI("NonToggableButtonClick, KeyPress: %{private}s", buttonName.c_str());
+
+                if (!g_FnKeyState && code == KeyEvent::KEYCODE_F4) {
+                    // VOLUME_MUTE (F4) needs special touch down trigger logic.
+                    SendKeyRelease(KeyEvent::KEYCODE_VOLUME_MUTE);
+                } else if (!g_FnKeyState && g_VKeyFunctionKeyMapping.find(code) != g_VKeyFunctionKeyMapping.end()) {
+                    // fn key off, and first row hardware switch keys are pressed.
+                    int32_t hardwareCode = g_VKeyFunctionKeyMapping.find(code)->second;
+                    SendKeyPress(hardwareCode);
+                } else if (!useShift) {
+                    // regular key press without the need of using Shift to assist key injection.
+                    SendKeyPress(code);
+                }
+                else {
+                    // spefical floating keyboard symbol keys that need Shift to assist key injection.
+                    toggleKeyCodes.clear();
+                    toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
+                    SendCombinationKeyPress(toggleKeyCodes, code);
+                    // If this key is triggered with use shift ON, then it shall be resumed after use.
+                    SendKeyRelease(KeyEvent::KEYCODE_SHIFT_LEFT);
+                }
+
+                // the keyCodeToRelease has been handled.
+                if (code == keyCodeToRelease) {
+                    keyCodeToRelease = -1;
+                }
+
                 break;
             }
             case StateMachineMessageType::ButtonSound: {
@@ -836,12 +878,15 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
             }
             case StateMachineMessageType::ResetButtonColor: {
                 SendKeyboardAction(KeyEvent::VKeyboardAction::RESET_BUTTON_COLOR);
+
+                g_VKeyVisualsDownSet.clear();
                 break;
             }
             case StateMachineMessageType::CombinationKeyPressed: {
                 toggleKeyCodes.clear();
                 std::string remainStr = toggleButtonName;
-                int32_t toggleCode(-1), triggerCode(-1);
+                int32_t toggleCode(-1);
+                int32_t triggerCode(-1);
                 while (remainStr.find(';') != std::string::npos) {
                     // still has more than one 
                     size_t pos = remainStr.find(';');
@@ -865,6 +910,11 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                     MMI_HILOGW("VKeyboard combination keycodes not found for %{private}s + %{private}s",
                         toggleButtonName.c_str(), buttonName.c_str());
                 }
+
+                // this trigger code has been handled.
+                if (triggerCode == keyCodeToRelease) {
+                    keyCodeToRelease = -1;
+                }
                 break;
             }
             case StateMachineMessageType::BackSwipeLeft: {
@@ -872,6 +922,8 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 toggleKeyCodes.clear();
                 toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
                 SendCombinationKeyPress(toggleKeyCodes, KeyEvent::KEYCODE_DPAD_LEFT);
+
+                g_VKeyVisualsDownSet.insert(KeyEvent::KEYCODE_DEL);
                 break;
             }
             case StateMachineMessageType::BackSwipeRight: {
@@ -879,6 +931,8 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 toggleKeyCodes.clear();
                 toggleKeyCodes.push_back(KeyEvent::KEYCODE_SHIFT_LEFT);
                 SendCombinationKeyPress(toggleKeyCodes, KeyEvent::KEYCODE_DPAD_RIGHT);
+
+                g_VKeyVisualsDownSet.insert(KeyEvent::KEYCODE_DEL);
                 break;
             }
             case StateMachineMessageType::BackspaceSwipeRelease: {
@@ -939,13 +993,13 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 break;
             }
             case StateMachineMessageType::DelayUpdateButtonTouchDownVisual: {
-                MMI_HILOGI("VKeyboard key down (delayed): %{public}s, mode: %{public}d",
+                MMI_HILOGI("VKeyboard key down (delayed): %{private}s, mode: %{public}d",
                     buttonName.c_str(),
                     buttonMode);
 
                 int32_t keyCode = gaussiankeyboard_getKeyCodeByKeyName_(buttonName);
                 if (keyCode < 0) {
-                    MMI_HILOGW("VKeyboard key code not found for %{public}s", buttonName.c_str());
+                    MMI_HILOGW("VKeyboard key code not found for %{private}s", buttonName.c_str());
                     break;
                 }
 
@@ -954,10 +1008,16 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 if (buttonMode == 1) {
                     // flag for turning it off now.
                     ToggleKeyVisualState(buttonName, keyCode, false);
+                } else {
+                    // not turning it off right away, then store this info.
+                    g_VKeyVisualsDownSet.insert(keyCode);
                 }
 
                 if (keyCode == KeyEvent::KEYCODE_FN) {
                     g_FnKeyState = !g_FnKeyState;
+                } else if (!g_FnKeyState && keyCode == KeyEvent::KEYCODE_F4) {
+                    // VOLUME_MUTE (F4) needs special touch down logic.
+                    SendKeyDown(KeyEvent::KEYCODE_VOLUME_MUTE);
                 }
 
                 break;
@@ -965,6 +1025,11 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
             default:
                 break;
         }
+    }
+
+    // all state machine messages are handled, see if the keyCodeToRelease remains unhandled.
+    if (keyCodeToRelease >= 0) {
+        SendKeyRelease(keyCodeToRelease);
     }
     return RET_OK;
 }
