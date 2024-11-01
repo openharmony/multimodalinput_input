@@ -258,7 +258,14 @@ int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> optio
         .session = session,
         .callback = callback,
     };
-    if (KeyShortcutManager::IsModifier(sysKey.finalKey)) {
+    // In registration of pure modifiers key-shortcuts, we need to adapt key-subscription to
+    // key-shortcut due to difference of implementation details.
+    if (KeyShortcutManager::IsModifier(sysKey.finalKey) &&
+        !sysKey.modifiers.empty() &&
+        std::all_of(sysKey.modifiers.cbegin(), sysKey.modifiers.cend(),
+            [](auto key) {
+                return KeyShortcutManager::IsModifier(key);
+            })) {
         sysKey.modifiers.insert(sysKey.finalKey);
         sysKey.finalKey = KeyShortcutManager::SHORTCUT_PURE_MODIFIERS;
     }
