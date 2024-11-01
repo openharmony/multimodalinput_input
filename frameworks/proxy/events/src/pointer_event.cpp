@@ -277,10 +277,11 @@ int32_t PointerEvent::PointerItem::GetMoveFlag() const
     return moveFlag_;
 }
 
-void PointerEvent::PointerItem::SetMoveFlag(int32_t moveFlag)
+void PointerEvent::PointerItem::SetMoveFlag(int32_t moveflag)
 {
-    moveFlag_ = moveFlag;
+    moveFlag_ = moveflag;
 }
+
 
 int32_t PointerEvent::PointerItem::GetLongAxis() const
 {
@@ -412,11 +413,11 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(rawDisplayX_) &&
         out.WriteInt32(rawDisplayY_) &&
         out.WriteInt32(targetWindowId_) &&
+        out.WriteInt32(originPointerId_) &&
         out.WriteDouble(displayXPos_) &&
         out.WriteDouble(displayYPos_) &&
         out.WriteDouble(windowXPos_) &&
-        out.WriteDouble(windowYPos_) &&
-        out.WriteInt32(originPointerId_)
+        out.WriteDouble(windowYPos_)
     );
 }
 
@@ -450,11 +451,11 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(rawDisplayX_) &&
         in.ReadInt32(rawDisplayY_) &&
         in.ReadInt32(targetWindowId_) &&
+        in.ReadInt32(originPointerId_) &&
         in.ReadDouble(displayXPos_) &&
         in.ReadDouble(displayYPos_) &&
         in.ReadDouble(windowXPos_) &&
-        in.ReadDouble(windowYPos_) &&
-        in.ReadInt32(originPointerId_)
+        in.ReadDouble(windowYPos_)
     );
 }
 
@@ -945,7 +946,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
-    WRITEDOUBLE(out, velocity_);
 
     WRITEINT32(out, axisEventType_);
     WRITEINT32(out, pullId_);
@@ -1013,17 +1013,20 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         pressedKeys_.emplace_back(val);
     }
     READINT32(in, sourceType_);
+
     READINT32(in, pointerAction_);
+
     READINT32(in, originPointerAction_);
+
     READINT32(in, buttonId_);
+
     READINT32(in, fingerCount_);
+
     READFLOAT(in, zOrder_);
 
     if (!ReadAxisFromParcel(in)) {
         return false;
     }
-
-    READDOUBLE(in, velocity_);
 
     READINT32(in, axisEventType_);
     READINT32(in, pullId_);
@@ -1084,7 +1087,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
     int32_t size = 0;
     READINT32(in, size);
     if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
-        MMI_HILOGE("The enhanceData_ size is invalid");
+        MMI_HILOGE("enhanceData_ size is invalid");
         return false;
     }
 
@@ -1117,19 +1120,19 @@ bool PointerEvent::IsValidCheckMouseFunc() const
 {
     CALL_DEBUG_ENTER;
     if (pointers_.size() != 1) {
-        MMI_HILOGE("The pointers_ is invalid");
+        MMI_HILOGE("Pointers_ is invalid");
         return false;
     }
 
     const size_t maxPressedButtons = 3;
     if (pressedButtons_.size() > maxPressedButtons) {
-        MMI_HILOGE("The pressedButtons_.size is greater than three and is invalid");
+        MMI_HILOGE("PressedButtons_.size is greater than three and is invalid");
         return false;
     }
 
     for (const auto &item : pressedButtons_) {
         if (item != MOUSE_BUTTON_LEFT && item != MOUSE_BUTTON_RIGHT && item != MOUSE_BUTTON_MIDDLE) {
-            MMI_HILOGE("The pressedButtons_ is invalid");
+            MMI_HILOGE("PressedButtons_ is invalid");
             return false;
         }
     }
