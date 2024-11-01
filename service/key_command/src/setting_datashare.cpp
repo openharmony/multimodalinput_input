@@ -265,13 +265,16 @@ ErrCode SettingDataShare::PutStringValue(
 
 std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper(const std::string &strUri)
 {
+    auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    CHKPP(sam);
+    auto remoteObj = sam->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    if (remoteObj == nullptr) {
+        MMI_HILOGI("Data share not start");
+        return nullptr;
+    }
     if (remoteObj_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (remoteObj_ == nullptr) {
-            auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-            CHKPP(sam);
-            remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
-        }
+        remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
     }
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
     if (strUri.empty()) {
