@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t SLEEP_TIME { 10 * 60 };
+constexpr int32_t SLEEP_TIME = 10 * 60;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
