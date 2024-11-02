@@ -142,10 +142,6 @@ struct KnuckleGesture {
     } lastDownPointer;
 };
 
-struct MultiFingersTap {
-    Ability ability;
-};
-
 struct RepeatKey {
     int32_t keyCode { -1 };
     int32_t keyAction { 0 };
@@ -154,6 +150,10 @@ struct RepeatKey {
     int64_t delay { 0 };
     std::string statusConfig;
     bool statusConfigValue { true };
+    Ability ability;
+};
+
+struct MultiFingersTap {
     Ability ability;
 };
 
@@ -198,11 +198,7 @@ public:
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void InitKeyObserver();
-#ifdef UNIT_TEST
-public:
-#else
 private:
-#endif // UNIT_TEST
     void Print();
     void PrintSeq();
     void PrintExcludeKeys();
@@ -278,7 +274,6 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
-
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -326,6 +321,7 @@ private:
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
     void TouchPadKnuckleDoubleClickProcess(const std::string bundleName, const std::string abilityName,
         const std::string action);
+
 private:
     Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;
@@ -380,6 +376,7 @@ private:
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
     int32_t lastKeyEventCode_ { -1 };
+    int32_t screenRecordingSuccessCount_ { 0 };
     std::string sessionKey_ { };
     bool isStartBase_ { false };
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER

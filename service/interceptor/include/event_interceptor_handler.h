@@ -59,7 +59,9 @@ public:
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 private:
     class SessionHandler {
     public:

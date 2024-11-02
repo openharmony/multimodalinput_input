@@ -143,7 +143,7 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointe
 
 void EventInterceptorHandler::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_) {
+    if (sessionLostCallbackInitialized_)  {
         MMI_HILOGE("Init session is failed");
         return;
     }
@@ -201,10 +201,6 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<Point
     CHKPV(session_);
     if (session_->GetUid() == ACCESSIBILITY_UID) {
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
-        if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
-            pointerEvent->SetPointerAction(pointerEvent->GetOriginPointerAction());
-            MMI_HILOGD("OriginPointerAction:%{public}d", pointerEvent->GetPointerAction());
-        }
     }
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service send to client InputHandlerType:%{public}d", handlerType_);
@@ -400,6 +396,7 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool EventInterceptorHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
 {
     CHKPF(event);
@@ -412,5 +409,6 @@ bool EventInterceptorHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<K
     nextHandler_->HandleKeyEvent(event);
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS
