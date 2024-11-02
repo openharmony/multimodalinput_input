@@ -1465,7 +1465,7 @@ bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActio
         currentPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     }
 
-    CHKPF(currentPointerEvent);
+    CHKPF(currentPointerEvent) ;
     int32_t pointerAction = currentPointerEvent->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
