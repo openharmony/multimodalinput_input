@@ -410,12 +410,12 @@ void FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
         auto ret = abmc->StartExtensionAbility(want, nullptr, -1, AppExecFwk::ExtensionAbilityType::SERVICE);
         if (ret != RET_OK) {
             MMI_HILOGE("StartExtensionAbility failed, ret: %{public}d", ret);
-            return;
+            return false;
         }
         MMI_HILOGI("StartServiceExtAbility finished");
         return true;
     });
-    return true;
+    return;
 }
 
 void FingerprintEventProcessor::ProcessSlideEvent()
