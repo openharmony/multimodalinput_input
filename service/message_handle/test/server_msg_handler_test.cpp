@@ -150,9 +150,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_GetShieldStatus_01, TestSize
     CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     int32_t shieldMode = -1;
-    bool isNativeInject = false;
-    int32_t result = servermsghandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false);
-    EXPECT_EQ(result, ERROR_NULL_POINTER);
+    bool isShield = false;
+    int32_t result = servermsghandler.GetShieldStatus(shieldMode, isShield);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**
