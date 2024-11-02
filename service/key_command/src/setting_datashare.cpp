@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -79,12 +79,8 @@ ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value, c
 {
     std::string valueStr;
     ErrCode ret = GetStringValue(key, valueStr, strUri);
-    if (ret == ERR_NAME_NOT_FOUND) {
-        MMI_HILOGW("Not found this property");
-        return ERR_OK;
-    }
     if (ret != ERR_OK) {
-        MMI_HILOGE("Get long value fail, ret:%{public}d", ret);
+        MMI_HILOGE("Get long value fail");
         return ret;
     }
     value = static_cast<int64_t>(strtoll(valueStr.c_str(), nullptr, DECIMAL_BASE));
@@ -95,12 +91,8 @@ ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, cons
 {
     std::string valueStr;
     ErrCode ret = GetStringValue(key, valueStr, strUri);
-    if (ret == ERR_NAME_NOT_FOUND) {
-        MMI_HILOGW("Not found this property");
-        return ERR_OK;
-    }
     if (ret != ERR_OK) {
-        MMI_HILOGE("Get bool value fail, ret:%{public}d", ret);
+        MMI_HILOGE("Get bool value fail");
         return ret;
     }
     value = ((valueStr == "true") || (valueStr == "1"));
@@ -265,16 +257,13 @@ ErrCode SettingDataShare::PutStringValue(
 
 std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper(const std::string &strUri)
 {
-    auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    CHKPP(sam);
-    auto remoteObj = sam->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-    if (remoteObj == nullptr) {
-        MMI_HILOGI("Data share not start");
-        return nullptr;
-    }
     if (remoteObj_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
-        remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
+        if (remoteObj_ == nullptr) {
+            auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+            CHKPP(sam);
+            remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
+        }
     }
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
     if (strUri.empty()) {

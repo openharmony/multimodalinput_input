@@ -76,6 +76,7 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     CHKPR(filter, ERROR_NULL_POINTER);
     MMI_HILOGI("Add filter, filterId:%{public}d, priority:%{public}d, clientPid:%{public}d, filters_ size:%{public}zu",
         filterId, priority, clientPid, filters_.size());
+
     std::weak_ptr<EventFilterHandler> weakPtr = shared_from_this();
     auto deathCallback = [weakPtr, filterId, clientPid](const wptr<IRemoteObject> &object) {
         auto sharedPtr = weakPtr.lock();
@@ -93,6 +94,7 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) EventFilterDeathRecipient(deathCallback);
     CHKPR(deathRecipient, RET_ERR);
     filter->AsObject()->AddDeathRecipient(deathRecipient);
+
     FilterInfo info { .filter = filter, .deathRecipient = deathRecipient, .filterId = filterId,
         .priority = priority, .deviceTags = deviceTags, .clientPid = clientPid };
     auto it = filters_.cbegin();
@@ -208,6 +210,7 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
     return false;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool EventFilterHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
 {
     CHKPF(event);
@@ -220,5 +223,6 @@ bool EventFilterHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEve
     nextHandler_->HandleKeyEvent(event);
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS
