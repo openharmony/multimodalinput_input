@@ -239,7 +239,6 @@ private:
     void HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent> &keyEvent);
     int32_t GetKeyDownDurationFromXml(const std::string &businessId);
     void SendKeyEvent();
-    bool CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent);
     template <class T>
     void CreateStatusConfigObserver(T& item);
     void ResetLastMatchedKey()

@@ -46,11 +46,19 @@ JsEventTarget::JsEventTarget()
     CK(ret.second, VAL_NOT_EXP);
 }
 
-void JsEventTarget::EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData)
+void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::ReportData> reportData(static_cast<JsUtil::ReportData *>(work->data));
     reportData->DecStrongRef(nullptr);
+    JsUtil::DeletePtr<uv_work_t *>(work);
     auto addEvent = devListener_.find(CHANGED_TYPE);
     if (addEvent == devListener_.end()) {
         MMI_HILOGE("Find change event failed");
@@ -84,16 +92,24 @@ void JsEventTarget::EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData)
         napi_close_handle_scope(item->env, scope);
         BytraceAdapter::StartDevListener(ADD_EVENT, reportData->deviceId);
         MMI_HILOGI("Report device change task, event type:%{public}s, eventid:%{public}d",
-            ADD_EVENT.c_str(), reportData->deviceId);
+            REMOVE_EVENT.c_str(), reportData->deviceId);
         BytraceAdapter::StopDevListener();
     }
 }
 
-void JsEventTarget::EmitRemoveDeviceEvent(sptr<JsUtil::ReportData> reportData)
+void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::ReportData> reportData(static_cast<JsUtil::ReportData *>(work->data));
     reportData->DecStrongRef(nullptr);
+    JsUtil::DeletePtr<uv_work_t *>(work);
     auto removeEvent = devListener_.find(CHANGED_TYPE);
     if (removeEvent == devListener_.end()) {
         MMI_HILOGE("Find change event failed");
@@ -145,18 +161,30 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
     for (auto &item : changeEvent->second) {
         CHKPC(item);
         CHKPC(item->env);
+        uv_loop_s *loop = nullptr;
+        CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
         sptr<JsUtil::ReportData> reportData = new (std::nothrow) JsUtil::ReportData;
         if (reportData == nullptr) {
             MMI_HILOGE("Memory allocation failed");
+            JsUtil::DeletePtr<uv_work_t *>(work);
             return;
         }
         reportData->deviceId = deviceId;
         reportData->ref = item->ref;
         reportData->IncStrongRef(nullptr);
-        auto task = [reportData, this] () { EmitAddedDeviceEvent(reportData); };
-        int32_t ret = napi_send_event(item->env, task, napi_eprio_vip);
+        work->data = reportData.GetRefPtr();
+        int32_t ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            EmitAddedDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
-            MMI_HILOGE("napi_send_event failed");
+            MMI_HILOGE("uv_queue_work_with_qos failed");
+            JsUtil::DeletePtr<uv_work_t *>(work);
+            reportData->DecStrongRef(nullptr);
             return;
         }
     }
@@ -174,18 +202,30 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
     for (auto &item : changeEvent->second) {
         CHKPC(item);
         CHKPC(item->env);
+        uv_loop_s *loop = nullptr;
+        CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
         sptr<JsUtil::ReportData> reportData = new (std::nothrow) JsUtil::ReportData;
         if (reportData == nullptr) {
             MMI_HILOGE("Memory allocation failed");
+            JsUtil::DeletePtr<uv_work_t *>(work);
             return;
         }
         reportData->deviceId = deviceId;
         reportData->ref = item->ref;
         reportData->IncStrongRef(nullptr);
-        auto task = [reportData, this] () { EmitAddedDeviceEvent(reportData); };
-        int32_t ret = napi_send_event(item->env, task, napi_eprio_vip);
+        work->data = reportData.GetRefPtr();
+        int32_t ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            EmitRemoveDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
-            MMI_HILOGE("napi_send_event failed");
+            MMI_HILOGE("uv_queue_work_with_qos failed");
+            JsUtil::DeletePtr<uv_work_t *>(work);
+            reportData->DecStrongRef(nullptr);
             return;
         }
     }

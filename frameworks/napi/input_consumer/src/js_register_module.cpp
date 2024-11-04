@@ -63,7 +63,7 @@ void JsCommon::ThrowError(napi_env env, int32_t code)
     }
 }
 
-napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
+napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -186,7 +186,7 @@ static bool IsMatchKeyAction(bool isFinalKeydown, int32_t keyAction)
     return false;
 }
 
-static bool MatchCombinationKeys(sptr<KeyEventMonitorInfo> monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
+static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(monitorInfo);
@@ -270,16 +270,20 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
-    sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
+    KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
+        .env = env,
+        .asyncWork = nullptr,
+    };
     CHKPP(event);
-    event->env = env;
     auto keyOption = std::make_shared<KeyOption>();
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
+        delete event;
         MMI_HILOGE("Napi typeof failed");
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+        delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
     }
@@ -291,6 +295,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            delete event;
             return nullptr;
         }
         MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
@@ -299,6 +304,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         event->subscribeId = preSubscribeId;
     }
     if (AddEventCallback(env, callbacks, event) < 0) {
+        delete event;
         MMI_HILOGE("AddEventCallback failed");
         return nullptr;
     }
@@ -316,21 +322,26 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
-    sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
+    KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
+        .env = env,
+        .asyncWork = nullptr,
+    };
     CHKPP(event);
-    event->env = env;
     auto keyOption = std::make_shared<KeyOption>();
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
+        delete event;
         MMI_HILOGE("Napi typeof failed");
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+        delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
     }
     int32_t subscribeId = -1;
     if (DelEventCallback(env, callbacks, event, subscribeId) < 0) {
+        delete event;
         MMI_HILOGE("DelEventCallback failed");
         return nullptr;
     }
@@ -338,6 +349,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
+    delete event;
     return nullptr;
 }
 

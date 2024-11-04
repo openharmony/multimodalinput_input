@@ -231,13 +231,6 @@ ohos_prebuilt_etc("drawing_pointer_image_Screenshot_Cursor") {
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_Knuckle_Sprite_360") {
-  source = "src/Knuckle_Sprite_360.png"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-  relative_install_dir = "multimodalinput/mouse_icon"
-}
-
 ohos_prebuilt_etc("drawing_pointer_image_South") {
   source = "src/South.svg"
   part_name = "input"

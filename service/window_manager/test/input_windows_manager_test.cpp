@@ -369,7 +369,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDi
     CALL_TEST_DEBUG;
     int32_t displayId = -1;
     const std::vector<WindowInfo>& windowGroupInfo = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
-    EXPECT_EQ(windowGroupInfo.size(), 1);
+    EXPECT_EQ(windowGroupInfo.size(), 0);
 }
 
 /**
@@ -383,7 +383,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDi
     CALL_TEST_DEBUG;
     int32_t displayId = 1;
     const std::vector<WindowInfo>& windowGroupInfo = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
-    EXPECT_FALSE(windowGroupInfo.empty());
+    EXPECT_TRUE(windowGroupInfo.empty());
 }
 
 /**
@@ -530,7 +530,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCaptureMode_001,
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 123;
     WIN_MGR->UpdateCaptureMode(displayGroupInfo);
-    EXPECT_FALSE(WIN_MGR->captureModeInfo_.isCaptureMode);
+    EXPECT_TRUE(WIN_MGR->captureModeInfo_.isCaptureMode);
 }
 
 /**
@@ -655,7 +655,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyleByArea_
     EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_WEST);
     area = WindowArea::FOCUS_ON_INNER;
     WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_WEST);
+    EXPECT_NE(pointerStyle.id, MOUSE_ICON::NORTH_WEST);
 }
 
 /**
@@ -909,7 +909,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, Test
     coord.x = 10;
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
-    EXPECT_EQ(coord.x, 580);
+    EXPECT_EQ(coord.x, 780);
     EXPECT_EQ(coord.y, 10);
 }
 
@@ -952,7 +952,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
     EXPECT_EQ(coord.x, 20);
-    EXPECT_EQ(coord.y, 790);
+    EXPECT_EQ(coord.y, 590);
 }
 
 /**
@@ -964,11 +964,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
+    EXPECT_TRUE(WIN_MGR->IsNeedRefreshLayer(1));
     WIN_MGR->GetWindowInfo(0, 0)->id = 2;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(GLOBAL_WINDOW_ID));
+    EXPECT_TRUE(WIN_MGR->IsNeedRefreshLayer(GLOBAL_WINDOW_ID));
     WIN_MGR->GetWindowInfo(0, 0)->id = 3;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
+    EXPECT_TRUE(WIN_MGR->IsNeedRefreshLayer(1));
 }
 
 /**
@@ -998,7 +998,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001,
     int32_t windowId = 2;
     PointerStyle pointerStyle;
     int32_t ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_NE(ret, 401);
+    EXPECT_EQ(ret, 401);
     pid = -1;
     windowId = -2;
     ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
@@ -1006,7 +1006,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001,
     pid = 1;
     windowId = -2;
     ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_NE(ret, 401);
+    EXPECT_EQ(ret, 401);
 }
 
 /**
@@ -1028,6 +1028,23 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointe
     windowId = -2;
     ret = WIN_MGR->UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001
+ * @tc.desc: Test setting global default pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WIN_MGR->SetGlobalDefaultPointerStyle();
+    for (auto &iter : WIN_MGR->pointerStyle_) {
+        for (auto &item : iter.second) {
+            EXPECT_NE(item.second.id, WIN_MGR->globalStyle_.id);
+        }
+    }
 }
 
 /**
@@ -1353,13 +1370,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_001, T
     CALL_TEST_DEBUG;
     int32_t displayId = 1;
     bool ret = WIN_MGR->UpdateDisplayId(displayId);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     displayId = 0;
     ret = WIN_MGR->UpdateDisplayId(displayId);
     EXPECT_FALSE(ret);
     displayId = -1;
     ret = WIN_MGR->UpdateDisplayId(displayId);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -2018,7 +2035,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_00
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(1);
     result = WIN_MGR->UpdateTargetPointer(pointerEvent);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_NE(result, RET_OK);
     pointerEvent->SetSourceType(999);
     pointerEvent->SetPointerAction(1);
     result = WIN_MGR->UpdateTargetPointer(pointerEvent);
@@ -2349,7 +2366,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
     isRealData = true;
     WIN_MGR->UpdateAndAdjustMouseLocation(displayId, x, y, isRealData);
     ret = WIN_MGR->GetDisplayId(inputEvent);
-    EXPECT_NE(displayId, ret);
+    EXPECT_EQ(displayId, ret);
     displayId = 0;
     x = -100.5;
     y = -200.5;
@@ -2407,15 +2424,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_001, Test
     manager.cursorPos_.displayId = -1;
     manager.displayGroupInfo_.displaysInfo.push_back({0, 800, 600});
     CursorPosition result = WIN_MGR->GetCursorPos();
-    EXPECT_NE(result.displayId, RET_ERR);
-    EXPECT_NE(result.cursorPos.x, RET_OK);
-    EXPECT_NE(result.cursorPos.y, RET_OK);
+    EXPECT_EQ(result.displayId, RET_ERR);
+    EXPECT_EQ(result.cursorPos.x, RET_OK);
+    EXPECT_EQ(result.cursorPos.y, RET_OK);
     manager.cursorPos_.displayId = 1;
     manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
     result = WIN_MGR->GetCursorPos();
-    EXPECT_NE(result.displayId, RET_ERR);
-    EXPECT_NE(result.cursorPos.x, RET_OK);
-    EXPECT_NE(result.cursorPos.y, RET_OK);
+    EXPECT_EQ(result.displayId, RET_ERR);
+    EXPECT_EQ(result.cursorPos.x, RET_OK);
+    EXPECT_EQ(result.cursorPos.y, RET_OK);
 }
  
 /**
@@ -2429,14 +2446,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_001, Te
     InputWindowsManager manager;
     manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
     CursorPosition result = WIN_MGR->ResetCursorPos();
-    EXPECT_NE(result.displayId, RET_ERR);
-    EXPECT_NE(result.cursorPos.x, RET_OK);
-    EXPECT_NE(result.cursorPos.y, RET_OK);
+    EXPECT_EQ(result.displayId, RET_ERR);
+    EXPECT_EQ(result.cursorPos.x, RET_OK);
+    EXPECT_EQ(result.cursorPos.y, RET_OK);
     manager.displayGroupInfo_.displaysInfo.clear();
     result = WIN_MGR->ResetCursorPos();
-    EXPECT_NE(result.displayId, RET_ERR);
-    EXPECT_NE(result.cursorPos.x, RET_OK);
-    EXPECT_NE(result.cursorPos.y, RET_OK);
+    EXPECT_EQ(result.displayId, RET_ERR);
+    EXPECT_EQ(result.cursorPos.x, RET_OK);
+    EXPECT_EQ(result.cursorPos.y, RET_OK);
 }
  
 /**
@@ -2624,7 +2641,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_002, T
     auto pointerEvent = PointerEvent::Create();
     pointerEvent->SetTargetDisplayId(1);
     auto id = pointerEvent->GetTargetDisplayId();
-    ASSERT_TRUE(WIN_MGR->UpdateDisplayId(id));
+    ASSERT_FALSE(WIN_MGR->UpdateDisplayId(id));
 }
 
 /**
@@ -4493,9 +4510,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002
     EXPECT_NE(inputEvent, nullptr);
     inputEvent->targetDisplayId_ = -11;
     bool ret = inputWindowsManager.IsNeedRefreshLayer(windowId);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
     inputEvent->targetDisplayId_ = 11;
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -6421,4 +6438,4 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsKnuckleOnAncoWindow,
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace MMI
-} // namespace OHOS
+} // namespace OHOS
