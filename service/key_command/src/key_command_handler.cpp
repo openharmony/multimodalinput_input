@@ -304,9 +304,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (!lastPointerDownTime_.empty()) {
-        int64_t lastPointerDownTime = touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ?
-            lastPointerDownTime_[SIMULATE_POINTER_ID] : lastPointerDownTime_[0];
-        int64_t diffTime = item.GetDownTime() - lastPointerDownTime;
+        int64_t diffTime = item.GetDownTime() - lastPointerDownTime_[0];
         if (diffTime > TWO_FINGERS_TIME_LIMIT) {
             MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}" PRId64, diffTime);
             return;
@@ -938,28 +936,6 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
     maxCount_ = tempCount;
 }
 
-bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent)
-{
-    if (item.keyCode != keyEvent->GetKeyCode()) {
-        return false;
-    }
-    if (item.keyCode != KeyEvent::KEYCODE_VOLUME_DOWN) {
-        return false;
-    }
-    std::string bundleName = item.ability.bundleName;
-    std::string matchName = ".camera";
-    if (bundleName.find(matchName) == std::string::npos) {
-        return false;
-    }
-    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    MMI_HILOGI("ScreenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
-    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
-        return false;
-    }
-    return true;
-}
-
 bool KeyCommandHandler::ParseJson(const std::string &configFile)
 {
     CALL_DEBUG_ENTER;
@@ -1349,10 +1325,6 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     bool waitRepeatKey = false;
 
     for (RepeatKey& item : repeatKeys_) {
-        if (CheckSpecialRepeatKey(item, keyEvent)) {
-            MMI_HILOGI("Skip repeatKey");
-            return false;
-        }
         if (HandleKeyUpCancel(item, keyEvent)) {
             return false;
         }
@@ -1381,17 +1353,15 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         return false;
     }
     if (count_ == item.times) {
-        if (!item.statusConfig.empty()) {
-            bool statusValue = true;
-            auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-                .GetBoolValue(item.statusConfig, statusValue);
-            if (ret != RET_OK) {
-                MMI_HILOGE("Get value from setting date fail");
-                return false;
-            }
-            if (!statusValue) {
-                return false;
-            }
+        bool statusValue = true;
+        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .GetBoolValue(item.statusConfig, statusValue);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get value from setting date fail");
+            return false;
+        }
+        if (!statusValue) {
+            return false;
         }
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
         LaunchAbility(item.ability);

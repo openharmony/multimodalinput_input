@@ -19,7 +19,6 @@ config("inputconsumer_config") {
   include_dirs = [
     "${mmi_path}/util/common/include",
     "${mmi_path}/frameworks/napi/input_consumer/include",
-    "${mmi_path}/frameworks/napi/input_device/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/napi/include",

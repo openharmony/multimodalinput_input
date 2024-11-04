@@ -560,4 +560,4 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
     EXPECT_EQ(OH_Input_UnregisterDeviceListener(&listener), INPUT_PARAMETER_ERROR);
 }
 } // namespace MMI
-} // namespace OHOS
+} // namespace OHOSs
