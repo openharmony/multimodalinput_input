@@ -188,13 +188,7 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
     if (filters_.empty()) {
         return false;
     }
-    PointerEvent::PointerItem pointerItem;
-    int32_t pointerId = event->GetPointerId();
-    if (!event->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
-        return false;
-    }
-    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(pointerItem.GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(event->GetDeviceId());
     CHKPF(inputDevice);
     for (auto &i: filters_) {
         if (!inputDevice->HasCapability(i.deviceTags)) {
