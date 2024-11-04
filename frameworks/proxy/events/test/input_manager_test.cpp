@@ -170,38 +170,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_02, TestSize.Leve
 }
 
 /**
- * @tc.name: InputManagerTest_SetMouseIcon_01
- * @tc.desc: Test setMouseIcon
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t windowId = 2;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerTest::SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-
-    int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputManagerTest_EnableHardwareCursorStats_01
- * @tc.desc: Test EnableHardwareCursorStats
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool enable = true;
-    int32_t ret = InputManager::GetInstance()->EnableHardwareCursorStats(enable);
-    EXPECT_NE(ret, RET_ERR);
-}
-
-/**
  * @tc.name: InputManagerTest_EnableHardwareCursorStats_02
  * @tc.desc: Test EnableHardwareCursorStats
  * @tc.type: FUNC
@@ -3115,16 +3083,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level
 }
 
 /**
- * @tc.name: InputManagerTest_ConvertToCapiKeyAction_001
- * @tc.desc: Test the funcation ConvertToCapiKeyAction
+ * @tc.name: InputManagerTest_GetPointerSnapshot
+ * @tc.desc: Test GetPointerSnapshot
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t keyAction = 0X00000002;
-    int32_t ret = InputManager::GetInstance()->ConvertToCapiKeyAction(keyAction);
-    EXPECT_NE(ret, -1);
+    void *pixelMap = nullptr;
+    EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

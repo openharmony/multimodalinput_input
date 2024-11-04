@@ -80,6 +80,16 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHECK_SCOPE_BEFORE_BREAK(env, state, desc, scope, pointerEvent) \
+    do { \
+        if ((state) != napi_ok) { \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            (pointerEvent)->MarkProcessed(); \
+            napi_close_handle_scope(env, scope); \
+            break; \
+        } \
+    } while (0)
+
 #define CHKNRV_SCOPE(env, cond, desc, scope) \
     do { \
         if ((cond) == nullptr) { \
