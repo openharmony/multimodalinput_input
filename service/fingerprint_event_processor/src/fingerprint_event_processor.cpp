@@ -142,12 +142,12 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
     if (screenMissTouchFlag_ == false) {
         if (screen == true) {
             screenMissTouchFlag_ = true;
-            // 上报cancel的逻辑是手指按下屏幕
+            // �ϱ�cancel���߼�����ָ������Ļ
             SendFingerprintCancelEvent();
             return;
         }
     } else {
-        // 手指没有在屏幕，且目前为止收到cancel事件
+        // ��ָû������Ļ����ĿǰΪֹ�յ�cancel�¼�
         if (screen == false && cancel == true) {
             screenMissTouchFlag_ = false;
             return;
@@ -433,6 +433,7 @@ void FingerprintEventProcessor::ProcessClickEvent()
 
 void FingerprintEventProcessor::ReportResSched(uint32_t resType, int64_t value)
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     std::unordered_map<std::string, std::string> payload { {"msg", ""} };
     ResourceSchedule::ResSchedClient::GetInstance().ReportData(resType, value, payload);
 }

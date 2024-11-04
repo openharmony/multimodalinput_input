@@ -25,10 +25,7 @@ ohos_source_set("libinput_interface_sources") {
     debug = false
   }
 
-  include_dirs = [
-    "include",
-    "$root_out_dir/diff_libinput_mmi/export_include",
-  ]
+  include_dirs = [ "include" ]
 
   sources = [ "src/libinput_interface.cpp" ]
 

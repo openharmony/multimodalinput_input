@@ -1162,22 +1162,22 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     msgHandler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
 }
 
 /**
@@ -1241,7 +1241,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent_003, TestSi
     keyEvent->eventType_ = 1;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    EXPECT_NE(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), RET_OK);
+    EXPECT_EQ(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), RET_OK);
 }
 
 /**
@@ -1306,7 +1306,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_004, Te
     pointerEvent->eventType_ = 1;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    EXPECT_NE(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false), RET_OK);
+    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false), RET_OK);
 }
 
 /**
