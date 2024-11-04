@@ -2332,39 +2332,13 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
-    int32_t displayX = item.GetDisplayX();
-    int32_t displayY = item.GetDisplayY();
-    int32_t displayId = touchEvent->GetTargetDisplayId();
-    auto windows = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
-    int32_t tragetWindowId = touchEvent->GetTargetWindowId();
-    for (auto window : windows) {
-        if (window.windowType != WINDOW_INPUT_METHOD_TYPE) {
-            continue;
-        }
-        if (window.id != tragetWindowId) {
+    int32_t targetWindowId = item.GetTargetWindowId();
+    int32_t targetDisplayId = touchEvent->GetTargetDisplayId();
+    auto window = WIN_MGR->GetWindowAndDisplayInfo(targetWindowId, targetDisplayId);
+    if (!window || window->windowType != WINDOW_INPUT_METHOD_TYPE) {
             return false;
-        }
-        int32_t rightDownX;
-        int32_t rightDownY;
-        if (!AddInt32(window.area.x, window.area.width, rightDownX)) {
-            MMI_HILOGE("The addition of displayMaxX overflows");
-            return false;
-        }
-        if (!AddInt32(window.area.y, window.area.height, rightDownY)) {
-            MMI_HILOGE("The addition of displayMaxX overflows");
-            return false;
-        }
-        if (displayX >= window.area.x && displayX <= rightDownX &&
-            displayY >= window.area.y && displayY <= rightDownY) {
-            if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
-                touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-                MMI_HILOGI("In input method area, windowId:%{public}d, windowType:%{public}d",
-                    window.id, window.windowType);
-                return true;
-            }
-        }
     }
-    return false;
+    return true;
 }
 
 void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
