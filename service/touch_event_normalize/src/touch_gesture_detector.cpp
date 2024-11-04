@@ -134,6 +134,9 @@ void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         HandlePinchMoveEvent(event);
     }
+    if (isRecognized_) {
+        lastTouchEvent_ = std::make_shared<PointerEvent>(*event);
+    }
 }
 
 void TouchGestureDetector::HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> event)
@@ -398,7 +401,7 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
     if (downPoint_.size() < THREE_FINGER_COUNT) {
         return state;
     }
-    int32_t recognizedCount = 0;
+    uint32_t recognizedCount = 0;
     std::unordered_set<TouchGestureDetector::SlideState> directions;
     for (const auto &dPoint : downPoint_) {
         int32_t pointerId = dPoint.first;

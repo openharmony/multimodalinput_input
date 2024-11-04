@@ -274,9 +274,9 @@ HWTEST_F(TouchPadTransformProcessorTest, SetMULTI_FINGERTAP_HDRDefault_001, Test
     CALL_TEST_DEBUG;
     MultiFingersTapHandler processor;
     bool isAlldefault = true;
-    ASSERT_NO_FATAL_FAILURE(processor.SetMULTI_FINGERTAP_HDRDefault(isAlldefault));
+    ASSERT_NO_FATAL_FAILURE(processor.SetMultiFingersTapHdrDefault(isAlldefault));
     isAlldefault = false;
-    ASSERT_NO_FATAL_FAILURE(processor.SetMULTI_FINGERTAP_HDRDefault(isAlldefault));
+    ASSERT_NO_FATAL_FAILURE(processor.SetMultiFingersTapHdrDefault(isAlldefault));
 }
 
 /**
@@ -583,7 +583,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_TRUE(processor.pointerEvent_ != nullptr);
-    MULTI_FINGERTAP_HDR->multiFingersState_ = MulFingersTap::TRIPLETAP;
+    MULTI_FINGERTAP_HDR->multiFingersState_ = MulFingersTap::TRIPLE_TAP;
     int32_t ret = processor.OnEventTouchPadUp(event);
     ASSERT_EQ(ret, RET_ERR);
 }
@@ -1059,7 +1059,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
     auto touchpad = libinput_event_get_touchpad_event(event);
     ASSERT_TRUE(touchpad != nullptr);
     MultiFingersTapHandler processor;
-    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::NOMULTAP;
+    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::NO_MULTAP;
     int32_t type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
     auto ret = processor.HandleMulFingersTap(touchpad, type);
     ASSERT_EQ(ret, RET_OK);
@@ -1167,35 +1167,25 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
 }
 
 /**
- * @tc.name: TouchPadTransformProcessorTest_SetTouchpadScrollRows_001
- * @tc.desc: Test SetTouchpadScrollRows
+ * @tc.name: TouchPadTransformProcessorTest_CanUnsetPointerItem_001
+ * @tc.desc: test CanUnsetPointerItem
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchpadScrollRows_001, TestSize.Level1)
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_CanUnsetPointerItem_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t deviceId = 1;
-    TouchPadTransformProcessor processor(deviceId);
-    int32_t rows = 1;
-    ASSERT_TRUE(processor.SetTouchpadScrollRows(rows) == RET_OK);
-}
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 530);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 440);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    ASSERT_TRUE(touchpad != nullptr);
+    MultiFingersTapHandler processor;
 
-/**
- * @tc.name: TouchPadTransformProcessorTest_GetTouchpadScrollRows_002
- * @tc.desc: Test GetTouchpadScrollRows
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouchpadScrollRows_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 1;
-    TouchPadTransformProcessor processor(deviceId);
-    int32_t rows = 1;
-    processor.SetTouchpadScrollRows(rows);
-    int32_t newRows = processor.GetTouchpadScrollRows();
-    ASSERT_TRUE(rows == newRows);
+    bool ret = processor.CanUnsetPointerItem(touchpad);
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -1236,5 +1226,36 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetPinch
     ASSERT_EQ(action, PointerEvent::POINTER_ACTION_AXIS_END);
 }
 
+/**
+ * @tc.name: TouchPadTransformProcessorTest_SetTouchpadScrollRows_001
+ * @tc.desc: Test SetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    TouchPadTransformProcessor processor(deviceId);
+    int32_t rows = 1;
+    ASSERT_TRUE(processor.SetTouchpadScrollRows(rows) == RET_OK);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_GetTouchpadScrollRows_002
+ * @tc.desc: Test GetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouchpadScrollRows_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    TouchPadTransformProcessor processor(deviceId);
+    int32_t rows = 1;
+    processor.SetTouchpadScrollRows(rows);
+    int32_t newRows = processor.GetTouchpadScrollRows();
+    ASSERT_TRUE(rows == newRows);
+}
 } // namespace MMI
 } // namespace OHOS
