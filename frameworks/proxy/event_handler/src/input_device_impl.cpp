@@ -112,13 +112,13 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
         return;
     }
     for (const auto &item : iter->second) {
-        BytraceAdapter::StartDevListener(type, deviceId);
-        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d", type.c_str(), deviceId);
         if (type == "add") {
             item->OnDeviceAdded(deviceId, type);
             continue;
         }
         item->OnDeviceRemoved(deviceId, type);
+        BytraceAdapter::StartDevListener(type, deviceId);
+        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d", type.c_str(), deviceId);
         BytraceAdapter::StopDevListener();
     }
 }

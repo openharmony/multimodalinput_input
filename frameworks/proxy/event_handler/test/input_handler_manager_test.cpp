@@ -361,11 +361,11 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource
     uint32_t deviceTags = 2;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_CROWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     bool result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
     ASSERT_FALSE(result);
     deviceTags = 10;
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_CROWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
     ASSERT_FALSE(result);
 }

@@ -144,8 +144,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     MMI_HILOG_DISPATCHD("Key event dispatcher of client, Fd:%{public}d", fd);
-    MMI_HILOG_DISPATCHI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
-    EventLogHelper::PrintEventData(key, MMI_LOG_HEADER);
+    MMI_HILOG_DISPATCHI("Received");
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -185,14 +184,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    MMI_HILOG_FREEZEI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
         std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
         aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
             std::to_string(pointerEvent->GetId()));
     }
-    EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction() ||
         PointerEvent::POINTER_ACTION_HOVER_CANCEL == pointerEvent->GetPointerAction() ||
         PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL == pointerEvent->GetPointerAction()) {
@@ -239,12 +236,10 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
                 subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                 keyEvent->GetEventType(), keyEvent->GetFlag());
         } else {
-            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
-                "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
-                "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
-            subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
-            keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-            keyEvent->GetEventType(), keyEvent->GetFlag());
+            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
+                "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
+                subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+                keyEvent->GetEventType(), keyEvent->GetFlag());
         }
     } else {
         MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
@@ -279,7 +274,7 @@ int32_t ClientMsgHandler::OnSubscribeSwitchEventCallback(const UDSClient &client
     }
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.OnSubscribeSwitchEventCallback(switchEvent, subscribeId);
 }
-#endif // OHOS_BUILD_ENABLE_SWITCH
+#endif
 
 int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 {
