@@ -149,7 +149,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
     if (subscribeId < 0) {
-        MMI_HILOGE("Subscribe id is less than 0");
+        MMI_HILOGE("The subscribe id is less than 0");
         return RET_ERR;
     }
 
@@ -159,7 +159,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         return INVALID_SUBSCRIBE_ID;
     }
     if (subscribeInfos_.empty()) {
-        MMI_HILOGE("Subscribe Infos is empty");
+        MMI_HILOGE("The subscribe Infos is empty");
         return RET_ERR;
     }
 
