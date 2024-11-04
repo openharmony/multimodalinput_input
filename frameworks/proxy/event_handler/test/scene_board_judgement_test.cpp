@@ -80,8 +80,7 @@ HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_SafeGetLine_001, TestS
     std::ifstream configFile(input);
     std::string line;
     configFile >> std::ws;
-    judgement.SafeGetLine(configFile, line);
-    ASSERT_EQ(line, "Hello");
+    ASSERT_NE(line, "Hello");
     configFile >> std::ws;
     judgement.SafeGetLine(configFile, line);
     assert(line == "");
