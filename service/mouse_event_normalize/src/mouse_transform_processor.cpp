@@ -18,6 +18,7 @@
 #include <cinttypes>
 #include <chrono>
 #include <functional>
+
 #include <linux/input-event-codes.h>
 
 #include "define_multimodal.h"
@@ -35,6 +36,7 @@
 #include "preferences_helper.h"
 #include "scene_board_judgement.h"
 #include "timer_manager.h"
+#include "touchpad_transform_processor.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -62,19 +64,15 @@ constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
 constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };
 constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH { 3120 };
 constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
-constexpr int32_t WEBER_DEVICE_WIDTH { 2880 };
-constexpr int32_t WEBER_DEVICE_HEIGHT { 1920 };
-const std::string DEVICE_TYPE_WEBER { "WEB" };
-const std::string DEVICE_TYPE_PCE { "PCEL" };
 const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
+const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr char ROTATE_WINDOW_ROTATE { '0' };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
-constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
+constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 15 };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -210,7 +208,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         RightClickType switchType = RightClickType(switchTypeData);
         if (type == LIBINPUT_EVENT_POINTER_TAP && switchType == RightClickType::TP_TWO_FINGER_TAP &&
             button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
-            MMI_HILOGI("Right click up, do sleep");
+            MMI_HILOGD("Right click up, do sleep");
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_BUTTON_UP));
         }
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
@@ -293,12 +291,8 @@ int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
     }
     std::string name = "rows";
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, rows);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set mouse scroll rows failed, code:%{public}d", ret);
-        return ret;
-    }
     MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
-    return RET_OK;
+    return ret;
 }
 
 int32_t MouseTransformProcessor::GetMouseScrollRows()
@@ -366,8 +360,6 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
                 CHKPV(pointerEvent);
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
                 pointerEvent->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
-                pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 0);
-                pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 0);
                 pointerEvent->UpdateId();
                 LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
                 auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
@@ -515,6 +507,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
 
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetActionStartTime(time);
@@ -524,7 +517,6 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
     if (data == nullptr) {
-        pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
         return false;
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
@@ -533,7 +525,6 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     } else {
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     }
-    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     return true;
 }
 
@@ -610,10 +601,8 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->ClearAxisValue();
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
-    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     if (!HandlePostInner(data, pointerItem)) {
         WIN_MGR->UpdateTargetPointer(pointerEvent_);
-        DumpInner();
         return ERROR_NULL_POINTER;
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
@@ -715,15 +704,10 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
             ret = DeviceType::DEVICE_HARD_HARDEN;
         } else if (width == SOFT_HARDEN_DEVICE_WIDTH && height == SOFT_HARDEN_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_SOFT_HARDEN;
-        } else if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("Undefined width:%{private}d, height:%{private}d", width, height);
+        } else {
+            MMI_HILOGE("Undefined width:%{public}d, height:%{public}d", width, height);
         }
-        MMI_HILOGD("Device width:%{private}d, height:%{private}d", width, height);
-    }
-    if (PRODUCT_TYPE == DEVICE_TYPE_WEBER || PRODUCT_TYPE == DEVICE_TYPE_PCE) {
-        if (width == WEBER_DEVICE_WIDTH && height == WEBER_DEVICE_HEIGHT) {
-            ret = DeviceType::DEVICE_WEBER;
-        }
+        MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
     }
     return ret;
 }
@@ -748,11 +732,7 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     std::string name = "primaryButton";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, primaryButton);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set mouse primary button failed, code:%{public}d", ret);
-        return ret;
-    }
+    PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, primaryButton);
     return RET_OK;
 }
 
@@ -776,12 +756,8 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
     globalPointerSpeed_ = speed;
     std::string name = "speed";
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, speed);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set pointer speed failed, code:%{public}d", ret);
-        return ret;
-    }
     MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
-    return RET_OK;
+    return ret;
 }
 
 int32_t MouseTransformProcessor::GetPointerSpeed()

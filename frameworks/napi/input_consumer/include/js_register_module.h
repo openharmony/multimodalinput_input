@@ -24,7 +24,6 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "refbase.h"
 #include "utils/log.h"
 
 #include "define_multimodal.h"
@@ -51,7 +50,7 @@ public:
     static void ThrowError(napi_env env, int32_t code);
 };
 
-struct KeyEventMonitorInfo : RefBase {
+struct KeyEventMonitorInfo {
     napi_env env{ nullptr };
     napi_async_work asyncWork{ nullptr };
     std::string eventType;
@@ -61,7 +60,7 @@ struct KeyEventMonitorInfo : RefBase {
     std::shared_ptr<KeyOption> keyOption{ nullptr };
     ~KeyEventMonitorInfo();
 };
-typedef std::map<std::string, std::list<sptr<KeyEventMonitorInfo>>> Callbacks;
+typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_REGISTER_MODULE_H

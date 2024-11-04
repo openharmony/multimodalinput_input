@@ -653,7 +653,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_03, T
     int32_t windowId = 2;
     PointerStyle style;
     int32_t ret1 = pointerDrawingManager.SetPointerStyle(pid, windowId, style);
-    EXPECT_EQ(ret1, RET_ERR);
+    EXPECT_EQ(ret1, RET_OK);
 
     void* pixelMap = nullptr;
     int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, pixelMap);

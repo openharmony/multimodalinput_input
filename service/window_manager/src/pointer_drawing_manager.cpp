@@ -1039,7 +1039,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
 
 void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle)
 {
-    MMI_HILOGI("Draw mouse icon of style(%{public}d)", static_cast<int32_t>(mouseStyle));
+    CALL_DEBUG_ENTER;
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
@@ -1063,7 +1063,7 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
         CHKPV(pixelmap);
         image = ExtractDrawingImage(pixelmap);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        if ((mouseStyle == MOUSE_ICON::DEFAULT) || (mouseStyle == MOUSE_ICON::CURSOR_CIRCLE)) {
+        if (mouseStyle == MOUSE_ICON::DEFAULT) {
             SetPixelMap(pixelmap);
         }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1080,15 +1080,15 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 void PointerDrawingManager::SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
-    MMI_HILOGI("Set pointer snapshot");
     pixelMap_ = pixelMap;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
-    MMI_HILOGI("Get pointer snapshot");
     *newPixelMapPtr = pixelMap_;
     if (HasMagicCursor()) {
         MMI_HILOGE("magic pixelmap");
@@ -1609,12 +1609,6 @@ bool PointerDrawingManager::IsPointerVisible()
                 return item.visible;
             }
         }
-        if (!(INPUT_DEV_MGR->HasPointerDevice() || WIN_MGR->IsMouseSimulate()) || pid_ == 0) {
-            auto info = hapPidInfos_.back();
-            MMI_HILOGI("Only hap visible pid:%{public}d-visible:%{public}s",
-                info.pid, info.visible ? "true" : "false");
-            return info.visible;
-        }
     }
     if (pidInfos_.empty()) {
         MMI_HILOGD("Visible property is true");
@@ -1657,27 +1651,12 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 
 bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 {
-    bool ret = true;
-    int32_t count = 0;
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
-            count++;
-            ret = it->visible;
-            break;
+            return it->visible;
         }
     }
-    if (count == 0 && !hapPidInfos_.empty()) {
-        for (auto& item : hapPidInfos_) {
-            if (item.pid == pid_) {
-                MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
-                    item.pid, item.visible ? "true" : "false");
-                count++;
-                ret = item.visible;
-                break;
-            }
-        }
-    }
-    return ret;
+    return true;
 }
 
 void PointerDrawingManager::OnSessionLost(int32_t pid)
