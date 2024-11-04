@@ -107,33 +107,10 @@ int32_t MockInputAdapter::RemoveVirtualInputDevice(int32_t deviceId)
     return RET_OK;
 }
 
-MockPluginManager::MockPluginManager(IContext *context)
-{
-    pluginMgr_ = std::make_unique<PluginManager>(context);
-}
-
-ICooperate* MockPluginManager::LoadCooperate()
-{
-    return pluginMgr_->LoadCooperate();
-}
-
-void MockPluginManager::UnloadCooperate()
-{
-    pluginMgr_->UnloadCooperate();
-}
-
-IMotionDrag* MockPluginManager::LoadMotionDrag()
-{
-    return nullptr;
-}
-
-void MockPluginManager::UnloadMotionDrag()
-{}
-
 TestContext::TestContext()
 {
     input_ = std::make_unique<MockInputAdapter>();
-    pluginMgr_ = std::make_unique<MockPluginManager>(this);
+    pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
 }
 

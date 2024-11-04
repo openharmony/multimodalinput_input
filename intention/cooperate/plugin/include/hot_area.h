@@ -18,7 +18,7 @@
 
 #include <set>
 
-#include "nocopyable.h"s
+#include "nocopyable.h"
 #include "pointer_event.h"
 
 #include "cooperate_events.h"

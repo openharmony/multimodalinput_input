@@ -52,7 +52,6 @@ public:
     void OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &notice);
     void OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notice);
     void OnClientDied(const ClientDiedEvent &event);
-    void OnSoftbusSessionClosed(const DSoftbusSessionClosed &notice);
 
 private:
     int32_t SubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &event);
