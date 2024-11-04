@@ -171,9 +171,6 @@ StateMachine::StateMachine(IContext *env)
         [this](Context &context, const CooperateEvent &event) {
             this->OnRemoteInputDevice(context, event);
     });
-    AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
-        this->StopCooperate(context, event);
-    });
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -292,13 +289,6 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
         return;
     }
     startEvent.errCode->set_value(RET_OK);
-    Transfer(context, event);
-}
-
-void StateMachine::StopCooperate(Context &context, const CooperateEvent &event)
-{
-    CALL_INFO_TRACE;
-    context.CloseDistributedFileConnection(context.Peer());
     Transfer(context, event);
 }
 
