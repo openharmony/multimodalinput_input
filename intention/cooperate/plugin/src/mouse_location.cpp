@@ -15,7 +15,7 @@
 
 #include "mouse_location.h"
 
-#include "devicestatus_define.h"s
+#include "devicestatus_define.h"
 #include "dsoftbus_handler.h"
 #include "utility.h"
 
@@ -44,10 +44,7 @@ void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
         .networkId = localNetworkId_,
         .remoteNetworkId = event.networkId,
     };
-    if (SubscribeMouseLocation(softbusEvent) != RET_OK) {
-        FI_HILOGE("SubscribeMouseLocation failed, networkId:%{public}s", Utility::Anonymize(event.networkId).c_str());
-        return;
-    }
+    SubscribeMouseLocation(softbusEvent);
     listeners_[event.networkId].insert(event.pid);
 }
 
@@ -65,10 +62,8 @@ void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
         .networkId = localNetworkId_,
         .remoteNetworkId = event.networkId,
     };
-    if (UnSubscribeMouseLocation(softbusEvent) != RET_OK) {
-        FI_HILOGE("UnSubscribeMouseLocation failed, networkId:%{public}s", Utility::Anonymize(event.networkId).c_str());
-    }
-    if (listeners_.find(event.networkId) == listeners_.end()) {
+    UnSubscribeMouseLocation(softbusEvent);
+    if (listeners_.find(event.networkId) != listeners_.end()) {
         FI_HILOGE("No listener for networkId:%{public}s", Utility::Anonymize(event.networkId).c_str());
         return;
     }
@@ -97,21 +92,6 @@ void MouseLocation::OnClientDied(const ClientDiedEvent &event)
         } else {
             ++it;
         }
-    }
-}
-
-void MouseLocation::OnSoftbusSessionClosed(const DSoftbusSessionClosed &notice)
-{
-    CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    FI_HILOGI("Session to %{public}s closed", Utility::Anonymize(notice.networkId).c_str());
-    if (remoteSubscribers_.find(notice.networkId) != remoteSubscribers_.end()) {
-        remoteSubscribers_.erase(notice.networkId);
-        FI_HILOGI("Remove remote subscribers from %{public}s", Utility::Anonymize(notice.networkId).c_str());
-    }
-    if (listeners_.find(notice.networkId) != listeners_.end()) {
-        listeners_.erase(notice.networkId);
-        FI_HILOGI("Remove listeners listen to %{public}s", Utility::Anonymize(notice.networkId).c_str());
     }
 }
 
@@ -376,8 +356,8 @@ int32_t MouseLocation::SendPacket(const std::string &remoteNetworkId, NetPacket 
 {
     CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
-    if (!context_->GetDSoftbus().HasSessionExisted(remoteNetworkId)) {
-        FI_HILOGE("No session connected to %{public}s", Utility::Anonymize(remoteNetworkId).c_str());
+    if (context_->GetDSoftbus().OpenSession(remoteNetworkId) != RET_OK) {
+        FI_HILOGE("Failed to connect to %{public}s", Utility::Anonymize(remoteNetworkId).c_str());
         return RET_ERR;
     }
     if (context_->GetDSoftbus().SendPacket(remoteNetworkId, packet) != RET_OK) {
