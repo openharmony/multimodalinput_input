@@ -234,7 +234,7 @@ void InputEvent::ClearFlag()
 
 void InputEvent::ClearFlag(uint32_t flag)
 {
-    bitwise_ &= (~flag);
+    bitwise_ &= ~flag;
 }
 
 bool InputEvent::IsMarkEnabled() const
@@ -336,12 +336,8 @@ bool InputEvent::ReadFromParcel(Parcel &in)
         return false;
     }
     const uint8_t *buffer = in.ReadBuffer(extraDataLength_);
-    if (buffer == nullptr) {
-        extraDataLength_ = 0;
-        return false;
-    }
     std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_], [](uint8_t* ptr) { delete[] ptr; });
-    if (sp == nullptr) {
+    if ((buffer == nullptr) || (sp == nullptr)) {
         extraDataLength_ = 0;
         return false;
     }
@@ -364,7 +360,7 @@ std::string_view InputEvent::ActionToShortStr(int32_t action)
 }
 
 struct LogTraceKey {
-    int64_t Id;
+    int64_t traceId;
     int32_t action;
     int32_t evtType;
 };
@@ -399,14 +395,14 @@ void RefreshTraceStr()
 {
     g_traceStr.clear();
     for (auto item = g_traceIds.begin(); item < g_traceIds.end(); ++item) {
-        if (item->Id == -1) {
+        if (item->traceId == -1) {
             continue;
         }
         if (item != g_traceIds.begin()) {
             g_traceStr += "/";
         }
         g_traceStr += Action2Str(item->evtType, item->action);
-        g_traceStr += std::to_string(item->Id);
+        g_traceStr += std::to_string(item->traceId);
     }
 }
 
@@ -454,13 +450,13 @@ void EndLogTraceId(int64_t id)
 
     if (idCount == idx + 1) {
         g_traceIds.pop_back();
-        while (!g_traceIds.empty() && g_traceIds.back().Id == -1) {
+        while (!g_traceIds.empty() && g_traceIds.back().traceId == -1) {
             g_traceIds.pop_back();
         }
     } else {
         // can't erase it, erase it will make the index of other elem changed.
         LogTraceKey &toDelete = g_traceIds.at(idx);
-        toDelete.Id = -1;
+        toDelete.traceId = -1;
     }
     RefreshTraceStr();
 }
