@@ -261,16 +261,16 @@ bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
 
     bool tabletProximityState = libinput_event_tablet_tool_get_proximity_state(tabletEvent);
     if (tabletProximityState) {
-        MMI_HILOGI("The pen is getting close and report proximity in event");
+        MMI_HILOGD("The pen is getting close and report proximity in event");
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
     } else {
-        MMI_HILOGI("The pen is getting away and report proximity out event");
+        MMI_HILOGD("The pen is getting away and report proximity out event");
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PROXIMITY_OUT);
     }
 
     int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
-    PhysicalCoordinate tCoord;
-    if (!WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord)) {
+    PhysicalCoordinate coord;
+    if (!WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, coord)) {
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }
@@ -294,10 +294,10 @@ bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
     item.SetDownTime(time);
     item.SetPressed(false);
     item.SetToolType(toolType);
-    item.SetDisplayX(static_cast<int32_t>(tCoord.x));
-    item.SetDisplayY(static_cast<int32_t>(tCoord.y));
-    item.SetDisplayXPos(tCoord.x);
-    item.SetDisplayYPos(tCoord.y);
+    item.SetDisplayX(static_cast<int32_t>(coord.x));
+    item.SetDisplayY(static_cast<int32_t>(coord.y));
+    item.SetDisplayXPos(coord.x);
+    item.SetDisplayYPos(coord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);

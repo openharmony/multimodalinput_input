@@ -125,14 +125,14 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if ((type == LIBINPUT_EVENT_POINTER_TAP) &&
-        (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP)) {
-        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+        (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP)) {
+        MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault();
         return;
     }
     if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         auto iter = std::find(ALL_EVENT_TYPES.begin(), ALL_EVENT_TYPES.end(), static_cast<int32_t>(type));
         if (iter != ALL_EVENT_TYPES.end()) {
-            MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+            MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault();
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -477,7 +477,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(nextHandler_);
-    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
+    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
         if (!threeFingerSwitch) {
@@ -528,7 +528,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         g_isSwipeInward = false;
     }
     if (buttonIds_.empty()) {
-        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault(false);
+        MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault(false);
     }
     MMI_HILOGD("Button ids count:%{public}d, action:%{public}d",
         static_cast<int32_t>(buttonIds_.size()), pointerEvent->GetPointerAction());
