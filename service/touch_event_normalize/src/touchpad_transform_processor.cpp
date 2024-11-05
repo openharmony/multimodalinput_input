@@ -49,7 +49,7 @@ constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t DEFAULT_ROWS { 3 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
-std::string THREE_FINGER_TAP_KEY = "touchpadThreeFingerTap";
+std::string g_threeFingerTapKey  = "touchpadThreeFingerTap";
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
@@ -89,7 +89,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *e
     if (toolType == PointerEvent::TOOL_TYPE_PALM) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     }
-    MMI_HILOGD("The pointer action is %{public}d", pointerEvent_->GetPointerAction());
+
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
     item.SetPressure(pressure);
@@ -142,9 +142,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
     int32_t toolType = GetTouchPadToolType(touchpad, device);
     if (toolType == PointerEvent::TOOL_TYPE_PALM) {
         MMI_HILOGD("Tool type is palm");
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     }
-    MMI_HILOGD("The pointer action is %{public}d", pointerEvent_->GetPointerAction());
 
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -171,7 +169,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *eve
 
     uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     pointerEvent_->SetActionTime(time);
-    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
+    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         SetTouchPadMultiTapData();
     } else {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -237,7 +235,6 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     }
 
     if (ret != RET_OK) {
-        MMI_HILOGW("The event on touch pad execute fail");
         return nullptr;
     }
 
@@ -251,8 +248,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
         aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
-            std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
-            std::to_string(pointerEvent_->GetId()));
+            std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
     }
 
     return pointerEvent_;
@@ -287,7 +283,6 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(struct libinput_device *
 {
     for (const auto &item : vecToolType_) {
         if (libinput_device_touchpad_btn_tool_type_down(device, item.first) == BTN_DOWN) {
-            MMI_HILOGD("The btn tool type is %{public}d", item.second);
             return item.second;
         }
     }
@@ -449,7 +444,6 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent
     }
 
     if (pointerEvent_->GetFingerCount() == TP_SYSTEM_PINCH_FINGER_CNT) {
-        MMI_HILOGD("The finger count achieves two");
         WIN_MGR->UpdateTargetPointer(pointerEvent_);
     }
 
@@ -638,8 +632,7 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     CALL_DEBUG_ENTER;
     CHKPR(event, RET_ERR);
     // if is not multifigners tap, return.
-    if (tapTrends_ == TapTrends::NOMULTAP) {
-        MMI_HILOGD("The tapsTrends is MOMULTAP");
+    if (tapTrends_ == TapTrends::NO_MULTAP) {
         return RET_OK;
     }
     // calculator delta time, if is larger than threshold, return.
@@ -654,14 +647,14 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     if ((deltaTime > perTimeThreshold) || ((lastTime - beginTime) > totalTimeThreshold)) {
         MMI_HILOGD("Not multitap, single time interval or total time interval is out of range."
             "single:%{public}" PRId64 ", total:%{public}" PRId64, deltaTime, (lastTime - beginTime));
-        SetMULTI_FINGERTAP_HDRDefault();
+        SetMultiFingersTapHdrDefault();
         return RET_OK;
     }
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
         // if trends is up, is not multifigners tap, return.
         if ((tapTrends_ == TapTrends::UPING) || !CanAddToPointerMaps(event)) {
             MMI_HILOGD("The trends is up, is not a multifigners tap event");
-            SetMULTI_FINGERTAP_HDRDefault();
+            SetMultiFingersTapHdrDefault();
             return RET_OK;
         } else {
             downCnt++;
@@ -679,15 +672,14 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     return RET_OK;
 }
 
-void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
+void MultiFingersTapHandler::SetMultiFingersTapHdrDefault(bool isAllDefault)
 {
     downCnt = 0;
     upCnt = 0;
     tapTrends_ = TapTrends::BEGIN;
     beginTime = 0;
     lastTime = 0;
-    if (isAlldefault) {
-        MMI_HILOGD("Reset the multi finger state is NO_TAP");
+    if (isAllDefault) {
         multiFingersState_ = MulFingersTap::NO_TAP;
     }
     pointerMaps.clear();
@@ -695,6 +687,7 @@ void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
 
 bool MultiFingersTapHandler::ClearPointerItems(std::shared_ptr<PointerEvent> pointer)
 {
+    CHKPR(pointer, ERROR_NULL_POINTER);
     auto ids_ = pointer->GetPointerIds();
     for (const auto &id : ids_) {
         pointer->RemovePointerItem(id);
@@ -709,9 +702,9 @@ MulFingersTap MultiFingersTapHandler::GetMultiFingersState() const
 
 bool MultiFingersTapHandler::CanAddToPointerMaps(struct libinput_event_touch *event)
 {
+    CHKPR(event, RET_ERR);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(event);
     if (pointerMaps.find(seatSlot) != pointerMaps.end()) {
-        MMI_HILOGD("The pointerMaps can not find the seatSlot");
         return false;
     }
     auto currentX = libinput_event_touchpad_get_x(event);
@@ -722,9 +715,9 @@ bool MultiFingersTapHandler::CanAddToPointerMaps(struct libinput_event_touch *ev
 
 bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *event)
 {
+    CHKPR(event, RET_ERR);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(event);
     if (pointerMaps.find(seatSlot) != pointerMaps.end()) {
-        MMI_HILOGD("The pointerMaps can not find the seatSlot");
         return false;
     } else {
         pointerMaps[seatSlot] = {-1.0F, -1.0F};
@@ -734,7 +727,7 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
 
 int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
-    if (PutConfigDataToDatabase(THREE_FINGER_TAP_KEY, switchFlag) != RET_OK) {
+    if (PutConfigDataToDatabase(g_threeFingerTapKey, switchFlag) != RET_OK) {
         MMI_HILOGE("Failed to set touchpad three fingers switch flag to mem.");
         return RET_ERR;
     }
@@ -745,7 +738,7 @@ int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(bool switch
 
 int32_t TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
 {
-    GetConfigDataFromDatabase(THREE_FINGER_TAP_KEY, switchFlag);
+    GetConfigDataFromDatabase(g_threeFingerTapKey, switchFlag);
     return RET_OK;
 }
 } // namespace MMI
