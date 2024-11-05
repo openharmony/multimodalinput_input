@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 enum class MulFingersTap : int32_t {
     NO_TAP = 0,
-    TRIPLETAP = 3,
+    TRIPLE_TAP = 3,
     QUADTAP = 4,
     QUINTTAP = 5,
 };
@@ -44,12 +44,12 @@ public:
         BEGIN = 0,
         DOWNING = 1,
         UPING = 2,
-        NOMULTAP = 3,
+        NO_MULTAP = 3,
     };
 
     int32_t HandleMulFingersTap(struct libinput_event_touch *event, int32_t type);
     MulFingersTap GetMultiFingersState() const;
-    void SetMULTI_FINGERTAP_HDRDefault(bool isAllDefault = true);
+    void SetMultiFingersTapHdrDefault(bool isAllDefault = true);
     bool ClearPointerItems(std::shared_ptr<PointerEvent> pointer);
     bool CanAddToPointerMaps(struct libinput_event_touch *event);
     bool CanUnsetPointerItem(struct libinput_event_touch *event);
