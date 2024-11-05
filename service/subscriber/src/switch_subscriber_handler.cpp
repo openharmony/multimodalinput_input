@@ -86,7 +86,7 @@ int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t s
     }
     CHKPR(sess, ERROR_NULL_POINTER);
 
-    MMI_HILOGD("subscribeId:%{public}d, switchType:%{public}d", subscribeId, switchType);
+    MMI_HILOGD("subscribeId:%{public}d switchType:%{public}d", subscribeId, switchType);
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, switchType);
     InsertSubScriber(std::move(subscriber));
     InitSessionDeleteCallback();
@@ -110,8 +110,7 @@ int32_t SwitchSubscriberHandler::UnsubscribeSwitchEvent(SessionPtr sess, int32_t
 bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent> switchEvent)
 {
     CHKPF(switchEvent);
-    MMI_HILOGD("switchValue:%{public}d", switchEvent->GetSwitchValue());
-
+    MMI_HILOGI("switchValue:%{public}d", switchEvent->GetSwitchValue());
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
         DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
     }
@@ -121,6 +120,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
         if (subscriber->switchType_ == switchEvent->GetSwitchType() ||
             (subscriber->switchType_ == SwitchEvent::SwitchType::SWITCH_DEFAULT &&
                 switchEvent->GetSwitchType() != SwitchEvent::SwitchType::SWITCH_PRIVACY)) {
+            MMI_HILOGI("subscriber:%{public}d", subscriber->sess_->GetPid());
             NotifySubscriber(switchEvent, subscriber);
             handled = true;
         }
