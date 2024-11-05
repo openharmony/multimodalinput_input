@@ -1965,7 +1965,6 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
             }
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
             return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
-
         });
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
