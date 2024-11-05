@@ -2921,8 +2921,15 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-    double physicalX = pointerItem.GetDisplayX();
-    double physicalY = pointerItem.GetDisplayY();
+    double physicalX = 0;
+    double physicalY = 0;
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        physicalX = pointerItem.GetDisplayX();
+        physicalY = pointerItem.GetDisplayY();
+    } else {
+        physicalX = pointerItem.GetDisplayXPos();
+        physicalY = pointerItem.GetDisplayYPos();
+    }
     for (auto &item : windowsInfo) {
         if (IsValidNavigationWindow(item, physicalX, physicalY) &&
             !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION) && pointerEvent->GetZOrder() <= 0) {

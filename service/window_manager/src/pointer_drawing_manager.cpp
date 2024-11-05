@@ -2841,6 +2841,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
             lastDisplayId_, displayId);
         CHKPV(surfaceNode_);
         surfaceNode_->DetachToDisplay(screenId_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
         screenId_ = static_cast<uint64_t>(displayId);
         MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
         AttachToDisplay();
