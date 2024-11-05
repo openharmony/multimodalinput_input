@@ -786,6 +786,15 @@ bool KeyShortcutManager::IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyE
     return false;
 }
 
+bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
+{
+    auto it = std::find(specialKeyCodes.begin(), specialKeyCodes.end(), keyEvent->GetKeyCode());
+    if (it != specialKeyCodes.end() && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        return false;
+    }
+    return (shortcutConsumed_.find(keyEvent->GetKeyCode()) != shortcutConsumed_.cend());
+}
+
 int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
 {
     CALL_DEBUG_ENTER;
@@ -796,15 +805,6 @@ int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyO
         sysKeys.push_back(std::move(keyOptionPtr));
     }
     return RET_OK;
-}
-
-bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
-{
-    auto it = std::find(specialKeyCodes.begin(), specialKeyCodes.end(), keyEvent->GetKeyCode());
-    if (it != specialKeyCodes.end() && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        return false;
-    }
-    return (shortcutConsumed_.find(keyEvent->GetKeyCode()) != shortcutConsumed_.cend());
 }
 
 void KeyShortcutManager::UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
@@ -922,6 +922,10 @@ void KeyShortcutManager::ReadHotkeys(const std::string &cfgPath)
         return;
     }
     cJSON* jsonHotkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Hotkeys");
+    if (!jsonHotkeys) {
+        MMI_HILOGE("JsonHotkeys is nullptr");
+        return;
+    }
     if (!cJSON_IsArray(jsonHotkeys)) {
         MMI_HILOGE("JsonHotkeys is not array");
         return;
@@ -929,6 +933,10 @@ void KeyShortcutManager::ReadHotkeys(const std::string &cfgPath)
     int32_t nSysKeys = cJSON_GetArraySize(jsonHotkeys);
     for (int32_t index = 0; index < nSysKeys; ++index) {
         cJSON *jsonHotkey = cJSON_GetArrayItem(jsonHotkeys, index);
+        if (!jsonHotkey) {
+        MMI_HILOGE("JsonHotkey is nullptr");
+        return;
+        }
         if (ReadHotkey(jsonHotkey) != RET_OK) {
             MMI_HILOGE("Read hotkey failed");
             return;
@@ -943,13 +951,17 @@ int32_t KeyShortcutManager::ReadHotkey(cJSON *jsonHotkey)
         return RET_ERR;
     }
     cJSON *jsonPreKeys = cJSON_GetObjectItem(jsonHotkey, "preKeys");
+    if (!jsonPreKeys) {
+        MMI_HILOGE("JsonPreKeys is nullptr");
+        return RET_ERR;
+    }
     if (!cJSON_IsArray(jsonPreKeys)) {
         MMI_HILOGE("Expect array for PreKeys");
         return RET_ERR;
     }
     std::set<int32_t> preKeys;
     int32_t nPreKeys = cJSON_GetArraySize(jsonPreKeys);
-
+ 
     for (int32_t index = 0; index < nPreKeys; ++index) {
         cJSON *jsonPreKey = cJSON_GetArrayItem(jsonPreKeys, index);
         if (!cJSON_IsNumber(jsonPreKey)) {
@@ -959,6 +971,10 @@ int32_t KeyShortcutManager::ReadHotkey(cJSON *jsonHotkey)
         preKeys.insert(static_cast<int32_t>(cJSON_GetNumberValue(jsonPreKey)));
     }
     cJSON *jsonFinalKey = cJSON_GetObjectItem(jsonHotkey, "finalKey");
+    if (!jsonFinalKey) {
+        MMI_HILOGE("JsonFinalKey is nullptr");
+        return RET_ERR;
+    }
     if (!cJSON_IsNumber(jsonFinalKey)) {
         MMI_HILOGE("Expect number for FinalKey");
         return RET_ERR;
@@ -979,7 +995,7 @@ int32_t KeyShortcutManager::AddHotkey(const std::set<int32_t> &preKeys, int32_t 
             return RET_ERR;
         }
     }
-
+ 
     if (IsModifier(hotkey.finalKey)) {
         MMI_HILOGE("FinalKey is modifier");
         return RET_ERR;

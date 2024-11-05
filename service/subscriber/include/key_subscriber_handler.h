@@ -127,10 +127,10 @@ private:
     void ClearSubscriberTimer(std::list<std::shared_ptr<Subscriber>> subscribers);
     void GetForegroundPids(std::set<int32_t> &pidList);
     void PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent);
+    void RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent);
     void HangUpCallProcess();
     void RejectCallProcess();
-    void RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     SubscriberCollection subscriberMap_;
@@ -149,4 +149,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // KEY_SUBSCRIBER_HANDLER_H
+#endif  // KEY_SUBSCRIBER_HANDLER_H

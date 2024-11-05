@@ -21,9 +21,7 @@
 
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
-#ifdef CALL_MANAGER_SERVICE_ENABLED
 #include "call_manager_client.h"
-#endif // CALL_MANAGER_SERVICE_ENABLED
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
@@ -59,9 +57,7 @@ constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
-#ifdef CALL_MANAGER_SERVICE_ENABLED
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
-#endif // CALL_MANAGER_SERVICE_ENABLED
 const std::string CALL_BEHAVIOR_KEY { "incall_power_button_behavior" };
 const std::string SETTINGS_DATA_SYSTEM_URI {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true" };
@@ -84,7 +80,7 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
             keyEvent->SetFourceMonitorFlag(false);
         }
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
+            MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%d", keyEvent->GetKeyCode());
         } else {
             MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
         }
@@ -258,8 +254,6 @@ int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> optio
         .session = session,
         .callback = callback,
     };
-    // In registration of pure modifiers key-shortcuts, we need to adapt key-subscription to
-    // key-shortcut due to difference of implementation details.
     if (KeyShortcutManager::IsModifier(sysKey.finalKey) &&
         !sysKey.modifiers.empty() &&
         std::all_of(sysKey.modifiers.cbegin(), sysKey.modifiers.cend(),
@@ -471,7 +465,7 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT ||
         keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_LEFT) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
+            MMI_HILOGD("Subscriber mulit swipe keycode is:%d", keyEvent->GetKeyCode());
         } else {
             MMI_HILOGD("Subscriber mulit swipe keycode is:%{private}d", keyEvent->GetKeyCode());
         }
@@ -525,7 +519,6 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGD("There is no need to set mute");
         return false;
     }
-#ifdef CALL_MANAGER_SERVICE_ENABLED
     int32_t ret = -1;
     PublishKeyPressCommonEvent(keyEvent);
     if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING ||
@@ -558,10 +551,6 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
     return false;
-#else
-    MMI_HILOGD("call manager service is not enabled, skip");
-    return true;
-#endif // CALL_MANAGER_SERVICE_ENABLED
 }
 
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -592,8 +581,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
-            KeyEvent::ActionToString(keyAction));
+        MMI_HILOGD("keyCode:%d, keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     } else {
         MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}s",
             keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
@@ -606,7 +594,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     }
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Pressed KeyCode:%{private}d", keyCode);
+            MMI_HILOGD("Pressed KeyCode:%d", keyCode);
         } else {
             MMI_HILOGD("Pressed KeyCode:%{private}d", keyCode);
         }
@@ -673,16 +661,19 @@ bool KeySubscriberHandler::IsPreKeysMatch(const std::set<int32_t> &preKeys,
                                           const std::vector<int32_t> &pressedKeys) const
 {
     if (preKeys.size() == 0) {
+        MMI_HILOGD("The preKeys is empty");
         return true;
     }
 
     if (preKeys.size() != pressedKeys.size()) {
+        MMI_HILOGE("The size of preKeys is not match");
         return false;
     }
 
     for (const auto &pressedKey : pressedKeys) {
         auto it = std::find(preKeys.begin(), preKeys.end(), pressedKey);
         if (it == preKeys.end()) {
+            MMI_HILOGE("Cant't find the pressedKey");
             return false;
         }
     }
@@ -736,7 +727,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CHKPV(keyOption);
     MMI_HILOGD("Notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
-        NotifyKeyDownRightNow(keyEvent, subscribers, keyOption->IsRepeat(), handled);
+        NotifyKeyDownRightNow(keyEvent, subscribers,  keyOption->IsRepeat(), handled);
     } else {
         NotifyKeyDownDelay(keyEvent, subscribers, handled);
     }
@@ -829,7 +820,7 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
     } else {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{private}d, pid:%{public}d",
+            MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%d, pid:%{public}d",
                 subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
         } else {
             MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{private}d, pid:%{public}d",
@@ -1270,6 +1261,25 @@ void KeySubscriberHandler::DumpSubscriber(int32_t fd, std::shared_ptr<Subscriber
             session->GetProgramName().c_str());
 }
 
+void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_INFO_TRACE;
+    CHKPV(keyEvent);
+    auto keyCode = keyEvent->GetKeyCode();
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    RemoveKeyCode(keyCode, pressedKeys);
+    std::set<int32_t> pids;
+    GetForegroundPids(pids);
+    MMI_HILOGI("Foreground pid size:%{public}zu", pids.size());
+    for (auto &iter : subscriberMap_) {
+        auto keyOption = iter.first;
+        auto subscribers = iter.second;
+        PrintKeyOption(keyOption);
+        IsMatchForegroundPid(subscribers, pids);
+        ClearSubscriberTimer(subscribers);
+    }
+}
+
 bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1388,25 +1398,6 @@ void KeySubscriberHandler::InitDataShareListener()
             CreateObserver(CALL_BEHAVIOR_KEY, func);
         CHKPV(statusObserver);
         helper->RegisterObserver(uri, statusObserver);
-    }
-}
-
-void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent)
-{
-    CALL_INFO_TRACE;
-    CHKPV(keyEvent);
-    auto keyCode = keyEvent->GetKeyCode();
-    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-    RemoveKeyCode(keyCode, pressedKeys);
-    std::set<int32_t> pids;
-    GetForegroundPids(pids);
-    MMI_HILOGI("Foreground pid size:%{public}zu", pids.size());
-    for (auto &iter : subscriberMap_) {
-        auto keyOption = iter.first;
-        auto subscribers = iter.second;
-        PrintKeyOption(keyOption);
-        IsMatchForegroundPid(subscribers, pids);
-        ClearSubscriberTimer(subscribers);
     }
 }
 } // namespace MMI
