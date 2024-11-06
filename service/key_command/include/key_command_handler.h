@@ -400,6 +400,7 @@ private:
     int32_t tappingCount_ { 0 };
     std::mutex mutex_;
     std::map<int32_t, int64_t> lastPointerDownTime_;
+    int64_t walletLaunchDelayTimes_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
