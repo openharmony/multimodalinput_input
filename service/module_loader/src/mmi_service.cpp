@@ -708,9 +708,11 @@ int32_t SendKeyboardAction(KeyEvent::VKeyboardAction action)
 int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     int32_t pointerAction = pointerEvent->GetPointerAction();
-    if (pointerAction != MMI::PointerEvent::POINTER_ACTION_UP &&
+    int32_t sourceType = pointerEvent->GetSourceType();
+    if (sourceType != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
+        (pointerAction != MMI::PointerEvent::POINTER_ACTION_UP &&
         pointerAction != MMI::PointerEvent::POINTER_ACTION_DOWN &&
-        pointerAction != MMI::PointerEvent::POINTER_ACTION_MOVE) {
+        pointerAction != MMI::PointerEvent::POINTER_ACTION_MOVE)) {
         return 0;
     }
     // Set touch point
