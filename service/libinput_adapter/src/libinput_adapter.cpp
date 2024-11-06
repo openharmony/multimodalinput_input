@@ -121,10 +121,11 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         std::string str_path(path);
         std::smatch match;
         int32_t id;
-        if (std::regex_search(str_path, match, re)) {
-            id = std::stoi(match[0]);
-        } else {
+        bool isPath = std::regex_search(str_path, match, re);
+        if (!isPath) {
             id = -1;
+        } else {
+            id = std::stoi(match[0]);
         }
         MMI_HILOGWK("Libinput .open_restricted id:%{public}d, fd:%{public}d, errno:%{public}d",
             id, fd, errNo);
@@ -226,10 +227,11 @@ void LibinputAdapter::OnDeviceAdded(std::string path)
     std::string str_path(path);
     std::smatch match;
     int32_t id;
-    if (std::regex_search(str_path, match, re)) {
-        id = std::stoi(match[0]);
-    } else {
+    bool isPath = std::regex_search(str_path, match, re);
+    if (!isPath) {
         id = -1;
+    } else {
+        id = std::stoi(match[0]);
     }
     MMI_HILOGI("OnDeviceAdded id:%{public}d", id);
     auto pos = devices_.find(path);
@@ -251,10 +253,11 @@ void LibinputAdapter::OnDeviceRemoved(std::string path)
     std::string str_path(path);
     std::smatch match;
     int32_t id;
-    if (std::regex_search(str_path, match, re)) {
-        id = std::stoi(match[0]);
-    } else {
+    bool isPath = std::regex_search(str_path, match, re);
+    if (!isPath) {
         id = -1;
+    } else {
+        id = std::stoi(match[0]);
     }
     MMI_HILOGI("OnDeviceRemoved id:%{public}d", id);
     auto pos = devices_.find(path);
