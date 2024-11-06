@@ -16,6 +16,7 @@
 #include "anco_channel_proxy.h"
 
 #include "message_option.h"
+
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
