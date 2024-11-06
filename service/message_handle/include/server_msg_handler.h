@@ -64,8 +64,6 @@ public:
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
     int32_t OnRemoveGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
-    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, std::vector<int32_t> actionsType);
-    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, std::vector<int32_t> actionsType);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);
@@ -141,8 +139,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void CalculateOffset(Direction direction, Offset &offset);
 #endif // OHOS_BUILD_ENABLE_POINTER
-    bool CloseInjectNotice(int32_t pid);
     int32_t OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info);
+    bool CloseInjectNotice(int32_t pid);
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     UDSServer *udsServer_ { nullptr };

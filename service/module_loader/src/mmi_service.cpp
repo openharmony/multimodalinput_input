@@ -950,11 +950,6 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 }
                 break;
             }
-            case StateMachineMessageType::Idle: {
-                MMI_HILOGI("VKeyboard Statemachine enters idle state.");
-                SendKeyboardAction(KeyEvent::VKeyboardAction::IDLE);
-                break;
-            }
             case StateMachineMessageType::SwitchLayout: {
                 int gestureId = buttonMode;
                 auto gestureType = static_cast<VGestureMode>(gestureId);
@@ -2012,51 +2007,29 @@ int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, Han
     return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
 
-int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType)
-{
-    auto sess = GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnAddInputHandler(sess, handlerType, actionsType);
-}
-
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
     uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
     CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     bool isRegisterCaptureCb = false;
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     if (!PER_HELPER->VerifySystemApp() && handlerType == InputHandlerType::MONITOR) {
         isRegisterCaptureCb = true;
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
-    int32_t ret = RET_ERR;
-    if (actionsType.empty()) {
-        ret = delegateTasks_.PostSyncTask(
-            [this, pid, handlerType, eventType, priority, deviceTags, isRegisterCaptureCb] {
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, handlerType, eventType, priority, deviceTags, isRegisterCaptureCb] {
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
-                if (isRegisterCaptureCb) {
-                    RegisterScreenCaptureCallback();
-                }
-#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
-                return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
+            if (isRegisterCaptureCb) {
+                RegisterScreenCaptureCallback();
             }
-            );
-    } else {
-        ret = delegateTasks_.PostSyncTask(
-            [this, pid, handlerType, actionsType, isRegisterCaptureCb] {
-#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
-                if (isRegisterCaptureCb) {
-                    RegisterScreenCaptureCallback();
-                }
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
-                return this->CheckAddInput(pid, handlerType, actionsType);
-            }
-            );
-    }
+            return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
+        });
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return ret;
@@ -2077,13 +2050,6 @@ int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, 
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
-}
-
-int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType)
-{
-    auto sess = GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, actionsType);
 }
 
 int32_t MMIService::ObserverAddInputHandler(int32_t pid)
@@ -2113,20 +2079,11 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
-    int32_t ret = RET_ERR;
-    if (actionsType.empty()) {
-        ret = delegateTasks_.PostSyncTask(
-            [this, pid, handlerType, eventType, priority, deviceTags] {
-                return this->CheckRemoveInput(pid, handlerType, eventType, priority, deviceTags);
-            }
-            );
-    } else {
-        ret = delegateTasks_.PostSyncTask(
-            [this, pid, handlerType, actionsType] {
-                return this->CheckRemoveInput(pid, handlerType, actionsType);
-            }
-            );
-    }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, handlerType, eventType, priority, deviceTags] {
+            return this->CheckRemoveInput(pid, handlerType, eventType, priority, deviceTags);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
         return ret;

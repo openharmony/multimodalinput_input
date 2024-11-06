@@ -28,9 +28,9 @@
 namespace OHOS {
 namespace MMI {
 const std::string SHORTHAND_ABILITY_NAME { "HiNotePcMainAbility" };
-const std::string SHORTHAND_BUNDLE_NAME { "com.hmos.hinote" };
+const std::string SHORTHAND_BUNDLE_NAME { "com.huawei.hmos.hinote" };
 const std::string MEMORANDUM_ABILITY_NAME { "MainAbility" };
-const std::string MEMORANDUM_BUNDLE_NAME { "com.hmos.hinote.notepad" };
+const std::string MEMORANDUM_BUNDLE_NAME { "com.huawei.hmos.hinote.notepad" };
 const std::string IS_SCREEN_OFF { "is_sceen_off" };
 const std::string SHORTHAND_SWITCH { "shorthand_switch_state" };
 const std::string SHORTHAND_TARGET { "shorthand_target" };

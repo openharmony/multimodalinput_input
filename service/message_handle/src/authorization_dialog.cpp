@@ -60,7 +60,7 @@ bool AuthorizationDialog::ConnectSystemUi()
     CHKPF(abilityMgr);
 
     AAFwk::Want want;
-    want.SetElementName("com.ohos.systemui", "com.ohos.systemui.dialog");
+    want.SetElementName("com.ohos.sceneboard", "com.ohos.sceneboard.systemdialog");
     ErrCode result = abilityMgr->ConnectAbility(want, dialogConnectionCallback_, INVALID_USERID);
     if (result != ERR_OK) {
         MMI_HILOGW("ConnectAbility systemui dialog failed, result:%{public}d", result);
