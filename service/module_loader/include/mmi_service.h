@@ -227,8 +227,6 @@ protected:
         int32_t priority, uint32_t deviceTags);
     int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags);
-    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType);
-    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType);
     int32_t ObserverAddInputHandler(int32_t pid);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);

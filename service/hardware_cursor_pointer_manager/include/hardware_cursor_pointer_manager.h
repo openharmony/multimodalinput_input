@@ -17,6 +17,7 @@
 #define HARDWARE_CURSOR_POINTER_MANAGER_H
 
 #include <mutex>
+#include <parameters.h>
 
 #include "singleton.h"
 #include "v1_2/include/idisplay_composer_interface.h"

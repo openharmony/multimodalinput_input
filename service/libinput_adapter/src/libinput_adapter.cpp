@@ -53,11 +53,11 @@ void HiLogFunc(struct libinput* input, libinput_log_priority priority, const cha
         va_end(args);
         return;
     }
-    if (strstr(buffer, "LOG_LEVEL_I") != NULL) {
+    if (strstr(buffer, "LOG_LEVEL_I") != nullptr) {
         MMI_HILOGI("PrintLog_Info:%{public}s", buffer);
-    } else if (strstr(buffer, "LOG_LEVEL_D") != NULL) {
+    } else if (strstr(buffer, "LOG_LEVEL_D") != nullptr) {
         MMI_HILOGD("PrintLog_Info:%{public}s", buffer);
-    } else if (strstr(buffer, "LOG_LEVEL_E") != NULL) {
+    } else if (strstr(buffer, "LOG_LEVEL_E") != nullptr) {
         MMI_HILOGE("PrintLog_Info:%{public}s", buffer);
     } else {
         MMI_HILOGD("PrintLog_Info:%{public}s", buffer);
