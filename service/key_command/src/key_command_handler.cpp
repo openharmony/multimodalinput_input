@@ -78,6 +78,7 @@ const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
+const std::string WALLET_BUNDLE_NAME { "com.hmos.wallet" };
 constexpr int32_t DEFAULT_VALUE { -1 };
 const std::string HARDEN_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string HARDEN_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
@@ -966,6 +967,9 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
         if (item.delay > tempDelay) {
             tempDelay = item.delay;
         }
+        if (item.ability.bundleName == WALLET_BUNDLE_NAME) {
+            walletLaunchDelayTimes_ = item.delay;
+        }
     }
     maxCount_ = tempCount;
     intervalTime_ = tempDelay;
@@ -1576,7 +1580,14 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
         upActionTime_ = keyEvent->GetActionTime();
         repeatKey_.keyCode = item.keyCode;
         repeatKey_.keyAction = keyEvent->GetKeyAction();
-        repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
+        int64_t intervalTime = intervalTime_;
+        if (item.keyCode == KeyEvent::KEYCODE_POWER) {
+            intervalTime = intervalTime_ - (upActionTime_ - downActionTime_);
+            if (walletLaunchDelayTimes_ != 0 && intervalTime < walletLaunchDelayTimes_) {
+                intervalTime = walletLaunchDelayTimes_;
+            }
+        }
+        repeatTimerId_ = TimerMgr->AddTimer(intervalTime / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
         });
         if (repeatTimerId_ < 0) {
