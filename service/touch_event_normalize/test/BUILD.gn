@@ -30,7 +30,6 @@ ohos_unittest("TouchEventNormalizeTest") {
   ]
 
   sources = [
-    "src/joystick_transform_processor_test.cpp",
     "src/touch_event_normalize_test.cpp",
     "src/touch_transform_processor_test.cpp",
     "src/touchpad_transform_processor_test.cpp",

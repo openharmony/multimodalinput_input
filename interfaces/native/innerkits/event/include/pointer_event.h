@@ -1579,6 +1579,7 @@ public:
      * @since 9
      */
     void ClearAxisValue();
+    void ClearAxisStatus(AxisType axis);
 
     /**
      * @brief Checks whether this event contains a specified axis type.
@@ -1861,7 +1862,7 @@ private:
     int32_t sourceType_ { SOURCE_TYPE_UNKNOWN };
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t originPointerAction_ { POINTER_ACTION_UNKNOWN };
-    int32_t buttonId_ { -1 };
+    int32_t buttonId_ { BUTTON_NONE };
     int32_t fingerCount_ { 0 };
     int32_t pullId_ { -1 };
     float zOrder_ { -1.0f };
