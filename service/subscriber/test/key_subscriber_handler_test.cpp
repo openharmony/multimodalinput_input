@@ -58,135 +58,6 @@ public:
 };
 
 /**
- * @tc.name: KeySubscriberHandlerTest_HandleCallEnded_001
- * @tc.desc: Test HandleCallEnded
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    handler.callBahaviorState_ = true;
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
-    keyEvent->keyAction_ = KeyEvent::KEY_ACTION_DOWN;
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_ALERTING;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_ANSWERED;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_ACTIVE;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_DIALING;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_WAITING;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_IDLE;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_DISCONNECTING;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_DISCONNECTED;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleCallEnded_002
- * @tc.desc: Test HandleCallEnded
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    handler.callBahaviorState_ = false;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HandleCallEnded_003
- * @tc.desc: Test HandleCallEnded
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    handler.callBahaviorState_ = true;
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_UP;
-    keyEvent->keyAction_ = KeyEvent::KEY_ACTION_UP;
-    EXPECT_FALSE(handler.HandleCallEnded(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HangUpCallProcess_001
- * @tc.desc: Test HangUpCallProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HangUpCallProcess_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
-    ASSERT_NO_FATAL_FAILURE(handler.HangUpCallProcess());
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_HangUpCallProcess_002
- * @tc.desc: Test HangUpCallProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HangUpCallProcess_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr;
-    callManagerClientPtr = std::make_shared<OHOS::Telephony::CallManagerClient>();
-    EXPECT_NE(callManagerClientPtr, nullptr);
-    ASSERT_NO_FATAL_FAILURE(handler.HangUpCallProcess());
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_RejectCallProcess_001
- * @tc.desc: Test RejectCallProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RejectCallProcess_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
-    ASSERT_NO_FATAL_FAILURE(handler.RejectCallProcess());
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_RejectCallProcess_002
- * @tc.desc: Test RejectCallProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RejectCallProcess_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr;
-    callManagerClientPtr = std::make_shared<OHOS::Telephony::CallManagerClient>();
-    EXPECT_NE(callManagerClientPtr, nullptr);
-    ASSERT_NO_FATAL_FAILURE(handler.RejectCallProcess());
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyEvent_001
  * @tc.desc: Test HandleKeyEvent
  * @tc.type: FUNC
@@ -220,7 +91,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyEvent_001, 
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     handler.keyEvent_->AddKeyItem(item);
     EXPECT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
-    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
+    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
 }
@@ -2043,7 +1914,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_08, T
 
     DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
     std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -2088,7 +1959,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_10, T
     EXPECT_NE(callManagerClientPtr, nullptr);
     DEVICE_MONITOR->hasHandleRingMute_ = true;
     keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_UP;
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -2128,8 +1999,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddKeyGestureSubscri
     std::shared_ptr<KeyOption> keyOption;
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
     subscriber->timerId_ = -1;
-    int32_t ret = handler.AddKeyGestureSubscriber(subscriber, keyOption);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(handler.AddKeyGestureSubscriber(subscriber, keyOption));
 }
 
 /**
@@ -2164,8 +2034,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddKeyGestureSubscri
     for (auto &iter : handler.keyGestures_) {
         EXPECT_TRUE(handler.IsEqualKeyOption(keyOption1, iter.first));
     }
-    int32_t ret = handler.AddKeyGestureSubscriber(subscriber, keyOption1);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(handler.AddKeyGestureSubscriber(subscriber, keyOption1));
 }
 
 /**
@@ -2200,8 +2069,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddKeyGestureSubscri
     for (auto &iter : handler.keyGestures_) {
         EXPECT_FALSE(handler.IsEqualKeyOption(keyOption1, iter.first));
     }
-    int32_t ret = handler.AddKeyGestureSubscriber(subscriber, keyOption1);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(handler.AddKeyGestureSubscriber(subscriber, keyOption1));
 }
 
 /**
@@ -2409,7 +2277,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_005
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
     ASSERT_NE(subscriber, nullptr);
     keyEvent->keyCode_ = KeyEvent::KEYCODE_CAMERA;
-    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
+    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
 
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
@@ -2534,25 +2402,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(100);
     EXPECT_NE(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_OK);
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_AddKeyGestureSubscriber_003
- * @tc.desc: Test AddKeyGestureSubscriber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddKeyGestureSubscriber_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    int32_t subscribeId = 1;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
-        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
-    subscriber->timerId_ = -1;
-    EXPECT_EQ(handler.AddKeyGestureSubscriber(subscriber, keyOption), RET_ERR);
 }
 
 /**

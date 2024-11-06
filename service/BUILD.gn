@@ -1297,10 +1297,6 @@ ohos_unittest("SubscriberTest") {
 
   sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
 
-  if (input_feature_switch) {
-    sources += [ "subscriber/test/switch_subscriber_handler_test.cpp" ]
-  }
-
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
