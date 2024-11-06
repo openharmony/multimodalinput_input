@@ -3681,6 +3681,18 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     CHKPV(InputHandler->GetKeyCommandHandler());
     auto knuckleSwitch = InputHandler->GetKeyCommandHandler()->GetKnuckleSwitchValue();
     auto isInMethodWindow = InputHandler->GetKeyCommandHandler()->CheckInputMethodArea(pointerEvent);
+    if (isInMethodWindow) {
+        int32_t pointerId = pointerEvent->GetPointerId();
+        PointerEvent::PointerItem item;
+        if (!pointerEvent->GetPointerItem(pointerId, item)) {
+            MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
+            return;
+        }
+        if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
+            item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+            pointerEvent->UpdatePointerItem(pointerId, item);
+        }
+    }
     if (!knuckleSwitch && !isInMethodWindow) {
         knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
         knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
