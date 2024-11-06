@@ -15,6 +15,7 @@
 #include "mock.h"
 
 #include "iremote_broker.h"
+
 #include "i_anco_channel.h"
 
 namespace OHOS {
