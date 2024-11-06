@@ -292,10 +292,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     CHKPV(dataWorker->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(dataWorker->env, &scope);
-    if (scope == nullptr) {
-        MMI_HILOGE("Scope is nullptr");
-        return;
-    }
+    CHKPV(scope);
     napi_value callback = nullptr;
     MMI_HILOGD("deliver uv work from %{public}d", GetPid());
     if (dataWorker->callback == nullptr) {
@@ -326,10 +323,7 @@ void EmitAsyncCallbackWork(sptr<KeyEventMonitorInfo> reportEvent)
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        MMI_HILOGE("work is nullptr");
-        return;
-    }
+    CHKPV(work);
     reportEvent->IncStrongRef(nullptr);
     work->data = reportEvent.GetRefPtr();
     int32_t ret = uv_queue_work_with_qos(
