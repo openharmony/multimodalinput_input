@@ -2027,7 +2027,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_08, T
 
     DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
     std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -2072,7 +2072,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_10, T
     EXPECT_NE(callManagerClientPtr, nullptr);
     DEVICE_MONITOR->hasHandleRingMute_ = true;
     keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_UP;
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
