@@ -3688,7 +3688,7 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
             MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
         }
         if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
-            item.SetToolType(TOOL_TYPE_FINGER);
+            item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
             pointerEvent->UpdatePointerItem(pointerId, item);
         }
     }
