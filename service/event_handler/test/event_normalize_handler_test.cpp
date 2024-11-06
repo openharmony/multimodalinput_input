@@ -86,10 +86,10 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
     ASSERT_NO_FATAL_FAILURE(handler.HandleTableToolEvent(event));
     event->type = LIBINPUT_EVENT_JOYSTICK_BUTTON;
     handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickEvent(event));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickButtonEvent(event));
     event->type = LIBINPUT_EVENT_JOYSTICK_AXIS;
     handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickEvent(event));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickAxisEvent(event));
     event->type = LIBINPUT_EVENT_SWITCH_TOGGLE;
     handler.HandleEvent(event, frameTime);
     ASSERT_NO_FATAL_FAILURE(handler.HandleSwitchInputEvent(event));

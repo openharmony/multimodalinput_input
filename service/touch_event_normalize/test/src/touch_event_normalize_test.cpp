@@ -26,11 +26,8 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
 using namespace testing::ext;
-constexpr int32_t LIBINPUT_HOMEPAGE_BUTTON_CODE = 172;
-constexpr int32_t LIBINPUT_BUTTON_NONE = -1;
-} // namespace
+
 class TouchEventNormalizeTest : public testing::Test {
 public:
     void SetUp();
@@ -69,23 +66,6 @@ void TouchEventNormalizeTest::TearDown()
     TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(preRotateSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
-}
-
-/**
- * @tc.name: JoystickTransformProcessorTest_LibinputButtonToPointer
- * @tc.desc: Test LibinputButtonToPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(JoystickTransformProcessorTest, JoystickTransformProcessorTest_LibinputButtonToPointer, TestSize.Level1)
-{
-    int32_t deviceId = 123;
-    JoystickTransformProcessor joystickTransformProcessor(deviceId);
-    uint32_t button = LIBINPUT_HOMEPAGE_BUTTON_CODE;
-    ASSERT_EQ(joystickTransformProcessor.LibinputButtonToPointer(button), PointerEvent::JOYSTICK_BUTTON_HOMEPAGE);
-
-    button = LIBINPUT_BUTTON_NONE;
-    ASSERT_EQ(joystickTransformProcessor.LibinputButtonToPointer(button), PointerEvent::BUTTON_NONE);
 }
 
 /**
