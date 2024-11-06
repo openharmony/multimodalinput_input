@@ -49,7 +49,7 @@ int32_t AncoChannelStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     auto cbIter = handlers_.find(static_cast<AncoRequestId>(code));
 
     if (cbIter == handlers_.end()) {
-        MMI_HILOGE("Unexpected request: %{public}u", code);
+        MMI_HILOGE("Unexpected request:%{public}u", code);
     } else {
         ret = (this->*(cbIter->second))(data, reply);
     }
