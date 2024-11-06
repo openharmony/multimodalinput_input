@@ -435,7 +435,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     item.SetPointerId(1);
     item.SetDisplayX(150);
     item.SetDisplayY(150);
-    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     touchEvent->AddPointerItem(item);
     item.SetPointerId(2);
     touchEvent->AddPointerItem(item);
