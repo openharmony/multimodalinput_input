@@ -123,6 +123,10 @@ config("libmmi_server_config") {
   if (is_emulator) {
     defines += [ "OHOS_BUILD_EMULATOR" ]
   }
+
+  if (input_feature_joystick) {
+    include_dirs += [ "${mmi_service_path}/joystick/include" ]
+  }
 }
 
 ohos_rust_shared_ffi("mmi_rust") {
@@ -225,7 +229,10 @@ ohos_shared_library("libmmi-server") {
         [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
   }
   if (input_feature_joystick) {
-    sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
+    sources += [
+      "joystick/src/joystick_event_normalize.cpp",
+      "joystick/src/joystick_event_processor.cpp",
+    ]
   }
   if (input_feature_monitor) {
     sources += [
@@ -1157,7 +1164,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
   include_dirs = [
     "window_manager/test",
     "${mmi_path}/libudev/include",
-    "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_path}/common/anco/comm/include",
   ]
 
@@ -1179,6 +1185,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 

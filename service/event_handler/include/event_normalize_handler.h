@@ -19,6 +19,9 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+#include "joystick_event_normalize.h"
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 #include "key_event_normalize.h"
 
 namespace OHOS {
@@ -58,7 +61,10 @@ private:
     int32_t HandleTouchEvent(libinput_event* event, int64_t frameTime);
     int32_t HandleSwitchInputEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
-    int32_t HandleJoystickEvent(libinput_event* event);
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    int32_t HandleJoystickButtonEvent(libinput_event *event);
+    int32_t HandleJoystickAxisEvent(libinput_event *event);
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
     void HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent);
     bool JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
         enum libinput_event_type type, libinput_event* event);
@@ -84,6 +90,9 @@ private:
     bool moveEventFilterFlag_ { false };
     std::list<PointerEvent::PointerItem> lastTouchDownItems_;
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    JoystickEventNormalize joystick_;
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
     bool ProcessNullEvent(libinput_event *event, int64_t frameTime);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
