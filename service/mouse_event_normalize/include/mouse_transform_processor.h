@@ -159,6 +159,7 @@ private:
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };
+    uint32_t pressedButton_ { 0 };
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
