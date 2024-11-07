@@ -1420,11 +1420,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
 void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)
 {
     if (item.ability.bundleName == SOS_BUNDLE_NAME) {
-        if (repeatKeyCountMap_[item.ability.bundleName] == 1) {
-            if (downActionTime_ - lastVolumeDownActionTime_ > SOS_INTERVAL_TIMES) {
-                repeatKeyCountMap_[item.ability.bundleName]++;
-            }
-        } else if (downActionTime_ - lastDownActionTime_ < item.delay) {
+        if (downActionTime_ - lastDownActionTime_ < item.delay) {
             repeatKeyCountMap_[item.ability.bundleName]++;
         }
     } else if (downActionTime_ - upActionTime_ < item.delay) {
@@ -1447,9 +1443,13 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     }
     auto it = repeatKeyCountMap_.find(item.ability.bundleName);
     if (it == repeatKeyCountMap_.end()) {
-        repeatKeyCountMap_.emplace(item.ability.bundleName, 1);
         lastDownActionTime_ = downActionTime_;
-        return true;
+        if (item.ability.bundleName != SOS_BUNDLE_NAME ||
+            downActionTime_ - lastVolumeDownActionTime_ > SOS_INTERVAL_TIMES) {
+            repeatKeyCountMap_.emplace(item.ability.bundleName, 1);
+            return true;
+        }
+        return false;
     }
     HandleRepeatKeyOwnCount(item);
     lastDownActionTime_ = downActionTime_;
