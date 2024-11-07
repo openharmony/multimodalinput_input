@@ -38,62 +38,62 @@ struct CurveItem {
     pub diff_nums: Vec<f64>,
 }
 
-struct KLVMouseAccelerateCurves {
+struct PCMouseAccelerateCurves {
     data: Vec<CurveItem>,
 }
-struct SoftHardenMouseAccelerateCurves {
+struct SoftPcProMouseAccelerateCurves {
     data: Vec<CurveItem>,
 }
-struct HardHardenMouseAccelerateCurves {
+struct HardPcProMouseAccelerateCurves {
     data: Vec<CurveItem>,
 }
-struct KLVTouchpadAccelerateCurves {
+struct PCTouchpadAccelerateCurves {
     data: Vec<CurveItem>,
 }
-struct SoftHardenTouchpadAccelerateCurves {
+struct SoftPcProTouchpadAccelerateCurves {
     data: Vec<CurveItem>,
 }
-struct HardHardenTouchpadAccelerateCurves {
+struct HardPcProTouchpadAccelerateCurves {
     data: Vec<CurveItem>,
 }
-struct WeberTouchpadAccelerateCurves {
+struct TabletTouchpadAccelerateCurves {
     data: Vec<CurveItem>,
 }
 struct AxisAccelerateCurvesTouchpad {
     data: Vec<CurveItem>,
 }
-impl KLVMouseAccelerateCurves {
-    fn klv_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+impl PCMouseAccelerateCurves {
+    fn pc_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl SoftHardenMouseAccelerateCurves {
-    fn soft_harden_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+impl SoftPcProMouseAccelerateCurves {
+    fn soft_pc_pro_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl HardHardenMouseAccelerateCurves {
-    fn hard_harden_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+impl HardPcProMouseAccelerateCurves {
+    fn hard_pc_pro_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl KLVTouchpadAccelerateCurves {
-    fn klv_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+impl PCTouchpadAccelerateCurves {
+    fn pc_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl SoftHardenTouchpadAccelerateCurves {
-    fn soft_harden_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+impl SoftPcProTouchpadAccelerateCurves {
+    fn soft_pc_pro_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl HardHardenTouchpadAccelerateCurves {
-    fn hard_harden_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+impl HardPcProTouchpadAccelerateCurves {
+    fn hard_pc_pro_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl WeberTouchpadAccelerateCurves {
-    fn weber_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+impl TabletTouchpadAccelerateCurves {
+    fn tablet_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
@@ -103,13 +103,13 @@ impl AxisAccelerateCurvesTouchpad {
     }
 }
 
-impl KLVMouseAccelerateCurves {
-    fn get_instance() -> &'static KLVMouseAccelerateCurves {
-        static mut GLOBAL_CURVES: Option<KLVMouseAccelerateCurves> = None;
+impl PCMouseAccelerateCurves {
+    fn get_instance() -> &'static PCMouseAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<PCMouseAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(KLVMouseAccelerateCurves {
+            GLOBAL_CURVES = Some(PCMouseAccelerateCurves {
                 data: vec![
                     CurveItem {
                         speeds: vec![8.0, 32.0, 128.0],
@@ -173,13 +173,13 @@ impl KLVMouseAccelerateCurves {
     }
 }
 
-impl SoftHardenMouseAccelerateCurves {
-    fn get_instance() -> &'static SoftHardenMouseAccelerateCurves {
-        static mut GLOBAL_CURVES: Option<SoftHardenMouseAccelerateCurves> = None;
+impl SoftPcProMouseAccelerateCurves {
+    fn get_instance() -> &'static SoftPcProMouseAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<SoftPcProMouseAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(SoftHardenMouseAccelerateCurves {
+            GLOBAL_CURVES = Some(SoftPcProMouseAccelerateCurves {
                 data: vec![
                     CurveItem {
                         speeds: vec![3.76, 9.77, 16.54, 128.0],
@@ -243,13 +243,13 @@ impl SoftHardenMouseAccelerateCurves {
     }
 }
 
-impl HardHardenMouseAccelerateCurves {
-    fn get_instance() -> &'static HardHardenMouseAccelerateCurves {
-        static mut GLOBAL_CURVES: Option<HardHardenMouseAccelerateCurves> = None;
+impl HardPcProMouseAccelerateCurves {
+    fn get_instance() -> &'static HardPcProMouseAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<HardPcProMouseAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(HardHardenMouseAccelerateCurves {
+            GLOBAL_CURVES = Some(HardPcProMouseAccelerateCurves {
                 data: vec![
                     CurveItem {
                         speeds: vec![8.0, 32.0, 128.0],
@@ -313,13 +313,13 @@ impl HardHardenMouseAccelerateCurves {
     }
 }
 
-impl KLVTouchpadAccelerateCurves {
-    fn get_instance() -> &'static KLVTouchpadAccelerateCurves {
-        static mut GLOBAL_CURVES: Option<KLVTouchpadAccelerateCurves> = None;
+impl PCTouchpadAccelerateCurves {
+    fn get_instance() -> &'static PCTouchpadAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<PCTouchpadAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(KLVTouchpadAccelerateCurves {
+            GLOBAL_CURVES = Some(PCTouchpadAccelerateCurves {
                 data: vec![
                     CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
@@ -383,13 +383,13 @@ impl KLVTouchpadAccelerateCurves {
     }
 }
 
-impl SoftHardenTouchpadAccelerateCurves {
-    fn get_instance() -> &'static SoftHardenTouchpadAccelerateCurves {
-        static mut GLOBAL_CURVES: Option<SoftHardenTouchpadAccelerateCurves> = None;
+impl SoftPcProTouchpadAccelerateCurves {
+    fn get_instance() -> &'static SoftPcProTouchpadAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<SoftPcProTouchpadAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(SoftHardenTouchpadAccelerateCurves {
+            GLOBAL_CURVES = Some(SoftPcProTouchpadAccelerateCurves {
                 data: vec![
                     CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
@@ -453,13 +453,13 @@ impl SoftHardenTouchpadAccelerateCurves {
     }
 }
 
-impl HardHardenTouchpadAccelerateCurves {
-    fn get_instance() -> &'static HardHardenTouchpadAccelerateCurves {
-        static mut GLOBAL_CURVES: Option<HardHardenTouchpadAccelerateCurves> = None;
+impl HardPcProTouchpadAccelerateCurves {
+    fn get_instance() -> &'static HardPcProTouchpadAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<HardPcProTouchpadAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(HardHardenTouchpadAccelerateCurves {
+            GLOBAL_CURVES = Some(HardPcProTouchpadAccelerateCurves {
                 data: vec![
                     CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
@@ -548,13 +548,13 @@ impl AxisAccelerateCurvesTouchpad {
     }
 }
 
-impl WeberTouchpadAccelerateCurves {
-    fn get_instance() -> &'static WeberTouchpadAccelerateCurves {
-        static mut GLOBAL_CURVES: Option<WeberTouchpadAccelerateCurves> = None;
+impl TabletTouchpadAccelerateCurves {
+    fn get_instance() -> &'static TabletTouchpadAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<TabletTouchpadAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(WeberTouchpadAccelerateCurves {
+            GLOBAL_CURVES = Some(TabletTouchpadAccelerateCurves {
                 data: vec![
                     CurveItem {
                         speeds: vec![2.0, 20.0, 30.0, 128.0],
@@ -692,10 +692,10 @@ fn get_speed_gain_mouse(vin: f64, gain: *mut f64, speed: i32, device_type: i32) 
         return false;
     }
     let item = match device_type {  
-        1 => KLVMouseAccelerateCurves::get_instance().klv_mouse_get_curve_by_speed(speed as usize),  
-        2 => SoftHardenMouseAccelerateCurves::get_instance().soft_harden_mouse_get_curve_by_speed(speed as usize),  
-        3 => HardHardenMouseAccelerateCurves::get_instance().hard_harden_mouse_get_curve_by_speed(speed as usize),  
-        _ => KLVMouseAccelerateCurves::get_instance().klv_mouse_get_curve_by_speed(speed as usize),
+        1 => PCMouseAccelerateCurves::get_instance().pc_mouse_get_curve_by_speed(speed as usize),  
+        2 => SoftPcProMouseAccelerateCurves::get_instance().soft_pc_pro_mouse_get_curve_by_speed(speed as usize),  
+        3 => HardPcProMouseAccelerateCurves::get_instance().hard_pc_pro_mouse_get_curve_by_speed(speed as usize),  
+        _ => PCMouseAccelerateCurves::get_instance().pc_mouse_get_curve_by_speed(speed as usize),
     };
     unsafe {
         let num: f64 = fabs(vin);
@@ -729,11 +729,11 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         return false;
     }
     let item = match device_type {  
-        1 => KLVTouchpadAccelerateCurves::get_instance().klv_touchpad_get_curve_by_speed(speed as usize),  
-        2 => SoftHardenTouchpadAccelerateCurves::get_instance().soft_harden_touchpad_get_curve_by_speed(speed as usize),  
-        3 => HardHardenTouchpadAccelerateCurves::get_instance().hard_harden_touchpad_get_curve_by_speed(speed as usize),  
-        4 => WeberTouchpadAccelerateCurves::get_instance().weber_touchpad_get_curve_by_speed(speed as usize),
-        _ => KLVTouchpadAccelerateCurves::get_instance().klv_touchpad_get_curve_by_speed(speed as usize),
+        1 => PCTouchpadAccelerateCurves::get_instance().pc_touchpad_get_curve_by_speed(speed as usize),  
+        2 => SoftPcProTouchpadAccelerateCurves::get_instance().soft_pc_pro_touchpad_get_curve_by_speed(speed as usize),  
+        3 => HardPcProTouchpadAccelerateCurves::get_instance().hard_pc_pro_touchpad_get_curve_by_speed(speed as usize),  
+        4 => TabletTouchpadAccelerateCurves::get_instance().tablet_touchpad_get_curve_by_speed(speed as usize),
+        _ => PCTouchpadAccelerateCurves::get_instance().pc_touchpad_get_curve_by_speed(speed as usize),
     };
     unsafe {
         let num: f64 = fabs(vin);
@@ -1046,9 +1046,9 @@ fn test_handle_motion_accelerate_capture_mode_false_touchpad()
     assert_eq!(abs_y, 0.0);
 }
 
-/* test for touchpad klv */
+/* test for touchpad pc */
 #[test]
-fn test_handle_motion_accelerate_capture_klv_offset_false_touchpad()
+fn test_handle_motion_accelerate_capture_pc_offset_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00000001, dy: 0.00000002 };
     let mut abs_x: f64 = 0.0;
@@ -1063,7 +1063,7 @@ fn test_handle_motion_accelerate_capture_klv_offset_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_klv_speed_false_touchpad()
+fn test_handle_motion_accelerate_capture_pc_speed_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1078,7 +1078,7 @@ fn test_handle_motion_accelerate_capture_klv_speed_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_klv_mode_false_touchpad()
+fn test_handle_motion_accelerate_capture_pc_mode_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1091,7 +1091,7 @@ fn test_handle_motion_accelerate_capture_klv_mode_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_klv_nomarl_touchpad()
+fn test_handle_motion_accelerate_capture_pc_nomarl_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1104,7 +1104,7 @@ fn test_handle_motion_accelerate_capture_klv_nomarl_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_klv_offset_exceed_max_touchpad()
+fn test_handle_motion_accelerate_capture_pc_offset_exceed_max_touchpad()
 {
     let offset: Offset = Offset{ dx: 82.00002, dy: 82.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1118,9 +1118,9 @@ fn test_handle_motion_accelerate_capture_klv_offset_exceed_max_touchpad()
     assert_eq!(abs_y, 0.0);
 }
 
-/* test for touchpad soft_harden */
+/* test for touchpad soft_pc_pro */
 #[test]
-fn test_handle_motion_accelerate_capture_soft_harden_offset_false_touchpad()
+fn test_handle_motion_accelerate_capture_soft_pc_pro_offset_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00000001, dy: 0.00000002 };
     let mut abs_x: f64 = 0.0;
@@ -1139,7 +1139,7 @@ fn test_handle_motion_accelerate_capture_soft_harden_offset_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_soft_harden_speed_false_touchpad()
+fn test_handle_motion_accelerate_capture_soft_pc_pro_speed_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1154,7 +1154,7 @@ fn test_handle_motion_accelerate_capture_soft_harden_speed_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_soft_harden_mode_false_touchpad()
+fn test_handle_motion_accelerate_capture_soft_pc_pro_mode_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1167,7 +1167,7 @@ fn test_handle_motion_accelerate_capture_soft_harden_mode_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_soft_harden_nomarl_touchpad()
+fn test_handle_motion_accelerate_capture_soft_pc_pro_nomarl_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1180,7 +1180,7 @@ fn test_handle_motion_accelerate_capture_soft_harden_nomarl_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_soft_harden_offset_exceed_max_touchpad()
+fn test_handle_motion_accelerate_capture_soft_pc_pro_offset_exceed_max_touchpad()
 {
     let offset: Offset = Offset{ dx: 160.00002, dy: 160.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1194,9 +1194,9 @@ fn test_handle_motion_accelerate_capture_soft_harden_offset_exceed_max_touchpad(
     assert_eq!(abs_y, 0.0);
 }
 
-/* test for touchpad hard_harden */
+/* test for touchpad hard_pc_pro */
 #[test]
-fn test_handle_motion_accelerate_capture_hard_harden_offset_false_touchpad()
+fn test_handle_motion_accelerate_capture_hard_pc_pro_offset_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00000001, dy: 0.00000002 };
     let mut abs_x: f64 = 0.0;
@@ -1211,7 +1211,7 @@ fn test_handle_motion_accelerate_capture_hard_harden_offset_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_hard_harden_speed_false_touchpad()
+fn test_handle_motion_accelerate_capture_hard_pc_pro_speed_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1226,7 +1226,7 @@ fn test_handle_motion_accelerate_capture_hard_harden_speed_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_hard_harden_mode_false_touchpad()
+fn test_handle_motion_accelerate_capture_hard_pc_pro_mode_false_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1239,7 +1239,7 @@ fn test_handle_motion_accelerate_capture_hard_harden_mode_false_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_hard_harden_nomarl_touchpad()
+fn test_handle_motion_accelerate_capture_hard_pc_pro_nomarl_touchpad()
 {
     let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
     let mut abs_x: f64 = 0.0;
@@ -1252,7 +1252,7 @@ fn test_handle_motion_accelerate_capture_hard_harden_nomarl_touchpad()
 }
 
 #[test]
-fn test_handle_motion_accelerate_capture_hard_harden_offset_exceed_max_touchpad()
+fn test_handle_motion_accelerate_capture_hard_pc_pro_offset_exceed_max_touchpad()
 {
     let offset: Offset = Offset{ dx: 160.00002, dy: 160.00004 };
     let mut abs_x: f64 = 0.0;
