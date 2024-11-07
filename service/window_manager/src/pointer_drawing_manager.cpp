@@ -66,7 +66,7 @@ const std::string POINTER_SIZE { "pointerSize" };
 const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
 const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
 const std::string POINTER_CURSOR_RENDER_RECEIVER_NAME { "PointerCursorReceiver" };
-const std::string DEVICE_TYPE_HARDEN { "HAD" };
+const std::string DEVICE_TYPE_PC_PRO { "PC_PRO" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
@@ -2752,7 +2752,7 @@ void PointerDrawingManager::InitStyle()
     CheckMouseIconPath();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
-    if (productType == DEVICE_TYPE_HARDEN) {
+    if (productType == DEVICE_TYPE_PC_PRO) {
         renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
