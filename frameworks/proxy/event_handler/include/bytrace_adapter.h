@@ -84,6 +84,21 @@ public:
     static void StartTouchEvent(int32_t pointerId);
     static void StopTouchEvent();
 
+    static void StartKnuckle(int32_t pointerId);
+    static void StopKnuckle();
+
+    static void StartDataShare(const std::string &key);
+    static void StopDataShare();
+
+    static void StartRsSurfaceNode(int32_t displayId);
+    static void StopRsSurfaceNode();
+
+    static void StartFoldState(bool state);
+    static void StopFoldState();
+
+    static void StartWindowVisible(int32_t pid);
+    static void StopWindowVisible();
+
 private:
     static std::string GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent);

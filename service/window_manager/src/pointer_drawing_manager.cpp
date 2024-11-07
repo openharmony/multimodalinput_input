@@ -27,6 +27,7 @@
 #include "magic_pointer_velocity_tracker.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "i_multimodal_input_connect.h"
 #include "input_device_manager.h"
@@ -1564,6 +1565,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 {
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
+    BytraceAdapter::StartRsSurfaceNode(displayId);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -1609,6 +1611,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     lastDirection_ = direction;
     CreateCanvasNode();
     Rosen::RSTransaction::FlushImplicitTransaction();
+    BytraceAdapter::StopRsSurfaceNode();
 }
 
 sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
