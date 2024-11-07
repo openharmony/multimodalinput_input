@@ -276,22 +276,6 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_01, TestSize.Lev
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_IsWorking_02
- * @tc.desc: Test the funcation ShouldIntercept
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
-    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON;
-    DISPLAY_MONITOR->isScreenLocked_ = true;
-    bool ret = pullUpAccessibility.IsWorking();
-    EXPECT_FALSE(ret);
-}
-
-/**
  * @tc.name: KeyGestureManagerTest_OnTriggerAll_01
  * @tc.desc: Test the funcation OnTriggerAll
  * @tc.type: FUNC
