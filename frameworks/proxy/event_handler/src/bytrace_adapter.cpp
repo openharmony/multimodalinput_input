@@ -399,12 +399,32 @@ void BytraceAdapter::StopTouchEvent()
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
 
-void BytraceAdapter::StartKnuckle(int32_t pointerId)
+void BytraceAdapter::StartToolType(int32_t toolType)
 {
-    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "StartKnuckle pointerId:" + std::to_string(pointerId));
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "current ToolType:" + std::to_string(toolType));
 }
 
-void BytraceAdapter::StopKnuckle()
+void BytraceAdapter::StopToolType()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartTouchUp(int32_t pointerId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startTouchUp pointerId:" + std::to_string(pointerId));
+}
+
+void BytraceAdapter::StopTouchUp()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartUpdateDisplayMode(const std::string &modeMsg)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, modeMsg);
+}
+
+void BytraceAdapter::StopUpdateDisplayMode()
 {
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }

@@ -131,9 +131,9 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
 #endif // OHOS_BUILD_ENABLE_TOUCH
         rawTouchTmp.x = displayX * DRIVER_NUMBER;
         rawTouchTmp.y = displayY * DRIVER_NUMBER;
-        BytraceAdapter::StartKnuckle(pointerItem.GetPointerId());
+        BytraceAdapter::StartToolType(toolType);
         FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
-        BytraceAdapter::StopKnuckle();
+        BytraceAdapter::StopToolType();
     }
 }
 void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
@@ -228,9 +228,9 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 #endif // OHOS_BUILD_ENABLE_TOUCH
         rawTouchTmp.x = displayX * DRIVER_NUMBER;
         rawTouchTmp.y = displayY * DRIVER_NUMBER;
-        BytraceAdapter::StartKnuckle(pointerEvent_->GetId());
+        BytraceAdapter::StartTouchUp(item.GetPointerId());
         FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouchTmp);
-        BytraceAdapter::StopKnuckle();
+        BytraceAdapter::StopTouchUp();
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     pointerEvent_->UpdatePointerItem(seatSlot, item);
