@@ -84,8 +84,14 @@ public:
     static void StartTouchEvent(int32_t pointerId);
     static void StopTouchEvent();
 
-    static void StartKnuckle(int32_t pointerId);
-    static void StopKnuckle();
+    static void StartToolType(int32_t toolType);
+    static void StopToolType();
+
+    static void StartTouchUp(int32_t pointerId);
+    static void StopTouchUp();
+
+    static void StartUpdateDisplayMode(const std::string &modeMsg);
+    static void StopUpdateDisplayMode();
 
     static void StartDataShare(const std::string &key);
     static void StopDataShare();

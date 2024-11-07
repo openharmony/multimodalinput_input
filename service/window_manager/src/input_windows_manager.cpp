@@ -1094,9 +1094,9 @@ void InputWindowsManager::UpdateDisplayMode()
         return;
     }
     MMI_HILOGI("Update fingersense display mode, displayMode:%{public}d", displayMode_);
-    BytraceAdapter::StartKnuckle(displayGroupInfo_.displaysInfo[0].id);
+    BytraceAdapter::StartUpdateDisplayMode("display mode change");
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
-    BytraceAdapter::StopKnuckle();
+    BytraceAdapter::StopUpdateDisplayMode();
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
