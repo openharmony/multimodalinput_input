@@ -93,9 +93,9 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     if (IsCallFromWorkerThread()) {
         return callback();
     }
-    Promise promise;
-    Future future = promise.get_future();
-    auto task = PostTask(callback, &promise);
+    std::shared_ptr<Promise> promise;
+    Future future = promise->get_future();
+    auto task = PostTask(callback, promise);
     CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
     static constexpr int32_t timeout = 3000;
@@ -138,7 +138,7 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
     }
 }
 
-DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *promise)
+DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, std::shared_ptr<Promise> promise)
 {
     if (IsCallFromWorkerThread()) {
         MMI_HILOGE("This interface cannot be called from a worker thread");
