@@ -1132,6 +1132,10 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         } else {
             windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEvent_);
         }
+        if (windowInfo == std::nullopt && isDisplayRemoved) {
+            DrawPointer(isDisplayRemoved);
+            return;
+        }
         CHKFRV(windowInfo, "The windowInfo is nullptr");
         int32_t windowPid = GetWindowPid(windowInfo->id);
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
