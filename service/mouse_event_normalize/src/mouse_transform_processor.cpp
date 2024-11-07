@@ -936,8 +936,12 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         MMI_HILOGE("Event not from touchpad");
         return;
     }
-
     MMI_HILOGD("Transform right button event, evenType:%d, switchType:%d, button:%d", evenType, switchType, button);
+    auto state = libinput_event_pointer_get_button_state(data);
+    if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
+        button = pressedButton_;
+        return;
+    }
     switch (switchType) {
         case RightClickType::TP_RIGHT_BUTTON:
             HandleTouchpadRightButton(data, evenType, button);
@@ -953,6 +957,9 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         default:
             MMI_HILOGD("Invalid type, switchType:%{public}d", switchType);
             break;
+    }
+    if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
+        pressedButton_ = button;
     }
 }
 
