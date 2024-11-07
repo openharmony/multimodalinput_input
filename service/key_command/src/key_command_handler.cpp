@@ -335,7 +335,8 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
             lastPointerDownTime_[SIMULATE_POINTER_ID] : lastPointerDownTime_[0];
         int64_t diffTime = item.GetDownTime() - lastPointerDownTime;
         if (diffTime > TWO_FINGERS_TIME_LIMIT) {
-            MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}" PRId64, diffTime);
+            MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}" PRId64 ",pointerId:%{public}d",
+            diffTime, id);
             return;
         }
     }
@@ -350,7 +351,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         return;
     }
     if (CheckInputMethodArea(touchEvent)) {
-        MMI_HILOGI("In input method area, skip");
+        MMI_HILOGW("Event skipping inputmethod area");
         return;
     }
     size_t pointercnt = touchEvent->GetPointerIds().size();
@@ -373,6 +374,7 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     int32_t id = touchEvent->GetPointerId();
     auto it = lastPointerDownTime_.find(id);
     if (it != lastPointerDownTime_.end()) {
+        MMI_HILOGW("lastPointerDownTime_ has been erased, pointerId:%{public}d", id);
         lastPointerDownTime_.erase(it);
     }
 
@@ -2140,7 +2142,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     }
     DfxHisysevent::CalcComboStartTimes(delay);
     DfxHisysevent::ReportComboStartTimes();
-    MMI_HILOGI("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGW("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
@@ -2158,7 +2160,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     int32_t syncState = ACTIVE_EVENT;
     NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
     NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
-    MMI_HILOGI("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGW("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
     return;
 }
 
@@ -2177,7 +2179,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         want.SetParam(item.first, item.second);
     }
 
-    MMI_HILOGI("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGW("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
     if (ability.abilityType == EXTENSION_ABILITY) {
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, nullptr);
         if (err != ERR_OK) {
@@ -2202,8 +2204,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
             }
         }
     }
-
-    MMI_HILOGI("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGW("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 
 void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
