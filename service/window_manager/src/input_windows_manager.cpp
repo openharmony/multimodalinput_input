@@ -21,6 +21,7 @@
 #include <linux/input.h>
 #include <unordered_map>
 
+#include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "display_manager.h"
 #include "dfx_hisysevent.h"
@@ -1093,7 +1094,9 @@ void InputWindowsManager::UpdateDisplayMode()
         return;
     }
     MMI_HILOGI("Update fingersense display mode, displayMode:%{public}d", displayMode_);
+    BytraceAdapter::StartUpdateDisplayMode("display mode change");
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
+    BytraceAdapter::StopUpdateDisplayMode();
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
@@ -4018,7 +4021,9 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid)
         return true;
     }
     std::vector<sptr<Rosen::WindowVisibilityInfo>> infos;
+    BytraceAdapter::StartWindowVisible(pid);
     Rosen::WindowManagerLite::GetInstance().GetVisibilityWindowInfo(infos);
+    BytraceAdapter::StopWindowVisible();
     for (const auto &it: infos) {
         if (pid == it->pid_ &&
             it->visibilityState_ < Rosen::WindowVisibilityState::WINDOW_VISIBILITY_STATE_TOTALLY_OCCUSION) {
@@ -4585,7 +4590,9 @@ int32_t InputWindowsManager::GetCurrentUserId()
 
 void InputWindowsManager::SetFoldState()
 {
+    BytraceAdapter::StartFoldState(Rosen::DisplayManager::GetInstance().IsFoldable());
     IsFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
+    BytraceAdapter::StopFoldState();
 }
 
 const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id, const DisplayGroupInfo &displayGroupInfo) const
