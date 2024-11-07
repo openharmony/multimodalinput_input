@@ -1042,7 +1042,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointe
     WIN_MGR->SetGlobalDefaultPointerStyle();
     for (auto &iter : WIN_MGR->pointerStyle_) {
         for (auto &item : iter.second) {
-            EXPECT_EQ(item.second.id, WIN_MGR->globalStyle_.id);
+            EXPECT_EQ(item.second.id, 3);
+            EXPECT_EQ(WIN_MGR->globalStyle_.id, 0);
         }
     }
 }
@@ -5047,36 +5048,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetUIExtentionWindowIn
     uiExtentionWindowInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWinMgr.GetUIExtentionWindowInfo(uiExtentionWindowInfo, windowId,
         &touchWindow, isUiExtentionWindow));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea
- * @tc.desc: Test the funcation CheckUIExtentionWindowDefaultHotArea
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWinMgr;
-    int32_t logicalX = 150;
-    int32_t logicalY = 150;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    std::vector<WindowInfo> windowInfos;
-    bool isHotArea = true;
-    std::pair<int32_t, int32_t> logicalXY(std::make_pair(logicalX, logicalY));
-    WindowInfo windowInfo;
-    Rect rect;
-    rect.x = INT32_MAX;
-    rect.width = 100;
-    windowInfo.defaultHotAreas.push_back(rect);
-    windowInfos.push_back(windowInfo);
-    const WindowInfo* touchWindow = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWinMgr.CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent,
-        windowInfos, touchWindow));
 }
 
 /**

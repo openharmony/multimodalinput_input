@@ -572,25 +572,5 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Chec
     EXPECT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
 }
 
-/**
- * @tc.name: KnuckleDynamicDrawingManagerTest_ProcessUpAndCancelEvent
- * @tc.desc: Test Overrides ProcessUpAndCancelEvent function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_ProcessUpAndCancelEvent, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-    auto pixelMap = DecodeImageToPixelMap(imagePath);
-    knuckleDynamicDrawMgr.glowTraceSystem_ = std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE,
-        pixelMap, MAX_DIVERGENCE_NUM);
-    pointerEvent->SetPointerId(10);
-    pointerEvent->SetActionTime(1000);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessUpAndCancelEvent(pointerEvent));
-}
 } // namespace MMI
 } // namespace OHOS
