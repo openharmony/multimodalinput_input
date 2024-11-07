@@ -80,10 +80,10 @@ const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 const std::string WALLET_BUNDLE_NAME { "com.hmos.wallet" };
 constexpr int32_t DEFAULT_VALUE { -1 };
-const std::string HARDEN_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const std::string HARDEN_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const std::string HARDEN_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const std::string HARDEN_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
+const std::string PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const std::string PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const std::string PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2478,13 +2478,13 @@ bool KeyCommandHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEven
     CHKPF(event);
     auto actionType = event->GetKeyAction();
     if (actionType == KNUCKLE_1F_DOUBLE_CLICK) {
-        TouchPadKnuckleDoubleClickProcess(HARDEN_SCREENSHOT_BUNDLE_NAME,
-            HARDEN_SCREENSHOT_ABILITY_NAME, "single_knuckle");
+        TouchPadKnuckleDoubleClickProcess(PC_PRO_SCREENSHOT_BUNDLE_NAME,
+            PC_PRO_SCREENSHOT_ABILITY_NAME, "single_knuckle");
         return true;
     }
     if (actionType == KNUCKLE_2F_DOUBLE_CLICK) {
-        TouchPadKnuckleDoubleClickProcess(HARDEN_SCREENRECORDER_BUNDLE_NAME,
-            HARDEN_SCREENRECORDER_ABILITY_NAME, "double_knuckle");
+        TouchPadKnuckleDoubleClickProcess(PC_PRO_SCREENRECORDER_BUNDLE_NAME,
+            PC_PRO_SCREENRECORDER_ABILITY_NAME, "double_knuckle");
         return true;
     }
     return false;
