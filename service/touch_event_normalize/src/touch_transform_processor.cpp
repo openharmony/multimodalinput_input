@@ -18,6 +18,7 @@
 #include <linux/input.h>
 
 #include "aggregator.h"
+#include "bytrace_adapter.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
@@ -130,7 +131,9 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
 #endif // OHOS_BUILD_ENABLE_TOUCH
         rawTouchTmp.x = displayX * DRIVER_NUMBER;
         rawTouchTmp.y = displayY * DRIVER_NUMBER;
+        BytraceAdapter::StartToolType(toolType);
         FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
+        BytraceAdapter::StopToolType();
     }
 }
 void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
@@ -225,7 +228,9 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 #endif // OHOS_BUILD_ENABLE_TOUCH
         rawTouchTmp.x = displayX * DRIVER_NUMBER;
         rawTouchTmp.y = displayY * DRIVER_NUMBER;
+        BytraceAdapter::StartTouchUp(item.GetPointerId());
         FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouchTmp);
+        BytraceAdapter::StopTouchUp();
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     pointerEvent_->UpdatePointerItem(seatSlot, item);

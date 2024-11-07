@@ -398,5 +398,76 @@ void BytraceAdapter::StopTouchEvent()
 {
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
+
+void BytraceAdapter::StartToolType(int32_t toolType)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "current ToolType:" + std::to_string(toolType));
+}
+
+void BytraceAdapter::StopToolType()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartTouchUp(int32_t pointerId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startTouchUp pointerId:" + std::to_string(pointerId));
+}
+
+void BytraceAdapter::StopTouchUp()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartUpdateDisplayMode(const std::string &modeMsg)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, modeMsg);
+}
+
+void BytraceAdapter::StopUpdateDisplayMode()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartDataShare(const std::string &key)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, key);
+}
+
+void BytraceAdapter::StopDataShare()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartRsSurfaceNode(int32_t displayId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "pointerWindow displayId:" + std::to_string(displayId));
+}
+
+void BytraceAdapter::StopRsSurfaceNode()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartFoldState(bool state)
+{
+    std::string foldState = state ? "true" : "false";
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, foldState);
+}
+
+void BytraceAdapter::StopFoldState()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartWindowVisible(int32_t pid)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "get visibility window info:" + std::to_string(pid));
+}
+
+void BytraceAdapter::StopWindowVisible()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
 } // namespace MMI
 } // namespace OHOS
