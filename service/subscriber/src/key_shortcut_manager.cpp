@@ -795,18 +795,6 @@ bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent
     return (shortcutConsumed_.find(keyEvent->GetKeyCode()) != shortcutConsumed_.cend());
 }
 
-int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
-{
-    CALL_DEBUG_ENTER;
-    for (const auto &item : hotkeys_) {
-        std::unique_ptr<KeyOption> keyOptionPtr = std::make_unique<KeyOption>();
-        keyOptionPtr->SetPreKeys(item.preKeys);
-        keyOptionPtr->SetFinalKey(item.finalKey);
-        sysKeys.push_back(std::move(keyOptionPtr));
-    }
-    return RET_OK;
-}
-
 void KeyShortcutManager::UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
@@ -896,6 +884,18 @@ void KeyShortcutManager::ResetTriggering(int32_t shortcutId)
         TimerMgr->RemoveTimer(iter->second);
         triggering_.erase(iter);
     }
+}
+
+int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &item : hotkeys_) {
+        std::unique_ptr<KeyOption> keyOptionPtr = std::make_unique<KeyOption>();
+        keyOptionPtr->SetPreKeys(item.preKeys);
+        keyOptionPtr->SetFinalKey(item.finalKey);
+        sysKeys.push_back(std::move(keyOptionPtr));
+    }
+    return RET_OK;
 }
 
 void KeyShortcutManager::LoadHotkeys()
