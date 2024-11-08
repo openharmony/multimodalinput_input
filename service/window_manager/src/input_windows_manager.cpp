@@ -998,7 +998,7 @@ bool InputWindowsManager::JudgeCaramaInFore()
     int32_t focPid = GetPidByWindowId(focWid);
     if (udsServer_ == nullptr) {
         MMI_HILOGW("The udsServer is nullptr");
-        return false;  
+        return false;
     }
     SessionPtr sess = udsServer_->GetSessionByPid(focPid);
     if (sess == nullptr) {
