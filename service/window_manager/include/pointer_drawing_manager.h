@@ -182,6 +182,7 @@ private:
     void CreateDynamicCanvas();
     int32_t ParsingDynamicImage(MOUSE_ICON mouseStyle);
     void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
+    std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
@@ -252,6 +253,7 @@ private:
     std::atomic<bool> isRenderRuning_{ false };
     std::unique_ptr<std::thread> renderThread_ { nullptr };
     bool isInit_ { false };
+    std::mutex mtx_;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
