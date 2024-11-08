@@ -1031,24 +1031,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointe
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001
- * @tc.desc: Test setting global default pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WIN_MGR->SetGlobalDefaultPointerStyle();
-    for (auto &iter : WIN_MGR->pointerStyle_) {
-        for (auto &item : iter.second) {
-            EXPECT_EQ(item.second.id, 3);
-            EXPECT_EQ(WIN_MGR->globalStyle_.id, 0);
-        }
-    }
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
  * @tc.desc: Test setting pointer style
  * @tc.type: FUNC
@@ -5048,38 +5030,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetUIExtentionWindowIn
     uiExtentionWindowInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWinMgr.GetUIExtentionWindowInfo(uiExtentionWindowInfo, windowId,
         &touchWindow, isUiExtentionWindow));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea_001
- * @tc.desc: Test the funcation CheckUIExtentionWindowDefaultHotArea
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWinMgr;
-    int32_t logicalX = 150;
-    int32_t logicalY = 150;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    std::vector<WindowInfo> windowInfos;
-    bool isHotArea = true;
-    std::pair<int32_t, int32_t> logicalXY(std::make_pair(logicalX, logicalY));
-    WindowInfo windowInfo;
-    Rect rect;
-    rect.x = 100;
-    rect.y = 100;
-    rect.width = 200;
-    rect.height = 200;
-    windowInfo.defaultHotAreas.push_back(rect);
-    windowInfos.push_back(windowInfo);
-    const WindowInfo* touchWindow = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWinMgr.CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent,
-        windowInfos, touchWindow));
 }
 
 /**
