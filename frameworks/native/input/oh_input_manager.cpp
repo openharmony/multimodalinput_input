@@ -1742,10 +1742,7 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count)
 Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
 {
     CALL_DEBUG_ENTER;
-    if (count == nullptr) {
-        MMI_HILOGE("Parameter error");
-        return INPUT_PARAMETER_ERROR;
-    }
+    CHKPR(count, INPUT_PARAMETER_ERROR);
     std::vector<std::unique_ptr<OHOS::MMI::KeyOption>> keyOptions;
     int32_t hotkeyCount = -1;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, hotkeyCount);
@@ -1777,10 +1774,7 @@ Input_Hotkey* OH_Input_CreateHotkey(void)
 {
     CALL_DEBUG_ENTER;
     Input_Hotkey* hotkey = new (std::nothrow) Input_Hotkey();
-    if (hotkey == nullptr) {
-        MMI_HILOGE("Hotkey is null");
-        return nullptr;
-    }
+    CHKPP(hotkey);
     return hotkey;
 }
 
@@ -2011,10 +2005,7 @@ static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
     CHKPV(reportEvent);
 
     Input_HotkeyInfo *info = new(std::nothrow) Input_HotkeyInfo();
-    if (info == nullptr) {
-        MMI_HILOGE("Info is null");
-        return;
-    }
+    CHKPV(info);
     info->keyOption = reportEvent->keyOption;
     if (info->keyOption == nullptr) {
         delete info;
@@ -2238,10 +2229,7 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
 Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
 {
     CALL_DEBUG_ENTER;
-    if (listener == nullptr) {
-        MMI_HILOGE("listener is nullptr");
-        return INPUT_PARAMETER_ERROR;
-    }
+    CHKPR(listener, INPUT_PARAMETER_ERROR);
     std::lock_guard guard(g_DeviceListerCallbackMutex);
     auto it = g_ohDeviceListenerList.find(listener);
     if (it == g_ohDeviceListenerList.end()) {
@@ -2308,10 +2296,7 @@ Input_DeviceInfo* OH_Input_CreateDeviceInfo(void)
 {
     CALL_DEBUG_ENTER;
     Input_DeviceInfo* deviceInfo = new (std::nothrow) Input_DeviceInfo();
-    if (deviceInfo == nullptr) {
-        MMI_HILOGE("deviceInfo is null");
-        return nullptr;
-    }
+    CHKPP(deviceInfo);
     return deviceInfo;
 }
 
