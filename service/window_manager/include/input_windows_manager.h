@@ -49,6 +49,7 @@ public:
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
     bool GetMouseFlag();
+    bool JudgeCaramaInFore();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void JudgMouseIsDownOrUp(bool dragState);
 #endif // OHOS_BUILD_ENABLE_POINTER
