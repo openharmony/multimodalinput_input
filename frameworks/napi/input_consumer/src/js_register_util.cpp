@@ -237,7 +237,8 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEven
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
-int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEventMonitorInfo> event, int32_t &subscribeId)
+int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEventMonitorInfo> event,
+    int32_t &subscribeId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
