@@ -363,7 +363,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
                 CALL_DEBUG_ENTER;
                 auto sharedPtr = weakPtr.lock();
                 CHKPV(sharedPtr);
-                MMI_HILOGI("Timer:%{public}d", sharedPtr->timerId_);
+                MMI_HILOGD("Timer:%{public}d", sharedPtr->timerId_);
                 sharedPtr->timerId_ = -1;
                 auto pointerEvent = sharedPtr->GetPointerEvent();
                 CHKPV(pointerEvent);
@@ -380,7 +380,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
             pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
-            MMI_HILOGI("Axis begin");
+            MMI_HILOGD("Axis begin");
         }
     }
 
@@ -751,7 +751,7 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
         } else if (width == SOFT_PC_PRO_DEVICE_WIDTH && height == SOFT_PC_PRO_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_SOFT_PC_PRO;
         } else {
-            MMI_HILOGE("Undefined width:%{public}d, height:%{public}d", width, height);
+            MMI_HILOGD("Undefined width:%{public}d, height:%{public}d", width, height);
         }
         MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
     }
@@ -933,7 +933,7 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
 
     RightClickType switchType = RightClickType(switchTypeData);
     if (evenType != LIBINPUT_EVENT_POINTER_TAP && evenType != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        MMI_HILOGE("Event not from touchpad");
+        MMI_HILOGD("Event not from touchpad");
         return;
     }
     MMI_HILOGD("Transform right button event, evenType:%d, switchType:%d, button:%d", evenType, switchType, button);
