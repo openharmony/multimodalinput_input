@@ -195,20 +195,24 @@ int32_t DelEventCallbackRef(const napi_env &env, std::list<sptr<KeyEventMonitorI
 int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEventMonitorInfo> event)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(sCallBacksMutex);
     CHKPR(event, ERROR_NULL_POINTER);
-    if (callbacks.find(event->eventType) == callbacks.end()) {
-        MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
-        callbacks[event->eventType] = {};
-    }
     napi_value handler1 = nullptr;
     napi_status status = napi_get_reference_value(env, event->callback, &handler1);
     if (status != napi_ok) {
         MMI_HILOGE("Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    auto it = callbacks.find(event->eventType);
-    for (const auto &iter: it->second) {
+    
+    std::list<sptr<KeyEventMonitorInfo>> eventCallbacks;
+    {
+        std::lock_guard guard(sCallBacksMutex);
+        if (callbacks.find(event->eventType) == callbacks.end()) {
+            MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
+            callbacks[event->eventType] = {};
+        }
+        eventCallbacks = callbacks[event->eventType];
+    }
+    for (const auto& iter : eventCallbacks) {
         napi_value handler2 = nullptr;
         status = napi_get_reference_value(env, iter->callback, &handler2);
         if (status != napi_ok) {
@@ -226,7 +230,10 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEven
             return JS_CALLBACK_EVENT_FAILED;
         }
     }
-    it->second.push_back(event);
+    {
+        std::lock_guard guard(sCallBacksMutex);
+        callbacks[event->eventType].push_back(event);
+    }
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
@@ -234,20 +241,30 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEven
     int32_t &subscribeId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(sCallBacksMutex);
     CHKPR(event, ERROR_NULL_POINTER);
-    if (callbacks.count(event->eventType) <= 0) {
-        MMI_HILOGE("Callback doesn't exists");
-        return JS_CALLBACK_EVENT_FAILED;
+    std::list<sptr<KeyEventMonitorInfo>> info;
+    {
+        std::lock_guard guard(sCallBacksMutex);
+        if (callbacks.count(event->eventType) <= 0) {
+            MMI_HILOGE("Callback doesn't exists");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
+        info = callbacks[event->eventType];
+        MMI_HILOGD("EventType:%{private}s, keyEventMonitorInfos:%{public}zu", event->eventType.c_str(), info.size());
     }
-    auto &info = callbacks[event->eventType];
-    MMI_HILOGD("EventType:%{private}s, keyEventMonitorInfos:%{public}zu", event->eventType.c_str(), info.size());
     napi_value eventHandler = nullptr;
     if (event->callback != nullptr) {
         CHKRR(napi_get_reference_value(env, event->callback, &eventHandler), GET_REFERENCE_VALUE,
               JS_CALLBACK_EVENT_FAILED);
     }
-    return DelEventCallbackRef(env, info, eventHandler, subscribeId);
+
+    int32_t result = DelEventCallbackRef(env, info, eventHandler, subscribeId);
+    if (info.empty()) {
+        std::lock_guard guard(sCallBacksMutex);
+        callbacks.erase(event->eventType);
+    }
+
+    return result;
 }
 
 static void AsyncWorkFn(const napi_env &env, std::shared_ptr<KeyOption> keyOption, napi_value &result,
