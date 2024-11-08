@@ -79,7 +79,7 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
         return nullptr;
     }
     JS_INPUT_MONITOR_MGR.AddMonitor(env, typeName, argv[1]);
-    MMI_HILOGI("Add Monitor success, type: %{public}s", typeName);
+    MMI_HILOGI("Add Monitor success, type:%{public}s", typeName);
     return nullptr;
 }
 
@@ -159,7 +159,7 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
         }
         JS_INPUT_MONITOR_MGR.AddMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
     }
-    MMI_HILOGI("Add Monitor success, type: %{public}s", typeName);
+    MMI_HILOGI("Add Monitor success, type:%{public}s", typeName);
     return nullptr;
 }
 
