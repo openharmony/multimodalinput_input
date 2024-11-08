@@ -2607,6 +2607,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             }
             int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            } else {
+                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+            }
             IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
             int64_t endTime = GetSysClockTime();
@@ -2712,6 +2717,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsMouseDrawing(pointerEvent->GetPointerAction())) {
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        } else {
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+        }
         IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
