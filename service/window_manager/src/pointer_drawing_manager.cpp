@@ -1883,7 +1883,10 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
     float xAxis = (float)cursorWidth_ / (float)imageInfo.size.width;
     float yAxis = (float)cursorHeight_ / (float)imageInfo.size.height;
     newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
-    userIcon_.reset(newPixelMap);
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        userIcon_.reset(newPixelMap);
+    }
     userIconHotSpotX_ = static_cast<int32_t>((float)focusX * xAxis);
     userIconHotSpotY_ = static_cast<int32_t>((float)focusY * yAxis);
     MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
@@ -1911,7 +1914,11 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
-    userIcon_.reset(pixelMapPtr);
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        userIcon_.reset(pixelMapPtr);
+    }
+    
     mouseIconUpdate_ = true;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
