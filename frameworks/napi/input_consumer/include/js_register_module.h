@@ -20,7 +20,7 @@
 #include <cstring>
 #include <iostream>
 #include <list>
-#include <map>
+#include <unordered_map>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -62,7 +62,7 @@ struct KeyEventMonitorInfo : RefBase {
     std::shared_ptr<KeyOption> keyOption{ nullptr };
     ~KeyEventMonitorInfo();
 };
-typedef std::map<std::string, std::list<sptr<KeyEventMonitorInfo>>> Callbacks;
+typedef std::unordered_map<std::string, std::list<sptr<KeyEventMonitorInfo>>> Callbacks;
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_REGISTER_MODULE_H
