@@ -93,7 +93,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     if (IsCallFromWorkerThread()) {
         return callback();
     }
-    std::shared_ptr<Promise> promise;
+    std::shared_ptr<Promise> promise = std::make_shared<Promise>();
     Future future = promise->get_future();
     auto task = PostTask(callback, promise);
     CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
