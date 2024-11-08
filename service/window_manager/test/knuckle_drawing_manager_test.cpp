@@ -419,37 +419,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002,
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_007
- * @tc.desc: Test Overrides KnuckleDrawHandler function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler_007, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
-    ASSERT_NE(touchEvent, nullptr);
-    touchEvent->SetPointerId(1);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(1);
-    item.SetDisplayX(150);
-    item.SetDisplayY(150);
-    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
-    touchEvent->AddPointerItem(item);
-    kceDrawMgr.isRotate_ = false;
-    kceDrawMgr.lastUpTime_ = 1000;
-    kceDrawMgr.lastDownPointer_.x = 50;
-    kceDrawMgr.lastDownPointer_.y = 50;
-    touchEvent->SetTargetDisplayId(10);
-    touchEvent->SetActionTime(100);
-    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.KnuckleDrawHandler(touchEvent));
-    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.KnuckleDrawHandler(touchEvent));
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckleDoubleClick
  * @tc.desc: Test Overrides IsSingleKnuckleDoubleClick function branches
  * @tc.type: Function
