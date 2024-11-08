@@ -72,6 +72,7 @@ constexpr int64_t SOS_INTERVAL_TIMES { 300000 };
 constexpr int64_t SOS_DELAY_TIMES { 1000000 };
 constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
+constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 10000 };
 const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
@@ -423,6 +424,15 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     knuckleGesture.downToPrevUpTime = intervalTime;
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent) && isTimeIntervalReady &&
+        (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
+        MMI_HILOGI("Anco knuckle toast");
+        knuckleCount_ = 0;
+        SendNotSupportMsg(touchEvent);
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
         MMI_HILOGI("Knuckle gesture start launch ability");
         knuckleCount_ = 0;
@@ -449,6 +459,47 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     }
     AdjustTimeIntervalConfigIfNeed(intervalTime);
     AdjustDistanceConfigIfNeed(downToPrevDownDistance);
+}
+
+void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    auto tempEvent = std::make_shared<PointerEvent>(*touchEvent);
+    std::list<PointerEvent::PointerItem> pointerItems = tempEvent->GetAllPointerItems();
+    tempEvent->RemoveAllPointerItems();
+    for (auto &pointerItem : pointerItems) {
+        pointerItem.SetPointerId(ANCO_KNUCKLE_POINTER_ID);
+        pointerItem.SetOriginPointerId(ANCO_KNUCKLE_POINTER_ID);
+        tempEvent->AddPointerItem(pointerItem);
+    }
+    tempEvent->SetPointerId(ANCO_KNUCKLE_POINTER_ID);
+    tempEvent->SetAgentWindowId(tempEvent->GetTargetWindowId());
+    MMI_HILOGW("Event is %{public}s", tempEvent->ToString().c_str());
+    auto fd = WIN_MGR->GetClientFd(tempEvent);
+    auto udsServer = InputHandler->GetUDSServer();
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(tempEvent, pkt);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    InputEventDataTransformation::MarshallingEnhanceData(tempEvent, pkt);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    udsServer->SendMsg(fd, pkt);
+
+    tempEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    tempEvent->SetId(tempEvent-GetId() + 1);
+    tempEvent->SetActionTime(tempEvent->GetActionTime() + 1);
+    std::list<PointerEvent::PointerItem> tmpPointerItems = tempEvent->GetAllPointerItems();
+    tempEvent->RemoveAllPointerItems();
+    for (auto &pointerItem : tmpPointerItems) {
+        pointerItem.SetPressed(false);
+        tempEvent->AddPointerItem(pointerItem);
+    }
+    NetPacket pktUp(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(tempEvent, pktUp);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    InputEventDataTransformation::MarshallingEnhanceData(tempEvent, pktUp);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    udsServer->SendMsg(fd, pktUp);
 }
 
 void KeyCommandHandler::UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent,
@@ -776,6 +827,14 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
     CHKPV(touchUp);
     MMI_HILOGI("Knuckle gesturePoints size:%{public}zu, isGesturing:%{public}d, isLetterGesturing:%{public}d",
         gesturePoints_.size(), isGesturing_, isLetterGesturing_);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent)) {
+        MMI_HILOGI("Anco knuckle toast");
+        ResetKnuckleGesture();
+        SendNotSupportMsg(touchEvent);
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
         isGesturing_, isLetterGesturing_));
     switch (notifyType) {
