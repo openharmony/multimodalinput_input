@@ -755,7 +755,8 @@ int32_t PointerDrawingManager::ParsingDynamicImage(MOUSE_ICON mouseStyle)
     std::shared_ptr<OHOS::Media::PixelMap> pixelmap = nullptr;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseicon by userIcon_");
-        image_ = ExtractDrawingImage(userIcon_);
+        auto userIconCopy = GetUserIconCopy();
+        image_ = ExtractDrawingImage(userIconCopy);
     } else {
         if (mouseStyle == MOUSE_ICON::RUNNING) {
             pixelmap = DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_LEFT].iconPath);
@@ -1309,7 +1310,8 @@ void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int
             [[fallthrough]];
         }
         case ANGLE_NW: {
-            if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+            auto userIconCopy = GetUserIconCopy();
+            if (userIconCopy != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX -= userIconHotSpotX_;
                 physicalY -= userIconHotSpotY_;
             }
@@ -1350,7 +1352,8 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
             [[fallthrough]];
         }
         case ANGLE_NW: {
-            if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+            auto userIconCopy = GetUserIconCopy();
+            if (userIconCopy != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX -= userIconHotSpotX_;
                 physicalY += userIconHotSpotY_;
             }
@@ -1391,7 +1394,8 @@ void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, i
             [[fallthrough]];
         }
         case ANGLE_NW: {
-            if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+            auto userIconCopy = GetUserIconCopy();
+            if (userIconCopy != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX += userIconHotSpotX_;
                 physicalY += userIconHotSpotY_;
             }
@@ -1432,7 +1436,8 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
             [[fallthrough]];
         }
         case ANGLE_NW: {
-            if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+            auto userIconCopy = GetUserIconCopy();
+            if (userIconCopy != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX += userIconHotSpotX_;
                 physicalY -= userIconHotSpotY_;
             }
@@ -1715,9 +1720,10 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     std::shared_ptr<OHOS::Media::PixelMap> pixelmap = nullptr;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseicon by userIcon_");
-        image = ExtractDrawingImage(userIcon_);
+        auto userIconCopy = GetUserIconCopy();
+        image = ExtractDrawingImage(userIconCopy);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        SetPixelMap(userIcon_);
+        SetPixelMap(userIconCopy);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     } else {
         if (mouseStyle == MOUSE_ICON::RUNNING) {
@@ -1808,7 +1814,9 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     canvas.AttachPen(pen);
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseicon by userIcon_");
-        OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *userIcon_, 0, 0);
+        auto userIconCopy = GetUserIconCopy();
+        CHKPV(userIconCopy);
+        OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *userIconCopy, 0, 0);
     } else {
         std::shared_ptr<OHOS::Media::PixelMap> pixelmap;
         if (mouseStyle == MOUSE_ICON::RUNNING) {
@@ -1929,7 +1937,8 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
         MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
-    if (hotSpotX < 0 || hotSpotY < 0 || userIcon_ == nullptr) {
+    auto userIconCopy = GetUserIconCopy();
+    if (hotSpotX < 0 || hotSpotY < 0 || userIconCopy == nullptr) {
         MMI_HILOGE("invalid value");
         return RET_ERR;
     }
@@ -2869,6 +2878,12 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
         DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
             pointerStyle, direction);
     }
+}
+
+std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    return userIcon_;
 }
 } // namespace MMI
 } // namespace OHOS
