@@ -990,12 +990,16 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     if (bundleName.find(matchName) == std::string::npos) {
         return false;
     }
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    if (WIN_MGR->JudgeCaramaInFore() &&
+        (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked)) {
+            return true;
+    }
     auto callState = DEVICE_MONITOR->GetCallState();
     if (callState == StateType::CALL_STATUS_ACTIVE) {
         return true;
     }
-    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
     MMI_HILOGI("ScreenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
         return false;

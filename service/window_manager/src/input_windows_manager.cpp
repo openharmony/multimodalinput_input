@@ -35,6 +35,7 @@
 #include "util.h"
 #include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
+#include "uds_session.h"
 #include "util_ex.h"
 #include "scene_board_judgement.h"
 #include "parameters.h"
@@ -988,6 +989,23 @@ void InputWindowsManager::HandleWindowPositionChange()
             iter->rectChangeBySystem = false;
         }
     }
+}
+
+bool InputWindowsManager::JudgeCaramaInFore()
+{
+    int32_t focWid = displayGroupInfo_.focusWindowId;
+    int32_t focPid = GetPidByWindowId(focWid);
+    if (udsServer_ == nullptr) {
+        MMI_HILOGW("The udsServer is nullptr");
+        return false;
+    }
+    SessionPtr sess = udsServer_->GetSessionByPid(focPid);
+    if (sess == nullptr) {
+        MMI_HILOGW("The sess is nullptr");
+        return false;
+    }
+    std::string programName = sess->GetProgramName();
+    return programName.find(".camera") != std::string::npos;
 }
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
