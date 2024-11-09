@@ -471,6 +471,7 @@ void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEve
         pointerItem.SetOriginPointerId(ANCO_KNUCKLE_POINTER_ID);
         tempEvent->AddPointerItem(pointerItem);
     }
+    tempEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     tempEvent->SetPointerId(ANCO_KNUCKLE_POINTER_ID);
     tempEvent->SetAgentWindowId(tempEvent->GetTargetWindowId());
     MMI_HILOGW("Event is %{public}s", tempEvent->ToString().c_str());
@@ -484,8 +485,6 @@ void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEve
     udsServer->SendMsg(fd, pkt);
 
     tempEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    tempEvent->SetId(tempEvent->GetId() + 1);
-    tempEvent->SetActionTime(tempEvent->GetActionTime() + 1);
     std::list<PointerEvent::PointerItem> tmpPointerItems = tempEvent->GetAllPointerItems();
     tempEvent->RemoveAllPointerItems();
     for (auto &pointerItem : tmpPointerItems) {
@@ -825,16 +824,17 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
     CHKPV(touchUp);
     MMI_HILOGI("Knuckle gesturePoints size:%{public}zu, isGesturing:%{public}d, isLetterGesturing:%{public}d",
         gesturePoints_.size(), isGesturing_, isLetterGesturing_);
+    NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
+        isGesturing_, isLetterGesturing_));
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent)) {
-        MMI_HILOGI("Anco knuckle toast");
-        ResetKnuckleGesture();
+    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent) && (notifyType == NotifyType::REGIONGESTURE ||
+        notifyType == NotifyType::LETTERGESTURE)) {
+        MMI_HILOGI("Anco single knuckle toast");
         SendNotSupportMsg(touchEvent);
+        ResetKnuckleGesture();
         return;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
-        isGesturing_, isLetterGesturing_));
     switch (notifyType) {
         case NotifyType::REGIONGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
