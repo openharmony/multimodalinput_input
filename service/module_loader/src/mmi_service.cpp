@@ -4030,6 +4030,7 @@ void MMIService::PrintLog(const std::string &flag, int32_t duration, int32_t pid
     MMI_HILOGW("DfxThreadBlockMsg:%{public}s", dfxThreadBlockMsg.c_str());
     OHOS::HiviewDFX::DfxDumpCatcher dumpCatcher;
     dumpCatcher.DumpCatch(pid, tid, dfxThreadBlockMsg, MAX_FRAME_NUMS, false);
+    MMI_HILOGW("BlockMsg:%{public}s", dfxThreadBlockMsg.c_str());
 }
 
 int32_t MMIService::SkipPointerLayer(bool isSkip)
