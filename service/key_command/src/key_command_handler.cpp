@@ -424,16 +424,14 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     knuckleGesture.downToPrevUpTime = intervalTime;
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent) && isTimeIntervalReady &&
-        (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
-        MMI_HILOGI("Anco knuckle toast");
-        knuckleCount_ = 0;
-        SendNotSupportMsg(touchEvent);
-        return;
-    }
-#endif // OHOS_BUILD_ENABLE_ANCO
     if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
+#ifdef OHOS_BUILD_ENABLE_ANCO
+        if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent)) {
+            knuckleCount_ = 0;
+            SendNotSupportMsg(touchEvent);
+            return;
+        }
+#endif // OHOS_BUILD_ENABLE_ANCO
         MMI_HILOGI("Knuckle gesture start launch ability");
         knuckleCount_ = 0;
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
@@ -486,7 +484,7 @@ void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEve
     udsServer->SendMsg(fd, pkt);
 
     tempEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    tempEvent->SetId(tempEvent-GetId() + 1);
+    tempEvent->SetId(tempEvent->GetId() + 1);
     tempEvent->SetActionTime(tempEvent->GetActionTime() + 1);
     std::list<PointerEvent::PointerItem> tmpPointerItems = tempEvent->GetAllPointerItems();
     tempEvent->RemoveAllPointerItems();
