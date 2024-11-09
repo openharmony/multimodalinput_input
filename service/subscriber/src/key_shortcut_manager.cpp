@@ -451,7 +451,7 @@ bool KeyShortcutManager::CheckSystemKey(const SystemShortcutKey &key, KeyShortcu
         }
     }
     if (nModifiers < SINGLE_MODIFIER) {
-        MMI_HILOGE("Require modifier(s)");
+        MMI_HILOGD("Require modifier(s)");
         return false;
     }
     if (key.finalKey == SHORTCUT_PURE_MODIFIERS) {

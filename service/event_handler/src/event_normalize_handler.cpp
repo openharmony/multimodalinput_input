@@ -438,7 +438,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     }
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
-        MMI_HILOGE("OnEvent is failed");
+        MMI_HILOGD("OnEvent is failed");
         BytraceAdapter::StopPackageEvent();
         return RET_ERR;
     }
