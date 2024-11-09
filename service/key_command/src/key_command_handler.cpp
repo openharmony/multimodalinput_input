@@ -1815,6 +1815,13 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+            MMI_HILOGI("The screen is currently off and the power button needs to respond");
+            return false;
+        }
+    }
     if (IsActiveSequenceRepeating(keyEvent)) {
         MMI_HILOGD("Skip repeating key(%{public}d) in active sequence", keyEvent->GetKeyCode());
         return true;
