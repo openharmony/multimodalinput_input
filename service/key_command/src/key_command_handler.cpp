@@ -1572,6 +1572,8 @@ bool KeyCommandHandler::HandleKeyUpCancel(const RepeatKey &item, const std::shar
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) {
         isKeyCancel_ = true;
         isDownStart_ = false;
+        count_ = 0;
+        repeatKeyCountMap_.clear();
         return true;
     }
     return false;
