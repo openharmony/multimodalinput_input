@@ -321,24 +321,22 @@ static bool MatchCombinationKeys(sptr<KeyEventMonitorInfo> monitorInfo, std::sha
     return count == infoSize;
 }
 
-static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
+static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent, const std::string& keyOptionKey)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     std::lock_guard guard(sCallBacksMutex);
-    auto iter = callbacks.begin();
-    while (iter != callbacks.end()) {
+    auto iter = callbacks.find(keyOptionKey);
+    if (iter != callbacks.end()) {
         auto &list = iter->second;
-        ++iter;
         MMI_HILOGD("list size:%{public}zu", list.size());
-        auto infoIter = list.begin();
-        while (infoIter != list.end()) {
-            auto monitorInfo = *infoIter;
+        for (auto monitorInfo : list) {
             if (MatchCombinationKeys(monitorInfo, keyEvent)) {
                 EmitAsyncCallbackWork(monitorInfo);
             }
-            ++infoIter;
         }
+    } else {
+        MMI_HILOGE("No Matches found for SubKeyEventCallback");
     }
 }
 
@@ -363,6 +361,24 @@ static void SubHotkeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
     }
 }
 
+std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
+{
+    std::string subKeyNames;
+    const std::set<int32_t>& preKeys = keyOption->GetPreKeys();
+    int32_t finalKey = keyOption->GetFinalKey();
+    bool isFinalKeyDown = keyOption->IsFinalKeyDown();
+    int32_t finalKeyDownDuration = keyOption->GetFinalKeyDownDuration();
+    bool isRepeat = keyOption->IsRepeat();
+    for (const auto& key : preKeys) {
+        subKeyNames.append(std::to_string(key)).append(",");
+    }
+    subKeyNames.append(std::to_string(finalKey)).append(",");
+    subKeyNames.append(std::to_string(isFinalKeyDown)).append(",");
+    subKeyNames.append(std::to_string(finalKeyDownDuration)).append(",");
+    subKeyNames.append(std::to_string(isRepeat));
+    return subKeyNames;
+}
+
 napi_value SubscribeKey(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
@@ -378,7 +394,11 @@ napi_value SubscribeKey(napi_env env, napi_callback_info info, sptr<KeyEventMoni
     if (preSubscribeId < 0) {
         MMI_HILOGD("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
-        subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
+        subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, 
+            [keyOption](std::shared_ptr<KeyEvent> keyEvent) {
+                std::string keyOptionKey = GenerateKeyOptionKey(keyOption);
+                SubKeyEventCallback(keyEvent, keyOptionKey);
+            });
         if (subscribeId < 0) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return nullptr;
