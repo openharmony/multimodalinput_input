@@ -72,7 +72,7 @@ constexpr int64_t SOS_INTERVAL_TIMES { 300000 };
 constexpr int64_t SOS_DELAY_TIMES { 1000000 };
 constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
-constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 10000 };
+constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 15000 };
 const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
