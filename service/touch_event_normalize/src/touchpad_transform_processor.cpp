@@ -49,7 +49,7 @@ constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t DEFAULT_ROWS { 3 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
-std::string g_threeFingerTapKey  = "touchpadThreeFingerTap";
+std::string g_threeFingerTapKey = "touchpadThreeFingerTap";
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
@@ -141,7 +141,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
     double toolHeight = libinput_event_touchpad_get_tool_height(touchpad);
     int32_t toolType = GetTouchPadToolType(touchpad, device);
     if (toolType == PointerEvent::TOOL_TYPE_PALM) {
-        MMI_HILOGD("Tool type is palm");
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     }
 
     item.SetLongAxis(longAxis);
@@ -695,7 +695,7 @@ bool MultiFingersTapHandler::ClearPointerItems(std::shared_ptr<PointerEvent> poi
     return true;
 }
 
-MulFingersTap MultiFingersTapHandler::GetMultiFingersState() const
+MulFingersTap MultiFingersTapHandler::GetMultiFingersState()
 {
     return multiFingersState_;
 }
