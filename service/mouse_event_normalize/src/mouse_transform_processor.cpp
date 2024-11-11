@@ -49,8 +49,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MIN_SPEED { 1 };
-constexpr int32_t MAX_SPEED { 11 };
-constexpr int32_t DEFAULT_SPEED { 7 };
+constexpr int32_t MAX_SPEED { 20 };
+constexpr int32_t DEFAULT_SPEED { 10 };
+constexpr int32_t MAX_TOUCHPAD_SPEED { 11 };
 constexpr int32_t DEFAULT_TOUCHPAD_SPEED { 6 };
 constexpr int32_t DEFAULT_ROWS { 3 };
 constexpr int32_t MIN_ROWS { 1 };
@@ -1042,7 +1043,7 @@ void MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
     GetConfigDataFromDatabase(name, speed);
     speed = speed == 0 ? DEFAULT_TOUCHPAD_SPEED : speed;
     speed = speed < MIN_SPEED ? MIN_SPEED : speed;
-    speed = speed > MAX_SPEED ? MAX_SPEED : speed;
+    speed = speed > MAX_TOUCHPAD_SPEED ? MAX_TOUCHPAD_SPEED : speed;
 }
 
 int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
