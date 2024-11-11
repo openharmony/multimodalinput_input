@@ -24,7 +24,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t STANDARD_SPEED { 5 };
-constexpr int32_t MAX_SPEED { 11 };
+constexpr int32_t MAX_SPEED { 20 };
+constexpr int32_t MAX_TOUCHPAD_SPEED { 11 };
 constexpr int32_t MIN_SPEED { 1 };
 constexpr int32_t DEFAULT_ROWS { 3 };
 constexpr int32_t MIN_ROWS { 1 };
@@ -1478,7 +1479,7 @@ napi_value JsPointerContext::SetTouchpadPointerSpeed(napi_env env, napi_callback
     auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadPointerSpeed(env, data, handle);
     };
-    return SetTouchpadInt32Data(env, info, func, MAX_SPEED, MIN_SPEED);
+    return SetTouchpadInt32Data(env, info, func, MAX_TOUCHPAD_SPEED, MIN_SPEED);
 }
 
 napi_value JsPointerContext::GetTouchpadPointerSpeed(napi_env env, napi_callback_info info)
@@ -1556,7 +1557,7 @@ napi_value JsPointerContext::SetTouchpadRightClickType(napi_env env, napi_callba
     auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadRightClickType(env, data, handle);
     };
-    return SetTouchpadInt32Data(env, info, func, MAX_SPEED, MIN_SPEED);
+    return SetTouchpadInt32Data(env, info, func, MAX_TOUCHPAD_SPEED, MIN_SPEED);
 }
 
 napi_value JsPointerContext::GetTouchpadRightClickType(napi_env env, napi_callback_info info)
