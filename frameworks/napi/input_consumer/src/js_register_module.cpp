@@ -394,7 +394,7 @@ napi_value SubscribeKey(napi_env env, napi_callback_info info, sptr<KeyEventMoni
     if (preSubscribeId < 0) {
         MMI_HILOGD("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
-        subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, 
+        subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
             [keyOption](std::shared_ptr<KeyEvent> keyEvent) {
                 std::string keyOptionKey = GenerateKeyOptionKey(keyOption);
                 SubKeyEventCallback(keyEvent, keyOptionKey);
