@@ -155,7 +155,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
         case LIBINPUT_EVENT_POINTER_BUTTON:
         case LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD:
+        case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN:
         case LIBINPUT_EVENT_POINTER_AXIS:
+        case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END:
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
             if (g_isSwipeInward) {

@@ -616,6 +616,28 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
 
 const char* PointerEvent::DumpPointerAction() const
 {
+    if (pointerAction_ == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
+        if (HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL) ||
+            HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+            return "axis-begin";
+        } else if (HasAxis(axes_, PointerEvent::AXIS_TYPE_PINCH)) {
+            return "pinch-begin";
+        }
+    } else if (pointerAction_ == PointerEvent::POINTER_ACTION_AXIS_UPDATE) {
+        if (HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL) ||
+            HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+            return "axis-update";
+        } else if (HasAxis(axes_, PointerEvent::AXIS_TYPE_PINCH)) {
+            return "pinch-update";
+        }
+    } else if (pointerAction_ == PointerEvent::POINTER_ACTION_AXIS_END) {
+        if (HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL) ||
+            HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+            return "axis-end";
+        } else if (HasAxis(axes_, PointerEvent::AXIS_TYPE_PINCH)) {
+            return "pinch-end";
+        }
+    }
     auto it = pointerActionMap.find(pointerAction_);
     if (it != pointerActionMap.end()) {
         return it->second.c_str();
