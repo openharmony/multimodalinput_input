@@ -963,7 +963,8 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
 
 void InputWindowsManager::HandleWindowPositionChange()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
+    PrintWindowNavbar();
     for (auto it = touchItemDownInfos_.begin(); it != touchItemDownInfos_.end(); ++it) {
         int32_t pointerId = it->first;
         int32_t windowId = it->second.window.id;
@@ -987,6 +988,26 @@ void InputWindowsManager::HandleWindowPositionChange()
             inputEventNormalizeHandler->HandleTouchEvent(tmpEvent);
             it->second.flag = true;
             iter->rectChangeBySystem = false;
+        }
+    }
+}
+
+void InputWindowsManager::PrintWindowNavbar()
+{
+    for (auto &item : displayGroupInfo_.windowsInfo) {
+        if (item.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
+            std::string dump;
+            dump += StringPrintf("%d|%d|%d|%d|%d|%zu(", item.id, item.area.x, item.area.y, item.area.width,
+                item.area.height, item.defaultHotAreas.size());
+            for (const auto &win : item.defaultHotAreas) {
+                dump += StringPrintf(" %d|%d|%d|%d ", win.x, win.y, win.width, win.height);
+            }
+            dump += StringPrintf(")\n");
+            for (auto it : item.transform) {
+                dump += StringPrintf("%f,", it);
+            }
+            dump += StringPrintf("]\n");
+            MMI_HILOGI("%{public}s", dump.c_str());
         }
     }
 }
@@ -4414,6 +4435,26 @@ void InputWindowsManager::PrintChangedWindowBySync(const DisplayGroupInfo &newDi
             MMI_HILOGI("Window sync changed %{public}d %{public}d %{public}f %{public}d %{public}d %{public}f",
                 oldWindows[0].id, oldWindows[0].pid, oldWindows[0].zOrder, newWindows[0].id,
                 newWindows[0].pid, newWindows[0].zOrder);
+        }
+    }
+    if (newDisplayInfo.displaysInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGE("displayGroupInfo.displaysInfo is empty");
+        return;
+    }
+    for (const auto &item : newDisplayInfo.displaysInfo) {
+        int32_t displayId = item.id;
+        auto iter = std::find_if(displayGroupInfo_.displaysInfo.begin(), displayGroupInfo_.displaysInfo.end(),
+            [displayId](const auto& displayInfo) {
+            return displayId == displayInfo.id;
+        });
+        if (iter == displayGroupInfo_.displaysInfo.end()) {
+            continue;
+        }
+        if (item.direction != iter->direction) {
+            MMI_HILOGI("displayInfos,id:%{public}d,x:%d,y:%d,width:%{public}d,height:%{public}d,name:%{public}s,"
+                "uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d, oldDirection:%{public}d",
+                item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
+                item.uniq.c_str(), item.direction, item.displayDirection, iter->direction);
         }
     }
 }

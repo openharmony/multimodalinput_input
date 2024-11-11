@@ -197,6 +197,7 @@ private:
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
     void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
+    void PrintWindowNavbar();
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const std::vector<WindowInfo> &oldWindowsInfo,
         const std::vector<WindowInfo> &newWindowsInfo);
