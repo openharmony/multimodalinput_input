@@ -647,7 +647,7 @@ fn get_speed_dynamic_gain_mouse(vin: f64, gain: *mut f64, speed: i32, delta_time
         error!(LOG_LABEL, "{} The speed value can't be less than 1", @public(speed));
         return false;
     }
-    let speeds_radio = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
+    let speeds_radio = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
                         1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0];
     let standard_slopes = [2.9394, 3.7879, 8.2121, 13.1515];
     let vins = [0.50, 1.30, 2.20, 16.17];
