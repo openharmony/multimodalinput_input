@@ -225,6 +225,12 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
         TimerMgr->RemoveTimer(gestureTimer_);
         gestureTimer_ = -1;
     }
+    if (isRecognized_ && (lastTouchEvent_ != nullptr)) {
+        PointerEvent::PointerItem pointerItem {};
+        if (event->GetPointerItem(event->GetPointerId(), pointerItem)) {
+            lastTouchEvent_->UpdatePointerItem(event->GetPointerId(), pointerItem);
+        }
+    }
     MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
         gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId);
     if (downPoint_.empty()) {
