@@ -31,8 +31,8 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
-constexpr int32_t HARD_HARDEN_DEVICE_WIDTH = 2880;
-constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT = 1920;
+constexpr int32_t HARD_PC_PRO_DEVICE_WIDTH = 2880;
+constexpr int32_t HARD_PC_PRO_DEVICE_HEIGHT = 1920;
 }
 class MouseTransformProcessorTest : public testing::Test {
 public:
@@ -177,8 +177,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_CheckDeviceTyp
 {
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    int32_t width = HARD_HARDEN_DEVICE_WIDTH;
-    int32_t height = HARD_HARDEN_DEVICE_HEIGHT;
+    int32_t width = HARD_PC_PRO_DEVICE_WIDTH;
+    int32_t height = HARD_PC_PRO_DEVICE_HEIGHT;
     ASSERT_NO_FATAL_FAILURE(processor.CheckDeviceType(width, height));
 }
 
