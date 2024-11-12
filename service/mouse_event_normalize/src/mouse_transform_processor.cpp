@@ -60,11 +60,11 @@ constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
 constexpr int32_t RIGHT_CLICK_TYPE_MAX { 3 };
 constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
-constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
-constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };
-constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH { 3120 };
-constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
-const std::string DEVICE_TYPE_HARDEN { "HAD" };
+constexpr int32_t HARD_PC_PRO_DEVICE_WIDTH { 2880 };
+constexpr int32_t HARD_PC_PRO_DEVICE_HEIGHT { 1920 };
+constexpr int32_t SOFT_PC_PRO_DEVICE_WIDTH { 3120 };
+constexpr int32_t SOFT_PC_PRO_DEVICE_HEIGHT { 2080 };
+const std::string DEVICE_TYPE_PC_PRO { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
@@ -398,9 +398,9 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
     const int32_t initRows = 3;
-    DeviceType deviceType = DeviceType::DEVICE_KLV;
-    if (PRODUCT_TYPE == DEVICE_TYPE_HARDEN) {
-        deviceType = DeviceType::DEVICE_SOFT_HARDEN;
+    DeviceType deviceType = DeviceType::DEVICE_PC;
+    if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
+        deviceType = DeviceType::DEVICE_SOFT_PC_PRO;
     }
     int32_t ret =
         HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
@@ -698,12 +698,12 @@ void MouseTransformProcessor::DumpInner()
 DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t height)
 {
     CALL_DEBUG_ENTER;
-    DeviceType ret = DeviceType::DEVICE_KLV;
-    if (PRODUCT_TYPE == DEVICE_TYPE_HARDEN) {
-        if (width == HARD_HARDEN_DEVICE_WIDTH && height == HARD_HARDEN_DEVICE_HEIGHT) {
-            ret = DeviceType::DEVICE_HARD_HARDEN;
-        } else if (width == SOFT_HARDEN_DEVICE_WIDTH && height == SOFT_HARDEN_DEVICE_HEIGHT) {
-            ret = DeviceType::DEVICE_SOFT_HARDEN;
+    DeviceType ret = DeviceType::DEVICE_PC;
+    if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
+        if (width == HARD_PC_PRO_DEVICE_WIDTH && height == HARD_PC_PRO_DEVICE_HEIGHT) {
+            ret = DeviceType::DEVICE_HARD_PC_PRO;
+        } else if (width == SOFT_PC_PRO_DEVICE_WIDTH && height == SOFT_PC_PRO_DEVICE_HEIGHT) {
+            ret = DeviceType::DEVICE_SOFT_PC_PRO;
         } else {
             MMI_HILOGE("Undefined width:%{public}d, height:%{public}d", width, height);
         }
