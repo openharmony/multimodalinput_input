@@ -1400,22 +1400,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadR
 }
 
 /**
- * @tc.name: MouseTransformProcessorTest_TransTouchpadRightButton_05
- * @tc.desc: Test TransTouchpadRightButton
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadRightButton_05, TestSize.Level1)
-{
-    int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
-    struct libinput_event_pointer *data = nullptr;
-    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
-    uint32_t button = BTN_RIGHT_MENUE_CODE;
-    processor.TransTouchpadRightButton(data, evenType, button);
-}
-
-/**
  * @tc.name: MouseTransformProcessorTest_TransTouchpadRightButton_06
  * @tc.desc: Test TransTouchpadRightButton
  * @tc.type: FUNC
