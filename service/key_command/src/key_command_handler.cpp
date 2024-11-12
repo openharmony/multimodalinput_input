@@ -330,21 +330,30 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
+    int64_t currentDownTime = item.GetDownTime();
     if (!lastPointerDownTime_.empty()) {
+        int64_t firstDownTime = lastPointerDownTime_.begin()->second;
         int64_t lastPointerDownTime = touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ?
-            lastPointerDownTime_[SIMULATE_POINTER_ID] : lastPointerDownTime_[0];
-        int64_t diffTime = item.GetDownTime() - lastPointerDownTime;
+            lastPointerDownTime_[SIMULATE_POINTER_ID] : firstDownTime;
+        int64_t diffTime = currentDownTime - lastPointerDownTime;
+        lastPointerDownTime_[id] = currentDownTime;
+        MMI_HILOGW("Size:%{public}zu, firstDownTime:%{public}" PRId64 ", "
+            "currentDownTime:%{public}" PRId64 ", diffTime:%{public}" PRId64,
+            lastPointerDownTime_.size(), firstDownTime, currentDownTime, diffTime);
         if (diffTime > TWO_FINGERS_TIME_LIMIT) {
-            MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}" PRId64 ",pointerId:%{public}d",
-            diffTime, id);
+            MMI_HILOGE("Invalid double knuckle event, pointerId:%{public}d", id);
             return;
         }
     }
-    lastPointerDownTime_[id] = item.GetDownTime();
 
-    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
-        MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
-        return;
+    lastPointerDownTime_[id] = currentDownTime;
+    auto items = touchEvent->GetAllPointerItems();
+    MMI_HILOGI("itemsSize:%{public}zu", items.size());
+    for (const auto &item : items) {
+        if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
+            MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
+            return;
+        }
     }
     if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
