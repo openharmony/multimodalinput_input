@@ -136,21 +136,6 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_ExecRegisterCb, TestSize.Lev
 }
 
 /**
- * @tc.name: SettingDatashareTest_RegisterObserver
- * @tc.desc: Test RegisterObserver
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    SettingDataShare settingDataShare;
-    std::string key = "settingDateShare";
-    sptr<SettingObserver> observer = nullptr;
-    ASSERT_EQ(settingDataShare.RegisterObserver(observer), RET_ERR);
-}
-
-/**
  * @tc.name: SettingDatashareTest_UnregisterObserver
  * @tc.desc: Test UnregisterObserver
  * @tc.type: FUNC

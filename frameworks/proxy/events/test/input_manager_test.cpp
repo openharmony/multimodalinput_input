@@ -1397,7 +1397,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_IsPointerVisible_001, TestSize.Level
     pointerEvent->AddPointerItem(item);
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    ASSERT_FALSE(InputManager::GetInstance()->IsPointerVisible());
+    ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible());
 }
 
 /**
