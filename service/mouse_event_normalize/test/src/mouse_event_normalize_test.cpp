@@ -104,7 +104,8 @@ void MouseEventNormalizeTest::TearDown()
     MouseEventHdr->SetMouseScrollRows(preScrollRows_);
     MouseEventHdr->SetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
     MouseEventHdr->SetTouchpadRightClickType(preRightClickType_);
-    MouseEventHdr->SetTouchpadScrollSwitch(preScrollSwitch_);
+    int32_t pid = 1;
+    MouseEventHdr->SetTouchpadScrollSwitch(pid, preScrollSwitch_);
     MouseEventHdr->SetTouchpadScrollDirection(preScrollDirection_);
     MouseEventHdr->SetTouchpadTapSwitch(preTapSwitch_);
 }
@@ -355,8 +356,9 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollRows_012
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollSwitch_013, TestSize.Level1)
 {
+    int32_t pid = 1;
     bool flag = false;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(flag) == RET_OK);
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(pid, flag) == RET_OK);
 }
 
 /**
@@ -367,8 +369,9 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollSwitc
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitch_014, TestSize.Level1)
 {
+    int32_t pid = 1;
     bool flag = true;
-    MouseEventHdr->SetTouchpadScrollSwitch(flag);
+    MouseEventHdr->SetTouchpadScrollSwitch(pid, flag);
     bool newFlag = true;
     MouseEventHdr->GetTouchpadScrollSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
