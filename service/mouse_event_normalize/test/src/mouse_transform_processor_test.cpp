@@ -119,7 +119,8 @@ void MouseTransformProcessorTest::TearDown()
     g_processor_.SetMouseScrollRows(preScrollRows_);
     g_processor_.SetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
     g_processor_.SetTouchpadRightClickType(preRightClickType_);
-    g_processor_.SetTouchpadScrollSwitch(preScrollSwitch_);
+    int32_t pid = 1;
+    g_processor_.SetTouchpadScrollSwitch(pid, preScrollSwitch_);
     g_processor_.SetTouchpadScrollDirection(preScrollDirection_);
     g_processor_.SetTouchpadTapSwitch(preTapSwitch_);
 }
@@ -372,8 +373,9 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadScr
 {
     int32_t deviceId = 6;
     MouseTransformProcessor processor(deviceId);
+    int32_t pid = 1;
     bool flag = false;
-    ASSERT_TRUE(processor.SetTouchpadScrollSwitch(flag) == RET_OK);
+    ASSERT_TRUE(processor.SetTouchpadScrollSwitch(pid, flag) == RET_OK);
 }
 
 /**
@@ -386,8 +388,9 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadScr
 {
     int32_t deviceId = 6;
     MouseTransformProcessor processor(deviceId);
+    int32_t pid = 1;
     bool flag = true;
-    processor.SetTouchpadScrollSwitch(flag);
+    processor.SetTouchpadScrollSwitch(pid, flag);
     bool newFlag = true;
     processor.GetTouchpadScrollSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
