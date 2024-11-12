@@ -325,6 +325,7 @@ private:
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
     void TouchPadKnuckleDoubleClickProcess(const std::string bundleName, const std::string abilityName,
         const std::string action);
+    void SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEvent);
 
 private:
     Sequence matchedSequence_;
