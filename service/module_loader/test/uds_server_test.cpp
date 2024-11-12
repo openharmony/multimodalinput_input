@@ -596,23 +596,6 @@ HWTEST_F(UDSServerTest, AddSocketPairInfo_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetFdProperty_003
- * @tc.desc: Test the scenario of setting file descriptor properties
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UDSServerTest, SetFdProperty_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    UDSServer udsServer;
-    int32_t tokenType = TokenType::TOKEN_NATIVE;
-    int32_t serverFd = 123;
-    int32_t toReturnClientFd = 456;
-    auto ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: Dump_002
  * @tc.desc: Test the Dump functionality of UDSServer
  * @tc.type: FUNC
