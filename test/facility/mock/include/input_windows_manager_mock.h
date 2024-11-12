@@ -30,6 +30,10 @@ public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManagerMock);
 
     void Init(UDSServer&) override {}
+    bool JudgeCaramaInFore() override
+    {
+        return true;
+    }
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>, int32_t));
     void UpdateDisplayInfo(DisplayGroupInfo&) override {}

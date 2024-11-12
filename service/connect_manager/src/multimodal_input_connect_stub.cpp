@@ -23,6 +23,7 @@
 #include "string_ex.h"
 #include "tokenid_kit.h"
 
+
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"

@@ -46,6 +46,7 @@ bool StylusKeyHandler::HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent)
         CreateStatusConfigObserver(stylusKey_);
         shortHandTarget_.statusConfig = SHORTHAND_TARGET;
         CreateStatusConfigObserver(shortHandTarget_);
+        isShortHandConfig_ = true;
     }
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_STYLUS_SCREEN) {
         stylusKey_.lastEventIsStylus = false;
@@ -90,7 +91,6 @@ void StylusKeyHandler::CreateStatusConfigObserver(T& item)
     }
     MMI_HILOGI("Get value success key:%{public}s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
     item.statusConfigValue = configVlaue;
-    isShortHandConfig_ = true;
 }
 
 void StylusKeyHandler::IsLaunchAbility()

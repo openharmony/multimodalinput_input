@@ -21,11 +21,11 @@
 namespace OHOS {
 namespace MMI {
 struct PointerStyle {
-    int32_t size { -1 };
-    int32_t color { 0 };
-    int32_t id { 0 };
-    int32_t options { 0 };
-    bool operator==(const PointerStyle &rhs) const
+    int32_t size{ -1 };
+    int32_t color{ 0 };
+    int32_t id{ 0 };
+    int32_t options{ 0 };
+    bool operator==(const PointerStyle& rhs) const
     {
         return id == rhs.id && size == rhs.size && color == rhs.color && options == rhs.options;
     }

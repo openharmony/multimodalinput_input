@@ -189,6 +189,7 @@ public:
     bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t SetIsFreezePowerKey(const std::string pageName);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
@@ -208,6 +209,7 @@ private:
     void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
     void LaunchAbility(const Sequence &sequence);
+    void LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLaunched, const std::shared_ptr<KeyEvent> keyEvent);
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool IsRepeatKeyEvent(const SequenceKey &sequenceKey);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
@@ -217,8 +219,11 @@ private:
     bool HandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
+    void HandleRepeatKeyOwnCount(const RepeatKey &item);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+        const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes);
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility);
@@ -239,6 +244,7 @@ private:
     void HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent> &keyEvent);
     int32_t GetKeyDownDurationFromXml(const std::string &businessId);
     void SendKeyEvent();
+    bool CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent);
     template <class T>
     void CreateStatusConfigObserver(T& item);
     void ResetLastMatchedKey()
@@ -322,6 +328,9 @@ private:
     bool isParseExcludeConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
+    std::map<int32_t, int32_t> repeatKeyMaxTimes_;
+    std::map<std::string, int32_t> repeatKeyTimerIds_;
+    std::map<std::string, int32_t> repeatKeyCountMap_;
     TwoFingerGesture twoFingerGesture_;
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
@@ -342,10 +351,14 @@ private:
     int32_t count_ { 0 };
     int32_t repeatTimerId_ { -1 };
     int32_t knuckleCount_ { 0 };
+    int32_t sosDelayTimerId_ { -1 };
     int64_t downActionTime_ { 0 };
+    int64_t lastDownActionTime_ { 0 };
+    int64_t lastVolumeDownActionTime_ { 0 };
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
     int64_t intervalTime_ { 120000 };
+    std::atomic<bool> isFreezePowerKey_ { false };
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
     bool sequenceOccurred_ { false };
@@ -374,6 +387,8 @@ private:
     int64_t previousUpTime_ { 0 };
     int32_t tappingCount_ { 0 };
     std::map<int32_t, int64_t> lastPointerDownTime_;
+    std::mutex mutex_;
+    int64_t walletLaunchDelayTimes_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
