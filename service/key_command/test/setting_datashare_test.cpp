@@ -136,6 +136,24 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_ExecRegisterCb, TestSize.Lev
 }
 
 /**
+ * @tc.name: SettingDatashareTest_RegisterObserver
+ * @tc.desc: Test RegisterObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SettingDataShare settingDataShare;
+    std::string key = "settingDateShare";
+    sptr<SettingObserver> observer = new (std::nothrow) SettingObserver;
+    observer->key_ = "settingDateShare";
+    std::string strUri = "strUri";
+    settingDataShare.isDataShareReady_ = false;
+    ASSERT_EQ(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
+}
+
+/**
  * @tc.name: SettingDatashareTest_UnregisterObserver
  * @tc.desc: Test UnregisterObserver
  * @tc.type: FUNC
@@ -146,11 +164,11 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize
     CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
-    sptr<SettingObserver> observer = nullptr;
-    ASSERT_EQ(settingDataShare.UnregisterObserver(observer), RET_ERR);
-
-    observer = new (std::nothrow) SettingObserver;
-    ASSERT_EQ(settingDataShare.UnregisterObserver(observer), RET_ERR);
+    sptr<SettingObserver> observer = new (std::nothrow) SettingObserver;
+    observer->key_ = "settingDateShare";
+    std::string strUri = "strUri";
+    settingDataShare.isDataShareReady_ = false;
+    ASSERT_EQ(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
 }
 
 /**
