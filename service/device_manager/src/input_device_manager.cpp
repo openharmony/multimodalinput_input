@@ -742,7 +742,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     }
     device->SetId(deviceId);
     virtualInputDevices_[deviceId] = device;
-    MMI_HILOGI("AddVirtualInputDevice successfully, deivceId:%{public}d", deviceId);
+    MMI_HILOGI("AddVirtualInputDevice successfully, deviceId:%{public}d", deviceId);
     for (const auto& item : devListeners_) {
         CHKPC(item);
         NotifyMessage(item, deviceId, "add");

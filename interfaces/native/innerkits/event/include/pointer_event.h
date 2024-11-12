@@ -184,6 +184,15 @@ public:
 
     static constexpr int32_t POINTER_ACTION_HOVER_CANCEL = 33;
 
+    /**
+     *Indicates that the pen proximity action.
+     *
+     * @since 12
+     */
+    static constexpr int32_t POINTER_ACTION_PROXIMITY_IN = 35;
+
+    static constexpr int32_t POINTER_ACTION_PROXIMITY_OUT = 36;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -1781,7 +1790,7 @@ private:
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
     int32_t pullId_ { -1 };
-    float zOrder_{ -1.0f};
+    float zOrder_ { -1.0f};
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     double velocity_ { 0.0 };
