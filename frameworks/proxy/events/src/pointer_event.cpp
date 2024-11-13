@@ -549,8 +549,8 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE, "fingerprint-slide" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH, "fingerprint-retouch" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK, "fingerprint-click" },
-    { PointerEvent::POINTER_ACTION_PROXIMITY_IN, "pen-proximity-in"},
-    { PointerEvent::POINTER_ACTION_PROXIMITY_OUT, "pen-proximity-out"},
+    { PointerEvent::POINTER_ACTION_PROXIMITY_IN, "pen-proximity-in" },
+    { PointerEvent::POINTER_ACTION_PROXIMITY_OUT, "pen-proximity-out" },
 };
 
 const char* PointerEvent::DumpPointerAction() const
