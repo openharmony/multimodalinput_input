@@ -142,7 +142,7 @@ public:
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
     static int32_t SetPointerLocation(int32_t x, int32_t y);
-    static int32_t SetTouchpadScrollSwitch(bool switchFlag);
+    static int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag);
     static void GetTouchpadScrollSwitch(bool &switchFlag);
     static int32_t SetTouchpadScrollDirection(bool state);
     static void GetTouchpadScrollDirection(bool &state);
@@ -156,6 +156,7 @@ public:
 
 private:
     static int32_t globalPointerSpeed_;
+    static int32_t scrollSwitchPid_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };

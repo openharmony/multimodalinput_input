@@ -3063,9 +3063,11 @@ int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [switchFlag] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadScrollSwitch(switchFlag);
+        [clientPid, switchFlag] {
+            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadScrollSwitch(clientPid,
+                switchFlag);
         }
         );
     if (ret != RET_OK) {

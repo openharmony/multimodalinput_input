@@ -80,6 +80,7 @@ constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
+int32_t MouseTransformProcessor::scrollSwitchPid_ = -1;
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
     : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
@@ -339,7 +340,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(data);
     HandleTouchPadAxisState(source, tpScrollDirection, tpScrollSwitch);
     if (!tpScrollSwitch && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        MMI_HILOGD("TouchPad axis event is disable");
+        MMI_HILOGE("TouchPad axis event is disable,pid:%{public}d Set false", scrollSwitchPid_);
         return RET_ERR;
     }
 
@@ -964,12 +965,15 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     }
 }
 
-int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(bool switchFlag)
+int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(int32_t pid, bool switchFlag)
 {
     std::string name = "scrollSwitch";
     if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
         MMI_HILOGE("Failed to set scroll switch flag to mem, name:%s, switchFlag:%{public}d", name.c_str(), switchFlag);
         return RET_ERR;
+    }
+    if (!switchFlag) {
+        scrollSwitchPid_ = pid;
     }
     DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_SCROLL_SETTING,
         switchFlag);
