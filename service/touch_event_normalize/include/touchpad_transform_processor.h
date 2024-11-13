@@ -30,8 +30,8 @@ namespace MMI {
 enum class MulFingersTap : int32_t {
     NO_TAP = 0,
     TRIPLE_TAP = 3,
-    QUADTAP = 4,
-    QUINTTAP = 5,
+    QUAD_TAP = 4,
+    QUINT_TAP = 5,
 };
 
 class MultiFingersTapHandler final {
@@ -48,7 +48,7 @@ public:
     };
 
     int32_t HandleMulFingersTap(struct libinput_event_touch *event, int32_t type);
-    MulFingersTap GetMultiFingersState() const;
+    MulFingersTap GetMultiFingersState();
     void SetMultiFingersTapHdrDefault(bool isAllDefault = true);
     bool ClearPointerItems(std::shared_ptr<PointerEvent> pointer);
     bool CanAddToPointerMaps(struct libinput_event_touch *event);
