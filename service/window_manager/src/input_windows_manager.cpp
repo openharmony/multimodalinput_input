@@ -2894,6 +2894,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isHotArea = false;
     bool isFirstSpecialWindow = false;
     static std::unordered_map<int32_t, int32_t> winMap;
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+        (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN && MMI_LE(pointerItem.GetPressure(), 0.0f))) {
+        ClearTargetWindowId(pointerId);
+    }
     for (auto &item : windowsInfo) {
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
@@ -2936,7 +2940,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 continue;
             }
         }
-        if (targetWindowId >= 0 && pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN) {
+        if (targetWindowId >= 0 && pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
+            (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_PEN || pointerItem.GetPressure() > 0)) {
             bool isUiExtentionWindow = false;
             for (auto &windowinfo : item.uiExtentionWindowInfo) {
                 if (windowinfo.id == targetWindowId) {
