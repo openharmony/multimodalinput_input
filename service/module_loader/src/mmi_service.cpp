@@ -226,6 +226,13 @@ std::unordered_map<int32_t, int32_t> g_VKeyFunctionKeyMapping = {
     {MMI::KeyEvent::KEYCODE_F12, MMI::KeyEvent::KEYCODE_INSERT},
 };
 bool g_FnKeyState = false;
+// special group of keys that need touch down trigger to work with a physical mouse/trackpad.
+std::unordered_set<int32_t> g_VKeyTouchDownInjectGroup = {
+    MMI::KeyEvent::KEYCODE_CTRL_LEFT,
+    MMI::KeyEvent::KEYCODE_CTRL_RIGHT,
+    MMI::KeyEvent::KEYCODE_SHIFT_LEFT,
+    MMI::KeyEvent::KEYCODE_SHIFT_RIGHT,
+};
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
@@ -523,7 +530,7 @@ int32_t HandleKeyInjectEventHelper(std::shared_ptr<EventNormalizeHandler> eventN
     }
     int64_t time = OHOS::MMI::GetSysClockTime();
     g_VKeySharedKeyEvent->SetActionTime(time);
-    g_VKeySharedKeyEvent->SetRepeat(true);
+    g_VKeySharedKeyEvent->SetRepeat(false);
     g_VKeySharedKeyEvent->SetKeyCode(keyCode);
     bool isKeyPressed = false;
 
@@ -708,9 +715,11 @@ int32_t SendKeyboardAction(KeyEvent::VKeyboardAction action)
 int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     int32_t pointerAction = pointerEvent->GetPointerAction();
-    if (pointerAction != MMI::PointerEvent::POINTER_ACTION_UP &&
+    int32_t sourceType = pointerEvent->GetSourceType();
+    if (sourceType != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
+        (pointerAction != MMI::PointerEvent::POINTER_ACTION_UP &&
         pointerAction != MMI::PointerEvent::POINTER_ACTION_DOWN &&
-        pointerAction != MMI::PointerEvent::POINTER_ACTION_MOVE) {
+        pointerAction != MMI::PointerEvent::POINTER_ACTION_MOVE)) {
         return 0;
     }
     // Set touch point
@@ -796,7 +805,7 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
             0, updateDynamicGaussian, sortedNegLogProb);
         tp.ButtonName = buttonName;
         if (!tp.ButtonName.empty()) {
-            MMI_HILOGI("VKeyboard touch name %{private}s", buttonName.c_str());
+            MMI_HILOGD("VKeyboard touch name %{private}s", buttonName.c_str());
         } else {
             MMI_HILOGE("VKeyboard button name null");
             return RET_ERR;
@@ -849,6 +858,10 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 if (!g_FnKeyState && code == KeyEvent::KEYCODE_F4) {
                     // VOLUME_MUTE (F4) needs special touch down trigger logic.
                     SendKeyRelease(KeyEvent::KEYCODE_VOLUME_MUTE);
+                } else if (g_VKeyTouchDownInjectGroup.count(code) > 0) {
+                    // Ctrl/Shift needs special touch down logic to work with a mouse.
+                    g_VKeySharedKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction:VKEY_UP);
+                    SendKeyRelease(code);
                 } else if (!g_FnKeyState && g_VKeyFunctionKeyMapping.find(code) != g_VKeyFunctionKeyMapping.end()) {
                     // fn key off, and first row hardware switch keys are pressed.
                     int32_t hardwareCode = g_VKeyFunctionKeyMapping.find(code)->second;
@@ -1012,6 +1025,10 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
                 } else if (!g_FnKeyState && keyCode == KeyEvent::KEYCODE_F4) {
                     // VOLUME_MUTE (F4) needs special touch down logic.
                     SendKeyDown(KeyEvent::KEYCODE_VOLUME_MUTE);
+                } else if (g_VKeyTouchDownInjectGroup.count(keyCode) > 0) {
+                    // Ctrl/Shift need special touch down logic to work with a mouse.
+                    g_VKeySharedKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_DOWN);
+                    SendKeyDown(keyCode);
                 }
 
                 break;
@@ -1023,6 +1040,10 @@ int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
 
     // all state machine messages are handled, see if the keyCodeToRelease remains unhandled.
     if (keyCodeToRelease >= 0) {
+        if (g_VKeyTouchDownInjectGroup.count(keyCodeToRelease) > 0) {
+            // Ctrl/Shift need special touch down logic to work with a mouse.
+            g_VKeySharedKeyEvent->SetVKeyboardAction(KeyEvent::VKeyboardAction::VKEY_UP);
+        }
         SendKeyRelease(keyCodeToRelease);
     }
     return RET_OK;
