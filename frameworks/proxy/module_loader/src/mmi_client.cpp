@@ -87,7 +87,7 @@ MMIClientPtr MMIClient::GetSharedPtr()
 
 bool MMIClient::Start()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     msgHandler_.Init();
     auto callback = [this] (const UDSClient& client, NetPacket& pkt) { return msgHandler_.OnMsgHandler(client, pkt); };
     if (!StartClient(callback)) {

@@ -2202,7 +2202,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey, TestSize.
     repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
 /**

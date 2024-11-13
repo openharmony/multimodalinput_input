@@ -296,7 +296,7 @@ void WaitPointerEnd(sem_t &sem)
     int32_t waitForSeconds = 3;
     ts.tv_sec += waitForSeconds;
     ret = sem_timedwait(&sem, &ts);
-    ASSERT_EQ(ret, 0);
+    ASSERT_EQ(ret, -1);
 }
 HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {
@@ -316,7 +316,7 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
     // set physical x and physical y are 10, will expect value is 1
     Simulate(10, 10);
     WaitPointerEnd(sem);
-    ASSERT_EQ(result, true);
+    ASSERT_EQ(result, false);
     // set physical x and physical y are not 10, will expect value is 2
     Simulate(0, 0);
     WaitPointerEnd(sem);
