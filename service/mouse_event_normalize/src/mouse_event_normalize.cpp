@@ -214,9 +214,9 @@ int32_t MouseEventNormalize::SetPointerLocation(int32_t x, int32_t y)
     return MouseTransformProcessor::SetPointerLocation(x, y);
 }
 
-int32_t MouseEventNormalize::SetTouchpadScrollSwitch(bool switchFlag) const
+int32_t MouseEventNormalize::SetTouchpadScrollSwitch(int32_t pid, bool switchFlag) const
 {
-    return MouseTransformProcessor::SetTouchpadScrollSwitch(switchFlag);
+    return MouseTransformProcessor::SetTouchpadScrollSwitch(pid, switchFlag);
 }
 
 void MouseEventNormalize::GetTouchpadScrollSwitch(bool &switchFlag) const
