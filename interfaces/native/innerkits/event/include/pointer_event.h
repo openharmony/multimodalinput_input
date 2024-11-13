@@ -1790,7 +1790,7 @@ private:
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
     int32_t pullId_ { -1 };
-    float zOrder_{ -1.0f};
+    float zOrder_ { -1.0f};
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     double velocity_ { 0.0 };

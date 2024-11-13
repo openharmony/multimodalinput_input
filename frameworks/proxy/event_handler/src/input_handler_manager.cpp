@@ -39,6 +39,10 @@ InputHandlerManager::InputHandlerManager()
 {
     monitorCallback_ =
         [this] (int32_t eventId, int64_t actionTime) { return this->OnDispatchEventProcessed(eventId, actionTime); };
+    monitorCallbackConsume_ =
+        [this] (int32_t eventId, int64_t actionTime) {
+            return this->OnDispatchEventProcessed(eventId, actionTime, true);
+        };
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
@@ -322,21 +326,12 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
         return;
     }
     AddMouseEventId(pointerEvent);
-    AddProcessedEventId(pointerEvent, consumerCount);
 }
 
 void InputHandlerManager::AddMouseEventId(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         mouseEventIds_.emplace(pointerEvent->GetId());
-    }
-}
-
-void InputHandlerManager::AddProcessedEventId(std::shared_ptr<PointerEvent> pointerEvent, int32_t consumerCount)
-{
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
-        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
     }
 }
 
@@ -369,14 +364,18 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> consumerInfos;
     GetConsumerInfos(pointerEvent, deviceTags, consumerInfos);
-    for (const auto &iter : consumerInfos) {
+    for (auto iter = consumerInfos.begin(); iter != consumerInfos.end(); ++iter) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
-        tempEvent->SetProcessedCallback(monitorCallback_);
-        CHKPV(iter.second);
-        auto consumer = iter.second;
+        if (std::next(iter) == consumerInfos.end()) {
+            tempEvent->SetProcessedCallback(monitorCallbackConsume_);
+        } else {
+            tempEvent->SetProcessedCallback(monitorCallback_);
+        }
+        CHKPV(iter->second);
+        auto consumer = iter->second;
         consumer->OnInputEvent(tempEvent);
         MMI_HILOG_DISPATCHD("Pointer event id:%{public}d pointerId:%{public}d",
-            iter.first, pointerEvent->GetPointerId());
+            iter->first, pointerEvent->GetPointerId());
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -387,6 +386,7 @@ bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
 {
     CALL_INFO_TRACE;
     CHKPF(lastPointerEvent_);
+    std::unique_lock<std::mutex> lock(mtxHandlers_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
@@ -400,8 +400,10 @@ bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
             item.SetPressed(false);
             lastPointerEvent_->UpdatePointerItem(pointerId, item);
             lastPointerEvent_->SetPointerAction(pointerActionEvent);
+            auto copiedPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+            lock.unlock();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-            OnInputEvent(lastPointerEvent_, DEVICE_TAGS);
+            OnInputEvent(copiedPointerEvent, DEVICE_TAGS);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
             return true;
         }
@@ -511,17 +513,11 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
         mouseEventIds_.erase(eventId);
         return;
     }
-    auto iter = processedEvents_.find(eventId);
-    if (iter == processedEvents_.end()) {
-        return;
-    }
-    int32_t count = iter->second;
-    processedEvents_.erase(iter);
-    count--;
-    if (count > 0) {
-        processedEvents_.emplace(eventId, count);
-        return;
-    }
+}
+
+void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime, bool isNeedConsume)
+{
+    OnDispatchEventProcessed(eventId, actionTime);
     ANRHDL->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
 }
 } // namespace MMI

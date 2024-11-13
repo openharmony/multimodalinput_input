@@ -142,12 +142,10 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
     if (screenMissTouchFlag_ == false) {
         if (screen == true) {
             screenMissTouchFlag_ = true;
-            // �ϱ�cancel���߼�����ָ������Ļ
             SendFingerprintCancelEvent();
             return;
         }
     } else {
-        // ��ָû������Ļ����ĿǰΪֹ�յ�cancel�¼�
         if (screen == false && cancel == true) {
             screenMissTouchFlag_ = false;
             return;
@@ -396,8 +394,8 @@ void FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
         MMI_HILOGI("StartServiceExtAbility start");
         std::shared_ptr<AAFwk::AbilityManagerClient> abmc = AAFwk::AbilityManagerClient::GetInstance();
         CHKPV(abmc);
-        const std::string smartKeyBundleName = "";
-        const std::string smartKeyAbilityName = "";
+        const std::string smartKeyBundleName = "com.hmos.hwquickaccessmenu";
+        const std::string smartKeyAbilityName = "ServiceAbility";
         AAFwk::Want want;
         want.SetElementName(smartKeyBundleName, smartKeyAbilityName);
         if (isShowDialog) {
@@ -433,7 +431,6 @@ void FingerprintEventProcessor::ProcessClickEvent()
 
 void FingerprintEventProcessor::ReportResSched(uint32_t resType, int64_t value)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
     std::unordered_map<std::string, std::string> payload { {"msg", ""} };
     ResourceSchedule::ResSchedClient::GetInstance().ReportData(resType, value, payload);
 }

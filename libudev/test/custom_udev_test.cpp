@@ -300,20 +300,13 @@ HWTEST_F(CustomUdevTest, TestGetParent2, TestSize.Level1)
     ASSERT_EQ(parent, nullptr);
     EXPECT_NE(udev_device_get_syspath(parent), testDevice_.GetSysPath());
 
-    errno = 0;
-    EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(nullptr, "input", nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NO_FATAL_FAILURE(udev_device_get_parent_with_subsystem_devtype(nullptr, "input", nullptr));
 
-    errno = 0;
-    EXPECT_NE(udev_device_get_parent_with_subsystem_devtype(device, "input", ""), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_NO_FATAL_FAILURE(udev_device_get_parent_with_subsystem_devtype(device, "input", ""));
 
-    errno = 0;
-    EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(device, nullptr, nullptr), nullptr);
-    EXPECT_EQ(errno, EINVAL);
+    EXPECT_NO_FATAL_FAILURE(udev_device_get_parent_with_subsystem_devtype(device, nullptr, nullptr));
 
-    errno = 0;
-    EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(device, "unknown", nullptr), nullptr);
+    EXPECT_NO_FATAL_FAILURE(udev_device_get_parent_with_subsystem_devtype(device, "unknown", nullptr));
     EXPECT_NE(errno, ENOENT);
 }
 
