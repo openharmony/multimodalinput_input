@@ -184,8 +184,8 @@ public:
 
     static constexpr int32_t POINTER_ACTION_HOVER_CANCEL = 33;
 
-    /**
-     *Indicates that the pen proximity action.
+     /**
+     * Indicates that the pen proximity action.
      *
      * @since 12
      */
