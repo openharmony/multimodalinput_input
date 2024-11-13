@@ -527,6 +527,8 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
+    MMI_HILOGI("HiviewDFX Report touchpad setting code is:%{public}s, setting state is:%{public}s",
+        (it->second).c_str(), flag ? "true" : "false");
 }
 
 void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, int32_t value)
@@ -551,6 +553,8 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
+    MMI_HILOGI("HiviewDFX Report touchpad setting code is:%{public}s, setting state is:%{public}d",
+        (it->second).c_str(), value);
 }
 
 void DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime, int32_t distanceInterval)
