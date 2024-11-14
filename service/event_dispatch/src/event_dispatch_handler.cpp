@@ -181,7 +181,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         }
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP &&
             windowInfo->windowInputType == WindowInputType::TRANSMIT_ALL && windowIds.size() > 1) {
-            MMI_HILOGD("When the drag is finished. the multi-window distribution is canceled. window:%{public}d,"
+            MMI_HILOGD("When the drag is finished, the multi-window distribution is canceled. window:%{public}d,"
                 "windowInputType:%{public}d", windowId, static_cast<int32_t>(windowInfo->windowInputType));
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         }
@@ -405,7 +405,11 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         }
         return RET_OK;
     }
-
+    auto keyHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(keyHandler, RET_ERR);
+    if (key->GetKeyCode() != keyHandler->GetCurrentHandleKeyCode()) {
+        MMI_HILOGW("Keycode has been changed");
+    }
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);

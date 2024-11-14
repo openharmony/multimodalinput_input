@@ -91,6 +91,7 @@ std::mutex g_instanceMutex;
 MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const std::string THREAD_NAME { "mmi-service" };
+const std::string SHELL_ASSISTANT { "com.shell_assistant" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };

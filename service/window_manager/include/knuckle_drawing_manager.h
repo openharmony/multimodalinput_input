@@ -62,7 +62,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     void CreateBrushWorkCanvasNode();
     void CreateTrackCanvasNode();
-    void InitEmitter();
+    void InitParticleEmitter();
     void UpdateEmitter();
     void DrawTrackCanvas();
     void DrawBrushCanvas();

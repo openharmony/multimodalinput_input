@@ -152,6 +152,11 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
+    auto keyHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(keyHandler);
+    if (keyEvent->GetKeyCode() != keyHandler->GetCurrentHandleKeyCode()) {
+        MMI_HILOGW("Keycode has been changed");
+    }
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {

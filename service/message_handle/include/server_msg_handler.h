@@ -87,7 +87,7 @@ public:
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell);
     int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
-    int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell, bool isStoreWindowId);
+    int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags,
@@ -139,6 +139,7 @@ private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
     std::map<int32_t, int32_t> shellTargetWindowIds_;
+    std::map<int32_t, int32_t> accessTargetWindowIds_;
     std::map<int32_t, AuthorizationStatus> authorizationCollection_;
     int32_t CurrentPID_ { -1 };
     InjectionType InjectionType_ { InjectionType::UNKNOWN };
