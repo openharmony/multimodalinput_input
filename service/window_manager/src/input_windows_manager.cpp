@@ -537,11 +537,13 @@ void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32
 
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         auto udServer = InputHandler->GetUDSServer();
-        auto fd = udServer->GetClientFd(GetWindowPid(focusWindowId_));
-        MMI_HILOG_DISPATCHI("Out focus window:%{public}d is replaced by window:%{public}d",
-            focusWindowId_, focusWindowId);
-        if (eventDispatchHandler != nullptr && udServer != nullptr) {
-            eventDispatchHandler->DispatchKeyEvent(fd, *udServer, keyEventReissue);
+        if(udServer != nullptr) {
+            auto fd = udServer->GetClientFd(GetWindowPid(focusWindowId_));
+            MMI_HILOG_DISPATCHI("Out focus window:%{public}d is replaced by window:%{public}d",
+                focusWindowId_, focusWindowId);
+            if (eventDispatchHandler != nullptr && udServer != nullptr) {
+                eventDispatchHandler->DispatchKeyEvent(fd, *udServer, keyEventReissue);
+            }
         }
     }
     focusWindowId_ = focusWindowId;
