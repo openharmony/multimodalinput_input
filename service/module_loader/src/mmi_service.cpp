@@ -141,7 +141,7 @@ constexpr int32_t DEFAULT_USER_ID { 100 };
 const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 // Define vkeyboard functions from vendor
-const std::string VKEYBOARD_PATH { "libvkeyboard.z.so" };
+const std::string VKEYBOARD_PATH { "libvkeyboard_device.z.so" };
 constexpr int32_t VKEY_TP_SM_MSG_SIZE { 4 };
 constexpr int32_t VKEY_TP_SM_MSG_TYPE_IDX { 0 };
 constexpr int32_t VKEY_TP_SM_MSG_POINTER_ID_IDX { 1 };
@@ -205,6 +205,15 @@ typedef void (*TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)(
 TRACKPADENGINE_GETALLKEYMESSAGE_TYPE trackPadEngine_getAllKeyMessage_ = nullptr;
 typedef void (*TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)();
 TRACKPADENGINE_CLEARKEYMESSAGE_TYPE trackPadEngine_clearKeyMessage_ = nullptr;
+typedef int32_t (*VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)(IRemoteObject* &vkeyboardDevice);
+VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE vkeyboard_createVKeyboardDevice_ = nullptr;
+typedef int32_t (*VKEYBOARD_ONPOINTEREVENT_TYPE)(std::shared_ptr<PointerEvent> pointerEvent);
+VKEYBOARD_ONPOINTEREVENT_TYPE vkeyboard_onPointerEvent_ = nullptr;
+typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcKeyEvent);
+VKEYBOARD_ONFUNCKEYEVENT_TYPE vkeyboard_onFuncKeyEvent_ = nullptr;
+typedef int32_t (*VKEYBOARD_ONINPUTEVENTHANDLER_TYPE)(
+    std::shared_ptr<IInputEventHandler> inputEventHandler);
+VKEYBOARD_ONINPUTEVENTHANDLER_TYPE vkeyboard_onInputEventHandler_ = nullptr;
 std::vector<int32_t> g_VKeyDownSet;
 std::unordered_set<int32_t> g_VKeyModifiersDownSet;
 // Shared key event for key injection for printing.
@@ -618,6 +627,10 @@ int32_t ToggleKeyVisualState(std::string& keyName, int32_t keyCode, bool visualP
 {
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
+    if (g_VKeySharedUIKeyEvent == nullptr) {
+        MMI_HILOGE("VKeyboard the g_VKeySharedUIKeyEvent is nullptr");
+        return RET_ERR;
+    }
     g_VKeySharedUIKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
     // If this shared event's previous action is up, it means
     // there is a key up event left in the pressed seq. remove it now.
@@ -681,6 +694,11 @@ int32_t SendKeyboardAction(KeyEvent::VKeyboardAction action)
 
 int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    if (vkeyboard_onPointerEvent_ != nullptr) {
+        vkeyboard_onPointerEvent_(pointerEvent);
+    }
+    return 0;
+
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction != MMI::PointerEvent::POINTER_ACTION_UP &&
         pointerAction != MMI::PointerEvent::POINTER_ACTION_DOWN &&
@@ -3507,6 +3525,62 @@ int32_t MMIService::OnSetMotionSpace(std::string& keyName, bool useShift, std::v
     } else {
         return COMMON_PARAMETER_ERROR;
     }
+}
+
+int32_t MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    CALL_INFO_TRACE;
+    if (!isHPR_) {
+        MMI_HILOGE("Failed to create vkeyboard device, feature not support");
+        return RET_ERR;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &vkeyboardDevice] {
+            return this->OnCreateVKeyboardDevice(vkeyboardDevice);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to create vkeyboard device, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    if (g_VKeyboardHandle == nullptr) {
+        MMI_HILOGE("VKeyboard handler is nullptr");
+        return RET_ERR;
+    }
+    vkeyboard_createVKeyboardDevice_ = (VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)dlsym(
+        g_VKeyboardHandle, "CreateVKeyboardDevice");
+    IRemoteObject* vkbDevice = nullptr;
+    int32_t ret = vkeyboard_createVKeyboardDevice_(vkbDevice);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Create vkeyboard device failed");
+        return ret;
+    }
+    if (vkbDevice == nullptr) {
+        MMI_HILOGE("VKeyboard device pointer is nullptr");
+        return RET_ERR;
+    }
+    vkeyboardDevice = sptr(vkbDevice);
+
+    vkeyboard_onPointerEvent_ = (VKEYBOARD_ONPOINTEREVENT_TYPE)dlsym(
+        g_VKeyboardHandle, "OnPointerEvent");
+    vkeyboard_onFuncKeyEvent_ = (VKEYBOARD_ONFUNCKEYEVENT_TYPE)dlsym(
+        g_VKeyboardHandle, "OnFuncKeyEvent");
+    vkeyboard_onInputEventHandler_ = (VKEYBOARD_ONINPUTEVENTHANDLER_TYPE)dlsym(
+        g_VKeyboardHandle, "OnInputEventHandler");
+    
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    vkeyboard_onFuncKeyEvent_(keyEvent);
+    auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
+    auto inputEventHandler = static_cast<std::shared_ptr<IInputEventHandler>>(
+        eventNormalizeHandler);
+    vkeyboard_onInputEventHandler_(eventNormalizeHandler);
+    return RET_OK;
 }
 
 void MMIService::OnVKeyTrackPadMessage(const std::vector<std::vector<int32_t>>& msgList)

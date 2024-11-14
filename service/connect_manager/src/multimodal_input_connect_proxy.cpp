@@ -2104,6 +2104,29 @@ int32_t MultimodalInputConnectProxy::SetMotionSpace(std::string& keyName, bool u
     }
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CREATE_VKEYBOARD_DEVICE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("CreateVKeyboardDevice Send request fail, ret:%{public}d", ret);
+    }
+    vkeyboardDevice = reply.ReadRemoteObject();
+    CHKPR(vkeyboardDevice, ERR_INVALID_VALUE);
+    return ret;
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)

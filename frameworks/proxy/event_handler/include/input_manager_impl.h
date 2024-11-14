@@ -215,6 +215,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
     int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern);
+    int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
