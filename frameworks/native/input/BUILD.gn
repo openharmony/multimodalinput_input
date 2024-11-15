@@ -17,6 +17,11 @@ import("../../../multimodalinput_mini.gni")
 
 module_output_path = "multimodalinput/mmi_unit_out"
 
+config("oh_input_manager_config") {
+  visibility = [ ":*" ]
+  include_dirs = [ "../../../interfaces/kits/c/input" ]
+}
+
 ohos_shared_library("oh_input_manager") {
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -27,6 +32,9 @@ ohos_shared_library("oh_input_manager") {
     cfi_cross_dso = true
     debug = false
   }
+
+  public_configs = [ ":oh_input_manager_config" ]
+
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/frameworks/native/input/",
