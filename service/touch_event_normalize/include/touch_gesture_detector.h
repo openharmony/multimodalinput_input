@@ -52,6 +52,7 @@ public:
         GestureListener() = default;
         virtual ~GestureListener() = default;
         virtual bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode) = 0;
+        virtual void OnGestureTrend(std::shared_ptr<PointerEvent> event) = 0;
     };
 
     TouchGestureDetector(TouchGestureType type, std::shared_ptr<GestureListener> listener)
@@ -59,6 +60,8 @@ public:
     bool OnTouchEvent(std::shared_ptr<PointerEvent> event);
     void AddGestureFingers(int32_t fingers);
     void RemoveGestureFingers(int32_t fingers);
+
+    static bool IsPhysicalPointer(std::shared_ptr<PointerEvent> event);
 
 private:
     enum class SlideState {
@@ -69,7 +72,6 @@ private:
         DIRECTION_RIGHT
     };
 
-    bool IsPhysicalPointer(std::shared_ptr<PointerEvent> event) const;
     void ReleaseData();
     bool IsMatchGesture(int32_t count) const;
     bool IsMatchGesture(GestureMode action, int32_t count) const;
@@ -99,6 +101,7 @@ private:
     bool IsFingerMove(const Point &downPt, const Point &movePt) const;
     double GetAngle(float startX, float startY, float endX, float endY);
     SlideState ClacFingerMoveDirection(std::shared_ptr<PointerEvent> event);
+    void CheckGestureTrend(std::shared_ptr<PointerEvent> event) const;
 
 private:
     std::set<int32_t> fingers_;
