@@ -735,5 +735,22 @@ HWTEST_F(KeyEventTest, KeyEventTest_VKeyboardActionToStr_001, TestSize.Level1)
     ASSERT_EQ(ret, "UNKNOWN");
     #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
+
+/**
+ * @tc.name: KeyEventTest_SetFourceMonitorFlag
+ * @tc.desc: Test the funcation SetFourceMonitorFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_SetFourceMonitorFlag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    bool fourceMonitorFlag = false;
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetFourceMonitorFlag(fourceMonitorFlag));
+    fourceMonitorFlag = true;
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetFourceMonitorFlag(fourceMonitorFlag));
+}
 } // namespace MMI
 } // namespace OHOS
