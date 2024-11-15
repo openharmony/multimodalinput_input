@@ -2270,6 +2270,9 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         }
         if (err == ERR_OK && ability.bundleName == SOS_BUNDLE_NAME) {
+            if (isDownStart_) {
+                isDownStart_ = false;
+            }
             isFreezePowerKey_ = true;
             count_ = 0;
             launchAbilityCount_ = 0;
