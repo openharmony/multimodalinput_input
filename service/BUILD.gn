@@ -1436,7 +1436,10 @@ ohos_unittest("MonitorTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "monitor/test/event_monitor_handler_test.cpp" ]
+  sources = [
+    "monitor/test/event_monitor_handler_test.cpp",
+    "monitor/test/gesture_monitor_handler_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
