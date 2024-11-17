@@ -1395,11 +1395,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     if (HandleEvent(key)) {
         return true;
     }
-    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-        MMI_HILOGI("Set specialKeys to empty");
-        specialKeys_.clear();
-    }
+
     if (specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
         HandleSpecialKeys(key->GetKeyCode(), key->GetAction());
         return true;
@@ -1849,6 +1845,8 @@ bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> k
         && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGI("Handle consumed key event, cancel opration");
         ResetCurrentLaunchAbilityKey();
+        repeatKey_.keyCode = -1;
+        repeatKey_.keyAction = -1;
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
