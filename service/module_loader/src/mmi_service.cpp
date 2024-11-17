@@ -207,6 +207,8 @@ typedef void (*TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)();
 TRACKPADENGINE_CLEARKEYMESSAGE_TYPE trackPadEngine_clearKeyMessage_ = nullptr;
 typedef int32_t (*VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)(IRemoteObject* &vkeyboardDevice);
 VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE vkeyboard_createVKeyboardDevice_ = nullptr;
+typedef int32_t (*VKEYBOARD_ONPOINTEREVENT_TYPE)(std::shared_ptr<PointerEvent> pointerEvent);
+VKEYBOARD_ONPOINTEREVENT_TYPE vkeyboard_onPointerEvent_ = nullptr;
 typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcKeyEvent);
 VKEYBOARD_ONFUNCKEYEVENT_TYPE vkeyboard_onFuncKeyEvent_ = nullptr;
 typedef int32_t (*VKEYBOARD_ONINPUTEVENTHANDLER_TYPE)(
@@ -692,6 +694,11 @@ int32_t SendKeyboardAction(KeyEvent::VKeyboardAction action)
 
 int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    if (vkeyboard_onPointerEvent_ != nullptr) {
+        vkeyboard_onPointerEvent_(pointerEvent);
+    }
+    return 0;
+
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction != MMI::PointerEvent::POINTER_ACTION_UP &&
         pointerAction != MMI::PointerEvent::POINTER_ACTION_DOWN &&
@@ -3558,6 +3565,8 @@ int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice
     }
     vkeyboardDevice = sptr(vkbDevice);
 
+    vkeyboard_onPointerEvent_ = (VKEYBOARD_ONPOINTEREVENT_TYPE)dlsym(
+        g_VKeyboardHandle, "OnPointerEvent");
     vkeyboard_onFuncKeyEvent_ = (VKEYBOARD_ONFUNCKEYEVENT_TYPE)dlsym(
         g_VKeyboardHandle, "OnFuncKeyEvent");
     vkeyboard_onInputEventHandler_ = (VKEYBOARD_ONINPUTEVENTHANDLER_TYPE)dlsym(
