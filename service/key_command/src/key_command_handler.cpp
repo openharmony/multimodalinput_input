@@ -1395,7 +1395,11 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     if (HandleEvent(key)) {
         return true;
     }
-
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        MMI_HILOGI("Set specialKeys to empty");
+        specialKeys_.clear();
+    }
     if (specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
         HandleSpecialKeys(key->GetKeyCode(), key->GetAction());
         return true;
@@ -1511,6 +1515,10 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     }
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
         (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
+        MMI_HILOGI("isDownStart:%{public}d", isDownStart_);
+        if (isDownStart_) {
+            HandleSpecialKeys(keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        }
         return true;
     }
     auto it = repeatKeyCountMap_.find(item.ability.bundleName);
@@ -2326,7 +2334,7 @@ void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
 
 void KeyCommandHandler::HandleSpecialKeys(int32_t keyCode, int32_t keyAction)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     auto iter = specialKeys_.find(keyCode);
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
         if (iter != specialKeys_.end()) {
