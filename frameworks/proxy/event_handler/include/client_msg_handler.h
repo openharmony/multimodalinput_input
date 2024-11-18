@@ -42,6 +42,7 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnPointerEvent(const UDSClient &client, NetPacket &pkt);
+    int32_t OnSubscribeLongPressEventCallback(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt);

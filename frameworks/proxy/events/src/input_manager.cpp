@@ -129,6 +129,17 @@ void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeSwitchEvent(subscriberId);
 }
 
+int32_t InputManager::SubscribeLongPressEvent(const LongPressRequest &longPressRequest,
+    std::function<void(LongPressEvent)> callback)
+{
+    return InputMgrImpl.SubscribeLongPressEvent(longPressRequest, callback);
+}
+ 
+void InputManager::UnsubscribeLongPressEvent(int32_t subscriberId)
+{
+    InputMgrImpl.UnsubscribeLongPressEvent(subscriberId);
+}
+
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
     return InputMgrImpl.AddMonitor(monitor);
