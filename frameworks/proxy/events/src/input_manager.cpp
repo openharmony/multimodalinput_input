@@ -624,6 +624,11 @@ int32_t InputManager::SetMotionSpace(std::string& keyName, bool useShift, std::v
 {
     return InputMgrImpl.SetMotionSpace(keyName, useShift, pattern);
 }
+
+int32_t InputManager::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    return InputMgrImpl.CreateVKeyboardDevice(vkeyboardDevice);
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t InputManager::SetCurrentUser(int32_t userId)

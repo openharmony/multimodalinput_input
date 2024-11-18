@@ -145,6 +145,7 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t StubSetVKeyboardArea(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMotionSpace(MessageParcel& data, MessageParcel& reply);
+    int32_t StubCreateVKeyboardDevice(MessageParcel& data, MessageParcel& reply);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply);

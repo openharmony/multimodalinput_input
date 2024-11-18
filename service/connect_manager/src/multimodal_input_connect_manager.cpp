@@ -806,6 +806,13 @@ int32_t MultimodalInputConnectManager::SetMotionSpace(std::string& keyName, bool
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMotionSpace(keyName, useShift, pattern);
 }
+
+int32_t MultimodalInputConnectManager::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->CreateVKeyboardDevice(vkeyboardDevice);
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)

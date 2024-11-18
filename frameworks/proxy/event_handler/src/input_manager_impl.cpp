@@ -2361,6 +2361,12 @@ int32_t InputManagerImpl::SetMotionSpace(std::string& keyName, bool useShift, st
     CALL_INFO_TRACE;
     return MULTIMODAL_INPUT_CONNECT_MGR->SetMotionSpace(keyName, useShift, pattern);
 }
+
+int32_t InputManagerImpl::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->CreateVKeyboardDevice(vkeyboardDevice);
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
