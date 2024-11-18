@@ -132,6 +132,21 @@ int32_t MultimodalEventHandler::UnsubscribeSwitchEvent(int32_t subscribeId)
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
 
+int32_t MultimodalEventHandler::SubscribeLongPressEvent(int32_t subscribeId,
+    const LongPressRequest &longPressRequest)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeLongPressEvent(subscribeId, longPressRequest);
+}
+ 
+int32_t MultimodalEventHandler::UnsubscribeLongPressEvent(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeLongPressEvent(subscribeId);
+}
+
 bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 {
     CALL_DEBUG_ENTER;

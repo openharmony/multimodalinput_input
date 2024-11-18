@@ -39,6 +39,7 @@
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
 #include "key_subscriber_handler.h"
+#include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "parameters.h"
 #include "switch_subscriber_handler.h"
@@ -826,6 +827,25 @@ int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t p
     return subscriberHandler->UnsubscribeSwitchEvent(sess, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
+
+int32_t ServerMsgHandler::OnSubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,
+    const LongPressRequest &longPressRequest)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(server, ERROR_NULL_POINTER);
+    auto sess = server->GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
+}
+ 
+int32_t ServerMsgHandler::OnUnsubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(server, ERROR_NULL_POINTER);
+    auto sess = server->GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
+}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
 int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,

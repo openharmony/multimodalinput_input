@@ -17,6 +17,7 @@
 #define INPUT_EVENT_DATA_TRANSFORMATION_H
 
 #include "key_event.h"
+#include "long_press_event.h"
 #include "net_packet.h"
 #include "pointer_event.h"
 #include "switch_event.h"
@@ -32,6 +33,8 @@ public:
     static int32_t NetPacketToKeyEvent(NetPacket &pkt, std::shared_ptr<KeyEvent> key);
     static int32_t SwitchEventToNetPacket(const std::shared_ptr<SwitchEvent> key, NetPacket &pkt);
     static int32_t NetPacketToSwitchEvent(NetPacket &pkt, std::shared_ptr<SwitchEvent> key);
+    static int32_t LongPressEventToNetPacket(const LongPressEvent &longPressEvent, NetPacket &pkt);
+    static int32_t NetPacketToLongPressEvent(NetPacket &pkt, LongPressEvent &longPressEvent);
     static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &pkt);
     static int32_t DeserializeInputEvent(NetPacket &pkt, std::shared_ptr<InputEvent> event);
     static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
