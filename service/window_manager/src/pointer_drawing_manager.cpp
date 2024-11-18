@@ -61,6 +61,8 @@ const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscre
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 const std::string CursorIconPath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
+const std::string LoadingIconPath = IMAGE_POINTER_DEFAULT_PATH + "Loading.svg";
+const std::string LoadingRightIconPath = IMAGE_POINTER_DEFAULT_PATH + "Loading_Right.svg";
 const std::string POINTER_COLOR { "pointerColor" };
 const std::string POINTER_SIZE { "pointerSize" };
 const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
@@ -115,6 +117,8 @@ constexpr float CALCULATE_MOUSE_ICON_BAIS { 5.0f };
 constexpr int32_t SYNC_FENCE_WAIT_TIME { 3000 };
 float g_hardwareCanvasSize = { 512.0f };
 float g_focalPoint = { 256.0f };
+constexpr int32_t REPEAT_COOLING_TIME { 10000 };
+constexpr int32_t REPEAT_ONCE { 1 };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -1963,6 +1967,20 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
 std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(const std::string &imagePath)
 {
     CALL_DEBUG_ENTER;
+    for (auto item = mousePixelMap_.begin(); item != mousePixelMap_.end(); ++item) {
+        if (item->first != imagePath) {
+            continue;
+        }
+        if (item->second.imageWidth != imageWidth_ || item->second.imageHeight != imageHeight_
+            || item->second.pointerColor != GetPointerColor()) {
+            if (!UpdateLoadingAndLoadingRightPixelMap()) {
+                MMI_HILOGI("Update Loading And Loading Right Pointer success");
+            }
+            return mousePixelMap_[imagePath].pixelMap;
+        } else {
+            return item->second.pixelMap;
+        }
+    }
     OHOS::Media::SourceOptions opts;
     uint32_t ret = 0;
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, ret);
@@ -2002,6 +2020,45 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
         }
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
+int32_t PointerDrawingManager::UpdateLoadingAndLoadingRightPixelMap()
+{
+    for (auto iter = mousePixelMap_.begin(); iter != mousePixelMap_.end();) {
+        OHOS::Media::SourceOptions opts;
+        uint32_t ret = 0;
+        auto imageSource = OHOS::Media::ImageSource::CreateImageSource(iter->first, opts, ret);
+        CHKPR(imageSource, RET_ERR);
+        std::set<std::string> formats;
+        ret = imageSource->GetSupportedFormats(formats);
+        MMI_HILOGD("Get supported format ret:%{public}u", ret);
+        OHOS::Media::DecodeOptions decodeOpts;
+        decodeOpts.desiredSize = {
+            .width = imageWidth_,
+            .height = imageHeight_
+        };
+        int32_t pointerColor = GetPointerColor();
+        if (tempPointerColor_ != DEFAULT_VALUE) {
+             decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
+            if (pointerColor == MAX_POINTER_COLOR) {
+                decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
+            } else {
+                decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
+            }
+        }
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+        CHKPR(pixelMap, RET_ERR);
+        iter->second.pixelMap = pixelMap;
+        iter->second.imageWidth = imageWidth_;
+        iter->second.imageHeight = imageHeight_;
+        iter->second.pointerColor = pointerColor;
+        int32_t width = pixelMap->GetWidth();
+        int32_t height = pixelMap->GetHeight();
+        MMI_HILOGI("Pixelmap width:%{public}d, height:%{public}d, %{public}s update success",
+            width, height, iter->first.c_str());
+        ++iter;
+    }
+    return RET_OK;
 }
 
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
@@ -2252,12 +2309,53 @@ void PointerDrawingManager::DrawManager()
     }
 }
 
+void PointerDrawingManager::InitLoadingAndLoadingRightPixelMap()
+{
+    mousePixelMap_.clear();
+    mousePixelMap_[LoadingIconPath];
+    mousePixelMap_[LoadingRightIconPath];
+    initLoadingAndLoadingRightPixelTimerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
+        for (auto iter = mousePixelMap_.begin(); iter != mousePixelMap_.end();) {
+            OHOS::Media::SourceOptions opts;
+            uint32_t ret = 0;
+            auto imageSource = OHOS::Media::ImageSource::CreateImageSource(iter->first, opts, ret);
+            CHKPV(imageSource);
+            std::set<std::string> formats;
+            ret = imageSource->GetSupportedFormats(formats);
+            MMI_HILOGD("Get supported format ret:%{public}u", ret);
+            OHOS::Media::DecodeOptions decodeOpts;
+            decodeOpts.desiredSize = {
+                .width = imageWidth_,
+                .height = imageHeight_
+            };
+            int32_t pointerColor = GetPointerColor();
+            if (tempPointerColor_ != DEFAULT_VALUE) {
+                decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
+                if (pointerColor == MAX_POINTER_COLOR) {
+                    decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
+                } else {
+                    decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
+                }
+            }
+            std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+            CHKPV(pixelMap);
+            iter->second.pixelMap = pixelMap;
+            iter->second.imageWidth = imageWidth_;
+            iter->second.imageHeight = imageHeight_;
+            iter->second.pointerColor = pointerColor;
+            MMI_HILOGI("%{public}s init success", iter->first.c_str());
+            ++iter;
+        }
+    });
+}
+
 bool PointerDrawingManager::Init()
 {
     CALL_DEBUG_ENTER;
     INPUT_DEV_MGR->Attach(shared_from_this());
     pidInfos_.clear();
     hapPidInfos_.clear();
+    InitLoadingAndLoadingRightPixelMap();
     return true;
 }
 
