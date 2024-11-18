@@ -48,7 +48,7 @@ declare_args() {
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
   input_feature_crown = true
-  input_new_knuckle_dynamic_enabled = false
+  input_new_knuckle_dynamic_enabled = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_call_manager)) {
