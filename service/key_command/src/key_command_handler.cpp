@@ -1505,7 +1505,6 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
-
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
