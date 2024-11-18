@@ -435,7 +435,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
     if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
 #ifdef OHOS_BUILD_ENABLE_ANCO
-        if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent)) {
+        if (WIN_MGR->IsKnuckleOnAncoWindow(touchEvent)) {
             knuckleCount_ = 0;
             SendNotSupportMsg(touchEvent);
             return;
@@ -836,7 +836,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
     NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
         isGesturing_, isLetterGesturing_));
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent) && (notifyType == NotifyType::REGIONGESTURE ||
+    if (WIN_MGR->IsKnuckleOnAncoWindow(touchEvent) && (notifyType == NotifyType::REGIONGESTURE ||
         notifyType == NotifyType::LETTERGESTURE)) {
         MMI_HILOGI("Anco single knuckle toast");
         SendNotSupportMsg(touchEvent);
