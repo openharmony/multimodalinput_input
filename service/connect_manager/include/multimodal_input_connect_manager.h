@@ -97,6 +97,8 @@ public:
     int32_t UnsubscribeHotkey(int32_t subscribeId);
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
+    int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest);
+    int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
     int32_t SetAnrObserver();
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);

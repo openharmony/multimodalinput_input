@@ -22,6 +22,7 @@
 #include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_option.h"
+#include "long_press_event.h"
 #include "mouse_event_normalize.h"
 #include "msg_handler.h"
 #include "pixel_map.h"
@@ -81,7 +82,9 @@ public:
     int32_t OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType);
     int32_t OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_SWITCH
-
+    int32_t OnSubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,
+        const LongPressRequest &longPressRequest);
+    int32_t OnUnsubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING

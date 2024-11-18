@@ -179,6 +179,11 @@ public:
     int32_t UnsubscribeHotkey(int32_t subscribeId) override { return subscribeId; }
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override { return subscribeId; }
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override { return subscribeId; }
+    int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override
+    {
+        return subscribeId;
+    }
+    int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override { return subscribeId; }
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override
     {
         return static_cast<int32_t>(isNativeInject);

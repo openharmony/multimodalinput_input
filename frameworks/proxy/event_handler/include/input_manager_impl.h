@@ -41,6 +41,7 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "key_option.h"
+#include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "nap_process.h"
 #include "pointer_event.h"
@@ -74,6 +75,9 @@ public:
     void UnsubscribeHotkey(int32_t subscriberId);
     int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
+    int32_t SubscribeLongPressEvent(const LongPressRequest &LongPressRequest,
+        std::function<void(LongPressEvent)> callback);
+    void UnsubscribeLongPressEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer);

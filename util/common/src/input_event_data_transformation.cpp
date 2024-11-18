@@ -157,6 +157,37 @@ int32_t InputEventDataTransformation::NetPacketToSwitchEvent(NetPacket &pkt, std
     return RET_OK;
 }
 
+int32_t InputEventDataTransformation::LongPressEventToNetPacket(const LongPressEvent &longPressEvent, NetPacket &pkt)
+{
+    pkt << longPressEvent.fingerCount << longPressEvent.duration << longPressEvent.pid << longPressEvent.displayId
+        << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+ 
+int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, LongPressEvent &longPressEvent)
+{
+    int32_t data = 0;
+    pkt >> data;
+    longPressEvent.fingerCount = data;
+    pkt >> data;
+    longPressEvent.duration = data;
+    pkt >> data;
+    longPressEvent.pid = data;
+    pkt >> data;
+    longPressEvent.displayId = data;
+    pkt >> data;
+    longPressEvent.displayX = data;
+    pkt >> data;
+    longPressEvent.displayY = data;
+    pkt >> data;
+    longPressEvent.result = data;
+    return RET_OK;
+}
+
 int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &pkt)
 {
     CHKPR(event, ERROR_NULL_POINTER);
