@@ -396,6 +396,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOTION_SPACE):
             ret = StubSetMotionSpace(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CREATE_VKEYBOARD_DEVICE):
+            ret = StubCreateVKeyboardDevice(data, reply);
+            break;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             ret = StubSetPixelMapData(data, reply);
@@ -2521,6 +2524,22 @@ int32_t MultimodalInputConnectStub::StubSetMotionSpace(MessageParcel& data, Mess
     }
     WRITEINT32(reply, ret);
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubCreateVKeyboardDevice(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubCreateVKeyboardDevice Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    sptr<IRemoteObject> vkeyboardDevice = nullptr;
+    int32_t ret = CreateVKeyboardDevice(vkeyboardDevice);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StubCreateVKeyboardDevice failed ret:%{public}d", ret);
+    }
+    WRITEREMOTEOBJECT(reply, vkeyboardDevice, ERR_INVALID_VALUE);
+    return ret;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
