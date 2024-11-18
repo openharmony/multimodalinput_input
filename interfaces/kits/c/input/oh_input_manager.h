@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-#ifndef OH_INPUT_MANAGER_H
-#define OH_INPUT_MANAGER_H
-
 /**
  * @addtogroup input
  * @{
@@ -34,6 +31,9 @@
  * @library liboh_input.so
  * @since 12
  */
+
+#ifndef OH_INPUT_MANAGER_H
+#define OH_INPUT_MANAGER_H
 
 #include <stdint.h>
 
@@ -662,7 +662,8 @@ int32_t OH_Input_GetMouseEventAxisType(const struct Input_MouseEvent* mouseEvent
  * @brief Sets the axis value for a mouse axis event.
  *
  * @param mouseEvent Mouse event object.
- * @param axisType Axis value. A positive value means scrolling forward, and a negative number means scrolling backward.
+ * @param axisValue Axis value. A positive value means scrolling forward,
+ * and a negative number means scrolling backward.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
@@ -691,7 +692,7 @@ void OH_Input_SetMouseEventActionTime(struct Input_MouseEvent* mouseEvent, int64
 /**
  * @brief Obtains the time when a mouse event occurs.
  *
- * @param keyEvent Mouse event object.
+ * @param mouseEvent Mouse event object.
  * @return Returns the time when the mouse event occurs.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
@@ -812,7 +813,7 @@ int32_t OH_Input_GetTouchEventDisplayY(const struct Input_TouchEvent* touchEvent
 /**
  * @brief Sets the time when a touch event occurs.
  *
- * @param keyEvent Touch event object.
+ * @param touchEvent Touch event object.
  * @param actionTime Time when the touch event occurs.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
@@ -822,7 +823,7 @@ void OH_Input_SetTouchEventActionTime(struct Input_TouchEvent* touchEvent, int64
 /**
  * @brief Obtains the time when a touch event occurs.
  *
- * @param keyEvent touch event object.
+ * @param touchEvent touch event object.
  * @return Returns the time when the touch event occurs.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
@@ -1037,7 +1038,7 @@ Input_Result OH_Input_SetAxisEventSourceType(Input_AxisEvent* axisEvent, InputEv
  * @brief Obtains the axis event source type.
  *
  * @param axisEvent Axis event object.
- * @param axisEventType Axis event source type. The values are defined in {@link InputEvent_SourceType}.
+ * @param sourceType Axis event source type. The values are defined in {@link InputEvent_SourceType}.
  * @return OH_Input_GetAxisEventSourceType function result code.
  *         {@link INPUT_SUCCESS} Obtains the axis event source type success.\n
  *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the sourceType is NULL.\n
