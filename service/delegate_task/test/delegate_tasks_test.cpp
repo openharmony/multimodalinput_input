@@ -176,8 +176,8 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostTask_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
-    DelegateTasks::Promise promise;
-    auto task = delegateTasks.PostTask(nullptr, &promise);
+    std::shared_ptr<DelegateTasks::Promise> promise = std::make_shared<DelegateTasks::Promise>();
+    auto task = delegateTasks.PostTask(nullptr, promise);
     EXPECT_EQ(task, nullptr);
 }
 

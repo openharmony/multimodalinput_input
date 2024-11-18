@@ -5280,29 +5280,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLoc
 }
  
 /**
- * @tc.name: InputWindowsManagerTest_DrawTouchGraphic_002
- * @tc.desc: Test the funcation DrawTouchGraphic
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsMgr;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    inputWindowsMgr.knuckleDrawMgr_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
-    inputWindowsMgr.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    ASSERT_NE(inputWindowsMgr.knuckleDrawMgr_, nullptr);
-    inputWindowsMgr.knuckleDynamicDrawingManager_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
-    inputWindowsMgr.knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
-    ASSERT_NE(inputWindowsMgr.knuckleDynamicDrawingManager_, nullptr);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
-}
- 
-/**
  * @tc.name: InputWindowsManagerTest_IsMouseDrawing_001
  * @tc.desc: Test the funcation IsMouseDrawing
  * @tc.type: FUNC

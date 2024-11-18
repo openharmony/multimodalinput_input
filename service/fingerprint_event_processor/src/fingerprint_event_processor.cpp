@@ -164,7 +164,7 @@ bool FingerprintEventProcessor::CheckMisTouchState()
 bool FingerprintEventProcessor::CheckScreenMisTouchState()
 {
     int32_t flag = screenMissTouchFlag_ ? 1 : 0;
-    MMI_HILOGD("screenMissTouchFlag_ is %{public}d", flag);
+    MMI_HILOGI("screenMissTouchFlag_ is %{public}d", flag);
     return screenMissTouchFlag_;
 }
 
@@ -194,7 +194,7 @@ bool FingerprintEventProcessor::CheckKeyMisTouchState()
             }
         }
     }
-    MMI_HILOGD("KeyMisTouchState is %{public}d", ret);
+    MMI_HILOGI("KeyMisTouchState is %{public}d", ret);
     return ret;
 }
 
@@ -293,7 +293,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    MMI_HILOGD("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
+    MMI_HILOGI("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
     if (CheckMisTouchState()) {
         MMI_HILOGD("in mistouch state, dont report event");
         return ERR_OK;
@@ -324,7 +324,7 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    MMI_HILOGD("Fingerprint key:%{public}d, ux:%f, uy:%f", pointerEvent->GetPointerAction(), ux, uy);
+    MMI_HILOGI("Fingerprint key:%{public}d, ux:%f, uy:%f", pointerEvent->GetPointerAction(), ux, uy);
     if (CheckMisTouchState()) {
         MMI_HILOGD("in mistouch state, dont report event");
         return ERR_OK;

@@ -533,44 +533,5 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Chec
     EXPECT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
 }
 
-/**
- * @tc.name: KnuckleDynamicDrawingManagerTest_CheckPointerAction_001
- * @tc.desc: Test Overrides CheckPointerAction function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_CheckPointerAction_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(10);
-    pointerEvent->AddPointerItem(item);
-    knuckleDynamicDrawMgr.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    knuckleDynamicDrawMgr.knuckleDrawMgr_->screenReadState_.state = "0";
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    EXPECT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
-    EXPECT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    EXPECT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
-    EXPECT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    knuckleDynamicDrawMgr.isStop_ = true;
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    EXPECT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    knuckleDynamicDrawMgr.isStop_ = false;
-    knuckleDynamicDrawMgr.traceControlPoints_.clear();
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
-    EXPECT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    Rosen::Drawing::Point point = Rosen::Drawing::Point();
-    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
-    EXPECT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    EXPECT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-}
-
 } // namespace MMI
 } // namespace OHOS

@@ -107,7 +107,6 @@ constexpr int32_t SCALE_CHANGE_END_MILLIS { 700 };
 constexpr float ALPHA_RANGE_BEGIN { 1.0f };
 constexpr float ALPHA_RANGE_END { 0.0f };
 constexpr float EMIT_RADIUS { 40.0f };
-constexpr float BRUSH_FILTER_SCALAR { 60.0f };
 constexpr float TRACK_FILTER_SCALAR { 20.0f };
 constexpr int32_t TRACK_PATH_LENGTH_400 { 400 };
 constexpr int32_t TRACK_PATH_LENGTH_500 { 500 };
@@ -321,7 +320,7 @@ bool KnuckleDrawingManager::CheckRotatePolicy(const DisplayInfo& displayInfo)
 }
 
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-void KnuckleDrawingManager::InitEmitter()
+void KnuckleDrawingManager::InitParticleEmitter()
 {
     CALL_DEBUG_ENTER;
     Rosen::Vector2f position = {DEFAULT_PARTICLE_POSITION_X, DEFAULT_PARTICLE_POSITION_Y};
@@ -411,7 +410,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     brushCanvasNode_->ResetSurface(scaleW_, scaleH_);
     trackCanvasNode_->ResetSurface(scaleW_, scaleH_);
-    InitEmitter();
+    InitParticleEmitter();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 #else
@@ -553,17 +552,22 @@ void KnuckleDrawingManager::UpdateEmitter()
     emitSize = {EMIT_SIZE_RANGE_BEGIN, EMIT_SIZE_RANGE_END};
     std::optional<int32_t> emitRate = std::nullopt;
     emitRate = EMIT_RATE;
-    std::shared_ptr<Rosen::EmitterUpdater> updater = std::make_shared<Rosen::EmitterUpdater>(
+    auto updater = std::make_shared<Rosen::EmitterUpdater>(
         0, position, emitSize, emitRate);
-    std::vector<std::shared_ptr<Rosen::EmitterUpdater>> para;
-    para.push_back(updater);
-    brushCanvasNode_->SetEmitterUpdater(para);
+    std::vector<std::shared_ptr<Rosen::EmitterUpdater>> paras;
+    paras.push_back(updater);
+    brushCanvasNode_->SetEmitterUpdater(paras);
 }
 
 uint32_t KnuckleDrawingManager::GetDeltaColor(uint32_t deltaSource, uint32_t deltaTarget)
 {
     CALL_DEBUG_ENTER;
-    return deltaSource - deltaTarget;
+    if (deltaTarget > deltaSource) {
+        MMI_HILOGE("Invalid deltaSource or deltaTarget");
+        return 0;
+    } else {
+        return deltaSource - deltaTarget;
+    }
 }
 
 uint32_t KnuckleDrawingManager::DrawTrackColorBlue(int32_t pathValue)
@@ -716,19 +720,6 @@ void KnuckleDrawingManager::DrawBrushCanvas()
             BeginRecording(scaleW_, scaleH_));
 #endif // USE_ROSEN_DRAWING
         CHKPV(canvas);
-        for (size_t i = 0; i < pathInfos_.size(); ++i) {
-            Rosen::Drawing::Pen pen;
-            Rosen::Drawing::Filter filter;
-            filter.SetMaskFilter(
-                Rosen::Drawing::MaskFilter::CreateBlurMaskFilter(Rosen::Drawing::BlurType::OUTER, BRUSH_FILTER_SCALAR));
-            pen.SetFilter(filter);
-            pen.SetWidth(TRACK_WIDTH_THIRTY);
-            pen.SetColor(TRACK_COLOR_YELLOW);
-            canvas->AttachPen(pen);
-            canvas->DrawPath(pathInfos_[i]);
-            canvas->DetachPen();
-        }
-
         for (size_t i = 0; (i < pathInfos_.size()) && (pathInfos_.size() != 1); ++i) {
             Rosen::Drawing::Paint paint;
             paint.SetAntiAlias(true);

@@ -57,4 +57,4 @@ private:
 #define APP_OBSERVER_MGR ::OHOS::DelayedSingleton<AppObserverManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_APP_STATE_OBSERVER_H
+#endif  // OHOS_APP_STATE_OBSERVER_H

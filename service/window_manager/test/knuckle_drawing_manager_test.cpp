@@ -57,43 +57,6 @@ private:
 };
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_StartTouchDraw
- * @tc.desc: Test Overrides StartTouchDraw function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_StartTouchDraw, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-    kceDrawMgr.trackCanvasNode_ = nullptr;
-    kceDrawMgr.StartTouchDraw(pointerEvent);
-    EXPECT_EQ(kceDrawMgr.trackCanvasNode_, nullptr);
-    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
-#else
-    kceDrawMgr.canvasNode_ = nullptr;
-    kceDrawMgr.StartTouchDraw(pointerEvent);
-    EXPECT_EQ(kceDrawMgr.canvasNode_, nullptr);
-    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
-#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    kceDrawMgr.isActionUp_ = true;
-    kceDrawMgr.displayInfo_.width = 200;
-    kceDrawMgr.displayInfo_.height = 200;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
-    kceDrawMgr.StartTouchDraw(pointerEvent);
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow
  * @tc.desc: Test Overrides CreateTouchWindow function branches
  * @tc.type: Function

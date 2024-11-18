@@ -385,8 +385,8 @@ template<typename T>
 bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
     CALL_INFO_TRACE;
-    CHKPF(lastPointerEvent_);
     std::unique_lock<std::mutex> lock(mtxHandlers_);
+    CHKPF(lastPointerEvent_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
