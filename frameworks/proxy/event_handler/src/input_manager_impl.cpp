@@ -29,6 +29,7 @@
 #include "event_filter_service.h"
 #include "event_log_helper.h"
 #include "input_scene_board_judgement.h"
+#include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -423,6 +424,24 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
     MMI_HILOGW("Switch device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
+int32_t InputManagerImpl::SubscribeLongPressEvent(const LongPressRequest &longPressRequest,
+    std::function<void(LongPressEvent)> callback)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(callback, RET_ERR);
+    return LONG_PRESS_EVENT_SUBSCRIBE_MGR.SubscribeLongPressEvent(longPressRequest, callback);
+}
+ 
+void InputManagerImpl::UnsubscribeLongPressEvent(int32_t subscriberId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    LONG_PRESS_EVENT_SUBSCRIBE_MGR.UnsubscribeLongPressEvent(subscriberId);
 }
 
 void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)

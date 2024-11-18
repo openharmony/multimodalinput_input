@@ -2612,6 +2612,38 @@ int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
     return RET_OK;
 }
 
+int32_t MMIService::SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId, longPressRequest] {
+            return sMsgHandler_.OnSubscribeLongPressEvent(this, pid, subscribeId, longPressRequest);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The subscribe long press event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+ 
+int32_t MMIService::UnsubscribeLongPressEvent(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId] {
+            return sMsgHandler_.OnUnsubscribeLongPressEvent(this, pid, subscribeId);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The unsubscribe long press event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::SetAnrObserver()
 {
     CALL_INFO_TRACE;

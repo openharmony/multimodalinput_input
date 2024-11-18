@@ -137,6 +137,8 @@ enum class MultimodalinputConnectInterfaceCode {
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     SUBSCRIBE_HOT_KEY = 303,
     UNSUBSCRIBE_HOT_KEY = 304,
+    SUBSCRIBE_LONG_PRESS = 305,
+    UNSUBSCRIBE_LONG_PRESS = 306,
 };
 
 enum class MultimodalinputEventObserverCode {

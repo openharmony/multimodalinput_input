@@ -30,6 +30,7 @@
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
+#include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -62,6 +63,8 @@ void ClientMsgHandler::Init()
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         { MmiMessageId::ON_POINTER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->OnPointerEvent(client, pkt); }},
+        { MmiMessageId::ON_SUBSCRIBE_LONG_PRESS, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->OnSubscribeLongPressEventCallback(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         { MmiMessageId::ADD_INPUT_DEVICE_LISTENER, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->OnDevListener(client, pkt); }},
@@ -209,6 +212,25 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
     return RET_OK;
 }
+
+int32_t ClientMsgHandler::OnSubscribeLongPressEventCallback(const UDSClient& client, NetPacket& pkt)
+{
+    LongPressEvent longPressEvent;
+    int32_t ret = InputEventDataTransformation::NetPacketToLongPressEvent(pkt, longPressEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Read net packet failed");
+        return RET_ERR;
+    }
+    int32_t fd = -1;
+    int32_t subscribeId = -1;
+    pkt >> fd >> subscribeId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
+    return LONG_PRESS_EVENT_SUBSCRIBE_MGR.OnSubscribeLongPressEventCallback(longPressEvent, subscribeId);
+}
+
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
