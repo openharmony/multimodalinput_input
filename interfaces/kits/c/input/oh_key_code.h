@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-#ifndef OH_KEY_CODE_H
-#define OH_KEY_CODE_H
-
 /**
  * @addtogroup input
  * @{
@@ -34,6 +31,9 @@
  * @library libohinput.so
  * @since 12
  */
+
+#ifndef OH_KEY_CODE_H
+#define OH_KEY_CODE_H
 
 #ifdef __cplusplus
 extern "C" {
