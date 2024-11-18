@@ -1505,12 +1505,15 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
-
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
         (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
+        MMI_HILOGI("isDownStart:%{public}d", isDownStart_);
+        if (isDownStart_) {
+            HandleSpecialKeys(keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        }
         return true;
     }
     auto it = repeatKeyCountMap_.find(item.ability.bundleName);
@@ -1841,6 +1844,8 @@ bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> k
         && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGI("Handle consumed key event, cancel opration");
         ResetCurrentLaunchAbilityKey();
+        repeatKey_.keyCode = -1;
+        repeatKey_.keyAction = -1;
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
@@ -2326,7 +2331,7 @@ void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
 
 void KeyCommandHandler::HandleSpecialKeys(int32_t keyCode, int32_t keyAction)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     auto iter = specialKeys_.find(keyCode);
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
         if (iter != specialKeys_.end()) {
