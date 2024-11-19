@@ -1091,7 +1091,6 @@ napi_value JsPointerManager::SetTouchpadScrollRows(napi_env env, int32_t rows, n
         CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
     AsyncCallbackWork(asyncContext);
-    napi_delete_reference(env, asyncContext->callback);
     return promise;
 }
 
@@ -1118,7 +1117,6 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
         }
     } else {
         CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
-        napi_delete_reference(env, asyncContext->callback);
     }
     AsyncCallbackWork(asyncContext);
     return promise;
