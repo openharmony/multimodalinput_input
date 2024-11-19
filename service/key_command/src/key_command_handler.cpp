@@ -1207,7 +1207,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
             MMI_HILOGD("ExcludekeyCode:%d, ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
         }
         auto items = key->GetKeyItems();
-        MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
+        MMI_HILOGI("KeyItemsSize:%{public}zu", items.size());
         if (items.size() != 1) {
             return enableCombineKey_;
         }
@@ -1218,6 +1218,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
             int32_t keyCode = item.GetKeyCode();
             if (keyCode != KeyEvent::KEYCODE_L && keyCode != KeyEvent::KEYCODE_META_LEFT &&
                 keyCode != KeyEvent::KEYCODE_META_RIGHT) {
+                MMI_HILOGI("GetKeyCode:%d", keyCode);
                 return enableCombineKey_;
             }
         }
