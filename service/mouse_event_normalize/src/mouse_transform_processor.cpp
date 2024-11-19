@@ -765,7 +765,7 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
             ret = DeviceType::DEVICE_TABLET;
         }
     }
-    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC){
+    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
         if (width == FOLD_PC_WIDTH && height == FOLD_PC_HEIGHT) {
             ret = DeviceType::DEVICE_FOLD_PC;
         }
