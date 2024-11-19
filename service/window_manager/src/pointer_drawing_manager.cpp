@@ -901,7 +901,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
             .h = buffer->GetHeight(),
         },
     };
-    OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
+    OHOS::SurfaceError ret = layer->FlushBuffer(buffer, releaseFence_, flushConfig);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
         return RET_ERR;
@@ -1099,7 +1099,7 @@ int32_t PointerDrawingManager::FlushBuffer()
             .h = buffer_->GetHeight(),
         },
     };
-    OHOS::SurfaceError ret = layer_->FlushBuffer(buffer_, DEFAULT_VALUE, flushConfig);
+    OHOS::SurfaceError ret = layer_->FlushBuffer(buffer_, releaseFence_, flushConfig);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
     }
@@ -1626,11 +1626,10 @@ sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
     return surfaceNode_->GetSurface();
 }
 
-sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer) const
+sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer)
 {
     CALL_DEBUG_ENTER;
     sptr<OHOS::SurfaceBuffer> buffer;
-    int32_t releaseFence = -1;
     int32_t width = 0;
     int32_t height = 0;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -1660,20 +1659,21 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
         .timeout = 150,
     };
 
-    OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence, config);
+    OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence_, config);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Request buffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
         return nullptr;
     }
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (hardwareCursorPointerManager_->IsSupported()) {
-        sptr<OHOS::SyncFence> tempFence = new OHOS::SyncFence(releaseFence);
+        sptr<OHOS::SyncFence> tempFence = new OHOS::SyncFence(releaseFence_);
         if (tempFence != nullptr && (tempFence->Wait(SYNC_FENCE_WAIT_TIME) < 0)) {
             MMI_HILOGE("Failed to create surface, this buffer is not available");
         }
     }
 #else
-    close(releaseFence);
+    close(releaseFence_);
+    releaseFence_ = -1;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return buffer;
 }
