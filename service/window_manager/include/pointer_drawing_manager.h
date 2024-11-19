@@ -166,6 +166,8 @@ private:
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
+    int32_t UpdateLoadingAndLoadingRightPixelMap();
+    void InitLoadingAndLoadingRightPixelMap();
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -202,6 +204,12 @@ private:
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };
+    };
+    struct loadingAndLoadingPixelMapInfo {
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
+        int32_t imageWidth { 0 };
+        int32_t imageHeight { 0 };
+        int32_t pointerColor { 0 };
     };
     bool hasDisplay_ { false };
     DisplayInfo displayInfo_ {};
@@ -264,6 +272,8 @@ private:
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
     int32_t releaseFence_ { -1 };
+    std::map<std::string, loadingAndLoadingPixelMapInfo> mousePixelMap_;
+    int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
