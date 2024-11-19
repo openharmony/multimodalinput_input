@@ -67,6 +67,9 @@ constexpr int32_t SOFT_PC_PRO_DEVICE_WIDTH { 3120 };
 constexpr int32_t SOFT_PC_PRO_DEVICE_HEIGHT { 2080 };
 constexpr int32_t TABLET_DEVICE_WIDTH { 2880 };
 constexpr int32_t TABLET_DEVICE_HEIGHT { 1920 };
+constexpr int32_t FOLD_PC_WIDTH { 2472 };
+constexpr int32_t FOLD_PC_HEIGHT { 3296 };
+const std::string DEVICE_TYPE_FOLD_PC { "FOLD_PC" };
 const std::string DEVICE_TYPE_TABLET { "TABLET"};
 const std::string DEVICE_TYPE_PC_PRO { "PC_PRO" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
@@ -760,6 +763,11 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
     if (PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
         if (width == TABLET_DEVICE_WIDTH && height == TABLET_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_TABLET;
+        }
+    }
+    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+        if (width == FOLD_PC_WIDTH && height == FOLD_PC_HEIGHT) {
+            ret = DeviceType::DEVICE_FOLD_PC;
         }
     }
     return ret;
