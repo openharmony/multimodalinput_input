@@ -41,6 +41,8 @@ public:
     {
         return true;
     }
+
+    void OnGestureTrend(std::shared_ptr<PointerEvent> event) override {}
 };
 
 void TouchGestureDetectorTest::SetUpTestCase(void)
