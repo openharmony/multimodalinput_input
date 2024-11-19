@@ -46,8 +46,7 @@ constexpr int32_t MAXIMUM_SAME_DIRECTION_OFFSET = 1;
 constexpr float MAXIMUM_POINTER_SPACING = 2000;
 constexpr int64_t MAXIMUM_POINTER_INTERVAL = 100000;
 constexpr int64_t MAXIMUM_PRESS_DELAY { 15 }; // ms
-constexpr double MINIMUM_FINGER_MOVEMENT { 5.0 };
-constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE = 5;
+constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE { 3.0 };
 constexpr double MINIMUM_GRAVITY_OFFSET = 0.5;
 constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS = 2;
 constexpr int32_t MINIMUM_FINGER_COUNT_OFFSET = 1;
@@ -126,6 +125,8 @@ void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
     if (downPoint_.size() < THREE_FINGER_COUNT) {
         return;
     }
+    CheckGestureTrend(event);
+
     if (!IsMatchGesture(event->GetPointerCount()) && !IsMatchGesture(ALL_FINGER_COUNT)) {
         return;
     }
@@ -242,7 +243,7 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
     }
 }
 
-bool TouchGestureDetector::IsPhysicalPointer(std::shared_ptr<PointerEvent> event) const
+bool TouchGestureDetector::IsPhysicalPointer(std::shared_ptr<PointerEvent> event)
 {
     if (event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
         return false;
@@ -359,7 +360,7 @@ double TouchGestureDetector::GetAngle(float startX, float startY, float endX, fl
 
 bool TouchGestureDetector::IsFingerMove(const Point &downPt, const Point &movePt) const
 {
-    return (CalcTwoPointsDistance(downPt, movePt) > MINIMUM_FINGER_MOVEMENT);
+    return (CalcTwoPointsDistance(downPt, movePt) > MAXIMUM_SINGLE_SLIDE_DISTANCE);
 }
 
 TouchGestureDetector::SlideState TouchGestureDetector::GetSlidingDirection(double angle)
@@ -703,6 +704,29 @@ bool TouchGestureDetector::NotifyGestureEvent(std::shared_ptr<PointerEvent> even
     }
     MMI_HILOGI("Gesture(%{public}d) identified successfully", mode);
     return true;
+}
+
+void TouchGestureDetector::CheckGestureTrend(std::shared_ptr<PointerEvent> event) const
+{
+    CHKPV(listener_);
+    int32_t nMovements { 0 };
+
+    for (const auto &[pointerId, downPt] : downPoint_) {
+        PointerEvent::PointerItem item {};
+
+        if (!event->GetPointerItem(pointerId, item)) {
+            MMI_HILOGW("No touch(%{public}d) record", pointerId);
+            return;
+        }
+        Point movePt { item.GetDisplayX(), item.GetDisplayY() };
+
+        if (IsFingerMove(downPt, movePt)) {
+            ++nMovements;
+        }
+    }
+    if (nMovements >= THREE_FINGER_COUNT) {
+        listener_->OnGestureTrend(event);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
