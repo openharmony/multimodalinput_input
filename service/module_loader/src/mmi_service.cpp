@@ -3650,12 +3650,16 @@ int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice
     
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    vkeyboard_onFuncKeyEvent_(keyEvent);
+    if (vkeyboard_onFuncKeyEvent_ != nullptr) {
+        vkeyboard_onFuncKeyEvent_(keyEvent);
+    }
     auto eventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(eventNormalizeHandler, ERROR_NULL_POINTER);
     auto inputEventHandler = static_cast<std::shared_ptr<IInputEventHandler>>(
         eventNormalizeHandler);
-    vkeyboard_onInputEventHandler_(eventNormalizeHandler);
+    if (vkeyboard_onInputEventHandler_ != nullptr) {
+        vkeyboard_onInputEventHandler_(eventNormalizeHandler);
+    }
     return RET_OK;
 }
 
