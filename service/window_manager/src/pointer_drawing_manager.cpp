@@ -475,10 +475,9 @@ int32_t PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_
             surfaceNode_->SetBounds(physicalX, physicalY,
                 canvasWidth_, canvasHeight_);
         } else {
-            if (surfaceNode_ != nullptr) {
-                surfaceNode_->SetBounds(physicalX, physicalY,
-                    imageWidth_, imageHeight_);
-            }
+            CHKPR(surfaceNode_, RET_ERR);
+            surfaceNode_->SetBounds(physicalX, physicalY,
+                imageWidth_, imageHeight_);
         }
         return RET_OK;
     }
