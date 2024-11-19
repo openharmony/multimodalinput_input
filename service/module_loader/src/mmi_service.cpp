@@ -727,6 +727,11 @@ int32_t SendKeyboardAction(KeyEvent::VKeyboardAction action)
 
 int32_t PointerEventHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    if (vkeyboard_onPointerEvent_ != nullptr) {
+        vkeyboard_onPointerEvent_(pointerEvent);
+    }
+    return 0;
+
     int32_t pointerAction = pointerEvent->GetPointerAction();
     int32_t sourceType = pointerEvent->GetSourceType();
     if (sourceType != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
