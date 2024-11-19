@@ -443,10 +443,15 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {744, {"KEY_ENDCALL", 744, 4, HOS_KEY_ENDCALL}},
     {407, {"KEY_NEXT", 407, 2629, HOS_KEY_NEXT}},
     {412, {"KEY_PREVIOUS", 412, 2631, HOS_KEY_PREVIOUS}},
+
+    {760, {"DAGGER_PRESS", 760, 3211, DAGGER_PRESS}},
+    {761, {"DAGGER_CLICK", 761, 3212, DAGGER_CLICK}},
+    {762, {"DAGGER_LONG_PRESS", 762, 3213, DAGGER_LONG_PRESS}},
 };
 
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
 {
+    MMI_HILOGI("TransferKeyValue into, keyValueOfInput:%{public}d", keyValueOfInput);
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         static constexpr int32_t unknownKeyBase = 10000;
