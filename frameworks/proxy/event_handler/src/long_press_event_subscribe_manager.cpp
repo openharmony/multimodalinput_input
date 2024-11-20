@@ -121,7 +121,7 @@ int32_t LongPressEventSubscribeManager::OnSubscribeLongPressEventCallback(const 
     }
     CHKPR(callback, ERROR_NULL_POINTER);
     callback(longPressEvent);
-    MMI_HILOGI("LongPressEvent fingerCount:%{public}d, duration:%{public}d, pid:%{public}d, displayId:%{public}d, "
+    MMI_HILOGD("LongPressEvent fingerCount:%{public}d, duration:%{public}d, pid:%{public}d, displayId:%{public}d, "
         "displayX:%{public}d, displayY:%{public}d, result:%{public}d, windowId:%{public}d, bundleName:%{public}s, "
         "subscribeId:%{public}d",
         longPressEvent.fingerCount, longPressEvent.duration, longPressEvent.pid,
