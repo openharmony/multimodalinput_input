@@ -33,6 +33,30 @@
 
 namespace OHOS {
 namespace MMI {
+struct DurationTimer {
+    int32_t duration = -1;
+    int32_t timerId = -1;
+};
+
+struct FingerGesture {
+    inline static constexpr auto MAX_TOUCH_NUM = 2;
+    struct {
+        int32_t id { 0 };
+        int32_t x { 0 };
+        int32_t y { 0 };
+        int64_t downTime { 0 };
+    } touches[MAX_TOUCH_NUM];
+};
+
+struct Subscriber {
+    Subscriber(int32_t id, SessionPtr sess, int32_t fingerCount, int32_t duration)
+        : id_(id), sess_(sess), fingerCount_(fingerCount), duration_(duration) {}
+    int32_t id_ { -1 };
+    SessionPtr sess_ { nullptr };
+    int32_t fingerCount_ { -1 };
+    int32_t duration_ {-1};
+};
+
 class LongPressSubscriberHandler final {
     DECLARE_DELAYED_SINGLETON(LongPressSubscriberHandler);
 public:
@@ -40,27 +64,40 @@ public:
     
     int32_t SubscribeLongPressEvent(SessionPtr sess, int32_t subscribeId, const LongPressRequest &longPressRequest);
     int32_t UnsubscribeLongPressEvent(SessionPtr sess, int32_t subscribeId);
-    
-private:
-    struct Subscriber {
-        Subscriber(int32_t id, SessionPtr sess, int32_t fingerCount, int32_t duration)
-            : id_(id), sess_(sess), fingerCount_(fingerCount), duration_(duration), timerId_(-1) {}
-        int32_t id_ { -1 };
-        SessionPtr sess_ { nullptr };
-        int32_t fingerCount_ { -1 };
-        int32_t duration_ {-1};
-        int32_t timerId_ { -1 };
-    };
-    void InsertSubScriber(std::shared_ptr<Subscriber> subs);
+    void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent, int64_t abilityStartDelay,
+        std::function<void(int32_t displayX1, int32_t displayY1, int32_t displayX2, int32_t displayY2)>);
+    void HandleFingerGestureMoveEvent(const std::shared_ptr<PointerEvent> &touchEvent);
+    void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent);
 
 private:
-    void OnSubscribeLongPressEvent(int32_t duration);
-    void NotifySubscriber(const std::shared_ptr<Subscriber> &subscriber);
+    void OnSubscribeLongPressEvent(int32_t fingerCount, int32_t duration);
+    void OnSubscribeLongPressCancelEvent(SessionPtr sess, int32_t fingerCount, int32_t duration) const;
+    void NotifySubscriber(const std::shared_ptr<Subscriber> &subscriber, int32_t result) const;
     void OnSessionDelete(SessionPtr sess);
+    void InsertSubScriber(const std::shared_ptr<Subscriber> &subscriber);
     bool InitSessionDeleteCallback();
+    void StopFingerGesture();
+    int32_t ConvertVPToPX(int32_t vp) const;
+    bool CheckFingerGestureAction(int32_t fingerCount) const;
+    void StartFingerGesture(int32_t fingerCount);
+    int32_t GetBundleName(std::string &bundleName, int32_t windowPid) const;
+    void AddDurationTimer(int32_t duration);
+    void RemoveDurationTimer(int32_t fingerCount, int32_t duration);
+    void AddSessSubscriber(const std::shared_ptr<Subscriber> &subscriber);
+    void RemoveSessSubscriber(SessionPtr sess, int32_t subscribeId);
+    void CheckFingerGestureCancelEvent(const std::shared_ptr<PointerEvent> &touchEvent) const;
 
 private:
+    std::map<std::pair<int32_t, int32_t>, std::vector<std::shared_ptr<Subscriber>>> subscriberInfos_;
+    std::vector<DurationTimer> durationTimers_;
+    std::map<SessionPtr, std::vector<std::shared_ptr<Subscriber>>> sessManager_;
+    FingerGesture fingerGesture_;
+    std::shared_ptr<PointerEvent> touchEvent_ { nullptr };
     std::atomic_bool callbackInitialized_ { false };
+    int64_t abilityStartDelay_ = -1;
+    int32_t abilityTimerId_ = -1;
+    bool isAllTimerClosed = false;
+    std::function<void(int32_t displayX1, int32_t displayY1, int32_t displayX2, int32_t displayY2)> callback_;
 };
 #define LONG_PRESS_EVENT_HANDLER ::OHOS::DelayedSingleton<LongPressSubscriberHandler>::GetInstance()
 } // namespace MMI
