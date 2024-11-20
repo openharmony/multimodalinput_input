@@ -3615,7 +3615,8 @@ int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice
     return RET_OK;
 }
 
-void MMIService::InitVKeyboardPointerEventHandler() {
+void MMIService::InitVKeyboardPointerEventHandler()
+{
     if (isHPR_) {
         // Suppose to be monitoring pointer event for vkeyboard
         // DelegateInterface::HandlerSummary summary = {}
@@ -3629,7 +3630,8 @@ void MMIService::InitVKeyboardPointerEventHandler() {
     }
 }
 
-void MMIService::InitVKeyboardFuncHandler() {
+void MMIService::InitVKeyboardFuncHandler()
+{
     if (isHPR_) {
         // Initialize vkeyboard handler
         g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
