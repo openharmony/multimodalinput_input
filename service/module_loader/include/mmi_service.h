@@ -274,6 +274,8 @@ protected:
         std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRightBtnUp(
         std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    void InitVKeyboardPointerEventHandler();
+    void InitVKeyboardFuncHandler();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 private:
     MMIService();
