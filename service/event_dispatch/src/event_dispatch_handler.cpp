@@ -274,7 +274,9 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     }
     auto udsServer = InputHandler->GetUDSServer();
     int32_t fd = -1;
-    if ((point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
+    if (point->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL &&
+        point->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL &&
+        (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
         point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
         WIN_MGR->GetWindowPid(pointerItem.GetTargetWindowId() > 0)) {
         CHKPV(udsServer);
