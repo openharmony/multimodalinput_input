@@ -583,12 +583,10 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
 #ifdef OHOS_RSS_CLIENT
     if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCH_DOWN) {
         std::unordered_map<std::string, std::string> mapPayload;
-        OHOS::ResourceSchedule::ResScheduleClient::GetInstance().ReportData(
-            OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-                OHOS::ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
-                OHOS::ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN_MNI,
-                mapPayload);
-        )
+        OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+            OHOS::ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
+            OHOS::ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN_MMI,
+            mapPayload);
     }
 #endif
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
