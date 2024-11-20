@@ -763,16 +763,17 @@ void KeyShortcutManager::ResetCheckState()
 {
     isCheckShortcut_ = true;
 }
- 
+
 static const std::vector<int32_t> specialKeyCodes = {
     KeyEvent::KEYCODE_ALT_LEFT,
     KeyEvent::KEYCODE_ALT_RIGHT,
     KeyEvent::KEYCODE_TAB,
     KeyEvent::KEYCODE_VOLUME_UP,
     KeyEvent::KEYCODE_VOLUME_DOWN,
-    KeyEvent::KEYCODE_POWER
+    KeyEvent::KEYCODE_POWER,
+    KeyEvent::KEYCODE_HEADSETHOOK
 };
- 
+
 bool KeyShortcutManager::IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     auto it = std::find(specialKeyCodes.begin(), specialKeyCodes.end(), keyEvent->GetKeyCode());
