@@ -1104,64 +1104,6 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
-    if (isHPR_) {
-        DelegateInterface::HandlerSummary summary = {};
-        summary.handlerName = "VKeyboard";
-        summary.eventType = HANDLE_EVENT_TYPE_POINTER;
-        summary.mode = HandlerMode::SYNC;
-        summary.priority = 0;
-        summary.deviceTags = 0;
-        summary.cb = PointerEventHandler;
-        delegateInterface_->AddHandler(InputHandlerType::MONITOR, summary);
-
-        // Initialize vkeyboard handler
-        g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
-        if (g_VKeyboardHandle != nullptr) {
-            algorithm_keydown_ = (ALGORITHM_KEYDOWN_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyDown");
-            algorithm_keyup_ = (ALGORITHM_KEYUP_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyUp");
-            gaussiankeyboard_getKeyCodeByKeyName_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyName");
-            gaussiankeyboard_getKeyCodeByKeyNameAndShift_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyNameAndShift");
-            gaussiankeyboard_updateMotionSpace_ = (GAUSSIANKEYBOARD_UPDATEMOTIONSPACE_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardUpdateMotionSpace");
-            gaussiankeyboard_setVKeyboardArea_ = (GAUSSIANKEYBOARD_SETVKEYBOARDAREA_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardSetVKeyboardArea");
-            bayesianengine_mapTouchToButton_ = (BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE)dlsym(
-                g_VKeyboardHandle, "BayesianEngineMapTouchToButton");
-            statemachineMessageQueue_getMessage_ = (STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "StateMachineMessageQueueGetMessage");
-            gaussiankeyboard_isInsideVKeyboardArea_ = (GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardIsInsideVKeyboardArea");
-            gaussiankeyboard_isVKeyboardVisible_ = (GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardIsVKeyboardVisible");
-            algorithm_isKeyDownInKeyboard_ = (ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)dlsym(
-                g_VKeyboardHandle, "AlgorithmIsKeyDownInKeyboard");
-            algorithm_initialize_ = (ALGORITHM_INITIALIZE_TYPE)dlsym(
-                g_VKeyboardHandle, "AlgorithmInitialize");
-            trackPadEngine_isInsideVTrackPadArea_ = (TRACKPADENGINE_ISINSIDEVTRACKPADAREA_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineIsInsideVTrackPadArea");
-            trackPadEngine_isVTrackPadVisible_ = (TRACKPADENGINE_ISVTRACKPADVISIBLE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineIsVTrackPadVisible");
-            trackPadEngine_interpretPointerEvent_ = (TRACKPADENGINE_INTERPRETPOINTEREVENT_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineInterpretPointerEvent");
-            trackPadEngine_setVTrackPadArea_ = (TRACKPADENGINE_SETVTRACKPADAREA_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineSetVTrackPadArea");
-            trackPadEngine_setScreenArea_ = (TRACKPADENGINE_SETSCREENAREA_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineSetScreenArea");
-            trackPadEngine_getAllTouchMessage_ = (TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineGetAllTouchMessage");
-            trackPadEngine_clearTouchMessage_ = (TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineClearTouchMessage");
-            trackPadEngine_getAllKeyMessage_ = (TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineGetAllKeyMessage");
-            trackPadEngine_clearKeyMessage_ = (TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
-        }
-    }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -3611,6 +3553,7 @@ int32_t MMIService::OnSetMotionSpace(std::string& keyName, bool useShift, std::v
 int32_t MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
     CALL_INFO_TRACE;
+    isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
     if (!isHPR_) {
         MMI_HILOGE("Failed to create vkeyboard device, feature not support");
         return RET_ERR;
@@ -3628,6 +3571,10 @@ int32_t MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 
 int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
+    if (g_VKeyboardHandle == nullptr) {
+        InitVKeyboardPointerEventHandler();
+        InitVKeyboardFuncHandler();
+    }
     if (g_VKeyboardHandle == nullptr) {
         MMI_HILOGE("VKeyboard handler is nullptr");
         return RET_ERR;
@@ -3666,6 +3613,68 @@ int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice
         vkeyboard_onInputEventHandler_(eventNormalizeHandler);
     }
     return RET_OK;
+}
+
+void MMIService::InitVKeyboardPointerEventHandler() {
+    if (isHPR_) {
+        DelegateInterface::HandlerSummary summary = {};
+        summary.handlerName = "VKeyboard";
+        summary.eventType = HANDLE_EVENT_TYPE_POINTER;
+        summary.mode = HandlerMode::SYNC;
+        summary.priority = 0;
+        summary.deviceTags = 0;
+        summary.cb = PointerEventHandler;
+        delegateInterface_->AddHandler(InputHandlerType::MONITOR, summary);
+    }
+}
+
+void MMIService::InitVKeyboardFuncHandler() {
+    if (isHPR_) {
+        // Initialize vkeyboard handler
+        g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
+        if (g_VKeyboardHandle != nullptr) {
+            algorithm_keydown_ = (ALGORITHM_KEYDOWN_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyDown");
+            algorithm_keyup_ = (ALGORITHM_KEYUP_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyUp");
+            gaussiankeyboard_getKeyCodeByKeyName_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyName");
+            gaussiankeyboard_getKeyCodeByKeyNameAndShift_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAMEANDSHIFT_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyNameAndShift");
+            gaussiankeyboard_updateMotionSpace_ = (GAUSSIANKEYBOARD_UPDATEMOTIONSPACE_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardUpdateMotionSpace");
+            gaussiankeyboard_setVKeyboardArea_ = (GAUSSIANKEYBOARD_SETVKEYBOARDAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardSetVKeyboardArea");
+            bayesianengine_mapTouchToButton_ = (BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE)dlsym(
+                g_VKeyboardHandle, "BayesianEngineMapTouchToButton");
+            statemachineMessageQueue_getMessage_ = (STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "StateMachineMessageQueueGetMessage");
+            gaussiankeyboard_isInsideVKeyboardArea_ = (GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardIsInsideVKeyboardArea");
+            gaussiankeyboard_isVKeyboardVisible_ = (GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)dlsym(
+                g_VKeyboardHandle, "GaussianKeyboardIsVKeyboardVisible");
+            algorithm_isKeyDownInKeyboard_ = (ALGORITHM_ISKEYDOWNINKEYBOARD_TYPE)dlsym(
+                g_VKeyboardHandle, "AlgorithmIsKeyDownInKeyboard");
+            algorithm_initialize_ = (ALGORITHM_INITIALIZE_TYPE)dlsym(
+                g_VKeyboardHandle, "AlgorithmInitialize");
+            trackPadEngine_isInsideVTrackPadArea_ = (TRACKPADENGINE_ISINSIDEVTRACKPADAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineIsInsideVTrackPadArea");
+            trackPadEngine_isVTrackPadVisible_ = (TRACKPADENGINE_ISVTRACKPADVISIBLE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineIsVTrackPadVisible");
+            trackPadEngine_interpretPointerEvent_ = (TRACKPADENGINE_INTERPRETPOINTEREVENT_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineInterpretPointerEvent");
+            trackPadEngine_setVTrackPadArea_ = (TRACKPADENGINE_SETVTRACKPADAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineSetVTrackPadArea");
+            trackPadEngine_setScreenArea_ = (TRACKPADENGINE_SETSCREENAREA_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineSetScreenArea");
+            trackPadEngine_getAllTouchMessage_ = (TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineGetAllTouchMessage");
+            trackPadEngine_clearTouchMessage_ = (TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineClearTouchMessage");
+            trackPadEngine_getAllKeyMessage_ = (TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineGetAllKeyMessage");
+            trackPadEngine_clearKeyMessage_ = (TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
+        }
+    }
 }
 
 void MMIService::OnVKeyTrackPadMessage(const std::vector<std::vector<int32_t>>& msgList)
