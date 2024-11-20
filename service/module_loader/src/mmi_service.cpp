@@ -3617,14 +3617,15 @@ int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice
 
 void MMIService::InitVKeyboardPointerEventHandler() {
     if (isHPR_) {
-        DelegateInterface::HandlerSummary summary = {};
-        summary.handlerName = "VKeyboard";
-        summary.eventType = HANDLE_EVENT_TYPE_POINTER;
-        summary.mode = HandlerMode::SYNC;
-        summary.priority = 0;
-        summary.deviceTags = 0;
-        summary.cb = PointerEventHandler;
-        delegateInterface_->AddHandler(InputHandlerType::MONITOR, summary);
+        // Suppose to be monitoring pointer event for vkeyboard
+        // DelegateInterface::HandlerSummary summary = {}
+        // summary.handlerName = "VKeyboard"
+        // summary.eventType = HANDLE_EVENT_TYPE_POINTER
+        // summary.mode = HandlerMode::SYNC
+        // summary.priority = 0
+        // summary.deviceTags = 0
+        // summary.cb = PointerEventHandler
+        // delegateInterface_->AddHandler(InputHandlerType::MONITOR, summary)
     }
 }
 
