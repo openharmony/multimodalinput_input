@@ -284,7 +284,6 @@ void LibinputAdapter::OnEventHandler()
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
             ) {
-
             libinput_event_touch* touch = libinput_event_get_touch_event(event);
             if (deviceId == -1) {
                 // initialize touch device ID.
