@@ -148,6 +148,9 @@ constexpr int32_t VKEY_TP_SM_MSG_POINTER_ID_IDX { 1 };
 constexpr int32_t VKEY_TP_SM_MSG_POS_X_IDX { 2 };
 constexpr int32_t VKEY_TP_SM_MSG_POS_Y_IDX { 3 };
 void* g_VKeyboardHandle = nullptr;
+typedef int32_t (*HANDLE_TOUCHPOINT_TYPE)(
+    double screenX, double screenY, int touchId, bool tipDown);
+HANDLE_TOUCHPOINT_TYPE handleTouchPoint_ = nullptr;
 typedef void (*ALGORITHM_KEYDOWN_TYPE)(
     double screenX, double screenY, int touchId, bool tipDown, string buttonName);
 ALGORITHM_KEYDOWN_TYPE algorithm_keydown_ = nullptr;
@@ -3636,6 +3639,7 @@ void MMIService::InitVKeyboardFuncHandler()
         // Initialize vkeyboard handler
         g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
         if (g_VKeyboardHandle != nullptr) {
+            handleTouchPoint_ = (HANDLE_TOUCHPOINT_TYPE)dlsym(g_VKeyboardHandle, "HandleTouchPoint");
             algorithm_keydown_ = (ALGORITHM_KEYDOWN_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyDown");
             algorithm_keyup_ = (ALGORITHM_KEYUP_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyUp");
             gaussiankeyboard_getKeyCodeByKeyName_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)dlsym(
@@ -3676,6 +3680,14 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "TrackPadEngineGetAllKeyMessage");
             trackPadEngine_clearKeyMessage_ = (TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)dlsym(
                 g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
+            libinputAdapter_.InitVKeyboard(handleTouchPoint_,
+                                           gaussiankeyboard_isInsideVKeyboardArea_,
+                                           gaussiankeyboard_isVKeyboardVisible_,
+                                           bayesianengine_mapTouchToButton_,
+                                           algorithm_keydown_,
+                                           algorithm_keyup_,
+                                           statemachineMessageQueue_getMessage_,
+                                           gaussiankeyboard_getKeyCodeByKeyName_);
         }
     }
 }
