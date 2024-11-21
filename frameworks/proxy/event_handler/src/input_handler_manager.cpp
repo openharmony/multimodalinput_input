@@ -643,10 +643,11 @@ bool InputHandlerManager::IsFingerprintType(std::shared_ptr<PointerEvent> pointe
 }
 #endif
 
-bool InputHandlerManager::CheckIfNeedAddToConsumerInfos(const Handler &monitor, std::shared_ptr<PointerEvent> pointerEvent)
+bool InputHandlerManager::CheckIfNeedAddToConsumerInfos(const Handler &monitor,
+    std::shared_ptr<PointerEvent> pointerEvent)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    if((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT &&
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT &&
         IsFingerprintType(pointerEvent)) {
         return true;
     }
