@@ -443,10 +443,15 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {744, {"KEY_ENDCALL", 744, 4, HOS_KEY_ENDCALL}},
     {407, {"KEY_NEXT", 407, 2629, HOS_KEY_NEXT}},
     {412, {"KEY_PREVIOUS", 412, 2631, HOS_KEY_PREVIOUS}},
+
+    {760, {"DAGGER_PRESS", 760, 3211, DAGGER_PRESS}},
+    {761, {"DAGGER_CLICK", 761, 3212, DAGGER_CLICK}},
+    {762, {"DAGGER_LONG_PRESS", 762, 3213, DAGGER_LONG_PRESS}},
 };
 
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
 {
+    MMI_HILOGD("TransferKeyValue into, keyValueOfInput:%{public}d", keyValueOfInput);
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         static constexpr int32_t unknownKeyBase = 10000;
@@ -503,6 +508,13 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
     {(int64_t)KeyEvent::KEYCODE_APPSELECT, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_BACK, KeyEvent::INTENTION_BACK},
     {(int64_t)KeyEvent::KEYCODE_MOVE_HOME, KeyEvent::INTENTION_HOME},
+    {(int64_t)KeyEvent::KEYCODE_BUTTON_A, KeyEvent::INTENTION_SELECT},
+    {(int64_t)KeyEvent::KEYCODE_BUTTON_B, KeyEvent::INTENTION_BACK},
+    {(int64_t)KeyEvent::KEYCODE_BUTTON_SELECT, KeyEvent::INTENTION_MENU},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_UP, KeyEvent::INTENTION_UP},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::INTENTION_DOWN},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_LEFT},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_RIGHT},
 };
 } // namespace
 

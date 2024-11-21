@@ -24,7 +24,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t STANDARD_SPEED { 5 };
-constexpr int32_t MAX_SPEED { 11 };
+constexpr int32_t MAX_SPEED { 20 };
+constexpr int32_t MAX_TOUCHPAD_SPEED { 11 };
 constexpr int32_t MIN_SPEED { 1 };
 constexpr int32_t DEFAULT_ROWS { 3 };
 constexpr int32_t MIN_ROWS { 1 };
@@ -138,7 +139,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
-        MMI_HILOGE("visible parameter type is invalid");
+        MMI_HILOGE("Visible parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
         return nullptr;
     }
@@ -152,7 +153,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
         return jsPointerMgr->SetPointerVisible(env, visible);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -171,7 +172,7 @@ napi_value JsPointerContext::SetPointerVisibleSync(napi_env env, napi_callback_i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
-        MMI_HILOGE("visible parameter type is invalid");
+        MMI_HILOGE("Visible parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
         return nullptr;
     }
@@ -198,7 +199,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
         return jsPointerMgr->IsPointerVisible(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1304,7 +1305,7 @@ napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_inf
 {
     CALL_DEBUG_ENTER;
     if (!func) {
-        MMI_HILOGE("func is nullptr");
+        MMI_HILOGE("The func is nullptr");
         return nullptr;
     }
     size_t argc = 2;
@@ -1478,7 +1479,7 @@ napi_value JsPointerContext::SetTouchpadPointerSpeed(napi_env env, napi_callback
     auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadPointerSpeed(env, data, handle);
     };
-    return SetTouchpadInt32Data(env, info, func, MAX_SPEED, MIN_SPEED);
+    return SetTouchpadInt32Data(env, info, func, MAX_TOUCHPAD_SPEED, MIN_SPEED);
 }
 
 napi_value JsPointerContext::GetTouchpadPointerSpeed(napi_env env, napi_callback_info info)
@@ -1556,7 +1557,7 @@ napi_value JsPointerContext::SetTouchpadRightClickType(napi_env env, napi_callba
     auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadRightClickType(env, data, handle);
     };
-    return SetTouchpadInt32Data(env, info, func, MAX_SPEED, MIN_SPEED);
+    return SetTouchpadInt32Data(env, info, func, MAX_TOUCHPAD_SPEED, MIN_SPEED);
 }
 
 napi_value JsPointerContext::GetTouchpadRightClickType(napi_env env, napi_callback_info info)
@@ -1676,7 +1677,7 @@ napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("rows parameter type is invalid");
+        MMI_HILOGE("Rows parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touchpadScrollRows", "number");
         return nullptr;
     }
@@ -1690,7 +1691,7 @@ napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_i
         return jsPointerMgr->SetTouchpadScrollRows(env, newRows);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1710,7 +1711,7 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
         return jsPointerMgr->GetTouchpadScrollRows(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1722,7 +1723,7 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
     CALL_DEBUG_ENTER;
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
-        THROWERR(env, "failed to create instance");
+        THROWERR(env, "Failed to create instance");
         return nullptr;
     }
     napi_property_descriptor desc[] = {

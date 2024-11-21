@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <climits>
+#include <regex>
 
 #include <dirent.h>
 #include <fcntl.h>
@@ -27,6 +28,7 @@
 #include "i_input_windows_manager.h"
 #include "param_wrapper.h"
 #include "util.h"
+#include "input_device_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -52,11 +54,11 @@ void HiLogFunc(struct libinput* input, libinput_log_priority priority, const cha
         va_end(args);
         return;
     }
-    if (strstr(buffer, "LOG_LEVEL_I") != NULL) {
+    if (strstr(buffer, "LOG_LEVEL_I") != nullptr) {
         MMI_HILOGI("PrintLog_Info:%{public}s", buffer);
-    } else if (strstr(buffer, "LOG_LEVEL_D") != NULL) {
+    } else if (strstr(buffer, "LOG_LEVEL_D") != nullptr) {
         MMI_HILOGD("PrintLog_Info:%{public}s", buffer);
-    } else if (strstr(buffer, "LOG_LEVEL_E") != NULL) {
+    } else if (strstr(buffer, "LOG_LEVEL_E") != nullptr) {
         MMI_HILOGE("PrintLog_Info:%{public}s", buffer);
     } else {
         MMI_HILOGD("PrintLog_Info:%{public}s", buffer);
@@ -116,7 +118,18 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
         }
         int32_t errNo = errno;
-        MMI_HILOGWK("Libinput .open_restricted path:%{private}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+        std::regex re("(\\d+)");
+        std::string str_path(path);
+        std::smatch match;
+        int32_t id;
+        bool isPath = std::regex_search(str_path, match, re);
+        if (!isPath) {
+            id = -1;
+        } else {
+            id = std::stoi(match[0]);
+        }
+        MMI_HILOGWK("Libinput .open_restricted id:%{public}d, fd:%{public}d, errno:%{public}d",
+            id, fd, errNo);
         return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
@@ -186,6 +199,78 @@ void LibinputAdapter::ProcessPendingEvents()
     OnEventHandler();
 }
 
+void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
+                                    IsInsideVKeyboardArea isInsideVKeyboardArea,
+                                    IsKeyboardVisible isKeyboardVisible,
+                                    MapTouchToButton mapTouchToButton,
+                                    KeyDown keyDown,
+                                    KeyUp keyUp,
+                                    GetMessage getMessage,
+                                    GetKeyCodeByKeyName getKeyCodeByKeyName)
+{
+    handleTouchPoint_ = handleTouchPoint;
+    isInsideVKeyboardArea_ = isInsideVKeyboardArea;
+    isKeyboardVisible_ = isKeyboardVisible;
+    mapTouchToButton_ = mapTouchToButton;
+    keyDown_ = keyDown;
+    keyUp_ = keyUp;
+    getMessage_ = getMessage;
+    getKeyCodeByKeyName_ = getKeyCodeByKeyName;
+
+    deviceId = -1;
+}
+
+std::unordered_map<std::string, int32_t> LibinputAdapter::keyCodes_ = {
+    { "Btn_ESCAPE", 1 }, { "Btn_F1", 59 }, { "Btn_F2", 60 }, { "Btn_F3", 61 }, { "Btn_F4", 62 },
+    { "Btn_F5", 63 }, { "Btn_F6", 64 }, { "Btn_SMART", -1 }, { "Btn_F7", 65 }, { "Btn_F8", 66 },
+    { "Btn_F9", 67 }, { "Btn_F10", 68 }, { "Btn_F11", 87 }, { "Btn_F12", 88 }, { "Btn_DELETE", 111 },
+
+    { "Btn_OEM_3", 41 }, { "Btn_1", 2 }, { "Btn_2", 3 }, { "Btn_3", 4 }, { "Btn_4", 5 },
+    { "Btn_5", 6 }, { "Btn_6", 7 }, { "Btn_7", 8 }, { "Btn_8", 9 }, { "Btn_9", 10 },
+    { "Btn_0", 11 }, { "Btn_SS", 12 }, { "Btn_INVERTED_COMMA", 13 }, { "Btn_BACK", 14 },
+
+    { "Btn_TAB", 15 }, { "Btn_Q", 16 }, { "Btn_W", 17 }, { "Btn_E", 18 }, { "Btn_R", 19 },
+    { "Btn_T", 20 }, { "Btn_Y", 21 }, { "Btn_U", 22 }, { "Btn_I", 23 }, { "Btn_O", 24 },
+    { "Btn_P", 25 }, { "Btn_UE", 26 }, { "Btn_PLUS", 27 }, { "Btn_HASHTAG", 43 },
+
+    { "Btn_CAPS", 58 }, { "Btn_A", 30 }, { "Btn_S", 31 }, { "Btn_D", 32 }, { "Btn_F", 33 },
+    { "Btn_G", 34 }, { "Btn_H", 35 }, { "Btn_J", 36 }, { "Btn_K", 37 }, { "Btn_L", 38 },
+    { "Btn_OE", 39 }, { "Btn_AE", 40 }, { "Btn_ENTER", 28 },
+
+    { "Btn_LSHIFT", 42 }, { "Btn_Z", 44 }, { "Btn_X", 45 }, { "Btn_C", 46 }, { "Btn_V", 47 },
+    { "Btn_B", 48 }, { "Btn_N", 49 }, { "Btn_M", 50 }, { "Btn_COMMA", 51 }, { "Btn_DOT", 52 },
+    { "Btn_MINUS", 53 }, { "Btn_RSHIFT", 54 },
+
+    { "Btn_LCTRL", 29 }, { "Btn_FNCT", 125 }, { "Btn_WINDOWS", 86 }, { "Btn_ALT", 56 },
+    { "Btn_SPACE", 57 }, { "Btn_ALTGR", 100 }, { "Btn_RCTRL", 97 }, { "Btn_LEFT", 105 },
+    { "Btn_UP", 107 }, { "Btn_DOWN", 108 }, { "Btn_RIGHT", 106 },
+};
+
+void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCode,
+                                     libinput_key_state state, int64_t frameTime)
+{
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    libinput_event_keyboard* key_event_pressed =
+            libinput_create_keyboard_event(touch, keyCode, state);
+
+    funInputEvent_((libinput_event*)key_event_pressed, frameTime);
+    free(key_event_pressed);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+}
+
+void LibinputAdapter::InjectCombinationKeyEvent(libinput_event_touch* touch, std::vector<int32_t>& toggleKeyCodes,
+                                                int32_t triggerKeyCode, int64_t frameTime)
+{
+    for (auto& toggleCode: toggleKeyCodes) {
+        InjectKeyEvent(touch, toggleCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
+    }
+    InjectKeyEvent(touch, triggerKeyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
+    InjectKeyEvent(touch, triggerKeyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
+    for (auto& toggleCode: toggleKeyCodes) {
+        InjectKeyEvent(touch, toggleCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
+    }
+}
+
 void LibinputAdapter::OnEventHandler()
 {
     CALL_DEBUG_ENTER;
@@ -193,8 +278,114 @@ void LibinputAdapter::OnEventHandler()
     libinput_event *event = nullptr;
     int64_t frameTime = GetSysClockTime();
     while ((event = libinput_get_event(input_))) {
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        libinput_event_type eventType = libinput_event_get_type(event);
+        if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
+            || eventType == LIBINPUT_EVENT_TOUCH_UP
+            || eventType == LIBINPUT_EVENT_TOUCH_MOTION
+            ) {
+            libinput_event_touch* touch = libinput_event_get_touch_event(event);
+            if (deviceId == -1) {
+                // initialize touch device ID.
+                libinput_device* device = libinput_event_get_device(event);
+                deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+            }
+
+            EventTouch touchInfo;
+            int32_t logicalDisplayId = -1;
+            double x = 0.0;
+            double y = 0.0;
+            int32_t touchId = libinput_event_touch_get_slot(touch);
+            bool tipDown = (eventType != LIBINPUT_EVENT_TOUCH_UP);
+
+            // touch up event has no coordinates information, skip coordinate calculation.
+            if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
+                if (!WIN_MGR->TouchPointToDisplayPoint(deviceId, touch, touchInfo, logicalDisplayId)) {
+                    MMI_HILOGE("Map touch point to display point failed");
+                } else {
+                    x = touchInfo.point.x;
+                    y = touchInfo.point.y;
+
+                    touchPoints_[touchId] = std::pair<double, double>(x, y);
+                }
+            } else {
+                auto pos = touchPoints_.find(touchId);
+                if (pos != touchPoints_.end()) {
+                    x = (pos->second).first;
+                    y = (pos->second).second;
+                    touchPoints_.erase(pos);
+                }
+            }
+
+            MMI_HILOGD("#### touch event. deviceId: %d, touchId: %d, x: %d, y: %d, type: %d", deviceId,
+                       touchId, (int)x, (int)y, (int)eventType);
+
+            if (handleTouchPoint_(x, y, touchId, tipDown) == 0) {
+                MMI_HILOGD("#### inside vkeyboard area");
+
+                while (true) {
+                    std::string buttonName;
+                    std::string toggleButtonName;
+                    int buttonMode;
+                    std::string restList;
+                    VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(buttonName, toggleButtonName,
+                                                                                  buttonMode, restList);
+                    MMI_HILOGD("#### get message type: %d", (int)type);
+                    if (type == VNoMessage) {
+                        break;
+                    }
+
+                    switch (type) {
+                        case VKeyboardMessageType::VKeyPressed: {
+                            MMI_HILOGD("#### press key: %s", buttonName.c_str());
+                            int32_t keyCode = keyCodes_[buttonName];
+                            InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
+                            InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
+                            break;
+                        }
+                        case VKeyboardMessageType::VCombinationKeyPressed: {
+                            MMI_HILOGD("#### combination key. triger button: %s, toggle button: %s",
+                                       buttonName.c_str(), toggleButtonName.c_str());
+
+                            std::vector<int32_t> toggleKeyCodes;
+                            std::string remainStr = toggleButtonName;
+                            int32_t toggleCode(-1), triggerCode(-1);
+                            while (remainStr.find(';') != std::string::npos) {
+                                // still has more than one
+                                size_t pos = remainStr.find(';');
+                                toggleCode = keyCodes_[remainStr.substr(0, pos)];
+                                if (toggleCode >= 0) {
+                                    toggleKeyCodes.push_back(toggleCode);
+                                }
+                                remainStr = remainStr.substr(pos + 1);
+                            }
+                            // Add the last piece.
+                            toggleCode = keyCodes_[remainStr];
+                            if (toggleCode >= 0) {
+                                toggleKeyCodes.push_back(toggleCode);
+                            }
+                            // Trigger code:
+                            triggerCode = keyCodes_[buttonName];
+
+                            InjectCombinationKeyEvent(touch, toggleKeyCodes, triggerCode, frameTime);
+                            break;
+                        }
+                        default: break;
+                    }
+                }
+                libinput_event_destroy(event);
+            } else {
+                funInputEvent_(event, frameTime);
+                libinput_event_destroy(event);
+            }
+        } else {
+            funInputEvent_(event, frameTime);
+            libinput_event_destroy(event);
+        }
+#else // OHOS_BUILD_ENABLE_VKEYBOARD
         funInputEvent_(event, frameTime);
         libinput_event_destroy(event);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
     if (event == nullptr) {
         funInputEvent_(nullptr, 0);
@@ -211,7 +402,17 @@ void LibinputAdapter::ReloadDevice()
 
 void LibinputAdapter::OnDeviceAdded(std::string path)
 {
-    CALL_DEBUG_ENTER;
+    std::regex re("(\\d+)");
+    std::string str_path(path);
+    std::smatch match;
+    int32_t id;
+    bool isPath = std::regex_search(str_path, match, re);
+    if (!isPath) {
+        id = -1;
+    } else {
+        id = std::stoi(match[0]);
+    }
+    MMI_HILOGI("OnDeviceAdded id:%{public}d", id);
     auto pos = devices_.find(path);
     if (pos != devices_.end()) {
         MMI_HILOGD("Path is found");
@@ -227,7 +428,17 @@ void LibinputAdapter::OnDeviceAdded(std::string path)
 
 void LibinputAdapter::OnDeviceRemoved(std::string path)
 {
-    CALL_DEBUG_ENTER;
+    std::regex re("(\\d+)");
+    std::string str_path(path);
+    std::smatch match;
+    int32_t id;
+    bool isPath = std::regex_search(str_path, match, re);
+    if (!isPath) {
+        id = -1;
+    } else {
+        id = std::stoi(match[0]);
+    }
+    MMI_HILOGI("OnDeviceRemoved id:%{public}d", id);
     auto pos = devices_.find(path);
     if (pos != devices_.end()) {
         libinput_path_remove_device(pos->second);

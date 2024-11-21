@@ -15,10 +15,13 @@
 
 #include "event_monitor_handler.h"
 
+#include "common_event_support.h"
+
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "display_event_monitor.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
@@ -41,6 +44,7 @@ constexpr size_t MAX_EVENTIDS_SIZE { 1000 };
 constexpr int32_t ACTIVE_EVENT { 2 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t POWER_UID { 5528 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -174,6 +178,11 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
+    auto keyHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPF(keyHandler);
+    if (keyEvent->GetKeyCode() != keyHandler->GetCurrentHandleKeyCode()) {
+        MMI_HILOGW("Keycode has been changed");
+    }
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {
@@ -222,6 +231,16 @@ void EventMonitorHandler::OnSessionLost(SessionPtr session)
     monitors_.OnSessionLost(session);
 }
 
+bool EventMonitorHandler::SessionHandler::Expect(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    if (GestureMonitorHandler::IsTouchGestureEvent(pointerEvent->GetPointerAction())) {
+        return (((eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) &&
+            gesture_.IsMatchGesture(pointerEvent->GetPointerAction(), pointerEvent->GetPointerCount()));
+    } else {
+        return ((eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER);
+    }
+}
+
 void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const
 {
     CHKPV(keyEvent);
@@ -240,10 +259,6 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
-    if (((eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) &&
-        !GestureMonitorHandler::IsMatchGesture(pointerEvent->GetPointerAction(), pointerEvent->GetPointerCount())) {
-        return;
-    }
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d, TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
     if (!session_->SendMsg(pkt)) {
@@ -296,8 +311,8 @@ int32_t EventMonitorHandler::MonitorCollection::UpdateEventTypeMonitor(const std
         return RET_OK;
     }
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
-        auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
-        gestureHandler.AddGestureMonitor(monitor.gestureType_, monitor.fingers_);
+        auto gestureHandler = iter->gesture_;
+        gestureHandler.AddGestureMonitor(monitor.gesture_.gestureType_, monitor.gesture_.fingers_);
         handler(gestureHandler);
     }
 
@@ -347,7 +362,6 @@ bool EventMonitorHandler::MonitorCollection::IsNeedInsertToMonitors(std::vector<
     return isNeedInsertToMonitors;
 }
 
-
 void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
     SessionHandler handler = monitor;
@@ -358,8 +372,8 @@ void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler&
     }
 
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
-        auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
-        gestureHandler.RemoveGestureMonitor(monitor.gestureType_, monitor.fingers_);
+        auto gestureHandler = iter->gesture_;
+        gestureHandler.RemoveGestureMonitor(monitor.gesture_.gestureType_, monitor.gesture_.fingers_);
         handler(gestureHandler);
     }
     monitors_.erase(iter);
@@ -439,7 +453,12 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
         return false;
     }
     for (const auto &mon : monitors_) {
-        if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
+        if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+            continue;
+        }
+        if (!keyEvent->GetFourceMonitorFlag()) {
+            mon.SendToClient(keyEvent, pkt);
+        } else if (mon.session_ != nullptr && mon.session_->GetUid() == POWER_UID) {
             mon.SendToClient(keyEvent, pkt);
         }
     }
@@ -589,10 +608,12 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
 void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler &monitor,
     std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt)
 {
-    if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
+    if (monitor.Expect(pointerEvent)) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
-            MMI_HILOGI("Swipe event sended in monitor! action type: %{public}d", pointerEvent->GetPointerAction());
+            MMI_HILOGI("Swipe event sended in monitor! action type: %{public}d finger count: %{public}d",
+                pointerEvent->GetPointerAction(),
+                pointerEvent->GetFingerCount());
         }
         if (monitor.session_) {
             monitor.SendToClient(pointerEvent, pkt);
@@ -726,6 +747,6 @@ void EventMonitorHandler::ProcessScreenCapture(int32_t pid, bool isStart)
         monitors_.RemoveScreenCaptureMonitor(session);
     }
 }
-#endif
+#endif // PLAYER_FRAMEWORK_EXISTS
 } // namespace MMI
 } // namespace OHOS

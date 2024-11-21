@@ -46,6 +46,9 @@ public:
     void Stop();
     void MarkConsumed(int32_t eventId);
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void SetCallback(std::function<void(std::shared_ptr<KeyEvent>)> callback);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     void SetId(int32_t id);
     void SetFingers(int32_t fingers);
     void SetHotRectArea(std::vector<Rect> hotRectArea);
@@ -63,6 +66,9 @@ private:
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    std::function<void(std::shared_ptr<KeyEvent>)> keyEventCallback_;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t id_ { -1 };
     int32_t monitorId_ { -1 };
     int32_t fingers_ { 0 };
@@ -92,6 +98,11 @@ public:
     void OnPointerEventInJsThread(const std::string &typeName, const int32_t fingers);
     void CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent);
     void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void OnKeyEventInJsThread(const std::string &typeName, const int32_t fingers);
+    void CheckKeyEventConsumed(bool isConsumed, std::shared_ptr<KeyEvent> keyEvent);
+    void OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     std::string GetTypeName() const;
     bool IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, std::vector<Rect> hotRectArea);
 private:
@@ -122,6 +133,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t TransformFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t TransformKeyEvent(std::shared_ptr<KeyEvent> keyEvent, napi_value result);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     std::optional<int32_t> GetJoystickAction(int32_t action);
     int32_t GetJoystickButton(int32_t button);
@@ -144,10 +158,16 @@ private:
     bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
     MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool IsKeyEvent(const std::string &typeName);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 private:
     std::shared_ptr<InputMonitor> monitor_ { nullptr };
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
     std::queue<std::shared_ptr<PointerEvent>> pointerQueue_;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    std::queue<std::shared_ptr<KeyEvent>> keyEventQueue_;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     napi_ref receiver_ { nullptr };
     napi_env jsEnv_ { nullptr };
     std::string typeName_;

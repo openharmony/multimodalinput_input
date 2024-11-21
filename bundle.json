@@ -36,15 +36,11 @@
       "input_feature_short_key",
       "input_feature_fingerprint",
       "input_feature_crown",
-      "input_ext_feature_anco",
-      "input_ext_feature_fingersense",
-      "input_ext_feature_gesturesense",
-      "input_ext_feature_magiccursor",
-      "input_feature_infrared_emitter",
       "input_feature_joystick",
       "input_feature_coverage",
       "input_shortcut_key_manager_enabled",
-      "input_shortcut_key_rules_enabled"
+      "input_shortcut_key_rules_enabled",
+      "input_feature_virtual_keyboard"
     ],
     "adapted_system_type": [
       "standard"
@@ -98,7 +94,6 @@
         "qos_manager"
       ],
       "third_party": [
-        "node",
         "libuv",
         "libevdev",
         "mtdev",

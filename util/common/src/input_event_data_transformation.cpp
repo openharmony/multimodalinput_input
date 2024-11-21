@@ -35,6 +35,9 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
         return RET_ERR;
     }
     pkt << key->GetKeyCode() << key->GetKeyAction() << key->GetKeyIntention();
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    pkt << key->GetVKeyboardAction() << key->GetKeyName();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     auto keys = key->GetKeyItems();
     int32_t size = static_cast<int32_t>(keys.size());
     if (size > MAX_KEY_SIZE) {
@@ -69,6 +72,13 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     key->SetKeyAction(data);
     pkt >> data;
     key->SetKeyIntention(data);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    pkt >> data;
+    key->SetVKeyboardAction((KeyEvent::VKeyboardAction)data);
+    std::string keyName;
+    pkt >> keyName;
+    key->SetKeyName(keyName);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t size = 0;
     pkt >> size;
     if (size > MAX_KEY_SIZE) {
@@ -144,6 +154,37 @@ int32_t InputEventDataTransformation::NetPacketToSwitchEvent(NetPacket &pkt, std
     swEvent->SetSwitchValue(data);
     pkt >> data;
     swEvent->SetSwitchMask(data);
+    return RET_OK;
+}
+
+int32_t InputEventDataTransformation::LongPressEventToNetPacket(const LongPressEvent &longPressEvent, NetPacket &pkt)
+{
+    pkt << longPressEvent.fingerCount << longPressEvent.duration << longPressEvent.pid << longPressEvent.displayId
+        << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+ 
+int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, LongPressEvent &longPressEvent)
+{
+    int32_t data = 0;
+    pkt >> data;
+    longPressEvent.fingerCount = data;
+    pkt >> data;
+    longPressEvent.duration = data;
+    pkt >> data;
+    longPressEvent.pid = data;
+    pkt >> data;
+    longPressEvent.displayId = data;
+    pkt >> data;
+    longPressEvent.displayX = data;
+    pkt >> data;
+    longPressEvent.displayY = data;
+    pkt >> data;
+    longPressEvent.result = data;
     return RET_OK;
 }
 
@@ -240,6 +281,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     for (const auto &buf : buffer) {
         pkt << buf;
     }
+    pkt << event->GetPullId();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Marshalling pointer event failed");
         return RET_ERR;
@@ -285,8 +327,9 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetButtonId(tField);
     pkt >> tField;
     event->SetFingerCount(tField);
-    pkt >> tField;
-    event->SetZOrder(tField);
+    float zOrder;
+    pkt >> zOrder;
+    event->SetZOrder(zOrder);
     pkt >> tField;
     event->SetDispatchTimes(tField);
     uint32_t type = 0u;
@@ -367,11 +410,13 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         pkt >> buff;
         buffer.push_back(buff);
     }
+    pkt >> tField;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Unmarshalling pointer event failed");
         return RET_ERR;
     }
     event->SetBuffer(buffer);
+    event->SetPullId(tField);
     return RET_OK;
 }
 

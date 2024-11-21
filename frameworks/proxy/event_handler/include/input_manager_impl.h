@@ -41,6 +41,7 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "key_option.h"
+#include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "nap_process.h"
 #include "pointer_event.h"
@@ -74,6 +75,9 @@ public:
     void UnsubscribeHotkey(int32_t subscriberId);
     int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
+    int32_t SubscribeLongPressEvent(const LongPressRequest &LongPressRequest,
+        std::function<void(LongPressEvent)> callback);
+    void UnsubscribeLongPressEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
@@ -117,7 +121,7 @@ public:
     int32_t RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
+    int32_t SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void OnConnected();
@@ -212,6 +216,11 @@ public:
     int32_t HasIrEmitter(bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
+    int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern);
+    int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
     int32_t SetMoveEventFilters(bool flag);

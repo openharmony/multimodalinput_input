@@ -42,6 +42,9 @@ public:
     void RemoveMonitor(napi_env jsEnv, const std::string &typeName, const int32_t fingers = 0);
     void RemoveMonitor(napi_env jsEnv);
     void OnPointerEventByMonitorId(int32_t id, int32_t fingers, std::shared_ptr<PointerEvent> pointEvent);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void OnKeyEventByMonitorId(int32_t id, int32_t fingers, std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     const std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id, int32_t fingers);
     std::string GetMonitorTypeName(int32_t id, int32_t fingers);
     bool AddEnv(napi_env env, napi_callback_info cbInfo);

@@ -131,7 +131,7 @@ private:
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
     sptr<OHOS::Surface> GetLayer();
-    sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
+    sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
     bool RetryGetSurfaceBuffer(sptr<OHOS::SurfaceBuffer> buffer, sptr<OHOS::Surface> layer);
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
@@ -166,6 +166,8 @@ private:
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
+    int32_t UpdateLoadingAndLoadingRightPixelMap();
+    void InitLoadingAndLoadingRightPixelMap();
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -182,6 +184,7 @@ private:
     void CreateDynamicCanvas();
     int32_t ParsingDynamicImage(MOUSE_ICON mouseStyle);
     void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
+    std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
@@ -201,6 +204,12 @@ private:
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };
+    };
+    struct loadingAndLoadingPixelMapInfo {
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
+        int32_t imageWidth { 0 };
+        int32_t imageHeight { 0 };
+        int32_t pointerColor { 0 };
     };
     bool hasDisplay_ { false };
     DisplayInfo displayInfo_ {};
@@ -252,6 +261,7 @@ private:
     std::atomic<bool> isRenderRuning_{ false };
     std::unique_ptr<std::thread> renderThread_ { nullptr };
     bool isInit_ { false };
+    std::mutex mtx_;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -261,6 +271,9 @@ private:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
+    int32_t releaseFence_ { -1 };
+    std::map<std::string, loadingAndLoadingPixelMapInfo> mousePixelMap_;
+    int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

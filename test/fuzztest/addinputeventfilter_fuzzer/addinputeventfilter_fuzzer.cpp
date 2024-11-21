@@ -19,13 +19,33 @@
 #include "define_multimodal.h"
 #include "mmi_log.h"
 
+#include "securec.h"
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AddInputEventFilterFuzzTest"
 
 namespace OHOS {
 namespace MMI {
+template<class T>
+size_t GetObject(T &object, const uint8_t *data, size_t size)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
+
 void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
+
     struct TestFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {

@@ -123,6 +123,10 @@ config("libmmi_server_config") {
   if (is_emulator) {
     defines += [ "OHOS_BUILD_EMULATOR" ]
   }
+
+  if (input_feature_joystick) {
+    include_dirs += [ "${mmi_service_path}/joystick/include" ]
+  }
 }
 
 ohos_rust_shared_ffi("mmi_rust") {
@@ -174,6 +178,7 @@ ohos_shared_library("libmmi-server") {
       sources += [
         "key_command/src/key_command_handler.cpp",
         "key_command/src/key_command_handler_util.cpp",
+        "key_command/src/long_press_subscriber_handler.cpp",
         "key_command/src/stylus_key_handler.cpp",
       ]
     }
@@ -225,10 +230,16 @@ ohos_shared_library("libmmi-server") {
         [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
   }
   if (input_feature_joystick) {
-    sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
+    sources += [
+      "joystick/src/joystick_event_normalize.cpp",
+      "joystick/src/joystick_event_processor.cpp",
+    ]
   }
   if (input_feature_monitor) {
-    sources += [ "monitor/src/event_monitor_handler.cpp" ]
+    sources += [
+      "monitor/src/event_monitor_handler.cpp",
+      "monitor/src/gesture_monitor_handler.cpp",
+    ]
   }
   if (input_feature_interceptor) {
     sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
@@ -411,6 +422,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
@@ -491,7 +503,6 @@ ohos_unittest("EventFilterHandlerTest") {
     "${mmi_path}/service/filter/src/event_filter_proxy.cpp",
     "${mmi_path}/service/filter/test/event_filter_handler_ex_test.cpp",
     "${mmi_path}/service/filter/test/event_filter_handler_test.cpp",
-    "${mmi_path}/service/filter/test/event_filter_proxy_test.cpp",
     "${mmi_path}/service/filter/test/message_parcel_mock.cpp",
     "${mmi_path}/service/filter/test/mock.cpp",
   ]
@@ -1153,7 +1164,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
   include_dirs = [
     "window_manager/test",
     "${mmi_path}/libudev/include",
-    "${mmi_path}/test/facility/libinput_interface/include",
+    "${mmi_path}/common/anco/comm/include",
   ]
 
   configs = [
@@ -1172,7 +1183,11 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager/test/mock.cpp",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
@@ -1288,10 +1303,6 @@ ohos_unittest("SubscriberTest") {
   ]
 
   sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
-
-  if (input_feature_switch) {
-    sources += [ "subscriber/test/switch_subscriber_handler_test.cpp" ]
-  }
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -1426,7 +1437,10 @@ ohos_unittest("MonitorTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "monitor/test/event_monitor_handler_test.cpp" ]
+  sources = [
+    "monitor/test/event_monitor_handler_test.cpp",
+    "monitor/test/gesture_monitor_handler_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -1488,7 +1502,6 @@ ohos_unittest("ModuleLoaderTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
-    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

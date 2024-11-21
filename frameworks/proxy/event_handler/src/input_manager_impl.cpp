@@ -29,6 +29,7 @@
 #include "event_filter_service.h"
 #include "event_log_helper.h"
 #include "input_scene_board_judgement.h"
+#include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -52,6 +53,10 @@ constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
 constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
 constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
 constexpr int32_t INVALID_KEY_ACTION { -1 };
+constexpr int32_t MAX_WINDOW_SIZE { 15 };
+constexpr int32_t INPUT_SUCCESS { 0 };
+constexpr int32_t INPUT_PERMISSION_DENIED { 201 };
+constexpr int32_t INPUT_OCCUPIED_BY_OTHER { 4200003 };
 const std::map<int32_t, int32_t> g_keyActionMap = {
     {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
     {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
@@ -142,6 +147,9 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (displayGroupInfo.windowsInfo.size() < MAX_WINDOW_SIZE) {
+        windowGroupInfo_.windowsInfo.clear();
+    }
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Failed to initialize MMI client");
         return RET_ERR;
@@ -411,7 +419,7 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
     if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
-        MMI_HILOGE("switch type error, switchType:%{public}d", switchType);
+        MMI_HILOGE("Switch type error, switchType:%{public}d", switchType);
         return RET_ERR;
     }
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(switchType, callback);
@@ -421,10 +429,29 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
 #endif // OHOS_BUILD_ENABLE_SWITCH
 }
 
+int32_t InputManagerImpl::SubscribeLongPressEvent(const LongPressRequest &longPressRequest,
+    std::function<void(LongPressEvent)> callback)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(callback, RET_ERR);
+    return LONG_PRESS_EVENT_SUBSCRIBE_MGR.SubscribeLongPressEvent(longPressRequest, callback);
+}
+ 
+void InputManagerImpl::UnsubscribeLongPressEvent(int32_t subscriberId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    LONG_PRESS_EVENT_SUBSCRIBE_MGR.UnsubscribeLongPressEvent(subscriberId);
+}
+
 void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribeSwitchEvent(subscriberId);
 #else
@@ -523,7 +550,11 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
-        MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+            MMI_HILOG_FREEZEI("id:%{public}d recv, BI:%{public}d", pointerEvent->GetId(), pointerEvent->GetButtonId());
+        } else {
+            MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
+        }
     }
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
@@ -685,7 +716,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.dpi << item.name << item.uniq << item.direction
-            << item.displayDirection << item.displayMode << item.transform;
+            << item.displayDirection << item.displayMode << item.transform << item.ppi;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -1033,11 +1064,11 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
     }
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
+int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    CHKPV(pointerEvent);
+    CHKPR(pointerEvent, RET_ERR);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
@@ -1051,33 +1082,27 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
         MMI_HILOGW("Pointer device does not support");
-        return;
+        return INPUT_OCCUPIED_BY_OTHER;
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
 #ifndef OHOS_BUILD_ENABLE_TOUCH
         MMI_HILOGW("Touchscreen device does not support");
-        return;
+        return INPUT_OCCUPIED_BY_OTHER;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     }
 #ifndef OHOS_BUILD_ENABLE_JOYSTICK
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
         MMI_HILOGW("Joystick device does not support");
-        return;
+        return INPUT_OCCUPIED_BY_OTHER;
     }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
-    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        HandleSimulateInputEvent(pointerEvent);
-    } else {
-        int32_t pointerAction = pointerEvent->GetPointerAction();
-        if (pointerAction < PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
-            pointerAction > PointerEvent::POINTER_ACTION_SWIPE_END) {
-            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-        }
-    }
+    HandleSimulateInputEvent(pointerEvent);
     if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
+        return INPUT_PERMISSION_DENIED;
     }
+    return INPUT_SUCCESS;
 #else
     MMI_HILOGW("Pointer and touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -1118,7 +1143,7 @@ int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, int32_t focusX, int3
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t winPid = GetWindowPid(windowId);
     if (winPid == -1) {
-        MMI_HILOGE("winPid is invalid");
+        MMI_HILOGE("The winPid is invalid");
         return RET_ERR;
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(winPid, windowId, focusX, focusY, pixelMap);
@@ -1153,7 +1178,7 @@ int32_t InputManagerImpl::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, in
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t winPid = GetWindowPid(windowId);
     if (winPid == -1) {
-        MMI_HILOGE("winPid is invalid return -1");
+        MMI_HILOGE("The winPid is invalid return -1");
         return RET_ERR;
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMouseHotSpot(winPid, windowId, hotSpotX, hotSpotY);
@@ -1461,22 +1486,28 @@ template<typename T>
 bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(resourceMtx_);
-    CHKPF(lastPointerEvent_);
-    int32_t pointerAction = lastPointerEvent_->GetPointerAction();
+    std::shared_ptr<PointerEvent> currentPointerEvent = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPF(lastPointerEvent_);
+        currentPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    }
+
+    CHKPF(currentPointerEvent);
+    int32_t pointerAction = currentPointerEvent->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
             PointerEvent::PointerItem item;
-            int32_t pointerId = lastPointerEvent_->GetPointerId();
-            if (!lastPointerEvent_->GetPointerItem(pointerId, item)) {
+            int32_t pointerId = currentPointerEvent->GetPointerId();
+            if (!currentPointerEvent->GetPointerItem(pointerId, item)) {
                 MMI_HILOG_DISPATCHD("Get pointer item failed. pointer:%{public}d",
                     pointerId);
                 return false;
             }
             item.SetPressed(false);
-            lastPointerEvent_->UpdatePointerItem(pointerId, item);
-            lastPointerEvent_->SetPointerAction(pointerActionEvent);
-            OnPointerEvent(lastPointerEvent_);
+            currentPointerEvent->UpdatePointerItem(pointerId, item);
+            currentPointerEvent->SetPointerAction(pointerActionEvent);
+            OnPointerEvent(currentPointerEvent);
             return true;
         }
     }
@@ -2341,6 +2372,26 @@ int32_t InputManagerImpl::CancelInjection()
     }
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+int32_t InputManagerImpl::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+}
+
+int32_t InputManagerImpl::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetMotionSpace(keyName, useShift, pattern);
+}
+
+int32_t InputManagerImpl::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->CreateVKeyboardDevice(vkeyboardDevice);
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
 {

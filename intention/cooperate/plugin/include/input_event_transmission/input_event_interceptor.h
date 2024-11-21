@@ -44,7 +44,6 @@ private:
     void ReportPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 
     IContext *env_ { nullptr };
-    int32_t timerId_ { -1 };
     int32_t interceptorId_ { -1 };
     std::string remoteNetworkId_;
     Channel<CooperateEvent>::Sender sender_;

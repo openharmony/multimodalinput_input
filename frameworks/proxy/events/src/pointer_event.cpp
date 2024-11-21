@@ -34,6 +34,7 @@ constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_BUFFER_SIZE { 512 };
+constexpr size_t MAX_N_PRESSED_KEYS { 10 };
 } // namespace
 
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
@@ -276,10 +277,11 @@ int32_t PointerEvent::PointerItem::GetMoveFlag() const
     return moveFlag_;
 }
 
-void PointerEvent::PointerItem::SetMoveFlag(int32_t moveFlag)
+void PointerEvent::PointerItem::SetMoveFlag(int32_t moveflag)
 {
-    moveFlag_ = moveFlag;
+    moveFlag_ = moveflag;
 }
+
 
 int32_t PointerEvent::PointerItem::GetLongAxis() const
 {
@@ -411,11 +413,11 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(rawDisplayX_) &&
         out.WriteInt32(rawDisplayY_) &&
         out.WriteInt32(targetWindowId_) &&
+        out.WriteInt32(originPointerId_) &&
         out.WriteDouble(displayXPos_) &&
         out.WriteDouble(displayYPos_) &&
         out.WriteDouble(windowXPos_) &&
-        out.WriteDouble(windowYPos_) &&
-        out.WriteInt32(originPointerId_)
+        out.WriteDouble(windowYPos_)
     );
 }
 
@@ -449,11 +451,11 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(rawDisplayX_) &&
         in.ReadInt32(rawDisplayY_) &&
         in.ReadInt32(targetWindowId_) &&
+        in.ReadInt32(originPointerId_) &&
         in.ReadDouble(displayXPos_) &&
         in.ReadDouble(displayYPos_) &&
         in.ReadDouble(windowXPos_) &&
-        in.ReadDouble(windowYPos_) &&
-        in.ReadInt32(originPointerId_)
+        in.ReadDouble(windowYPos_)
     );
 }
 
@@ -463,7 +465,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), originPointerAction_(other.originPointerAction_),
-      buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), zOrder_(other.zOrder_),
+      buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), pullId_(other.pullId_), zOrder_(other.zOrder_),
       axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_), axisEventType_(other.axisEventType_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
@@ -614,6 +616,28 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
 
 const char* PointerEvent::DumpPointerAction() const
 {
+    if (pointerAction_ == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
+        if (HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL) ||
+            HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+            return "axis-begin";
+        } else if (HasAxis(axes_, PointerEvent::AXIS_TYPE_PINCH)) {
+            return "pinch-begin";
+        }
+    } else if (pointerAction_ == PointerEvent::POINTER_ACTION_AXIS_UPDATE) {
+        if (HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL) ||
+            HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+            return "axis-update";
+        } else if (HasAxis(axes_, PointerEvent::AXIS_TYPE_PINCH)) {
+            return "pinch-update";
+        }
+    } else if (pointerAction_ == PointerEvent::POINTER_ACTION_AXIS_END) {
+        if (HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL) ||
+            HasAxis(axes_, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+            return "axis-end";
+        } else if (HasAxis(axes_, PointerEvent::AXIS_TYPE_PINCH)) {
+            return "pinch-end";
+        }
+    }
     auto it = pointerActionMap.find(pointerAction_);
     if (it != pointerActionMap.end()) {
         return it->second.c_str();
@@ -828,6 +852,11 @@ void PointerEvent::ClearAxisValue()
     axes_ = 0;
 }
 
+void PointerEvent::ClearAxisStatus(AxisType axis)
+{
+    axes_ &= ~static_cast<uint32_t>(1U << axis);
+}
+
 bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
 {
     bool ret { false };
@@ -865,6 +894,16 @@ int32_t PointerEvent::GetAxisEventType() const
 void PointerEvent::SetAxisEventType(int32_t axisEventType)
 {
     axisEventType_ = axisEventType;
+}
+
+int32_t PointerEvent::GetPullId() const
+{
+    return pullId_;
+}
+
+void PointerEvent::SetPullId(int32_t pullId)
+{
+    pullId_ = pullId;
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -934,9 +973,9 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
-    WRITEDOUBLE(out, velocity_);
 
     WRITEINT32(out, axisEventType_);
+    WRITEINT32(out, pullId_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
     for (uint32_t i = 0; i < enhanceData_.size(); i++) {
@@ -991,6 +1030,9 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     int32_t nPressedKeys = 0;
     READINT32(in, nPressedKeys);
+    if (nPressedKeys > static_cast<int32_t>(MAX_N_PRESSED_KEYS)) {
+        return false;
+    }
 
     for (int32_t i = 0; i < nPressedKeys; i++) {
         int32_t val = 0;
@@ -998,19 +1040,23 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         pressedKeys_.emplace_back(val);
     }
     READINT32(in, sourceType_);
+
     READINT32(in, pointerAction_);
+
     READINT32(in, originPointerAction_);
+
     READINT32(in, buttonId_);
+
     READINT32(in, fingerCount_);
+
     READFLOAT(in, zOrder_);
 
     if (!ReadAxisFromParcel(in)) {
         return false;
     }
 
-    READDOUBLE(in, velocity_);
-
     READINT32(in, axisEventType_);
+    READINT32(in, pullId_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
         return false;

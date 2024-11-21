@@ -142,10 +142,6 @@ struct KnuckleGesture {
     } lastDownPointer;
 };
 
-struct MultiFingersTap {
-    Ability ability;
-};
-
 struct RepeatKey {
     int32_t keyCode { -1 };
     int32_t keyAction { 0 };
@@ -154,6 +150,10 @@ struct RepeatKey {
     int64_t delay { 0 };
     std::string statusConfig;
     bool statusConfigValue { true };
+    Ability ability;
+};
+
+struct MultiFingersTap {
     Ability ability;
 };
 
@@ -278,7 +278,6 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
-
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -326,6 +325,8 @@ private:
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
     void TouchPadKnuckleDoubleClickProcess(const std::string bundleName, const std::string abilityName,
         const std::string action);
+    void SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEvent);
+
 private:
     Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;
@@ -400,6 +401,7 @@ private:
     int32_t tappingCount_ { 0 };
     std::mutex mutex_;
     std::map<int32_t, int64_t> lastPointerDownTime_;
+    int64_t walletLaunchDelayTimes_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

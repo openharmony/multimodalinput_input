@@ -89,6 +89,8 @@ public:
     int32_t UnsubscribeHotkey(int32_t subscribeId) override;
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
+    int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
+    int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
@@ -127,6 +129,11 @@ public:
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY) override;
+    int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern) override;
+    int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) override;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetMoveEventFilters(bool flag) override;
     int32_t SetCurrentUser(int32_t userId) override;

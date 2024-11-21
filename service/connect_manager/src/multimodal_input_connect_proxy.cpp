@@ -1317,6 +1317,53 @@ int32_t MultimodalInputConnectProxy::UnsubscribeSwitchEvent(int32_t subscribeId)
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::SubscribeLongPressEvent(int32_t subscribeId,
+    const LongPressRequest &longPressRequest)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
+    WRITEINT32(data, longPressRequest.fingerCount, ERR_INVALID_VALUE);
+    WRITEINT32(data, longPressRequest.duration, ERR_INVALID_VALUE);
+ 
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SUBSCRIBE_LONG_PRESS), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, result:%{public}d", ret);
+    }
+    return ret;
+}
+ 
+int32_t MultimodalInputConnectProxy::UnsubscribeLongPressEvent(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
+ 
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        UNSUBSCRIBE_LONG_PRESS), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, result:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
     bool isNativeInject)
 {
@@ -1583,6 +1630,7 @@ int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData& extraData)
     }
     WRITEINT32(data, extraData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pointerId, ERR_INVALID_VALUE);
+    WRITEINT32(data, extraData.pullId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -2050,6 +2098,83 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
     }
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+int32_t MultimodalInputConnectProxy::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEDOUBLE(data, topLeftX, ERR_INVALID_VALUE);
+    WRITEDOUBLE(data, topLeftY, ERR_INVALID_VALUE);
+    WRITEDOUBLE(data, bottomRightX, ERR_INVALID_VALUE);
+    WRITEDOUBLE(data, bottomRightY, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+        MultimodalinputConnectInterfaceCode::SET_VKEYBOARD_AREA), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetVKeyboardArea Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITESTRING(data, keyName, ERR_INVALID_VALUE);
+    WRITEBOOL(data, useShift, ERR_INVALID_VALUE);
+    WRITEINT32(data, static_cast<int32_t>(pattern.size()), ERR_INVALID_VALUE);
+    for (const auto &item : pattern) {
+        WRITEINT32(data, item);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+                                      MultimodalinputConnectInterfaceCode::SET_MOTION_SPACE),
+                                      data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetMotionSpace Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CREATE_VKEYBOARD_DEVICE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("CreateVKeyboardDevice Send request fail, ret:%{public}d", ret);
+    }
+    vkeyboardDevice = reply.ReadRemoteObject();
+    CHKPR(vkeyboardDevice, ERR_INVALID_VALUE);
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)
     __attribute__((no_sanitize("cfi")))

@@ -34,6 +34,9 @@
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_shortcut_manager.h"
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "libinput_adapter.h"
 #include "mmi_log.h"
 #include "multimodal_input_preferences_manager.h"
@@ -54,9 +57,17 @@ namespace MMI {
 namespace {
 constexpr int32_t FINGER_NUM { 2 };
 constexpr int32_t SWIPE_INWARD_FINGER_ONE { 1 };
-constexpr int32_t SWIPE_INWARD_MAX_X_THRE { 110 };
-constexpr int32_t SWIPE_INWARD_MIN_X_THRE { 10 };
+constexpr int32_t USELIB_ABS_MT_POSITION_X { 0x35 };
+constexpr int32_t USELIB_ABS_MT_POSITION_Y { 0x36 };
+constexpr int32_t SWIPE_INWARD_EDGE_X_THRE { 8 };
+constexpr int32_t SWIPE_INWARD_ANGLE_TOLERANCE { 8 };
+constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
+double g_touchPadDeviceWidth { 1 }; // physic size
+double g_touchPadDeviceHeight { 1 };
+int32_t g_touchPadDeviceAxisX { 1 }; // max axis size
+int32_t g_touchPadDeviceAxisY { 1 };
 bool g_isSwipeInward = false;
+constexpr int32_t SWIPE_INWARD_ANGLE_JUDGE { 2 };
 constexpr int32_t MT_TOOL_PALM { 2 };
 [[ maybe_unused ]] constexpr double TOUCH_SLOP { 1.0 };
 [[ maybe_unused ]] constexpr int32_t SQUARE { 2 };
@@ -91,6 +102,7 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_JOYSTICK_AXIS),
     static_cast<int32_t>(LIBINPUT_EVENT_SWITCH_TOGGLE)
 };
+constexpr int32_t MAX_N_PRESSED_KEYS { 10 };
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -113,14 +125,14 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if ((type == LIBINPUT_EVENT_POINTER_TAP) &&
-        (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP)) {
-        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+        (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP)) {
+        MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault();
         return;
     }
     if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         auto iter = std::find(ALL_EVENT_TYPES.begin(), ALL_EVENT_TYPES.end(), static_cast<int32_t>(type));
         if (iter != ALL_EVENT_TYPES.end()) {
-            MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+            MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault();
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -143,9 +155,14 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
         case LIBINPUT_EVENT_POINTER_BUTTON:
         case LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD:
+        case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN:
         case LIBINPUT_EVENT_POINTER_AXIS:
+        case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END:
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
+            if (g_isSwipeInward) {
+                break;
+            }
             HandleMouseEvent(event);
             DfxHisysevent::CalcPointerDispTimes();
             break;
@@ -180,12 +197,18 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             HandleTableToolEvent(event);
             break;
         }
-        case LIBINPUT_EVENT_JOYSTICK_BUTTON:
-        case LIBINPUT_EVENT_JOYSTICK_AXIS: {
-            HandleJoystickEvent(event);
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+        case LIBINPUT_EVENT_JOYSTICK_BUTTON: {
+            HandleJoystickButtonEvent(event);
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+        case LIBINPUT_EVENT_JOYSTICK_AXIS: {
+            HandleJoystickAxisEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
         case LIBINPUT_EVENT_SWITCH_TOGGLE: {
             HandleSwitchInputEvent(event);
             break;
@@ -288,7 +311,9 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
                 item.GetMoveFlag(), item.GetDeviceId());
         }
     }
-    WIN_MGR->UpdateTargetPointer(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        WIN_MGR->UpdateTargetPointer(pointerEvent);
+    }
     nextHandler_->HandlePointerEvent(pointerEvent);
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
@@ -332,7 +357,6 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
     EventStatistic::PushEvent(keyEvent);
-    WIN_MGR->HandleKeyEventWindowId(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -352,6 +376,9 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
+#ifdef SHORTCUT_KEY_RULES_ENABLED
+    KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
+#endif // SHORTCUT_KEY_RULES_ENABLED
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
@@ -368,6 +395,8 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
+    WIN_MGR->HandleKeyEventWindowId(keyEvent);
+    currentHandleKeyCode_ = keyEvent->GetKeyCode();
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
@@ -403,9 +432,15 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    TerminateAxis(event);
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    if (MouseEventHdr->CheckFilterMouseEvent(event)) {
+        MMI_HILOGD("Mouse motion event have been filtered");
+        BytraceAdapter::StopPackageEvent();
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
-        MMI_HILOGE("OnEvent is failed");
+        MMI_HILOGD("OnEvent is failed");
         BytraceAdapter::StopPackageEvent();
         return RET_ERR;
     }
@@ -450,7 +485,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(nextHandler_);
-    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
+    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
         if (!threeFingerSwitch) {
@@ -485,10 +520,9 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     buttonIds_.insert(seatSlot);
     if (buttonIds_.size() == FINGER_NUM &&
         (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP)) {
-        MMI_HILOGD("Handle mouse axis event");
-        HandleMouseEvent(event);
+        g_isSwipeInward = false;
     }
-    if (buttonIds_.size() == SWIPE_INWARD_FINGER_ONE && JudgeIfSwipeInward(pointerEvent)) {
+    if (buttonIds_.size() == SWIPE_INWARD_FINGER_ONE && JudgeIfSwipeInward(pointerEvent, type, event)) {
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
@@ -502,7 +536,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         g_isSwipeInward = false;
     }
     if (buttonIds_.empty()) {
-        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault(false);
+        MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault(false);
     }
     MMI_HILOGD("Button ids count:%{public}d, action:%{public}d",
         static_cast<int32_t>(buttonIds_.size()), pointerEvent->GetPointerAction());
@@ -520,16 +554,11 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
-        MMI_HILOGI("Prepare to send a axis-end event");
-        CancelTwoFingerAxis(event);
-    }
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     PointerEventSetPressedKeys(pointerEvent);
     EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
-    type = libinput_event_get_type(event);
+    auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch pad event is up remove this finger");
@@ -571,6 +600,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         CHKPR(outputEvent, RET_OK);
         MMI_HILOGD("Output event received, SourceType:%{public}d, PointerAction:%{public}d, status:%{public}d",
             outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
+        CHKPR(pointerEvent, RET_ERR);
         EndLogTraceId(pointerEvent->GetId());
         pointerEvent = outputEvent;
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
@@ -600,8 +630,15 @@ void EventNormalizeHandler::PointerEventSetPressedKeys(std::shared_ptr<PointerEv
     if (KeyEventHdr != nullptr) {
         const auto &keyEvent = KeyEventHdr->GetKeyEvent();
         if (keyEvent != nullptr && pointerEvent != nullptr) {
+            std::vector<int32_t> setPressedKeys;
             std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-            pointerEvent->SetPressedKeys(pressedKeys);
+            if (pressedKeys.size() > MAX_N_PRESSED_KEYS) {
+                setPressedKeys.insert(setPressedKeys.begin(), pressedKeys.begin(),
+                    pressedKeys.begin() + MAX_N_PRESSED_KEYS);
+            } else {
+                setPressedKeys = pressedKeys;
+            }
+            pointerEvent->SetPressedKeys(setPressedKeys);
         }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -645,23 +682,44 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK
     CHKPR(event, ERROR_NULL_POINTER);
-    BytraceAdapter::StartPackageEvent("package joystickEvent");
-    auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
+    BytraceAdapter::StartPackageEvent("package joystick button event");
+    auto keyEvent = joystick_.OnButtonEvent(event);
+    BytraceAdapter::StopPackageEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    BytraceAdapter::StartBytrace(keyEvent);
+    EventStatistic::PushEvent(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    nextHandler_->HandleKeyEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
+{
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
+    CHKPR(event, ERROR_NULL_POINTER);
+    BytraceAdapter::StartPackageEvent("package joystick axis event");
+    auto pointerEvent = joystick_.OnAxisEvent(event);
     BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
-#else
-    MMI_HILOGW("Joystick device does not support");
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
+    joystick_.CheckIntention(pointerEvent, [this](std::shared_ptr<KeyEvent> keyEvent) {
+        BytraceAdapter::StartBytrace(keyEvent);
+        EventStatistic::PushEvent(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+        nextHandler_->HandleKeyEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    });
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 
 int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 {
@@ -850,16 +908,91 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
+bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
+    enum libinput_event_type type, libinput_event* event)
 {
+    static int32_t angleTolerance = 0;
+    static int32_t lastDirection = 0;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     if (g_isSwipeInward == false &&
-        pointerEvent->GetAllPointerItems().size() == SWIPE_INWARD_FINGER_ONE &&
-        (pointerEvent->GetAllPointerItems().begin()->GetDisplayX() >= SWIPE_INWARD_MAX_X_THRE ||
-        pointerEvent->GetAllPointerItems().begin()->GetDisplayX() <= SWIPE_INWARD_MIN_X_THRE)) {
-        g_isSwipeInward = true;
+        type == LIBINPUT_EVENT_TOUCHPAD_DOWN &&
+        pointerEvent->GetAllPointerItems().size() == SWIPE_INWARD_FINGER_ONE) {
+        auto touchPadDevice = libinput_event_get_device(event);
+        // product isolation
+        uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
+        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID) {
+            return g_isSwipeInward;
+        }
+        // get touchpad physic size
+        if (libinput_device_get_size(touchPadDevice, &g_touchPadDeviceWidth, &g_touchPadDeviceHeight)) {
+            MMI_HILOGD("judgeIfSwipeInward, get touchPad physic size error");
+        }
+        // get touchpad max axis size
+        g_touchPadDeviceAxisX = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_X);
+        g_touchPadDeviceAxisY = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_Y);
+        // if down position on edge, start deliver data
+        if (pointerEvent->GetAllPointerItems().begin()->GetDisplayX() >=
+            g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
+            lastDirection = -1; // -1 means direction from right to left
+            g_isSwipeInward = true;
+        } else if (pointerEvent->GetAllPointerItems().begin()->GetDisplayX() <= SWIPE_INWARD_EDGE_X_THRE) {
+            lastDirection = 1; // 1 means direction from left to right
+            g_isSwipeInward = true;
+        }
+    }
+    // judge
+    if (g_isSwipeInward == true) {
+        SwipeInwardProcess(pointerEvent, type, event, &angleTolerance, lastDirection);
+        if (angleTolerance == 0) {
+            g_isSwipeInward = false;
+        }
     }
     return g_isSwipeInward;
+}
+
+void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent,
+    enum libinput_event_type type, libinput_event* event, int32_t* angleTolerance, int32_t lastDirection)
+{
+    static int32_t lastPointerX;
+    static int32_t lastPointerY;
+    int32_t pointerMotionX;
+    int32_t pointerMotionY;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGD("judgeIfSwipeInward, Can't find pointerItem");
+        g_isSwipeInward = false;
+        return;
+    }
+    switch (static_cast<int32_t>(type)) {
+        case static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_DOWN):
+            pointerItem.SetDisplayX(g_touchPadDeviceAxisX);
+            pointerItem.SetDisplayY(g_touchPadDeviceAxisY);
+            *angleTolerance = SWIPE_INWARD_ANGLE_TOLERANCE;
+            return;
+        case static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_MOTION): {
+            auto touchpad = libinput_event_get_touchpad_event(event);
+            pointerItem.SetDisplayX(static_cast<int32_t>(
+                (libinput_event_touchpad_get_x(touchpad) / g_touchPadDeviceWidth) * g_touchPadDeviceAxisX));
+            pointerItem.SetDisplayY(static_cast<int32_t>(
+                (libinput_event_touchpad_get_y(touchpad) / g_touchPadDeviceHeight) * g_touchPadDeviceAxisY));
+            break;
+        }
+        case static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_UP):
+            lastPointerX = 0;
+            return;
+        default:
+            return;
+    }
+    // angle and direction judge
+    if ((std::abs(pointerItem.GetDisplayX() - lastPointerX) * SWIPE_INWARD_ANGLE_JUDGE <
+        std::abs(pointerItem.GetDisplayY() - lastPointerY) ||
+        (pointerItem.GetDisplayX() - lastPointerX) * lastDirection < 0) && lastPointerX) {
+        --(*angleTolerance); // angle judge have more weights than direction judge
+        --(*angleTolerance);
+    }
+    lastPointerX = pointerItem.GetDisplayX();
+    lastPointerY = pointerItem.GetDisplayY();
 }
 
 bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* event)

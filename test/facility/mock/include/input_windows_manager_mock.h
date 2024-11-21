@@ -30,6 +30,10 @@ public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManagerMock);
 
     void Init(UDSServer&) override {}
+    bool JudgeCaramaInFore() override
+    {
+        return true;
+    }
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>, int32_t));
     void UpdateDisplayInfo(DisplayGroupInfo&) override {}
@@ -73,6 +77,7 @@ public:
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
     MOCK_METHOD(bool, IsMouseSimulate, (), (const));
+    MOCK_METHOD(bool, HasMouseHideFlag, (), (const));
     MOCK_METHOD(bool, SelectPointerChangeArea, (int32_t, int32_t, int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -95,6 +100,7 @@ public:
     MOCK_METHOD(const DisplayInfo*, GetDefaultDisplayInfo, (), (const));
     MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
     MOCK_METHOD(void, SendCancelEventWhenLock, ());
+    MOCK_METHOD(void, FoldScreenRotation, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

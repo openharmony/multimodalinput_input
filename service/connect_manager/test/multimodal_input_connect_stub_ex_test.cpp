@@ -179,6 +179,11 @@ public:
     int32_t UnsubscribeHotkey(int32_t subscribeId) override { return subscribeId; }
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override { return subscribeId; }
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override { return subscribeId; }
+    int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override
+    {
+        return subscribeId;
+    }
+    int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override { return subscribeId; }
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override
     {
         return static_cast<int32_t>(isNativeInject);
@@ -775,6 +780,67 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_029, TestSize.Level1)
     MessageParcel reply;
     MessageOption option;
     uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE);
+    EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
+}
+
+/**
+ * @tc.name: OnRemoteRequest_030
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_030, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillOnce(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(nullptr));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_HOT_KEY);
+    EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
+}
+
+/**
+ * @tc.name: OnRemoteRequest_031
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_031, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillOnce(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(nullptr));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_HOT_KEY);
+    EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
+}
+
+/**
+ * @tc.name: OnRemoteRequest_032
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_032, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillOnce(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(nullptr));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOVE_EVENT_FILTERS);
     EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
 }
 
@@ -3762,161 +3828,6 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_002, TestSize.Le
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(Return(false));
-    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
-    ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
-    MessageParcel data;
-    MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubInjectPointerEvent(data, reply));
-}
-
-/**
- * @tc.name: StubInjectPointerEvent_003
- * @tc.desc: Test the function StubInjectPointerEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
-#else
-        .WillOnce(Return(true));
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    EXPECT_CALL(*messageParcelMock_, ReadInt64(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint32(_))
-        .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_))
-        .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadFloat(_)).WillOnce(Return(true));
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillRepeatedly(Return(true));
-#else
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillOnce(Return(true));
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
-    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
-    ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
-    MessageParcel data;
-    MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubInjectPointerEvent(data, reply));
-}
-
-/**
- * @tc.name: StubInjectPointerEvent_004
- * @tc.desc: Test the function StubInjectPointerEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
-#else
-        .WillOnce(Return(true));
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    EXPECT_CALL(*messageParcelMock_, ReadInt64(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint32(_))
-        .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_))
-        .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadFloat(_)).WillOnce(Return(true));
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillRepeatedly(Return(true));
-#else
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillOnce(Return(true));
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
-    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
-    ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
-    MessageParcel data;
-    MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubInjectPointerEvent(data, reply));
-}
-
-/**
- * @tc.name: StubInjectPointerEvent_005
- * @tc.desc: Test the function StubInjectPointerEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(Return(true)).WillOnce(Return(true))
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-        .WillOnce(Return(true)).WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
-#else
-        .WillOnce(Return(true));
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    EXPECT_CALL(*messageParcelMock_, ReadInt64(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint32(_))
-        .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_))
-        .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadFloat(_)).WillOnce(Return(true));
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillRepeatedly(Return(true));
-#else
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillOnce(Return(true));
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);

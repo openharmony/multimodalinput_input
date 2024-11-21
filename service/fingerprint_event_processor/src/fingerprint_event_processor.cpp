@@ -34,9 +34,9 @@ namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 namespace {
-constexpr int32_t KEY_INIT { 0 };
-constexpr int32_t KEY_DOWN { 1 };
-constexpr int32_t KEY_UP { 2 };
+constexpr int32_t MUTE_KEY_INIT { 0 };
+constexpr int32_t MUTE_KEY_DOWN { 1 };
+constexpr int32_t MUTE_KEY_UP { 2 };
 constexpr int32_t POWER_KEY_UP_TIME { 1000 }; // 1000ms
 constexpr int32_t VOLUME_KEY_UP_TIME { 500 }; // 500ms
 const std::string IS_START_SMART_KEY = "close_fingerprint_nav_event_key";
@@ -105,10 +105,10 @@ void FingerprintEventProcessor::SetPowerAndVolumeKeyState(struct libinput_event*
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     MMI_HILOGD("current keycode is %{private}d, keyaction is %{private}d", keyCode, keyAction);
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        iter->second.first = KEY_DOWN;
+        iter->second.first = MUTE_KEY_DOWN;
         SendFingerprintCancelEvent();
     } else {
-        iter->second.first = KEY_UP;
+        iter->second.first = MUTE_KEY_UP;
         iter->second.second = std::chrono::steady_clock::now();
     }
 }
@@ -136,7 +136,6 @@ void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
     ChangeScreenMissTouchFlag(screenState_, cancelState_);
 }
  
-// 屏幕down 智xxdown 屏幕up 智xx up ==> 直接操作智xx 无响应
  
 /*
 * This is a poorly designed state machine for handling screen touch errors, SAD :(
@@ -148,12 +147,10 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
     if (screenMissTouchFlag_ == false) {
         if (screen == true) {
             screenMissTouchFlag_ = true;
-            // 上报cancel的逻辑是手指按下屏幕
             SendFingerprintCancelEvent();
             return;
         }
     } else {
-        // 手指没有在屏幕，且目前为止收到cancel事件
         if (screen == false && cancel == true) {
             screenMissTouchFlag_ = false;
             return;
@@ -163,7 +160,6 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
  
 bool FingerprintEventProcessor::CheckMisTouchState()
 {
-    // 不太清楚
     if (CheckKeyMisTouchState() || CheckScreenMisTouchState()) {
         return true;
     }
@@ -173,7 +169,7 @@ bool FingerprintEventProcessor::CheckMisTouchState()
 bool FingerprintEventProcessor::CheckScreenMisTouchState()
 {
     int32_t flag = screenMissTouchFlag_ ? 1 : 0;
-    MMI_HILOGD("screenMissTouchFlag_ is %{public}d", flag);
+    MMI_HILOGI("screenMissTouchFlag_ is %{public}d", flag);
     return screenMissTouchFlag_;
 }
  
@@ -184,9 +180,9 @@ bool FingerprintEventProcessor::CheckKeyMisTouchState()
     for (auto &[key, value] : keyStateMap_) {
         auto keystate = value.first;
         MMI_HILOGD("keycode : %{private}d, state : %{public}d", key, value.first);
-        if (keystate == KEY_DOWN) {
+        if (keystate == MUTE_KEY_DOWN) {
             ret = true;
-        } else if (keystate == KEY_UP) {
+        } else if (keystate == MUTE_KEY_UP) {
             auto currentTime = std::chrono::steady_clock::now();
             auto duration = currentTime - value.second;
             auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
@@ -199,11 +195,11 @@ bool FingerprintEventProcessor::CheckKeyMisTouchState()
                     key, value.first);
                 ret = true;
             } else {
-                value.first = KEY_INIT;
+                value.first = MUTE_KEY_INIT;
             }
         }
     }
-    MMI_HILOGD("KeyMisTouchState is %{public}d", ret);
+    MMI_HILOGI("KeyMisTouchState is %{public}d", ret);
     return ret;
 }
 
@@ -218,7 +214,7 @@ int32_t FingerprintEventProcessor::SendFingerprintCancelEvent()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    MMI_HILOGI("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
+    MMI_HILOGD("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
     if (eventMonitorHandler_ != nullptr) {
@@ -302,7 +298,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    MMI_HILOGD("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
+    MMI_HILOGI("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
     if (CheckMisTouchState()) {
         MMI_HILOGD("in mistouch state, dont report event");
         return ERR_OK;
@@ -333,7 +329,7 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    MMI_HILOGD("Fingerprint key:%{public}d, ux:%f, uy:%f", pointerEvent->GetPointerAction(), ux, uy);
+    MMI_HILOGI("Fingerprint key:%{public}d, ux:%f, uy:%f", pointerEvent->GetPointerAction(), ux, uy);
     if (CheckMisTouchState()) {
         MMI_HILOGD("in mistouch state, dont report event");
         return ERR_OK;
@@ -397,9 +393,9 @@ void FingerprintEventProcessor::StartSmartKeyIfNeeded()
     }
 }
 
-bool FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
+void FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
 {
-    ffrt::submit([this, isShowDialog] {
+    ffrt::submit([isShowDialog] {
         MMI_HILOGI("StartServiceExtAbility start");
         std::shared_ptr<AAFwk::AbilityManagerClient> abmc = AAFwk::AbilityManagerClient::GetInstance();
         CHKPF(abmc);
@@ -419,7 +415,7 @@ bool FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
         MMI_HILOGI("StartServiceExtAbility finished");
         return true;
     });
-    return true;
+    return;
 }
 
 void FingerprintEventProcessor::ProcessSlideEvent()

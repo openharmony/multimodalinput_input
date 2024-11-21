@@ -24,6 +24,9 @@
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
 #include "js_gesture_event.h"
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+#include "key_event_napi.h"
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #include "napi_constants.h"
 #include "util_napi_error.h"
 #include "util_napi_value.h"
@@ -50,6 +53,7 @@ constexpr int32_t RIGHT { 2 };
 constexpr int32_t MOUSE_FLOW { 10 };
 constexpr int32_t ONE_FINGERS { 1 };
 constexpr int32_t THREE_FINGERS { 3 };
+constexpr int32_t INJECTION_EVENT_FLAG { 10000 };
 constexpr int32_t FOUR_FINGERS { 4 };
 constexpr int32_t GESTURE_BEGIN { 1 };
 constexpr int32_t GESTURE_UPDATE { 2 };
@@ -210,6 +214,14 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
     callback_ = callback;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+void InputMonitor::SetCallback(std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    std::lock_guard<std::mutex> guard(mutex_);
+    keyEventCallback_ = callback;
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CALL_DEBUG_ENTER;
@@ -320,7 +332,25 @@ uint32_t InputMonitor::GetRectTotal()
     return rectTotal_;
 }
 
-void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const {}
+void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    std::function<void(std::shared_ptr<KeyEvent>)> callback;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        auto typeName = JS_INPUT_MONITOR_MGR.GetMonitorTypeName(id_, fingers_);
+        if (typeName == INVALID_TYPE_NAME) {
+            MMI_HILOGE("Failed to process key event, id:%{public}d", id_);
+            return;
+        }
+        callback = keyEventCallback_;
+    }
+    CHKPV(callback);
+    callback(keyEvent);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+}
 
 void InputMonitor::OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const {}
 
@@ -365,9 +395,21 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
 {
     SetCallback(callback);
     CHKPV(monitor_);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (IsKeyEvent(typeName_)) {
+        monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<KeyEvent> keyEvent) {
+            JS_INPUT_MONITOR_MGR.OnKeyEventByMonitorId(jsId, jsFingers, keyEvent);
+        });
+    } else {
+        monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
+            JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
+        });
+    }
+#else
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     monitor_->SetTypeName(typeName_);
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
@@ -685,6 +727,9 @@ int32_t JsInputMonitor::TransformSwipeEvent(std::shared_ptr<PointerEvent> pointe
     }
     PointerEvent::PointerItem pointeritem;
     int32_t pointerId = 0;
+    if (INJECTION_EVENT_FLAG <= pointerEvent->GetPointerId()) {
+        pointerId = pointerEvent->GetPointerId();
+    }
     if (!pointerEvent->GetPointerItem(pointerId, pointeritem)) {
         MMI_HILOGE("Can't find this pointerItem");
         return RET_ERR;
@@ -819,7 +864,7 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
             return FINGERPRINT_CANCEL;
         }
         default: {
-            MMI_HILOGE("wrong action is %{public}d", action);
+            MMI_HILOGE("Wrong action is %{public}d", action);
             return RET_ERR;
         }
     }
@@ -1367,6 +1412,20 @@ int32_t JsInputMonitor::TransformGestureEvent(const std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+int32_t JsInputMonitor::TransformKeyEvent(std::shared_ptr<KeyEvent> keyEvent, napi_value result)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    KeyEventNapi keyEventHelper;
+    if (keyEventHelper.CreateKeyEvent(jsEnv_, keyEvent, result) != napi_ok) {
+        MMI_HILOGE("Write KeyEvent into a JS object failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 int32_t JsInputMonitor::Start(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
@@ -1451,9 +1510,54 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         CHKPV(work);
         MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
         if (monitorInfo == nullptr) {
-            MMI_HILOGE("monitorInfo is nullptr");
+            MMI_HILOGE("The monitorInfo is nullptr");
             delete work;
             work = nullptr;
+            return;
+        }
+        monitorInfo->monitorId = monitorId_;
+        monitorInfo->fingers = fingers_;
+        work->data = monitorInfo;
+        uv_loop_s *loop = nullptr;
+        auto status = napi_get_uv_event_loop(jsEnv_, &loop);
+        if (status != napi_ok) {
+            THROWERR(jsEnv_, "napi_get_uv_event_loop is failed");
+            CleanData(&monitorInfo, &work);
+            return;
+        }
+        int32_t ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            &JsInputMonitor::JsCallback, uv_qos_user_initiated);
+        if (ret != 0) {
+            MMI_HILOGE("Add uv_queue failed, ret is %{public}d", ret);
+            CleanData(&monitorInfo, &work);
+        }
+    }
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (!isMonitoring_) {
+        MMI_HILOGE("Js monitor stop");
+        return;
+    }
+    CHKPV(monitor_);
+    CHKPV(keyEvent);
+    std::lock_guard<std::mutex> guard(mutex_);
+    keyEventQueue_.push(keyEvent);
+ 
+    if (!keyEventQueue_.empty()) {
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
+        MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
+        if (monitorInfo == nullptr) {
+            MMI_HILOGE("The monitorInfo is nullptr");
+            delete work;
             return;
         }
         monitorInfo->monitorId = monitorId_;
@@ -1478,6 +1582,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         }
     }
 }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 bool JsInputMonitor::IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -1498,7 +1603,15 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
     work = nullptr;
     auto jsMonitor { JS_INPUT_MONITOR_MGR.GetMonitor(temp->monitorId, temp->fingers) };
     CHKPV(jsMonitor);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (jsMonitor->IsKeyEvent(jsMonitor->GetTypeName())) {
+        jsMonitor->OnKeyEventInJsThread(jsMonitor->GetTypeName(), temp->fingers);
+    } else {
+        jsMonitor->OnPointerEventInJsThread(jsMonitor->GetTypeName(), temp->fingers);
+    }
+#else
     jsMonitor->OnPointerEventInJsThread(jsMonitor->GetTypeName(), temp->fingers);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     delete temp;
     temp = nullptr;
 }
@@ -1524,7 +1637,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             CHKPV(scope);
             auto pointerEvent = evQueue_.front();
             if (pointerEvent == nullptr) {
-                MMI_HILOGE("scope is nullptr");
+                MMI_HILOGE("Scope is nullptr");
                 napi_close_handle_scope(jsEnv_, scope);
                 continue;
             }
@@ -1664,6 +1777,80 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+void JsInputMonitor::OnKeyEventInJsThread(const std::string &typeName, const int32_t fingers)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (!isMonitoring_) {
+        MMI_HILOGE("Js monitor stop");
+        return;
+    }
+    CHKPV(jsEnv_);
+    CHKPV(receiver_);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(jsEnv_, &scope);
+    CHKPV(scope);
+    while (!keyEventQueue_.empty()) {
+        if (!isMonitoring_) {
+            MMI_HILOGE("Js monitor stop handle callback");
+            break;
+        }
+        auto keyEvent = keyEventQueue_.front();
+        LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
+        if (keyEvent == nullptr) {
+            MMI_HILOGE("Scope is nullptr");
+            napi_close_handle_scope(jsEnv_, scope);
+            continue;
+        }
+        keyEventQueue_.pop();
+        napi_value napiKey = nullptr;
+        auto statusCreateObject = napi_create_object(jsEnv_, &napiKey);
+        if (statusCreateObject != napi_ok) {
+            MMI_HILOGE("napi_create_object failed");
+            keyEvent->MarkProcessed();
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+ 
+        auto ret = TransformKeyEvent(keyEvent, napiKey);
+ 
+        bool checkFlag = ret != RET_OK || napiKey == nullptr;
+        if (checkFlag) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        napi_value callback = nullptr;
+        auto statusRefValue = napi_get_reference_value(jsEnv_, receiver_, &callback);
+        if (statusRefValue != napi_ok) {
+            MMI_HILOGE("napi_get_reference_value failed");
+            keyEvent->MarkProcessed();
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        napi_value result = nullptr;
+        if (monitor_->GetRectTotal() == 0
+            || IsLocaledWithinRect(jsEnv_, napiKey, monitor_->GetRectTotal(), monitor_->GetHotRectArea())) {
+            auto status = napi_call_function(jsEnv_, nullptr, callback, 1, &napiKey, &result);
+            if (status != napi_ok) {
+                MMI_HILOGE("napi_call_function failed");
+                keyEvent->MarkProcessed();
+                napi_close_handle_scope(jsEnv_, scope);
+                break;
+            }
+        }
+ 
+        bool typeNameFlag = IsKeyEvent(typeName);
+        if (typeNameFlag) {
+            bool retValue = false;
+            CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);
+            CheckKeyEventConsumed(retValue, keyEvent);
+        }
+        napi_close_handle_scope(jsEnv_, scope);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer,
     uint32_t rectTotal, std::vector<Rect> hotRectArea)
 {
@@ -1701,6 +1888,18 @@ void JsInputMonitor::CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> 
         MarkConsumed(eventId);
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+void JsInputMonitor::CheckKeyEventConsumed(bool isConsumed, std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    if (isConsumed) {
+        auto eventId = keyEvent->GetId();
+        MarkConsumed(eventId);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 bool JsInputMonitor::IsPinch(std::shared_ptr<PointerEvent> pointerEvent, const int32_t fingers)
 {
@@ -1784,15 +1983,15 @@ bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGE("failed to do swipe inward, wrong source: %{public}d ", pointerEvent->GetSourceType());
+        MMI_HILOGE("Failed to do swipe inward, wrong source:%{public}d ", pointerEvent->GetSourceType());
         return false;
     } else if (pointerEvent->GetPointerCount() != ONE_FINGERS) {
-        MMI_HILOGE("failed to do swipe inward, more than one finger");
+        MMI_HILOGE("Failed to do swipe inward, more than one finger");
         return false;
     } else if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
-        MMI_HILOGE("failed to do swipe inward, wrong action");
+        MMI_HILOGE("Failed to do swipe inward, wrong action");
         return false;
     }
     return true;
@@ -1807,8 +2006,15 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL)) {
         return true;
     }
-    MMI_HILOGD("not fingerprint event");
+    MMI_HILOGD("Not fingerprint event");
     return false;
 }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+bool JsInputMonitor::IsKeyEvent(const std::string &typeName)
+{
+    return typeName == "key";
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS

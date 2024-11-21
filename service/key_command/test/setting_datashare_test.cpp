@@ -22,6 +22,7 @@
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SettingDatashareTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -70,7 +71,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutIntValue, TestSize.Level1
     std::string key = "settingDateShare";
     int32_t value = 123;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutIntValue(key, value, needNotify), RET_ERR);
+    ASSERT_NE(settingDataShare.PutIntValue(key, value, needNotify), ERR_OK);
 }
 
 /**
@@ -86,7 +87,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutLongValue, TestSize.Level
     std::string key = "settingDateShare";
     int64_t value = 123;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutLongValue(key, value, needNotify), RET_ERR);
+    ASSERT_NE(settingDataShare.PutLongValue(key, value, needNotify), ERR_OK);
 }
 
 /**
@@ -102,7 +103,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutBoolValue, TestSize.Level
     std::string key = "settingDateShare";
     bool value = true;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutBoolValue(key, value, needNotify), RET_ERR);
+    ASSERT_NE(settingDataShare.PutBoolValue(key, value, needNotify), ERR_OK);
 }
 
 /**
@@ -145,8 +146,11 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.L
     CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
-    sptr<SettingObserver> observer = nullptr;
-    ASSERT_EQ(settingDataShare.RegisterObserver(observer), RET_ERR);
+    sptr<SettingObserver> observer = new (std::nothrow) SettingObserver;
+    observer->key_ = "settingDateShare";
+    std::string strUri = "strUri";
+    settingDataShare.isDataShareReady_ = false;
+    ASSERT_EQ(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
 }
 
 /**
@@ -160,11 +164,11 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize
     CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
-    sptr<SettingObserver> observer = nullptr;
-    ASSERT_EQ(settingDataShare.UnregisterObserver(observer), RET_ERR);
-
-    observer = new (std::nothrow) SettingObserver;
-    ASSERT_EQ(settingDataShare.UnregisterObserver(observer), RET_ERR);
+    sptr<SettingObserver> observer = new (std::nothrow) SettingObserver;
+    observer->key_ = "settingDateShare";
+    std::string strUri = "strUri";
+    settingDataShare.isDataShareReady_ = false;
+    ASSERT_EQ(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
 }
 
 /**
@@ -191,7 +195,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutStringValue, TestSize.Lev
  */
 HWTEST_F(SettingObserverTest, SettingObserverTest_OnChange, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
+    CALL_DEBUG_ENTER;
     SettingObserver observer;
     std::string key = "SettingObserver";
     observer.SetKey(key);

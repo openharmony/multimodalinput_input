@@ -53,6 +53,7 @@ declare_args() {
   input_shortcut_key_manager_enabled = true
   input_shortcut_key_rules_enabled = true
   input_new_knuckle_dynamic_enabled = true
+  input_feature_virtual_keyboard = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -94,6 +95,7 @@ declare_args() {
     "event_handler/src/input_device_impl.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
+    "event_handler/src/long_press_event_subscribe_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/scene_board_judgement.cpp",
     "events/src/input_manager.cpp",
@@ -383,6 +385,7 @@ if (input_ext_feature_anco) {
 
 if (input_feature_product == "pc") {
   input_default_defines += [ "OHOS_BUILD_ENABLE_HARDWARE_CURSOR" ]
+  input_default_defines += [ "OHOS_BUILD_MOUSE_REPORTING_RATE" ]
 }
 
 if (input_ext_feature_magiccursor) {
@@ -427,4 +430,8 @@ if (defined(global_parts_info) &&
     defined(global_parts_info.hiviewdfx_hitrace)) {
   hitrace_enabled = true
   input_default_defines += [ "HITRACE_ENABLED" ]
+}
+
+if (input_feature_virtual_keyboard) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_VKEYBOARD" ]
 }

@@ -44,7 +44,7 @@ public:
         CALL_DEBUG_ENTER;
         std::string action = eventData.GetWant().GetAction();
         if (action.empty()) {
-            MMI_HILOGE("action is empty");
+            MMI_HILOGE("The action is empty");
             return;
         }
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED) {
@@ -74,7 +74,7 @@ void DeviceEventMonitor::InitCommonEventSubscriber()
 {
     CALL_DEBUG_ENTER;
     if (hasInit_) {
-        MMI_HILOGE("current common event has subscribered");
+        MMI_HILOGE("Current common event has subscribered");
         return;
     }
     EventFwk::MatchingSkills matchingSkills;
@@ -90,9 +90,16 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
+    if (eventData.GetWant().GetIntParam("slotId", -1) != -1) {
+        int32_t state = eventData.GetWant().GetIntParam("state", -1);
+        if (hasHandleRingMute_ && (state == CALL_STATUS_INCOMING || state == CALL_STATUS_DISCONNECTED)) {
+            hasHandleRingMute_ = false;
+        }
+        return;
+    }
     callState = eventData.GetWant().GetIntParam("state", -1);
     MMI_HILOGI("state %{public}d", callState);
-    if (hasHandleRingMute_ && callState_ == CALL_STATUS_INCOMING && callState != CALL_STATUS_INCOMING) {
+    if (hasHandleRingMute_ && (callState_ == CALL_STATUS_INCOMING || callState_ == CALL_STATUS_WAITING)) {
         MMI_HILOGI("Mute reply success");
         hasHandleRingMute_ = false;
     }

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 
 #include <thread>
 
+#include "bytrace_adapter.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_values_bucket.h"
@@ -79,12 +80,8 @@ ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value, c
 {
     std::string valueStr;
     ErrCode ret = GetStringValue(key, valueStr, strUri);
-    if (ret == ERR_NAME_NOT_FOUND) {
-        MMI_HILOGW("Not found this property");
-        return ERR_OK;
-    }
     if (ret != ERR_OK) {
-        MMI_HILOGE("Get long value fail, ret:%{public}d", ret);
+        MMI_HILOGE("Get long value fail");
         return ret;
     }
     value = static_cast<int64_t>(strtoll(valueStr.c_str(), nullptr, DECIMAL_BASE));
@@ -95,12 +92,8 @@ ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, cons
 {
     std::string valueStr;
     ErrCode ret = GetStringValue(key, valueStr, strUri);
-    if (ret == ERR_NAME_NOT_FOUND) {
-        MMI_HILOGW("Not found this property");
-        return ERR_OK;
-    }
     if (ret != ERR_OK) {
-        MMI_HILOGE("Get bool value fail, ret:%{public}d", ret);
+        MMI_HILOGE("Get bool value fail");
         return ret;
     }
     value = ((valueStr == "true") || (valueStr == "1"));
@@ -150,8 +143,10 @@ void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
+    BytraceAdapter::StartDataShare(observer->GetKey());
     if (!isDataShareReady_) {
         MMI_HILOGI("Data share not ready!");
+        BytraceAdapter::StopDataShare();
         return RET_ERR;
     }
     CHKPR(observer, RET_ERR);
@@ -160,6 +155,7 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
     auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
+        BytraceAdapter::StopDataShare();
         return ERR_NO_INIT;
     }
     helper->RegisterObserver(uri, observer);
@@ -168,13 +164,16 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
     execCb.detach();
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
+    BytraceAdapter::StopDataShare();
     return ERR_OK;
 }
 
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
+    BytraceAdapter::StartDataShare(observer->GetKey());
     if (!isDataShareReady_) {
         MMI_HILOGI("Data share not ready!");
+        BytraceAdapter::StopDataShare();
         return RET_ERR;
     }
     CHKPR(observer, RET_ERR);
@@ -183,24 +182,29 @@ ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observ
     auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
+        BytraceAdapter::StopDataShare();
         return ERR_NO_INIT;
     }
     helper->UnregisterObserver(uri, observer);
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
+    BytraceAdapter::StopDataShare();
     return ERR_OK;
 }
 
 ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& value, const std::string &strUri)
 {
+    BytraceAdapter::StartDataShare(key);
     if (!isDataShareReady_) {
         MMI_HILOGI("Data share not ready!");
+        BytraceAdapter::StopDataShare();
         return RET_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
+        BytraceAdapter::StopDataShare();
         return ERR_NO_INIT;
     }
     std::vector<std::string> columns = {SETTING_COLUMN_VALUE};
@@ -211,12 +215,14 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
+        BytraceAdapter::StopDataShare();
         return ERR_INVALID_OPERATION;
     }
     int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
+        BytraceAdapter::StopDataShare();
         return ERR_NAME_NOT_FOUND;
     }
     const int32_t tmpRow = 0;
@@ -224,24 +230,29 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     int32_t ret = resultSet->GetString(tmpRow, value);
     if (ret != RET_OK) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
+        BytraceAdapter::StopDataShare();
         return ERR_INVALID_VALUE;
     }
     resultSet->Close();
     IPCSkeleton::SetCallingIdentity(callingIdentity);
+    BytraceAdapter::StopDataShare();
     return ERR_OK;
 }
 
 ErrCode SettingDataShare::PutStringValue(
     const std::string& key, const std::string& value, bool needNotify, const std::string &strUri)
 {
+    BytraceAdapter::StartDataShare(key);
     if (!isDataShareReady_) {
         MMI_HILOGI("Data share not ready!");
+        BytraceAdapter::StopDataShare();
         return RET_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
+        BytraceAdapter::StopDataShare();
         return ERR_NO_INIT;
     }
     DataShare::DataShareValueObject keyObj(key);
@@ -260,11 +271,13 @@ ErrCode SettingDataShare::PutStringValue(
     }
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
+    BytraceAdapter::StopDataShare();
     return ERR_OK;
 }
 
 std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper(const std::string &strUri)
 {
+    BytraceAdapter::StartDataShare(strUri);
     if (remoteObj_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (remoteObj_ == nullptr) {
@@ -279,6 +292,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
     } else {
         ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, "");
     }
+    BytraceAdapter::StopDataShare();
     return ret.second;
 }
 
@@ -318,18 +332,18 @@ bool SettingDataShare::CheckIfSettingsDataReady()
     CHKPF(remoteObj_);
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
             DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
-    MMI_HILOGD("create data_share helper, ret=%{public}d", ret.first);
+    MMI_HILOGD("Create data_share helper, ret=%{public}d", ret.first);
     if (ret.first == E_OK) {
-        MMI_HILOGD("create data_share helper success");
+        MMI_HILOGD("Create data_share helper success");
         auto helper = ret.second;
         if (helper != nullptr) {
             bool releaseRet = helper->Release();
-            MMI_HILOGD("release data_share helper, releaseRet=%{public}d", releaseRet);
+            MMI_HILOGD("Release data_share helper, releaseRet=%{public}d", releaseRet);
         }
         isDataShareReady_ = true;
         return true;
     } else if (ret.first == E_DATA_SHARE_NOT_READY) {
-        MMI_HILOGE("create data_share helper failed");
+        MMI_HILOGE("Create data_share helper failed");
         isDataShareReady_ = false;
         return false;
     }

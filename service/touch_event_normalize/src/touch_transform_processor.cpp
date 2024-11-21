@@ -18,6 +18,7 @@
 #include <linux/input.h>
 
 #include "aggregator.h"
+#include "bytrace_adapter.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
@@ -130,7 +131,9 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
 #endif // OHOS_BUILD_ENABLE_TOUCH
         rawTouchTmp.x = displayX * DRIVER_NUMBER;
         rawTouchTmp.y = displayY * DRIVER_NUMBER;
+        BytraceAdapter::StartToolType(toolType);
         FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
+        BytraceAdapter::StopToolType();
     }
 }
 void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
@@ -225,13 +228,34 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 #endif // OHOS_BUILD_ENABLE_TOUCH
         rawTouchTmp.x = displayX * DRIVER_NUMBER;
         rawTouchTmp.y = displayY * DRIVER_NUMBER;
+        BytraceAdapter::StartTouchUp(item.GetPointerId());
         FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouchTmp);
+        BytraceAdapter::StopTouchUp();
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
     pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     return true;
+}
+
+void TouchTransformProcessor::DumpInner()
+{
+    static int32_t lastDeviceId = -1;
+    static std::string lastDeviceName("default");
+    auto nowId = pointerEvent_->GetDeviceId();
+    if (lastDeviceId != nowId) {
+        auto device = INPUT_DEV_MGR->GetInputDevice(nowId);
+        CHKPV(device);
+        lastDeviceId = nowId;
+        lastDeviceName = device->GetName();
+    }
+    WIN_MGR->UpdateTargetPointer(pointerEvent_);
+    if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+        aggregator_.Record(MMI_LOG_FREEZE, lastDeviceName + ", TW: " +
+            std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
+    }
 }
 
 std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_event *event)
@@ -267,14 +291,7 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     pointerEvent_->UpdateId();
     pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_GENERATE_FROM_REAL);
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
-    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
-    CHKPP(device);
-    WIN_MGR->UpdateTargetPointer(pointerEvent_);
-    if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-        pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
-        aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
-            std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
-    }
+    DumpInner();
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_FREEZE);
     WIN_MGR->DrawTouchGraphic(pointerEvent_);

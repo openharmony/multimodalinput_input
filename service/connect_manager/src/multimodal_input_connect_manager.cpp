@@ -440,6 +440,21 @@ int32_t MultimodalInputConnectManager::UnsubscribeSwitchEvent(int32_t subscribeI
     return multimodalInputConnectService_->UnsubscribeSwitchEvent(subscribeId);
 }
 
+int32_t MultimodalInputConnectManager::SubscribeLongPressEvent(int32_t subscribeId,
+    const LongPressRequest &longPressRequest)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SubscribeLongPressEvent(subscribeId, longPressRequest);
+}
+ 
+int32_t MultimodalInputConnectManager::UnsubscribeLongPressEvent(int32_t subscribeId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->UnsubscribeLongPressEvent(subscribeId);
+}
+
 int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -790,6 +805,30 @@ int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vec
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->TransmitInfrared(number, pattern);
 }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+int32_t MultimodalInputConnectManager::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+}
+
+int32_t MultimodalInputConnectManager::SetMotionSpace(std::string& keyName, bool useShift,
+    std::vector<int32_t>& pattern)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMotionSpace(keyName, useShift, pattern);
+}
+
+int32_t MultimodalInputConnectManager::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->CreateVKeyboardDevice(vkeyboardDevice);
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)
 {

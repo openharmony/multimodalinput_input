@@ -42,6 +42,7 @@ public:
     private:
         sptr<IRemoteObject> remoteObject_ { nullptr };
         std::atomic_bool isConnected_ = false;
+        std::mutex mutex_;
     };
     bool StartNoticeAbility();
     bool ConnectNoticeSrv();

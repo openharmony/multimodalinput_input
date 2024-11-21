@@ -450,22 +450,35 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
 {
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
     if (GetHandlerType() == InputHandlerType::MONITOR) {
-        for (const auto &item : monitorHandlers_) {
+        std::map<int32_t, Handler> tempMonitorHandlers;
+        {
+            std::lock_guard<std::mutex> guard(mtxHandlers_);
+            tempMonitorHandlers = monitorHandlers_;
+        }
+        for (const auto &item : tempMonitorHandlers) {
             if ((item.second.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
                 continue;
             }
             int32_t handlerId = item.first;
             std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
+            {
+                std::lock_guard<std::mutex> guard(mtxHandlers_);
+                auto iter = monitorHandlers_.find(handlerId);
+                if (iter == monitorHandlers_.end()) {
+                    MMI_HILOGE("No handler with specified");
+                    continue;
+                }
+            }
             consumer->OnInputEvent(keyEvent);
             MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{private}d",
                 handlerId, keyEvent->GetKeyCode());
         }
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
+        std::lock_guard<std::mutex> guard(mtxHandlers_);
         for (const auto &item : interHandlers_) {
             if ((item.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
                 continue;
@@ -607,7 +620,9 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         }
         if (tempEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
             tempEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
-            MMI_HILOGI("Swipe event sended to handler! action type: %{public}d", tempEvent->GetPointerAction());
+            MMI_HILOGI("Swipe event sended to handler! action type: %{public}d finger count: %{public}d",
+                tempEvent->GetPointerAction(),
+                tempEvent->GetFingerCount());
         }
         CHKPV(iter->second);
         auto consumer = iter->second;
@@ -701,7 +716,7 @@ HandleEventType InputHandlerManager::GetEventType() const
     uint32_t eventType{ HANDLE_EVENT_TYPE_NONE };
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         if (monitorHandlers_.empty()) {
-            MMI_HILOGD("monitorHandlers_ is empty");
+            MMI_HILOGD("The monitorHandlers_ is empty");
             return HANDLE_EVENT_TYPE_NONE;
         }
         for (const auto &inputHandler : monitorHandlers_) {
@@ -711,7 +726,7 @@ HandleEventType InputHandlerManager::GetEventType() const
 
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
         if (interHandlers_.empty()) {
-            MMI_HILOGD("interHandlers_ is empty");
+            MMI_HILOGD("The interHandlers_ is empty");
             return HANDLE_EVENT_TYPE_NONE;
         }
         for (const auto &interHandler : interHandlers_) {

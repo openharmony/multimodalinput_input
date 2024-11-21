@@ -62,6 +62,7 @@ public:
     virtual ~IInputWindowsManager() = default;
 
     virtual void Init(UDSServer& udsServer) = 0;
+    virtual bool JudgeCaramaInFore() = 0;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId) = 0;
@@ -116,6 +117,7 @@ public:
     virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
     virtual bool IsMouseSimulate() const = 0;
+    virtual bool HasMouseHideFlag() const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -130,6 +132,7 @@ public:
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
     virtual const DisplayInfo *GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
+    virtual void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual void SendCancelEventWhenLock() = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 

@@ -129,6 +129,17 @@ void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeSwitchEvent(subscriberId);
 }
 
+int32_t InputManager::SubscribeLongPressEvent(const LongPressRequest &longPressRequest,
+    std::function<void(LongPressEvent)> callback)
+{
+    return InputMgrImpl.SubscribeLongPressEvent(longPressRequest, callback);
+}
+ 
+void InputManager::UnsubscribeLongPressEvent(int32_t subscriberId)
+{
+    InputMgrImpl.UnsubscribeLongPressEvent(subscriberId);
+}
+
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
     return InputMgrImpl.AddMonitor(monitor);
@@ -613,6 +624,23 @@ int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pat
 {
     return InputMgrImpl.TransmitInfrared(number, pattern);
 }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+int32_t InputManager::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
+{
+    return InputMgrImpl.SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
+}
+
+int32_t InputManager::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
+{
+    return InputMgrImpl.SetMotionSpace(keyName, useShift, pattern);
+}
+
+int32_t InputManager::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
+    return InputMgrImpl.CreateVKeyboardDevice(vkeyboardDevice);
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 int32_t InputManager::SetCurrentUser(int32_t userId)
 {

@@ -47,7 +47,7 @@ bool HardwareCursorPointerManager::IsSupported()
     if (isEnable_ && isEnableState_) {
         return true;
     }
-    if (isEnable_ && isDeviceChange_ && !isEnableState_) {
+    if (isEnable_ && isDeviceChange_ && (isEnableState_ == false)) {
         return false;
     }
     if (!isEnable_) {
