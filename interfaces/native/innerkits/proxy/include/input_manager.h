@@ -37,6 +37,7 @@
 #include "input_device.h"
 #include "input_handler_type.h"
 #include "key_option.h"
+#include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
 #include "window_info.h"
@@ -170,6 +171,27 @@ public:
      */
     void UnsubscribeSwitchEvent(int32_t subscriberId);
 
+    /**
+     * @brief Subscribes to the long press touch event that meets a specific condition. When such an event occurs,
+     * the <b>callback</b> specified is invoked to process the event.
+     * @param LongPressRequest Indicates the information of long press touch event.
+     * @param callback Indicates the callback.
+     * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
+     * If the value is greater than or equal to <b>0</b>,
+     * the subscription is successful. Otherwise, the subscription fails.
+     * @since 16
+     */
+    int32_t SubscribeLongPressEvent(const LongPressRequest &LongPressRequest,
+        std::function<void(LongPressEvent)> callback);
+
+    /**
+     * @brief Unsubscribes from a long press touch event.
+     * @param subscriberId Indicates the subscription ID, which is the return value of <b>SubscribeKeyEvent</b>.
+     * @return void
+     * @since 16
+     */
+    void UnsubscribeLongPressEvent(int32_t subscriberId);
+    
     /**
      * @brief Adds an input event monitor. After such a monitor is added,
      * an input event is copied and distributed to the monitor while being distributed to the original target.
@@ -915,6 +937,23 @@ public:
      * @since 12
      */
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
+
+    /**
+     * @brief Sets virtual keyboard motion space.
+     * @param keyName The key name of the virtual keyboard button to be updated.
+     * @param useShift Indicates if the key code injection needs to combine with shift key code.
+     * @param pattern Pattern is an ordered list that contains x, y, width, height, keyCode,
+     *   motionSpaceTypeId and pageTypeId of the virtual keyboard button.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern);
+
+    int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     int32_t SetCurrentUser(int32_t userId);
     

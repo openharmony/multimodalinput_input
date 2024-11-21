@@ -55,7 +55,7 @@ void KeyGestureManager::Handler::ResetTimer()
 
 void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGI("[Handler] Handler will run after %{public}dms", GetLongPressTime());
+    MMI_HILOGI("[Handler] Handler(%{public}d) will run after %{public}dms", GetId(), GetLongPressTime());
     keyEvent_ = KeyEvent::Clone(keyEvent);
     timerId_ = TimerMgr->AddTimer(GetLongPressTime(), REPEAT_ONCE,
         [this]() {
@@ -72,6 +72,7 @@ void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
 void KeyGestureManager::Handler::Run(std::shared_ptr<KeyEvent> keyEvent) const
 {
     if (callback_ != nullptr) {
+        MMI_HILOGI("[Handler] Run handler(%{public}d)", GetId());
         callback_(keyEvent);
     }
 }
@@ -102,8 +103,9 @@ bool KeyGestureManager::KeyGesture::RemoveHandler(int32_t id)
 {
     for (auto iter = handlers_.begin(); iter != handlers_.end(); ++iter) {
         if (iter->GetId() == id) {
+            iter->ResetTimer();
             handlers_.erase(iter);
-            MMI_HILOGI("Handler(%{public}d) of key gesture was removed", iter->GetId());
+            MMI_HILOGI("Handler(%{public}d) of key gesture was removed", id);
             return true;
         }
     }
@@ -285,7 +287,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             std::ostringstream output;
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("[LongPressCombinationKey] %{public}s is active now", output.str().c_str());
+                MMI_HILOGI("[LongPressCombinationKey] %s is active now", output.str().c_str());
             } else {
                 MMI_HILOGI("[LongPressCombinationKey] %s is active now", output.str().c_str());
             }
@@ -295,7 +297,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             std::ostringstream output;
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("[LongPressCombinationKey] Switch off %{public}s", output.str().c_str());
+                MMI_HILOGI("[LongPressCombinationKey] Switch off %s", output.str().c_str());
             } else {
                 MMI_HILOGI("[LongPressCombinationKey] Switch off %s", output.str().c_str());
             }
@@ -305,7 +307,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             std::ostringstream output;
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("[LongPressCombinationKey] No handler for %{public}s", output.str().c_str());
+                MMI_HILOGI("[LongPressCombinationKey] No handler for %s", output.str().c_str());
             } else {
                 MMI_HILOGI("[LongPressCombinationKey] No handler for %s", output.str().c_str());
             }
@@ -360,7 +362,7 @@ void KeyGestureManager::LongPressCombinationKey::TriggerAll(std::shared_ptr<KeyE
     std::ostringstream output;
     Dump(output);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGI("[LongPressCombinationKey] trigger %{public}s", output.str().c_str());
+        MMI_HILOGI("[LongPressCombinationKey] trigger %s", output.str().c_str());
     } else {
         MMI_HILOGI("[LongPressCombinationKey] trigger %s", output.str().c_str());
     }
@@ -447,7 +449,7 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
             std::ostringstream output;
             (*iter)->Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("Intercepted by %{public}s", output.str().c_str());
+                MMI_HILOGI("Intercepted by %s", output.str().c_str());
             } else {
                 MMI_HILOGI("Intercepted by %s", output.str().c_str());
             }

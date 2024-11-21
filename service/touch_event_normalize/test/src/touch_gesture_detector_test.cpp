@@ -41,6 +41,8 @@ public:
     {
         return true;
     }
+
+    void OnGestureTrend(std::shared_ptr<PointerEvent> event) override {}
 };
 
 void TouchGestureDetectorTest::SetUpTestCase(void)
@@ -74,6 +76,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_01, Tes
     detector.gestureEnable_ = true;
     detector.gestureDisplayId_ = INT32_MAX;
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    pointerEvent->SetPointerId(0);
     EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
 
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
@@ -406,6 +409,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_WhetherDiscardTouchE
     detector.gestureEnable_ = true;
     detector.gestureDisplayId_ = 3;
     pointerEvent->targetDisplayId_ = 2;
+    pointerEvent->SetPointerId(0);
     EXPECT_TRUE(detector.WhetherDiscardTouchEvent(pointerEvent));
 
     pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
@@ -702,6 +706,63 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcGravityCenter_02
     points[2] = Point(3.0f, 4.0f);
     points[3] = Point(5.0f, 6.0f);
     ASSERT_NO_FATAL_FAILURE(detector.CalcGravityCenter(points));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_IsFingerMove
+ * @tc.desc: Test IsFingerMove
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_IsFingerMove, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    ASSERT_NO_FATAL_FAILURE(detector.IsFingerMove(Point(1.0f, 2.0f), Point(3.0f, 4.0f)));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcTwoPointsDistance
+ * @tc.desc: Test CalcTwoPointsDistance
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcTwoPointsDistance, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    ASSERT_NO_FATAL_FAILURE(detector.CalcTwoPointsDistance(Point(1.0f, 2.0f), Point(3.0f, 4.0f)));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcClusterCenter_01
+ * @tc.desc: Test CalcClusterCenter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcClusterCenter_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    std::map<int32_t, Point> points;
+    ASSERT_NO_FATAL_FAILURE(detector.CalcClusterCenter(points));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcClusterCenter_02
+ * @tc.desc: Test CalcClusterCenter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcClusterCenter_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    std::map<int32_t, Point> points;
+    points[1] = Point(1.0f, 2.0f);
+    points[2] = Point(3.0f, 4.0f);
+    points[3] = Point(5.0f, 6.0f);
+    ASSERT_NO_FATAL_FAILURE(detector.CalcClusterCenter(points));
 }
 
 /**

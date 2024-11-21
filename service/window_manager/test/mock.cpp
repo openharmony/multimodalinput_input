@@ -14,48 +14,6 @@
  */
 #include "mock.h"
 
-extern "C" {
-double libinput_event_tablet_tool_get_x_transformed(struct libinput_event_tablet_tool *event, uint32_t width)
-{
-    return -1.0;
-}
-
-double libinput_event_tablet_tool_get_y_transformed(struct libinput_event_tablet_tool *event, uint32_t height)
-{
-    return -1.0;
-}
-
-double libinput_event_touch_get_x_transformed(struct libinput_event_touch *event, uint32_t width)
-{
-    return -1.0;
-}
-
-double libinput_event_touch_get_y_transformed(struct libinput_event_touch *event, uint32_t height)
-{
-    return -1.0;
-}
-
-double libinput_event_touch_get_tool_x_transformed(struct libinput_event_touch *event, uint32_t width)
-{
-    return -1.0;
-}
-
-double libinput_event_touch_get_tool_y_transformed(struct libinput_event_touch *event, uint32_t height)
-{
-    return -1.0;
-}
-
-double libinput_event_touch_get_tool_width_transformed(struct libinput_event_touch *event, uint32_t width)
-{
-    return -1.0;
-}
-
-double libinput_event_touch_get_tool_height_transformed(struct libinput_event_touch *event, uint32_t height)
-{
-    return -1.0;
-}
-} // extern "C"
-
 namespace OHOS {
 using namespace OHOS::MMI;
 

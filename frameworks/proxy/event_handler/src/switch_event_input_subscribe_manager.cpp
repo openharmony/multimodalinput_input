@@ -46,7 +46,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     int32_t switchType,
     std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(callback, ERROR_NULL_POINTER);
     if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
         MMI_HILOGE("Switch type error");

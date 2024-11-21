@@ -37,16 +37,19 @@ extern "C" {
     };
     enum class DeviceType {
         DEVICE_UNKOWN = 0,
-        DEVICE_KLV = 1,
-        DEVICE_SOFT_HARDEN = 2,
-        DEVICE_HARD_HARDEN = 3,
-        DEVICE_WEBER = 4,
+        DEVICE_PC = 1,
+        DEVICE_SOFT_PC_PRO = 2,
+        DEVICE_HARD_PC_PRO = 3,
+        DEVICE_TABLET = 4,
+        DEVICE_FOLD_PC = 5,
     };
     int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);
     int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);
     int32_t HandleAxisAccelerateTouchpad(bool mode, double* abs_axis, int32_t deviceType);
+    int32_t HandleMotionDynamicAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
+        int32_t speed, uint64_t delta_time, double display_ppi);
 }
 
 namespace MMI {
@@ -73,6 +76,17 @@ public:
         TOUCHPAD = 2,
     };
 
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    struct FilterInsertionPoint {
+        double filterX{ 0.0 };
+        double filterY{ 0.0 };
+        uint64_t filterPrePointTime{ 0 };
+        uint64_t filterDeltaTime{ 0 };
+        bool filterFlag{ false };
+        static constexpr int32_t FILTER_THRESHOLD_US = 909; // <=1ms
+    };
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+
 public:
     DISALLOW_COPY_AND_MOVE(MouseTransformProcessor);
     explicit MouseTransformProcessor(int32_t deviceId);
@@ -85,11 +99,17 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    void HandleFilterMouseEvent(Offset* offset);
+    bool CheckFilterMouseEvent(struct libinput_event *event);
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
     int32_t HandleAxisBeginEndInner(struct libinput_event *event);
+    int32_t HandleScrollFingerInner(struct libinput_event *event);
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
@@ -123,7 +143,7 @@ public:
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
     static int32_t SetPointerLocation(int32_t x, int32_t y);
-    static int32_t SetTouchpadScrollSwitch(bool switchFlag);
+    static int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag);
     static void GetTouchpadScrollSwitch(bool &switchFlag);
     static int32_t SetTouchpadScrollDirection(bool state);
     static void GetTouchpadScrollDirection(bool &state);
@@ -137,9 +157,11 @@ public:
 
 private:
     static int32_t globalPointerSpeed_;
+    static int32_t scrollSwitchPid_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };
+    uint32_t pressedButton_ { 0 };
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
@@ -154,6 +176,9 @@ private:
                 return TimerMgr->ResetTimer(timerId);
             }
     };
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    struct FilterInsertionPoint filterInsertionPoint_;
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 };
 } // namespace MMI
 } // namespace OHOS

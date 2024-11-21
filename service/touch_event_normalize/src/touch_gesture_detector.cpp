@@ -19,9 +19,10 @@
 #include <cfloat>
 #include <cmath>
 #include <cstdint>
-#include <unordered_set>
+#include <numeric>
 
 #include "mmi_log.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -31,6 +32,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t MAX_PHYSCAL_POINTER_NUM { 10 };
 constexpr int32_t ANGLE_PI = 180;
 
@@ -43,7 +45,8 @@ constexpr double ANGLE_LEFT_UP = 135.0;
 constexpr int32_t MAXIMUM_SAME_DIRECTION_OFFSET = 1;
 constexpr float MAXIMUM_POINTER_SPACING = 2000;
 constexpr int64_t MAXIMUM_POINTER_INTERVAL = 100000;
-constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE = 5;
+constexpr int64_t MAXIMUM_PRESS_DELAY { 15 }; // ms
+constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE { 3.0 };
 constexpr double MINIMUM_GRAVITY_OFFSET = 0.5;
 constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS = 2;
 constexpr int32_t MINIMUM_FINGER_COUNT_OFFSET = 1;
@@ -98,6 +101,10 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
     if (!iter.second) {
         MMI_HILOGE("Insert value failed, duplicated pointerId:%{public}d", pointerId);
     }
+    if (gestureTimer_ >= 0) {
+        TimerMgr->RemoveTimer(gestureTimer_);
+        gestureTimer_ = -1;
+    }
     if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
         isFingerReady_ = HandleFingerDown();
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
@@ -112,12 +119,14 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
 void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
 {
     CHKPV(event);
-    if (isRecognized_) {
+    if (isRecognized_ || (gestureTimer_ >= 0)) {
         return;
     }
     if (downPoint_.size() < THREE_FINGER_COUNT) {
         return;
     }
+    CheckGestureTrend(event);
+
     if (!IsMatchGesture(event->GetPointerCount()) && !IsMatchGesture(ALL_FINGER_COUNT)) {
         return;
     }
@@ -142,8 +151,18 @@ void TouchGestureDetector::HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> ev
         return;
     }
     GestureMode type = ChangeToGestureMode(state);
-    if (NotifyGestureEvent(event, type)) {
-        isRecognized_ = true;
+    if (type == GestureMode::ACTION_UNKNOWN) {
+        return;
+    }
+    gestureTimer_ = TimerMgr->AddTimer(MAXIMUM_PRESS_DELAY, REPEAT_ONCE,
+        [this, pointerEvent = std::make_shared<PointerEvent>(*event), type]() {
+            gestureTimer_ = -1;
+            isRecognized_ = true;
+            lastTouchEvent_ = pointerEvent;
+            NotifyGestureEvent(pointerEvent, type);
+        });
+    if (gestureTimer_ < 0) {
+        MMI_HILOGE("TimerMgr::AddTimer fail");
     }
 }
 
@@ -154,19 +173,28 @@ void TouchGestureDetector::HandlePinchMoveEvent(std::shared_ptr<PointerEvent> ev
         return;
     }
     std::map<int32_t, Point> movePoints;
-    for (const auto &[pointerId, _] : downPoint_) {
+    std::unordered_set<SlideState> directions;
+
+    for (const auto &[pointerId, downPt] : downPoint_) {
         PointerEvent::PointerItem item;
         if (!event->GetPointerItem(pointerId, item)) {
             MMI_HILOGE("Get pointer item:%{public}d fail", pointerId);
             return;
         }
-        int32_t x = item.GetDisplayX();
-        int32_t y = item.GetDisplayY();
-        int64_t time = item.GetDownTime();
-        auto iter = movePoints.insert(std::make_pair(pointerId, Point(x, y, time)));
+        Point movePt { item.GetDisplayX(), item.GetDisplayY(), item.GetDownTime() };
+
+        if (IsFingerMove(downPt, movePt)) {
+            double angle = GetAngle(downPt.x, downPt.y, movePt.x, movePt.y);
+            auto direction = GetSlidingDirection(angle);
+            directions.insert(direction);
+        }
+        auto iter = movePoints.insert_or_assign(pointerId, movePt);
         if (!iter.second) {
             MMI_HILOGE("Insert value failed, duplicated pointerId:%{public}d", pointerId);
         }
+    }
+    if (!InOppositeDirections(directions)) {
+        return;
     }
     if (CalcMultiFingerMovement(movePoints) >
         static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
@@ -174,6 +202,14 @@ void TouchGestureDetector::HandlePinchMoveEvent(std::shared_ptr<PointerEvent> ev
         GestureMode type = JudgeOperationMode(movePoints);
         isRecognized_ = AntiJitter(event, type);
     }
+}
+
+bool TouchGestureDetector::InOppositeDirections(const std::unordered_set<SlideState> &directions) const
+{
+    return (((directions.find(SlideState::DIRECTION_DOWN) != directions.cend()) &&
+             (directions.find(SlideState::DIRECTION_UP) != directions.cend())) ||
+            ((directions.find(SlideState::DIRECTION_LEFT) != directions.cend()) &&
+             (directions.find(SlideState::DIRECTION_RIGHT) != directions.cend())));
 }
 
 void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
@@ -186,10 +222,20 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
         return;
     }
     downPoint_.erase(iter);
+    if (gestureTimer_ >= 0) {
+        TimerMgr->RemoveTimer(gestureTimer_);
+        gestureTimer_ = -1;
+    }
+    if (isRecognized_ && (lastTouchEvent_ != nullptr)) {
+        PointerEvent::PointerItem pointerItem {};
+        if (event->GetPointerItem(event->GetPointerId(), pointerItem)) {
+            lastTouchEvent_->UpdatePointerItem(event->GetPointerId(), pointerItem);
+        }
+    }
     MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
         gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId);
     if (downPoint_.empty()) {
-        if (isRecognized_) {
+        if (isRecognized_ && (lastTouchEvent_ != nullptr)) {
             lastTouchEvent_->SetActionTime(GetSysClockTime());
             NotifyGestureEvent(lastTouchEvent_, GestureMode::ACTION_GESTURE_END);
         }
@@ -197,7 +243,7 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
     }
 }
 
-bool TouchGestureDetector::IsPhysicalPointer(std::shared_ptr<PointerEvent> event) const
+bool TouchGestureDetector::IsPhysicalPointer(std::shared_ptr<PointerEvent> event)
 {
     if (event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
         return false;
@@ -312,9 +358,9 @@ double TouchGestureDetector::GetAngle(float startX, float startY, float endX, fl
     return atan2((endY - startY), (endX - startX)) * (ANGLE_PI / M_PI);
 }
 
-bool TouchGestureDetector::IsFingerMove(float startX, float startY, float endX, float endY)
+bool TouchGestureDetector::IsFingerMove(const Point &downPt, const Point &movePt) const
 {
-    return std::fabs(endX + endY - startX - startY) > FLT_EPSILON;
+    return (CalcTwoPointsDistance(downPt, movePt) > MAXIMUM_SINGLE_SLIDE_DISTANCE);
 }
 
 TouchGestureDetector::SlideState TouchGestureDetector::GetSlidingDirection(double angle)
@@ -362,7 +408,7 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
     if (downPoint_.size() < THREE_FINGER_COUNT) {
         return state;
     }
-    int32_t recognizedCount = 0;
+    uint32_t recognizedCount = 0;
     std::unordered_set<TouchGestureDetector::SlideState> directions;
     for (const auto &dPoint : downPoint_) {
         int32_t pointerId = dPoint.first;
@@ -373,15 +419,12 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
             MMI_HILOGE("Get pointer item:%{public}d fail", pointerId);
             return state;
         }
-        int32_t x = item.GetDisplayX();
-        int32_t y = item.GetDisplayY();
-        double angle = GetAngle(point.x, point.y, x, y);
-        bool isMove = IsFingerMove(point.x, point.y, x, y);
-        MMI_HILOGI("pointerId:%{public}d,dx:%{private}.2f,dy:%{private}.2f,x:%{private}d,"
-            "y:%{private}d,isMove:%{public}s", pointerId, point.x, point.y, x, y, isMove ? "true" : "false");
-        if (fabs(angle) < FLT_EPSILON && !isMove) {
+        Point movePt { item.GetDisplayX(), item.GetDisplayY() };
+
+        if (!IsFingerMove(point, movePt)) {
             continue;
         }
+        double angle = GetAngle(point.x, point.y, movePt.x, movePt.y);
         auto direction = GetSlidingDirection(angle);
         if (direction != state) {
             directions.insert(direction);
@@ -395,9 +438,9 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
     return *(directions.begin());
 }
 
-double TouchGestureDetector::CalcTwoPointsDistance(const Point &p1, const Point &p2)
+double TouchGestureDetector::CalcTwoPointsDistance(const Point &p1, const Point &p2) const
 {
-    return sqrt(fabs((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)));
+    return std::hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
 std::vector<std::pair<int32_t, Point>> TouchGestureDetector::SortPoints(std::map<int32_t, Point> &points)
@@ -419,6 +462,18 @@ std::vector<std::pair<int32_t, Point>> TouchGestureDetector::SortPoints(std::map
     sequence.erase(iter);
     sequence.push_back(temp);
     return sequence;
+}
+
+Point TouchGestureDetector::CalcClusterCenter(std::map<int32_t, Point> &points) const
+{
+    if (points.empty()) {
+        return Point {};
+    }
+    Point acc = std::accumulate(points.cbegin(), points.cend(), Point{},
+        [](const auto &init, const auto &item) {
+            return Point { init.x + item.second.x, init.y + item.second.y };
+        });
+    return Point { acc.x / points.size(), acc.y / points.size() };
 }
 
 Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
@@ -483,7 +538,7 @@ void TouchGestureDetector::CalcAndStoreDistance(std::map<int32_t, Point> &points
         MMI_HILOGE("The pointers down time interval is too long");
         return;
     }
-    Point center = CalcGravityCenter(points);
+    Point center = CalcClusterCenter(points);
     if (!lastDistance_.empty()) {
         lastDistance_.clear();
     }
@@ -516,7 +571,7 @@ GestureMode TouchGestureDetector::JudgeOperationMode(std::map<int32_t, Point> &m
     if (downPoint_.size() < FOUR_FINGER_COUNT || !haveLastDistance_) {
         return type;
     }
-    Point center = CalcGravityCenter(movePoints);
+    Point center = CalcClusterCenter(movePoints);
     std::map<int32_t, double> tempDistance;
     int32_t closeCount = 0;
     int32_t openCount = 0;
@@ -649,6 +704,29 @@ bool TouchGestureDetector::NotifyGestureEvent(std::shared_ptr<PointerEvent> even
     }
     MMI_HILOGI("Gesture(%{public}d) identified successfully", mode);
     return true;
+}
+
+void TouchGestureDetector::CheckGestureTrend(std::shared_ptr<PointerEvent> event) const
+{
+    CHKPV(listener_);
+    int32_t nMovements { 0 };
+
+    for (const auto &[pointerId, downPt] : downPoint_) {
+        PointerEvent::PointerItem item {};
+
+        if (!event->GetPointerItem(pointerId, item)) {
+            MMI_HILOGW("No touch(%{public}d) record", pointerId);
+            return;
+        }
+        Point movePt { item.GetDisplayX(), item.GetDisplayY() };
+
+        if (IsFingerMove(downPt, movePt)) {
+            ++nMovements;
+        }
+    }
+    if (nMovements >= THREE_FINGER_COUNT) {
+        listener_->OnGestureTrend(event);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

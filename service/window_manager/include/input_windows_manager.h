@@ -49,6 +49,7 @@ public:
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
     bool GetMouseFlag();
+    bool JudgeCaramaInFore();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void JudgMouseIsDownOrUp(bool dragState);
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -87,10 +88,12 @@ public:
     void SetFoldState ();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
+    void ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     bool IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems);
     bool IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent);
     void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t focusWindowId_ { -1 };
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
 
@@ -115,6 +118,7 @@ public:
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
     bool IsMouseSimulate() const;
+    bool HasMouseHideFlag() const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     PointerStyle GetLastPointerStyle() const;
@@ -138,6 +142,9 @@ public:
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
     const DisplayInfo *GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void SendCancelEventWhenLock();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -191,6 +198,7 @@ private:
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
     void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
+    void PrintWindowNavbar();
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const std::vector<WindowInfo> &oldWindowsInfo,
         const std::vector<WindowInfo> &newWindowsInfo);
@@ -212,9 +220,6 @@ private:
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
     void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
     bool IsMouseDrawing(int32_t currentAction);
@@ -267,6 +272,7 @@ private:
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo, bool isDisplayRemoved = false);
+void DrawPointer(bool isDisplayRemoved);
 bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -293,7 +299,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     void SetAntiMisTakeStatus(bool state);
     void CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t, int32_t> logicalXY, bool isHotArea,
         const std::shared_ptr<PointerEvent> pointerEvent, const std::vector<WindowInfo>& windowInfos,
-        const WindowInfo* touchWindow);
+        const WindowInfo** touchWindow);
     void GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
         WindowInfo **touchWindow, bool &isUiExtentionWindow);
 #endif // OHOS_BUILD_ENABLE_TOUCH

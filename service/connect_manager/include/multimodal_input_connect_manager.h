@@ -97,6 +97,8 @@ public:
     int32_t UnsubscribeHotkey(int32_t subscribeId);
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
+    int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest);
+    int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
     int32_t SetAnrObserver();
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
@@ -131,6 +133,11 @@ public:
     int32_t HasIrEmitter(bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
+    int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern);
+    int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetMoveEventFilters(bool flag);
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);

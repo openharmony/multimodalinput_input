@@ -17,6 +17,7 @@
 #define HARDWARE_CURSOR_POINTER_MANAGER_H
 
 #include <mutex>
+#include <parameters.h>
 
 #include "singleton.h"
 #include "v1_2/include/idisplay_composer_interface.h"
@@ -34,13 +35,13 @@ public:
     int32_t SetPosition(int32_t x, int32_t y);
     int32_t EnableStats(bool enable);
     int32_t GetCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 private:
     bool isEnableState_ { false };
-    [[ maybe_unused ]] bool isEnable_ { false };
+    bool isEnable_ { false };
     bool isDeviceChange_ { false };
     uint32_t devId_ { 0 };
     sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 };
 } // namespace MMI
 } // namespace OHOS

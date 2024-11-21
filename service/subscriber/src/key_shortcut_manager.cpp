@@ -415,7 +415,7 @@ bool KeyShortcutManager::IsExceptionalSystemKey(const ExceptionalSystemKey &sysK
     return (exceptSysKeys_.find(sysKey) != exceptSysKeys_.cend());
 }
 
-bool KeyShortcutManager::IsModifier(int32_t keyCode) const
+bool KeyShortcutManager::IsModifier(int32_t keyCode)
 {
     return (modifiers_.find(keyCode) != modifiers_.cend());
 }
@@ -451,7 +451,7 @@ bool KeyShortcutManager::CheckSystemKey(const SystemShortcutKey &key, KeyShortcu
         }
     }
     if (nModifiers < SINGLE_MODIFIER) {
-        MMI_HILOGE("Require modifier(s)");
+        MMI_HILOGD("Require modifier(s)");
         return false;
     }
     if (key.finalKey == SHORTCUT_PURE_MODIFIERS) {
@@ -527,18 +527,18 @@ bool KeyShortcutManager::CheckGlobalKey(const HotKey &key, KeyShortcut &shortcut
 
 bool KeyShortcutManager::HaveRegisteredGlobalKey(const KeyShortcut &key) const
 {
-    return (
-        std::any_of(shortcuts_.cbegin(), shortcuts_.cend(),
-            [&key](const auto &item) {
-                return ((item.second.modifiers == key.modifiers) &&
-                        (item.second.finalKey == key.finalKey));
-            }) ||
-        std::any_of(systemKeys_.cbegin(), systemKeys_.cend(),
-            [&key](const auto &item) {
-                return ((item.modifiers == key.modifiers) &&
-                        (item.finalKey == key.finalKey));
-            })
-    );
+    auto iter = std::find_if(shortcuts_.cbegin(), shortcuts_.cend(),
+        [&key](const auto &item) {
+            return ((item.second.modifiers == key.modifiers) &&
+                    (item.second.finalKey == key.finalKey));
+        });
+    // We met the problem: key-shortcut does not differentiate left/right CTRL/SHIFT/ALT/LOGO.
+    // but the implementation of key-shortcut reuse the logic of key-subscription, which
+    // treat left/right CTRL/SHIFT/ALT/LOGO as different keys. That means, for 'CTRL+A' etc
+    // to work as expected, we have to subscribe both 'LEFT-CTRL+A' and 'RIGHT-CTRL+A'.
+    // But duplicate global key registration will fail according to key-shortcut rules.
+    // We relax this retriction here to allow duplicate global key registration from same application.
+    return (iter != shortcuts_.cend() ? (iter->second.session != key.session) : false);
 }
 
 std::string KeyShortcutManager::FormatPressedKeys(std::shared_ptr<KeyEvent> keyEvent) const
@@ -763,16 +763,17 @@ void KeyShortcutManager::ResetCheckState()
 {
     isCheckShortcut_ = true;
 }
- 
+
 static const std::vector<int32_t> specialKeyCodes = {
     KeyEvent::KEYCODE_ALT_LEFT,
     KeyEvent::KEYCODE_ALT_RIGHT,
     KeyEvent::KEYCODE_TAB,
     KeyEvent::KEYCODE_VOLUME_UP,
     KeyEvent::KEYCODE_VOLUME_DOWN,
-    KeyEvent::KEYCODE_POWER
+    KeyEvent::KEYCODE_POWER,
+    KeyEvent::KEYCODE_HEADSETHOOK
 };
- 
+
 bool KeyShortcutManager::IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     auto it = std::find(specialKeyCodes.begin(), specialKeyCodes.end(), keyEvent->GetKeyCode());
@@ -784,18 +785,6 @@ bool KeyShortcutManager::IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyE
         return true;
     }
     return false;
-}
-
-int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
-{
-    CALL_DEBUG_ENTER;
-    for (const auto &item : hotkeys_) {
-        std::unique_ptr<KeyOption> keyOptionPtr = std::make_unique<KeyOption>();
-        keyOptionPtr->SetPreKeys(item.preKeys);
-        keyOptionPtr->SetFinalKey(item.finalKey);
-        sysKeys.push_back(std::move(keyOptionPtr));
-    }
-    return RET_OK;
 }
 
 bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
@@ -898,6 +887,18 @@ void KeyShortcutManager::ResetTriggering(int32_t shortcutId)
     }
 }
 
+int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &item : hotkeys_) {
+        std::unique_ptr<KeyOption> keyOptionPtr = std::make_unique<KeyOption>();
+        keyOptionPtr->SetPreKeys(item.preKeys);
+        keyOptionPtr->SetFinalKey(item.finalKey);
+        sysKeys.push_back(std::move(keyOptionPtr));
+    }
+    return RET_OK;
+}
+
 void KeyShortcutManager::LoadHotkeys()
 {
     char cfgName[] { "etc/multimodalinput/system_hotkeys_config.json" };
@@ -922,6 +923,10 @@ void KeyShortcutManager::ReadHotkeys(const std::string &cfgPath)
         return;
     }
     cJSON* jsonHotkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Hotkeys");
+    if (!jsonHotkeys) {
+        MMI_HILOGE("JsonHotkeys is nullptr");
+        return;
+    }
     if (!cJSON_IsArray(jsonHotkeys)) {
         MMI_HILOGE("JsonHotkeys is not array");
         return;
@@ -929,6 +934,10 @@ void KeyShortcutManager::ReadHotkeys(const std::string &cfgPath)
     int32_t nSysKeys = cJSON_GetArraySize(jsonHotkeys);
     for (int32_t index = 0; index < nSysKeys; ++index) {
         cJSON *jsonHotkey = cJSON_GetArrayItem(jsonHotkeys, index);
+        if (!jsonHotkey) {
+        MMI_HILOGE("JsonHotkey is nullptr");
+        return;
+        }
         if (ReadHotkey(jsonHotkey) != RET_OK) {
             MMI_HILOGE("Read hotkey failed");
             return;
@@ -943,13 +952,17 @@ int32_t KeyShortcutManager::ReadHotkey(cJSON *jsonHotkey)
         return RET_ERR;
     }
     cJSON *jsonPreKeys = cJSON_GetObjectItem(jsonHotkey, "preKeys");
+    if (!jsonPreKeys) {
+        MMI_HILOGE("JsonPreKeys is nullptr");
+        return RET_ERR;
+    }
     if (!cJSON_IsArray(jsonPreKeys)) {
         MMI_HILOGE("Expect array for PreKeys");
         return RET_ERR;
     }
     std::set<int32_t> preKeys;
     int32_t nPreKeys = cJSON_GetArraySize(jsonPreKeys);
-
+ 
     for (int32_t index = 0; index < nPreKeys; ++index) {
         cJSON *jsonPreKey = cJSON_GetArrayItem(jsonPreKeys, index);
         if (!cJSON_IsNumber(jsonPreKey)) {
@@ -959,6 +972,10 @@ int32_t KeyShortcutManager::ReadHotkey(cJSON *jsonHotkey)
         preKeys.insert(static_cast<int32_t>(cJSON_GetNumberValue(jsonPreKey)));
     }
     cJSON *jsonFinalKey = cJSON_GetObjectItem(jsonHotkey, "finalKey");
+    if (!jsonFinalKey) {
+        MMI_HILOGE("JsonFinalKey is nullptr");
+        return RET_ERR;
+    }
     if (!cJSON_IsNumber(jsonFinalKey)) {
         MMI_HILOGE("Expect number for FinalKey");
         return RET_ERR;
@@ -979,7 +996,7 @@ int32_t KeyShortcutManager::AddHotkey(const std::set<int32_t> &preKeys, int32_t 
             return RET_ERR;
         }
     }
-
+ 
     if (IsModifier(hotkey.finalKey)) {
         MMI_HILOGE("FinalKey is modifier");
         return RET_ERR;

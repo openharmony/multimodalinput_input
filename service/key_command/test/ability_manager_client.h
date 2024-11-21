@@ -80,7 +80,7 @@ private:
 } // namespace AAFwk
 
 namespace EventFwk {
-class CommonEventSupport {
+class CommonEventSupportTest {
 public:
     /**
      * Indicates the action of a common event that the device screen is off and the device is sleeping.
@@ -105,8 +105,8 @@ public:
      */
     static const std::string COMMON_EVENT_SCREEN_UNLOCKED;
 public:
-    CommonEventSupport();
-    virtual ~CommonEventSupport();
+    CommonEventSupportTest();
+    virtual ~CommonEventSupportTest();
 };
 } // namespace EventFwk
 } // namespace OHOS

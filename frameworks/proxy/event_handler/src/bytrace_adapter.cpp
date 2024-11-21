@@ -17,9 +17,7 @@
 #include <string>
 
 #include "define_multimodal.h"
-#ifdef HITRACE_ENABLED
 #include "hitrace_meter.h"
-#endif // HITRACE_ENABLED
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -48,12 +46,10 @@ constexpr int32_t STOP_ID { 3 };
 
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(keyEvent);
     int32_t keyId = keyEvent->GetId();
     StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, ON_KEY_EVENT, keyId);
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report keyId=" + std::to_string(keyId));
-#endif // HITRACE_ENABLED
 }
 
 std::string BytraceAdapter::GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent)
@@ -64,7 +60,6 @@ std::string BytraceAdapter::GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent
 
 std::string BytraceAdapter::GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent)
 {
-#ifdef HITRACE_ENABLED
     CHKPS(pointerEvent);
     std::vector<PointerEvent::PointerItem> pointerItems;
     std::vector<int32_t> pointerIds{ pointerEvent->GetPointerIds() };
@@ -88,14 +83,10 @@ std::string BytraceAdapter::GetPointerTraceString(std::shared_ptr<PointerEvent> 
         traceStr += "]";
     }
     return traceStr;
-#else
-    return "";
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(pointerEvent);
     int32_t eventId = pointerEvent->GetId();
     if (traceBtn == TRACE_START) {
@@ -115,14 +106,11 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, Tr
             FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, ON_TOUCH_EVENT, eventId);
         }
     }
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType handlerType)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(key);
-    [[ maybe_unused ]] int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
     switch (handlerType) {
         case KEY_INTERCEPT_EVENT: {
@@ -149,15 +137,12 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType han
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
     int32_t keyId = key->GetId();
     FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, ON_KEY_EVENT, keyId);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn traceBtn, HandlerType handlerType)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(keyEvent);
     int32_t keyId = keyEvent->GetId();
-    [[ maybe_unused ]] int32_t keyCode = keyEvent->GetKeyCode();
     if (traceBtn == TRACE_START) {
         switch (handlerType) {
             case KEY_INTERCEPT_EVENT: {
@@ -200,13 +185,11 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
             }
         }
     }
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartBytrace(
     std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn, HandlerType handlerType)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(pointerEvent);
     int32_t eventId = pointerEvent->GetId();
     if (traceBtn == TRACE_START) {
@@ -244,12 +227,10 @@ void BytraceAdapter::StartBytrace(
             }
         }
     }
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartBytrace(TraceBtn traceBtn, EventType eventType)
 {
-#ifdef HITRACE_ENABLED
     std::string checkKeyCode;
     if (traceBtn == TRACE_START) {
         switch (eventType) {
@@ -288,183 +269,205 @@ void BytraceAdapter::StartBytrace(TraceBtn traceBtn, EventType eventType)
             }
         }
     }
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartIpcServer(uint32_t code)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "ipcServerHandle code:" + std::to_string(code));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopIpcServer()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartPackageEvent(const std::string& msg)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, msg);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopPackageEvent()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartHandleInput(int32_t code)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "originEventHandle code:" + std::to_string(code));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopHandleInput()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartHandleTracker(int32_t pointerId)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "pointerId:" + std::to_string(pointerId));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopHandleTracker()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartConsumer(std::shared_ptr<PointerEvent> pointerEvent)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(pointerEvent);
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "eventConsume pointerEventId:" + std::to_string(pointerEvent->GetId()));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopConsumer()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartConsumer(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(keyEvent);
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "eventConsume keyEventId:" + std::to_string(keyEvent->GetId()));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartPostTaskEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(pointerEvent);
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startpostEvent pointerEventId:" +
         std::to_string(pointerEvent->GetId()));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartPostTaskEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifdef HITRACE_ENABLED
     CHKPV(keyEvent);
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startpostEvent keyEventId:" +
         std::to_string(keyEvent->GetId()));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopPostTaskEvent()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartSocketHandle(int32_t msgId)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "socketMsgHandle msgId:" + std::to_string(msgId));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopSocketHandle()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartDevListener(const std::string& type, int32_t deviceId)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT,
         "device listener type:" + type + ", deviceid:" + std::to_string(deviceId));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopDevListener()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartLaunchAbility(int32_t type, const std::string& bundleName)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT,
         "launchAbility type:" + std::to_string(type) + ", bundleName:" + bundleName);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopLaunchAbility()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartMarkedTracker(int32_t eventId)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "markProcessed eventId:" + std::to_string(eventId));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopMarkedTracker()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StartTouchEvent(int32_t pointerId)
 {
-#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startTouchEvent pointerId:" + std::to_string(pointerId));
-#endif // HITRACE_ENABLED
 }
 
 void BytraceAdapter::StopTouchEvent()
 {
-#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
-#endif // HITRACE_ENABLED
+}
+
+void BytraceAdapter::StartToolType(int32_t toolType)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "current ToolType:" + std::to_string(toolType));
+}
+
+void BytraceAdapter::StopToolType()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartTouchUp(int32_t pointerId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startTouchUp pointerId:" + std::to_string(pointerId));
+}
+
+void BytraceAdapter::StopTouchUp()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartUpdateDisplayMode(const std::string &modeMsg)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, modeMsg);
+}
+
+void BytraceAdapter::StopUpdateDisplayMode()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartDataShare(const std::string &key)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, key);
+}
+
+void BytraceAdapter::StopDataShare()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartRsSurfaceNode(int32_t displayId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "pointerWindow displayId:" + std::to_string(displayId));
+}
+
+void BytraceAdapter::StopRsSurfaceNode()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartFoldState(bool state)
+{
+    std::string foldState = state ? "true" : "false";
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, foldState);
+}
+
+void BytraceAdapter::StopFoldState()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartWindowVisible(int32_t pid)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "get visibility window info:" + std::to_string(pid));
+}
+
+void BytraceAdapter::StopWindowVisible()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
 } // namespace MMI
 } // namespace OHOS

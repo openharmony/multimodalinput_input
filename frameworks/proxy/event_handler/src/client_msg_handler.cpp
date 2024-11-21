@@ -30,6 +30,7 @@
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
+#include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -62,6 +63,8 @@ void ClientMsgHandler::Init()
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         { MmiMessageId::ON_POINTER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->OnPointerEvent(client, pkt); }},
+        { MmiMessageId::ON_SUBSCRIBE_LONG_PRESS, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->OnSubscribeLongPressEventCallback(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         { MmiMessageId::ADD_INPUT_DEVICE_LISTENER, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->OnDevListener(client, pkt); }},
@@ -144,8 +147,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     MMI_HILOG_DISPATCHD("Key event dispatcher of client, Fd:%{public}d", fd);
-    MMI_HILOG_DISPATCHI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
-    EventLogHelper::PrintEventData(key, MMI_LOG_HEADER);
+    MMI_HILOG_DISPATCHI("Received");
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -185,14 +187,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    MMI_HILOG_FREEZEI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
         std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
         aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
             std::to_string(pointerEvent->GetId()));
     }
-    EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction() ||
         PointerEvent::POINTER_ACTION_HOVER_CANCEL == pointerEvent->GetPointerAction() ||
         PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL == pointerEvent->GetPointerAction()) {
@@ -212,6 +212,25 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
     return RET_OK;
 }
+
+int32_t ClientMsgHandler::OnSubscribeLongPressEventCallback(const UDSClient& client, NetPacket& pkt)
+{
+    LongPressEvent longPressEvent;
+    int32_t ret = InputEventDataTransformation::NetPacketToLongPressEvent(pkt, longPressEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Read net packet failed");
+        return RET_ERR;
+    }
+    int32_t fd = -1;
+    int32_t subscribeId = -1;
+    pkt >> fd >> subscribeId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
+    return LONG_PRESS_EVENT_SUBSCRIBE_MGR.OnSubscribeLongPressEventCallback(longPressEvent, subscribeId);
+}
+
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -239,12 +258,10 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
                 subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                 keyEvent->GetEventType(), keyEvent->GetFlag());
         } else {
-            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
-                "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
-                "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
-            subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
-            keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-            keyEvent->GetEventType(), keyEvent->GetFlag());
+            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
+                "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
+                subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+                keyEvent->GetEventType(), keyEvent->GetFlag());
         }
     } else {
         MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
@@ -279,7 +296,7 @@ int32_t ClientMsgHandler::OnSubscribeSwitchEventCallback(const UDSClient &client
     }
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.OnSubscribeSwitchEventCallback(switchEvent, subscribeId);
 }
-#endif // OHOS_BUILD_ENABLE_SWITCH
+#endif
 
 int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 {

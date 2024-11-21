@@ -187,7 +187,6 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_002, Test
     touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::SWIPE;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
     event->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    touchGestureAdapter->hasCancel_ = false;
     touchGestureAdapter->gestureStarted_ = true;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
     event->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -352,11 +351,9 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_003, Test
     event->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     touchGestureAdapter->gestureStarted_ = true;
     touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::SWIPE;
-    touchGestureAdapter->hasCancel_ = true;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
     touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::IDLE;
     event->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    touchGestureAdapter->hasCancel_ = true;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
 }
 } // namespace MMI

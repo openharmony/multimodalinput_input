@@ -22,6 +22,7 @@
 #include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_option.h"
+#include "long_press_event.h"
 #include "mouse_event_normalize.h"
 #include "msg_handler.h"
 #include "pixel_map.h"
@@ -64,8 +65,6 @@ public:
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
     int32_t OnRemoveGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
-    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, std::vector<int32_t> actionsType);
-    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, std::vector<int32_t> actionsType);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);
@@ -83,7 +82,9 @@ public:
     int32_t OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType);
     int32_t OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_SWITCH
-
+    int32_t OnSubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,
+        const LongPressRequest &longPressRequest);
+    int32_t OnUnsubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -96,7 +97,7 @@ public:
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell);
     int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
-    int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell, bool isStoreWindowId);
+    int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags,
@@ -141,13 +142,14 @@ private:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void CalculateOffset(Direction direction, Offset &offset);
 #endif // OHOS_BUILD_ENABLE_POINTER
-    bool CloseInjectNotice(int32_t pid);
     int32_t OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info);
+    bool CloseInjectNotice(int32_t pid);
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
     std::map<int32_t, int32_t> shellTargetWindowIds_;
+    std::map<int32_t, int32_t> accessTargetWindowIds_;
     std::map<int32_t, AuthorizationStatus> authorizationCollection_;
     int32_t CurrentPID_ { -1 };
     InjectionType InjectionType_ { InjectionType::UNKNOWN };

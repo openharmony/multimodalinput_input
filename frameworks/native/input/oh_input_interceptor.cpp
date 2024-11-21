@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_INTERCEPTOR_ID { -1 };
+constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
 }
 int32_t OHInputInterceptor::Start(OHInterceptorType type)
 {

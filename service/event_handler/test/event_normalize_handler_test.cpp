@@ -127,10 +127,10 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
     ASSERT_NO_FATAL_FAILURE(handler.HandleTableToolEvent(event));
     event->type = LIBINPUT_EVENT_JOYSTICK_BUTTON;
     handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickEvent(event));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickButtonEvent(event));
     event->type = LIBINPUT_EVENT_JOYSTICK_AXIS;
     handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickEvent(event));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickAxisEvent(event));
     event->type = LIBINPUT_EVENT_SWITCH_TOGGLE;
     handler.HandleEvent(event, frameTime);
     ASSERT_NO_FATAL_FAILURE(handler.HandleSwitchInputEvent(event));
@@ -702,20 +702,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleSwitchInputE
     EventNormalizeHandler eventNormalizeHandler;
     libinput_event *event = nullptr;
     int32_t ret = eventNormalizeHandler.HandleSwitchInputEvent(event);
-    ASSERT_EQ(ret, ERROR_UNSUPPORT);
-}
-
-/**
- * @tc.name: EventNormalizeHandlerTest_HandleJoystickEvent_001
- * @tc.desc: Handle Joystick Event
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleJoystickEvent_001, TestSize.Level1)
-{
-    EventNormalizeHandler eventNormalizeHandler;
-    libinput_event *event = nullptr;
-    int32_t ret = eventNormalizeHandler.HandleJoystickEvent(event);
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 }
 

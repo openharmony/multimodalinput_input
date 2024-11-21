@@ -103,6 +103,8 @@ public:
     int32_t UnsubscribeHotkey(int32_t subscribeId) override;
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
+    int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
+    int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
@@ -146,6 +148,15 @@ public:
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY) override;
+    int32_t OnSetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
+    int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern) override;
+    int32_t OnSetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern);
+    void OnVKeyTrackPadMessage(const std::vector<std::vector<int32_t>>& msgList);
+    int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) override;
+    int32_t OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
@@ -220,8 +231,6 @@ protected:
         int32_t priority, uint32_t deviceTags);
     int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags);
-    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType);
-    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, std::vector<int32_t> actionsType);
     int32_t ObserverAddInputHandler(int32_t pid);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
@@ -254,6 +263,20 @@ protected:
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
     void InitPrintClientInfo();
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool HandleVKeyTrackPadPointerMove(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadLeftBtnDown(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadLeftBtnUp(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRightBtnDown(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRightBtnUp(
+        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
+    void InitVKeyboardPointerEventHandler();
+    void InitVKeyboardFuncHandler();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 private:
     MMIService();
     ~MMIService();
@@ -291,6 +314,9 @@ private:
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     bool hasRegisterListener_ { false };
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    std::atomic_bool isHPR_ { false };
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 };
 } // namespace MMI
 } // namespace OHOS

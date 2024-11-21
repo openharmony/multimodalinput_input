@@ -30,6 +30,18 @@ enum class Action : int32_t {
     DOWN = 1,
     UP = 2,
 };
+enum VKeyboardAction : int32_t {
+    UNKNOWN = 0,
+    ACTIVATE_KEYBOARD = 1,
+    VKEY_DOWN = 2,
+    VKEY_UP = 3,
+    RESET_BUTTON_COLOR = 4,
+    TWO_FINGERS_IN = 5,
+    TWO_FINGERS_OUT = 6,
+    TWO_HANDS_UP = 7,
+    TWO_HANDS_DOWN = 8,
+    IDLE = 9,
+};
 } // namespace
 
 napi_value JsKeyEvent::GetNapiInt32(napi_env env, int32_t code)
@@ -51,6 +63,36 @@ napi_value JsKeyEvent::EnumClassConstructor(napi_env env, napi_callback_info inf
     return ret;
 }
 
+napi_value JsKeyEvent::ExportVKeyboardAction(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN", GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("ACTIVATE_KEYBOARD",
+            GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::ACTIVATE_KEYBOARD))),
+        DECLARE_NAPI_STATIC_PROPERTY("VKEY_DOWN",
+            GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::VKEY_DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("VKEY_UP",
+            GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::VKEY_UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESET_BUTTON_COLOR",
+            GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::RESET_BUTTON_COLOR))),
+        DECLARE_NAPI_STATIC_PROPERTY("TWO_FINGERS_IN",
+            GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::TWO_FINGERS_IN))),
+        DECLARE_NAPI_STATIC_PROPERTY("TWO_FINGERS_OUT",
+            GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::TWO_FINGERS_OUT))),
+        DECLARE_NAPI_STATIC_PROPERTY("TWO_HANDS_UP",
+            GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::TWO_HANDS_UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("TWO_HANDS_DOWN",
+            GetNapiInt32(env, static_cast<int32_t>(VKeyboardAction::TWO_HANDS_DOWN))),
+    };
+
+    napi_value vkAction = nullptr;
+    CHKRP(napi_define_class(env, "VKeyboardAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &vkAction), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "VKeyboardAction", vkAction), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 napi_value JsKeyEvent::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -64,6 +106,7 @@ napi_value JsKeyEvent::Export(napi_env env, napi_value exports)
     CHKRP(napi_define_class(env, "Action", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &action), DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "Action", action), SET_NAMED_PROPERTY);
+    CHKPP(ExportVKeyboardAction(env, exports));
     return exports;
 }
 } // namespace MMI

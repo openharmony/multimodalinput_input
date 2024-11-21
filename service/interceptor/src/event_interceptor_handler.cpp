@@ -127,12 +127,6 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent)) {
-        MMI_HILOGI("Knuckle in ancowindow need to be intercepted");
-        return true;
-    }
-#endif // OHOS_BUILD_ENABLE_ANCO
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         MMI_HILOGW("This event has been tagged as not to be intercepted");
         return false;
@@ -143,7 +137,7 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointe
 
 void EventInterceptorHandler::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_) {
+    if (sessionLostCallbackInitialized_)  {
         MMI_HILOGE("Init session is failed");
         return;
     }
@@ -396,6 +390,7 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool EventInterceptorHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
 {
     CHKPF(event);
@@ -408,5 +403,6 @@ bool EventInterceptorHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<K
     nextHandler_->HandleKeyEvent(event);
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS

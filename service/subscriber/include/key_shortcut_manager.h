@@ -82,15 +82,16 @@ public:
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
     void ResetAll();
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys);
-    void ResetCheckState();
-    bool IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent);
 
     bool HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent);
     void UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent);
     void MarkShortcutConsumed(const ShortcutKey &shortcut);
     void MarkShortcutConsumed(const KeyOption &shortcut);
+    void ResetCheckState();
+    bool IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent);
 
     static std::shared_ptr<KeyShortcutManager> GetInstance();
+    static bool IsModifier(int32_t keyCode);
 
 private:
     struct SystemKey {
@@ -136,7 +137,6 @@ private:
     std::string FormatModifiers(const std::set<int32_t> &modifiers) const;
     int32_t GenerateId() const;
     bool IsExceptionalSystemKey(const ExceptionalSystemKey &sysKey) const;
-    bool IsModifier(int32_t keyCode) const;
     bool CheckSystemKey(const SystemShortcutKey &key, KeyShortcut &shortcut) const;
     bool IsValid(const ShortcutTriggerType triggerType) const;
     bool IsReservedSystemKey(const KeyShortcut &shortcut) const;
@@ -167,11 +167,11 @@ private:
     std::set<ExceptionalSystemKey> exceptSysKeys_;
     std::map<int32_t, KeyShortcut> shortcuts_;
     std::map<int32_t, int32_t> triggering_;
+    bool isCheckShortcut_ { true };
     static const std::map<int32_t, uint32_t> modifiers_;
     static std::mutex mutex_;
     static std::shared_ptr<KeyShortcutManager> instance_;
     std::set<SystemHotkey> hotkeys_;
-    bool isCheckShortcut_ { true };
 };
 
 #define KEY_SHORTCUT_MGR KeyShortcutManager::GetInstance()

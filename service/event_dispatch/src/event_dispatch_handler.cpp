@@ -273,7 +273,18 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         return;
     }
     auto udsServer = InputHandler->GetUDSServer();
-    auto fd = WIN_MGR->GetClientFd(point);
+    int32_t fd = -1;
+    if (point->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL &&
+        point->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL &&
+        (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
+        point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
+        WIN_MGR->GetWindowPid(pointerItem.GetTargetWindowId() > 0)) {
+        CHKPV(udsServer);
+        WIN_MGR->FoldScreenRotation(point);
+        fd = udsServer->GetClientFd(WIN_MGR->GetPidByWindowId(point->GetTargetWindowId()));
+    } else {
+        fd = WIN_MGR->GetClientFd(point);
+    }
     auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
     if (WIN_MGR->GetCancelEventFlag(point) && udsServer->GetSession(fd) == nullptr &&
         pid != -1 && point->GetTargetWindowId() != -1) {
@@ -397,7 +408,11 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         }
         return RET_OK;
     }
-
+    auto keyHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(keyHandler, RET_ERR);
+    if (key->GetKeyCode() != keyHandler->GetCurrentHandleKeyCode()) {
+        MMI_HILOGW("Keycode has been changed");
+    }
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);

@@ -30,6 +30,7 @@
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
+#include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "multimodalinput_ipc_interface_code.h"
 #include "nap_process.h"
@@ -104,6 +105,8 @@ public:
     virtual int32_t UnsubscribeHotkey(int32_t subscribeId) = 0;
     virtual int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) = 0;
     virtual int32_t UnsubscribeSwitchEvent(int32_t subscribeId) = 0;
+    virtual int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) = 0;
+    virtual int32_t UnsubscribeLongPressEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) = 0;
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
@@ -142,6 +145,11 @@ public:
     virtual int32_t HasIrEmitter(bool &hasIrEmitter) = 0;
     virtual int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) = 0;
     virtual int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) = 0;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    virtual int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY) = 0;
+    virtual int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern) = 0;
+    virtual int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) = 0;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     virtual int32_t SetPixelMapData(int32_t infoId, void* pixelMap) = 0;
     virtual int32_t SetMoveEventFilters(bool flag) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;

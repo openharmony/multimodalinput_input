@@ -97,10 +97,6 @@ void EventManager::StartCooperate(const StartCooperateEvent &event)
 
 void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &event)
 {
-    std::shared_ptr<EventInfo> eventInfo = calls_[EventType::START];
-    CHKPV(eventInfo);
-    CooperateNotice notice {
-        .pid = eventInfo->pid,
         .msgId = eventInfo->msgId,
         .userData = eventInfo->userData,
         .networkId = eventInfo->networkId,
@@ -149,10 +145,6 @@ void EventManager::StopCooperate(const StopCooperateEvent &event)
 
 void EventManager::StopCooperateFinish(const DSoftbusStopCooperateFinished &event)
 {
-    std::shared_ptr<EventInfo> eventInfo = calls_[EventType::STOP];
-    CHKPV(eventInfo);
-    CooperateNotice notice {
-        .pid = eventInfo->pid,
         .msgId = eventInfo->msgId,
         .userData = eventInfo->userData,
         .networkId = eventInfo->networkId,

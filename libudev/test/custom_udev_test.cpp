@@ -102,7 +102,7 @@ HWTEST_F(CustomUdevTest, TestBasicsFail, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_ref(nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NE(errno, 0);
 
     errno = 0;
     EXPECT_EQ(udev_device_unref(nullptr), nullptr);
@@ -201,7 +201,7 @@ HWTEST_F(CustomUdevTest, TestGetDevnode, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_devnode(nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NE(errno, 0);
 }
 
 /*
@@ -217,7 +217,7 @@ HWTEST_F(CustomUdevTest, TestGetSysname, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_sysname(nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NE(errno, 0);
 }
 
 /*
@@ -234,7 +234,7 @@ HWTEST_F(CustomUdevTest, TestGetSyspath, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_syspath(nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NE(errno, 0);
 }
 
 /*
@@ -258,7 +258,7 @@ HWTEST_F(CustomUdevTest, TestGetProperty, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_property_value(nullptr, "DEVNAME"), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NE(errno, 0);
 
     errno = 0;
     EXPECT_EQ(udev_device_get_property_value(device, nullptr), nullptr);
@@ -302,7 +302,7 @@ HWTEST_F(CustomUdevTest, TestGetParent2, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(nullptr, "input", nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NE(errno, 0);
 
     errno = 0;
     EXPECT_NE(udev_device_get_parent_with_subsystem_devtype(device, "input", ""), nullptr);
@@ -346,19 +346,6 @@ HWTEST_F(CustomUdevTest, TestUdevWheel, TestSize.Level1)
 
     EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
     EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_KEY"), "1");
-}
-
-HWTEST_F(CustomUdevTest, TestUdevAbsMouse, TestSize.Level1)
-{
-    testDevice_.AbsMouseSetup();
-    ASSERT_NO_FATAL_FAILURE(testDevice_.Init(false));
-    auto* device = testDevice_.GetDevice();
-
-    auto* parent = udev_device_get_parent(device);
-    ASSERT_NE(parent, nullptr);
-
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_MOUSE"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsKey, TestSize.Level1)

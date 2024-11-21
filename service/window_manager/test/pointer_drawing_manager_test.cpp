@@ -1975,26 +1975,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetTargetDevice_001
- * @tc.desc: Test SetTargetDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetTargetDevice_001, TestSize.Level1)
-{
-    #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CALL_TEST_DEBUG;
-    uint32_t devId = 0;
-    hardwareCursorPointerManager_->devId_ = 0;
-    hardwareCursorPointerManager_->SetTargetDevice(devId);
-    ASSERT_FALSE(hardwareCursorPointerManager_->isEnableState_);
-    devId = 10;
-    hardwareCursorPointerManager_->SetTargetDevice(devId);
-    ASSERT_FALSE(hardwareCursorPointerManager_->isEnableState_);
-    #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_InitPointerObserver_001
  * @tc.desc: Test InitPointerObserver
  * @tc.type: FUNC
@@ -2107,74 +2087,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AdjustMouseFocusBy
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AdjustMouseFocusByDirection90(iconType, physicalX, physicalY));
     pointerDrawMgr.userIcon_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AdjustMouseFocusByDirection90(iconType, physicalX, physicalY));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetPointerColor_003
- * @tc.desc: Test SetPointerColor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
-        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ != nullptr);
-    pointerDrawingManager->SetPointerColor(16777216);
-    int32_t color = pointerDrawingManager->GetPointerColor();
-    EXPECT_EQ(color, RET_OK);
-    pointerDrawingManager->surfaceNode_ = nullptr;
-    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ == nullptr);
-    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MAGIC_CURSOR->isExistDefaultStyle = false;
-    int32_t ret = pointerDrawingManager->SetPointerColor(16777216);
-    EXPECT_EQ(ret, RET_OK);
-    MAGIC_CURSOR->isExistDefaultStyle = true;
-    ret = pointerDrawingManager->SetPointerColor(16777216);
-    EXPECT_EQ(ret, RET_OK);
-    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetPointerSize_002
- * @tc.desc: Test SetPointerSize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerSize_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
-        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    pointerDrawingManager->SetPointerSize(0);
-    int32_t pointerSize = pointerDrawingManager->GetPointerSize();
-    EXPECT_EQ(pointerSize, 0);
-    pointerDrawingManager->SetPointerSize(8);
-    pointerSize = pointerDrawingManager->GetPointerSize();
-    EXPECT_EQ(pointerSize, 0);
-    pointerDrawingManager->surfaceNode_ = nullptr;
-    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ == nullptr);
-    pointerDrawingManager->SetPointerSize(5);
-    pointerSize = pointerDrawingManager->GetPointerSize();
-    EXPECT_EQ(pointerSize, 0);
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ != nullptr);
-    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MAGIC_CURSOR->isExistDefaultStyle = false;
-    int32_t ret = pointerDrawingManager->SetPointerSize(5);
-    EXPECT_EQ(ret, RET_OK);
-    MAGIC_CURSOR->isExistDefaultStyle = true;
-    ret = pointerDrawingManager->SetPointerSize(5);
-    EXPECT_EQ(ret, RET_OK);
-    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
 /**

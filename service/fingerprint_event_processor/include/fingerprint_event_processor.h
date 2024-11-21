@@ -63,7 +63,7 @@ private:
     template <class T>
     void CreateStatusConfigObserver(T& item);
     void StartSmartKeyIfNeeded();
-    bool StartSmartKey(bool isShowDialog);
+    void StartSmartKey(bool isShowDialog);
     void ProcessSlideEvent();
     void ProcessClickEvent();
     void ReportResSched(uint32_t resType, int64_t value);

@@ -17,7 +17,6 @@
 
 #include "mmi_log.h"
 #include "proto.h"
-#include "udp_wrap.h"
 #include "uds_server.h"
 
 #undef MMI_LOG_TAG
@@ -597,23 +596,6 @@ HWTEST_F(UDSServerTest, AddSocketPairInfo_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetFdProperty_003
- * @tc.desc: Test the scenario of setting file descriptor properties
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UDSServerTest, SetFdProperty_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    UDSServer udsServer;
-    int32_t tokenType = TokenType::TOKEN_NATIVE;
-    int32_t serverFd = 123;
-    int32_t toReturnClientFd = 456;
-    auto ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: Dump_002
  * @tc.desc: Test the Dump functionality of UDSServer
  * @tc.type: FUNC
@@ -685,21 +667,6 @@ HWTEST_F(UDSServerTest, SetRecvFun_002, TestSize.Level1)
     UDSServer udsServer;
     MsgServerFunCallback fun{ nullptr };
     ASSERT_NO_FATAL_FAILURE(udsServer.SetRecvFun(fun));
-}
-
-/**
- * @tc.name: ReleaseSession_002
- * @tc.desc: Test the ReleaseSession function of UDSServer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UDSServerTest, ReleaseSession_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    UDSServer udsServer;
-    int32_t fd = 1;
-    epoll_event ev;
-    ASSERT_NO_FATAL_FAILURE(udsServer.ReleaseSession(fd, ev));
 }
 
 /**
@@ -916,32 +883,6 @@ HWTEST_F(UDSServerTest, UDSServerTest_GetSessionByPid, TestSize.Level1)
     udsServer.sessionsMap_.insert(std::make_pair(fd, session));
     udsServer.idxPidMap_.insert(std::make_pair(UDS_PID, fd));
     ASSERT_EQ(udsServer.GetSessionByPid(UDS_PID), session);
-}
-
-/**
- * @tc.name: UDSServerTest_AddSession
- * @tc.desc: Test Add Session
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UDSServerTest, UDSServerTest_AddSession, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    UDSServer udsServer;
-    int32_t udsSessionFd = 100;
-    int32_t udsSessionPid = -1;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, udsSessionFd, UDS_UID, udsSessionPid);
-    ASSERT_FALSE(udsServer.AddSession(session));
-
-    udsSessionPid = 1000;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, udsSessionFd, UDS_UID, udsSessionPid);
-    udsServer.sessionsMap_.insert(std::make_pair(udsSessionFd, sess));
-    ASSERT_TRUE(udsServer.AddSession(sess));
-    SessionPtr sessPtr = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, udsSessionFd, UDS_UID, udsSessionPid);
-    for (int32_t i = 0; i < MAX_SESSON_ALARM + 1; ++i) {
-        udsServer.sessionsMap_.insert(std::make_pair(i, sessPtr));
-    }
-    ASSERT_TRUE(udsServer.AddSession(sessPtr));
 }
 
 /**

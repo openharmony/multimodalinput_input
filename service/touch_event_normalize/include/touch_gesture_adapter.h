@@ -37,6 +37,11 @@ private:
         SWIPE,
         PINCH,
     };
+
+    struct TouchItem {
+        bool cancelled_ { false };
+    };
+
     inline bool ShouldDeliverToNext() const
     {
         return shouldDeliverToNext_;
@@ -46,16 +51,18 @@ private:
     void OnSwipeGesture(std::shared_ptr<PointerEvent> event);
     void OnPinchGesture(std::shared_ptr<PointerEvent> event);
     void OnGestureSuccessful(std::shared_ptr<PointerEvent> event);
-    virtual bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode) override;
+    bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode) override;
+    void OnGestureTrend(std::shared_ptr<PointerEvent> event) override;
+    void UpdateTouchMovement(std::shared_ptr<PointerEvent> event);
 
 private:
-    bool hasCancel_ { false };
     bool gestureStarted_ { false };
     bool shouldDeliverToNext_ { true };
     TouchGestureType gestureType_ { TOUCH_GESTURE_TYPE_NONE };
     inline static GestureState state_ { GestureState::IDLE };
     std::shared_ptr<TouchGestureDetector> gestureDetector_ { nullptr };
     std::shared_ptr<TouchGestureAdapter> nextAdapter_ { nullptr };
+    std::map<int32_t, TouchItem> touches_;
 };
 } // namespace MMI
 } // namespace OHOS

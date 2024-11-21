@@ -40,7 +40,7 @@ public:
         using Promise = std::promise<int32_t>;
         using Future = std::future<int32_t>;
         using TaskPtr = std::shared_ptr<DelegateTasks::Task>;
-        Task(int32_t id, DTaskCallback fun, Promise *promise = nullptr)
+        Task(int32_t id, DTaskCallback fun, std::shared_ptr<Promise> promise = nullptr)
             : id_(id), fun_(fun), promise_(promise) {}
         ~Task() = default;
         void ProcessTask();
@@ -62,7 +62,7 @@ public:
         std::atomic_bool hasWaited_ { false };
         int32_t id_ { 0 };
         DTaskCallback fun_;
-        Promise* promise_ { nullptr };
+        std::shared_ptr<Promise> promise_ { nullptr };
     };
     using TaskPtr = Task::TaskPtr;
     using Promise = Task::Promise;
@@ -92,7 +92,7 @@ public:
 
 private:
     void PopPendingTaskList(std::vector<TaskPtr> &tasks);
-    TaskPtr PostTask(DTaskCallback callback, Promise *promise = nullptr);
+    TaskPtr PostTask(DTaskCallback callback, std::shared_ptr<Promise>promise = nullptr);
 
 private:
     uint64_t workerThreadId_ { 0 };

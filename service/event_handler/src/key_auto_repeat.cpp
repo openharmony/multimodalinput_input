@@ -60,7 +60,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     std::string fileName = KeyMapMgr->GetKeyEventFileName(device);
     DeviceConfig devConf;
     if (ReadTomlFile(GetTomlFilePath(fileName), devConf) != RET_OK) {
-        MMI_HILOGI("Can not read device config file");
+        MMI_HILOGD("Can not read device config file");
         return RET_ERR;
     }
     int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
@@ -108,15 +108,18 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
                 }
             }
             TimerMgr->RemoveTimer(timerId_);
+            keyEvent_->SetRepeatKey(false);
             timerId_ = -1;
             repeatKeyCode_ = -1;
         }
         int32_t delayTime = GetDelayTime();
+        keyEvent_->SetRepeatKey(true);
         AddHandleTimer(delayTime);
         repeatKeyCode_ = keyEvent_->GetKeyCode();
     }
     if (JudgeKeyEvent(keyEvent_) && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
+        keyEvent_->SetRepeatKey(false);
         timerId_ = -1;
         if (!JudgeLimitPrint(keyEvent_)) {
             MMI_HILOGI("Stop autorepeat, keyCode:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
@@ -140,6 +143,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
             int32_t delayTime = GetDelayTime();
+            keyEvent_->SetRepeatKey(true);
             AddHandleTimer(delayTime);
             if (!JudgeLimitPrint(keyEvent_)) {
                 MMI_HILOGD("The end keyboard autorepeat, keyCode:%{private}d", keyEvent_->GetKeyCode());

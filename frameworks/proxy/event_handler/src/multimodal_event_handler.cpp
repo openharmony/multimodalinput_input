@@ -102,7 +102,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (keyEvent->GetKeyCode() < 0) {
         if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+            MMI_HILOGE("KeyCode is invalid:%{private}u", keyEvent->GetKeyCode());
         }
         return RET_ERR;
     }
@@ -131,6 +131,21 @@ int32_t MultimodalEventHandler::UnsubscribeSwitchEvent(int32_t subscribeId)
     return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeSwitchEvent(subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
+
+int32_t MultimodalEventHandler::SubscribeLongPressEvent(int32_t subscribeId,
+    const LongPressRequest &longPressRequest)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeLongPressEvent(subscribeId, longPressRequest);
+}
+ 
+int32_t MultimodalEventHandler::UnsubscribeLongPressEvent(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeLongPressEvent(subscribeId);
+}
 
 bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 {

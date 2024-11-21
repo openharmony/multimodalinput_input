@@ -72,7 +72,7 @@ void AncoChannelStubExTest::TearDownTestCase()
 
 /**
  * @tc.name: AncoChannelStubExTest_StubSyncPointerEvent
- * @tc.desc:
+ * @tc.desc: Test StubSyncPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -89,7 +89,7 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncPointerEvent, Test
 
 /**
  * @tc.name: AncoChannelStubExTest_StubSyncPointerEvent_001
- * @tc.desc:
+ * @tc.desc: Test StubSyncPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -106,7 +106,7 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncPointerEvent_001, 
 
 /**
  * @tc.name: AncoChannelStubExTest_StubSyncKeyEvent
- * @tc.desc:
+ * @tc.desc: Test StubSyncKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -123,7 +123,7 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKeyEvent, TestSize
 
 /**
  * @tc.name: AncoChannelStubExTest_StubSyncKeyEvent_001
- * @tc.desc:
+ * @tc.desc: Test StubSyncKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -140,7 +140,7 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKeyEvent_001, Test
 
 /**
  * @tc.name: AncoChannelStubExTest_StubUpdateWindowInfo
- * @tc.desc:
+ * @tc.desc: Test StubUpdateWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
