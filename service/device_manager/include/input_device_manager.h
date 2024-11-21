@@ -76,6 +76,7 @@ public:
     struct libinput_device* GetKeyboardDevice() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
+    bool HasVirtualPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasTouchDevice();
     const std::string& GetScreenId(int32_t deviceId) const;
