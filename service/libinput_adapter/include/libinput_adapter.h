@@ -31,21 +31,22 @@ typedef std::function<void(void *event, int64_t frameTime)> FunInputEvent;
 typedef std::function<bool(double x, double y)> IsInsideVKeyboardArea;
 typedef std::function<bool()> IsKeyboardVisible;
 typedef std::function<void(double screenX, double screenY, int touchId, bool tipDown, std::string& buttonName,
-    long long timestamp, bool updateDynamicGaussian, std::vector<std::pair<std::string, double>>& sortedNegLogProb)> MapTouchToButton;
+    long long timestamp, bool updateDynamicGaussian,
+    std::vector<std::pair<std::string, double>>& sortedNegLogProb)> MapTouchToButton;
 
 typedef std::function<void(double screenX, double screenY, int touchId, bool tipDown, std::string buttonName)> KeyDown;
 typedef std::function<void(double screenX, double screenY, int touchId, bool tipDown, std::string buttonName)> KeyUp;
 typedef std::function<int32_t(double screenX, double screenY, int touchId, bool tipDown)> HandleTouchPoint;
-typedef std::function<int32_t(std::string& buttonName, std::string& toggleButtonName, int& buttonMode, std::string& RestList)> GetMessage;
+typedef std::function<int32_t(std::string& buttonName, std::string& toggleButtonName, int& buttonMode, std::string& RestList)>
+                              GetMessage;
 typedef std::function<int32_t(std::string keyName)> GetKeyCodeByKeyName;
 
-enum VKeyboardMessageType
-{
+enum VKeyboardMessageType {
     VNoMessage = -1,
     VKeyPressed = 0,
     VCombinationKeyPressed = 1,
     VStartBackspace = 12,
-    VStopBackspace =13,
+    VStopBackspace = 13,
 };
 class LibinputAdapter final {
 public:
@@ -64,14 +65,14 @@ public:
         return std::array{fd_, hotplugDetector_.GetFd()};
     }
 	
-	void InitVKeyboard(HandleTouchPoint handleTouchPoint,
-					IsInsideVKeyboardArea isInsideVKeyboardArea,
-					IsKeyboardVisible isKeyboardVisible,
-					MapTouchToButton mapTouchToButton,
-					KeyDown keyDown,
-					KeyUp keyUp,
-					GetMessage getMessage,
-					GetKeyCodeByKeyName getKeyCodeByKeyName);
+    void InitVKeyboard(HandleTouchPoint handleTouchPoint,
+                    IsInsideVKeyboardArea isInsideVKeyboardArea,
+                    IsKeyboardVisible isKeyboardVisible,
+                    MapTouchToButton mapTouchToButton,
+                    KeyDown keyDown,
+                    KeyUp keyUp,
+                    GetMessage getMessage,
+                    GetKeyCodeByKeyName getKeyCodeByKeyName);
 
 private:
     void OnEventHandler();
@@ -85,7 +86,7 @@ private:
     libinput *input_ { nullptr };
 
     FunInputEvent funInputEvent_;
-	HandleTouchPoint handleTouchPoint_ { nullptr };
+    HandleTouchPoint handleTouchPoint_ { nullptr };
     IsInsideVKeyboardArea isInsideVKeyboardArea_ { nullptr };
     IsKeyboardVisible isKeyboardVisible_ { nullptr };
     MapTouchToButton mapTouchToButton_ { nullptr };
