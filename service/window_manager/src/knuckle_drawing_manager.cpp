@@ -175,9 +175,12 @@ void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> tou
     CreateObserver();
     int32_t touchAction = touchEvent->GetPointerAction();
     if (IsValidAction(touchAction) && IsSingleKnuckleDoubleClick(touchEvent)) {
-        int32_t displayId = touchEvent->GetTargetDisplayId();
-        CreateTouchWindow(displayId);
-        StartTouchDraw(touchEvent);
+        bool isNeedKnuckleDrawing = (touchEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;
+        if (isNeedKnuckleDrawing) {
+            int32_t displayId = touchEvent->GetTargetDisplayId();
+            CreateTouchWindow(displayId);
+            StartTouchDraw(touchEvent);
+        }
     }
 }
 
@@ -240,8 +243,7 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
         DestoryWindow();
     }
     if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
-        (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty())) ||
-        (action == PointerEvent::POINTER_ACTION_PULL_MOVE && (!pointerInfos_.empty())) ||
+        action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_PULL_MOVE ||
         action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
         return true;
     }
