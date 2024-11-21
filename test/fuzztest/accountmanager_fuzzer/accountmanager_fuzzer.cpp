@@ -16,14 +16,32 @@
 #include "account_manager.h"
 #include "accountmanager_fuzzer.h"
 
+#include "securec.h"
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AccountManagerFuzzTest"
 
 namespace OHOS {
 namespace MMI {
+template<class T>
+size_t GetObject(T &object, const uint8_t *data, size_t size)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
 
 bool AccountManagerFuzzTest(const uint8_t *data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     ACCOUNT_MGR->GetCurrentAccountSetting();
     ACCOUNT_MGR->SubscribeCommonEvent();
     ACCOUNT_MGR->UnsubscribeCommonEvent();

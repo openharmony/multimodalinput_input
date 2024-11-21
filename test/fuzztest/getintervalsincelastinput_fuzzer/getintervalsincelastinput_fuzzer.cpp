@@ -41,6 +41,9 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
 
 void GetIntervalSinceLastInputFuzzTest(const uint8_t* data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     int64_t timeInterval = -1;
     InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
 }
