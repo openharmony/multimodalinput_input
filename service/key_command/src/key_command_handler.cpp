@@ -1059,7 +1059,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
     if (WIN_MGR->JudgeCaramaInFore() &&
-        (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked)) {
+        (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked)) {
             return true;
     }
     auto callState = DEVICE_MONITOR->GetCallState();
@@ -1661,7 +1661,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
         int64_t intervalTime = intervalTime_;
         if (item.keyCode == KeyEvent::KEYCODE_POWER) {
             intervalTime = intervalTime_ - (upActionTime_ - downActionTime_);
-            if (walletLaunchDelayTimes_ != 0 && intervalTime < walletLaunchDelayTimes_) {
+            if (walletLaunchDelayTimes_ != 0) {
                 intervalTime = walletLaunchDelayTimes_;
             }
         }
