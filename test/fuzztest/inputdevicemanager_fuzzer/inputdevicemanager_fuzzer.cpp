@@ -17,14 +17,33 @@
 #include "input_device_manager.h"
 #include "inputdevicemanager_fuzzer.h"
 
+#include "securec.h"
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputDeviceManagerFuzzTest"
 
 namespace OHOS {
 namespace MMI {
 namespace OHOS {
+template<class T>
+size_t GetObject(T &object, const uint8_t *data, size_t size)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
+
 bool InputDeviceManagerFuzzTest(const uint8_t *data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     int32_t id = 1;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
