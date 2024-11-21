@@ -77,6 +77,7 @@ public:
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
     MOCK_METHOD(bool, IsMouseSimulate, (), (const));
+    MOCK_METHOD(bool, HasMouseHideFlag, (), (const));
     MOCK_METHOD(bool, SelectPointerChangeArea, (int32_t, int32_t, int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER
 
