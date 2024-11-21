@@ -164,6 +164,20 @@ void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
         *work = nullptr;
     }
 }
+
+std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
+    { "none", HANDLE_EVENT_TYPE_NONE },
+    { "key", HANDLE_EVENT_TYPE_KEY },
+    { "pointer", HANDLE_EVENT_TYPE_POINTER },
+    { "touch", HANDLE_EVENT_TYPE_TOUCH },
+    { "mouse", HANDLE_EVENT_TYPE_MOUSE },
+    { "pinch", HANDLE_EVENT_TYPE_PINCH },
+    { "threeFingersSwipe", HANDLE_EVENT_TYPE_THREEFINGERSSWIP },
+    { "fourFingersSwipe", HANDLE_EVENT_TYPE_FOURFINGERSSWIP },
+    { "rotate", HANDLE_EVENT_TYPE_ROTATE },
+    { "threeFingersTap", HANDLE_EVENT_TYPE_THREEFINGERSTAP },
+    { "fingerprint", HANDLE_EVENT_TYPE_FINGERPRINT },
+};
 } // namespace
 
 int32_t InputMonitor::Start(const std::string &typeName)
@@ -175,7 +189,12 @@ int32_t InputMonitor::Start(const std::string &typeName)
         if (it != TO_GESTURE_TYPE.end()) {
             monitorId_ = InputManager::GetInstance()->AddGestureMonitor(shared_from_this(), it->second, fingers_);
         } else {
-            monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
+            int32_t eventType = 0;
+            auto it = TO_HANDLE_EVENT_TYPE.find(typeName.c_str());
+            if (it != TO_HANDLE_EVENT_TYPE.end()) {
+                eventType = it->second;
+            }
+            monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this(), eventType);
         }
     }
     return monitorId_;
