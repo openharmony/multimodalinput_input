@@ -45,6 +45,8 @@ constexpr int32_t ACTIVE_EVENT { 2 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t POWER_UID { 5528 };
+constexpr int32_t THREE_FINGERS { 3 };
+constexpr int32_t FOUR_FINGERS { 4 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -237,7 +239,7 @@ bool EventMonitorHandler::SessionHandler::Expect(std::shared_ptr<PointerEvent> p
         return (((eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) &&
             gesture_.IsMatchGesture(pointerEvent->GetPointerAction(), pointerEvent->GetPointerCount()));
     } else {
-        return ((eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER);
+        return ((eventType_ & HANDLE_EVENT_TYPE_ALL) == eventType_);
     }
 }
 
@@ -615,7 +617,7 @@ void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler
                 pointerEvent->GetPointerAction(),
                 pointerEvent->GetFingerCount());
         }
-        if (monitor.session_) {
+        if (monitor.session_ && CheckIfNeedSendToClient(monitor, pointerEvent)) {
             monitor.SendToClient(pointerEvent, pkt);
             return;
         }
@@ -670,6 +672,122 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+bool EventMonitorHandler::MonitorCollection::IsPinch(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE &&
+        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        return false;
+    }
+    if ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_END)) {
+        return false;
+    }
+    return true;
+}
+
+bool EventMonitorHandler::MonitorCollection::IsRotate(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_END)) {
+        return false;
+    }
+    return true;
+}
+
+
+bool EventMonitorHandler::MonitorCollection::IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetFingerCount() != THREE_FINGERS ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        return false;
+    }
+    return true;
+}
+
+bool EventMonitorHandler::MonitorCollection::IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetFingerCount() != FOUR_FINGERS ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        return false;
+    }
+    return true;
+}
+
+bool EventMonitorHandler::MonitorCollection::IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetFingerCount() != THREE_FINGERS ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_TRIPTAP)) {
+        return false;
+    }
+    return true;
+}
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+bool EventMonitorHandler::MonitorCollection::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
+        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
+            return true;
+    }
+    MMI_HILOGD("not fingerprint event");
+    return false;
+}
+#endif
+bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(SessionHandler monitor,
+    std::shared_ptr<PointerEvent> pointerEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    if((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) ==
+        HANDLE_EVENT_TYPE_FINGERPRINT && IsFingerprint(pointerEvent)) {
+        return true;
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH) == HANDLE_EVENT_TYPE_TOUCH &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_MOUSE) == HANDLE_EVENT_TYPE_MOUSE &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_PINCH) == HANDLE_EVENT_TYPE_PINCH &&
+        IsPinch(pointerEvent)) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_THREEFINGERSSWIP) == HANDLE_EVENT_TYPE_THREEFINGERSSWIP &&
+        IsThreeFingersSwipe(pointerEvent)) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FOURFINGERSSWIP) == HANDLE_EVENT_TYPE_FOURFINGERSSWIP &&
+        IsFourFingersSwipe(pointerEvent)) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_ROTATE) == HANDLE_EVENT_TYPE_ROTATE &&
+        IsRotate(pointerEvent)) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_THREEFINGERSTAP) == HANDLE_EVENT_TYPE_THREEFINGERSTAP &&
+        IsThreeFingersTap(pointerEvent)) {
+        return true;
+    }
+    return false;
+}
 
 void EventMonitorHandler::MonitorCollection::OnSessionLost(SessionPtr session)
 {
