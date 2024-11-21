@@ -246,13 +246,16 @@ std::unordered_map<std::string, int32_t> LibinputAdapter::keyCodes_ = {
     { "Btn_UP", 107 }, { "Btn_DOWN", 108 }, { "Btn_RIGHT", 106 },
 };
 
-void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCode, libinput_key_state state, int64_t frameTime)
+void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCode,
+                                     libinput_key_state state, int64_t frameTime)
 {
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     libinput_event_keyboard* key_event_pressed =
             libinput_create_keyboard_event(touch, keyCode, state);
 
     funInputEvent_((libinput_event*)key_event_pressed, frameTime);
     free(key_event_pressed);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 void LibinputAdapter::InjectCombinationKeyEvent(libinput_event_touch* touch, std::vector<int32_t>& toggleKeyCodes,
@@ -277,7 +280,6 @@ void LibinputAdapter::OnEventHandler()
     while ((event = libinput_get_event(input_))) {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         libinput_event_type eventType = libinput_event_get_type(event);
-
         if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
@@ -317,7 +319,7 @@ void LibinputAdapter::OnEventHandler()
             }
 
             MMI_HILOGD("#### touch event. deviceId: %d, touchId: %d, x: %d, y: %d, type: %d", deviceId,
-                    touchId, (int)x, (int)y, (int)eventType);
+                       touchId, (int)x, (int)y, (int)eventType);
 
             if (handleTouchPoint_(x, y, touchId, tipDown) == 0) {
                 MMI_HILOGD("#### inside vkeyboard area");
@@ -327,7 +329,8 @@ void LibinputAdapter::OnEventHandler()
                     std::string toggleButtonName;
                     int buttonMode;
                     std::string restList;
-                    VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(buttonName, toggleButtonName, buttonMode, restList);
+                    VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(buttonName, toggleButtonName,
+                                                                                  buttonMode, restList);
                     MMI_HILOGD("#### get message type: %d", (int)type);
                     if (type == VNoMessage) {
                         break;
@@ -343,13 +346,13 @@ void LibinputAdapter::OnEventHandler()
                         }
                         case VKeyboardMessageType::VCombinationKeyPressed: {
                             MMI_HILOGD("#### combination key. triger button: %s, toggle button: %s",
-                                        buttonName.c_str(), toggleButtonName.c_str());
+                                    buttonName.c_str(), toggleButtonName.c_str());
 
                             std::vector<int32_t> toggleKeyCodes;
                             std::string remainStr = toggleButtonName;
                             int32_t toggleCode(-1), triggerCode(-1);
                             while (remainStr.find(';') != std::string::npos) {
-                                // still has more than one 
+                                // still has more than one
                                 size_t pos = remainStr.find(';');
                                 toggleCode = keyCodes_[remainStr.substr(0, pos)];
                                 if (toggleCode >= 0) {
@@ -378,7 +381,7 @@ void LibinputAdapter::OnEventHandler()
                 funInputEvent_(event, frameTime);
                 libinput_event_destroy(event);
             }
-		} else {
+        } else {
             funInputEvent_(event, frameTime);
             libinput_event_destroy(event);
         }
