@@ -62,6 +62,9 @@ void SetPointerSizeFuzzTest(const uint8_t* data, size_t size)
 
 void GetAllMmiSubscribedEventsFuzzTest(const uint8_t* data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> map;
     MMI_HILOGD("GetAllMmiSubscribedEventsFuzzTest start");
     InputManager::GetInstance()->GetAllMmiSubscribedEvents(map);
@@ -69,6 +72,9 @@ void GetAllMmiSubscribedEventsFuzzTest(const uint8_t* data, size_t size)
 
 void SetNapStatusFuzzTest(const uint8_t* data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     int32_t pid = 10;
     int32_t uid = 20;
     std::string bundleName = "name";
@@ -78,6 +84,9 @@ void SetNapStatusFuzzTest(const uint8_t* data, size_t size)
 
 void SetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     bool isHoverState = true;
     InputManager::GetInstance()->SetHoverScrollState(isHoverState);
     bool notHoverState = false;
@@ -88,6 +97,9 @@ void SetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
 
 void PointerColorFuzzTest(const uint8_t* data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     int32_t firstColor = 0xA946F1;
     InputManager::GetInstance()->SetPointerColor(firstColor);
     int32_t getColor = 3;
@@ -96,6 +108,9 @@ void PointerColorFuzzTest(const uint8_t* data, size_t size)
 
 void ClearWindowPointerStyleFuzzTest(const uint8_t* data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     int32_t pid = 0;
     int32_t uid = 0;
     InputManager::GetInstance()->ClearWindowPointerStyle(pid, uid);
@@ -103,6 +118,9 @@ void ClearWindowPointerStyleFuzzTest(const uint8_t* data, size_t size)
 
 void SetKeyboardRepeatDelayFuzzTest(const uint8_t* data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     int32_t delayTime = 10;
     InputManager::GetInstance()->SetKeyboardRepeatDelay(delayTime);
 }

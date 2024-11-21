@@ -15,6 +15,7 @@
 
 #include "stubgetpointersnapshot_fuzzer.h"
 
+#include "securec.h"
 #include "singleton.h"
 
 #include "mmi_service.h"
@@ -25,11 +26,27 @@
 
 namespace OHOS {
 namespace MMI {
+template<class T>
+size_t GetObject(T &object, const uint8_t *data, size_t size)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 bool StubGetPointerSnapshotFuzzTest(const uint8_t *data, size_t size)
 {
+    size_t startPos = 0;
+    int32_t rowsBefore;
+    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
