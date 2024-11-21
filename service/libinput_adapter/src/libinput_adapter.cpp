@@ -346,7 +346,7 @@ void LibinputAdapter::OnEventHandler()
                         }
                         case VKeyboardMessageType::VCombinationKeyPressed: {
                             MMI_HILOGD("#### combination key. triger button: %s, toggle button: %s",
-                                    buttonName.c_str(), toggleButtonName.c_str());
+                                       buttonName.c_str(), toggleButtonName.c_str());
 
                             std::vector<int32_t> toggleKeyCodes;
                             std::string remainStr = toggleButtonName;
@@ -374,9 +374,7 @@ void LibinputAdapter::OnEventHandler()
                         default: break;
                     }
                 }
-                
                 libinput_event_destroy(event);
-                
             } else {
                 funInputEvent_(event, frameTime);
                 libinput_event_destroy(event);
