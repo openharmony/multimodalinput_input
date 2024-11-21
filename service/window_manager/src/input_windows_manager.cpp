@@ -2767,13 +2767,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsMouseDrawing(pointerEvent->GetPointerAction())) {
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-            MMI_HILOGE("SetMouseDisplayState false");
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
-        } else {
-            MMI_HILOGE("SetMouseDisplayState true");
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
-        }
-        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         } else {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
