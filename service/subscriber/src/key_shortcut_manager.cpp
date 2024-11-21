@@ -297,7 +297,7 @@ void KeyShortcutManager::LoadExceptionalSystemKeys()
     char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
 
     if (cfgPath == nullptr) {
-        MMI_HILOGE("No '%{public}s' was found", cfgPath);
+        MMI_HILOGE("GetoneCfgFile failed");
         return;
     }
     MMI_HILOGI("Config of exceptional system keys:%{public}s", cfgPath);
