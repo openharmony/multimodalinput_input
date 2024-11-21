@@ -451,7 +451,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
 
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
 {
-    MMI_HILOGI("TransferKeyValue into, keyValueOfInput:%{public}d", keyValueOfInput);
+    MMI_HILOGD("TransferKeyValue into, keyValueOfInput:%{public}d", keyValueOfInput);
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         static constexpr int32_t unknownKeyBase = 10000;
