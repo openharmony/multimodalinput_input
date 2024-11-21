@@ -2517,8 +2517,6 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int3
     if (pidInfos_.size() > VISIBLE_LIST_MAX_SIZE) {
         pidInfos_.pop_front();
     }
-    MMI_HILOGI("hideflag:%{public}d, pointerdevice:%{public}d", WIN_MGR->HasMouseHideFlag(),
-        INPUT_DEV_MGR->HasPointerDevice());
     if (!WIN_MGR->HasMouseHideFlag() || INPUT_DEV_MGR->HasPointerDevice()) {
         UpdatePointerVisible();
     }
