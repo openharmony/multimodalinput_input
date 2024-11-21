@@ -755,7 +755,7 @@ bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(SessionHand
     std::shared_ptr<PointerEvent> pointerEvent)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    if((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) ==
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) ==
         HANDLE_EVENT_TYPE_FINGERPRINT && IsFingerprint(pointerEvent)) {
         return true;
     }
