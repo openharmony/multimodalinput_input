@@ -56,7 +56,7 @@ constexpr int32_t INVALID_KEY_ACTION { -1 };
 constexpr int32_t MAX_WINDOW_SIZE { 15 };
 constexpr int32_t INPUT_SUCCESS { 0 };
 constexpr int32_t INPUT_PERMISSION_DENIED { 201 };
-constexpr int32_t INPUT_OCCUPIED_BY_OTHER { 4200003 };
+[[ maybe_unused ]] constexpr int32_t INPUT_OCCUPIED_BY_OTHER { 4200003 };
 const std::map<int32_t, int32_t> g_keyActionMap = {
     {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
     {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
