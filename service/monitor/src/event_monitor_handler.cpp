@@ -750,10 +750,11 @@ bool EventMonitorHandler::MonitorCollection::IsFingerprint(std::shared_ptr<Point
     MMI_HILOGD("not fingerprint event");
     return false;
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(SessionHandler monitor,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) ==
         HANDLE_EVENT_TYPE_FINGERPRINT && IsFingerprint(pointerEvent)) {

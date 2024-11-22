@@ -641,11 +641,12 @@ bool InputHandlerManager::IsFingerprintType(std::shared_ptr<PointerEvent> pointe
     MMI_HILOGD("not fingerprint event");
     return false;
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 bool InputHandlerManager::CheckIfNeedAddToConsumerInfos(const Handler &monitor,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT &&
         IsFingerprintType(pointerEvent)) {
