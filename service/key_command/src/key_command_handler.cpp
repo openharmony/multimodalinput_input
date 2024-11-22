@@ -1502,7 +1502,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
 bool KeyCommandHandler::IsMusicActivate()
 {
     CALL_INFO_TRACE;
-    std::vector<std::unique_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
+    std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
     auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
     if (ret != ERR_OK) {
         MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
@@ -1513,7 +1513,7 @@ bool KeyCommandHandler::IsMusicActivate()
         return false;
     }
     for (const auto &info : rendererChangeInfo) {
-        if (info->rendererState == AudioStandard::RENDERER_RUNNING && 
+        if (info->rendererState == AudioStandard::RENDERER_RUNNING &&
             (info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
             info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
             MMI_HILOGI("Find music activate");
