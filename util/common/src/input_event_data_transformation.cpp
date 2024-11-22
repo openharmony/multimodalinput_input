@@ -160,7 +160,11 @@ int32_t InputEventDataTransformation::NetPacketToSwitchEvent(NetPacket &pkt, std
 int32_t InputEventDataTransformation::LongPressEventToNetPacket(const LongPressEvent &longPressEvent, NetPacket &pkt)
 {
     pkt << longPressEvent.fingerCount << longPressEvent.duration << longPressEvent.pid << longPressEvent.displayId
-        << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result;
+        << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result << longPressEvent.windowId;
+    if (!pkt.Write(longPressEvent.bundleName)) {
+        MMI_HILOGE("Packet write long press event failed");
+        return RET_ERR;
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return RET_ERR;
@@ -185,6 +189,12 @@ int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, 
     longPressEvent.displayY = data;
     pkt >> data;
     longPressEvent.result = data;
+    pkt >> data;
+    longPressEvent.windowId = data;
+    if (!pkt.Read(longPressEvent.bundleName)) {
+        MMI_HILOGE("Packet read long press event failed");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 

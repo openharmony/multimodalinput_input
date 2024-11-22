@@ -40,6 +40,7 @@
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_command_handler_util.h"
+#include "long_press_subscriber_handler.h"
 #include "mmi_log.h"
 #include "nap_process.h"
 #include "net_packet.h"
@@ -184,6 +185,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         case PointerEvent::POINTER_ACTION_MOVE: {
             HandlePointerActionMoveEvent(touchEvent);
+            LONG_PRESS_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
             break;
         }
         case PointerEvent::POINTER_ACTION_DOWN: {
@@ -214,6 +216,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureDownEvent(touchEvent);
+            LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
@@ -273,6 +276,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureUpEvent(touchEvent);
+            LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {

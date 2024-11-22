@@ -16,8 +16,6 @@
 #ifndef LONG_PRESS_EVENT_H
 #define LONG_PRESS_EVENT_H
 
-#include <iostream>
-
 namespace OHOS {
 namespace MMI {
 struct LongPressRequest {
@@ -33,6 +31,8 @@ struct LongPressEvent {
     int32_t displayX;
     int32_t displayY;
     int32_t result; // If the value is 0, it indicates correct reporting; non-zero indicates cancellation
+    int32_t windowId;
+    std::string bundleName;
 };
 } // namespace MMI
 } // namespace OHOS

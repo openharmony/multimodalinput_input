@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
-constexpr int32_t MAX_FINGER_COUNT { 3 };
+constexpr int32_t MAX_FINGER_COUNT { 2 };
 constexpr int32_t MAX_DURATION { 3000 };
 } // namespace
 int32_t LongPressEventSubscribeManager::subscribeManagerId_ = 0;
@@ -50,8 +50,8 @@ int32_t LongPressEventSubscribeManager::SubscribeLongPressEvent(
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, ERROR_NULL_POINTER);
-    if (longPressRequest.fingerCount <= 0 || longPressRequest.fingerCount > MAX_FINGERS_COUNT ||
-        longPressRequest.duration < 0 || longPressRequest.duration > MAX_DURATION) {
+    if (longPressRequest.fingerCount <= 0 || longPressRequest.fingerCount > MAX_FINGER_COUNT ||
+        longPressRequest.duration <= 0 || longPressRequest.duration > MAX_DURATION) {
         MMI_HILOGE("FingerCount or duration is invalid");
         return RET_ERR;
     }
@@ -100,7 +100,7 @@ int32_t LongPressEventSubscribeManager::UnsubscribeLongPressEvent(int32_t subscr
         subscribeInfos_.erase(it);
         return RET_OK;
     }
-
+    MMI_HILOGE("Failed to unsubscribe long press event, subscribeId:%{public}d", subscribeId);
     return RET_ERR;
 }
 
@@ -121,11 +121,12 @@ int32_t LongPressEventSubscribeManager::OnSubscribeLongPressEventCallback(const 
     }
     CHKPR(callback, ERROR_NULL_POINTER);
     callback(longPressEvent);
-    MMI_HILOGI("LongPressEvent fingerCount:%{public}d, duration:%{public}d, pid:%{public}d, displayId:%{public}d,"
-        "displayX:%{public}d, displayY:%{public}d, result:%{public}d, subscribeId:%{public}d",
+    MMI_HILOGD("LongPressEvent fingerCount:%{public}d, duration:%{public}d, pid:%{public}d, displayId:%{public}d, "
+        "displayX:%{public}d, displayY:%{public}d, result:%{public}d, windowId:%{public}d, bundleName:%{public}s, "
+        "subscribeId:%{public}d",
         longPressEvent.fingerCount, longPressEvent.duration, longPressEvent.pid,
         longPressEvent.displayId, longPressEvent.displayX, longPressEvent.displayY,
-        longPressEvent.result, subscribeId);
+        longPressEvent.result, longPressEvent.windowId, longPressEvent.bundleName.c_str(), subscribeId);
     return RET_OK;
 }
 
@@ -141,7 +142,7 @@ void LongPressEventSubscribeManager::OnConnected()
         LongPressRequest longPressRequest = subscribeInfo.GetLongPressRequest();
         int32_t ret = MMIEventHdl.SubscribeLongPressEvent(it->first, longPressRequest);
         if (ret != RET_OK) {
-            MMI_HILOGE("Subscribe switch event failed, ret:%{public}d", ret);
+            MMI_HILOGE("Subscribe long pres event failed, ret:%{public}d", ret);
         }
     }
 }
