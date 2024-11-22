@@ -366,6 +366,7 @@ void KnuckleDrawingManager::InitParticleEmitter()
     std::vector<Rosen::ParticleParams> particleParams;
     particleParams.push_back(params);
     brushCanvasNode_->SetParticleParams(particleParams);
+    isNeedInitParticleEmitter_ = false;
 }
 
 void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
@@ -410,7 +411,6 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     brushCanvasNode_->ResetSurface(scaleW_, scaleH_);
     trackCanvasNode_->ResetSurface(scaleW_, scaleH_);
-    InitParticleEmitter();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 #else
@@ -756,6 +756,37 @@ void KnuckleDrawingManager::ActionUpAnimation()
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
+int32_t KnuckleDrawingManager::ProcessUpEvent(bool isNeedUpAnimation)
+{
+    CALL_DEBUG_ENTER;
+    isActionUp_ = false;
+    isNeedInitParticleEmitter_ = true;
+    pathInfos_.clear();
+    pathLength_ = 0.0f;
+    brushPathLength_ = 0.0f;
+    trackColorR_ = 0x00;
+    trackColorG_ = 0x00;
+    trackColorB_ = 0x00;
+    if (ClearBrushCanvas() != RET_OK) {
+        MMI_HILOGE("ClearBrushCanvas failed");
+        return RET_ERR;
+    }
+    if (isNeedUpAnimation) {
+        ActionUpAnimation();
+        int32_t repeatTime = 1;
+        int32_t timerId = TimerMgr->AddTimer(PROTOCOL_DURATION, repeatTime, [this]() {
+            DestoryWindow();
+        });
+        if (timerId < 0) {
+            MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
+            DestoryWindow();
+        }
+    } else {
+        DestoryWindow();
+    }
+    return RET_OK;
+}
+
 int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -764,8 +795,15 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         MMI_HILOGD("GetPointerPos failed");
         return RET_ERR;
     }
+    bool needDrawParticle = (touchEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;
     if (!isActionUp_) {
-        UpdateEmitter();
+        if (needDrawParticle) {
+            if (isNeedInitParticleEmitter_) {
+                InitParticleEmitter();
+            } else {
+                UpdateEmitter();
+            }
+        }
         path_.MoveTo(pointerInfos_[POINT_INDEX0].x, pointerInfos_[POINT_INDEX0].y);
         path_.CubicTo(pointerInfos_[POINT_INDEX1].x, pointerInfos_[POINT_INDEX1].y,
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,
@@ -778,28 +816,8 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         DrawTrackCanvas();
         DrawBrushCanvas();
     } else {
-        MMI_HILOGE("The isActionUp_ is true");
-        isActionUp_ = false;
-        pathInfos_.clear();
-        pathLength_ = 0.0f;
-        brushPathLength_ = 0.0f;
-        trackColorR_ = 0x00;
-        trackColorG_ = 0x00;
-        trackColorB_ = 0x00;
-        if (ClearBrushCanvas() != RET_OK) {
-            MMI_HILOGE("ClearBrushCanvas failed");
-            return RET_ERR;
-        }
-        ActionUpAnimation();
-        int32_t repeatTime = 1;
-        int32_t timerId = TimerMgr->AddTimer(PROTOCOL_DURATION, repeatTime, [this]() {
-            DestoryWindow();
-        });
-        if (timerId < 0) {
-            MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
-            DestoryWindow();
-        }
-        return RET_OK;
+        MMI_HILOGE("isActionUp_ is true");
+        return ProcessUpEvent(needDrawParticle);
     }
     path_.Reset();
     return RET_OK;
