@@ -264,12 +264,12 @@ ohos_shared_library("libmmi-server") {
   }
 
   external_deps = [
+    "audio_framework:audio_client",
     "cJSON:cjson",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "graphic_2d:librender_service_base",
     "samgr:samgr_proxy",
-    "audio_framework:audio_client",
   ]
 
   if (input_feature_pointer_drawing) {
