@@ -193,7 +193,7 @@ int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, 
     longPressEvent.windowId = data;
     if (!pkt.Read(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet read long press event failed");
-        return RET_ERR;      
+        return RET_ERR;
     }
     return RET_OK;
 }
