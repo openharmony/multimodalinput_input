@@ -140,7 +140,7 @@ void LongPressSubscriberHandler::RemoveDurationTimer(int32_t fingerCount, int32_
     }
 }
 
-void LongPressSubscriberHandler::AddSessSubscriber(const std::shared_ptr<Subscriber> &subscriber)
+void LongPressSubscriberHandler::AddSessSubscriber(const std::shared_ptr<Subscriber> subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(subscriber);
@@ -186,7 +186,7 @@ void LongPressSubscriberHandler::OnSubscribeLongPressEvent(int32_t fingerCount, 
     }
 }
 
-void LongPressSubscriberHandler::InsertSubScriber(const std::shared_ptr<Subscriber> &subscriber)
+void LongPressSubscriberHandler::InsertSubScriber(const std::shared_ptr<Subscriber> subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(subscriber);
@@ -230,18 +230,13 @@ void LongPressSubscriberHandler::OnSessionDelete(SessionPtr sess)
     }
 }
 
-void LongPressSubscriberHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent,
-    int64_t abilityStartDelay,
-    std::function<void(int32_t displayX1, int32_t displayY1, int32_t displayX2, int32_t displayY2)> callback)
+void LongPressSubscriberHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    CHKPV(callback);
-    abilityStartDelay_ = abilityStartDelay;
     auto fingerCount = touchEvent->GetPointerIds().size();
     if (fingerCount > 0 && fingerCount <= TwoFingerGesture::MAX_TOUCH_NUM) {
         touchEvent_ = touchEvent;
-        callback_ = callback;
         int32_t id = touchEvent->GetPointerId();
         PointerEvent::PointerItem item;
         touchEvent->GetPointerItem(id, item);
@@ -272,11 +267,11 @@ void LongPressSubscriberHandler::HandleFingerGestureDownEvent(const std::shared_
     }
 }
 
-void LongPressSubscriberHandler::HandleFingerGestureMoveEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void LongPressSubscriberHandler::HandleFingerGestureMoveEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (isAllTimerClosed && abilityTimerId_ == -1) {
+    if (isAllTimerClosed) {
         MMI_HILOGD("Finger gesture has stopped");
         return;
     }
@@ -307,11 +302,11 @@ void LongPressSubscriberHandler::HandleFingerGestureMoveEvent(const std::shared_
     }   
 }
 
-void LongPressSubscriberHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void LongPressSubscriberHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (isAllTimerClosed && abilityTimerId_ == -1) {
+    if (isAllTimerClosed) {
         MMI_HILOGD("Finger gesture has stopped");
         return;
     }
@@ -323,7 +318,7 @@ void LongPressSubscriberHandler::HandleFingerGestureUpEvent(const std::shared_pt
     StopFingerGesture();
 }
 
-void LongPressSubscriberHandler::CheckFingerGestureCancelEvent(const std::shared_ptr<PointerEvent> &touchEvent) const
+void LongPressSubscriberHandler::CheckFingerGestureCancelEvent(const std::shared_ptr<PointerEvent> touchEvent) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -395,16 +390,6 @@ void LongPressSubscriberHandler::StartFingerGesture(int32_t fingerCount)
         });
     }
     isAllTimerClosed = false;
-    if (fingerCount == TWO_FINGER) {
-        abilityTimerId_ = TimerMgr->AddTimer(abilityStartDelay_, 1, [this, fingerCount]() {
-            abilityTimerId_ = -1;
-            if (!CheckFingerGestureAction(fingerCount)) {
-                return;
-            }
-            callback_(fingerGesture_.touches[0].x, fingerGesture_.touches[0].y, fingerGesture_.touches[1].x,
-                fingerGesture_.touches[1].y);
-        });
-    }
 }
 
 void LongPressSubscriberHandler::StopFingerGesture()
@@ -415,10 +400,6 @@ void LongPressSubscriberHandler::StopFingerGesture()
             TimerMgr->RemoveTimer(durationTimer.timerId);
             durationTimer.timerId = -1;
         }
-    }
-    if (abilityTimerId_ != -1) {
-        TimerMgr->RemoveTimer(abilityTimerId_);
-        abilityTimerId_ = -1;
     }
     isAllTimerClosed = true;
 }
@@ -510,7 +491,7 @@ int32_t LongPressSubscriberHandler::GetBundleName(std::string &bundleName, int32
     return RET_ERR;
 }
 
-void LongPressSubscriberHandler::NotifySubscriber(const std::shared_ptr<Subscriber> &subscriber, int32_t result) const
+void LongPressSubscriberHandler::NotifySubscriber(std::shared_ptr<Subscriber> subscriber, int32_t result) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(subscriber);
