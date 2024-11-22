@@ -36,6 +36,7 @@ void InputBinderClientServer::InitClientSrv()
     std::lock_guard<std::mutex> clientLock(clientSrvMutex_);
     if (clientSrvStub_ == nullptr) {
         clientSrvStub_ = new (std::nothrow) InputBinderClientStub();
+        CHKPV(clientSrvStub_);
     }
 }
 
