@@ -16,8 +16,6 @@
 #ifndef LONG_PRESS_EVENT_H
 #define LONG_PRESS_EVENT_H
 
-#include <iostream>
-
 namespace OHOS {
 namespace MMI {
 struct LongPressRequest {

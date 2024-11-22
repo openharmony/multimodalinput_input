@@ -100,7 +100,7 @@ int32_t LongPressEventSubscribeManager::UnsubscribeLongPressEvent(int32_t subscr
         subscribeInfos_.erase(it);
         return RET_OK;
     }
-
+    MMI_HILOGE("Failed to find the subscribeId:%{public}d", subscribeId);
     return RET_ERR;
 }
 
@@ -142,7 +142,7 @@ void LongPressEventSubscribeManager::OnConnected()
         LongPressRequest longPressRequest = subscribeInfo.GetLongPressRequest();
         int32_t ret = MMIEventHdl.SubscribeLongPressEvent(it->first, longPressRequest);
         if (ret != RET_OK) {
-            MMI_HILOGE("Subscribe switch event failed, ret:%{public}d", ret);
+            MMI_HILOGE("Subscribe long pres event failed, ret:%{public}d", ret);
         }
     }
 }
