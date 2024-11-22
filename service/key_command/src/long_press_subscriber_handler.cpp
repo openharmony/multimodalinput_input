@@ -17,7 +17,6 @@
 #include <parameters.h>
 
 #include "app_mgr_client.h"
-#include "running_process_info.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
@@ -28,6 +27,7 @@
 #include "key_command_handler_util.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "running_process_info.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
@@ -59,7 +59,7 @@ int32_t LongPressSubscriberHandler::SubscribeLongPressEvent(SessionPtr sess, int
 {
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_HILOGD("subscribeId:%{public}d, fingerCount:%{public}d, duration:%{public}d",
+    MMI_HILOGD("SubscribeId:%{public}d, fingerCount:%{public}d, duration:%{public}d",
         subscribeId, longPressRequest.fingerCount, longPressRequest.duration);
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribeId");
@@ -172,7 +172,7 @@ void LongPressSubscriberHandler::RemoveSessSubscriber(SessionPtr sess, int32_t s
 void LongPressSubscriberHandler::OnSubscribeLongPressEvent(int32_t fingerCount, int32_t duration)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("fingerCount:%{public}d, duration:%{public}d", fingerCount, duration);
+    MMI_HILOGD("FingerCount:%{public}d, duration:%{public}d", fingerCount, duration);
     auto pair = std::make_pair(fingerCount, duration);
     auto it = subscriberInfos_.find(pair);
     if (subscriberInfos_.find(pair) == subscriberInfos_.end()) {
@@ -182,7 +182,7 @@ void LongPressSubscriberHandler::OnSubscribeLongPressEvent(int32_t fingerCount, 
     }
     std::vector<std::shared_ptr<Subscriber>> &subscribers = it->second;
     for (const auto &subscriber : subscribers) {
-        NotifySubscriber(subscriber, RET_OK); 
+        NotifySubscriber(subscriber, RET_OK);
     }
 }
 
@@ -200,7 +200,7 @@ void LongPressSubscriberHandler::InsertSubScriber(const std::shared_ptr<Subscrib
                     subscriber->id_, subscriber->sess_->GetDescript().c_str());
                 return;
             }
-        } 
+        }
     }
     subscriberInfos_[pair].push_back(subscriber);
 }
@@ -263,7 +263,7 @@ void LongPressSubscriberHandler::HandleFingerGestureDownEvent(const std::shared_
         StartFingerGesture(TWO_FINGER);
     } else {
         MMI_HILOGW("The number of finger count is not 1 or 2");
-        StopFingerGesture(); 
+        StopFingerGesture();
     }
 }
 
@@ -293,13 +293,11 @@ void LongPressSubscriberHandler::HandleFingerGestureMoveEvent(const std::shared_
     auto dy = std::abs(pos->y - item.GetDisplayY());
     auto moveDistance = sqrt(pow(dx, TWO_FINGER) + pow(dy, TWO_FINGER));
     if (moveDistance > TOUCH_MOVE_THRESHOLD) {
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         MMI_HILOGD("Finger movement distance greater than 15PX, defaultDistance:%{public}d, moveDistance:%{public}f",
             TOUCH_MOVE_THRESHOLD, moveDistance);
         CheckFingerGestureCancelEvent(touchEvent);
         StopFingerGesture();
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    }   
+    }
 }
 
 void LongPressSubscriberHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -372,7 +370,7 @@ void LongPressSubscriberHandler::OnSubscribeLongPressCancelEvent(SessionPtr sess
     const std::vector<std::shared_ptr<Subscriber>> &subscribers = sessManager_.at(sess);
     for (const auto &subscriber : subscribers) {
         if (subscriber->fingerCount_ == fingerCount && subscriber->duration_ == duration) {
-            NotifySubscriber(subscriber, RET_ERR); 
+            NotifySubscriber(subscriber, RET_ERR);
         }
     }
 }
@@ -435,7 +433,7 @@ bool LongPressSubscriberHandler::CheckFingerGestureAction(int32_t fingerCount) c
             return false;
         }
     }
-    return true; 
+    return true;
 }
 
 bool LongPressSubscriberHandler::InitSessionDeleteCallback()

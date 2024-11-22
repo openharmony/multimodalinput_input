@@ -51,7 +51,7 @@ int32_t LongPressEventSubscribeManager::SubscribeLongPressEvent(
     CALL_DEBUG_ENTER;
     CHKPR(callback, ERROR_NULL_POINTER);
     if (longPressRequest.fingerCount <= 0 || longPressRequest.fingerCount > MAX_FINGER_COUNT ||
-        longPressRequest.duration < 0 || longPressRequest.duration > MAX_DURATION) {
+        longPressRequest.duration <= 0 || longPressRequest.duration > MAX_DURATION) {
         MMI_HILOGE("FingerCount or duration is invalid");
         return RET_ERR;
     }
@@ -100,7 +100,7 @@ int32_t LongPressEventSubscribeManager::UnsubscribeLongPressEvent(int32_t subscr
         subscribeInfos_.erase(it);
         return RET_OK;
     }
-    MMI_HILOGE("Failed to find the subscribeId:%{public}d", subscribeId);
+    MMI_HILOGE("Failed to unsubscribe long press event, subscribeId:%{public}d", subscribeId);
     return RET_ERR;
 }
 
