@@ -110,6 +110,16 @@ private:
     void AddMouseEventId(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetMonitorConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
         std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
+    bool CheckIfNeedAddToConsumerInfos(const Handler &monitor, std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsPinchType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsRotateType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsThreeFingersSwipeType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsFourFingersSwipeType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsBeginAndEndType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsThreeFingersTapType(std::shared_ptr<PointerEvent> pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    bool IsFingerprintType(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool CheckInputDeviceSource(const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const;
     void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,
