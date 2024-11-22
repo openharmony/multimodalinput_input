@@ -1514,8 +1514,8 @@ void KeyCommandHandler::IsMusicActivate()
     }
     for (const auto &info : rendererChangeInfo) {
         if (info->rendererState == AudioStandard::RENDERER_RUNNING && 
-            (INFO->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
-            INFO->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
+            (info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
+            info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
             MMI_HILOGI("Find music activate");
             return true;
         }
