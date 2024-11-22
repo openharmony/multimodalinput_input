@@ -1499,7 +1499,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     return isLaunched || waitRepeatKey;
 }
 
-void KeyCommandHandler::IsMusicActivate()
+bool KeyCommandHandler::IsMusicActivate()
 {
     CALL_INFO_TRACE;
     std::vector<std::unique_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
