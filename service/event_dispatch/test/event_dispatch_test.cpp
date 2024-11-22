@@ -1122,7 +1122,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_003, TestSize.Level1)
     std::optional<WindowInfo> windowInfo = std::nullopt;
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    handler.cancelEventList_[1].insert(windowInfo1);
+    handler.cancelEventList_[1].push_back(windowInfo1);
     bool result = handler.ReissueEvent(point, windowId, windowInfo);
     EXPECT_TRUE(result);
 }
@@ -1145,7 +1145,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_004, TestSize.Level1)
     std::optional<WindowInfo> windowInfo = std::nullopt;
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    handler.cancelEventList_[1].insert(windowInfo1);
+    handler.cancelEventList_[1].push_back(windowInfo1);
     bool result = handler.ReissueEvent(point, windowId, windowInfo);
     EXPECT_FALSE(result);
 }
@@ -1169,7 +1169,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_005, TestSize.Level1)
     point->SetPointerId(point->pointerId_);
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    dispatch.cancelEventList_[1].insert(windowInfo1);
+    dispatch.cancelEventList_[1].push_back(windowInfo1);
     bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
     EXPECT_TRUE(result);
 }
@@ -1193,7 +1193,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_006, TestSize.Level1)
     point->SetPointerId(point->pointerId_);
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    dispatch.cancelEventList_[1].insert(windowInfo1);
+    dispatch.cancelEventList_[1].push_back(windowInfo1);
     bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
     EXPECT_TRUE(result);
 }
@@ -1217,7 +1217,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_007, TestSize.Level1)
     point->SetPointerId(point->pointerId_);
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    dispatch.cancelEventList_[1].insert(windowInfo1);
+    dispatch.cancelEventList_[1].push_back(windowInfo1);
     bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
     EXPECT_FALSE(result);
 }
@@ -1241,7 +1241,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_008, TestSize.Level1)
     point->SetPointerId(point->pointerId_);
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    dispatch.cancelEventList_[1].insert(windowInfo1);
+    dispatch.cancelEventList_[1].push_back(windowInfo1);
     bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
     EXPECT_FALSE(result);
 }
@@ -1265,7 +1265,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_009, TestSize.Level1)
     point->SetPointerId(point->pointerId_);
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    dispatch.cancelEventList_[1].insert(windowInfo1);
+    dispatch.cancelEventList_[1].push_back(windowInfo1);
     bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
     EXPECT_FALSE(result);
 }
@@ -1289,7 +1289,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_010, TestSize.Level1)
     point->SetPointerId(point->pointerId_);
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    dispatch.cancelEventList_[1].insert(windowInfo1);
+    dispatch.cancelEventList_[1].push_back(windowInfo1);
     bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
     EXPECT_FALSE(result);
 }
@@ -1313,7 +1313,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ReissueEvent_011, TestSize.Level1)
     point->SetPointerId(point->pointerId_);
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    dispatch.cancelEventList_[1].insert(windowInfo1);
+    dispatch.cancelEventList_[1].push_back(windowInfo1);
     bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
     EXPECT_TRUE(result);
 }
@@ -1346,7 +1346,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_SearchCancelList_002, TestSize.Lev
     int32_t windowId = 2;
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    handler.cancelEventList_[1].insert(windowInfo1);
+    handler.cancelEventList_[1].push_back(windowInfo1);
     std::shared_ptr<WindowInfo> result = handler.SearchCancelList(pointerId, windowId);
     ASSERT_EQ(result, nullptr);
 }
@@ -1364,7 +1364,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_SearchCancelList_003, TestSize.Lev
     int32_t windowId = 1;
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    handler.cancelEventList_[1].insert(windowInfo1);
+    handler.cancelEventList_[1].push_back(windowInfo1);
     std::shared_ptr<WindowInfo> result = handler.SearchCancelList(pointerId, windowId);
     ASSERT_NE(result, nullptr);
 }
@@ -1485,10 +1485,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_007,
     point->pointerId_ = 1;
     std::shared_ptr<WindowInfo> windowInfo = std::make_shared<WindowInfo>();
     windowInfo->id = 5;
-    eventdispatchhandler.cancelEventList_[1].insert(windowInfo);
+    eventdispatchhandler.cancelEventList_[1].push_back(windowInfo);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
     windowInfo->id = 1;
-    eventdispatchhandler.cancelEventList_[2].insert(windowInfo);
+    eventdispatchhandler.cancelEventList_[2].push_back(windowInfo);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
     point->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
@@ -1575,7 +1575,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_01, 
     std::optional<WindowInfo> windowInfo = std::nullopt;
     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
     windowInfo1->id = 1;
-    dispatch.cancelEventList_[1].insert(windowInfo1);
+    dispatch.cancelEventList_[1].push_back(windowInfo1);
     bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
     EXPECT_TRUE(result);
 
@@ -1920,10 +1920,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_008,
     point->pointerId_ = 3;
     std::shared_ptr<WindowInfo> windowInfo = std::make_shared<WindowInfo>();
     windowInfo->id = 3;
-    eventdispatchhandler.cancelEventList_[1].insert(windowInfo);
+    eventdispatchhandler.cancelEventList_[1].push_back(windowInfo);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
     windowInfo->id = 1;
-    eventdispatchhandler.cancelEventList_[2].insert(windowInfo);
+    eventdispatchhandler.cancelEventList_[2].push_back(windowInfo);
     point->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
     point->pointerAction_ = PointerEvent::POINTER_ACTION_CANCEL;
