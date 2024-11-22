@@ -16,6 +16,7 @@
 #include "pointer_drawing_manager.h"
 
 #include <parameters.h>
+#include <regex>
 
 #include "image/bitmap.h"
 #include "image_source.h"
@@ -764,9 +765,9 @@ int32_t PointerDrawingManager::ParsingDynamicImage(MOUSE_ICON mouseStyle)
         image_ = ExtractDrawingImage(userIconCopy);
     } else {
         if (mouseStyle == MOUSE_ICON::RUNNING) {
-            pixelmap = DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_LEFT].iconPath);
+            pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
         } else {
-            pixelmap = DecodeImageToPixelMap(mouseIcons_[mouseStyle].iconPath);
+            pixelmap = DecodeImageToPixelMap(mouseStyle);
         }
         CHKPR(pixelmap, RET_ERR);
         if (mouseStyle == MOUSE_ICON::RUNNING_RIGHT) {
@@ -1226,7 +1227,7 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     float ratio = imageWidth_ * 1.0 / canvasWidth_;
     canvasNode_->SetPivot({RUNNING_X_RATIO * ratio, RUNNING_Y_RATIO * ratio});
     std::shared_ptr<OHOS::Media::PixelMap> pixelmap =
-        DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_RIGHT].iconPath);
+        DecodeImageToPixelMap(MOUSE_ICON::RUNNING_RIGHT);
     CHKPV(pixelmap);
     MMI_HILOGD("Set mouseicon to OHOS system");
 
@@ -1732,9 +1733,9 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     } else {
         if (mouseStyle == MOUSE_ICON::RUNNING) {
-            pixelmap = DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_LEFT].iconPath);
+            pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
         } else {
-            pixelmap = DecodeImageToPixelMap(mouseIcons_[mouseStyle].iconPath);
+            pixelmap = DecodeImageToPixelMap(mouseStyle);
         }
         CHKPV(pixelmap);
         image = ExtractDrawingImage(pixelmap);
@@ -1825,9 +1826,9 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     } else {
         std::shared_ptr<OHOS::Media::PixelMap> pixelmap;
         if (mouseStyle == MOUSE_ICON::RUNNING) {
-            pixelmap = DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_LEFT].iconPath);
+            pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
         } else {
-            pixelmap = DecodeImageToPixelMap(mouseIcons_[mouseStyle].iconPath);
+            pixelmap = DecodeImageToPixelMap(mouseStyle);
         }
         CHKPV(pixelmap);
         MMI_HILOGD("Set mouseicon to OHOS system");
@@ -1965,40 +1966,47 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
     return RET_OK;
 }
 
-std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(const std::string &imagePath)
+void ChangeSvgCursorColor(std::string& str, int32_t color)
+{
+    std::string targetColor = IntToHexRGB(color);
+    StringReplace(str, "#000000", targetColor);
+    if (color == MAX_POINTER_COLOR) {
+        // stroke=\"#FFFFFF" fill="#000000" stroke-linejoin="round" transform="xxx"
+        std::regex re("(<path.*)(stroke=\"#[a-fA-F0-9]{6}\")(.*path>)");
+        str = std::regex_replace(str, re, "$1stroke=\"#000000\"$3");
+    }
+}
+
+std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithColor(MOUSE_ICON type, int32_t color)
 {
     CALL_DEBUG_ENTER;
-    for (auto item = mousePixelMap_.begin(); item != mousePixelMap_.end(); ++item) {
-        if (item->first != imagePath) {
-            continue;
-        }
-        if (item->second.imageWidth != imageWidth_ || item->second.imageHeight != imageHeight_
-            || item->second.pointerColor != GetPointerColor()) {
-            if (!UpdateLoadingAndLoadingRightPixelMap()) {
-                MMI_HILOGI("Update Loading And Loading Right Pointer success");
-            }
-            return mousePixelMap_[imagePath].pixelMap;
-        } else {
-            return item->second.pixelMap;
-        }
+    std::string svgContent;
+    std::string imagePath = mouseIcons_[type].iconPath;
+    if (!ReadFile(imagePath, svgContent)) {
+        MMI_HILOGE("read file failed");
+        return nullptr;
     }
+    const bool isPartColor = (type == CURSOR_COPY) || (type == CURSOR_FORBID) || (type == HELP);
+    if (isPartColor) {
+        ChangeSvgCursorColor(svgContent, color);
+    }
+
     OHOS::Media::SourceOptions opts;
     uint32_t ret = 0;
-    auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, ret);
+    std::unique_ptr<std::istream>  isp(std::make_unique<std::istringstream>(svgContent));
+    auto imageSource = OHOS::Media::ImageSource::CreateImageSource(std::move(isp), opts, ret);
+    if (!imageSource || ret != ERR_OK) {
+        MMI_HILOGE("Get image source failed, ret:%{public}d", ret);
+    }
     CHKPP(imageSource);
-    std::set<std::string> formats;
-    ret = imageSource->GetSupportedFormats(formats);
-    MMI_HILOGD("Get supported format ret:%{public}u", ret);
-
     OHOS::Media::DecodeOptions decodeOpts;
     decodeOpts.desiredSize = {
         .width = imageWidth_,
         .height = imageHeight_
     };
-    int32_t pointerColor = GetPointerColor();
-    if (tempPointerColor_ != DEFAULT_VALUE) {
-        decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
-        if (pointerColor == MAX_POINTER_COLOR) {
+    if (!isPartColor) {
+        decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = color};
+        if (color == MAX_POINTER_COLOR) {
             decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
         } else {
             decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
@@ -2008,6 +2016,26 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
     CHKPL(pixelMap);
     return pixelMap;
+}
+std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(MOUSE_ICON type)
+{
+    CALL_DEBUG_ENTER;
+    for (auto item = mousePixelMap_.begin(); item != mousePixelMap_.end(); ++item) {
+        if (item->first != type) {
+            continue;
+        }
+        if (item->second.imageWidth != imageWidth_ || item->second.imageHeight != imageHeight_
+            || item->second.pointerColor != GetPointerColor()) {
+            if (!UpdateLoadingAndLoadingRightPixelMap()) {
+                MMI_HILOGI("Update Loading And Loading Right Pointer success");
+            }
+            return mousePixelMap_[type].pixelMap;
+        } else {
+            return item->second.pixelMap;
+        }
+    }
+    
+    return LoadCursorSvgWithColor(type, GetPointerColor());
 }
 
 void PointerDrawingManager::GetPreferenceKey(std::string &name)
@@ -2026,28 +2054,8 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
 int32_t PointerDrawingManager::UpdateLoadingAndLoadingRightPixelMap()
 {
     for (auto iter = mousePixelMap_.begin(); iter != mousePixelMap_.end();) {
-        OHOS::Media::SourceOptions opts;
-        uint32_t ret = 0;
-        auto imageSource = OHOS::Media::ImageSource::CreateImageSource(iter->first, opts, ret);
-        CHKPR(imageSource, RET_ERR);
-        std::set<std::string> formats;
-        ret = imageSource->GetSupportedFormats(formats);
-        MMI_HILOGD("Get supported format ret:%{public}u", ret);
-        OHOS::Media::DecodeOptions decodeOpts;
-        decodeOpts.desiredSize = {
-            .width = imageWidth_,
-            .height = imageHeight_
-        };
         int32_t pointerColor = GetPointerColor();
-        if (tempPointerColor_ != DEFAULT_VALUE) {
-            decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
-            if (pointerColor == MAX_POINTER_COLOR) {
-                decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
-            } else {
-                decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
-            }
-        }
-        std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMap = LoadCursorSvgWithColor(iter->first, pointerColor);
         CHKPR(pixelMap, RET_ERR);
         iter->second.pixelMap = pixelMap;
         iter->second.imageWidth = imageWidth_;
@@ -2055,8 +2063,8 @@ int32_t PointerDrawingManager::UpdateLoadingAndLoadingRightPixelMap()
         iter->second.pointerColor = pointerColor;
         int32_t width = pixelMap->GetWidth();
         int32_t height = pixelMap->GetHeight();
-        MMI_HILOGI("Pixelmap width:%{public}d, height:%{public}d, %{public}s update success",
-            width, height, iter->first.c_str());
+        MMI_HILOGI("Pixelmap width:%{public}d, height:%{public}d, %{public}d update success",
+            width, height, iter->first);
         ++iter;
     }
     return RET_OK;
@@ -2312,42 +2320,16 @@ void PointerDrawingManager::DrawManager()
 
 void PointerDrawingManager::InitLoadingAndLoadingRightPixelMap()
 {
-    mousePixelMap_.clear();
-    mousePixelMap_[LoadingIconPath];
-    mousePixelMap_[LoadingRightIconPath];
-    initLoadingAndLoadingRightPixelTimerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
-        for (auto iter = mousePixelMap_.begin(); iter != mousePixelMap_.end();) {
-            OHOS::Media::SourceOptions opts;
-            uint32_t ret = 0;
-            auto imageSource = OHOS::Media::ImageSource::CreateImageSource(iter->first, opts, ret);
-            CHKPV(imageSource);
-            std::set<std::string> formats;
-            ret = imageSource->GetSupportedFormats(formats);
-            MMI_HILOGD("Get supported format ret:%{public}u", ret);
-            OHOS::Media::DecodeOptions decodeOpts;
-            decodeOpts.desiredSize = {
-                .width = imageWidth_,
-                .height = imageHeight_
-            };
-            int32_t pointerColor = GetPointerColor();
-            if (tempPointerColor_ != DEFAULT_VALUE) {
-                decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
-                if (pointerColor == MAX_POINTER_COLOR) {
-                    decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
-                } else {
-                    decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
-                }
-            }
-            std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
-            CHKPV(pixelMap);
-            iter->second.pixelMap = pixelMap;
-            iter->second.imageWidth = imageWidth_;
-            iter->second.imageHeight = imageHeight_;
-            iter->second.pointerColor = pointerColor;
-            MMI_HILOGI("%{public}s init success", iter->first.c_str());
-            ++iter;
-        }
-    });
+    auto pointerColor = GetPointerColor();
+    for (auto iter = mousePixelMap_.begin(); iter != mousePixelMap_.end(); ++iter) {
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMap = LoadCursorSvgWithColor(iter->first, pointerColor);
+        CHKPV(pixelMap);
+        iter->second.pixelMap = pixelMap;
+        iter->second.imageWidth = imageWidth_;
+        iter->second.imageHeight = imageHeight_;
+        iter->second.pointerColor = pointerColor;
+        MMI_HILOGI("%{public}s init success", mouseIcons_[iter->first].iconPath.data());
+    }
 }
 
 bool PointerDrawingManager::Init()
@@ -2356,6 +2338,8 @@ bool PointerDrawingManager::Init()
     INPUT_DEV_MGR->Attach(shared_from_this());
     pidInfos_.clear();
     hapPidInfos_.clear();
+    mousePixelMap_[MOUSE_ICON::LOADING];
+    mousePixelMap_[MOUSE_ICON::RUNNING];
     InitLoadingAndLoadingRightPixelMap();
     return true;
 }
