@@ -64,17 +64,16 @@ public:
     
     int32_t SubscribeLongPressEvent(SessionPtr sess, int32_t subscribeId, const LongPressRequest &longPressRequest);
     int32_t UnsubscribeLongPressEvent(SessionPtr sess, int32_t subscribeId);
-    void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent, int64_t abilityStartDelay,
-        std::function<void(int32_t displayX1, int32_t displayY1, int32_t displayX2, int32_t displayY2)>);
-    void HandleFingerGestureMoveEvent(const std::shared_ptr<PointerEvent> &touchEvent);
-    void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent);
+    void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleFingerGestureMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
 
 private:
     void OnSubscribeLongPressEvent(int32_t fingerCount, int32_t duration);
     void OnSubscribeLongPressCancelEvent(SessionPtr sess, int32_t fingerCount, int32_t duration) const;
-    void NotifySubscriber(const std::shared_ptr<Subscriber> &subscriber, int32_t result) const;
+    void NotifySubscriber(std::shared_ptr<Subscriber> subscriber, int32_t result) const;
     void OnSessionDelete(SessionPtr sess);
-    void InsertSubScriber(const std::shared_ptr<Subscriber> &subscriber);
+    void InsertSubScriber(const std::shared_ptr<Subscriber> subscriber);
     bool InitSessionDeleteCallback();
     void StopFingerGesture();
     int32_t ConvertVPToPX(int32_t vp) const;
@@ -83,9 +82,9 @@ private:
     int32_t GetBundleName(std::string &bundleName, int32_t windowPid) const;
     void AddDurationTimer(int32_t duration);
     void RemoveDurationTimer(int32_t fingerCount, int32_t duration);
-    void AddSessSubscriber(const std::shared_ptr<Subscriber> &subscriber);
+    void AddSessSubscriber(const std::shared_ptr<Subscriber> subscriber);
     void RemoveSessSubscriber(SessionPtr sess, int32_t subscribeId);
-    void CheckFingerGestureCancelEvent(const std::shared_ptr<PointerEvent> &touchEvent) const;
+    void CheckFingerGestureCancelEvent(const std::shared_ptr<PointerEvent> touchEvent) const;
 
 private:
     std::map<std::pair<int32_t, int32_t>, std::vector<std::shared_ptr<Subscriber>>> subscriberInfos_;
@@ -94,10 +93,7 @@ private:
     FingerGesture fingerGesture_;
     std::shared_ptr<PointerEvent> touchEvent_ { nullptr };
     std::atomic_bool callbackInitialized_ { false };
-    int64_t abilityStartDelay_ = -1;
-    int32_t abilityTimerId_ = -1;
     bool isAllTimerClosed = false;
-    std::function<void(int32_t displayX1, int32_t displayY1, int32_t displayX2, int32_t displayY2)> callback_;
 };
 #define LONG_PRESS_EVENT_HANDLER ::OHOS::DelayedSingleton<LongPressSubscriberHandler>::GetInstance()
 } // namespace MMI
