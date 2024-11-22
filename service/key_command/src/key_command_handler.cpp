@@ -24,6 +24,7 @@
 #include "system_ability_definition.h"
 
 #include "ability_manager_client.h"
+#include "audio_stream_manager.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
@@ -1066,6 +1067,10 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     if (callState == StateType::CALL_STATUS_ACTIVE) {
         return true;
     }
+    if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
+        !IsMusicActivate()) {
+        return true;
+    }
     MMI_HILOGI("ScreenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
         return false;
@@ -1492,6 +1497,30 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     MMI_HILOGI("Handle repeat key, isLaunched:%{public}d, waitRepeatKey:%{public}d",
         isLaunched, waitRepeatKey);
     return isLaunched || waitRepeatKey;
+}
+
+void KeyCommandHandler::IsMusicActivate()
+{
+    CALL_INFO_TRACE;
+    std::vector<std::unique_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
+    auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
+        return false;
+    }
+    if (rendererChangeInfo.empty()) {
+        MMI_HILOGI("Music info empty");
+        return false;
+    }
+    for (const auto &info : rendererChangeInfo) {
+        if (info->rendererState == AudioStandard::RENDERER_RUNNING && 
+            (INFO->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
+            INFO->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
+            MMI_HILOGI("Find music activate");
+            return true;
+        }
+    }
+    return false;
 }
 
 void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)

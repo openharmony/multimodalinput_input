@@ -274,28 +274,28 @@ AccountManager::AccountManager()
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
-            [this](const EventFwk::CommonEventData &data) {
+            [](const EventFwk::CommonEventData &data) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF,
-            [this](const EventFwk::CommonEventData &data) {
+            [](const EventFwk::CommonEventData &data) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED,
-            [this](const EventFwk::CommonEventData &data) {
+            [](const EventFwk::CommonEventData &data) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenLocked(true);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
-            [this](const EventFwk::CommonEventData &data) {
+            [](const EventFwk::CommonEventData &data) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenLocked(false);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
