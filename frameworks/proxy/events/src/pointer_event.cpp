@@ -1114,7 +1114,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
     int32_t size = 0;
     READINT32(in, size);
     if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
-        MMI_HILOGE("enhanceData_ size is invalid");
+        MMI_HILOGE("The enhanceData_ size is invalid");
         return false;
     }
 
