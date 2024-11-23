@@ -37,8 +37,7 @@ typedef std::function<void(double screenX, double screenY, int touchId, bool tip
 typedef std::function<void(double screenX, double screenY, int touchId, bool tipDown, std::string buttonName)> KeyDown;
 typedef std::function<void(double screenX, double screenY, int touchId, bool tipDown, std::string buttonName)> KeyUp;
 typedef std::function<int32_t(double screenX, double screenY, int touchId, bool tipDown)> HandleTouchPoint;
-typedef std::function<int32_t(std::string& buttonName, std::string& toggleButtonName, int& buttonMode,
-                      std::string& RestList)> GetMessage;
+typedef std::function<int32_t(int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode)> GetMessage;
 typedef std::function<int32_t(std::string keyName)> GetKeyCodeByKeyName;
 
 enum VKeyboardMessageType {

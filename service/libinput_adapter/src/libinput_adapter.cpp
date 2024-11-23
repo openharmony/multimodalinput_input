@@ -220,32 +220,6 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     deviceId = -1;
 }
 
-std::unordered_map<std::string, int32_t> LibinputAdapter::keyCodes_ = {
-    { "Btn_ESCAPE", 1 }, { "Btn_F1", 59 }, { "Btn_F2", 60 }, { "Btn_F3", 61 }, { "Btn_F4", 62 },
-    { "Btn_F5", 63 }, { "Btn_F6", 64 }, { "Btn_SMART", -1 }, { "Btn_F7", 65 }, { "Btn_F8", 66 },
-    { "Btn_F9", 67 }, { "Btn_F10", 68 }, { "Btn_F11", 87 }, { "Btn_F12", 88 }, { "Btn_DELETE", 111 },
-
-    { "Btn_OEM_3", 41 }, { "Btn_1", 2 }, { "Btn_2", 3 }, { "Btn_3", 4 }, { "Btn_4", 5 },
-    { "Btn_5", 6 }, { "Btn_6", 7 }, { "Btn_7", 8 }, { "Btn_8", 9 }, { "Btn_9", 10 },
-    { "Btn_0", 11 }, { "Btn_SS", 12 }, { "Btn_INVERTED_COMMA", 13 }, { "Btn_BACK", 14 },
-
-    { "Btn_TAB", 15 }, { "Btn_Q", 16 }, { "Btn_W", 17 }, { "Btn_E", 18 }, { "Btn_R", 19 },
-    { "Btn_T", 20 }, { "Btn_Y", 21 }, { "Btn_U", 22 }, { "Btn_I", 23 }, { "Btn_O", 24 },
-    { "Btn_P", 25 }, { "Btn_UE", 26 }, { "Btn_PLUS", 27 }, { "Btn_HASHTAG", 43 },
-
-    { "Btn_CAPS", 58 }, { "Btn_A", 30 }, { "Btn_S", 31 }, { "Btn_D", 32 }, { "Btn_F", 33 },
-    { "Btn_G", 34 }, { "Btn_H", 35 }, { "Btn_J", 36 }, { "Btn_K", 37 }, { "Btn_L", 38 },
-    { "Btn_OE", 39 }, { "Btn_AE", 40 }, { "Btn_ENTER", 28 },
-
-    { "Btn_LSHIFT", 42 }, { "Btn_Z", 44 }, { "Btn_X", 45 }, { "Btn_C", 46 }, { "Btn_V", 47 },
-    { "Btn_B", 48 }, { "Btn_N", 49 }, { "Btn_M", 50 }, { "Btn_COMMA", 51 }, { "Btn_DOT", 52 },
-    { "Btn_MINUS", 53 }, { "Btn_RSHIFT", 54 },
-
-    { "Btn_LCTRL", 29 }, { "Btn_FNCT", 125 }, { "Btn_WINDOWS", 86 }, { "Btn_ALT", 56 },
-    { "Btn_SPACE", 57 }, { "Btn_ALTGR", 100 }, { "Btn_RCTRL", 97 }, { "Btn_LEFT", 105 },
-    { "Btn_UP", 107 }, { "Btn_DOWN", 108 }, { "Btn_RIGHT", 106 },
-};
-
 void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCode,
                                      libinput_key_state state, int64_t frameTime)
 {
@@ -324,12 +298,11 @@ void LibinputAdapter::OnEventHandler()
                 MMI_HILOGD("#### inside vkeyboard area");
 
                 while (true) {
-                    std::string buttonName;
-                    std::string toggleButtonName;
-                    int buttonMode;
-                    std::string restList;
-                    VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(buttonName, toggleButtonName,
-                                                                                  buttonMode, restList);
+                    int toggleCodeFirst(-1);
+                    int toggleCodeSecond(-1);
+                    int keyCode(-1);
+                    VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(toggleCodeFirst, toggleCodeSecond,
+                        keyCode);
                     MMI_HILOGD("#### get message type: %d", (int)type);
                     if (type == VNoMessage) {
                         break;
@@ -337,37 +310,22 @@ void LibinputAdapter::OnEventHandler()
 
                     switch (type) {
                         case VKeyboardMessageType::VKeyPressed: {
-                            MMI_HILOGD("#### press key: %s", buttonName.c_str());
-                            int32_t keyCode = keyCodes_[buttonName];
+                            MMI_HILOGD("#### press key: %{private}d", keyCode);
                             InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
                             InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
                             break;
                         }
                         case VKeyboardMessageType::VCombinationKeyPressed: {
-                            MMI_HILOGD("#### combination key. triger button: %s, toggle button: %s",
-                                       buttonName.c_str(), toggleButtonName.c_str());
-
+                            MMI_HILOGD("#### combination key. triger: %{private}d, toggle: %{private}d + %{private}d",
+                                keyCode, toggleCodeFirst, toggleCodeSecond);
                             std::vector<int32_t> toggleKeyCodes;
-                            std::string remainStr = toggleButtonName;
-                            int32_t toggleCode(-1), triggerCode(-1);
-                            while (remainStr.find(';') != std::string::npos) {
-                                // still has more than one
-                                size_t pos = remainStr.find(';');
-                                toggleCode = keyCodes_[remainStr.substr(0, pos)];
-                                if (toggleCode >= 0) {
-                                    toggleKeyCodes.push_back(toggleCode);
-                                }
-                                remainStr = remainStr.substr(pos + 1);
+                            if (toggleCodeFirst >= 0) {
+                                toggleKeyCodes.push_back(toggleCodeFirst);
                             }
-                            // Add the last piece.
-                            toggleCode = keyCodes_[remainStr];
-                            if (toggleCode >= 0) {
-                                toggleKeyCodes.push_back(toggleCode);
+                            if (toggleCodeSecond >= 0) {
+                                toggleKeyCodes.push_back(toggleCodeSecond);
                             }
-                            // Trigger code:
-                            triggerCode = keyCodes_[buttonName];
-
-                            InjectCombinationKeyEvent(touch, toggleKeyCodes, triggerCode, frameTime);
+                            InjectCombinationKeyEvent(touch, toggleKeyCodes, keyCode, frameTime);
                             break;
                         }
                         default: break;
