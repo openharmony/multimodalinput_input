@@ -265,7 +265,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     CHKPV(point);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (point->GetAncoDeal()) {
-        MMI_HILOGD("event dealed by anco, ignore it");
+        MMI_HILOGD("Event dealed by anco, ignore it");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
