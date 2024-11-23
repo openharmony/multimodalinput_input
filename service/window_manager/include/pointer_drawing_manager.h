@@ -272,7 +272,6 @@ private:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
-    int32_t releaseFence_ { -1 };
     std::map<MOUSE_ICON, loadingAndLoadingPixelMapInfo> mousePixelMap_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
     int releaseFence_ { -1 };
