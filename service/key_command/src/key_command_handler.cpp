@@ -24,6 +24,7 @@
 #include "system_ability_definition.h"
 
 #include "ability_manager_client.h"
+#include "audio_stream_manager.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
@@ -40,6 +41,7 @@
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_command_handler_util.h"
+#include "long_press_subscriber_handler.h"
 #include "mmi_log.h"
 #include "nap_process.h"
 #include "net_packet.h"
@@ -184,6 +186,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         case PointerEvent::POINTER_ACTION_MOVE: {
             HandlePointerActionMoveEvent(touchEvent);
+            LONG_PRESS_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
             break;
         }
         case PointerEvent::POINTER_ACTION_DOWN: {
@@ -214,6 +217,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureDownEvent(touchEvent);
+            LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
@@ -273,6 +277,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureUpEvent(touchEvent);
+            LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
@@ -1066,6 +1071,10 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     if (callState == StateType::CALL_STATUS_ACTIVE) {
         return true;
     }
+    if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
+        !IsMusicActivate()) {
+        return true;
+    }
     MMI_HILOGI("ScreenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
         return false;
@@ -1083,6 +1092,10 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     }
     JsonParser parser;
     parser.json_ = cJSON_Parse(jsonStr.c_str());
+    if (parser.json_ == nullptr) {
+        MMI_HILOGE("cJSON_Parse failed");
+        return false;
+    }    
     if (!cJSON_IsObject(parser.json_)) {
         MMI_HILOGE("Parser.json_ is not object");
         return false;
@@ -1488,6 +1501,30 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     MMI_HILOGI("Handle repeat key, isLaunched:%{public}d, waitRepeatKey:%{public}d",
         isLaunched, waitRepeatKey);
     return isLaunched || waitRepeatKey;
+}
+
+bool KeyCommandHandler::IsMusicActivate()
+{
+    CALL_INFO_TRACE;
+    std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
+    auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
+        return false;
+    }
+    if (rendererChangeInfo.empty()) {
+        MMI_HILOGI("Music info empty");
+        return false;
+    }
+    for (const auto &info : rendererChangeInfo) {
+        if (info->rendererState == AudioStandard::RENDERER_RUNNING &&
+            (info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
+            info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
+            MMI_HILOGI("Find music activate");
+            return true;
+        }
+    }
+    return false;
 }
 
 void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)

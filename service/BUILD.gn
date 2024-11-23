@@ -264,6 +264,7 @@ ohos_shared_library("libmmi-server") {
   }
 
   external_deps = [
+    "audio_framework:audio_client",
     "cJSON:cjson",
     "c_utils:utils",
     "eventhandler:libeventhandler",

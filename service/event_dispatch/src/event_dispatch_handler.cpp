@@ -132,19 +132,28 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
     std::shared_ptr<WindowInfo> curWindowInfo = std::make_shared<WindowInfo>(*windowInfo);
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         if (cancelEventList_.find(pointerId) == cancelEventList_.end()) {
-            cancelEventList_[pointerId] = std::set<std::shared_ptr<WindowInfo>, EventDispatchHandler::CancelCmp>();
+            cancelEventList_[pointerId] = std::vector<std::shared_ptr<WindowInfo>>(0);
         }
-        cancelEventList_[pointerId].insert(curWindowInfo);
+        cancelEventList_[pointerId].push_back(curWindowInfo);
     } else if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
-        if (cancelEventList_.find(pointerId) != cancelEventList_.end() &&
-            cancelEventList_[pointerId].find(curWindowInfo) != cancelEventList_[pointerId].end()) {
-            cancelEventList_[pointerId].erase(curWindowInfo);
-        } else {
+        if (cancelEventList_.find(pointerId) == cancelEventList_.end() ||
+            !SearchWindow(cancelEventList_[pointerId], curWindowInfo)) {
             return false;
         }
     }
     return true;
+}
+
+bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>> &windowList,
+    std::shared_ptr<WindowInfo> targetWindow)
+{
+    for (auto &window : windowList) {
+        if (window->id == targetWindow->id) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,

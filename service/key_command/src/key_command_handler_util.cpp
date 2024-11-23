@@ -144,6 +144,10 @@ void GetKeyVal(const cJSON* json, const std::string &key, std::string &value)
         return;
     }
     cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
+    if (valueJson == nullptr) {
+        MMI_HILOGE("valueJson init failed");
+        return;
+    }
     if (cJSON_IsString(valueJson)) {
         value = valueJson->valuestring;
     }
@@ -166,6 +170,10 @@ bool GetEntities(const cJSON* jsonAbility, Ability &ability)
     int32_t entitySize = cJSON_GetArraySize(entities);
     for (int32_t i = 0; i < entitySize; i++) {
         cJSON* entity = cJSON_GetArrayItem(entities, i);
+        if (entity == nullptr) {
+            MMI_HILOGE("entity init failed");
+            continue;
+        }
         if (!cJSON_IsString(entity)) {
             MMI_HILOGE("entity is not string");
             return false;
@@ -285,6 +293,10 @@ bool GetKeyCode(const cJSON* jsonData, int32_t &keyCodeInt)
         return false;
     }
     cJSON *keyCode = cJSON_GetObjectItemCaseSensitive(jsonData, "keyCode");
+    if (keyCode == nullptr) {
+        MMI_HILOGE("keyCode init failed");
+        return false;
+    }
     if (!cJSON_IsNumber(keyCode)) {
         MMI_HILOGE("keyCode is not number");
         return false;
@@ -304,6 +316,10 @@ bool GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt)
         return false;
     }
     cJSON *keyAction = cJSON_GetObjectItemCaseSensitive(jsonData, "keyAction");
+    if (keyAction == nullptr) {
+        MMI_HILOGE("keyAction Init failed");
+        return false;
+    }   
     if (!cJSON_IsNumber(keyAction)) {
         MMI_HILOGE("keyAction is not number");
         return false;
@@ -323,6 +339,10 @@ bool GetDelay(const cJSON* jsonData, int64_t &delayInt)
         return false;
     }
     cJSON *delay = cJSON_GetObjectItemCaseSensitive(jsonData, "delay");
+    if (delay == nullptr) {
+        MMI_HILOGE("delay init failed");
+        return false;
+    }    
     if (!cJSON_IsNumber(delay)) {
         MMI_HILOGE("delay is not number");
         return false;
@@ -342,6 +362,10 @@ bool GetRepeatTimes(const cJSON* jsonData, int32_t &repeatTimesInt)
         return false;
     }
     cJSON *repeatTimes = cJSON_GetObjectItemCaseSensitive(jsonData, "times");
+    if (repeatTimes == nullptr) {
+        MMI_HILOGE("repeatTimes init failed");
+        return false;
+    }    
     if (!cJSON_IsNumber(repeatTimes)) {
         MMI_HILOGE("repeatTimes is not number");
         return false;
@@ -361,6 +385,10 @@ bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
         return false;
     }
     cJSON *abilityStartDelay = cJSON_GetObjectItemCaseSensitive(jsonData, "abilityStartDelay");
+    if (abilityStartDelay == nullptr) {
+        MMI_HILOGE("abilityStartDelay init failed");
+        return false;
+    }
     if (!cJSON_IsNumber(abilityStartDelay)) {
         MMI_HILOGE("abilityStartDelay is not number");
         return false;
