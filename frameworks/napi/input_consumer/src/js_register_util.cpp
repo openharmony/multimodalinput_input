@@ -294,7 +294,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     napi_open_handle_scope(dataWorker->env, &scope);
     CHKPV(scope);
     napi_value callback = nullptr;
-    MMI_HILOGD("deliver uv work from %{public}d", GetPid());
+    MMI_HILOGD("Deliver uv work from %{public}d", GetPid());
     if (dataWorker->callback == nullptr) {
         MMI_HILOGE("dataWorker->callback is nullptr");
         napi_close_handle_scope(dataWorker->env, scope);
