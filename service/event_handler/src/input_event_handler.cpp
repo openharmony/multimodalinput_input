@@ -128,7 +128,7 @@ void InputEventHandler::UpdateDwtTouchpadRecord(libinput_event *event)
         double touchpadSizeX;
         double touchpadSizeY;
         if (libinput_device_get_size(touchpadDevice, &touchpadSizeX, &touchpadSizeY) != 0) {
-            MMI_HILOGW("failed to get touchpad device size");
+            MMI_HILOGW("Failed to get touchpad device size");
             return;
         }
         touchpadEventDownAbsX_ = libinput_event_touchpad_get_x(touchpadEvent);
