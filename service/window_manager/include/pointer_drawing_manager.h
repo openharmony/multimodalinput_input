@@ -275,6 +275,7 @@ private:
     int32_t releaseFence_ { -1 };
     std::map<MOUSE_ICON, loadingAndLoadingPixelMapInfo> mousePixelMap_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
+    int releaseFence_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

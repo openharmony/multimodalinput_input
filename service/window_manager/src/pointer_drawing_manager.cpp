@@ -188,7 +188,7 @@ static float GetCanvasSize()
     if (IsNum(ret)) {
         return g_hardwareCanvasSize;
     }
-    return std::atoi(ret.c_str());
+    return std::stoi(ret.c_str());
 }
 
 static float GetFocusCoordinates()
@@ -197,7 +197,7 @@ static float GetFocusCoordinates()
     if (IsNum(ret)) {
         return g_focalPoint;
     }
-    return std::atoi(ret.c_str());
+    return std::stoi(ret.c_str());
 }
 
 PointerDrawingManager::PointerDrawingManager()
@@ -907,12 +907,14 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
             .h = buffer->GetHeight(),
         },
     };
-    OHOS::SurfaceError ret = layer->FlushBuffer(buffer, releaseFence_, flushConfig);
+    OHOS::SurfaceError ret = layer->FlushBuffer(buffer, DEFAULT_VALUE, flushConfig);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
+        layer->CancelBuffer(buffer);
         return RET_ERR;
     }
     MMI_HILOGD("Init layer success");
+    layer->ReleaseBuffer(buffer, releaseFence_);
     return RET_OK;
 }
 
@@ -1105,9 +1107,10 @@ int32_t PointerDrawingManager::FlushBuffer()
             .h = buffer_->GetHeight(),
         },
     };
-    OHOS::SurfaceError ret = layer_->FlushBuffer(buffer_, releaseFence_, flushConfig);
+    OHOS::SurfaceError ret = layer_->FlushBuffer(buffer_, DEFAULT_VALUE, flushConfig);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
+        layer_->CancelBuffer(buffer_);
     }
     return ret;
 }
@@ -1118,6 +1121,11 @@ int32_t PointerDrawingManager::GetSurfaceInformation()
     if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
         MMI_HILOGE("Current mouse style is not equal to last mouse style");
         return RET_ERR;
+    }
+    if (buffer_ != nullptr && buffer_->GetVirAddr() != nullptr) {
+        addr_ = std::make_shared<uint8_t *>(static_cast<uint8_t *>(buffer_->GetVirAddr()));
+        CHKPR(addr_, RET_ERR);
+        return RET_OK;
     }
     layer_ = GetLayer();
     CHKPR(layer_, RET_ERR);
@@ -1144,6 +1152,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         }
         if (GetSurfaceInformation() != RET_OK) {
             MMI_HILOGE("OnVsync Get surface information fail");
+            layer_->ReleaseBuffer(buffer_, releaseFence_);
             return;
         }
         DoHardwareCursorDraw();
@@ -1154,6 +1163,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
             MMI_HILOGE("OnVsync set dynamic hardware cursor location error");
             return;
         }
+        layer->ReleaseBuffer(buffer, releaseFence_);
     });
     RequestNextVSync();
 }
@@ -1636,6 +1646,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
 {
     CALL_DEBUG_ENTER;
     sptr<OHOS::SurfaceBuffer> buffer;
+    int32_t releaseFence = -1;
     int32_t width = 0;
     int32_t height = 0;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -1665,21 +1676,18 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
         .timeout = 150,
     };
 
-    OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence_, config);
+    OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence, config);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Request buffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
         return nullptr;
     }
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (hardwareCursorPointerManager_->IsSupported()) {
-        sptr<OHOS::SyncFence> tempFence = new OHOS::SyncFence(releaseFence_);
+        sptr<OHOS::SyncFence> tempFence = new OHOS::SyncFence(releaseFence);
         if (tempFence != nullptr && (tempFence->Wait(SYNC_FENCE_WAIT_TIME) < 0)) {
             MMI_HILOGE("Failed to create surface, this buffer is not available");
         }
     }
-#else
-    close(releaseFence_);
-    releaseFence_ = -1;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return buffer;
 }

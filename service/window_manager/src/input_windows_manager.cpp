@@ -1090,13 +1090,13 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::AdjustDisplayRotation()
 {
+    PhysicalCoordinate coord {
+        .x = cursorPos_.cursorPos.x,
+        .y = cursorPos_.cursorPos.y,
+    };
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos_.displayId);
+    CHKPV(displayInfo);
     if (!TOUCH_DRAWING_MGR->IsWindowRotation()) {
-        PhysicalCoordinate coord {
-            .x = cursorPos_.cursorPos.x,
-            .y = cursorPos_.cursorPos.y,
-        };
-        auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos_.displayId);
-        CHKPV(displayInfo);
         if (cursorPos_.direction != displayInfo->direction) {
             RotateScreen(*displayInfo, coord);
             cursorPos_.direction = displayInfo->direction;
@@ -1104,6 +1104,11 @@ void InputWindowsManager::AdjustDisplayRotation()
             IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*displayInfo);
             IPointerDrawingManager::GetInstance()->SetPointerLocation(
                 static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y));
+        }
+    } else {
+        if (displayInfo->direction == DIRECTION90 || displayInfo->direction == DIRECTION270) {
+            RotateScreen(*displayInfo, coord);
+            UpdateAndAdjustMouseLocation(cursorPos_.displayId, coord.x, coord.y);
         }
     }
 }
