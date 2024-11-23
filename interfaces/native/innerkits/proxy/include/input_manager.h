@@ -172,11 +172,10 @@ public:
     void UnsubscribeSwitchEvent(int32_t subscriberId);
 
     /**
-     * @brief Subscribes to the long press touch event that meets a specific condition. When such an event occurs,
-     * the <b>callback</b> specified is invoked to process the event.
-     * @param LongPressRequest Indicates the information of long press touch event.
-     * @param callback Indicates the callback.
-     * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
+     * @brief Subscribes to the long-press event that meets a specific condition.
+     * @param LongPressRequest Long-press event.
+     * @param callback Callback invoked to process the event.
+     * @return Subscription ID, which uniquely identifies a subscription in the process.
      * If the value is greater than or equal to <b>0</b>,
      * the subscription is successful. Otherwise, the subscription fails.
      * @since 16
@@ -185,8 +184,8 @@ public:
         std::function<void(LongPressEvent)> callback);
 
     /**
-     * @brief Unsubscribes from a long press touch event.
-     * @param subscriberId Indicates the subscription ID, which is the return value of <b>SubscribeKeyEvent</b>.
+     * @brief Unsubscribes from a long-press event.
+     * @param subscriberId Subscription ID, which is the return value of <b>SubscribeKeyEvent</b>.
      * @return void
      * @since 16
      */
