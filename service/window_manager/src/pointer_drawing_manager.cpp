@@ -906,12 +906,14 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
             .h = buffer->GetHeight(),
         },
     };
-    OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
+    OHOS::SurfaceError ret = layer->FlushBuffer(buffer, DEFAULT_VALUE, flushConfig);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
+        layer->CancelBuffer(buffer);
         return RET_ERR;
     }
     MMI_HILOGD("Init layer success");
+    layer->ReleaseBuffer(buffer, releaseFence_);
     return RET_OK;
 }
 
@@ -1107,6 +1109,7 @@ int32_t PointerDrawingManager::FlushBuffer()
     OHOS::SurfaceError ret = layer_->FlushBuffer(buffer_, DEFAULT_VALUE, flushConfig);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
+        layer_->CancelBuffer(buffer_);
     }
     return ret;
 }
@@ -1117,6 +1120,11 @@ int32_t PointerDrawingManager::GetSurfaceInformation()
     if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
         MMI_HILOGE("Current mouse style is not equal to last mouse style");
         return RET_ERR;
+    }
+    if (buffer_ != nullptr && buffer_->GetVirAddr() != nullptr) {
+        addr_ = std::make_shared<uint8_t *>(static_cast<uint8_t *>(buffer_->GetVirAddr()));
+        CHKPR(addr_, RET_ERR);
+        return RET_OK;
     }
     layer_ = GetLayer();
     CHKPR(layer_, RET_ERR);
@@ -1143,6 +1151,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         }
         if (GetSurfaceInformation() != RET_OK) {
             MMI_HILOGE("OnVsync Get surface information fail");
+            layer_->ReleaseBuffer(buffer_, releaseFence_);
             return;
         }
         DoHardwareCursorDraw();
@@ -1153,6 +1162,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
             MMI_HILOGE("OnVsync set dynamic hardware cursor location error");
             return;
         }
+        layer->ReleaseBuffer(buffer, releaseFence_);
     });
     RequestNextVSync();
 }
@@ -1631,7 +1641,7 @@ sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
     return surfaceNode_->GetSurface();
 }
 
-sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer) const
+sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer)
 {
     CALL_DEBUG_ENTER;
     sptr<OHOS::SurfaceBuffer> buffer;
@@ -1677,9 +1687,6 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
             MMI_HILOGE("Failed to create surface, this buffer is not available");
         }
     }
-#else
-    close(releaseFence);
-    releaseFence = -1;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return buffer;
 }
