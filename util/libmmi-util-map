@@ -56,8 +56,8 @@
             OHOS::MMI::EventNormalizeHandler::*;
             OHOS::MMI::StartLogTraceId*;
             OHOS::MMI::ReadFile*;
-            OHOS::MMI::IntToHexRGB8;
-            OHOS::MMI::StringReplace;
+            OHOS::MMI::IntToHexRGB*;
+            OHOS::MMI::StringReplace*;
         };
     local:
         *;
