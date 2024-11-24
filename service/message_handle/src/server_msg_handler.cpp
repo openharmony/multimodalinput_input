@@ -265,7 +265,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
-                (!(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && pointerEvent->GetZOrder() > 0) &&
+                !(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) &&
                 !IsNavigationWindowInjectEvent(pointerEvent)) {
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
             }
@@ -413,7 +413,7 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         if (isShell) {
             shellTargetWindowIds_[pointerId] = targetWindowId;
-        } else if (!(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && pointerEvent->GetZOrder() > 0) {
+        } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
             castTargetWindowIds_[pointerId] = targetWindowId;
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             accessTargetWindowIds_[pointerId] = targetWindowId;
@@ -427,7 +427,7 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t pointerId = pointerEvent->GetPointerId();
         if (isShell) {
             shellTargetWindowIds_.erase(pointerId);
-        } else if (!(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && pointerEvent->GetZOrder() > 0) {
+        } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
             castTargetWindowIds_.erase(pointerId);
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             accessTargetWindowIds_.erase(pointerId);
@@ -455,7 +455,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         if (iter != shellTargetWindowIds_.end()) {
             targetWindowId = iter->second;
         }
-    } else if (!(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && pointerEvent->GetZOrder() > 0) {
+    } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
         pointerEvent->RemovePointerItem(pointerId);
         pointerId += CAST_POINTER_ID;
         pointerItem.SetPointerId(pointerId);

@@ -1544,6 +1544,11 @@ void InputWindowsManager::NotifyPointerToWindow()
         MMI_HILOGD("lastPointerEvent_ is nullptr");
         return;
     }
+    if ((lastPointerEvent_->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (lastPointerEvent_->GetButtonId() >= 0)) {
+        MMI_HILOGD("No need to respond to new interface layouts");
+        return;
+    }
     windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
