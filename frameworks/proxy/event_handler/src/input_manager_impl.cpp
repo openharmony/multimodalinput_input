@@ -1523,6 +1523,8 @@ void InputManagerImpl::OnDisconnected()
         PointerEvent::POINTER_ACTION_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
+    std::initializer_list<int32_t> pointerActionAxisEvents { PointerEvent::POINTER_ACTION_AXIS_UPDATE,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN };
     if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
         MMI_HILOGE("Up event for service exception re-sending");
         return;
@@ -1530,6 +1532,11 @@ void InputManagerImpl::OnDisconnected()
 
     if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
         MMI_HILOGE("Pull up event for service exception re-sending");
+        return;
+    }
+
+    if (RecoverPointerEvent(pointerActionAxisEvents, PointerEvent::POINTER_ACTION_AXIS_END)) {
+        MMI_HILOGE("Axis event for service exception re-sending");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
