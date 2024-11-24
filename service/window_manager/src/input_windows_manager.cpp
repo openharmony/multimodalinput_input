@@ -2068,6 +2068,12 @@ void InputWindowsManager::AdjustDisplayCoordinate(
 {
     int32_t width = displayInfo.width;
     int32_t height = displayInfo.height;
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
+            width = displayInfo.height;
+            height = displayInfo.width;
+        }
+    }
     if (physicalX <= 0) {
         physicalX = 0;
     }
