@@ -1162,7 +1162,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
             MMI_HILOGE("OnVsync set dynamic hardware cursor location error");
             return;
         }
-        layer->ReleaseBuffer(buffer, releaseFence_);
+        layer_->ReleaseBuffer(buffer, releaseFence_);
     });
     RequestNextVSync();
 }
