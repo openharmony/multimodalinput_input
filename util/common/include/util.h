@@ -71,6 +71,12 @@ int32_t ReadCursorStyleFile(const std::string &filePath);
 
 int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf);
 
+bool ReadFile(const std::string &path, std::string &content);
+
+std::string IntToHexRGB(int32_t color);
+
+void StringReplace(std::string &str, const std::string &pattern, const std::string &to);
+
 std::string FileVerification(std::string &filePath, const std::string &checkExtension);
 
 std::string StringPrintf(const char *format, ...);

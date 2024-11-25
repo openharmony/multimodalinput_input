@@ -21,6 +21,7 @@
 #include <cstdarg>
 #include <fstream>
 #include <iostream>
+#include <regex>
 
 #include <sys/prctl.h>
 #include <sys/stat.h>
@@ -62,6 +63,9 @@ constexpr size_t BUF_TID_SIZE { 10 };
 constexpr size_t BUF_CMD_SIZE { 512 };
 constexpr size_t PROGRAM_NAME_SIZE { 256 };
 constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
+constexpr int32_t COLOR_FIXEX_WIDTH { 6 };
+const std::string COLOR_PREFIX = "#";
+const char COLOR_FILL = '0';
 } // namespace
 
 int64_t GetSysClockTime()
@@ -566,6 +570,31 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
     return realPath;
 }
 
+bool ReadFile(const std::string &path, std::string &content)
+{
+    std::ifstream file(path);
+    if (!file) {
+        return false;
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    content = buffer.str();
+    return true;
+}
+
+std::string IntToHexRGB(int32_t color)
+{
+    std::ostringstream oss;
+    oss << COLOR_PREFIX << std::setfill(COLOR_FILL) << std::setw(COLOR_FIXEX_WIDTH) << std::hex << std::uppercase
+        << color;
+    return oss.str();
+}
+
+void StringReplace(std::string &str, const std::string &oldStr, const std::string &newStr)
+{
+    std::regex re(oldStr);
+    str = std::regex_replace(str, re, newStr);
+}
 
 bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::string &record)
 {
