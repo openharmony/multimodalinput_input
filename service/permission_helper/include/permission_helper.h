@@ -58,4 +58,4 @@ private:
 #define PER_HELPER PermissionHelper::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif  // PERMISSION_HELPER_H
+#endif // PERMISSION_HELPER_H
