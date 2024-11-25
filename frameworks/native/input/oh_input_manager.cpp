@@ -843,7 +843,7 @@ static bool SetAxisValueByAxisEventType(std::shared_ptr<OHOS::MMI::PointerEvent>
         value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
         axisEvent->axisValues.insert(std::make_pair(AXIS_TYPE_SCROLL_HORIZONTAL, value));
     } else {
-        MMI_HILOGE("Undefined axisEventType: %{public}d", axisEventType);
+        MMI_HILOGE("Undefined axisEventType:%{public}d", axisEventType);
         return false;
     }
     axisEvent->axisEventType = axisEventType;
@@ -938,7 +938,7 @@ Input_Result OH_Input_GetAxisEventAxisValue(const Input_AxisEvent* axisEvent,
     CHKPR(axisValue, INPUT_PARAMETER_ERROR);
     auto it = axisEvent->axisValues.find(axisType);
     if (it == axisEvent->axisValues.end()) {
-        MMI_HILOGE("There is no axis value of axisType: %{public}d in the axisEvent", axisType);
+        MMI_HILOGE("There is no axis value of axisType:%{public}d in the axisEvent", axisType);
         return INPUT_PARAMETER_ERROR;
     }
     *axisValue = it->second;
@@ -1043,7 +1043,7 @@ static bool IsScreenCaptureWorking()
     int32_t pid = OHOS::IPCSkeleton::GetCallingPid();
     int32_t capturePid = OHOS::Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
     if (capturePid != pid) {
-        MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
+        MMI_HILOGE("Calling pid is:%{public}d, but screen capture pid is:%{public}d", pid, capturePid);
         return false;
     }
     return true;
