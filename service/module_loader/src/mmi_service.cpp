@@ -2010,11 +2010,11 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, handlerType, eventType, priority, deviceTags, isRegisterCaptureCb] {
-#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
             if (isRegisterCaptureCb) {
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
                 RegisterScreenCaptureCallback();
-            }
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
+            }
             return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
         });
     if (ret != RET_OK) {
