@@ -98,4 +98,4 @@ private:
 #define LONG_PRESS_EVENT_HANDLER ::OHOS::DelayedSingleton<LongPressSubscriberHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif  // LONG_PRESS_SUBSCRIBER_HANDLER_H
+#endif // LONG_PRESS_SUBSCRIBER_HANDLER_H
