@@ -1015,7 +1015,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
     if (windowId == -1 && !PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("can not set global winid, because this is not sys app");
+        MMI_HILOGE("Can not set global winid, because this is not sys app");
         return ERROR_NOT_SYSAPI;
     }
     int32_t ret = SetPointerStyle(windowId, pointerStyle, isUiExtension);
