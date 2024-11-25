@@ -137,7 +137,8 @@ private:
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
-    std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
+    std::shared_ptr<OHOS::Media::PixelMap> LoadCursorSvgWithColor(MOUSE_ICON type, int32_t color);
+    std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(MOUSE_ICON type);
     void UpdatePointerVisible();
     int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style, bool isUiExtension = false);
     void CheckMouseIconPath();
@@ -271,7 +272,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
-    std::map<std::string, loadingAndLoadingPixelMapInfo> mousePixelMap_;
+    std::map<MOUSE_ICON, loadingAndLoadingPixelMapInfo> mousePixelMap_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
     int releaseFence_ { -1 };
 };

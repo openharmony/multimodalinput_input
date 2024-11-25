@@ -1352,7 +1352,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DecodeImageToPixelMa
     PointerDrawingManager pointerDrawingManager;
     std::string iconPath = ("/system/etc/multimodalinput/mouse_icon/Loading_Left.svg");
     pointerDrawingManager.tempPointerColor_ = 1;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DecodeImageToPixelMap(iconPath));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DecodeImageToPixelMap(MOUSE_ICON::RUNNING));
 }
 
 /**
