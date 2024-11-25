@@ -190,7 +190,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
         return nullptr;
     }
     if (preKeys.size() > PRE_KEYS_SIZE) {
-        MMI_HILOGE("preKeys size invalid");
+        MMI_HILOGE("PreKeys size invalid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
         return nullptr;
     }
