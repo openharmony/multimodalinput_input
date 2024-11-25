@@ -2361,6 +2361,9 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
         axisBeginWindowInfo_ = firstBtnDownWindowInfo_;
     }
+    if (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE && axisBeginWindowInfo_ != std::make_pair(-1, -1)) {
+        firstBtnDownWindowInfo_ = axisBeginWindowInfo_;
+    }
     if (action == PointerEvent::POINTER_ACTION_AXIS_END && axisBeginWindowInfo_ != std::make_pair(-1, -1)) {
         firstBtnDownWindowInfo_ = axisBeginWindowInfo_;
         axisBeginWindowInfo_ = {-1, -1};
