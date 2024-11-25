@@ -348,13 +348,13 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     preTime = fmin(preTime, currentTime);
     uint64_t deltaTime = (currentTime - preTime);
     ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed(),
-            dalta_time, static_cast<double>(displayInfo->ppi));
+        &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed(),
+        dalta_time, static_cast<double>(displayInfo->ppi));
     preTime = currentTime;
 #else
-        ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
-            MouseTransformProcessor::GetPointerSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
+    ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+        &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
+        MouseTransformProcessor::GetPointerSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     }
     if (ret != RET_OK) {
