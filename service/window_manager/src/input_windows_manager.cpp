@@ -2358,6 +2358,16 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         }
         winId2ZorderMap.clear();
     }
+    if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
+        axisBeginWindowInfo_ = firstBtnDownWindowInfo_;
+    }
+    if (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE && axisBeginWindowInfo_ != std::make_pair(-1, -1)) {
+        firstBtnDownWindowInfo_ = axisBeginWindowInfo_;
+    }
+    if (action == PointerEvent::POINTER_ACTION_AXIS_END && axisBeginWindowInfo_ != std::make_pair(-1, -1)) {
+        firstBtnDownWindowInfo_ = axisBeginWindowInfo_;
+        axisBeginWindowInfo_ = {-1, -1};
+    }
     MMI_HILOG_DISPATCHD("firstBtnDownWindowInfo_.first:%{public}d", firstBtnDownWindowInfo_.first);
     for (const auto &item : windowsInfo) {
         for (const auto &windowInfo : item.uiExtentionWindowInfo) {
