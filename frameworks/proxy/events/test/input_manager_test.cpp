@@ -2151,7 +2151,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeLongPressEvent_03, TestSi
 }
 
 /**
- * @tc.name: InputManagerTest_UnsubscribeLongPressEvent_054
+ * @tc.name: InputManagerTest_UnsubscribeLongPressEvent_04
  * @tc.desc: Verify cancel ten subscription.
  * @tc.type: FUNC
  * @tc.require: AR2024112192028
@@ -2160,7 +2160,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeLongPressEvent_03, TestSi
 HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeLongPressEvent_04, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(MMIEventHdl.InitClient());
     int32_t subscribeId = INVAID_VALUE;
     LongPressRequest pressEvent;
     pressEvent.fingerCount = 1;
