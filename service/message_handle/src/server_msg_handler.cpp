@@ -349,7 +349,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         uint64_t deltaTime = (currentTime - preTime);
         ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed(),
-            dalta_time, static_cast<double>(displayInfo->ppi));
+            deltaTime, static_cast<double>(displayInfo->ppi));
         preTime = currentTime;
 #else
         ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
