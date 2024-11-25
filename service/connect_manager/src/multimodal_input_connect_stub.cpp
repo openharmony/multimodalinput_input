@@ -46,9 +46,6 @@ constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-constexpr int32_t VKEY_MOTION_SPACE_PATTERN_MAX_SIZE { 10 };
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
@@ -390,12 +387,6 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubTransmitInfrared(data, reply);
             break;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_VKEYBOARD_AREA):
-            ret = StubSetVKeyboardArea(data, reply);
-            break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOTION_SPACE):
-            ret = StubSetMotionSpace(data, reply);
-            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CREATE_VKEYBOARD_DEVICE):
             ret = StubCreateVKeyboardDevice(data, reply);
             break;
@@ -2530,61 +2521,6 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-int32_t MultimodalInputConnectStub::StubSetVKeyboardArea(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("StubSetVKeyboardArea Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-    double topLeftX = 0.0;
-    double topLeftY = 0.0;
-    double bottomRightX = 0.0;
-    double bottomRightY = 0.0;
-    READDOUBLE(data, topLeftX, IPC_PROXY_DEAD_OBJECT_ERR);
-    READDOUBLE(data, topLeftY, IPC_PROXY_DEAD_OBJECT_ERR);
-    READDOUBLE(data, bottomRightX, IPC_PROXY_DEAD_OBJECT_ERR);
-    READDOUBLE(data, bottomRightY, IPC_PROXY_DEAD_OBJECT_ERR);
-
-    int32_t ret = SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call StubSetVKeyboardArea failed ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectStub::StubSetMotionSpace(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("StubSetMotionSpace Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-    std::string keyName;
-    READSTRING(data, keyName, IPC_PROXY_DEAD_OBJECT_ERR);
-    bool useShift = false;
-    READBOOL(data, useShift, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t patternLen = 0;
-    READINT32(data, patternLen, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (patternLen > VKEY_MOTION_SPACE_PATTERN_MAX_SIZE || patternLen <= 0) {
-        MMI_HILOGE("Virtual keyboard set motion space pattern len is invalid");
-        return RET_ERR;
-    }
-    std::vector<int32_t> pattern;
-    for (int32_t i = 0; i < patternLen; i++) {
-        int32_t value = 0;
-        READINT32(data, value);
-        pattern.push_back(value);
-    }
-    int32_t ret = SetMotionSpace(keyName, useShift, pattern);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call StubSetMotionSpace failed ret:%{public}d", ret);
-        return ret;
-    }
-    WRITEINT32(reply, ret);
-    return RET_OK;
-}
-
 int32_t MultimodalInputConnectStub::StubCreateVKeyboardDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;

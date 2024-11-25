@@ -952,10 +952,6 @@ KeyEvent::KeyEvent(const KeyEvent& other)
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
       enhanceData_(other.enhanceData_),
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-      vkeyboardAction_(other.vkeyboardAction_),
-      keyName_(other.keyName_),
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
       repeat_(other.repeat_),
       repeatKey_(other.repeatKey_) {}
 
@@ -983,10 +979,6 @@ void KeyEvent::Reset()
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     enhanceData_.clear();
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    vkeyboardAction_ = VKeyboardAction::UNKNOWN;
-    keyName_ = "";
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 std::string KeyEvent::ToString()
@@ -1251,10 +1243,6 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
         WRITEUINT32(out, enhanceData_[i]);
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    WRITEINT32(out, static_cast<int32_t>(vkeyboardAction_));
-    WRITESTRING(out, keyName_);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     return true;
 }
 
@@ -1286,12 +1274,6 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t vkAction = 0;
-    READINT32(in, vkAction);
-    vkeyboardAction_ = static_cast<VKeyboardAction>(vkAction);
-    READSTRING(in, keyName_);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     return true;
 }
 
@@ -1432,52 +1414,5 @@ std::vector<uint8_t> KeyEvent::GetEnhanceData() const
     return enhanceData_;
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-KeyEvent::VKeyboardAction KeyEvent::GetVKeyboardAction() const
-{
-    return vkeyboardAction_;
-}
-
-void KeyEvent::SetVKeyboardAction(VKeyboardAction vkAction)
-{
-    vkeyboardAction_ = vkAction;
-}
-
-const char* KeyEvent::VKeyboardActionToStr(VKeyboardAction vKeyAction)
-{
-    switch (vKeyAction) {
-        case VKeyboardAction::ACTIVATE_KEYBOARD:
-            return "ACTIVATE_KEYBOARD";
-        case VKeyboardAction::VKEY_DOWN:
-            return "VKEY_DOWN";
-        case VKeyboardAction::VKEY_UP:
-            return "VKEY_UP";
-        case VKeyboardAction::RESET_BUTTON_COLOR:
-            return "RESET_BUTTON_COLOR";
-        case VKeyboardAction::TWO_FINGERS_IN:
-            return "TWO_FINGERS_IN";
-        case VKeyboardAction::TWO_FINGERS_OUT:
-            return "TWO_FINGERS_OUT";
-        case VKeyboardAction::TWO_HANDS_UP:
-            return "TWO_HANDS_UP";
-        case VKeyboardAction::TWO_HANDS_DOWN:
-            return "TWO_HANDS_DOWN";
-        default:
-            MMI_HILOGW("Unknown virtual keyboard action:%{public}d", static_cast<int>(vKeyAction));
-            return "UNKNOWN";
-    }
-}
-
-std::string KeyEvent::GetKeyName() const
-{
-    return keyName_;
-}
-
-void KeyEvent::SetKeyName(const std::string& keyName)
-{
-    keyName_ = keyName;
-}
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS

@@ -2102,58 +2102,6 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-int32_t MultimodalInputConnectProxy::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEDOUBLE(data, topLeftX, ERR_INVALID_VALUE);
-    WRITEDOUBLE(data, topLeftY, ERR_INVALID_VALUE);
-    WRITEDOUBLE(data, bottomRightX, ERR_INVALID_VALUE);
-    WRITEDOUBLE(data, bottomRightY, ERR_INVALID_VALUE);
-
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        MultimodalinputConnectInterfaceCode::SET_VKEYBOARD_AREA), data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("SetVKeyboardArea Send request fail, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectProxy::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITESTRING(data, keyName, ERR_INVALID_VALUE);
-    WRITEBOOL(data, useShift, ERR_INVALID_VALUE);
-    WRITEINT32(data, static_cast<int32_t>(pattern.size()), ERR_INVALID_VALUE);
-    for (const auto &item : pattern) {
-        WRITEINT32(data, item);
-    }
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-                                      MultimodalinputConnectInterfaceCode::SET_MOTION_SPACE),
-                                      data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("SetMotionSpace Send request fail, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
 int32_t MultimodalInputConnectProxy::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
     CALL_DEBUG_ENTER;

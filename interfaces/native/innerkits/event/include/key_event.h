@@ -3083,27 +3083,6 @@ public:
      * @since 11
      */
     static const int32_t KEYCODE_CALL_CONTROL_CENTER;
-
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-public:
-    /**
-     * @brief Enumerated values of virtual keyboard actions
-     * @since 13
-     */
-    enum VKeyboardAction : int32_t {
-        UNKNOWN = 0,
-        ACTIVATE_KEYBOARD = 1,
-        VKEY_DOWN = 2,
-        VKEY_UP = 3,
-        RESET_BUTTON_COLOR = 4,
-        TWO_FINGERS_IN = 5,
-        TWO_FINGERS_OUT = 6,
-        TWO_HANDS_UP = 7,
-        TWO_HANDS_DOWN = 8,
-        IDLE = 9,
-    };
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
-
 public:
     class KeyItem {
     public:
@@ -3442,38 +3421,6 @@ public:
      */
     std::vector<uint8_t> GetEnhanceData() const;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    /**
-     * @brief Obtains the virtual keyboard action of this key event.
-     * @return VKeyboardAction
-     * @since 13
-     */
-    VKeyboardAction GetVKeyboardAction() const;
-
-    /**
-     * @brief Sets the virtual keyboard action for the current key event.
-     * @param vkAction Specified virtual keyboard action.
-     * @return void
-     * @since 13
-     */
-    void SetVKeyboardAction(VKeyboardAction vkAction);
-
-    /**
-     * @brief Get the key name of this key event.
-     * @return Key name string
-     * @since 13
-     */
-    std::string GetKeyName() const;
-
-    /**
-     * @brief Sets the key name for the current key event.
-     * @param vkAction Specified key name.
-     * @return void
-     * @since 13
-     */
-    void SetKeyName(const std::string& keyName);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -3498,16 +3445,6 @@ public:
      * @since 12
     */
     static std::string_view ActionToShortStr(int32_t action);
-
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    /**
-     * @brief Converts a virtual keyboard action into a string.
-     * @param Indicates the virtual keyboard action.
-     * @return Returns the string converted from the virtual keyboard action.
-     * @since 13
-     */
-    static const char* VKeyboardActionToStr(VKeyboardAction vKeyAction);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
@@ -3537,10 +3474,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    VKeyboardAction vkeyboardAction_ { VKeyboardAction::UNKNOWN };
-    std::string keyName_;
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     bool repeat_ { false };
     bool repeatKey_ { false };
     bool fourceMonitorFlag_ { false };

@@ -626,16 +626,6 @@ int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pat
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-int32_t InputManager::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
-{
-    return InputMgrImpl.SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
-}
-
-int32_t InputManager::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
-{
-    return InputMgrImpl.SetMotionSpace(keyName, useShift, pattern);
-}
-
 int32_t InputManager::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
     return InputMgrImpl.CreateVKeyboardDevice(vkeyboardDevice);
