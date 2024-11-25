@@ -2381,18 +2381,6 @@ int32_t InputManagerImpl::CancelInjection()
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-int32_t InputManagerImpl::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
-{
-    CALL_INFO_TRACE;
-    return MULTIMODAL_INPUT_CONNECT_MGR->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
-}
-
-int32_t InputManagerImpl::SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern)
-{
-    CALL_INFO_TRACE;
-    return MULTIMODAL_INPUT_CONNECT_MGR->SetMotionSpace(keyName, useShift, pattern);
-}
-
 int32_t InputManagerImpl::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
     CALL_INFO_TRACE;
