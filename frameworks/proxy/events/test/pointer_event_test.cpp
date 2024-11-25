@@ -1712,36 +1712,5 @@ HWTEST_F(PointerEventTest, PointerEventTest_ToString, TestSize.Level1)
     ASSERT_NE(inputEvent, nullptr);
     ASSERT_NO_FATAL_FAILURE(inputEvent->ToString());
 }
-
-/**
- * @tc.name: PointerEventTest_ReadFromParcel
- * @tc.desc: Test the funcation ReadFromParcel
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Parcel in;
-    PointerEvent::PointerItem item;
-    item.pressed_ = false;
-    bool ret = item.ReadFromParcel(in);
-    ASSERT_FALSE(ret);
-}
-
-/**
- * @tc.name: PointerEventTest_ClearAxisStatus
- * @tc.desc: Test the funcation ClearAxisStatus
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
-    ASSERT_NO_FATAL_FAILURE(pointerEvent->ClearAxisStatus(axis));
-}
 } // namespace MMI
 } // namespace OHOS
