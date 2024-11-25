@@ -28,17 +28,8 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<void(void *event, int64_t frameTime)> FunInputEvent;
-typedef std::function<bool(double x, double y)> IsInsideVKeyboardArea;
-typedef std::function<bool()> IsKeyboardVisible;
-typedef std::function<void(double screenX, double screenY, int touchId, bool tipDown, std::string& buttonName,
-    long long timestamp, bool updateDynamicGaussian,
-    std::vector<std::pair<std::string, double>>& sortedNegLogProb)> MapTouchToButton;
-
-typedef std::function<void(double screenX, double screenY, int touchId, bool tipDown, std::string buttonName)> KeyDown;
-typedef std::function<void(double screenX, double screenY, int touchId, bool tipDown, std::string buttonName)> KeyUp;
 typedef std::function<int32_t(double screenX, double screenY, int touchId, bool tipDown)> HandleTouchPoint;
 typedef std::function<int32_t(int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode)> GetMessage;
-typedef std::function<int32_t(std::string keyName)> GetKeyCodeByKeyName;
 
 enum VKeyboardMessageType {
     VNoMessage = -1,
@@ -65,13 +56,7 @@ public:
     }
 	
     void InitVKeyboard(HandleTouchPoint handleTouchPoint,
-                    IsInsideVKeyboardArea isInsideVKeyboardArea,
-                    IsKeyboardVisible isKeyboardVisible,
-                    MapTouchToButton mapTouchToButton,
-                    KeyDown keyDown,
-                    KeyUp keyUp,
-                    GetMessage getMessage,
-                    GetKeyCodeByKeyName getKeyCodeByKeyName);
+                    GetMessage getMessage);
 
 private:
     void OnEventHandler();
@@ -86,13 +71,7 @@ private:
 
     FunInputEvent funInputEvent_;
     HandleTouchPoint handleTouchPoint_ { nullptr };
-    IsInsideVKeyboardArea isInsideVKeyboardArea_ { nullptr };
-    IsKeyboardVisible isKeyboardVisible_ { nullptr };
-    MapTouchToButton mapTouchToButton_ { nullptr };
-    KeyDown keyDown_ { nullptr };
-    KeyUp keyUp_ { nullptr };
     GetMessage getMessage_ { nullptr };
-    GetKeyCodeByKeyName getKeyCodeByKeyName_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
