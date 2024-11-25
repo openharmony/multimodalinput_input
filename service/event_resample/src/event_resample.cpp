@@ -174,6 +174,7 @@ bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result)
 void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
 {
     EventDump("Output Event", *outEvent);
+    CHKPV(pointerEvent_);
     pointerEvent_->SetActionTime(outEvent->actionTime);
     pointerEvent_->SetPointerAction(outEvent->pointerAction);
     pointerEvent_->SetActionTime(outEvent->actionTime);
