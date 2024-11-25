@@ -1688,6 +1688,502 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
 }
 
 /**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_01
+ * @tc.desc: Verify invalid parameter : finger count less than 0.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = -1;
+    longPressRequest.duration = 300;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_02
+ * @tc.desc: Verify invalid parameter : finger count equals 0.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 0;
+    longPressRequest.duration = 300;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_03
+ * @tc.desc: Verify valid parameter : finger count equals 2.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 2;
+    longPressRequest.duration = 300;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_04
+ * @tc.desc: Verify invalid parameter : finger count greater than 2.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 4;
+    longPressRequest.duration = 300;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_05
+ * @tc.desc: Verify invalid parameter : duration less than 0ms.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = -1;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_06
+ * @tc.desc: Verify invalid parameter : duration equals 0ms.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 0;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_07
+ * @tc.desc: Verify valid parameter : duration equals 3000ms.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 3000;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_08
+ * @tc.desc: Verify invalid parameter : duration greater than 3000ms.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 4;
+    longPressRequest.duration = 3001;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_09
+ * @tc.desc: Verify invalid parameter : null callback.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_09, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest, nullptr);
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_10
+ * @tc.desc: Verify subscribe repeat long press event.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_10, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
+    int32_t subscribeId1 = INVAID_VALUE;
+    LongPressRequest pressEvent;
+    pressEvent.fingerCount = 1;
+    pressEvent.duration = 300;
+    subscribeId1 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId1 >= 0);
+
+    int32_t subscribeId2 = INVAID_VALUE;
+    subscribeId2 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId2 >= 0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId1);
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId2);
+}
+
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_11
+ * @tc.desc: Verify subscribe ten long press event.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_11, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
+    int32_t subscribeId = INVAID_VALUE;
+    LongPressRequest pressEvent;
+    pressEvent.fingerCount = 1;
+    pressEvent.duration = 300;
+    std::vector<int32_t> ids;
+    for (size_t i = 0; i < 10; ++i) {
+        subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent,
+            [](const LongPressEvent &longPressEvent) {
+            MMI_HILOGD("Subscribe long press event trigger callback");
+        });
+        EXPECT_TRUE(subscribeId >= 0);
+        ids.push_back(subscribeId);
+        pressEvent.duration += 100;
+    }
+    EXPECT_TRUE(ids.size() == 10);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    for (size_t i = 0; i < ids.size(); ++i) {
+        InputManager::GetInstance()->UnsubscribeLongPressEvent(ids[i]);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_12
+ * @tc.desc: Verify subscribe two long press event.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_12, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
+    int32_t subscribeId1 = INVAID_VALUE;
+    LongPressRequest pressEvent1;
+    pressEvent1.fingerCount = 1;
+    pressEvent1.duration = 300;
+    subscribeId1 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent1,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId1 >= 0);
+
+    int32_t subscribeId2 = INVAID_VALUE;
+    LongPressRequest pressEvent2;
+    pressEvent2.fingerCount = 2;
+    pressEvent2.duration = 300;
+    subscribeId2 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent2,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId2 >= 0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId1);
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId2);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_13
+ * @tc.desc: Verify recognition algorithm of long press event, only subscribe two finger.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_13, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
+    int32_t subscribeId1 = INVAID_VALUE;
+    LongPressRequest pressEvent1;
+    pressEvent1.fingerCount = 2;
+    pressEvent1.duration = 300;
+    subscribeId1 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent1,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId1 >= 0);
+
+    int32_t subscribeId2 = INVAID_VALUE;
+    LongPressRequest pressEvent2;
+    pressEvent2.fingerCount = 2;
+    pressEvent2.duration = 900;
+    subscribeId2 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent2,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId2 >= 0);
+
+    int32_t subscribeId3 = INVAID_VALUE;
+    LongPressRequest pressEvent3;
+    pressEvent3.fingerCount = 2;
+    pressEvent3.duration = 1500;
+    subscribeId3 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent3,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId3 >= 0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId1);
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId2);
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId3);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeLongPressEvent_14
+ * @tc.desc: Verify recognition algorithm of long press event, subscribe one finger and two finger.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeLongPressEvent_14, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
+    int32_t subscribeId1 = INVAID_VALUE;
+    LongPressRequest pressEvent1;
+    pressEvent1.fingerCount = 1;
+    pressEvent1.duration = 300;
+    subscribeId1 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent1,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId1 >= 0);
+
+    int32_t subscribeId2 = INVAID_VALUE;
+    LongPressRequest pressEvent2;
+    pressEvent2.fingerCount = 2;
+    pressEvent2.duration = 300;
+    subscribeId2 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent2,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId2 >= 0);
+
+    int32_t subscribeId3 = INVAID_VALUE;
+    LongPressRequest pressEvent3;
+    pressEvent3.fingerCount = 1;
+    pressEvent3.duration = 900;
+    subscribeId3 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent3,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId3 >= 0);
+
+    int32_t subscribeId4 = INVAID_VALUE;
+    LongPressRequest pressEvent4;
+    pressEvent4.fingerCount = 2;
+    pressEvent4.duration = 900;
+    subscribeId4 = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent4,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId4 >= 0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId1);
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId2);
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId3);
+    InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId4);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_UnsubscribeLongPressEvent_01
+ * @tc.desc: Verify invalid parameter : subscribe id less than 0.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeLongPressEvent_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    subscribeId = -1;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId));
+}
+
+/**
+ * @tc.name: InputManagerTest_UnsubscribeLongPressEvent_02
+ * @tc.desc: Verify invalid parameter : subscribe id less than 0.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeLongPressEvent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscribeId = INVAID_VALUE;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId));
+}
+
+/**
+ * @tc.name: InputManagerTest_UnsubscribeLongPressEvent_03
+ * @tc.desc: Verify invalid parameter : subscribe id is not a subscribed value.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeLongPressEvent_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(longPressRequest,
+        [](const LongPressEvent &longPressEvent) {
+        MMI_HILOGD("Subscribe long press event trigger callback");
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    subscribeId += 10;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId));
+}
+
+/**
+ * @tc.name: InputManagerTest_UnsubscribeLongPressEvent_054
+ * @tc.desc: Verify cancel ten subscription.
+ * @tc.type: FUNC
+ * @tc.require: AR2024112192028
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeLongPressEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
+    int32_t subscribeId = INVAID_VALUE;
+    LongPressRequest pressEvent;
+    pressEvent.fingerCount = 1;
+    pressEvent.duration = 300;
+    std::vector<int32_t> ids;
+    for (size_t i = 0; i < 10; ++i) {
+        subscribeId = InputManager::GetInstance()->SubscribeLongPressEvent(pressEvent,
+            [](const LongPressEvent &longPressEvent) {
+            MMI_HILOGD("Subscribe long press event trigger callback");
+        });
+        EXPECT_TRUE(subscribeId >= 0);
+        ids.push_back(subscribeId);
+        pressEvent.duration += 100;
+    }
+    EXPECT_TRUE(ids.size() == 10);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    for (size_t i = 0; i < ids.size(); ++i) {
+        ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
  * @tc.name: InputManagerTest_ClearWindowPointerStyle_001
  * @tc.desc: Verify invalid parameter.
  * @tc.type: FUNC
