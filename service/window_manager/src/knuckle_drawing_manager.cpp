@@ -365,6 +365,7 @@ void KnuckleDrawingManager::InitParticleEmitter()
     Rosen::ParticleParams params(emitterConfig, velocity, acceleration, color, opacity, scale, spin);
     std::vector<Rosen::ParticleParams> particleParams;
     particleParams.push_back(params);
+    CHKPV(brushCanvasNode_);
     brushCanvasNode_->SetParticleParams(particleParams);
     isNeedInitParticleEmitter_ = false;
 }
