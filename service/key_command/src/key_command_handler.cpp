@@ -1618,6 +1618,7 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
         if (repeatTimerId_ >= 0) {
             TimerMgr->RemoveTimer(repeatTimerId_);
             repeatTimerId_ = DEFAULT_VALUE;
+            isHandleSequence_ = false;
         }
         if (repeatKeyTimerIds_.find(item.ability.bundleName) == repeatKeyTimerIds_.end()) {
             repeatKeyTimerIds_.emplace(item.ability.bundleName, timerId);
@@ -1734,6 +1735,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
             if (repeatTimerId_ >= 0) {
                 TimerMgr->RemoveTimer(repeatTimerId_);
                 repeatTimerId_ = -1;
+                isHandleSequence_ = false;
             }
         }
         return true;
