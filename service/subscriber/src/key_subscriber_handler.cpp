@@ -1119,6 +1119,7 @@ bool KeySubscriberHandler::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent
         return false;
     }
 
+    CHKPF(keyEvent_);
     if (keyEvent->GetKeyCode() != keyEvent_->GetKeyCode()) {
         return false;
     }
