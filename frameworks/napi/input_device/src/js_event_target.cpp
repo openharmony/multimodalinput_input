@@ -623,7 +623,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult[0] == nullptr) {
-            MMI_HILOGE("callResult[0] is nullptr");
+            MMI_HILOGE("The callResult[0] is nullptr");
             napi_close_handle_scope(cb->env, scope);
             return;
         }
