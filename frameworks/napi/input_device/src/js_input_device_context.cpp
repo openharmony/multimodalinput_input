@@ -706,7 +706,7 @@ napi_value JsInputDeviceContext::SetVKeyboardArea(napi_env env, napi_callback_in
     }
     int32_t ret = InputManager::GetInstance()->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
     if (ret != RET_OK) {
-        MMI_HILOGE("SetVKeyboardArea failed with ret: %{public}d", ret);
+        MMI_HILOGE("SetVKeyboardArea failed with ret:%{public}d", ret);
         return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
     }
     return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::SUCCEED));
@@ -913,7 +913,7 @@ napi_value JsInputDeviceContext::UpdateMotionSpace(napi_env env, napi_callback_i
             pattern.push_back(static_cast<int32_t>(item->pageTypeId));
             ret = InputManager::GetInstance()->SetMotionSpace(item->keyName, item->useShift, pattern);
             if (ret != RET_OK) {
-                MMI_HILOGE("UpdateMotionSpace failed with ret: %{public}d", ret);
+                MMI_HILOGE("UpdateMotionSpace failed with ret:%{public}d", ret);
                 return JsUtil::GetNapiInt32(env, static_cast<int32_t>(VKeyResult::FAILED));
             }
         }
