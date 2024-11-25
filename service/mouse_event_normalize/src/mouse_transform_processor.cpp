@@ -423,6 +423,9 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     if (PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
         deviceType = DeviceType::DEVICE_TABLET;
     }
+    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+        deviceType = DeviceType::DEVICE_FOLD_PC;
+    }
     int32_t ret =
         HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
     if (ret != RET_OK) {
