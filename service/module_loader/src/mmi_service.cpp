@@ -142,27 +142,9 @@ void* g_VKeyboardHandle = nullptr;
 typedef int32_t (*HANDLE_TOUCHPOINT_TYPE)(
     double screenX, double screenY, int touchId, bool tipDown);
 HANDLE_TOUCHPOINT_TYPE handleTouchPoint_ = nullptr;
-typedef void (*ALGORITHM_KEYDOWN_TYPE)(
-    double screenX, double screenY, int touchId, bool tipDown, std::string buttonName);
-ALGORITHM_KEYDOWN_TYPE algorithm_keydown_ = nullptr;
-typedef void (*ALGORITHM_KEYUP_TYPE)(
-    double screenX, double screenY, int touchId, bool tipDown, std::string buttonName);
-ALGORITHM_KEYUP_TYPE algorithm_keyup_ = nullptr;
-typedef int32_t (*GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)(std::string keyName);
-GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE gaussiankeyboard_getKeyCodeByKeyName_ = nullptr;
-typedef void (*BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE)(
-    double screenX, double screenY, int touchId, bool tipDown, std::string& buttonName,
-    long long timestamp, bool updateDynamicGaussian, std::vector<std::pair<std::string, double>>& sortedNegLogProb);
-BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE bayesianengine_mapTouchToButton_ = nullptr;
 typedef int32_t (*STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)(
     int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode);
 STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE statemachineMessageQueue_getLibinputMessage_ = nullptr;
-typedef void (*STATEMACINEMESSAGQUEUE_CLEARMESSAGE_TYPE)();
-STATEMACINEMESSAGQUEUE_CLEARMESSAGE_TYPE statemachineMessageQueue_clearMessage_ = nullptr;
-typedef bool (*GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)(double x, double y);
-GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE gaussiankeyboard_isInsideVKeyboardArea_ = nullptr;
-typedef bool (*GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)();
-GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE gaussiankeyboard_isVKeyboardVisible_ = nullptr;
 typedef int32_t (*VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)(IRemoteObject* &vkeyboardDevice);
 VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE vkeyboard_createVKeyboardDevice_ = nullptr;
 typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcKeyEvent);
@@ -2872,26 +2854,10 @@ void MMIService::InitVKeyboardFuncHandler()
         g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
         if (g_VKeyboardHandle != nullptr) {
             handleTouchPoint_ = (HANDLE_TOUCHPOINT_TYPE)dlsym(g_VKeyboardHandle, "HandleTouchPoint");
-            algorithm_keydown_ = (ALGORITHM_KEYDOWN_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyDown");
-            algorithm_keyup_ = (ALGORITHM_KEYUP_TYPE)dlsym(g_VKeyboardHandle, "AlgorithmKeyUp");
-            gaussiankeyboard_getKeyCodeByKeyName_ = (GAUSSIANKEYBOARD_GETKEYCODEBYKEYNAME_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardGetKeyCodeByKeyName");
-            bayesianengine_mapTouchToButton_ = (BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE)dlsym(
-                g_VKeyboardHandle, "BayesianEngineMapTouchToButton");
             statemachineMessageQueue_getLibinputMessage_ = (STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)dlsym(
                 g_VKeyboardHandle, "StateMachineMessageQueueGetLibinputMessage");
-            gaussiankeyboard_isInsideVKeyboardArea_ = (GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardIsInsideVKeyboardArea");
-            gaussiankeyboard_isVKeyboardVisible_ = (GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)dlsym(
-                g_VKeyboardHandle, "GaussianKeyboardIsVKeyboardVisible");
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
-                                           gaussiankeyboard_isInsideVKeyboardArea_,
-                                           gaussiankeyboard_isVKeyboardVisible_,
-                                           bayesianengine_mapTouchToButton_,
-                                           algorithm_keydown_,
-                                           algorithm_keyup_,
-                                           statemachineMessageQueue_getLibinputMessage_,
-                                           gaussiankeyboard_getKeyCodeByKeyName_);
+                                           statemachineMessageQueue_getLibinputMessage_);
         }
     }
 }
