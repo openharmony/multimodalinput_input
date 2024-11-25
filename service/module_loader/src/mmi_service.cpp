@@ -175,6 +175,9 @@ BAYESIANENGINE_MAPTOUCHTOBUTTON_TYPE bayesianengine_mapTouchToButton_ = nullptr;
 typedef int32_t (*STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)(
     string& buttonName, string& toggleButtonName, int& buttonMode, string& RestList);
 STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE statemachineMessageQueue_getMessage_ = nullptr;
+typedef int32_t (*STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)(
+    int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode);
+STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE statemachineMessageQueue_getLibinputMessage_ = nullptr;
 typedef void (*STATEMACINEMESSAGQUEUE_CLEARMESSAGE_TYPE)();
 STATEMACINEMESSAGQUEUE_CLEARMESSAGE_TYPE statemachineMessageQueue_clearMessage_ = nullptr;
 typedef bool (*GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)(double x, double y);
@@ -3654,6 +3657,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "BayesianEngineMapTouchToButton");
             statemachineMessageQueue_getMessage_ = (STATEMACINEMESSAGQUEUE_GETMESSAGE_TYPE)dlsym(
                 g_VKeyboardHandle, "StateMachineMessageQueueGetMessage");
+            statemachineMessageQueue_getLibinputMessage_ = (STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "StateMachineMessageQueueGetLibinputMessage");
             gaussiankeyboard_isInsideVKeyboardArea_ = (GAUSSIANKEYBOARD_ISINSIDEVKEYBOARDAREA_TYPE)dlsym(
                 g_VKeyboardHandle, "GaussianKeyboardIsInsideVKeyboardArea");
             gaussiankeyboard_isVKeyboardVisible_ = (GAUSSIANKEYBOARD_ISVKEYBOARDVISIBLE_TYPE)dlsym(
@@ -3686,7 +3691,7 @@ void MMIService::InitVKeyboardFuncHandler()
                                            bayesianengine_mapTouchToButton_,
                                            algorithm_keydown_,
                                            algorithm_keyup_,
-                                           statemachineMessageQueue_getMessage_,
+                                           statemachineMessageQueue_getLibinputMessage_,
                                            gaussiankeyboard_getKeyCodeByKeyName_);
         }
     }
