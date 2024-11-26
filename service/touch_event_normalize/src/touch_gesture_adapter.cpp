@@ -155,6 +155,7 @@ bool TouchGestureAdapter::OnGestureEvent(std::shared_ptr<PointerEvent> event, Ge
 {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     auto pointEvent = std::make_shared<PointerEvent>(*event);
+    pointEvent->UpdateId();
     pointEvent->SetHandlerEventType(HANDLE_EVENT_TYPE_TOUCH_GESTURE);
     switch (mode) {
         case GestureMode::ACTION_SWIPE_DOWN:

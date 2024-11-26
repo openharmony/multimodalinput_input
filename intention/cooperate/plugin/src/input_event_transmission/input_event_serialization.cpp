@@ -158,7 +158,7 @@ int32_t InputEventSerialization::SerializeInputEvent(std::shared_ptr<MMI::InputE
     CHKPR(event, ERROR_NULL_POINTER);
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
-        << event->GetTargetDisplayId() << event->GetTargetWindowId()
+        << event->GetSourceType() << event->GetTargetDisplayId() << event->GetTargetWindowId()
         << event->GetAgentWindowId() << event->GetFlag();
     if (pkt.ChkRWError()) {
         FI_HILOGE("Serialize packet is failed");
@@ -187,6 +187,8 @@ int32_t InputEventSerialization::DeserializeInputEvent(NetPacket &pkt, std::shar
     pkt >> tField;
     event->SetDeviceId(tField);
     pkt >> tField;
+    event->SetSourceType(tField);
+    pkt >> tField;
     event->SetTargetDisplayId(tField);
     pkt >> tField;
     event->SetTargetWindowId(tField);
@@ -206,12 +208,11 @@ int32_t InputEventSerialization::SerializeBaseInfo(std::shared_ptr<MMI::PointerE
 {
     int32_t pointerAction = event->GetPointerAction();
     int32_t pointerId = event->GetPointerId();
-    int32_t sourceType = event->GetSourceType();
     int32_t btnId = event->GetButtonId();
     int32_t fingerCnt = event->GetFingerCount();
     float zOrder = event->GetZOrder();
 
-    pkt << pointerAction << pointerId << sourceType << btnId << fingerCnt << zOrder;
+    pkt << pointerAction << pointerId << btnId << fingerCnt << zOrder;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Failed to serialize base information of pointer event");
         return RET_ERR;
@@ -228,14 +229,13 @@ int32_t InputEventSerialization::DeserializeBaseInfo(NetPacket &pkt, std::shared
     int32_t fingerCnt {};
     float zOrder {};
 
-    pkt >> pointerAction >> pointerId >> sourceType >> btnId >> fingerCnt >> zOrder;
+    pkt >> pointerAction >> pointerId >> btnId >> fingerCnt >> zOrder;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Failed to deserialize base information of pointer event");
         return RET_ERR;
     }
     event->SetPointerAction(pointerAction);
     event->SetPointerId(pointerId);
-    event->SetSourceType(sourceType);
     event->SetButtonId(btnId);
     event->SetFingerCount(fingerCnt);
     event->SetZOrder(zOrder);

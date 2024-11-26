@@ -463,7 +463,7 @@ PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 
 PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
-      pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
+      pressedButtons_(other.pressedButtons_),
       pointerAction_(other.pointerAction_), originPointerAction_(other.originPointerAction_),
       buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), pullId_(other.pullId_), zOrder_(other.zOrder_),
       axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
@@ -496,7 +496,6 @@ void PointerEvent::Reset()
     pointerId_ = -1;
     pointers_.clear();
     pressedButtons_.clear();
-    sourceType_ = SOURCE_TYPE_UNKNOWN;
     pointerAction_ = POINTER_ACTION_UNKNOWN;
     originPointerAction_ = POINTER_ACTION_UNKNOWN;
     buttonId_ = -1;
@@ -518,7 +517,6 @@ std::string PointerEvent::ToString()
 {
     std::string eventStr = InputEvent::ToString();
     eventStr += ",pointerId:" + std::to_string(pointerId_);
-    eventStr += ",sourceType:" + std::to_string(sourceType_);
     eventStr += ",pointerAction:" + std::to_string(pointerAction_);
     eventStr += ",buttonId:" + std::to_string(buttonId_);
     eventStr += ",pointers:[";
@@ -761,44 +759,6 @@ std::list<PointerEvent::PointerItem> PointerEvent::GetAllPointerItems() const
     return pointers_;
 }
 
-int32_t PointerEvent::GetSourceType() const
-{
-    return sourceType_;
-}
-
-void PointerEvent::SetSourceType(int32_t sourceType)
-{
-    sourceType_ = sourceType;
-}
-
-const char* PointerEvent::DumpSourceType() const
-{
-    switch (sourceType_) {
-        case PointerEvent::SOURCE_TYPE_MOUSE: {
-            return "mouse";
-        }
-        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
-            return "touch-screen";
-        }
-        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
-            return "touch-pad";
-        }
-        case PointerEvent::SOURCE_TYPE_JOYSTICK: {
-            return "joystick";
-        }
-        case PointerEvent::SOURCE_TYPE_FINGERPRINT: {
-            return "fingerprint";
-        }
-        case PointerEvent::SOURCE_TYPE_CROWN: {
-            return "crown";
-        }
-        default: {
-            break;
-        }
-    }
-    return "unknown";
-}
-
 int32_t PointerEvent::GetButtonId() const
 {
     return buttonId_;
@@ -952,8 +912,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         WRITEINT32(out, item);
     }
 
-    WRITEINT32(out, sourceType_);
-
     WRITEINT32(out, pointerAction_);
 
     WRITEINT32(out, originPointerAction_);
@@ -1039,8 +997,6 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         READINT32(in, val);
         pressedKeys_.emplace_back(val);
     }
-    READINT32(in, sourceType_);
-
     READINT32(in, pointerAction_);
 
     READINT32(in, originPointerAction_);
