@@ -167,6 +167,12 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         isParseConfig_ = true;
     }
+    if (!isParseLongPressConfig_) {
+        if (!ParseLongPressConfig()) {
+            MMI_HILOGE("Parse long press configFile failed");
+        }
+        isParseLongPressConfig_ = true;
+    }
     if (!isTimeConfig_) {
         SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
         isTimeConfig_ = true;
@@ -217,7 +223,9 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureDownEvent(touchEvent);
-            LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
+            if (CheckBundleName(touchEvent)) {
+                LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
+            }
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
@@ -1333,6 +1341,12 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         isParseConfig_ = true;
     }
+    if (!isParseLongPressConfig_) {
+        if (!ParseLongPressConfig()) {
+            MMI_HILOGE("Parse long press configFile failed");
+        }
+        isParseLongPressConfig_ = true;
+    }
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
         isParseMaxCount_ = true;
@@ -1461,6 +1475,12 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
             return false;
         }
         isParseConfig_ = true;
+    }
+    if (!isParseLongPressConfig_) {
+        if (!ParseLongPressConfig()) {
+            MMI_HILOGE("Parse long press configFile failed");
+        }
+        isParseLongPressConfig_ = true;
     }
     return HandleMulFingersTap(pointer);
 }
@@ -2632,6 +2652,69 @@ void KeyCommandHandler::TouchPadKnuckleDoubleClickProcess(const std::string bund
     ability.abilityName = abilityName;
     ability.params.emplace(std::make_pair("trigger_type", action));
     LaunchAbility(ability, NO_DELAY);
+}
+
+bool KeyCommandHandler::ParseLongPressConfig()
+{
+    std::string configPath = "/system/variant/phone/base/etc/multimodalinput/universal_drag_app_whitelist.json";
+    return ParseLongPressJson(configPath);
+}
+
+bool KeyCommandHandler::ParseLongPressJson(const std::string &configFile)
+{
+    CALL_DEBUG_ENTER;
+    std::string jsonStr = ReadJsonFile(configFile);
+    if (jsonStr.empty()) {
+        MMI_HILOGE("Read configFile failed");
+        return false;
+    }
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(parser.json_)) {
+        MMI_HILOGE("Parser.json_ is not object");
+        return false;
+    }
+
+    cJSON* bundleWhitelist = cJSON_GetObjectItemCaseSensitive(parser.json_, "whitelist");
+    if (!cJSON_IsArray(bundleWhitelist)) {
+        MMI_HILOGE("whitelist is not array");
+        return false;
+    }
+    int32_t bundleNameSize = cJSON_GetArraySize(bundleWhitelist);
+    for (int32_t i = 0; i < bundleNameSize; ++i) {
+        cJSON *bundleName = cJSON_GetArrayItem(bundleWhitelist, i);
+        if (!cJSON_IsString(bundleName)) {
+            MMI_HILOGE("bundleName is not string");
+            return false;
+        }
+        appWhiteList_.insert(bundleName->valuestring);
+    }
+    return true;
+}
+
+bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (!isParseLongPressConfig_) {
+        MMI_HILOGE("Parse configFile failed");
+        return false;
+    }
+    int32_t windowPid = WIN_MGR->GetWindowPid(touchEvent->GetTargetWindowId());
+    if (windowPid == RET_ERR) {
+        MMI_HILOGE("Get window pid failed");
+        return false;
+    }
+
+    std::string bundleName;
+    if (LONG_PRESS_EVENT_HANDLER->GetBundleName(bundleName, windowPid) == RET_ERR) {
+        MMI_HILOGE("Failed to get bundle name, pid %{public}d", windowPid);
+        return false;
+    }
+    if (appWhiteList_.find(bundleName) == appWhiteList_.end()) {
+        MMI_HILOGE("The app does not support long-press drag., bundle name:%{public}s", bundleName.c_str());
+        return false;
+    }
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

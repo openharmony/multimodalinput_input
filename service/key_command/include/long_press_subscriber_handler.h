@@ -67,6 +67,7 @@ public:
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    int32_t GetBundleName(std::string &bundleName, int32_t windowPid) const;
 
 private:
     void OnSubscribeLongPressEvent(int32_t fingerCount, int32_t duration);
@@ -79,7 +80,6 @@ private:
     int32_t ConvertVPToPX(int32_t vp) const;
     bool CheckFingerGestureAction(int32_t fingerCount) const;
     void StartFingerGesture(int32_t fingerCount);
-    int32_t GetBundleName(std::string &bundleName, int32_t windowPid) const;
     void AddDurationTimer(int32_t duration);
     void RemoveDurationTimer(int32_t fingerCount, int32_t duration);
     void AddSessSubscriber(const std::shared_ptr<Subscriber> subscriber);
