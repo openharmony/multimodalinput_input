@@ -28,6 +28,8 @@
 #include "knuckle_drawing_manager.h"
 #include "knuckle_dynamic_drawing_manager.h"
 
+
+
 namespace OHOS {
 namespace MMI {
 struct WindowInfoEX {

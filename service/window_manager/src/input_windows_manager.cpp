@@ -55,6 +55,8 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputWindowsManager"
 
+
+
 namespace OHOS {
 namespace MMI {
 namespace {
