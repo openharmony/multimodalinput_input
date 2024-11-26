@@ -152,7 +152,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     CHKPR(event, ERROR_NULL_POINTER);
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
-        << event->GetTargetDisplayId() << event->GetTargetWindowId()
+        << event->GetSourceType() << event->GetTargetDisplayId() << event->GetTargetWindowId()
         << event->GetAgentWindowId() << event->GetFlag() << event->IsMarkEnabled();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Serialize packet is failed");
@@ -180,6 +180,8 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std:
     event->SetSensorInputTime(sensorTime);
     pkt >> tField;
     event->SetDeviceId(tField);
+    pkt >> tField;
+    event->SetSourceType(tField);
     pkt >> tField;
     event->SetTargetDisplayId(tField);
     pkt >> tField;
@@ -251,12 +253,10 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
 void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
     pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
-        << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
+        << event->GetButtonId() << event->GetFingerCount()
         << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
-        if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
-            pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
-        }
+        pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
     }
     pkt << event->GetVelocity();
     pkt << event->GetAxisEventType();
@@ -287,8 +287,6 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetOriginPointerAction(tField);
     pkt >> tField;
     event->SetPointerId(tField);
-    pkt >> tField;
-    event->SetSourceType(tField);
     pkt >> tField;
     event->SetButtonId(tField);
     pkt >> tField;
@@ -392,9 +390,11 @@ void InputEventDataTransformation::SetAxisInfo(NetPacket &pkt, std::shared_ptr<P
     pkt >> tAxes;
     double axisValue;
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
-        if (PointerEvent::HasAxis(tAxes, static_cast<PointerEvent::AxisType>(i))) {
-            pkt >> axisValue;
-            event->SetAxisValue(static_cast<PointerEvent::AxisType>(i), axisValue);
+        const PointerEvent::AxisType axisType { static_cast<PointerEvent::AxisType>(i) };
+        pkt >> axisValue;
+        event->SetAxisValue(axisType, axisValue);
+        if (!PointerEvent::HasAxis(tAxes, axisType)) {
+            event->ClearAxisStatus(axisType);
         }
     }
     double velocity;
