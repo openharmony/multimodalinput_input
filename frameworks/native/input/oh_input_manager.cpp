@@ -487,7 +487,7 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent)
     }
     g_mouseEvent->SetActionTime(time);
     OHOS::MMI::PointerEvent::PointerItem item;
-    int32 pointerId = 10000;
+    int32_t pointerId = 10000;
     g_mouseEvent->GetPointerItem(pointerId, item);
     item.SetDownTime(time);
     int32_t result = HandleMouseAction(mouseEvent, item);
