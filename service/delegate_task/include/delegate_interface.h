@@ -43,12 +43,13 @@ public:
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     struct HandlerSummary {
         std::string handlerName;
-        HandleEventType eventType;
-        HandlerMode mode;
-        int32_t priority;
-        uint32_t deviceTags;
+        HandleEventType eventType { HANDLE_EVENT_TYPE_NONE };
+        HandlerMode mode { HandlerMode::SYNC };
+        int32_t priority {};
+        uint32_t deviceTags {};
         TaskCallback cb;
     };
+
     void RemoveHandler(InputHandlerType handlerType, const std::string &name);
     int32_t AddHandler(InputHandlerType handlerType, const HandlerSummary &summary);
     bool HasHandler(const std::string &name) const;
@@ -69,7 +70,7 @@ private:
 private:
     std::function<int32_t(DTaskCallback)> delegateTasks_;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    std::unordered_multimap<InputHandlerType, HandlerSummary> handlers;
+    std::unordered_multimap<InputHandlerType, HandlerSummary> handlers_;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 };
 } // namespace MMI
