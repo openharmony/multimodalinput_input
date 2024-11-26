@@ -149,11 +149,6 @@ public:
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY) override;
-    int32_t OnSetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
-    int32_t SetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern) override;
-    int32_t OnSetMotionSpace(std::string& keyName, bool useShift, std::vector<int32_t>& pattern);
-    void OnVKeyTrackPadMessage(const std::vector<std::vector<int32_t>>& msgList);
     int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) override;
     int32_t OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -264,17 +259,6 @@ protected:
     int32_t OnCancelInjection();
     void InitPrintClientInfo();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    bool HandleVKeyTrackPadPointerMove(
-        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
-    bool HandleVKeyTrackPadLeftBtnDown(
-        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
-    bool HandleVKeyTrackPadLeftBtnUp(
-        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
-    bool HandleVKeyTrackPadRightBtnDown(
-        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
-    bool HandleVKeyTrackPadRightBtnUp(
-        std::shared_ptr<PointerEvent> pointerEvent, const std::vector<int32_t>& msgItem);
-    void InitVKeyboardPointerEventHandler();
     void InitVKeyboardFuncHandler();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 private:

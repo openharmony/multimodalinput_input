@@ -807,21 +807,6 @@ int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vec
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-int32_t MultimodalInputConnectManager::SetVKeyboardArea(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetVKeyboardArea(topLeftX, topLeftY, bottomRightX, bottomRightY);
-}
-
-int32_t MultimodalInputConnectManager::SetMotionSpace(std::string& keyName, bool useShift,
-    std::vector<int32_t>& pattern)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetMotionSpace(keyName, useShift, pattern);
-}
-
 int32_t MultimodalInputConnectManager::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
     std::lock_guard<std::mutex> guard(lock_);
