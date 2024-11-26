@@ -192,6 +192,7 @@ std::shared_ptr<KeyEvent> JoystickEventProcessor::FormatButtonEvent(const KeyEve
     keyEvent->SetActionTime(time);
     keyEvent->SetAction(button.IsPressed() ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP);
     keyEvent->SetDeviceId(deviceId_);
+    keyEvent->SetSourceType(InputEvent::SOURCE_TYPE_JOYSTICK);
     keyEvent->SetKeyCode(button.GetKeyCode());
     keyEvent->SetKeyAction(button.IsPressed() ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP);
     if (keyEvent->GetPressedKeys().empty()) {

@@ -44,7 +44,7 @@ InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 InputEvent::InputEvent(const InputEvent& other)
     : eventType_(other.eventType_), id_(other.id_), actionTime_(other.actionTime_),
       action_(other.action_), actionStartTime_(other.actionStartTime_),
-      deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
+      deviceId_(other.deviceId_), sourceType_(other.sourceType_), targetDisplayId_(other.targetDisplayId_),
       targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
       bitwise_(other.bitwise_), markEnabled_(other.markEnabled_), processedCallback_(other.processedCallback_) {}
 
@@ -64,6 +64,7 @@ void InputEvent::Reset()
     action_ = ACTION_UNKNOWN;
     actionStartTime_ = actionTime_;
     deviceId_ = -1;
+    sourceType_ = SOURCE_TYPE_UNKNOWN;
     targetDisplayId_ = -1;
     targetWindowId_ = -1;
     agentWindowId_ = -1;
@@ -166,6 +167,44 @@ int32_t InputEvent::GetDeviceId() const
 void InputEvent::SetDeviceId(int32_t deviceId)
 {
     deviceId_ = deviceId;
+}
+
+int32_t InputEvent::GetSourceType() const
+{
+    return sourceType_;
+}
+
+void InputEvent::SetSourceType(int32_t sourceType)
+{
+    sourceType_ = sourceType;
+}
+
+const char* InputEvent::DumpSourceType() const
+{
+    switch (sourceType_) {
+        case InputEvent::SOURCE_TYPE_MOUSE: {
+            return "mouse";
+        }
+        case InputEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            return "touch-screen";
+        }
+        case InputEvent::SOURCE_TYPE_TOUCHPAD: {
+            return "touch-pad";
+        }
+        case InputEvent::SOURCE_TYPE_JOYSTICK: {
+            return "joystick";
+        }
+        case InputEvent::SOURCE_TYPE_FINGERPRINT: {
+            return "fingerprint";
+        }
+        case InputEvent::SOURCE_TYPE_CROWN: {
+            return "crown";
+        }
+        default: {
+            break;
+        }
+    }
+    return "unknown";
 }
 
 int32_t InputEvent::GetTargetDisplayId() const
@@ -286,6 +325,7 @@ bool InputEvent::WriteToParcel(Parcel &out) const
     WRITEINT32(out, action_);
     WRITEINT64(out, actionStartTime_);
     WRITEINT32(out, deviceId_);
+    WRITEINT32(out, sourceType_);
     WRITEINT32(out, targetDisplayId_);
     WRITEINT32(out, targetWindowId_);
     WRITEINT32(out, agentWindowId_);
@@ -312,6 +352,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READINT32(in, action_);
     READINT64(in, actionStartTime_);
     READINT32(in, deviceId_);
+    READINT32(in, sourceType_);
     READINT32(in, targetDisplayId_);
     READINT32(in, targetWindowId_);
     READINT32(in, agentWindowId_);
