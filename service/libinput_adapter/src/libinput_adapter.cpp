@@ -200,22 +200,10 @@ void LibinputAdapter::ProcessPendingEvents()
 }
 
 void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
-                                    IsInsideVKeyboardArea isInsideVKeyboardArea,
-                                    IsKeyboardVisible isKeyboardVisible,
-                                    MapTouchToButton mapTouchToButton,
-                                    KeyDown keyDown,
-                                    KeyUp keyUp,
-                                    GetMessage getMessage,
-                                    GetKeyCodeByKeyName getKeyCodeByKeyName)
+                                    GetMessage getMessage)
 {
     handleTouchPoint_ = handleTouchPoint;
-    isInsideVKeyboardArea_ = isInsideVKeyboardArea;
-    isKeyboardVisible_ = isKeyboardVisible;
-    mapTouchToButton_ = mapTouchToButton;
-    keyDown_ = keyDown;
-    keyUp_ = keyUp;
     getMessage_ = getMessage;
-    getKeyCodeByKeyName_ = getKeyCodeByKeyName;
 
     deviceId = -1;
 }

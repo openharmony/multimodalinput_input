@@ -35,9 +35,6 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
         return RET_ERR;
     }
     pkt << key->GetKeyCode() << key->GetKeyAction() << key->GetKeyIntention();
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    pkt << key->GetVKeyboardAction() << key->GetKeyName();
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     auto keys = key->GetKeyItems();
     int32_t size = static_cast<int32_t>(keys.size());
     if (size > MAX_KEY_SIZE) {
@@ -72,13 +69,6 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     key->SetKeyAction(data);
     pkt >> data;
     key->SetKeyIntention(data);
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    pkt >> data;
-    key->SetVKeyboardAction((KeyEvent::VKeyboardAction)data);
-    std::string keyName;
-    pkt >> keyName;
-    key->SetKeyName(keyName);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t size = 0;
     pkt >> size;
     if (size > MAX_KEY_SIZE) {

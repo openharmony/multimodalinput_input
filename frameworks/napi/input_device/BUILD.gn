@@ -18,7 +18,6 @@ config("inputdevice_config") {
 
   include_dirs = [
     "${mmi_path}/frameworks/napi/input_device/include",
-    "${mmi_path}/interfaces/kits/c/input",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
@@ -49,7 +48,6 @@ ohos_shared_library("inputdevice") {
   ]
 
   deps = [
-    "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
   ]
