@@ -65,7 +65,7 @@ void DelegateInterface::OnInputEventHandler(
     InputHandlerType type, std::shared_ptr<PointerEvent> event) const
 {
     CHKPV(event);
-    for (const auto &handler : handlers) {
+    for (const auto &handler : handlers_) {
         auto summary = handler.second;
         if (handler.first != type) {
             continue;
@@ -105,7 +105,7 @@ int32_t DelegateInterface::AddHandler(InputHandlerType type, const HandlerSummar
     }
     const HandleEventType currentType = GetEventType(type);
     uint32_t currentTags = GetDeviceTags(type);
-    handlers.emplace(type, summary);
+    handlers_.emplace(type, summary);
     const HandleEventType newType = GetEventType(type);
     if (currentType != newType || ((currentTags & summary.deviceTags) != summary.deviceTags)) {
         uint32_t allDeviceTags = GetDeviceTags(type);
@@ -128,19 +128,19 @@ int32_t DelegateInterface::AddHandler(InputHandlerType type, const HandlerSummar
     if (ret != RET_OK) {
         RemoveLocal(type, summary.handlerName, currentTags);
     } else {
-        MMI_HILOGI("Service Add Monitor Success, size:%{public}zu", handlers.size());
+        MMI_HILOGI("Service Add Monitor Success, size:%{public}zu", handlers_.size());
     }
     return ret;
 }
 
 HandleEventType DelegateInterface::GetEventType(InputHandlerType type) const
 {
-    uint32_t eventType {HANDLE_EVENT_TYPE_NONE};
-    if (handlers.empty()) {
+    uint32_t eventType { HANDLE_EVENT_TYPE_NONE };
+    if (handlers_.empty()) {
         MMI_HILOGW("handlers is empty");
         return HANDLE_EVENT_TYPE_NONE;
     }
-    for (const auto &handler : handlers) {
+    for (const auto &handler : handlers_) {
         if (handler.first == type) {
             eventType |= handler.second.eventType;
         }
@@ -154,11 +154,11 @@ uint32_t DelegateInterface::GetDeviceTags(InputHandlerType type) const
     if (type == InputHandlerType::MONITOR) {
         return deviceTags;
     }
-    if (handlers.empty()) {
+    if (handlers_.empty()) {
         MMI_HILOGW("handlers is empty");
         return deviceTags;
     }
-    for (const auto &handler : handlers) {
+    for (const auto &handler : handlers_) {
         if (handler.first == type) {
             deviceTags |= handler.second.deviceTags;
         }
@@ -168,14 +168,14 @@ uint32_t DelegateInterface::GetDeviceTags(InputHandlerType type) const
 
 void DelegateInterface::RemoveLocal(InputHandlerType type, const std::string &name, uint32_t &deviceTags)
 {
-    for (auto it = handlers.cbegin(); it != handlers.cend(); ++it) {
+    for (auto it = handlers_.cbegin(); it != handlers_.cend(); ++it) {
         if (type != it->first) {
             continue;
         }
         if (it->second.handlerName != name) {
             continue;
         }
-        handlers.erase(it);
+        handlers_.erase(it);
         if (type == InputHandlerType::INTERCEPTOR) {
             deviceTags = it->second.deviceTags;
         }
@@ -185,7 +185,7 @@ void DelegateInterface::RemoveLocal(InputHandlerType type, const std::string &na
 
 int32_t DelegateInterface::GetPriority(InputHandlerType type) const
 {
-    for (auto it = handlers.cbegin(); it != handlers.cend(); ++it) {
+    for (auto it = handlers_.cbegin(); it != handlers_.cend(); ++it) {
         if (type == it->first) {
             return it->second.priority;
         }
@@ -221,15 +221,15 @@ void DelegateInterface::RemoveHandler(InputHandlerType type, const std::string &
         }
     }
     MMI_HILOGI("Remove Handler:%{public}d:%{public}s-%{public}d:%{public}d, size:%{public}zu", type,
-               name.c_str(), currentType, currentTags, handlers.size());
+               name.c_str(), currentType, currentTags, handlers_.size());
 }
 
 bool DelegateInterface::HasHandler(const std::string &name) const
 {
-    return std::find_if(handlers.cbegin(), handlers.cend(),
+    return std::find_if(handlers_.cbegin(), handlers_.cend(),
         [name](const auto &item) {
             return item.second.handlerName == name;
-        }) != handlers.cend();
+        }) != handlers_.cend();
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 } // namespace MMI
