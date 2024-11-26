@@ -212,7 +212,7 @@ void KeyShortcutManager::LoadSystemKeys()
     char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
 
     if (cfgPath == nullptr) {
-        MMI_HILOGE("No '%{public}s' was found", cfgPath);
+        MMI_HILOGE("No '%{public}s' was found", cfgName);
         return;
     }
     MMI_HILOGI("Config of system keys:%{public}s", cfgPath);
