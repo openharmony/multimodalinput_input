@@ -239,14 +239,14 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
     return true;
 }
 
-void TouchTransformProcessor::DumpInner()
+bool TouchTransformProcessor::DumpInner()
 {
     static int32_t lastDeviceId = -1;
     static std::string lastDeviceName("default");
     auto nowId = pointerEvent_->GetDeviceId();
     if (lastDeviceId != nowId) {
         auto device = INPUT_DEV_MGR->GetInputDevice(nowId);
-        CHKPV(device);
+        CHKPF(device);
         lastDeviceId = nowId;
         lastDeviceName = device->GetName();
     }
@@ -256,6 +256,7 @@ void TouchTransformProcessor::DumpInner()
         aggregator_.Record(MMI_LOG_FREEZE, lastDeviceName + ", TW: " +
             std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
     }
+    return true;
 }
 
 std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_event *event)
@@ -291,7 +292,9 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     pointerEvent_->UpdateId();
     pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_GENERATE_FROM_REAL);
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
-    DumpInner();
+    if (!DumpInner()) {
+        return nullptr;
+    }
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_FREEZE);
     WIN_MGR->DrawTouchGraphic(pointerEvent_);
