@@ -906,5 +906,34 @@ std::string DfxHisysevent::GetLcdInfo()
 {
     return GetVendorInfo(LCD_PATH);
 }
+
+void DfxHisysevent::ReportSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey,
+    std::string name, int32_t pid)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SUBSCRIBE_KEY_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "SUBSCRIBE_ID", subscribeId,
+        "FINAL_KEY", finalKey,
+        "NAME", name,
+        "PID", pid);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportUnSubscribeKeyEvent(std::string name, int32_t pid)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "UNSUBSCRIBE_KEY_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", pid,
+        "NAME", name);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
 } // namespace MMI
 } // namespace OHOS
