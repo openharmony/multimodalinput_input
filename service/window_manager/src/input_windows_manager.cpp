@@ -2932,7 +2932,7 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) {
         static int32_t lastDeviceId = -1;
         static std::shared_ptr<InputDevice> inputDevice = nullptr;
-        auto nowId = pointerItem->GetDeviceId();
+        auto nowId = pointerItem.GetDeviceId();
         if (lastDeviceId != nowId) {
             inputDevice = INPUT_DEV_MGR->GetInputDevice(nowId);
             CHKPF(inputDevice);
