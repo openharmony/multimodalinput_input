@@ -1509,6 +1509,7 @@ Input_Result OH_Input_AddKeyEventInterceptor(Input_KeyEventCallback callback, In
         MMI_HILOGE("Another key event interceptor has been added");
         return INPUT_REPEAT_INTERCEPTOR;
     }
+    CHKPR(g_keyInterceptor, INPUT_PARAMETER_ERROR);
     g_keyInterceptor->SetCallback(KeyEventInterceptorCallback);
     int32_t ret = g_keyInterceptor->Start(OHOS::MMI::INTERCEPTOR_TYPE_KEY);
     retCode = NormalizeResult(ret);
@@ -1653,6 +1654,7 @@ Input_Result OH_Input_AddInputEventInterceptor(Input_InterceptorEventCallback *c
 Input_Result OH_Input_RemoveKeyEventInterceptor(void)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(g_keyInterceptor, INPUT_PARAMETER_ERROR);
     Input_Result retCode = INPUT_SUCCESS;
     std::lock_guard guard(g_mutex);
     int32_t ret = g_keyInterceptor->Stop(OHOS::MMI::INTERCEPTOR_TYPE_KEY);
