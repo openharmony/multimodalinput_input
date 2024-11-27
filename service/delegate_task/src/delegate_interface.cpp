@@ -71,8 +71,7 @@ void DelegateInterface::OnInputEventHandler(
             continue;
         }
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-        if (type == InputHandlerType::MONITOR &&
-            (summary.eventType & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+        if ((type == InputHandlerType::MONITOR) && !MonitorExpectEvent(summary, event)) {
             continue;
         }
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -120,8 +119,8 @@ int32_t DelegateInterface::AddHandler(InputHandlerType type, const HandlerSummar
 #ifdef OHOS_BUILD_ENABLE_MONITOR
             auto monitorHandler = InputHandler->GetMonitorHandler();
             CHKPR(monitorHandler, ERROR_NULL_POINTER);
-            ret = monitorHandler->AddInputHandler(type,
-                newType, shared_from_this());
+            ret = monitorHandler->AddInputHandler(type, newType, shared_from_this(),
+                summary.gestureType, summary.fingers);
 #endif // OHOS_BUILD_ENABLE_MONITOR
         }
     }
@@ -166,7 +165,8 @@ uint32_t DelegateInterface::GetDeviceTags(InputHandlerType type) const
     return deviceTags;
 }
 
-void DelegateInterface::RemoveLocal(InputHandlerType type, const std::string &name, uint32_t &deviceTags)
+std::optional<DelegateInterface::HandlerSummary> DelegateInterface::RemoveLocal(
+    InputHandlerType type, const std::string &name, uint32_t &deviceTags)
 {
     for (auto it = handlers_.cbegin(); it != handlers_.cend(); ++it) {
         if (type != it->first) {
@@ -175,12 +175,14 @@ void DelegateInterface::RemoveLocal(InputHandlerType type, const std::string &na
         if (it->second.handlerName != name) {
             continue;
         }
+        auto summary = it->second;
         handlers_.erase(it);
         if (type == InputHandlerType::INTERCEPTOR) {
             deviceTags = it->second.deviceTags;
         }
-        break;
+        return summary;
     }
+    return std::nullopt;
 }
 
 int32_t DelegateInterface::GetPriority(InputHandlerType type) const
@@ -198,7 +200,10 @@ void DelegateInterface::RemoveHandler(InputHandlerType type, const std::string &
     const HandleEventType currentType = GetEventType(type);
     uint32_t currentTags = GetDeviceTags(type);
     uint32_t deviceTags = 0;
-    RemoveLocal(type, name, deviceTags);
+    auto handlerOpt = RemoveLocal(type, name, deviceTags);
+    if (!handlerOpt) {
+        return;
+    }
     const HandleEventType newType = GetEventType(type);
     const int32_t newLevel = GetPriority(type);
     const uint64_t newTags = GetDeviceTags(type);
@@ -215,8 +220,8 @@ void DelegateInterface::RemoveHandler(InputHandlerType type, const std::string &
 #ifdef OHOS_BUILD_ENABLE_MONITOR
             auto monitorHandler = InputHandler->GetMonitorHandler();
             CHKPV(monitorHandler);
-            monitorHandler->RemoveInputHandler(type,
-                newType, shared_from_this());
+            monitorHandler->RemoveInputHandler(type, newType, shared_from_this(),
+                handlerOpt->gestureType, handlerOpt->fingers);
 #endif // OHOS_BUILD_ENABLE_MONITOR
         }
     }
@@ -232,5 +237,15 @@ bool DelegateInterface::HasHandler(const std::string &name) const
         }) != handlers_.cend();
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+bool DelegateInterface::MonitorExpectEvent(const HandlerSummary &monitor, std::shared_ptr<PointerEvent> event) const
+{
+    if (GestureMonitorHandler::IsTouchGestureEvent(event->GetPointerAction())) {
+        return ((monitor.eventType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE);
+    } else {
+        return ((monitor.eventType & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_MONITOR
 } // namespace MMI
 } // namespace OHOS

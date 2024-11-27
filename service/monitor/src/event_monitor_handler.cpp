@@ -100,8 +100,8 @@ bool EventMonitorHandler::CheckHasInputHandler(HandleEventType eventType)
     return monitors_.CheckHasInputHandler(eventType);
 }
 
-int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback)
+int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+    std::shared_ptr<IInputEventConsumer> callback, TouchGestureType gestureType, int32_t fingers)
 {
     CALL_INFO_TRACE;
     CHKPR(callback, RET_ERR);
@@ -110,7 +110,7 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler mon { handlerType, eventType, nullptr, callback };
+    SessionHandler mon { handlerType, eventType, callback, gestureType, fingers };
     return monitors_.AddMonitor(mon);
 }
 
@@ -138,13 +138,13 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     return monitors_.AddMonitor(mon);
 }
 
-void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback)
+void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+    std::shared_ptr<IInputEventConsumer> callback, TouchGestureType gestureType, int32_t fingers)
 {
     CALL_INFO_TRACE;
     CHKPV(callback);
     if (handlerType == InputHandlerType::MONITOR) {
-        SessionHandler monitor {handlerType, eventType, nullptr, callback};
+        SessionHandler monitor { handlerType, eventType, callback, gestureType, fingers };
         monitors_.RemoveMonitor(monitor);
     }
 }
