@@ -1659,6 +1659,7 @@ napi_value JsPointerContext::GetHardwareCursorStats(napi_env env, napi_callback_
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 0) {
         return jsPointerMgr->GetHardwareCursorStats(env);
     }
@@ -1687,6 +1688,7 @@ napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->SetTouchpadScrollRows(env, newRows);
     }
@@ -1707,6 +1709,7 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 0) {
         return jsPointerMgr->GetTouchpadScrollRows(env);
     }
