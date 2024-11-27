@@ -121,7 +121,7 @@ public:
     static std::string GetAccVendorName();
     static std::string GetLcdInfo();
     static void ReportSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey, std::string name, int32_t pid);
-    static void ReportUnSubscribeKeyEvent(std::string name, int32_t pid);
+    static void ReportUnSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey, std::string name, int32_t pid);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
