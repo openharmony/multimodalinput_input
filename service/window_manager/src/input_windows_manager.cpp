@@ -374,6 +374,10 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         }
     }
     if (windowInfo == nullptr) {
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+            dragPointerStyle_.id = DEFAULT_POINTER_STYLE;
+            IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
+        }
         MMI_HILOG_DISPATCHD("window info is null, pointerAction:%{public}d", pointerEvent->GetPointerAction());
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
             windowInfo = &lastWindowInfo_;
