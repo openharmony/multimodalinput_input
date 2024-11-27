@@ -1370,19 +1370,18 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         return true;
     }
 
-    bool isHandled = HandleShortKeys(key);
+    bool shortKeysHandleRet = HandleShortKeys(key);
     if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && isFreezePowerKey_) {
         MMI_HILOGI("Freeze power key");
         return true;
     }
-    isHandled = HandleSequences(key) || isHandled;
-    if (isHandled) {
-        if (isKeyCancel_) {
-            isHandleSequence_ = false;
-            isKeyCancel_ = false;
-        } else {
-            isHandleSequence_ = true;
-        }
+    bool sequencesHandleRet = HandleSequences(key);
+    if (shortKeysHandleRet) {
+        isHandleSequence_ = false;
+        return true;
+    }
+    if (sequencesHandleRet) {
+        isHandleSequence_ = true;
         return true;
     }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
