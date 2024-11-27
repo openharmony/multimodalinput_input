@@ -292,3 +292,43 @@ UNSUBSCRIBE_KEY_EVENT:
   FINAL_KEY: {type: INT32, desc: final key}
   NAME: {type: STRING, desc: subscriber name}
   PID:  {type: INT32, desc: subscriber pid}
+
+KAYBOARD_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report keyboard event}
+  EVENT_TYPE: {type: INT32, desc: event type}
+  KEY_CODE: {type: INT32, desc: key code}
+  KEY_ACTION: {type: INT32, desc: key action}
+
+LAUNCH_ABILITY:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report launch ability}
+  BUNDLE_NAME: {type: STRING, desc: ability bundleName}
+
+COMMON_ACTION:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report common action}
+  ACTION: {type: STRING, desc: subscriber name}
+  PID:  {type: INT32, desc: subscriber pid}
+
+TOUCH_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report touch event}
+  POINT_ACTION: {type: INT32, desc: point action}
+  POINT_ID: {type: INT32, desc: point id}
+  WINDOW_ID: {type: INT32, desc: target window id}
+
+INJECT_POINTER_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report inject pointer event}
+  IS_NATIVE_INJECT: {type: BOOL, desc: is native inject}
+
+ENABLE_COMBINE_KEY:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report enable or disable Combine Key}
+  ENABLE: {type: BOOL, desc: enable or disable Combine Key}
+
+APPEND_EXTRA_DATA:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report append extra data}
+
+TRANSMIT_INFRARED:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report append extra data}
+  NUMBER: {type: INT64, desc: transmit number}
+
+SET_CURRENT_USER:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report set current user event}
+  USER_ID: {type: INT32, desc: userId}

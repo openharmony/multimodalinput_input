@@ -122,6 +122,15 @@ public:
     static std::string GetLcdInfo();
     static void ReportSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey, std::string name, int32_t pid);
     static void ReportUnSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey, std::string name, int32_t pid);
+    static void ReportKeyboardEvent(int32_t eventType, int32_t keyCode, int32_t keyAction);
+    static void ReportLaunchAbility(std::string bundleName);
+    static void ReportCommonAction(std::string action);
+    static void ReportTouchEvent(int32_t pointAction, int32_t pointId, int32_t windowId);
+    static void ReportInjectPointerEvent(bool isNativeInject);
+    static void ReportEnableCombineKey(bool enable);
+    static void ReportAppendExtraData();
+    static void ReportTransmitInfrared(int64_t number);
+    static void ReportSetCurrentUser(int32_t userId);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
