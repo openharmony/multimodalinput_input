@@ -278,3 +278,17 @@ FANTASY_CURSOR_FAILED:
   __BASE: {type: FAULT, level: MINOR, desc: report ERROR of Magic Cursor}
   ERROR_NAME: {type: STRING, desc: error name}
   ERROR_CODE: {type: STRING, desc: error code}
+
+SUBSCRIBE_KEY_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report subscribe key event}
+  SUBSCRIBE_ID: {type: INT32, desc: subscribe id}
+  FINAL_KEY: {type: INT32, desc: final key}
+  NAME: {type: STRING, desc: subscriber name}
+  PID:  {type: INT32, desc: subscriber pid}
+
+UNSUBSCRIBE_KEY_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report unsubscribe key event}
+  SUBSCRIBE_ID: {type: INT32, desc: subscribe id}
+  FINAL_KEY: {type: INT32, desc: final key}
+  NAME: {type: STRING, desc: subscriber name}
+  PID:  {type: INT32, desc: subscriber pid}
