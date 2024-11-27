@@ -98,9 +98,13 @@ private:
     GestureMode ChangeToGestureMode(SlideState state);
     SlideState GetSlidingDirection(double angle);
     void HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> event);
+    void AntiGestureJitter(std::shared_ptr<PointerEvent> event, GestureMode mode);
+    bool GestureRecurrent(GestureMode mode) const;
+    void UpdateTouchMovements(std::shared_ptr<PointerEvent> event);
     bool IsFingerMove(const Point &downPt, const Point &movePt) const;
     double GetAngle(float startX, float startY, float endX, float endY);
     SlideState ClacFingerMoveDirection(std::shared_ptr<PointerEvent> event);
+    bool DoesSwipeMove(const Point &downPt, const Point &movePt) const;
     void CheckGestureTrend(std::shared_ptr<PointerEvent> event) const;
 
 private:
@@ -113,7 +117,9 @@ private:
     int32_t gestureDisplayId_ { INT32_MAX };
     int32_t continuousCloseCount_ { 0 };
     int32_t continuousOpenCount_ { 0 };
-    int32_t gestureTimer_ { -1 };
+    size_t recurrentCount_ { 0 };
+    size_t recurrentTouchNum_ { 0 };
+    GestureMode recurrentGesture_ { GestureMode::ACTION_UNKNOWN };
     std::map<int32_t, Point> downPoint_;
     std::map<int32_t, Point> movePoint_;
     std::map<int32_t, double> lastDistance_;
