@@ -283,6 +283,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     }
     auto udsServer = InputHandler->GetUDSServer();
     int32_t fd = -1;
+    auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
     if (point->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL &&
         point->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL &&
         (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
@@ -290,11 +291,10 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         WIN_MGR->GetWindowPid(pointerItem.GetTargetWindowId() > 0)) {
         CHKPV(udsServer);
         WIN_MGR->FoldScreenRotation(point);
-        fd = udsServer->GetClientFd(WIN_MGR->GetPidByWindowId(point->GetTargetWindowId()));
+        fd = udsServer->GetClientFd(pid);
     } else {
         fd = WIN_MGR->GetClientFd(point);
     }
-    auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
     if (WIN_MGR->GetCancelEventFlag(point) && udsServer->GetSession(fd) == nullptr &&
         pid != -1 && point->GetTargetWindowId() != -1) {
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {

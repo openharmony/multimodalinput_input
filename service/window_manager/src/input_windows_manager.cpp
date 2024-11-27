@@ -2934,7 +2934,14 @@ bool InputWindowsManager::GetMouseIsCaptureMode() const
 bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const
 {
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) {
-        std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(pointerItem.GetDeviceId());
+        static int32_t lastDeviceId = -1;
+        static std::shared_ptr<InputDevice> inputDevice = nullptr;
+        auto nowId = pointerItem.GetDeviceId();
+        if (lastDeviceId != nowId) {
+            inputDevice = INPUT_DEV_MGR->GetInputDevice(nowId);
+            CHKPF(inputDevice);
+            lastDeviceId = nowId;
+        }
         if (inputDevice != nullptr) {
             MMI_HILOGD("name:%{public}s type:%{public}d bus:%{public}d, "
                        "version:%{public}d product:%{public}d vendor:%{public}d, "
@@ -4558,8 +4565,8 @@ int32_t InputWindowsManager::GetWindowStateNotifyPid()
 
 int32_t InputWindowsManager::GetPidByWindowId(int32_t id)
 {
-    for (auto item : displayGroupInfo_.windowsInfo) {
-        if (item.id== id) {
+    for (auto &item : displayGroupInfo_.windowsInfo) {
+        if (item.id == id) {
             return item.pid;
         }
     }
