@@ -35,7 +35,9 @@ public:
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
     void SetCurrentShieldMode(int32_t shieldMode);
     int32_t GetCurrentShieldMode();
+
 private:
+    int32_t TransformVolumeKey(struct libinput_device *dev, int32_t keyCode) const;
     void HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item, std::shared_ptr<KeyEvent> keyEvent);
 
 private:
