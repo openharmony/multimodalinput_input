@@ -134,7 +134,11 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void ReverseRotateScreen(const DisplayInfo& info, const double x, const double y, Coordinate2D& cursorPos) const;
+    void ReverseRotateDisplayScreen(const DisplayInfo& info, const double x, const double y,
+        Coordinate2D& cursorPos) const;
+    void ScreenRotateAdjustDisplayXY(const DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
+    void RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;

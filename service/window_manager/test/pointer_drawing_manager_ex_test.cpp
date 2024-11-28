@@ -1998,27 +1998,6 @@ ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ClearWindowPointerStyle(pid, windowId));
 }
 
 /**
-@tc.name: PointerDrawingManagerExTest_IsWindowRotation_001
-@tc.desc: Test the funcation IsWindowRotation
-@tc.type: FUNC
-@tc.require:
-*/
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_IsWindowRotation_001, TestSize.Level1)
-{
-CALL_TEST_DEBUG;
-PointerDrawingManager pointerDrawMgr;
-pointerDrawMgr.displayInfo_.displayMode = DisplayMode::MAIN;
-bool ret = pointerDrawMgr.IsWindowRotation();
-ASSERT_TRUE(ret);
-pointerDrawMgr.displayInfo_.displayMode = DisplayMode::FULL;
-ret = pointerDrawMgr.IsWindowRotation();
-ASSERT_TRUE(ret);
-pointerDrawMgr.displayInfo_.displayMode = DisplayMode::SUB;
-ret = pointerDrawMgr.IsWindowRotation();
-ASSERT_TRUE(ret);
-}
-
-/**
 @tc.name: PointerDrawingManagerExTest_DrawDynamicImage_001
 @tc.desc: Test the funcation DrawDynamicImage
 @tc.type: FUNC

@@ -60,7 +60,6 @@ constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
 [[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_ID { 10000 };
 [[ maybe_unused ]] constexpr int32_t CAST_POINTER_ID { 5000 };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_PC = "2in1";
 [[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
