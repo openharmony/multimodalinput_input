@@ -720,9 +720,12 @@ int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
     auto pointerEvent = joystick_.OnAxisEvent(event);
     BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    PointerEventSetPressedKeys(pointerEvent);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     EventStatistic::PushPointerEvent(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     nextHandler_->HandlePointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER
     joystick_.CheckIntention(pointerEvent, [this](std::shared_ptr<KeyEvent> keyEvent) {
         BytraceAdapter::StartBytrace(keyEvent);
         EventStatistic::PushEvent(keyEvent);
