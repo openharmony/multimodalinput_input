@@ -2086,9 +2086,12 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
         pointerStyle.id = globalStyle_.id;
         return RET_OK;
     }
-
-    MMI_HILOG_CURSORD("Window type:%{public}d get pointer style:%{public}d success", windowId, iter->second.id);
-    pointerStyle = iter->second;
+    if (iter->second.id == DEFAULT_POINTER_STYLE) {
+        pointerStyle.id = globalStyle_.id;
+    } else {
+        pointerStyle = iter->second;
+    }
+    MMI_HILOG_CURSORD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle.id);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
