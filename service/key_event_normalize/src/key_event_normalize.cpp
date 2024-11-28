@@ -15,7 +15,11 @@
 
 #include "key_event_normalize.h"
 
+#include <linux/input.h>
+#include <parameters.h>
+
 #include "input_device_manager.h"
+#include "input_windows_manager.h"
 #include "key_map_manager.h"
 #include "key_unicode_transformation.h"
 
@@ -58,6 +62,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{private}d", keyCode);
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
+    keyCode = TransformVolumeKey(device, keyCode);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     auto preAction = keyEvent->GetAction();
@@ -196,9 +201,38 @@ int32_t KeyEventNormalize::GetCurrentShieldMode()
 {
     return lastShieldMode_;
 }
+
 void KeyEventNormalize::SetCurrentShieldMode(int32_t shieldMode)
 {
     lastShieldMode_ = shieldMode;
+}
+
+int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32_t keyCode) const
+{
+    static std::once_flag flag;
+    static std::string product;
+    const std::string theProduct { "UNKNOWN_PRODUCT" };
+
+    std::call_once(flag, []() {
+        product = OHOS::system::GetParameter("const.build.product", "");
+    });
+    if (product != theProduct) {
+        return keyCode;
+    }
+    if (WIN_MGR->GetDisplayMode() != DisplayMode::SUB) {
+        return keyCode;
+    }
+    if ((keyCode != KeyEvent::KEYCODE_VOLUME_DOWN) && (keyCode != KeyEvent::KEYCODE_VOLUME_UP)) {
+        return keyCode;
+    }
+    const char *name = libinput_device_get_name(dev);
+    int32_t busType = libinput_device_get_id_bustype(dev);
+    MMI_HILOGD("Flip volume keys upon fold: Dev:%{public}s, Bus:%{public}d",
+        name != nullptr ? name : "(null)", busType);
+    if (busType != BUS_HOST) {
+        return keyCode;
+    }
+    return (keyCode == KeyEvent::KEYCODE_VOLUME_DOWN ? KeyEvent::KEYCODE_VOLUME_UP : KeyEvent::KEYCODE_VOLUME_DOWN);
 }
 } // namespace MMI
 } // namespace OHOS
