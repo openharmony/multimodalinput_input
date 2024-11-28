@@ -52,7 +52,7 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetDeviceTags_01, TestSize
     EXPECT_EQ(ret, 0);
 
     type = InputHandlerType::NONE;
-    EXPECT_TRUE(delegateInterface.handlers.empty());
+    EXPECT_TRUE(delegateInterface.handlers_.empty());
     uint32_t ret2 = delegateInterface.GetDeviceTags(type);
     EXPECT_EQ(ret2, 0);
 }
@@ -73,9 +73,9 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetDeviceTags_02, TestSize
     InputHandlerType type = InputHandlerType::INTERCEPTOR;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
-    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
-    delegateInterface.handlers.insert({MONITOR, handler2});
-    EXPECT_FALSE(delegateInterface.handlers.empty());
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
+    EXPECT_FALSE(delegateInterface.handlers_.empty());
     uint32_t ret1 = delegateInterface.GetDeviceTags(type);
     EXPECT_EQ(ret1, 2);
 
@@ -102,8 +102,8 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_RemoveLocal_01, TestSize.L
     uint32_t deviceTags = 1;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
-    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
-    delegateInterface.handlers.insert({MONITOR, handler2});
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
     ASSERT_NO_FATAL_FAILURE(delegateInterface.RemoveLocal(type, name, deviceTags));
 
     type = InputHandlerType::INTERCEPTOR;
@@ -131,8 +131,8 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetPriority_01, TestSize.L
     InputHandlerType type = InputHandlerType::INTERCEPTOR;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
-    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
-    delegateInterface.handlers.insert({MONITOR, handler2});
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
 
     int32_t ret = delegateInterface.GetPriority(type);
     EXPECT_EQ(ret, 1);
@@ -156,7 +156,7 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetEventType_01, TestSize.
     };
     DelegateInterface delegateInterface(delegate);
     InputHandlerType type = InputHandlerType::MONITOR;
-    EXPECT_TRUE(delegateInterface.handlers.empty());
+    EXPECT_TRUE(delegateInterface.handlers_.empty());
     uint32_t ret = delegateInterface.GetEventType(type);
     EXPECT_EQ(ret, 0);
 }
@@ -177,8 +177,8 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetEventType_02, TestSize.
     InputHandlerType type = InputHandlerType::MONITOR;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
-    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
-    delegateInterface.handlers.insert({MONITOR, handler2});
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
     uint32_t ret = delegateInterface.GetEventType(type);
     EXPECT_EQ(ret, 2);
 }
@@ -222,8 +222,8 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnInputEventHandler_01, Te
     InputHandlerType type = InputHandlerType::NONE;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
-    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
-    delegateInterface.handlers.insert({MONITOR, handler2});
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
     ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     type = InputHandlerType::MONITOR;
@@ -253,8 +253,8 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_01, TestSize.Le
     summary.handlerName = "handler1";
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
-    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
-    delegateInterface.handlers.insert({MONITOR, handler2});
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
 
     InputHandlerType type = InputHandlerType::MONITOR;
     int32_t ret = delegateInterface.AddHandler(type, summary);
@@ -282,8 +282,8 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_02, TestSize.Le
     summary.handlerName = "handler";
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
-    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
-    delegateInterface.handlers.insert({MONITOR, handler2});
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
 
     InputHandlerType type = InputHandlerType::MONITOR;
     HandleEventType currentType = delegateInterface.GetEventType(type);

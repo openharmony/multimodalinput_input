@@ -67,7 +67,10 @@
 #include "timer_manager.h"
 #include "tokenid_kit.h"
 #include "touch_event_normalize.h"
-#include "touch_gesture_adapter.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+#include "touch_gesture_handler.h"
+#include "touch_gesture_manager.h"
+#endif // OHOS_BUILD_ENABLE_TOUCH
 #include "util.h"
 #include "util_ex.h"
 #include "watchdog_task.h"
@@ -1425,25 +1428,11 @@ int32_t MMIService::AddGestureMonitor(InputHandlerType handlerType,
                 MMI_HILOGE("Wrong number of fingers:%{public}d", fingers);
                 return RET_ERR;
             }
-            if (touchGestureAdapter_ == nullptr) {
-                touchGestureAdapter_ = TouchGestureAdapter::GetGestureFactory();
+            if (touchGestureMgr_ == nullptr) {
+                touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
             }
-            if (touchGestureAdapter_ != nullptr) {
-                touchGestureAdapter_->SetGestureCondition(true, gestureType, fingers);
-            }
-            if (delegateInterface_ != nullptr && !delegateInterface_->HasHandler("touchGesture")) {
-                auto fun = [this](std::shared_ptr<PointerEvent> event) -> int32_t {
-                    CHKPR(touchGestureAdapter_, ERROR_NULL_POINTER);
-                    touchGestureAdapter_->process(event);
-                    return RET_OK;
-                };
-                int32_t ret = delegateInterface_->AddHandler(InputHandlerType::MONITOR,
-                    {"touchGesture", HANDLE_EVENT_TYPE_POINTER, HandlerMode::SYNC, 0, 0, fun});
-                if (ret != RET_OK) {
-                    MMI_HILOGE("Failed to add gesture recognizer, ret:%{public}d", ret);
-                    return ret;
-                }
-            }
+            touchGestureMgr_->AddHandler(pid, gestureType, fingers);
+
             auto sess = GetSessionByPid(pid);
             CHKPR(sess, ERROR_NULL_POINTER);
             return sMsgHandler_.OnAddGestureMonitor(sess, handlerType, eventType, gestureType, fingers);
@@ -1471,14 +1460,8 @@ int32_t MMIService::RemoveGestureMonitor(InputHandlerType handlerType,
                 MMI_HILOGE("Failed to remove gesture recognizer, ret:%{public}d", ret);
                 return ret;
             }
-            auto monitorHandler = InputHandler->GetMonitorHandler();
-            if (monitorHandler && !monitorHandler->CheckHasInputHandler(HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
-                if (delegateInterface_ && delegateInterface_->HasHandler("touchGesture")) {
-                    delegateInterface_->RemoveHandler(InputHandlerType::MONITOR, "touchGesture");
-                }
-            }
-            if (touchGestureAdapter_) {
-                touchGestureAdapter_->SetGestureCondition(false, gestureType, fingers);
+            if (touchGestureMgr_ != nullptr) {
+                touchGestureMgr_->RemoveHandler(pid, gestureType, fingers);
             }
             return RET_OK;
         });
@@ -2042,7 +2025,8 @@ void MMIService::OnThread()
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif // OHOS_RSS_CLIENT
-    libinputAdapter_.ProcessPendingEvents();
+    PreEventLoop();
+
     while (state_ == ServiceRunningState::STATE_RUNNING) {
 #if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
         if (isCesStart_ && !DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
@@ -2081,6 +2065,14 @@ void MMIService::OnThread()
         }
     }
     MMI_HILOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
+}
+
+void MMIService::PreEventLoop()
+{
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    SetupTouchGestureHandler();
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    libinputAdapter_.ProcessPendingEvents();
 }
 
 bool MMIService::InitSignalHandler()
@@ -3264,5 +3256,13 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
     MMI_HILOGI("OnGetAllSystemHotkey function does not support");
     return ERROR_UNSUPPORT;
 }
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void MMIService::SetupTouchGestureHandler()
+{
+    touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
+    touchGestureHandler_ = std::make_shared<TouchGestureHandler>(delegateInterface_, touchGestureMgr_);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
