@@ -133,6 +133,9 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         "isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
+    DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
+        sess->GetProgramName(), sess->GetPid());
+
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         auto ret = AddKeyGestureSubscriber(subscriber, keyOption);
@@ -183,6 +186,8 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
                 subscribers.erase(it);
+                DfxHisysevent::ReportUnSubscribeKeyEvent(subscribeId, option->GetFinalKey(),
+                    sess->GetProgramName(), sess->GetPid());
                 return RET_OK;
             }
         }
