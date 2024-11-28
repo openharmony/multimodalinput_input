@@ -930,7 +930,6 @@ std::string KeyCommandHandler::GesturePointsToStr() const
         cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
         cJSON_AddItemToArray(jsonArray, jsonData);
-        cJSON_Delete(jsonData);
     }
     char *jsonString = cJSON_Print(jsonArray);
     std::string result = std::string(jsonString);
