@@ -219,6 +219,8 @@ void TouchGestureHandler::StartMonitor()
             .handlerName = TOUCH_GESTURE_HANDLER_NAME,
             .eventType = HANDLE_EVENT_TYPE_TOUCH_GESTURE,
             .mode = HandlerMode::SYNC,
+            .gestureType = TOUCH_GESTURE_TYPE_ALL,
+            .fingers = ALL_FINGER_COUNT,
             .cb = [this](std::shared_ptr<PointerEvent> event) {
                 ProcessGestureEvent(event);
                 return RET_OK;
@@ -244,7 +246,8 @@ void TouchGestureHandler::ProcessGestureEvent(std::shared_ptr<PointerEvent> even
         return;
     }
     for (const auto &handler : handlers_) {
-        if (handler.modes_.find(gestureMode) != handler.modes_.cend()) {
+        if ((handler.modes_.find(gestureMode) != handler.modes_.cend()) &&
+            (handler.nFingers_ == event->GetPointerCount())) {
             LaunchAbility(handler.ability_);
         }
     }

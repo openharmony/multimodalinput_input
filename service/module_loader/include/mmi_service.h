@@ -36,7 +36,11 @@
 
 namespace OHOS {
 namespace MMI {
-class TouchGestureAdapter;
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+class TouchGestureHandler;
+class TouchGestureManager;
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_SYSTEM_ABILITY(MMIService);
@@ -243,6 +247,7 @@ protected:
     void InitPreferences();
 
     void OnThread();
+    void PreEventLoop();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
 
@@ -264,10 +269,14 @@ protected:
 private:
     MMIService();
     ~MMIService();
-private:
+
     int32_t CheckPidPermission(int32_t pid);
     void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
     void OnSessionDelete(SessionPtr session);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void SetupTouchGestureHandler();
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
     std::atomic<bool> isCesStart_ { false };
@@ -284,7 +293,8 @@ private:
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<TouchGestureAdapter> touchGestureAdapter_ { nullptr };
+    std::shared_ptr<TouchGestureHandler> touchGestureHandler_ { nullptr };
+    std::shared_ptr<TouchGestureManager> touchGestureMgr_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<DelegateInterface> delegateInterface_ { nullptr };
     sptr<AppDebugListener> appDebugListener_;

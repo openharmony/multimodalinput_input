@@ -42,14 +42,17 @@ constexpr double ANGLE_LEFT_DOWN = -135.0;
 constexpr double ANGLE_LEFT_UP = 135.0;
 
 // gesture threshold values
-constexpr int32_t MAXIMUM_SAME_DIRECTION_OFFSET = 1;
-constexpr float MAXIMUM_POINTER_SPACING = 2000;
-constexpr int64_t MAXIMUM_POINTER_INTERVAL = 100000;
+constexpr int32_t MAXIMUM_SAME_DIRECTION_OFFSET { 1 };
+constexpr float MAXIMUM_POINTER_SPACING { 2000 };
+constexpr int64_t MAXIMUM_POINTER_INTERVAL { 100000 };
 constexpr int64_t MAXIMUM_PRESS_DELAY { 15 }; // ms
 constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE { 3.0 };
-constexpr double MINIMUM_GRAVITY_OFFSET = 0.5;
-constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS = 2;
-constexpr int32_t MINIMUM_FINGER_COUNT_OFFSET = 1;
+constexpr double MINIMUM_GRAVITY_OFFSET { 0.5 };
+constexpr double MINIMUM_SWIPE_MOVEMENT { 150.0 };
+constexpr int32_t MINIMUM_SWIPE_RECURRENTS { 3 };
+constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS { 2 };
+constexpr int32_t MINIMUM_FINGER_COUNT_OFFSET { 1 };
+constexpr size_t FIRST_OCCURRENT { 1 };
 } // namespace
 
 bool TouchGestureDetector::OnTouchEvent(std::shared_ptr<PointerEvent> event)
@@ -101,10 +104,6 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
     if (!iter.second) {
         MMI_HILOGE("Insert value failed, duplicated pointerId:%{public}d", pointerId);
     }
-    if (gestureTimer_ >= 0) {
-        TimerMgr->RemoveTimer(gestureTimer_);
-        gestureTimer_ = -1;
-    }
     if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
         isFingerReady_ = HandleFingerDown();
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
@@ -119,7 +118,7 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
 void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
 {
     CHKPV(event);
-    if (isRecognized_ || (gestureTimer_ >= 0)) {
+    if (isRecognized_) {
         return;
     }
     if (downPoint_.size() < THREE_FINGER_COUNT) {
@@ -150,19 +149,44 @@ void TouchGestureDetector::HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> ev
     if (state == TouchGestureDetector::SlideState::DIRECTION_UNKNOW) {
         return;
     }
-    GestureMode type = ChangeToGestureMode(state);
-    if (type == GestureMode::ACTION_UNKNOWN) {
+    GestureMode mode = ChangeToGestureMode(state);
+    AntiGestureJitter(event, mode);
+}
+
+void TouchGestureDetector::AntiGestureJitter(std::shared_ptr<PointerEvent> event, GestureMode mode)
+{
+    if (mode == GestureMode::ACTION_UNKNOWN) {
         return;
     }
-    gestureTimer_ = TimerMgr->AddTimer(MAXIMUM_PRESS_DELAY, REPEAT_ONCE,
-        [this, pointerEvent = std::make_shared<PointerEvent>(*event), type]() {
-            gestureTimer_ = -1;
+    UpdateTouchMovements(event);
+
+    if (GestureRecurrent(mode)) {
+        ++recurrentCount_;
+        if (recurrentCount_ >= MINIMUM_SWIPE_RECURRENTS) {
             isRecognized_ = true;
-            lastTouchEvent_ = pointerEvent;
-            NotifyGestureEvent(pointerEvent, type);
-        });
-    if (gestureTimer_ < 0) {
-        MMI_HILOGE("TimerMgr::AddTimer fail");
+            NotifyGestureEvent(event, mode);
+        }
+    } else {
+        recurrentCount_ = FIRST_OCCURRENT;
+        recurrentGesture_ = mode;
+        recurrentTouchNum_ = downPoint_.size();
+    }
+}
+
+bool TouchGestureDetector::GestureRecurrent(GestureMode mode) const
+{
+    return ((recurrentGesture_ == mode) && (recurrentTouchNum_ == downPoint_.size()));
+}
+
+void TouchGestureDetector::UpdateTouchMovements(std::shared_ptr<PointerEvent> event)
+{
+    for (auto &[pointerId, downPt] : downPoint_) {
+        PointerEvent::PointerItem pointerItem {};
+
+        if (event->GetPointerItem(pointerId, pointerItem)) {
+            downPt.x = pointerItem.GetDisplayX();
+            downPt.y = pointerItem.GetDisplayY();
+        }
     }
 }
 
@@ -222,10 +246,7 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
         return;
     }
     downPoint_.erase(iter);
-    if (gestureTimer_ >= 0) {
-        TimerMgr->RemoveTimer(gestureTimer_);
-        gestureTimer_ = -1;
-    }
+
     if (isRecognized_ && (lastTouchEvent_ != nullptr)) {
         PointerEvent::PointerItem pointerItem {};
         if (event->GetPointerItem(event->GetPointerId(), pointerItem)) {
@@ -261,6 +282,9 @@ void TouchGestureDetector::ReleaseData()
     lastTouchEvent_ = nullptr;
     continuousCloseCount_ = 0;
     continuousOpenCount_ = 0;
+    recurrentCount_ = 0;
+    recurrentTouchNum_ = 0;
+    recurrentGesture_ = GestureMode::ACTION_UNKNOWN;
     lastDistance_.clear();
     downPoint_.clear();
     movePoint_.clear();
@@ -421,7 +445,7 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
         }
         Point movePt { item.GetDisplayX(), item.GetDisplayY() };
 
-        if (!IsFingerMove(point, movePt)) {
+        if (!DoesSwipeMove(point, movePt)) {
             continue;
         }
         double angle = GetAngle(point.x, point.y, movePt.x, movePt.y);
@@ -436,6 +460,11 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
         return state;
     }
     return *(directions.begin());
+}
+
+bool TouchGestureDetector::DoesSwipeMove(const Point &downPt, const Point &movePt) const
+{
+    return (CalcTwoPointsDistance(downPt, movePt) > MINIMUM_SWIPE_MOVEMENT);
 }
 
 double TouchGestureDetector::CalcTwoPointsDistance(const Point &p1, const Point &p2) const

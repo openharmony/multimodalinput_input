@@ -47,10 +47,12 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool CheckHasInputHandler(HandleEventType eventType);
-    int32_t AddInputHandler(InputHandlerType handlerType,
-        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
-    void RemoveInputHandler(InputHandlerType handlerType,
-        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        std::shared_ptr<IInputEventConsumer> callback,
+        TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
+    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        std::shared_ptr<IInputEventConsumer> callback,
+        TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         SessionPtr session, TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
     void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
@@ -77,16 +79,22 @@ private:
     class SessionHandler {
     public:
         SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
-            SessionPtr session, std::shared_ptr<IInputEventConsumer> cb = nullptr)
-            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session), callback_(cb) {}
-
-        SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
-            SessionPtr session, TouchGestureType gestureType, int32_t fingers)
-            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session)
+            std::shared_ptr<IInputEventConsumer> cb,
+            TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0)
+            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL), callback_(cb)
         {
-            gesture_.AddGestureMonitor(gestureType, fingers);
+            if ((gestureType & TOUCH_GESTURE_TYPE_ALL) != TOUCH_GESTURE_TYPE_NONE) {
+                gesture_.AddGestureMonitor(gestureType, fingers);
+            }
+        }
+
+        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session,
+            TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0)
+            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL), session_(session)
+        {
+            if ((gestureType & TOUCH_GESTURE_TYPE_ALL) != TOUCH_GESTURE_TYPE_NONE) {
+                gesture_.AddGestureMonitor(gestureType, fingers);
+            }
         }
 
         SessionHandler(InputHandlerType handlerType, uint32_t eventType, SessionPtr session,
