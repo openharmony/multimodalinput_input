@@ -1063,6 +1063,8 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     if (!displayGroupInfo_.displaysInfo.empty()) {
         UpdateDisplayIdAndName();
     }
+    UpdateDisplayMode();
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() && INPUT_DEV_MGR->HasPointerDevice()) {
@@ -1081,9 +1083,6 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    UpdateDisplayMode();
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (INPUT_DEV_MGR->HasPointerDevice() && pointerDrawFlag_) {
         NotifyPointerToWindow();
     }
@@ -1123,7 +1122,6 @@ DisplayMode InputWindowsManager::GetDisplayMode() const
     return displayMode_;
 }
 
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 void InputWindowsManager::UpdateDisplayMode()
 {
     CALL_DEBUG_ENTER;
@@ -1137,6 +1135,7 @@ void InputWindowsManager::UpdateDisplayMode()
         return;
     }
     displayMode_ = mode;
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
         MMI_HILOGD("Send fingersense display mode is nullptr");
         return;
@@ -1145,8 +1144,8 @@ void InputWindowsManager::UpdateDisplayMode()
     BytraceAdapter::StartUpdateDisplayMode("display mode change");
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
     BytraceAdapter::StopUpdateDisplayMode();
-}
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::DrawPointer(bool isDisplayRemoved)

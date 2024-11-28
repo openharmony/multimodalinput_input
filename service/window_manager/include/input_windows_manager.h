@@ -319,10 +319,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_CROWN)
     int32_t UpdateCrownTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
-
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     void UpdateDisplayMode();
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
     bool OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo);
