@@ -657,6 +657,8 @@ bool InputHandlerManager::CheckIfNeedAddToConsumerInfos(const Handler &monitor,
         return true;
     } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
         return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_SWIPEINWARD) == HANDLE_EVENT_TYPE_SWIPEINWARD) {
+        return true;
     } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH) == HANDLE_EVENT_TYPE_TOUCH &&
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         return true;

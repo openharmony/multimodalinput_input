@@ -171,6 +171,7 @@ std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
     { "pinch", HANDLE_EVENT_TYPE_PINCH },
     { "threeFingersSwipe", HANDLE_EVENT_TYPE_THREEFINGERSSWIP },
     { "fourFingersSwipe", HANDLE_EVENT_TYPE_FOURFINGERSSWIP },
+    { "swipeInward", HANDLE_EVENT_TYPE_SWIPEINWARD },
     { "rotate", HANDLE_EVENT_TYPE_ROTATE },
     { "threeFingersTap", HANDLE_EVENT_TYPE_THREEFINGERSTAP },
     { "fingerprint", HANDLE_EVENT_TYPE_FINGERPRINT },
