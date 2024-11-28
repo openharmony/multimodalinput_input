@@ -314,6 +314,38 @@ TOUCH_EVENT:
   POINT_ID: {type: INT32, desc: point id}
   WINDOW_ID: {type: INT32, desc: target window id}
 
+SET_CUSTOM_CURSOR:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report set custom cursor event}
+  WINDOW_PID: {type: INT32, desc: window pid}
+  WINDOW_ID: {type: INT32, desc: window id}
+
+SET_MOUSE_ICON:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report set mouse icon event}
+  WINDOW_ID: {type: INT32, desc: window id}
+
+SET_POINTER_STYLE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report set pointer style event}
+  WINDOW_ID: {type: INT32, desc: window id}
+  POINTER_STYLE_ID: {type: INT32, desc: pointer style id}
+  IS_UIEXTENSION: {type: BOOL, desc: is ui extension}
+
+SET_POINTER_VISIBLE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report set pointer visible event}
+  VISIBLE: {type: BOOL, desc: is visible}
+  PRIORITY: {type: INT32, desc: priority}
+
+SET_POINTER_SPEED:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report set pointer visible event}
+  SPEED: {type: INT32, desc: pointer speed}
+
+ADD_INPUT_HANDLER:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report add input handler event}
+  INPUT_HANDLER_TYPE: {type: INT32, desc: input handler type}
+
+REMOVE_INPUT_HANDLER:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report remove input handler event}
+  INPUT_HANDLER_TYPE: {type: INT32, desc: input handler type}
+
 INJECT_POINTER_EVENT:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report inject pointer event}
   IS_NATIVE_INJECT: {type: BOOL, desc: is native inject}

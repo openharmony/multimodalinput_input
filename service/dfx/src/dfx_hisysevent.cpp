@@ -991,6 +991,94 @@ void DfxHisysevent::ReportTouchEvent(int32_t pointAction, int32_t pointId, int32
     }
 }
 
+void DfxHisysevent::ReportSetCustomCursor(int32_t windowPid, int32_t windowId)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_CUSTOM_CURSOR",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "WINDOW_PID", windowPid,
+        "WINDOW_ID", windowId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetMouseIcon(int32_t windowId)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_MOUSE_ICON",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "WINDOW_ID", windowId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetPointerStyle(int32_t windowId, int32_t pointerStyleId, bool isUiExtension)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_POINTER_STYLE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "WINDOW_ID", windowId,
+        "POINTER_STYLE_ID", pointerStyleId,
+        "IS_UIEXTENSION", isUiExtension);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetPointerVisible(bool visible, int32_t priority)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_POINTER_VISIBLE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "VISIBLE", visible,
+        "PRIORITY", priority);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetPointerSpeed(int32_t speed)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_POINTER_SPEED",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "SPEED", speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportAddInputHandler(int32_t handlerType)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "ADD_INPUT_HANDLER",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "INPUT_HANDLER_TYPE", handlerType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportRemoveInputHandler(int32_t handlerType)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "REMOVE_INPUT_HANDLER",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "INPUT_HANDLER_TYPE", handlerType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
 void DfxHisysevent::ReportInjectPointerEvent(bool isNativeInject)
 {
     int32_t ret = HiSysEventWrite(
