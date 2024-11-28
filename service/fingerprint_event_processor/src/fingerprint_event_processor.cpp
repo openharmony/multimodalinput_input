@@ -149,7 +149,7 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
             screenMissTouchFlag_ = true;
             if (!fingerprintFlag_) {
                 return;
-            }          
+            }
             SendFingerprintCancelEvent();
             return;
         }
