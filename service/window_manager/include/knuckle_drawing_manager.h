@@ -45,7 +45,6 @@ public:
     KnuckleDrawingManager();
     ~KnuckleDrawingManager() = default;
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const DisplayInfo& displayInfo);
-    bool CheckRotatePolicy(const DisplayInfo& displayInfo);
     std::string GetScreenReadState();
 private:
     bool IsValidAction(int32_t action);

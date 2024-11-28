@@ -74,7 +74,8 @@ public:
         PointerEvent::PointerItem pointerItem);
 private:
     void CreateObserver();
-    void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode);
+    void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
+        bool isNeedRotate = true);
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
     void ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
     void RotationCanvas(RosenCanvas *canvas, Direction direction);

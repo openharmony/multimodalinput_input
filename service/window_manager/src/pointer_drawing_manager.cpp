@@ -70,11 +70,6 @@ const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
 const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
 const std::string POINTER_CURSOR_RENDER_RECEIVER_NAME { "PointerCursorReceiver" };
 const std::string DEVICE_TYPE_PC_PRO { "PC_PRO" };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
-constexpr int32_t WINDOW_ROTATE { 0 };
-constexpr char ROTATE_WINDOW_ROTATE { '0' };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
 [[ maybe_unused ]] constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
@@ -120,6 +115,8 @@ float g_hardwareCanvasSize = { 512.0f };
 float g_focalPoint = { 256.0f };
 constexpr int32_t REPEAT_COOLING_TIME { 10000 };
 constexpr int32_t REPEAT_ONCE { 1 };
+constexpr int32_t ANGLE_90 { 90 };
+constexpr int32_t ANGLE_360 { 360 };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -1484,18 +1481,6 @@ bool PointerDrawingManager::GetMouseDisplayState() const
     return mouseDisplayState_;
 }
 
-bool PointerDrawingManager::IsWindowRotation()
-{
-    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
-        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
-    return (ROTATE_POLICY == WINDOW_ROTATE ||
-        (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo_.displayMode == DisplayMode::MAIN &&
-        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
-        (displayInfo_.displayMode == DisplayMode::FULL &&
-        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
-}
-
 void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
 {
     if (physicalX < 0) {
@@ -1506,28 +1491,24 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (IsWindowRotation()) {
-        if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
-            if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
-                physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
-            }
-            if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
-                physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
-            }
-        } else {
-            if (physicalX > (displayInfo_.height - imageHeight_ / cursorUnit)) {
-                physicalX = displayInfo_.height - imageHeight_ / cursorUnit;
-            }
-            if (physicalY > (displayInfo_.width - imageWidth_ / cursorUnit)) {
-                physicalY = displayInfo_.width - imageWidth_ / cursorUnit;
-            }
-        }
-    } else {
+    Direction direction = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        direction = displayInfo_.direction;
+    }
+    if (direction == DIRECTION0 || direction == DIRECTION180) {
         if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
             physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
         }
         if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
             physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
+        }
+    } else {
+        if (physicalX > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+            physicalX = displayInfo_.height - imageHeight_ / cursorUnit;
+        }
+        if (physicalY > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+            physicalY = displayInfo_.width - imageWidth_ / cursorUnit;
         }
     }
 }
@@ -2193,10 +2174,8 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    Direction direction = DIRECTION0;
-    if (IsWindowRotation()) {
-        direction = displayInfo_.direction;
-    }
+    Direction direction = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     auto& iconPath = GetMouseIconPath();
     AdjustMouseFocus(direction, ICON_TYPE(iconPath.at(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
         physicalX, physicalY);
@@ -2309,10 +2288,8 @@ void PointerDrawingManager::DrawManager()
         PointerStyle pointerStyle;
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGD("Get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
-        Direction direction = DIRECTION0;
-        if (IsWindowRotation()) {
-            direction = displayInfo_.direction;
-        }
+        Direction direction = static_cast<Direction>((
+            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         lastDrawPointerStyle_ = pointerStyle;
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
@@ -2740,10 +2717,8 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
             AttachToDisplay();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
-        Direction direction = DIRECTION0;
-        if (IsWindowRotation()) {
-            direction = displayInfo_.direction;
-        }
+        Direction direction = static_cast<Direction>((
+            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
@@ -2971,10 +2946,8 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
             AttachToDisplay();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
-        Direction direction = DIRECTION0;
-        if (displayInfo_.displayDirection == DIRECTION0) {
-            direction = displayInfo_.direction;
-        }
+        Direction direction = static_cast<Direction>((
+            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
             pointerStyle, direction);
     }
