@@ -126,6 +126,13 @@ public:
     static void ReportLaunchAbility(std::string bundleName);
     static void ReportCommonAction(std::string action);
     static void ReportTouchEvent(int32_t pointAction, int32_t pointId, int32_t windowId);
+    static void ReportSetCustomCursor(int32_t windowPid, int32_t windowId);
+    static void ReportSetMouseIcon(int32_t windowId);
+    static void ReportSetPointerStyle(int32_t windowId, int32_t pointerStyleId, bool isUiExtension);
+    static void ReportSetPointerVisible(bool visible, int32_t priority);
+    static void ReportSetPointerSpeed(int32_t speed);
+    static void ReportAddInputHandler(int32_t handlerType);
+    static void ReportRemoveInputHandler(int32_t handlerType);
     static void ReportInjectPointerEvent(bool isNativeInject);
     static void ReportEnableCombineKey(bool enable);
     static void ReportAppendExtraData();
