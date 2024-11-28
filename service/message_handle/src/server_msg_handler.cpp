@@ -288,6 +288,8 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
                 break;
+            } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
             } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
