@@ -386,9 +386,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     CHKPV(knuckleDrawMgr_);
-    if (knuckleDrawMgr_->CheckRotatePolicy(displayInfo_)) {
-        knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
-    }
+    knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
