@@ -144,11 +144,6 @@ void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     BytraceAdapter::StartDataShare(observer->GetKey());
-    if (!isDataShareReady_) {
-        MMI_HILOGI("Data share not ready!");
-        BytraceAdapter::StopDataShare();
-        return RET_ERR;
-    }
     CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey(), strUri);
@@ -171,11 +166,6 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     BytraceAdapter::StartDataShare(observer->GetKey());
-    if (!isDataShareReady_) {
-        MMI_HILOGI("Data share not ready!");
-        BytraceAdapter::StopDataShare();
-        return RET_ERR;
-    }
     CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey(), strUri);
@@ -195,11 +185,6 @@ ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observ
 ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& value, const std::string &strUri)
 {
     BytraceAdapter::StartDataShare(key);
-    if (!isDataShareReady_) {
-        MMI_HILOGI("Data share not ready!");
-        BytraceAdapter::StopDataShare();
-        return RET_ERR;
-    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
@@ -243,11 +228,6 @@ ErrCode SettingDataShare::PutStringValue(
     const std::string& key, const std::string& value, bool needNotify, const std::string &strUri)
 {
     BytraceAdapter::StartDataShare(key);
-    if (!isDataShareReady_) {
-        MMI_HILOGI("Data share not ready!");
-        BytraceAdapter::StopDataShare();
-        return RET_ERR;
-    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
