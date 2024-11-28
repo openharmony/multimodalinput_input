@@ -64,17 +64,11 @@ constexpr int32_t ROTATION_ANGLE_90 { 90 };
 constexpr int32_t ROTATION_ANGLE_180 { 180 };
 constexpr int32_t ROTATION_ANGLE_270 { 270 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string FOLDABLE = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
-constexpr int32_t WINDOW_ROTATE { 0 };
-constexpr int32_t SCREEN_ROTATE { 1 };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
-constexpr char FOLDABLE_ROTATE { '0' };
-constexpr int32_t SUBSCRIPT_TWO { 2 };
-constexpr int32_t SUBSCRIPT_ZERO { 0 };
 constexpr std::string_view SCREEN_READING { "accessibility_screenreader_enabled" };
 constexpr std::string_view SCREEN_READ_ENABLE { "1" };
 constexpr int32_t POINTER_NUMBER_TO_DRAW { 10 };
+constexpr int32_t ANGLE_90 { 90 };
+constexpr int32_t ANGLE_360 { 360 };
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 constexpr int64_t PARTICLE_LIFE_TIME { 700 };
 constexpr int32_t PARTICLE_COUNT { -1 };
@@ -278,13 +272,15 @@ void KnuckleDrawingManager::RotationCanvasNode(
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvasNode);
-    if (displayInfo.direction == Direction::DIRECTION90) {
+    Direction displayDirection = static_cast<Direction>((
+        ((displayInfo.direction - displayInfo.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    if (displayDirection == Direction::DIRECTION90) {
         canvasNode->SetRotation(ROTATION_ANGLE_270);
         canvasNode->SetTranslateX(0);
-    } else if (displayInfo.direction == Direction::DIRECTION270) {
+    } else if (displayDirection == Direction::DIRECTION270) {
         canvasNode->SetRotation(ROTATION_ANGLE_90);
         canvasNode->SetTranslateX(-std::fabs(displayInfo.width - displayInfo.height));
-    } else if (displayInfo.direction == Direction::DIRECTION180) {
+    } else if (displayDirection == Direction::DIRECTION180) {
         canvasNode->SetRotation(ROTATION_ANGLE_180);
         canvasNode->SetTranslateX(-std::fabs(displayInfo.width - displayInfo.height));
     } else {
@@ -292,31 +288,6 @@ void KnuckleDrawingManager::RotationCanvasNode(
         canvasNode->SetTranslateX(0);
     }
     canvasNode->SetTranslateY(0);
-}
-
-bool KnuckleDrawingManager::CheckRotatePolicy(const DisplayInfo& displayInfo)
-{
-    CALL_DEBUG_ENTER;
-    bool isNeedRotate = false;
-    switch (ROTATE_POLICY) {
-        case WINDOW_ROTATE:
-            isNeedRotate = true;
-            break;
-        case SCREEN_ROTATE:
-            break;
-        case FOLDABLE_DEVICE: {
-            MMI_HILOGI("FOLDABLE:%{public}s", FOLDABLE.c_str());
-            if ((displayInfo.displayMode == DisplayMode::MAIN && FOLDABLE[SUBSCRIPT_ZERO] == FOLDABLE_ROTATE) ||
-                (displayInfo.displayMode == DisplayMode::FULL && FOLDABLE[SUBSCRIPT_TWO] == FOLDABLE_ROTATE)) {
-                isNeedRotate = true;
-            }
-            break;
-        }
-        default:
-            MMI_HILOGW("Unknown ROTATE_POLICY:%{public}d", ROTATE_POLICY);
-            break;
-    }
-    return isNeedRotate;
 }
 
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
@@ -406,10 +377,8 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (CheckRotatePolicy(displayInfo_)) {
-        RotationCanvasNode(brushCanvasNode_, displayInfo_);
-        RotationCanvasNode(trackCanvasNode_, displayInfo_);
-    }
+    RotationCanvasNode(brushCanvasNode_, displayInfo_);
+    RotationCanvasNode(trackCanvasNode_, displayInfo_);
     brushCanvasNode_->ResetSurface(scaleW_, scaleH_);
     trackCanvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -449,9 +418,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (CheckRotatePolicy(displayInfo_)) {
-        RotationCanvasNode(canvasNode_, displayInfo_);
-    }
+    RotationCanvasNode(canvasNode_, displayInfo_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }

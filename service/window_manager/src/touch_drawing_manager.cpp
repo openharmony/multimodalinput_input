@@ -76,6 +76,8 @@ const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.fo
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr char ROTATE_WINDOW_ROTATE { '0' };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
+constexpr int32_t ANGLE_90 { 90 };
+constexpr int32_t ANGLE_360 { 360 };
 const std::string PRODUCT_PHONE { "phone" };
 } // namespace
 
@@ -143,7 +145,7 @@ void TouchDrawingManager::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
         CreateTouchWindow();
         AddCanvasNode(trackerCanvasNode_, true);
         AddCanvasNode(crosshairCanvasNode_, false);
-        AddCanvasNode(labelsCanvasNode_, false);
+        AddCanvasNode(labelsCanvasNode_, false, false);
         DrawPointerPositionHandler();
         lastPt_ = currentPt_;
     }
@@ -209,7 +211,7 @@ int32_t TouchDrawingManager::UpdateLabels()
     CALL_DEBUG_ENTER;
     if (pointerMode_.isShow) {
         CreateTouchWindow();
-        AddCanvasNode(labelsCanvasNode_, false);
+        AddCanvasNode(labelsCanvasNode_, false, false);
         DrawLabels();
     } else {
         RemovePointerPosition();
@@ -238,22 +240,12 @@ void TouchDrawingManager::RotationScreen()
         return;
     }
 
-    if (IsWindowRotation()) {
-        if (pointerMode_.isShow) {
-            RotationCanvasNode(trackerCanvasNode_);
-            RotationCanvasNode(crosshairCanvasNode_);
-        }
-        if (bubbleMode_.isShow) {
-            RotationCanvasNode(bubbleCanvasNode_);
-        }
-    } else if (isChangedMode_) {
-        if (pointerMode_.isShow) {
-            ResetCanvasNode(trackerCanvasNode_);
-            ResetCanvasNode(crosshairCanvasNode_);
-        }
-        if (bubbleMode_.isShow) {
-            ResetCanvasNode(bubbleCanvasNode_);
-        }
+    if (pointerMode_.isShow) {
+        RotationCanvasNode(trackerCanvasNode_);
+        RotationCanvasNode(crosshairCanvasNode_);
+    }
+    if (bubbleMode_.isShow) {
+        RotationCanvasNode(bubbleCanvasNode_);
     }
 
     if (pointerMode_.isShow) {
@@ -346,7 +338,8 @@ std::string TouchDrawingManager::FormatNumber(T number, int32_t precision)
     return str.substr(0, str.find(".") + precision + 1);
 }
 
-void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode)
+void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
+    bool isNeedRotate)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
@@ -357,10 +350,8 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
-    if (IsWindowRotation()) {
+    if (isNeedRotate) {
         RotationCanvasNode(canvasNode);
-    } else {
-        canvasNode->SetRotation(0);
     }
 #ifndef USE_ROSEN_DRAWING
     canvasNode->SetBackgroundColor(SK_ColorTRANSPARENT);
@@ -376,13 +367,15 @@ void TouchDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvasNode);
-    if (displayInfo_.direction == Direction::DIRECTION90) {
+    Direction displayDirection = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    if (displayDirection == Direction::DIRECTION90) {
         canvasNode->SetRotation(ROTATION_ANGLE_270);
         canvasNode->SetTranslateX(0);
-    } else if (displayInfo_.direction == Direction::DIRECTION270) {
+    } else if (displayDirection == Direction::DIRECTION270) {
         canvasNode->SetRotation(ROTATION_ANGLE_90);
         canvasNode->SetTranslateX(-std::fabs(displayInfo_.width - displayInfo_.height));
-    } else if (displayInfo_.direction == Direction::DIRECTION180) {
+    } else if (displayDirection == Direction::DIRECTION180) {
         canvasNode->SetRotation(ROTATION_ANGLE_180);
         canvasNode->SetTranslateX(-std::fabs(displayInfo_.width - displayInfo_.height));
     } else {
@@ -404,17 +397,15 @@ void TouchDrawingManager::ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> c
 void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction direction)
 {
     CHKPV(canvas);
-    if (IsWindowRotation()) {
-        if (direction == Direction::DIRECTION90) {
-            canvas->Translate(0, displayInfo_.width);
-            canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
-        } else if (direction == Direction::DIRECTION180) {
-            canvas->Rotate(ROTATION_ANGLE_180, static_cast<float>(displayInfo_.width) / CALCULATE_MIDDLE,
-                static_cast<float>(displayInfo_.height) / CALCULATE_MIDDLE);
-        } else if (direction == Direction::DIRECTION270) {
-            canvas->Translate(displayInfo_.height, 0);
-            canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
-        }
+    if (direction == Direction::DIRECTION90) {
+        canvas->Translate(0, displayInfo_.width);
+        canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
+    } else if (direction == Direction::DIRECTION180) {
+        canvas->Rotate(ROTATION_ANGLE_180, static_cast<float>(displayInfo_.width) / CALCULATE_MIDDLE,
+            static_cast<float>(displayInfo_.height) / CALCULATE_MIDDLE);
+    } else if (direction == Direction::DIRECTION270) {
+        canvas->Translate(displayInfo_.height, 0);
+        canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
     }
 }
 void TouchDrawingManager::CreateTouchWindow()
@@ -556,7 +547,9 @@ void TouchDrawingManager::Snapshot()
     rect.bottom_ = rectTopPosition_ + RECT_HEIGHT;
     rect.left_ = 0;
     rect.right_ = itemRectW_ + rect.left_;
-    RotationCanvas(canvas, displayInfo_.direction);
+    Direction displayDirection = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    RotationCanvas(canvas, displayDirection);
 
     DrawRectItem(canvas, viewP, rect, color);
     color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
@@ -676,7 +669,9 @@ void TouchDrawingManager::DrawLabels()
     rect.bottom_ = rectTopPosition_ + RECT_HEIGHT;
     rect.left_ = 0;
     rect.right_ = itemRectW_ + rect.left_;
-    RotationCanvas(canvas, displayInfo_.direction);
+    Direction displayDirection = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    RotationCanvas(canvas, displayDirection);
     DrawRectItem(canvas, viewP, rect, color);
     if (isDownAction_ || !lastPointerItem_.empty()) {
         DrawRectItem(canvas, viewX, rect, color);
