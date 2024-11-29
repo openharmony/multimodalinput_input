@@ -681,6 +681,12 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
             windowPid = item.pid;
             break;
         }
+        for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
+            if (uiExtentionWindow.id == windowId) {
+                windowPid = uiExtentionWindow.pid;
+                break;
+            }
+        }
     }
     return windowPid;
 }
@@ -4696,6 +4702,11 @@ int32_t InputWindowsManager::GetPidByWindowId(int32_t id)
     for (auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == id) {
             return item.pid;
+        }
+        for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
+            if (uiExtentionWindow.id == id) {
+                return uiExtentionWindow.pid;
+            }
         }
     }
     return RET_ERR;
