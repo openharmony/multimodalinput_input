@@ -19,6 +19,7 @@
 #include "util.h"
 
 #include "ability_manager_client.h"
+#include "common_event_support.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
@@ -5433,6 +5434,121 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey, TestS
     EXPECT_EQ(handler.SetIsFreezePowerKey(pageName), RET_OK);
     handler.sosDelayTimerId_ = -1;
     EXPECT_EQ(handler.SetIsFreezePowerKey(pageName), RET_OK);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_TouchPadKnuckleDoubleClickProcess
+ * @tc.desc: Test the funcation TouchPadKnuckleDoubleClickProcess
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchPadKnuckleDoubleClickProcess, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    std::string action = "action";
+    DISPLAY_MONITOR-> SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    ASSERT_NO_FATAL_FAILURE(handler.TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, action));
+    DISPLAY_MONITOR-> SetScreenStatus("abc");
+    ASSERT_NO_FATAL_FAILURE(handler.TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, action));
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    ASSERT_NO_FATAL_FAILURE(handler.TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, action));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_TouchPadKnuckleDoubleClickHandle
+ * @tc.desc: Test the funcation TouchPadKnuckleDoubleClickHandle
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchPadKnuckleDoubleClickHandle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetKeyAction(KNUCKLE_1F_DOUBLE_CLICK);
+    bool ret = handler.TouchPadKnuckleDoubleClickHandle(event);
+    ASSERT_TRUE(ret);
+    event->SetKeyAction(KNUCKLE_2F_DOUBLE_CLICK);
+    ret = handler.TouchPadKnuckleDoubleClickHandle(event);
+    ASSERT_TRUE(ret);
+    event->SetKeyAction(1);
+    ret = handler.TouchPadKnuckleDoubleClickHandle(event);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsMatchedAbility_001
+ * @tc.desc: Test the funcation IsMatchedAbility
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMatchedAbility_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::vector<float> gesturePoints;
+    float gestureLastX = 100.0f;
+    float gestureLastY = 150.0f;
+    bool ret = handler.IsMatchedAbility(gesturePoints, gestureLastX, gestureLastY);
+    ASSERT_FALSE(ret);
+    gesturePoints.push_back(100.0f);
+    gesturePoints.push_back(150.0f);
+    ret = handler.IsMatchedAbility(gesturePoints, gestureLastX, gestureLastY);
+    ASSERT_FALSE(ret);
+    gesturePoints.push_back(200.0f);
+    ret = handler.IsMatchedAbility(gesturePoints, gestureLastX, gestureLastY);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_InitKeyObserver
+ * @tc.desc: Test the funcation InitKeyObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_InitKeyObserver, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isParseStatusConfig_ = false;
+    handler.isKnuckleSwitchConfig_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.InitKeyObserver());
+    handler.isKnuckleSwitchConfig_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.InitKeyObserver());
+    handler.isParseStatusConfig_ = true;
+    handler.isKnuckleSwitchConfig_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.InitKeyObserver());
+    handler.isKnuckleSwitchConfig_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.InitKeyObserver());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey_001
+ * @tc.desc: Test the funcation SetIsFreezePowerKey
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isFreezePowerKey_ = true;
+    std::string pageName = "pageName";
+    int32_t ret = handler.SetIsFreezePowerKey(pageName);
+    EXPECT_EQ(ret, RET_OK);
+    handler.isFreezePowerKey_ = false;
+    handler.sosDelayTimerId_ = 1;
+    pageName = "SosCountdown";
+    ret = handler.SetIsFreezePowerKey(pageName);
+    EXPECT_EQ(ret, RET_OK);
+    handler.sosDelayTimerId_ = -1;
+    ret = handler.SetIsFreezePowerKey(pageName);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
