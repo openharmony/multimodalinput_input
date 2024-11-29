@@ -38,6 +38,8 @@
 #include "mouse_event_normalize.h"
 #include "setting_observer.h"
 #include "struct_multimodal.h"
+#include "dm_common.h"
+#include "screen_manager_lite.h"
 
 namespace OHOS {
 namespace MMI {
@@ -274,6 +276,20 @@ private:
     std::map<MOUSE_ICON, loadingAndLoadingPixelMapInfo> mousePixelMap_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
     int releaseFence_ { -1 };
+};
+
+class ScreenModeChangeListener : public Rosen::ScreenManagerLite::IScreenModeChangeListener {
+public:
+    ScreenModeChangeListener() = default;
+    virtual ~ScreenModeChangeListener() = default;
+    void NotifyScreenModeChange(const std::vector<sptr<Rosen::ScreenInfo>>& screenInfos) override;
+};
+
+class ScreenListener : public Rosen::ScreenManagerLite::IScreenListener {
+public:
+    void OnConnect(Rosen::ScreenId screenId) override {};
+    void OnDisconnect(Rosen::ScreenId screenId) override;
+    void OnChange(Rosen::ScreenId screenId) override {} ;
 };
 } // namespace MMI
 } // namespace OHOS
