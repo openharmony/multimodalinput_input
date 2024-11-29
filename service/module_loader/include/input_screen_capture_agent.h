@@ -18,6 +18,7 @@
 
 #include <dlfcn.h>
 #include <mutex>
+#include <list>
 
 #include "singleton.h"
 #include "util.h"
@@ -27,7 +28,7 @@ namespace MMI {
 
 struct ScreenCaptureHandle {
     void *handle;
-    int32_t (*isWorking)();
+    std::list<int32_t> (*isWorking)();
     void (*registerListener)(ScreenCaptureCallback);
 
     ScreenCaptureHandle(): handle(nullptr), isWorking(nullptr), registerListener(nullptr) {}
@@ -46,7 +47,7 @@ struct ScreenCaptureHandle {
 class InputScreenCaptureAgent : public Singleton<InputScreenCaptureAgent> {
 public:
     ~InputScreenCaptureAgent() override;
-    int32_t IsScreenCaptureWorking();
+    std::list<int32_t> IsScreenCaptureWorking();
     void RegisterListener(ScreenCaptureCallback callback);
 
 private:
