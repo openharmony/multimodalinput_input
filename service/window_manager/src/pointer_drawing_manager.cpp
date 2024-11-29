@@ -117,12 +117,74 @@ constexpr int32_t REPEAT_COOLING_TIME { 10000 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
+std::map<Rosen::ScreenId, sptr<Rosen::ScreenInfo>> g_screenSourceMode;
+bool g_hasMirrorScreen { false };
+bool g_hasExtendScreen { false };
+bool g_hasVirtualScreen { false };
+std::mutex screenMtx;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
 
 namespace OHOS {
 namespace MMI {
+
+void PointerDrawingManager::InitScreenInfo()
+{
+    Rosen::DMError retMode = Rosen::ScreenManagerLite::GetInstance().RegisterScreenModeChangeListener(new ScreenModeChangeListener());
+    if (retMode != Rosen::DMError::DM_OK) {
+        MMI_HILOGE("RegisterScreenModeChangeListener fail");
+        return;
+    }
+    Rosen::DMError ret = Rosen::ScreenManagerLite::GetInstance().RegisterScreenListener(new ScreenListener());
+    if (ret != Rosen::DMError::DM_OK) {
+        MMI_HILOGE("RegisterScreenListener fail");
+        return;
+    }
+}
+
+void UpdateScreenModeChange() {
+    g_hasMirrorScreen = false;
+    g_hasExtendScreen = false;
+    g_hasVirtualScreen = false;
+    for (auto iter = g_screenSourceMode.begin(); iter != g_screenSourceMode.end(); ++iter) {
+        if (iter->second->GetType() == Rosen::ScreenType::REAL &&
+            iter->second->GetSourceMode() == Rosen::ScreenSourceMode::SCREEN_MIRROR) {
+            g_hasMirrorScreen = true;
+        } else if (iter->second->GetSourceMode() == Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+            g_hasExtendScreen = true;
+        } else if (iter->second->GetType() == Rosen::ScreenType::VIRTUAL) {
+            g_hasVirtualScreen = true;
+        } else {
+            MMI_HILOGE("no screenType match");
+        }
+    }
+}
+
+void ScreenModeChangeListener::NotifyScreenModeChange(const std::vector<sptr<Rosen::ScreenInfo>>& screenInfos)
+{
+    std::lock_guard<std::mutex> guard(screenMtx);
+    if (screenInfos.empty()) {
+        return;
+    }
+    g_screenSourceMode.clear();
+    for (auto screenInfo : screenInfos) {
+        MMI_HILOGI("insert current screenId:%{public}ld", static_cast<uint64_t>(screenInfo->GetScreenId()));
+        g_screenSourceMode.emplace(screenInfo->GetScreenId(), screenInfo);
+    }
+    UpdateScreenModeChange();
+}
+
+void ScreenListener::OnDisconnect(Rosen::ScreenId screenId)
+{
+    std::lock_guard<std::mutex> guard(screenMtx);
+    auto it = g_screenSourceMode.find(screenId);
+    if (it != g_screenSourceMode.end()) {
+        g_screenSourceMode.erase(screenId);
+        MMI_HILOGD("Clear current screenId:%{public}ld", static_cast<uint64_t>(screenId));
+    }
+    UpdateScreenModeChange();
+}
 
 static bool IsSingleDisplayFoldDevice()
 {
@@ -332,6 +394,9 @@ bool PointerDrawingManager::SetDynamicHardWareCursorLocation
 void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physicalY,
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode)
 {
+    if (!(g_hasMirrorScreen || g_hasVirtualScreen)) {
+        return;
+    }
     hardwareCanvasSize_ = g_hardwareCanvasSize;
     PostTask([this, physicalX, physicalY, surfaceNode]() -> void {
         CHKPV(surfaceNode);
@@ -374,8 +439,8 @@ bool PointerDrawingManager::SetTraditionsHardWareCursorLocation(int32_t displayI
         } else {
             surfaceNode_->SetBounds(physicalX, physicalY, surfaceNode_->GetStagingProperties().GetBounds().z_,
                 surfaceNode_->GetStagingProperties().GetBounds().w_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
         }
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
 #else
     if (!magicCursorSetBounds) {
@@ -2132,6 +2197,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->SetDisplayInfo(displayInfo);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    InitScreenInfo();
 }
 
 int32_t PointerDrawingManager::GetIndependentPixels()
@@ -2933,6 +2999,17 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
         AttachToDisplay();
         DrawCursor(MOUSE_ICON(lastMouseStyle_.id));
+        MMI_HILOGI("Mouse traversal occurs, lastPhysicalX_:%{public}d, lastPhysicalY_:%{public}d",
+            lastPhysicalX_,
+            lastPhysicalY_);
+        int32_t currnetPhysicalX =
+            lastPhysicalX_ -
+            CalculateHardwareXOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(lastDrawPointerStyle_.id)].alignmentWay));
+        int32_t currnetPhysicalY =
+            lastPhysicalY_ -
+            CalculateHardwareYOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(lastDrawPointerStyle_.id)].alignmentWay));
+        surfaceNode_->SetBounds(currnetPhysicalX, currnetPhysicalY, hardwareCanvasSize_, hardwareCanvasSize_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
         lastDisplayId_ = displayId;
     }
 }
