@@ -36,9 +36,17 @@ public:
     {
         return false;
     }
+    void SetScreenStatus(const std::string &screenStatus)
+    {
+        screenStatus_ = screenStatus;
+    }
     const std::string GetScreenStatus()
     {
         return screenStatus_;
+    }
+    void SetScreenLocked(bool isLocked)
+    {
+        isScreenLocked_ = isLocked;
     }
     bool GetScreenLocked() const
     {
