@@ -93,6 +93,11 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
         MMI_HILOGI("AutoRepeatSwitch not open and is not simulate event");
         return;
     }
+    bool isSameKeyDown = false;
+    if (keyEvent_ != nullptr) {
+        isSameKeyDown = ((keyEvent_->GetKeyItems().size() == keyEvent->GetKeyItems().size()) &&
+            (keyEvent_->GetKeyCode() == keyEvent->GetKeyCode()))
+    }
     keyEvent_ = keyEvent;
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         if (TimerMgr->IsExist(timerId_)) {
@@ -106,6 +111,9 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
                     MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{private}d",
                         timerId_, keyEvent_->GetKeyCode());
                 }
+            }
+            if (isSameKeyDown) {
+                return;
             }
             TimerMgr->RemoveTimer(timerId_);
             keyEvent_->SetRepeatKey(false);
