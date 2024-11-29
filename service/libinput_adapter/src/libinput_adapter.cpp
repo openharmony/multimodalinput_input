@@ -279,11 +279,11 @@ void LibinputAdapter::OnEventHandler()
                 }
             }
 
-            MMI_HILOGD("#### touch event. deviceId: %d, touchId: %d, x: %d, y: %d, type: %d", deviceId,
+            MMI_HILOGD("touch event. deviceId: %d, touchId: %d, x: %d, y: %d, type: %d", deviceId,
                        touchId, (int)x, (int)y, (int)eventType);
 
             if (handleTouchPoint_(x, y, touchId, tipDown) == 0) {
-                MMI_HILOGD("#### inside vkeyboard area");
+                MMI_HILOGD("inside vkeyboard area");
 
                 while (true) {
                     int toggleCodeFirst(-1);
@@ -291,20 +291,20 @@ void LibinputAdapter::OnEventHandler()
                     int keyCode(-1);
                     VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(toggleCodeFirst, toggleCodeSecond,
                         keyCode);
-                    MMI_HILOGD("#### get message type: %d", (int)type);
+                    MMI_HILOGD("get message type: %d", (int)type);
                     if (type == VNoMessage) {
                         break;
                     }
 
                     switch (type) {
                         case VKeyboardMessageType::VKeyPressed: {
-                            MMI_HILOGD("#### press key: %{private}d", keyCode);
+                            MMI_HILOGD("press key: %{private}d", keyCode);
                             InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
                             InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
                             break;
                         }
                         case VKeyboardMessageType::VCombinationKeyPressed: {
-                            MMI_HILOGD("#### combination key. triger: %{private}d, toggle: %{private}d + %{private}d",
+                            MMI_HILOGD("combination key. triger: %{private}d, toggle: %{private}d + %{private}d",
                                 keyCode, toggleCodeFirst, toggleCodeSecond);
                             std::vector<int32_t> toggleKeyCodes;
                             if (toggleCodeFirst >= 0) {
@@ -314,6 +314,16 @@ void LibinputAdapter::OnEventHandler()
                                 toggleKeyCodes.push_back(toggleCodeSecond);
                             }
                             InjectCombinationKeyEvent(touch, toggleKeyCodes, keyCode, frameTime);
+                            break;
+                        }
+                        case VKeyboardMessageType::VStartLongPressControl: {
+                            MMI_HILOGD("long press start: %{private}d", keyCode);
+                            InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
+                            break;
+                        }
+                        case VKeyboardMessageType::VStopLongPressControl: {
+                            MMI_HILOGD("long press stop: %{private}d", keyCode);
+                            InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
                             break;
                         }
                         default: break;
