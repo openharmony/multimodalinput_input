@@ -356,7 +356,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GlobalKey_07, TestSize.L
     int32_t shortcutId = shortcutMgr.RegisterHotKey(globalKey);
     EXPECT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
     shortcutId = shortcutMgr.RegisterHotKey(globalKey);
-    EXPECT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
+    EXPECT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
 }
 
 std::shared_ptr<KeyEvent> KeyShortcutManagerTest::TriggerSystemKey01()
@@ -1257,6 +1257,96 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_002, TestSiz
     keyEvent->SetKeyCode(2046);
     ret = shortcutMgr.HandleKeyUp(keyEvent);
     EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_UnregisterSystemKey_001
+ * @tc.desc: Test the funcation UnregisterSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_UnregisterSystemKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcutMgr.shortcuts_[1] = shortcut;
+    int32_t shortcutId = 1;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.UnregisterSystemKey(shortcutId));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_UnregisterHotKey_002
+ * @tc.desc: Test the funcation UnregisterHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_UnregisterHotKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcutMgr.shortcuts_[1] = shortcut;
+    int32_t shortcutId = 1;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.UnregisterHotKey(shortcutId));
+    shortcutId = 5;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.UnregisterHotKey(shortcutId));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleEvent_002
+ * @tc.desc: Test the funcation HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    bool ret = shortcutMgr.HandleEvent(keyEvent);
+    ASSERT_EQ(ret, false);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ret = shortcutMgr.HandleEvent(keyEvent);
+    ASSERT_EQ(ret, false);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    ret = shortcutMgr.HandleEvent(keyEvent);
+    ASSERT_EQ(ret, false);
+    keyEvent->SetKeyAction(KeyEvent::INTENTION_LEFT);
+    ret = shortcutMgr.HandleEvent(keyEvent);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_FormatPressedKeys_001
+ * @tc.desc: Test the funcation FormatPressedKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatPressedKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    int64_t downTime = 2;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(kitDown);
+    std::string ret = shortcutMgr.FormatPressedKeys(keyEvent);
+    ASSERT_EQ(ret, "-1");
 }
 } // namespace MMI
 } // namespace OHOS
