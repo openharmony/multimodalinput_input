@@ -78,6 +78,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     keyEvent->SetActionTime(time);
     keyEvent->SetAction(keyAction);
     keyEvent->SetDeviceId(deviceId);
+    keyEvent->SetSourceType(InputEvent::SOURCE_TYPE_UNKNOWN);
     keyEvent->SetKeyCode(keyCode);
     keyEvent->SetKeyAction(keyAction);
     StartLogTraceId(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
