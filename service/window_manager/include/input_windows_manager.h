@@ -337,7 +337,7 @@ private:
     int32_t uiExtensionPid_ { -1 };
     int32_t uiExtensionWindowId_ { -1 };
     std::pair<int32_t, int32_t> firstBtnDownWindowInfo_ {-1, -1};
-    std::pair<int32_t, int32_t> axisBeginWindowInfo_ {-1, -1};
+    std::optional<WindowInfo> axisBeginWindowInfo_ { std::nullopt };
     int32_t lastLogicX_ { -1 };
     int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
