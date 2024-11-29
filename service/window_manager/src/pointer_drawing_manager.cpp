@@ -117,11 +117,13 @@ constexpr int32_t REPEAT_COOLING_TIME { 10000 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 std::map<Rosen::ScreenId, sptr<Rosen::ScreenInfo>> g_screenSourceMode;
 bool g_hasMirrorScreen { false };
 bool g_hasExtendScreen { false };
 bool g_hasVirtualScreen { false };
 std::mutex screenMtx;
+#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -129,6 +131,7 @@ std::mutex screenMtx;
 namespace OHOS {
 namespace MMI {
 
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void PointerDrawingManager::InitScreenInfo()
 {
     Rosen::DMError retMode =
@@ -163,7 +166,7 @@ void UpdateScreenModeChange()
     }
 }
 
-void ScreenModeChangeListener::NotifyScreenModeChange(const std::vector<sptr<Rosen::ScreenInfo>>& screenInfos)
+void ScreenModeChangeListener::NotifyScreenModeChange(const std::vector<sptr<Rosen::ScreenInfo>> &screenInfos)
 {
     std::lock_guard<std::mutex> guard(screenMtx);
     if (screenInfos.empty()) {
@@ -187,6 +190,7 @@ void ScreenListener::OnDisconnect(Rosen::ScreenId screenId)
     }
     UpdateScreenModeChange();
 }
+#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 static bool IsSingleDisplayFoldDevice()
 {
@@ -396,8 +400,11 @@ bool PointerDrawingManager::SetDynamicHardWareCursorLocation
 void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physicalY,
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode)
 {
-    if (!(g_hasMirrorScreen || g_hasVirtualScreen)) {
-        return;
+    {
+        std::lock_guard<std::mutex> guard(screenMtx);
+        if (!(g_hasMirrorScreen || g_hasVirtualScreen)) {
+            return;
+        }
     }
     hardwareCanvasSize_ = g_hardwareCanvasSize;
     PostTask([this, physicalX, physicalY, surfaceNode]() -> void {
@@ -2188,6 +2195,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPV(hardwareCursorPointerManager_);
     hardwareCursorPointerManager_->SetTargetDevice(displayInfo.id);
+    InitScreenInfo();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
@@ -2199,7 +2207,6 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->SetDisplayInfo(displayInfo);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    InitScreenInfo();
 }
 
 int32_t PointerDrawingManager::GetIndependentPixels()
