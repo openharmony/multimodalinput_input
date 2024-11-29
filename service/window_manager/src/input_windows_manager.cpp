@@ -411,6 +411,13 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             }
             MMI_HILOGD("mouseevent occurs, update the pid:%{public}d", pid);
             InitMouseDownInfo();
+        } else if (axisBeginWindowInfo_ && axisBeginWindowInfo_->pid != -1) {
+            pid = GetWindowPid(axisBeginWindowInfo_->agentWindowId);
+            if (pid < 0) {
+                pid = axisBeginWindowInfo_->pid;
+            }
+            MMI_HILOGD("axisBeginEvent occurs, update the pid:%{public}d", pid);
+            axisBeginWindowInfo_ = std::nullopt;
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -2437,15 +2444,9 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         }
         winId2ZorderMap.clear();
     }
-    if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
-        axisBeginWindowInfo_ = firstBtnDownWindowInfo_;
-    }
-    if (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE && axisBeginWindowInfo_ != std::make_pair(-1, -1)) {
-        firstBtnDownWindowInfo_ = axisBeginWindowInfo_;
-    }
-    if (action == PointerEvent::POINTER_ACTION_AXIS_END && axisBeginWindowInfo_ != std::make_pair(-1, -1)) {
-        firstBtnDownWindowInfo_ = axisBeginWindowInfo_;
-        axisBeginWindowInfo_ = {-1, -1};
+    if (axisBeginWindowInfo_ &&
+        (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE || action == PointerEvent::POINTER_ACTION_AXIS_END)) {
+        firstBtnDownWindowInfo_ = { axisBeginWindowInfo_->id, axisBeginWindowInfo_->displayId };
     }
     MMI_HILOG_DISPATCHD("firstBtnDownWindowInfo_.first:%{public}d", firstBtnDownWindowInfo_.first);
     for (const auto &item : windowsInfo) {
@@ -2740,8 +2741,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t physicalX = pointerItem.GetDisplayX();
     int32_t physicalY = pointerItem.GetDisplayY();
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
+        axisBeginWindowInfo_ = touchWindow;
+    }
     if (!touchWindow) {
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || mouseDownInfo_.id == -1) {
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || (mouseDownInfo_.id == -1 &&
+            axisBeginWindowInfo_ == std::nullopt)) {
             MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
             if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
                 IsMouseDrawing(pointerEvent->GetPointerAction())) {
@@ -2763,7 +2768,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             }
             return RET_ERR;
         }
-        touchWindow = std::make_optional(mouseDownInfo_);
+        if (mouseDownInfo_.id != -1) {
+            touchWindow = std::make_optional(mouseDownInfo_);
+        } else if (axisBeginWindowInfo_) {
+            touchWindow = axisBeginWindowInfo_;
+        }
         int32_t pointerAction = pointerEvent->GetPointerAction();
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
@@ -2924,6 +2933,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (action == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         InitMouseDownInfo();
         MMI_HILOGD("Mouse up, clear mouse down info");
+    }
+    if (action == PointerEvent::POINTER_ACTION_AXIS_END) {
+        axisBeginWindowInfo_ = std::nullopt;
+        MMI_HILOGD("Axis end, clear axis begin info");
     }
     if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("pid:%{public}d, id:%{public}d, agentWindowId:%{public}d,"
