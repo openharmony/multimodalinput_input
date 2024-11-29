@@ -35,8 +35,8 @@ enum VKeyboardMessageType {
     VNoMessage = -1,
     VKeyPressed = 0,
     VCombinationKeyPressed = 1,
-    VStartBackspace = 12,
-    VStopBackspace = 13,
+    VStartLongPressControl = 16,
+    VStopLongPressControl = 17,
 };
 class LibinputAdapter final {
 public:
