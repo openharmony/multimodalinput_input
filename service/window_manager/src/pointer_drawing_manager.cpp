@@ -131,7 +131,8 @@ namespace MMI {
 
 void PointerDrawingManager::InitScreenInfo()
 {
-    Rosen::DMError retMode = Rosen::ScreenManagerLite::GetInstance().RegisterScreenModeChangeListener(new ScreenModeChangeListener());
+    Rosen::DMError retMode =
+        Rosen::ScreenManagerLite::GetInstance().RegisterScreenModeChangeListener(new ScreenModeChangeListener());
     if (retMode != Rosen::DMError::DM_OK) {
         MMI_HILOGE("RegisterScreenModeChangeListener fail");
         return;
@@ -143,7 +144,8 @@ void PointerDrawingManager::InitScreenInfo()
     }
 }
 
-void UpdateScreenModeChange() {
+void UpdateScreenModeChange()
+{
     g_hasMirrorScreen = false;
     g_hasExtendScreen = false;
     g_hasVirtualScreen = false;
