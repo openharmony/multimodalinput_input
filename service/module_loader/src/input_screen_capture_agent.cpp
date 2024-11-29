@@ -16,6 +16,7 @@
 #include "input_screen_capture_agent.h"
 
 #include <climits>
+#include <list>
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -59,7 +60,7 @@ int32_t InputScreenCaptureAgent::LoadLibrary()
         MMI_HILOGE("dlopen failed, reason:%{public}s", dlerror());
         return RET_ERR;
     }
-    handle_.isWorking = reinterpret_cast<int32_t (*)()>(dlsym(handle_.handle, "IsScreenCaptureWorking"));
+    handle_.isWorking = reinterpret_cast<std::list<int32_t> (*)()>(dlsym(handle_.handle, "IsScreenCaptureWorking"));
     if (handle_.isWorking == nullptr) {
         MMI_HILOGE("dlsym isWorking failed: error: %{public}s", dlerror());
         handle_.Free();
@@ -75,11 +76,11 @@ int32_t InputScreenCaptureAgent::LoadLibrary()
     return RET_OK;
 }
 
-int32_t InputScreenCaptureAgent::IsScreenCaptureWorking()
+std::list<int32_t> InputScreenCaptureAgent::IsScreenCaptureWorking()
 {
     if (LoadLibrary() != RET_OK) {
         MMI_HILOGE("LoadLibrary fail");
-        return RET_ERR;
+        return {};
     }
     return handle_.isWorking();
 }
