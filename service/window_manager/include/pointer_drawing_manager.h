@@ -33,13 +33,13 @@
 #include "device_observer.h"
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #include "hardware_cursor_pointer_manager.h"
+#include "dm_common.h"
+#include "screen_manager_lite.h"
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "setting_observer.h"
 #include "struct_multimodal.h"
-#include "dm_common.h"
-#include "screen_manager_lite.h"
 
 namespace OHOS {
 namespace MMI {
@@ -200,6 +200,7 @@ private:
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     void DrawTraditionsCursor(MOUSE_ICON mouseStyle);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
+    void InitScreenInfo();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
@@ -278,19 +279,21 @@ private:
     int releaseFence_ { -1 };
 };
 
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 class ScreenModeChangeListener : public Rosen::ScreenManagerLite::IScreenModeChangeListener {
 public:
     ScreenModeChangeListener() = default;
     virtual ~ScreenModeChangeListener() = default;
-    void NotifyScreenModeChange(const std::vector<sptr<Rosen::ScreenInfo>>& screenInfos) override;
+    void NotifyScreenModeChange(const std::vector<sptr<Rosen::ScreenInfo>> &screenInfos) override;
 };
 
 class ScreenListener : public Rosen::ScreenManagerLite::IScreenListener {
 public:
-    void OnConnect(Rosen::ScreenId screenId) override {};
+    void OnConnect(Rosen::ScreenId screenId) override{};
     void OnDisconnect(Rosen::ScreenId screenId) override;
-    void OnChange(Rosen::ScreenId screenId) override {} ;
+    void OnChange(Rosen::ScreenId screenId) override{};
 };
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_DRAWING_MANAGER_H
