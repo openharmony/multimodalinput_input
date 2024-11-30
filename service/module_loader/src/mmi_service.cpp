@@ -403,6 +403,10 @@ void MMIService::OnStart()
     pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
     eventMonitorThread_ = std::thread(&EventStatistic::WriteEventFile);
     pthread_setname_np(eventMonitorThread_.native_handle(), "event-monitor");
+    auto keyHandler = InputHandler->GetKeyCommandHandler();
+    if (keyHandler != nullptr) {
+        keyHandler->PreHandleEvent();
+    }
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -1666,10 +1670,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
             IPointerDrawingManager::GetInstance()->InitPointerObserver();
-            auto keyHandler = InputHandler->GetKeyCommandHandler();
-            if (keyHandler != nullptr) {
-                keyHandler->InitKeyObserver();
-            }
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING

@@ -1357,6 +1357,29 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
     return true;
 }
 
+bool KeyCommandHandler::PreHandleEvent()
+{
+    CALL_INFO_TRACE;
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return false;
+        }
+        isParseConfig_ = true;
+    }
+    if (!isParseLongPressConfig_) {
+        if (!ParseLongPressConfig()) {
+            MMI_HILOGE("Parse long press configFile failed");
+        }
+        isParseLongPressConfig_ = true;
+    }
+    if (!isParseMaxCount_) {
+        ParseRepeatKeyMaxCount();
+        isParseMaxCount_ = true;
+    }
+    return true;
+}
+
 bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
