@@ -935,7 +935,6 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     EXPECT_TRUE(ret >= 0);
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId3, longPressRequest3);
     EXPECT_TRUE(ret >= 0);
-
     auto pointerEvent = SetupSingleFingerDownEvent();
     PointerEvent::PointerItem item;
     int32_t pointerId = 0;
@@ -944,22 +943,18 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     item.SetDownTime(0);
     pointerEvent->UpdatePointerItem(pointerId, item);
     ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(pointerEvent));
-
     int64_t downTime = 400000;
     item.SetDownTime(downTime);
     pointerEvent->UpdatePointerItem(pointerId, item);
     ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
-
     downTime = 1000000;
     item.SetDownTime(downTime);
     pointerEvent->UpdatePointerItem(pointerId, item);
     ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
-    
     downTime = 1600000;
     item.SetDownTime(downTime);
     pointerEvent->UpdatePointerItem(pointerId, item);
     ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
-
     ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
     EXPECT_TRUE(ret == RET_OK);
     ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId2);
