@@ -29,6 +29,7 @@ ohos_source_set("input-manager") {
     "${mmi_path}/frameworks/proxy/events/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/service/event_handler/include",
   ]
 
   deps = [
