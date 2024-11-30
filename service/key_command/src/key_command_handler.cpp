@@ -1103,7 +1103,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     if (parser.json_ == nullptr) {
         MMI_HILOGE("cJSON_Parse failed");
         return false;
-    }    
+    }
     if (!cJSON_IsObject(parser.json_)) {
         MMI_HILOGE("Parser.json_ is not object");
         return false;
