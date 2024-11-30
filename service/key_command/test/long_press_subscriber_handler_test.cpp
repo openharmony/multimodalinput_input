@@ -824,5 +824,233 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_HandleFing
     LONG_PRESS_EVENT_HANDLER->isAllTimerClosed = false;
     ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(pointerEvent));
 }
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_CheckFingerGestureCancelEvent_001
+ * @tc.desc: Verify if (index < 0 || index > static_cast<size_t>(ONE_FINGER))
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFingerGestureCancelEvent_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = SetupThreeFingerDownEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
+
+    pointerEvent = SetupZeroFingerDownEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_CheckFingerGestureCancelEvent_002
+ * @tc.desc: Verify if (!durationTimers_.empty())
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFingerGestureCancelEvent_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_CheckFingerGestureCancelEvent_003
+ * @tc.desc: Verify if (!durationTimers_.empty())
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFingerGestureCancelEvent_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+    int32_t subscribeId = 0;
+    LongPressRequest longPressRequest {
+        .fingerCount = 1,
+        .duration = 300,
+    };
+    int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
+    EXPECT_TRUE(ret >= 0);
+
+    auto pointerEvent = SetupSingleFingerDownEvent();
+    PointerEvent::PointerItem item;
+    int32_t pointerId = 0;
+    bool result = pointerEvent->GetPointerItem(pointerId, item);
+    ASSERT_TRUE(result);
+    item.SetDownTime(0);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(pointerEvent));
+
+    int64_t downTime = 100000;
+    item.SetDownTime(downTime);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
+
+    downTime = 400000;
+    item.SetDownTime(downTime);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
+
+    ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
+    EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_CheckFingerGestureCancelEvent_004
+ * @tc.desc: Verify if (tempSubs.size() < static_cast<size_t>(TWO_FINGER))
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFingerGestureCancelEvent_004,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+    int32_t subscribeId = 0;
+    LongPressRequest longPressRequest {
+        .fingerCount = 1,
+        .duration = 300,
+    };
+    int32_t subscribeId2 = 0;
+    LongPressRequest longPressRequest2 {
+        .fingerCount = 1,
+        .duration = 900,
+    };
+    int32_t subscribeId3 = 0;
+    LongPressRequest longPressRequest3 {
+        .fingerCount = 1,
+        .duration = 1500,
+    };
+    int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
+    EXPECT_TRUE(ret >= 0);
+    ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
+    EXPECT_TRUE(ret >= 0);
+    ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId3, longPressRequest3);
+    EXPECT_TRUE(ret >= 0);
+
+    auto pointerEvent = SetupSingleFingerDownEvent();
+    PointerEvent::PointerItem item;
+    int32_t pointerId = 0;
+    bool result = pointerEvent->GetPointerItem(pointerId, item);
+    ASSERT_TRUE(result);
+    item.SetDownTime(0);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(pointerEvent));
+
+    int64_t downTime = 400000;
+    item.SetDownTime(downTime);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
+
+    downTime = 1000000;
+    item.SetDownTime(downTime);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
+    
+    downTime = 1600000;
+    item.SetDownTime(downTime);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->CheckFingerGestureCancelEvent(pointerEvent));
+
+    ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
+    EXPECT_TRUE(ret == RET_OK);
+    ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId2);
+    EXPECT_TRUE(ret == RET_OK);
+    ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId3);
+    EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_OnSubscribeLongPressCancelEvent_001
+ * @tc.desc: Verify if (it == sessManager_.end())
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_OnSubscribeLongPressCancelEvent_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+
+    int32_t fingerCount = 1;
+    int32_t duration = 300;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->OnSubscribeLongPressCancelEvent(sess, fingerCount, duration));
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_OnSubscribeLongPressCancelEvent_002
+ * @tc.desc: Verify if (subscriber->fingerCount_ == fingerCount && subscriber->duration_ == duration)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_OnSubscribeLongPressCancelEvent_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+    int32_t subscribeId = 0;
+    LongPressRequest longPressRequest {
+        .fingerCount = 1,
+        .duration = 300,
+    };
+    int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
+    EXPECT_TRUE(ret >= 0);
+
+    int32_t fingerCount = 1;
+    int32_t duration = 300;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->OnSubscribeLongPressCancelEvent(sess, fingerCount, duration));
+
+    fingerCount = 2;
+    duration = 300;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->OnSubscribeLongPressCancelEvent(sess, fingerCount, duration));
+
+    fingerCount = 1;
+    duration = 900;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->OnSubscribeLongPressCancelEvent(sess, fingerCount, duration));
+
+    fingerCount = 2;
+    duration = 900;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->OnSubscribeLongPressCancelEvent(sess, fingerCount, duration));
+
+    ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
+    EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_StartFingerGesture_001
+ * @tc.desc: Verify if (!CheckFingerGestureAction(fingerCount))
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_StartFingerGesture_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+    int32_t subscribeId = 0;
+    LongPressRequest longPressRequest {
+        .fingerCount = 1,
+        .duration = 300,
+    };
+    int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
+    EXPECT_TRUE(ret >= 0);
+
+    int32_t fingerCount = 2;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->StartFingerGesture(fingerCount));
+
+    ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
+    EXPECT_TRUE(ret == RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
