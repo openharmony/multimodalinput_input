@@ -1348,5 +1348,170 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatPressedKeys_001, T
     std::string ret = shortcutMgr.FormatPressedKeys(keyEvent);
     ASSERT_EQ(ret, "-1");
 }
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckGlobalKey_001
+ * @tc.desc: Test the funcation CheckGlobalKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckGlobalKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyShortcutManager::HotKey globalKey {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT },
+        .finalKey = KeyEvent::KEYCODE_M,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    bool ret = shortcutMgr.CheckGlobalKey(globalKey, shortcut);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_GetForegroundPids_001
+ * @tc.desc: Test the funcation GetForegroundPids
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GetForegroundPids_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    shortcutMgr.shortcuts_[1] = shortcut;
+    std::set<int32_t> ret = shortcutMgr.GetForegroundPids();
+    std::set<int> mySet;
+    ASSERT_EQ(ret, mySet);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_001
+ * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    shortcutMgr.shortcuts_[1] = shortcut;
+    bool ret = shortcutMgr.HandleKeyDown(keyEvent);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_002
+ * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    shortcutMgr.shortcuts_[1] = shortcut;
+    bool ret = shortcutMgr.HandleKeyDown(keyEvent);
+    EXPECT_EQ(ret, false);
+    shortcut.finalKey = KeyShortcutManager::SHORTCUT_PURE_MODIFIERS;
+    shortcutMgr.shortcuts_[1] = shortcut;
+    keyEvent->SetKeyCode(2046);
+    ret = shortcutMgr.HandleKeyDown(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyUp_003
+ * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    shortcutMgr.shortcuts_[1] = shortcut;
+    bool ret = shortcutMgr.HandleKeyUp(keyEvent);
+    ASSERT_FALSE(ret);
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcutMgr.shortcuts_[1] = shortcut;
+    ret = shortcutMgr.HandleKeyUp(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckPureModifiers_001
+ * @tc.desc: Test the funcation CheckPureModifiers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckPureModifiers_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    bool ret = shortcutMgr.CheckPureModifiers(keyEvent, shortcut);
+    ASSERT_FALSE(ret);
+    keyEvent->SetKeyCode(2045);
+    int64_t downTime = 2;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(kitDown);
+    ret = shortcutMgr.CheckPureModifiers(keyEvent, shortcut);
+    ASSERT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
