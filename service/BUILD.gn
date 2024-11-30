@@ -1640,12 +1640,14 @@ ohos_unittest("KeyCommandTest") {
 ohos_unittest("LongPressSubscribeHandlerTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
+  include_dirs = [
+    "connect_manager/include",
+    "${mmi_path}/test/unittest/common/include",
+    "key_command/include",
+    "module_loader/include",
   ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
 
   cflags = [
     "-Dprivate=public",
