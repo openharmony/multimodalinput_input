@@ -915,20 +915,11 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest { .fingerCount = 1, .duration = 300, };
     int32_t subscribeId2 = 0;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 1,
-        .duration = 900,
-    };
+    LongPressRequest longPressRequest2 { .fingerCount = 1, .duration = 900, };
     int32_t subscribeId3 = 0;
-    LongPressRequest longPressRequest3 {
-        .fingerCount = 1,
-        .duration = 1500,
-    };
+    LongPressRequest longPressRequest3 { .fingerCount = 1, .duration = 1500, };
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
