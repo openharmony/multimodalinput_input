@@ -16,6 +16,9 @@
 #include "mmi_service.h"
 
 #include <parameters.h>
+#ifdef OHOS_BUILD_PC_PRIORITY
+#include <sched.h>
+#endif // OHOS_BUILD_PC_PRIORITY
 #include <sys/signalfd.h>
 
 #include <cinttypes>
@@ -104,7 +107,7 @@ namespace {
 std::mutex g_instanceMutex;
 MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
-const std::string THREAD_NAME { "mmi-service" };
+const std::string THREAD_NAME { "mmi_service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 [[ maybe_unused ]] constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
@@ -153,6 +156,9 @@ VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE vkeyboard_createVKeyboardDevice_ = nullptr;
 typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcKeyEvent);
 VKEYBOARD_ONFUNCKEYEVENT_TYPE vkeyboard_onFuncKeyEvent_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+#ifdef OHOS_BUILD_PC_PRIORITY
+constexpr int32_t PC_PRIORITY { 2 };
+#endif // OHOS_BUILD_PC_PRIORITY
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
@@ -1611,7 +1617,7 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     return RET_OK;
 }
 
-#ifdef OHOS_RSS_CLIENT
+#if defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
 void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     int sleepSeconds = 1;
@@ -1629,17 +1635,17 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
     ResourceSchedule::ResSchedClient::GetInstance().ReportData(
         ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
 }
-#endif // OHOS_RSS_CLIENT
+#endif // defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
 
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
     MMI_HILOGI("systemAbilityId is %{public}d", systemAbilityId);
-#ifdef OHOS_RSS_CLIENT
+#if defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         OnAddResSchedSystemAbility(systemAbilityId, deviceId);
     }
-#endif // OHOS_RSS_CLIENT
+#endif // defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         isCesStart_ = true;
@@ -2022,6 +2028,9 @@ void MMIService::OnThread()
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
+#ifdef OHOS_BUILD_PC_PRIORITY
+    SetMmiServicePrority();
+#endif // OHOS_BUILD_PC_PRIORITY
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif // OHOS_RSS_CLIENT
@@ -2066,6 +2075,20 @@ void MMIService::OnThread()
     }
     MMI_HILOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
 }
+
+#ifdef OHOS_BUILD_PC_PRIORITY
+void MMIService::SetMmiServicePrority()
+{
+    struct sched_param param = {0};
+    param.sched_priority = PC_PRIORITY;
+    int32_t schRet = sched_setscheduler(0, SCHED_FIFO, &param);
+    if (schRet != 0) {
+        MMI_HILOGE("mmi_service Couldn't set SCHED_FIFO, schRet:%{public}d", schRet);
+    } else {
+        MMI_HILOGI("mmi_service set SCHED_FIFO succeed, schRet:%{public}d", schRet);
+    }
+}
+#endif // OHOS_BUILD_PC_PRIORITY
 
 void MMIService::PreEventLoop()
 {
