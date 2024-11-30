@@ -2029,7 +2029,7 @@ void MMIService::OnThread()
     delegateTasks_.SetWorkerThreadId(tid);
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 #ifdef OHOS_BUILD_PC_PRIORITY
-    SetMmiServicePrority();
+    SetMmiServicePriority();
 #endif // OHOS_BUILD_PC_PRIORITY
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
@@ -2077,7 +2077,7 @@ void MMIService::OnThread()
 }
 
 #ifdef OHOS_BUILD_PC_PRIORITY
-void MMIService::SetMmiServicePrority()
+void MMIService::SetMmiServicePriority()
 {
     struct sched_param param = {0};
     param.sched_priority = PC_PRIORITY;
