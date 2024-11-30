@@ -60,6 +60,7 @@ private:
     std::shared_ptr<PointerEvent> CreateEvent(int32_t id, int32_t type, int32_t pId, int32_t srcType, int32_t finCount);
     void FillPointerItem(PointerEvent::PointerItem &itemFirst, int32_t pointX, int32_t pointY, int32_t id, bool press);
     int32_t ActionPinchEvent(int32_t centerX, int32_t centerY, int32_t scalePercentNumerator);
+    uint32_t KeyCodeToUnicode(int32_t keyCode);
 };
 } // namespace MMI
 } // namespace OHOS
