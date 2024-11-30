@@ -919,7 +919,7 @@ bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
     WRITEINT64(out, downTime_);
     WRITEINT32(out, deviceId_);
     WRITEINT32(out, keyCode_);
-
+    WRITEUINT32(out, unicode_);
     return true;
 }
 
@@ -929,7 +929,7 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
     READINT64(in, downTime_);
     READINT32(in, deviceId_);
     READINT32(in, keyCode_);
-
+    READUINT32(in, unicode_);
     return true;
 }
 
