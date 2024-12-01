@@ -143,11 +143,21 @@ const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product
 const std::string VKEYBOARD_PATH { "libvkeyboard_device.z.so" };
 void* g_VKeyboardHandle = nullptr;
 typedef int32_t (*HANDLE_TOUCHPOINT_TYPE)(
-    double screenX, double screenY, int touchId, bool tipDown);
+    double screenX, double screenY, int touchId, int32_t eventType);
 HANDLE_TOUCHPOINT_TYPE handleTouchPoint_ = nullptr;
 typedef int32_t (*STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)(
     int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode);
 STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE statemachineMessageQueue_getLibinputMessage_ = nullptr;
+typedef void (*TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)(
+    std::vector<std::vector<int32_t>>& retMsgList);
+TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE trackPadEngine_getAllTouchMessage_ = nullptr;
+typedef void (*TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE)();
+TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE trackPadEngine_clearTouchMessage_ = nullptr;
+typedef void (*TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)(
+    std::vector<std::vector<int32_t>>& retMsgList);
+TRACKPADENGINE_GETALLKEYMESSAGE_TYPE trackPadEngine_getAllKeyMessage_ = nullptr;
+typedef void (*TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)();
+TRACKPADENGINE_CLEARKEYMESSAGE_TYPE trackPadEngine_clearKeyMessage_ = nullptr;
 typedef int32_t (*VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)(IRemoteObject* &vkeyboardDevice);
 VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE vkeyboard_createVKeyboardDevice_ = nullptr;
 typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcKeyEvent);
@@ -2848,8 +2858,20 @@ void MMIService::InitVKeyboardFuncHandler()
             handleTouchPoint_ = (HANDLE_TOUCHPOINT_TYPE)dlsym(g_VKeyboardHandle, "HandleTouchPoint");
             statemachineMessageQueue_getLibinputMessage_ = (STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)dlsym(
                 g_VKeyboardHandle, "StateMachineMessageQueueGetLibinputMessage");
+            trackPadEngine_getAllTouchMessage_ = (TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineGetAllTouchMessage");
+            trackPadEngine_clearTouchMessage_ = (TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineClearTouchMessage");
+            trackPadEngine_getAllKeyMessage_ = (TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineGetAllKeyMessage");
+            trackPadEngine_clearKeyMessage_ = (TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)dlsym(
+                g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
-                                           statemachineMessageQueue_getLibinputMessage_);
+                statemachineMessageQueue_getLibinputMessage_,
+                trackPadEngine_getAllTouchMessage_,
+                trackPadEngine_clearTouchMessage_,
+                trackPadEngine_getAllKeyMessage_,
+                trackPadEngine_clearKeyMessage_);
         }
     }
 }
