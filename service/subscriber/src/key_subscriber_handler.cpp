@@ -542,7 +542,7 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
                 MMI_HILOGE("Set mute fail, ret:%{public}d", ret);
                 return false;
             }
-            MMI_HILOGI("Set mute success");
+            MMI_HILOGW("Set mute success");
             DEVICE_MONITOR->SetHasHandleRingMute(true);
             if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
                 needSkipPowerKeyUp_ = true;
@@ -550,7 +550,7 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
             return true;
         } else {
             if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
-                MMI_HILOGD("Set mute success, block volumeKey");
+                MMI_HILOGI("Set mute success, block volumeKey");
                 return true;
             }
         }
