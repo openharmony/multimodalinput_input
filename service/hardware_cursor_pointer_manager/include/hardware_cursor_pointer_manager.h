@@ -36,11 +36,13 @@ public:
     int32_t EnableStats(bool enable);
     int32_t GetCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 private:
+    sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> GetPowerInterface();
     bool isEnableState_ { false };
     bool isEnable_ { false };
     bool isDeviceChange_ { false };
     uint32_t devId_ { 0 };
     sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
+    std::mutex mtx_;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 };
 } // namespace MMI
