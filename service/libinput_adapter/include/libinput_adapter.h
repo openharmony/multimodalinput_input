@@ -39,8 +39,8 @@ enum VKeyboardMessageType {
     VNoMessage = -1,
     VKeyPressed = 0,
     VCombinationKeyPressed = 1,
-    VStartBackspace = 12,
-    VStopBackspace = 13,
+    VStartLongPressControl = 16,
+    VStopLongPressControl = 17,
 };
 enum class VTPStateMachineMessageType : int32_t {
     UNKNOWN = 0,
