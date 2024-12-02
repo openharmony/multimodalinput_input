@@ -51,6 +51,7 @@
 #include "stylus_key_handler.h"
 #include "table_dump.h"
 #include "timer_manager.h"
+#include "util.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
@@ -83,6 +84,8 @@ const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 const std::string WALLET_BUNDLE_NAME { "com.hmos.wallet" };
 constexpr int32_t DEFAULT_VALUE { -1 };
+constexpr int64_t POWER_ACTION_INTERVAL { 600 };
+constexpr int64_t SOS_WAIT_TIME { 3000 };
 const std::string PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
@@ -1357,6 +1360,29 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
     return true;
 }
 
+bool KeyCommandHandler::PreHandleEvent()
+{
+    CALL_INFO_TRACE;
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return false;
+        }
+        isParseConfig_ = true;
+    }
+    if (!isParseLongPressConfig_) {
+        if (!ParseLongPressConfig()) {
+            MMI_HILOGE("Parse long press configFile failed");
+        }
+        isParseLongPressConfig_ = true;
+    }
+    if (!isParseMaxCount_) {
+        ParseRepeatKeyMaxCount();
+        isParseMaxCount_ = true;
+    }
+    return true;
+}
+
 bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
@@ -1370,6 +1396,16 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     bool shortKeysHandleRet = HandleShortKeys(key);
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && key->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        powerUpTime_ = key->GetActionTime();
+    }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && key->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        if ((key->GetActionTime() - powerUpTime_) > POWER_ACTION_INTERVAL * FREQUENCY &&
+            (key->GetActionTime() - sosLaunchTime_) > SOS_WAIT_TIME * FREQUENCY) {
+                MMI_HILOGI("Set isFreezePowerKey as false");
+                isFreezePowerKey_ = false;
+            }
+    }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && isFreezePowerKey_) {
         MMI_HILOGI("Freeze power key");
         return true;
@@ -1565,6 +1601,9 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
+    if (!isDownStart_) {
+        return false;
+    }
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
         (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
         MMI_HILOGI("isDownStart:%{public}d", isDownStart_);
@@ -1667,12 +1706,14 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
 
 int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
 {
+    CALL_INFO_TRACE;
     std::lock_guard<std::mutex> lock(mutex_);
     if (pageName != "SosCountdown") {
         isFreezePowerKey_ = false;
         return RET_OK;
     }
     isFreezePowerKey_ = true;
+    sosLaunchTime_ = OHOS::MMI::GetSysClockTime();
     count_ = 0;
     launchAbilityCount_ = 0;
     repeatKeyCountMap_.clear();
@@ -1687,6 +1728,7 @@ int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
     });
     if (timerId < 0) {
         MMI_HILOGE("Add timer failed");
+        isFreezePowerKey_ = false;
         return RET_ERR;
     }
     return RET_OK;
@@ -1741,6 +1783,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
                 MMI_HILOGD("Repeat key, reset down status");
                 count_ = 0;
                 isDownStart_ = false;
+                repeatKeyCountMap_.clear();
                 return true;
             } else {
                 repeatKey_.keyAction = keyEvent->GetKeyAction();
@@ -2338,6 +2381,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
                 isDownStart_ = false;
             }
             isFreezePowerKey_ = true;
+            sosLaunchTime_ = OHOS::MMI::GetSysClockTime();
             count_ = 0;
             launchAbilityCount_ = 0;
             repeatKeyCountMap_.clear();
@@ -2346,6 +2390,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
                 MMI_HILOGW("Timeout, restore the power button");
             });
             if (sosDelayTimerId_ < 0) {
+                isFreezePowerKey_ = false;
                 MMI_HILOGE("Add timer failed");
             }
         }

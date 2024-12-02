@@ -288,7 +288,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         point->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL &&
         (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
         point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
-        WIN_MGR->GetWindowPid(pointerItem.GetTargetWindowId() > 0)) {
+        (WIN_MGR->GetWindowPid(pointerItem.GetTargetWindowId()) > 0)) {
         CHKPV(udsServer);
         WIN_MGR->FoldScreenRotation(point);
         fd = udsServer->GetClientFd(pid);

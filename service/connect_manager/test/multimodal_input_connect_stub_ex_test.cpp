@@ -313,6 +313,14 @@ public:
     {
         return getAllSystemHotkeys_;
     }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) override
+    {
+        return retCreateVKeyboardDevice_;
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;
@@ -356,6 +364,7 @@ public:
     int32_t getAllSystemHotkeys_ = 0;
     int32_t retSetClientInfo_ = 0;
     int32_t retGetIntervalSinceLastInput_ = 0;
+    int32_t retCreateVKeyboardDevice_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:

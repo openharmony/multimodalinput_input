@@ -76,8 +76,14 @@ int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 {
     CHKPR(powerInterface_, RET_ERR);
     if (powerInterface_->SetHardwareCursorPosition(devId_, x, y) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
-        MMI_HILOGE("Set hardware cursor position is error");
-        return RET_ERR;
+        MMI_HILOGE("Set hardware cursor position failed, attempting to reinitialize interface.");
+        powerInterface_ = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
+        CHKPR(powerInterface_, RET_ERR);
+        if (powerInterface_->SetHardwareCursorPosition(devId_, x, y) !=
+            HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+            MMI_HILOGE("Set hardware cursor position is error");
+            return RET_ERR;
+        }
     }
     MMI_HILOGD("SetPosition, x:%{private}d, y:%{private}d", x, y);
     return RET_OK;

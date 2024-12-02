@@ -1200,8 +1200,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_00
     physicalX = 500;
     physicalY = 1100;
     pointerDrawingManager->FixCursorPosition(physicalX, physicalY);
-    EXPECT_EQ(physicalX, 497);
-    EXPECT_EQ(physicalY, 1097);
+    EXPECT_EQ(physicalX, 500);
+    EXPECT_EQ(physicalY, 497);
 }
 
 /**

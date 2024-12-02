@@ -198,6 +198,7 @@ public:
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void InitKeyObserver();
+    bool PreHandleEvent();
 #ifdef UNIT_TEST
 public:
 #else
@@ -408,6 +409,8 @@ private:
     std::mutex mutex_;
     std::map<int32_t, int64_t> lastPointerDownTime_;
     int64_t walletLaunchDelayTimes_ { 0 };
+    int64_t sosLaunchTime_ { -1 };
+    int64_t powerUpTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

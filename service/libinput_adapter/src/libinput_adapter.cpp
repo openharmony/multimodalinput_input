@@ -43,6 +43,28 @@ constexpr int32_t MAX_RETRY_COUNT { 5 };
 constexpr int32_t MIN_RIGHT_BTN_AREA_PERCENT { 0 };
 constexpr int32_t MAX_RIGHT_BTN_AREA_PERCENT { 100 };
 constexpr int32_t INVALID_RIGHT_BTN_AREA { -1 };
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+constexpr int32_t VKEY_TP_SM_MSG_SIZE { 6 };
+constexpr int32_t VKEY_TP_SM_MSG_TYPE_IDX { 0 };
+constexpr int32_t VKEY_TP_SM_MSG_POINTER_ID_IDX { 1 };
+constexpr int32_t VKEY_TP_SM_MSG_POS_X_IDX { 2 };
+constexpr int32_t VKEY_TP_SM_MSG_POS_Y_IDX { 3 };
+constexpr int32_t VKEY_TP_SM_MSG_SCALE_IDX { 4 };
+constexpr int32_t VKEY_TP_SM_MSG_ANGLE_IDX { 5 };
+constexpr int32_t VKEY_TP_GSE_TWO_FINGERS { 2 };
+constexpr uint32_t VKEY_TP_LB_ID { 272 };
+constexpr uint32_t VKEY_TP_RB_ID { 273 };
+constexpr uint32_t VKEY_TP_SEAT_BTN_COUNT_NONE { 0 };
+constexpr uint32_t VKEY_TP_SEAT_BTN_COUNT_ONE { 1 };
+constexpr uint32_t VKEY_TP_AXES_ZERO { 0 };
+constexpr uint32_t VKEY_TP_AXES_ONE { 1 };
+constexpr double VTP_SCALE_AND_ANGLE_FACTOR { 1000.0 };
+enum class VKeyboardTouchEventType : int32_t {
+    TOUCH_DOWN = 0,
+    TOUCH_UP = 1,
+    TOUCH_MOVE = 2,
+};
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
@@ -200,10 +222,18 @@ void LibinputAdapter::ProcessPendingEvents()
 }
 
 void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
-                                    GetMessage getMessage)
+    GetMessage getMessage,
+    GetAllTouchMessage getAllTouchMessage,
+    ClearTouchMessage clearTouchMessage,
+    GetAllKeyMessage getAllKeyMessage,
+    ClearKeyMessage clearKeyMessage)
 {
     handleTouchPoint_ = handleTouchPoint;
     getMessage_ = getMessage;
+    getAllTouchMessage_ = getAllTouchMessage;
+    clearTouchMessage_ = clearTouchMessage;
+    getAllKeyMessage_ = getAllKeyMessage;
+    clearKeyMessage_ = clearKeyMessage;
 
     deviceId = -1;
 }
@@ -233,6 +263,713 @@ void LibinputAdapter::InjectCombinationKeyEvent(libinput_event_touch* touch, std
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
+{
+    // Handle all track pad key messages
+    std::vector<std::vector<int32_t>> keyMsgList;
+    if (getAllKeyMessage_ != nullptr) {
+        getAllKeyMessage_(keyMsgList);
+    }
+    if (clearKeyMessage_ != nullptr) {
+        clearKeyMessage_();
+    }
+    OnVKeyTrackPadMessage(touch, keyMsgList);
+    // Handle all track pad touch messages
+    std::vector<std::vector<int32_t>> touchMsgList;
+    if (getAllTouchMessage_ != nullptr) {
+        getAllTouchMessage_(touchMsgList);
+    }
+    if (clearTouchMessage_ != nullptr) {
+        clearTouchMessage_();
+    }
+    OnVKeyTrackPadMessage(touch, touchMsgList);
+}
+
+void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
+    const std::vector<std::vector<int32_t>>& msgList)
+{
+    for (auto msgItem : msgList) {
+        if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+            MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+                static_cast<int32_t>(msgItem.size()));
+            continue;
+        }
+        auto msgType = static_cast<VTPStateMachineMessageType>(msgItem[VKEY_TP_SM_MSG_TYPE_IDX]);
+        switch (msgType) {
+            case VTPStateMachineMessageType::POINTER_MOVE:
+                if (!HandleVKeyTrackPadPointerMove(touch, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad pointer move event cannot be handled");
+                }
+                break;
+            case VTPStateMachineMessageType::LEFT_CLICK_DOWN:
+                if (!HandleVKeyTrackPadLeftBtnDown(touch, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad left button down event cannot be handled");
+                }
+                break;
+            case VTPStateMachineMessageType::LEFT_CLICK_UP:
+                if (!HandleVKeyTrackPadLeftBtnUp(touch, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad left button up event cannot be handled");
+                }
+                break;
+            case VTPStateMachineMessageType::RIGHT_CLICK_DOWN:
+                if (!HandleVKeyTrackPadRightBtnDown(touch, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad right button down event cannot be handled");
+                }
+                break;
+            case VTPStateMachineMessageType::RIGHT_CLICK_UP:
+                if (!HandleVKeyTrackPadRightBtnUp(touch, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad right button up event cannot be handled");
+                }
+                break;
+            default:
+                OnVKeyTrackPadGestureMessage(touch, msgType, msgItem);
+                break;
+        }
+    }
+}
+
+void LibinputAdapter::OnVKeyTrackPadGestureMessage(libinput_event_touch* touch,
+    VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem)
+{
+    switch (msgType) {
+        case VTPStateMachineMessageType::SCROLL_BEGIN:
+            if (!HandleVKeyTrackPadScrollBegin(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad scroll begin event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::SCROLL_UPDATE:
+            if (!HandleVKeyTrackPadScrollUpdate(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad scroll update event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::SCROLL_END:
+            if (!HandleVKeyTrackPadScrollEnd(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad scroll end event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::PINCH_BEGIN:
+            if (!HandleVKeyTrackPadPinchBegin(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad pinch begin event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::PINCH_UPDATE:
+            if (!HandleVKeyTrackPadPinchUpdate(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad pinch update event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::PINCH_END:
+            if (!HandleVKeyTrackPadPinchEnd(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad pinch end event cannot be handled");
+            }
+            break;
+        default:
+            OnVKeyTrackPadGestureTwoMessage(touch, msgType, msgItem);
+            break;
+    }
+}
+
+void LibinputAdapter::OnVKeyTrackPadGestureTwoMessage(libinput_event_touch* touch,
+    VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem)
+{
+    switch (msgType) {
+        case VTPStateMachineMessageType::PAN_BEGIN:
+            if (!HandleVKeyTrackPadPanBegin(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad pan begin event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::PAN_UPDATE:
+            if (!HandleVKeyTrackPadPanUpdate(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad pan update event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::PAN_END:
+            if (!HandleVKeyTrackPadPanEnd(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad pan end event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::ROT_BEGIN:
+            if (!HandleVKeyTrackPadRotateBegin(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad rotate begin event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::ROT_UPDATE:
+            if (!HandleVKeyTrackPadRotateUpdate(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad rotate update event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::ROT_END:
+            if (!HandleVKeyTrackPadRotateEnd(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad rotate update event cannot be handled");
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadPointerMove(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
+    pEvent.delta_raw_x = msgPPosX;
+    pEvent.delta_raw_y = msgPPosY;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+    pEvent.button = VKEY_TP_LB_ID;
+    pEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_ONE;
+    pEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_PRESSED;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+    pEvent.button = VKEY_TP_LB_ID;
+    pEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_NONE;
+    pEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_RELEASED;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadRightBtnDown(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_BUTTON;
+    pEvent.button = VKEY_TP_RB_ID;
+    pEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_ONE;
+    pEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_PRESSED;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadRightBtnUp(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_BUTTON;
+    pEvent.button = VKEY_TP_RB_ID;
+    pEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_NONE;
+    pEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_RELEASED;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadScrollBegin(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    MMI_HILOGI("VKey TrackPad Scroll Begin");
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN;
+    pEvent.delta_x = msgPPosX;
+    pEvent.delta_y = msgPPosY;
+    pEvent.delta_raw_x = msgPPosX;
+    pEvent.delta_raw_y = msgPPosY;
+    pEvent.axes = VKEY_TP_AXES_ZERO;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadScrollUpdate(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    MMI_HILOGI("VKey TrackPad Scroll Update");
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_AXIS;
+    pEvent.delta_x = msgPPosX;
+    pEvent.delta_y = msgPPosY;
+    pEvent.delta_raw_x = msgPPosX;
+    pEvent.delta_raw_y = msgPPosY;
+    pEvent.source = libinput_pointer_axis_source::LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
+    pEvent.axes = VKEY_TP_AXES_ONE;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_SCROLL_FINGER;
+    lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadScrollEnd(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    MMI_HILOGI("VKey TrackPad Scroll End");
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END;
+    pEvent.delta_x = msgPPosX;
+    pEvent.delta_y = msgPPosY;
+    pEvent.delta_raw_x = msgPPosX;
+    pEvent.delta_raw_y = msgPPosY;
+    pEvent.axes = VKEY_TP_AXES_ZERO;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadPinchBegin(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPScale = msgItem[VKEY_TP_SM_MSG_SCALE_IDX];
+    double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
+    int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
+    double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
+    MMI_HILOGI("VKey TrackPad Pinch Begin scale: %{public}f, angle: %{public}f",
+        scaleToDouble, angleToDouble);
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN;
+    gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
+    gEvent.cancelled = 0;
+    gEvent.delta_x = msgPPosX;
+    gEvent.delta_y = msgPPosY;
+    gEvent.delta_unaccel_x = msgPPosX;
+    gEvent.delta_unaccel_y = msgPPosY;
+    sloted_coords_info slotInfo;
+    gEvent.solt_touches = slotInfo;
+    gEvent.scale = scaleToDouble;
+    gEvent.angle = angleToDouble;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    PrintVKeyTPGestureLog(gEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadPinchUpdate(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPScale = msgItem[VKEY_TP_SM_MSG_SCALE_IDX];
+    double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
+    int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
+    double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
+    MMI_HILOGI("VKey TrackPad Pinch Update scale: %{public}f, angle: %{public}f",
+        scaleToDouble, angleToDouble);
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE;
+    gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
+    gEvent.cancelled = 0;
+    gEvent.delta_x = msgPPosX;
+    gEvent.delta_y = msgPPosY;
+    gEvent.delta_unaccel_x = msgPPosX;
+    gEvent.delta_unaccel_y = msgPPosY;
+    sloted_coords_info slotInfo;
+    gEvent.solt_touches = slotInfo;
+    gEvent.scale = scaleToDouble;
+    gEvent.angle = angleToDouble;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    PrintVKeyTPGestureLog(gEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPScale = msgItem[VKEY_TP_SM_MSG_SCALE_IDX];
+    double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
+    int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
+    double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
+    MMI_HILOGI("VKey TrackPad Pinch End scale: %{public}f, angle: %{public}f",
+        scaleToDouble, angleToDouble);
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_END;
+    gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
+    gEvent.cancelled = 0;
+    gEvent.delta_x = msgPPosX;
+    gEvent.delta_y = msgPPosY;
+    gEvent.delta_unaccel_x = msgPPosX;
+    gEvent.delta_unaccel_y = msgPPosY;
+    sloted_coords_info slotInfo;
+    gEvent.solt_touches = slotInfo;
+    gEvent.scale = scaleToDouble;
+    gEvent.angle = angleToDouble;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    PrintVKeyTPGestureLog(gEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    MMI_HILOGI("VKey TrackPad Pan Begin");
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN;
+    pEvent.delta_x = msgPPosX;
+    pEvent.delta_y = msgPPosY;
+    pEvent.delta_raw_x = msgPPosX;
+    pEvent.delta_raw_y = msgPPosY;
+    pEvent.axes = VKEY_TP_AXES_ZERO;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadPanUpdate(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    MMI_HILOGI("VKey TrackPad Pan Update");
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_AXIS;
+    pEvent.delta_x = msgPPosX;
+    pEvent.delta_y = msgPPosY;
+    pEvent.delta_raw_x = msgPPosX;
+    pEvent.delta_raw_y = msgPPosY;
+    pEvent.source = libinput_pointer_axis_source::LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
+    pEvent.axes = VKEY_TP_AXES_ONE;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_SCROLL_FINGER;
+    lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadPanEnd(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    MMI_HILOGI("VKey TrackPad Pan End");
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END;
+    pEvent.delta_x = msgPPosX;
+    pEvent.delta_y = msgPPosY;
+    pEvent.delta_raw_x = msgPPosX;
+    pEvent.delta_raw_y = msgPPosY;
+    pEvent.axes = VKEY_TP_AXES_ZERO;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    PrintVKeyTPPointerLog(pEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadRotateBegin(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPScale = msgItem[VKEY_TP_SM_MSG_SCALE_IDX];
+    double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
+    int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
+    double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
+    MMI_HILOGI("VKey TrackPad Rotate Begin scale: %{public}f, angle: %{public}f",
+        scaleToDouble, angleToDouble);
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN;
+    gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
+    gEvent.cancelled = 0;
+    gEvent.delta_x = msgPPosX;
+    gEvent.delta_y = msgPPosY;
+    gEvent.delta_unaccel_x = msgPPosX;
+    gEvent.delta_unaccel_y = msgPPosY;
+    sloted_coords_info slotInfo;
+    gEvent.solt_touches = slotInfo;
+    gEvent.scale = scaleToDouble;
+    gEvent.angle = angleToDouble;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    PrintVKeyTPGestureLog(gEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadRotateUpdate(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPScale = msgItem[VKEY_TP_SM_MSG_SCALE_IDX];
+    double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
+    int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
+    double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
+    MMI_HILOGI("VKey TrackPad Rotate Update scale: %{public}f, angle: %{public}f",
+        scaleToDouble, angleToDouble);
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE;
+    gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
+    gEvent.cancelled = 0;
+    gEvent.delta_x = msgPPosX;
+    gEvent.delta_y = msgPPosY;
+    gEvent.delta_unaccel_x = msgPPosX;
+    gEvent.delta_unaccel_y = msgPPosY;
+    sloted_coords_info slotInfo;
+    gEvent.solt_touches = slotInfo;
+    gEvent.scale = scaleToDouble;
+    gEvent.angle = angleToDouble;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    PrintVKeyTPGestureLog(gEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadRotateEnd(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size: %{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPScale = msgItem[VKEY_TP_SM_MSG_SCALE_IDX];
+    double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
+    int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
+    double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
+    MMI_HILOGI("VKey TrackPad Rotate End scale: %{public}f, angle: %{public}f",
+        scaleToDouble, angleToDouble);
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_END;
+    gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
+    gEvent.cancelled = 0;
+    gEvent.delta_x = msgPPosX;
+    gEvent.delta_y = msgPPosY;
+    gEvent.delta_unaccel_x = msgPPosX;
+    gEvent.delta_unaccel_y = msgPPosY;
+    sloted_coords_info slotInfo;
+    gEvent.solt_touches = slotInfo;
+    gEvent.scale = scaleToDouble;
+    gEvent.angle = angleToDouble;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    PrintVKeyTPGestureLog(gEvent);
+    int64_t frameTime = GetSysClockTime();
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    return true;
+}
+
+int32_t LibinputAdapter::ConvertToTouchEventType(
+    libinput_event_type eventType)
+{
+    if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
+        return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_DOWN);
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
+        return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_UP);
+    } else {
+        return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_MOVE);
+    }
+}
+
+void LibinputAdapter::PrintVKeyTPPointerLog(event_pointer &pEvent)
+{
+    MMI_HILOGD("######## pointerEvent");
+    MMI_HILOGD("######## event type: %{public}d, delta.x: %{public}d, delta.y: %{public}d",
+        static_cast<int32_t>(pEvent.event_type), static_cast<int32_t>(pEvent.delta_x),
+        static_cast<int32_t>(pEvent.delta_y));
+    MMI_HILOGD("######## delta_raw.x: %{public}d, delta_raw.y: %{public}d",
+        static_cast<int32_t>(pEvent.delta_raw_x), static_cast<int32_t>(pEvent.delta_raw_y));
+    MMI_HILOGD("######## absolute.x: %{public}d, absolute.y: %{public}d, source: %{public}d",
+        static_cast<int32_t>(pEvent.absolute_x), static_cast<int32_t>(pEvent.absolute_y),
+        static_cast<int32_t>(pEvent.source));
+    MMI_HILOGD("######## axes: %{public}d, button: %{public}d, seat button count: %{public}d",
+        static_cast<int32_t>(pEvent.axes), static_cast<int32_t>(pEvent.button),
+        static_cast<int32_t>(pEvent.seat_button_count));
+    MMI_HILOGD("######## state: %{public}d, discrete.x: %{public}d, discrete.y: %{public}d",
+        static_cast<int32_t>(pEvent.state), static_cast<int32_t>(pEvent.discrete_x),
+        static_cast<int32_t>(pEvent.discrete_y));
+    MMI_HILOGD("######## v120.x: %{public}d, v120.y: %{public}d",
+        static_cast<int32_t>(pEvent.v120_x), static_cast<int32_t>(pEvent.v120_y));
+}
+
+void LibinputAdapter::PrintVKeyTPGestureLog(event_gesture &gEvent)
+{
+    MMI_HILOGD("######## gestureEvent");
+    MMI_HILOGD("######## event_type: %{public}d, finger_count: %{public}d, cancelled: %{public}d",
+        static_cast<int32_t>(gEvent.event_type), static_cast<int32_t>(gEvent.finger_count),
+        static_cast<int32_t>(gEvent.cancelled));
+    MMI_HILOGD("######## delta_x: %{public}f, delta_y: %{public}f",
+        static_cast<double>(gEvent.delta_x), static_cast<double>(gEvent.delta_y));
+    MMI_HILOGD("######## delta_unaccel_x: %{public}f, delta_unaccel_y: %{public}f",
+        static_cast<double>(gEvent.delta_unaccel_x), static_cast<double>(gEvent.delta_unaccel_y));
+    MMI_HILOGD("######## solt_touches active_count: %{public}d",
+        static_cast<int32_t>(gEvent.solt_touches.active_count));
+    MMI_HILOGD("######## scale: %{public}f, angle: %{public}f",
+        static_cast<double>(gEvent.scale), static_cast<double>(gEvent.angle));
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 void LibinputAdapter::OnEventHandler()
 {
     CALL_DEBUG_ENTER;
@@ -258,7 +995,7 @@ void LibinputAdapter::OnEventHandler()
             double x = 0.0;
             double y = 0.0;
             int32_t touchId = libinput_event_touch_get_slot(touch);
-            bool tipDown = (eventType != LIBINPUT_EVENT_TOUCH_UP);
+            int32_t touchEventType = ConvertToTouchEventType(eventType);
 
             // touch up event has no coordinates information, skip coordinate calculation.
             if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
@@ -287,7 +1024,7 @@ type: %{private}d",
                 static_cast<int32_t>(y),
                 static_cast<int32_t>(eventType));
 
-            if (handleTouchPoint_(x, y, touchId, tipDown) == 0) {
+            if (handleTouchPoint_ != nullptr && handleTouchPoint_(x, y, touchId, touchEventType) == 0) {
                 MMI_HILOGD("inside vkeyboard area");
 
                 while (true) {
@@ -334,6 +1071,7 @@ type: %{private}d",
                         default: break;
                     }
                 }
+                HandleVKeyTouchpadMessages(touch);
                 libinput_event_destroy(event);
             } else {
                 funInputEvent_(event, frameTime);
