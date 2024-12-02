@@ -28,9 +28,13 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<void(void *event, int64_t frameTime)> FunInputEvent;
-typedef std::function<int32_t(double screenX, double screenY, int touchId, bool tipDown)> HandleTouchPoint;
+typedef std::function<int32_t(double screenX, double screenY, int touchId, int32_t eventType)> HandleTouchPoint;
 typedef std::function<int32_t(int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode)> GetMessage;
-
+typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllTouchMessage;
+typedef std::function<void()> ClearTouchMessage;
+typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllKeyMessage;
+typedef std::function<void()> ClearKeyMessage;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 enum VKeyboardMessageType {
     VNoMessage = -1,
     VKeyPressed = 0,
@@ -38,6 +42,27 @@ enum VKeyboardMessageType {
     VStartLongPressControl = 16,
     VStopLongPressControl = 17,
 };
+enum class VTPStateMachineMessageType : int32_t {
+    UNKNOWN = 0,
+    POINTER_MOVE = 1,
+    LEFT_CLICK_DOWN = 2,
+    LEFT_CLICK_UP = 3,
+    RIGHT_CLICK_DOWN = 4,
+    RIGHT_CLICK_UP = 5,
+    SCROLL_BEGIN = 6,
+    SCROLL_UPDATE = 7,
+    SCROLL_END = 8,
+    PINCH_BEGIN = 9,
+    PINCH_UPDATE = 10,
+    PINCH_END = 11,
+    PAN_BEGIN = 12,
+    PAN_UPDATE = 13,
+    PAN_END = 14,
+    ROT_BEGIN = 15,
+    ROT_UPDATE = 16,
+    ROT_END = 17,
+};
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 class LibinputAdapter final {
 public:
     static int32_t DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool isEnable);
@@ -56,7 +81,11 @@ public:
     }
 	
     void InitVKeyboard(HandleTouchPoint handleTouchPoint,
-                    GetMessage getMessage);
+        GetMessage getMessage,
+        GetAllTouchMessage getAllTouchMessage,
+        ClearTouchMessage clearTouchMessage,
+        GetAllKeyMessage getAllKeyMessage,
+        ClearKeyMessage clearKeyMessage);
 
 private:
     void OnEventHandler();
@@ -66,12 +95,62 @@ private:
     void InjectKeyEvent(libinput_event_touch* touch, int32_t keyCode, libinput_key_state state, int64_t frameTime);
     void InjectCombinationKeyEvent(libinput_event_touch* touch, std::vector<int32_t>& toggleKeyCodes,
                                    int32_t triggerKeyCode, int64_t frameTime);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void HandleVKeyTouchpadMessages(libinput_event_touch* touch);
+    void OnVKeyTrackPadMessage(libinput_event_touch* touch,
+        const std::vector<std::vector<int32_t>>& msgList);
+    void OnVKeyTrackPadGestureMessage(libinput_event_touch* touch,
+        VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
+    void OnVKeyTrackPadGestureTwoMessage(libinput_event_touch* touch,
+        VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadPointerMove(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRightBtnDown(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRightBtnUp(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadScrollBegin(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadScrollUpdate(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadScrollEnd(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadPinchBegin(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadPinchUpdate(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadPanUpdate(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadPanEnd(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRotateBegin(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRotateUpdate(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRotateEnd(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    int32_t ConvertToTouchEventType(libinput_event_type eventType);
+    void PrintVKeyTPPointerLog(event_pointer &pEvent);
+    void PrintVKeyTPGestureLog(event_gesture &gEvent);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
 
     FunInputEvent funInputEvent_;
     HandleTouchPoint handleTouchPoint_ { nullptr };
     GetMessage getMessage_ { nullptr };
+    GetAllTouchMessage getAllTouchMessage_ { nullptr };
+    ClearTouchMessage clearTouchMessage_ { nullptr };
+    GetAllKeyMessage getAllKeyMessage_ { nullptr };
+    ClearKeyMessage clearKeyMessage_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
