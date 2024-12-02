@@ -409,6 +409,8 @@ private:
     std::mutex mutex_;
     std::map<int32_t, int64_t> lastPointerDownTime_;
     int64_t walletLaunchDelayTimes_ { 0 };
+    int64_t sosLaunchTime_ { -1 };
+    int64_t powerUpTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
