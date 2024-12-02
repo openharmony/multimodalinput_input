@@ -400,7 +400,7 @@ void LibinputAdapter::OnVKeyTrackPadGestureTwoMessage(libinput_event_touch* touc
             break;
         case VTPStateMachineMessageType::ROT_END:
             if (!HandleVKeyTrackPadRotateEnd(touch, msgItem)) {
-                MMI_HILOGE("Virtual TrackPad rotate update event cannot be handled");
+                MMI_HILOGE("Virtual TrackPad rotate end event cannot be handled");
             }
             break;
         default:
@@ -427,7 +427,6 @@ bool LibinputAdapter::HandleVKeyTrackPadPointerMove(libinput_event_touch* touch,
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lpEvent, frameTime);
-    
     free(lpEvent);
     return true;
 }
@@ -631,8 +630,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchBegin(libinput_event_touch* touch,
     double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
     int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
     double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
-    MMI_HILOGI("VKey TrackPad Pinch Begin scale: %{public}f, angle: %{public}f",
-        scaleToDouble, angleToDouble);
+    MMI_HILOGI("VKey TrackPad Pinch Begin");
     event_gesture gEvent;
     gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN;
     gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
@@ -649,6 +647,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchBegin(libinput_event_touch* touch,
     PrintVKeyTPGestureLog(gEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
     return true;
 }
 
@@ -667,8 +666,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchUpdate(libinput_event_touch* touch,
     double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
     int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
     double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
-    MMI_HILOGI("VKey TrackPad Pinch Update scale: %{public}f, angle: %{public}f",
-        scaleToDouble, angleToDouble);
+    MMI_HILOGI("VKey TrackPad Pinch Update");
     event_gesture gEvent;
     gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE;
     gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
@@ -685,6 +683,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchUpdate(libinput_event_touch* touch,
     PrintVKeyTPGestureLog(gEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
     return true;
 }
 
@@ -703,8 +702,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
     int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
     double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
-    MMI_HILOGI("VKey TrackPad Pinch End scale: %{public}f, angle: %{public}f",
-        scaleToDouble, angleToDouble);
+    MMI_HILOGI("VKey TrackPad Pinch End");
     event_gesture gEvent;
     gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_END;
     gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
@@ -721,6 +719,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     PrintVKeyTPGestureLog(gEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
     return true;
 }
 
@@ -827,8 +826,7 @@ bool LibinputAdapter::HandleVKeyTrackPadRotateBegin(libinput_event_touch* touch,
     double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
     int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
     double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
-    MMI_HILOGI("VKey TrackPad Rotate Begin scale: %{public}f, angle: %{public}f",
-        scaleToDouble, angleToDouble);
+    MMI_HILOGI("VKey TrackPad Rotate Begin");
     event_gesture gEvent;
     gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN;
     gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
@@ -845,6 +843,7 @@ bool LibinputAdapter::HandleVKeyTrackPadRotateBegin(libinput_event_touch* touch,
     PrintVKeyTPGestureLog(gEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
     return true;
 }
 
@@ -863,8 +862,7 @@ bool LibinputAdapter::HandleVKeyTrackPadRotateUpdate(libinput_event_touch* touch
     double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
     int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
     double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
-    MMI_HILOGI("VKey TrackPad Rotate Update scale: %{public}f, angle: %{public}f",
-        scaleToDouble, angleToDouble);
+    MMI_HILOGI("VKey TrackPad Rotate Update");
     event_gesture gEvent;
     gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE;
     gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
@@ -881,6 +879,7 @@ bool LibinputAdapter::HandleVKeyTrackPadRotateUpdate(libinput_event_touch* touch
     PrintVKeyTPGestureLog(gEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
     return true;
 }
 
@@ -899,8 +898,7 @@ bool LibinputAdapter::HandleVKeyTrackPadRotateEnd(libinput_event_touch* touch,
     double scaleToDouble = static_cast<double>(msgPScale) / VTP_SCALE_AND_ANGLE_FACTOR;
     int32_t msgPAngle = msgItem[VKEY_TP_SM_MSG_ANGLE_IDX];
     double angleToDouble = static_cast<double>(msgPAngle) / VTP_SCALE_AND_ANGLE_FACTOR;
-    MMI_HILOGI("VKey TrackPad Rotate End scale: %{public}f, angle: %{public}f",
-        scaleToDouble, angleToDouble);
+    MMI_HILOGI("VKey TrackPad Rotate End");
     event_gesture gEvent;
     gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_END;
     gEvent.finger_count = VKEY_TP_GSE_TWO_FINGERS;
@@ -917,6 +915,7 @@ bool LibinputAdapter::HandleVKeyTrackPadRotateEnd(libinput_event_touch* touch,
     PrintVKeyTPGestureLog(gEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
     return true;
 }
 
