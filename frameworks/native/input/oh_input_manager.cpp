@@ -1043,12 +1043,16 @@ static bool IsScreenCaptureWorking()
     CALL_DEBUG_ENTER;
 #ifdef PLAYER_FRAMEWORK_EXISTS
     int32_t pid = OHOS::IPCSkeleton::GetCallingPid();
-    int32_t capturePid = OHOS::Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
-    if (capturePid != pid) {
-        MMI_HILOGE("Calling pid is:%{public}d, but screen capture pid is:%{public}d", pid, capturePid);
-        return false;
+    std::list<int32_t> pidList = OHOS::Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
+    for (const auto &capturePid : pidList) {
+        MMI_HILOGI("Current screen capture work pid %{public}d ", capturePid);
+        if (capturePid == pid) {
+            return true;
+        } else {
+            MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
+        }
     }
-    return true;
+    return false;
 #else
     return false;
 #endif // PLAYER_FRAMEWORK_EXISTS

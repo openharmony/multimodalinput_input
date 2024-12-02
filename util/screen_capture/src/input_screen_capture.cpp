@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <list>
+
 #include "define_multimodal.h"
 #include "input_screen_capture_monitor_listener.h"
 #include "mmi_log.h"
@@ -29,7 +31,11 @@ sptr<InputScreenCaptureMonitorListener> g_screenCaptureMonitorListener { nullptr
 
 extern "C" int32_t IsScreenCaptureWorking()
 {
-    int32_t pid = Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
+    std::list<int32_t> pidList = Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
+    int32_t pid = -1;
+    if (!pidList.empty()) {
+        pid = pidList.front();
+    }
     return pid;
 }
 
