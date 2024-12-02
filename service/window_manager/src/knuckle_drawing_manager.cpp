@@ -236,7 +236,8 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
     if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
         (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty())) ||
         (action == PointerEvent::POINTER_ACTION_PULL_MOVE && (!pointerInfos_.empty())) ||
-        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
+        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP ||
+        action == PointerEvent::POINTER_ACTION_CANCEL) {
         return true;
     }
     MMI_HILOGE("Action is not down or move or up, action:%{public}d", action);
@@ -482,7 +483,8 @@ void KnuckleDrawingManager::CreateCanvasNode()
 int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touchEvent)
 {
     CHKPR(touchEvent, RET_ERR);
-    if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+    if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
         isActionUp_ = true;
         return RET_OK;
     }
