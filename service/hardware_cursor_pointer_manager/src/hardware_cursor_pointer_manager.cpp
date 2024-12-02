@@ -51,13 +51,15 @@ bool HardwareCursorPointerManager::IsSupported()
         return false;
     }
     if (!isEnable_) {
+        std::lock_guard<std::mutex> guard(mtx_);
         powerInterface_ = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
         CHKPF(powerInterface_);
         isEnable_ = true;
     }
-    CHKPF(powerInterface_);
+    auto powerInterface = GetPowerInterface();
+    CHKPF(powerInterface);
     uint64_t value = 0;
-    if (powerInterface_->GetDisplayProperty(devId_,
+    if (powerInterface->GetDisplayProperty(devId_,
         HDI::Display::Composer::V1_2::DISPLAY_CAPBILITY_HARDWARE_CURSOR, value)
         != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
         MMI_HILOGE("Get display property is error");
@@ -74,12 +76,17 @@ bool HardwareCursorPointerManager::IsSupported()
 
 int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 {
-    CHKPR(powerInterface_, RET_ERR);
-    if (powerInterface_->SetHardwareCursorPosition(devId_, x, y) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+    auto powerInterface = GetPowerInterface();
+    CHKPR(powerInterface, RET_ERR);
+    if (powerInterface->SetHardwareCursorPosition(devId_, x, y) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
         MMI_HILOGE("Set hardware cursor position failed, attempting to reinitialize interface.");
-        powerInterface_ = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
-        CHKPR(powerInterface_, RET_ERR);
-        if (powerInterface_->SetHardwareCursorPosition(devId_, x, y) !=
+        {
+            std::lock_guard<std::mutex> guard(mtx_);
+            powerInterface_ = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
+        }
+        powerInterface = GetPowerInterface();
+        CHKPR(powerInterface, RET_ERR);
+        if (powerInterface->SetHardwareCursorPosition(devId_, x, y) !=
             HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
             MMI_HILOGE("Set hardware cursor position is error");
             return RET_ERR;
@@ -92,8 +99,9 @@ int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 int32_t HardwareCursorPointerManager::EnableStats(bool enable)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(powerInterface_, RET_ERR);
-    if (powerInterface_->EnableHardwareCursorStats(devId_, enable) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+    auto powerInterface = GetPowerInterface();
+    CHKPR(powerInterface, RET_ERR);
+    if (powerInterface->EnableHardwareCursorStats(devId_, enable) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
         MMI_HILOGE("Enable hardware cursor stats is error");
         return RET_ERR;
     }
@@ -104,14 +112,21 @@ int32_t HardwareCursorPointerManager::EnableStats(bool enable)
 int32_t HardwareCursorPointerManager::GetCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(powerInterface_, RET_ERR);
-    if (powerInterface_->GetHardwareCursorStats(devId_, frameCount, vsyncCount) !=
+    auto powerInterface = GetPowerInterface();
+    CHKPR(powerInterface, RET_ERR);
+    if (powerInterface->GetHardwareCursorStats(devId_, frameCount, vsyncCount) !=
         HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
         MMI_HILOGE("Get hardware cursor stats is error");
         return RET_ERR;
     }
     MMI_HILOGD("Get hardware cursor stats, frameCount:%{private}d, vsyncCount:%{private}d", frameCount, vsyncCount);
     return RET_OK;
+}
+
+sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> HardwareCursorPointerManager::GetPowerInterface()
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    return powerInterface_;
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
