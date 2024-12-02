@@ -1601,6 +1601,9 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
+    if (!isDownStart_) {
+        return false;
+    }
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
         (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
         MMI_HILOGI("isDownStart:%{public}d", isDownStart_);
@@ -1780,6 +1783,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
                 MMI_HILOGD("Repeat key, reset down status");
                 count_ = 0;
                 isDownStart_ = false;
+                repeatKeyCountMap_.clear();
                 return true;
             } else {
                 repeatKey_.keyAction = keyEvent->GetKeyAction();
