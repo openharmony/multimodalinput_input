@@ -95,8 +95,8 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     }
     bool isSameKeyDown = false;
     if (keyEvent_ != nullptr) {
-        isSameKeyDown = ((keyEvent_->GetKeyItems().size() == keyEvent->GetKeyItems().size()) &&
-            (keyEvent_->GetKeyCode() == keyEvent->GetKeyCode()));
+        isSameKeyDown = ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) && (TimerMgr->IsExist(timerId_)) &&
+            (keyEvent->GetKeyCode() == repeatKeyCode_));
     }
     keyEvent_ = keyEvent;
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
