@@ -65,6 +65,8 @@ const std::string PRODUCT_TYPE_PC = "2in1";
 [[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
+constexpr int32_t ANGLE_90 { 90 };
+constexpr int32_t ANGLE_360 { 360 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -333,9 +335,9 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
-        CalculateOffset(displayInfo->direction, offset);
-    }
+    Direction displayDirection = static_cast<Direction>((
+        ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    CalculateOffset(displayDirection, offset);
 #endif // OHOS_BUILD_EMULATOR
     int32_t ret = RET_OK;
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER)) {
