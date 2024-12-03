@@ -81,8 +81,8 @@ int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
     CHKPR(powerInterface, RET_ERR);
     if (powerInterface->SetHardwareCursorPosition(devId_, x, y) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
         MMI_HILOGE("Set hardware cursor position failed, attempting to reinitialize interface.");
-        auto DisplayComposer = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
         {
+            auto DisplayComposer = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
             std::lock_guard<std::mutex> guard(mtx_);
             powerInterface_ = DisplayComposer;
         }
