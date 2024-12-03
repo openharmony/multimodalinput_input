@@ -386,6 +386,7 @@ if (input_ext_feature_anco) {
 if (input_feature_product == "pc") {
   input_default_defines += [ "OHOS_BUILD_ENABLE_HARDWARE_CURSOR" ]
   input_default_defines += [ "OHOS_BUILD_MOUSE_REPORTING_RATE" ]
+  input_default_defines += [ "OHOS_BUILD_PC_PRIORITY" ]
 }
 
 if (input_ext_feature_magiccursor) {

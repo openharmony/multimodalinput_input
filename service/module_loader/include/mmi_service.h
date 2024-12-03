@@ -145,9 +145,9 @@ public:
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
     int32_t SetMoveEventFilters(bool flag) override;
-#ifdef OHOS_RSS_CLIENT
+#if defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
     void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
-#endif // OHOS_RSS_CLIENT
+#endif // defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
@@ -245,7 +245,9 @@ protected:
     bool InitDelegateTasks();
     int32_t Init();
     void InitPreferences();
-
+#ifdef OHOS_BUILD_PC_PRIORITY
+    void SetMmiServicePriority();
+#endif // OHOS_BUILD_PC_PRIORITY
     void OnThread();
     void PreEventLoop();
     void OnSignalEvent(int32_t signalFd);
