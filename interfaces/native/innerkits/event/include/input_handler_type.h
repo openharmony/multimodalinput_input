@@ -54,7 +54,7 @@ inline constexpr HandleEventType HANDLE_EVENT_TYPE_TOUCH { 1u << 3 };
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_MOUSE { 1u << 4 };
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_PINCH { 1u << 5 };
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_THREEFINGERSSWIP { 1u << 6 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_FOURFINGERSSWIP {1u << 7  };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_FOURFINGERSSWIP {1u << 7 };
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_ROTATE { 1u << 8 };
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_THREEFINGERSTAP { 1u << 9 };
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_SWIPEINWARD { 1u << 10 };

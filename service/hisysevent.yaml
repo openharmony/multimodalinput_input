@@ -284,14 +284,14 @@ SUBSCRIBE_KEY_EVENT:
   SUBSCRIBE_ID: {type: INT32, desc: subscribe id}
   FINAL_KEY: {type: INT32, desc: final key}
   NAME: {type: STRING, desc: subscriber name}
-  PID:  {type: INT32, desc: subscriber pid}
+  PID: {type: INT32, desc: subscriber pid}
 
 UNSUBSCRIBE_KEY_EVENT:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report unsubscribe key event}
   SUBSCRIBE_ID: {type: INT32, desc: subscribe id}
   FINAL_KEY: {type: INT32, desc: final key}
   NAME: {type: STRING, desc: subscriber name}
-  PID:  {type: INT32, desc: subscriber pid}
+  PID: {type: INT32, desc: subscriber pid}
 
 KAYBOARD_EVENT:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report keyboard event}
@@ -306,7 +306,7 @@ LAUNCH_ABILITY:
 COMMON_ACTION:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report common action}
   ACTION: {type: STRING, desc: subscriber name}
-  PID:  {type: INT32, desc: subscriber pid}
+  PID: {type: INT32, desc: subscriber pid}
 
 TOUCH_EVENT:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report touch event}
