@@ -151,6 +151,8 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.L
     std::string strUri = "strUri";
     settingDataShare.isDataShareReady_ = false;
     ASSERT_EQ(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
+    settingDataShare.isDataShareReady_ = true;
+    ASSERT_NE(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
 }
 
 /**
@@ -169,6 +171,8 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize
     std::string strUri = "strUri";
     settingDataShare.isDataShareReady_ = false;
     ASSERT_EQ(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
+    settingDataShare.isDataShareReady_ = true;
+    ASSERT_NE(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
 }
 
 /**
@@ -201,6 +205,63 @@ HWTEST_F(SettingObserverTest, SettingObserverTest_OnChange, TestSize.Level1)
     observer.SetKey(key);
     observer.update_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(observer.OnChange());
+}
+
+/**
+ * @tc.name: SettingObserverTest_CreateDataShareHelper
+ * @tc.desc: Test CreateDataShareHelper
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare settingDataShare;
+    std::string str = "createdatasharehelper";
+    ASSERT_NO_FATAL_FAILURE(settingDataShare.CreateDataShareHelper(str));
+    str = "";
+    ASSERT_NO_FATAL_FAILURE(settingDataShare.CreateDataShareHelper(str));
+}
+
+/**
+ * @tc.name: SettingObserverTest_AssembleUri
+ * @tc.desc: Test AssembleUri
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, SettingObserverTest_AssembleUri, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare settingDataShare;
+    std::string key = "";
+    std::string strui = "";
+    ASSERT_NO_FATAL_FAILURE(settingDataShare.AssembleUri(key, strui));
+
+    key = "close_fingerprint_nav_event_key";
+    ASSERT_NO_FATAL_FAILURE(settingDataShare.AssembleUri(key, strui));
+
+    strui = "AssembleUri";
+    ASSERT_NO_FATAL_FAILURE(settingDataShare.AssembleUri(key, strui));
+}
+
+/**
+ * @tc.name: SettingObserverTest_CheckIfSettingsDataReady
+ * @tc.desc: Test CheckIfSettingsDataReady
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, SettingObserverTest_CheckIfSettingsDataReady, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare settingDataShare;
+    settingDataShare.isDataShareReady_ = true;
+    bool ret = false;
+    ret = settingDataShare.CheckIfSettingsDataReady();
+    ASSERT_TRUE(ret);
+
+    settingDataShare.isDataShareReady_ = false;
+    ret = settingDataShare.CheckIfSettingsDataReady();
+    ASSERT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS
