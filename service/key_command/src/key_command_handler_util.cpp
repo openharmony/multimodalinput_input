@@ -319,7 +319,7 @@ bool GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt)
     if (keyAction == nullptr) {
         MMI_HILOGE("keyAction Init failed");
         return false;
-    }   
+    }
     if (!cJSON_IsNumber(keyAction)) {
         MMI_HILOGE("keyAction is not number");
         return false;
@@ -342,7 +342,7 @@ bool GetDelay(const cJSON* jsonData, int64_t &delayInt)
     if (delay == nullptr) {
         MMI_HILOGE("delay init failed");
         return false;
-    }    
+    }
     if (!cJSON_IsNumber(delay)) {
         MMI_HILOGE("delay is not number");
         return false;
@@ -365,7 +365,7 @@ bool GetRepeatTimes(const cJSON* jsonData, int32_t &repeatTimesInt)
     if (repeatTimes == nullptr) {
         MMI_HILOGE("repeatTimes init failed");
         return false;
-    }    
+    }
     if (!cJSON_IsNumber(repeatTimes)) {
         MMI_HILOGE("repeatTimes is not number");
         return false;
