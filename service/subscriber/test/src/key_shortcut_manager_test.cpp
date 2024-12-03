@@ -1513,5 +1513,117 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckPureModifiers_001, 
     ret = shortcutMgr.CheckPureModifiers(keyEvent, shortcut);
     ASSERT_TRUE(ret);
 }
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckModifiers_001
+ * @tc.desc: Test the funcation CheckModifiers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckModifiers_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    bool ret = shortcutMgr.CheckModifiers(keyEvent, shortcut);
+    ASSERT_FALSE(ret);
+    keyEvent->SetKeyCode(2045);
+    int64_t downTime = 2;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(kitDown);
+    ret = shortcutMgr.CheckModifiers(keyEvent, shortcut);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_TriggerDown_001
+ * @tc.desc: Test the funcation TriggerDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerDown_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = -5;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerDown(keyEvent, shortcutId, shortcut));
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerDown(keyEvent, shortcutId, shortcut));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_RunShortcut_003
+ * @tc.desc: Test the funcation RunShortcut
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RunShortcut_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.RunShortcut(keyEvent, shortcutId));
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcutMgr.shortcuts_[1] = shortcut;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.RunShortcut(keyEvent, shortcutId));
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.RunShortcut(keyEvent, shortcutId));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_TriggerUp_003
+ * @tc.desc: Test the funcation TriggerUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerUp_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    KeyShortcutManager::KeyShortcut shortcut;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    shortcut.longPressTime = 1000;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(5);
+    keyEvent->SetActionTime(3);
+    item.SetDownTime(1);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+    keyEvent->SetActionTime(1003);
+    item.SetDownTime(1);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+    shortcut.longPressTime = -10;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+}
 } // namespace MMI
 } // namespace OHOS
