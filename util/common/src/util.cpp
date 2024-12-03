@@ -572,7 +572,13 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
 
 bool ReadFile(const std::string &path, std::string &content)
 {
-    std::ifstream file(path);
+    if (path.empty()) {
+        MMI_HILOGE("path is empty");
+        return false;
+    }
+    char realPath[PATH_MAX] = {};
+    CHKPF(realpath(path.c_str(), realPath));
+    std::ifstream file(realPath);
     if (!file) {
         return false;
     }
