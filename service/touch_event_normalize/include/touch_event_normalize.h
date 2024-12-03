@@ -71,6 +71,7 @@ private:
 
 private:
     std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;
+    std::map<int32_t, std::shared_ptr<TransformProcessor>> touchpad_processors_;
 };
 
 #define TOUCH_EVENT_HDR ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()

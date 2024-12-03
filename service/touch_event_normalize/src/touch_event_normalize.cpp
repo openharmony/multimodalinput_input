@@ -41,14 +41,27 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(struct libinput_ev
     CHKPP(device);
     std::shared_ptr<TransformProcessor> processor{ nullptr };
     auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
-    if (auto it = processors_.find(deviceId); it != processors_.end()) {
-        processor = it->second;
+    if (deviceType == TouchEventNormalize::DeviceType::TOUCH_PAD) {
+        if (auto it = touchpad_processors_.find(deviceId); it != touchpad_processors_.end()) {
+            processor = it->second;
+        } else {
+            processor = MakeTransformProcessor(deviceId, deviceType);
+            CHKPP(processor);
+            auto [tIter, isOk] = touchpad_processors_.emplace(deviceId, processor);
+            if (!isOk) {
+                MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
+            }
+        }
     } else {
-        processor = MakeTransformProcessor(deviceId, deviceType);
-        CHKPP(processor);
-        auto [tIter, isOk] = processors_.emplace(deviceId, processor);
-        if (!isOk) {
-            MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
+        if (auto it = processors_.find(deviceId); it != processors_.end()) {
+            processor = it->second;
+        } else {
+            processor = MakeTransformProcessor(deviceId, deviceType);
+            CHKPP(processor);
+            auto [tIter, isOk] = processors_.emplace(deviceId, processor);
+            if (!isOk) {
+                MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
+            }
         }
     }
     return processor->OnEvent(event);
