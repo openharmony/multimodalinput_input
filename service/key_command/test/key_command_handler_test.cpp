@@ -5550,5 +5550,138 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey_001, T
     ret = handler.SetIsFreezePowerKey(pageName);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseStatusConfigObserver_001
+ * @tc.desc: Test the funcation ParseStatusConfigObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseStatusConfigObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    sequence.statusConfig = "statusConfig";
+    sequence.statusConfigValue = false;
+    sequence.abilityStartDelay = 1;
+    sequence.timerId = 1;
+    handler.sequences_.push_back(sequence);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business1";
+    key.statusConfig = "";
+    handler.shortcutKeys_.insert(std::make_pair("key1", key));
+    ASSERT_NO_FATAL_FAILURE(handler.ParseStatusConfigObserver());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseStatusConfigObserver_002
+ * @tc.desc: Test the funcation ParseStatusConfigObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseStatusConfigObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    sequence.statusConfig = "abc";
+    sequence.statusConfigValue = true;
+    sequence.abilityStartDelay = 1;
+    sequence.timerId = 5;
+    handler.sequences_.push_back(sequence);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business1";
+    key.statusConfig = "statusConfig";
+    key.statusConfigValue = true;
+    key.finalKey = 4;
+    key.keyDownDuration = 5;
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    key.timerId = 6;
+    Ability ability_temp;
+    ability_temp.bundleName = "bundleName";
+    ability_temp.abilityName = "abilityName";
+    key.ability = ability_temp;
+    handler.shortcutKeys_.insert(std::make_pair("key1", key));
+    ASSERT_NO_FATAL_FAILURE(handler.ParseStatusConfigObserver());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseStatusConfigObserver_003
+ * @tc.desc: Test the funcation ParseStatusConfigObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseStatusConfigObserver_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    sequence.statusConfig = "";
+    sequence.statusConfigValue = false;
+    sequence.abilityStartDelay = 2;
+    sequence.timerId = 2;
+    handler.sequences_.push_back(sequence);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_03
+ * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(1);
+    keyEvent->SetKeyAction(5);
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    shortcutKey.preKeys = {1, 2, 3};
+    shortcutKey.businessId = "businessId";
+    shortcutKey.statusConfig = "statusConfig";
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = 5;
+    shortcutKey.keyDownDuration = 1;
+    shortcutKey.triggerType = 10;
+    shortcutKey.timerId = 1;
+    std::vector<ShortcutKey> upAbilities;
+    upAbilities.push_back(shortcutKey);
+    bool ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_02
+ * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(6);
+    keyEvent->SetKeyAction(3);
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    shortcutKey.preKeys = {3, 2, 4};
+    shortcutKey.businessId = "businessId1";
+    shortcutKey.statusConfig = "statusConfig1";
+    shortcutKey.statusConfigValue = false;
+    shortcutKey.finalKey = 6;
+    shortcutKey.keyDownDuration = 9;
+    shortcutKey.triggerType = 1;
+    shortcutKey.timerId = 3;
+    std::vector<ShortcutKey> upAbilities;
+    upAbilities.push_back(shortcutKey);
+    bool ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
+    ASSERT_FALSE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
