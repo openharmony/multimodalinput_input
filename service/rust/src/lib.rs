@@ -1222,7 +1222,7 @@ fn test_handle_motion_accelerate_capture_soft_pc_pro_offset_false_touchpad()
         ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 2);
         debug!(
         LOG_LABEL,
-        "ret =  {}", @public(ret)
+        "ret = {}", @public(ret)
         );
     }
     assert_eq!(ret, RET_ERR);

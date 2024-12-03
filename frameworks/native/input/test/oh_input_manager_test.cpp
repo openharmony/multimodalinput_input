@@ -466,7 +466,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
 {
     Input_DeviceListener listener = {
         nullptr,
-        [](int32_t deviceId)  {},
+        [](int32_t deviceId) {},
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(&listener), INPUT_PARAMETER_ERROR);
     EXPECT_EQ(OH_Input_UnregisterDeviceListener(&listener), INPUT_PARAMETER_ERROR);
