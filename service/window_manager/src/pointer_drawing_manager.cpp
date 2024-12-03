@@ -123,7 +123,7 @@ bool g_hasMirrorScreen { false };
 bool g_hasExtendScreen { false };
 bool g_hasVirtualScreen { false };
 std::mutex screenMtx;
-#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -190,7 +190,7 @@ void ScreenListener::OnDisconnect(Rosen::ScreenId screenId)
     }
     UpdateScreenModeChange();
 }
-#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 static bool IsSingleDisplayFoldDevice()
 {

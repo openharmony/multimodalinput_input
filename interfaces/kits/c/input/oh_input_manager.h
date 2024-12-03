@@ -1399,7 +1399,7 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
 /**
  * @brief 取消注册设备热插拔的监听
  *
- * @param listener  指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
+ * @param listener 指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
  *
  * @return OH_Input_UnregisterDeviceListener 的返回值, 具体如下:
  *         {@link INPUT_SUCCESS} 调用成功;\n
