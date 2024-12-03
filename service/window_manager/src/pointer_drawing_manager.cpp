@@ -985,7 +985,6 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
         return RET_ERR;
     }
     MMI_HILOGD("Init layer success");
-    layer->ReleaseBuffer(buffer, releaseFence_);
     return RET_OK;
 }
 
@@ -1223,7 +1222,6 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         }
         if (GetSurfaceInformation() != RET_OK) {
             MMI_HILOGE("OnVsync Get surface information fail");
-            layer_->ReleaseBuffer(buffer_, releaseFence_);
             return;
         }
         DoHardwareCursorDraw();
@@ -1234,7 +1232,6 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
             MMI_HILOGE("OnVsync set dynamic hardware cursor location error");
             return;
         }
-        layer_->ReleaseBuffer(buffer_, releaseFence_);
     });
     RequestNextVSync();
 }
@@ -1736,14 +1733,10 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
         MMI_HILOGE("Request buffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
         return nullptr;
     }
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (hardwareCursorPointerManager_->IsSupported()) {
-        sptr<OHOS::SyncFence> tempFence = new OHOS::SyncFence(releaseFence);
-        if (tempFence != nullptr && (tempFence->Wait(SYNC_FENCE_WAIT_TIME) < 0)) {
-            MMI_HILOGE("Failed to create surface, this buffer is not available");
-        }
+    sptr<OHOS::SyncFence> tempFence = new OHOS::SyncFence(releaseFence);
+    if (tempFence != nullptr && (tempFence->Wait(SYNC_FENCE_WAIT_TIME) < 0)) {
+        MMI_HILOGE("Failed to create surface, this buffer is not available");
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return buffer;
 }
 
