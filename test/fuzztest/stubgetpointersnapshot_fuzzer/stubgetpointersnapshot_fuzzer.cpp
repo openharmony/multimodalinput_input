@@ -41,7 +41,6 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
 }
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 bool StubGetPointerSnapshotFuzzTest(const uint8_t *data, size_t size)
 {
     size_t startPos = 0;
@@ -55,11 +54,12 @@ bool StubGetPointerSnapshotFuzzTest(const uint8_t *data, size_t size)
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT), datas, reply, option);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return true;
 }
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // MMI
 } // OHOS
 
@@ -71,8 +71,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     OHOS::MMI::StubGetPointerSnapshotFuzzTest(data, size);
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return 0;
 }
