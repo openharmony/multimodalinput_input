@@ -759,6 +759,16 @@ std::list<PointerEvent::PointerItem> PointerEvent::GetAllPointerItems() const
     return pointers_;
 }
 
+int32_t PointerEvent::GetSourceType() const
+{
+    return InputEvent::GetSourceType();
+}
+
+void PointerEvent::SetSourceType(int32_t sourceType)
+{
+    InputEvent::SetSourceType(sourceType);
+}
+
 int32_t PointerEvent::GetButtonId() const
 {
     return buttonId_;
