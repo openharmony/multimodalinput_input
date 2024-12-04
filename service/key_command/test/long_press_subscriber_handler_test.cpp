@@ -1274,7 +1274,7 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_ConvertVPT
 
 /**
  * @tc.name: LongPressSubscribeHandlerTest_GetBundleName_001
- * @tc.desc: Verify if (userid < 0); 
+ * @tc.desc: Verify if (userid < 0);
  * @tc.type: Function
  * @tc.require:
  */
