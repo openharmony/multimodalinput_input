@@ -281,20 +281,10 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
     }
-    auto udsServer = InputHandler->GetUDSServer();
-    int32_t fd = -1;
     auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
-    if (point->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL &&
-        point->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL &&
-        (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
-        point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (WIN_MGR->GetWindowPid(pointerItem.GetTargetWindowId()) > 0)) {
-        CHKPV(udsServer);
-        WIN_MGR->FoldScreenRotation(point);
-        fd = udsServer->GetClientFd(pid);
-    } else {
-        fd = WIN_MGR->GetClientFd(point);
-    }
+    int32_t fd = GetClientFd(pid, point);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
     if (WIN_MGR->GetCancelEventFlag(point) && udsServer->GetSession(fd) == nullptr &&
         pid != -1 && point->GetTargetWindowId() != -1) {
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
@@ -308,6 +298,24 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         }
     }
     DispatchPointerEventInner(point, fd);
+}
+
+int32_t EventDispatchHandler::GetClientFd(int32_t pid, std::shared_ptr<PointerEvent> point)
+{
+    CHKPR(point, INVALID_FD);
+    if (WIN_MGR->AdjustFingerFlag(point)) {
+        return INVALID_FD;
+    }
+    if (point->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL &&
+        point->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL &&
+        (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
+        point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) && (pid > 0)) {
+        WIN_MGR->FoldScreenRotation(point);
+        auto udsServer = InputHandler->GetUDSServer();
+        CHKPR(udsServer, INVALID_FD);
+        return udsServer->GetClientFd(pid);
+    }
+    return WIN_MGR->GetClientFd(point);
 }
 
 void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd)
