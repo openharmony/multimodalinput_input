@@ -3681,6 +3681,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_003, TestSize.Level1
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
+        .WillOnce(Return(true))
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         .WillOnce(Return(true))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
@@ -3731,6 +3732,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_004, TestSize.Level1
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
+        .WillOnce(Return(true))
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         .WillOnce(Return(true))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
@@ -3772,6 +3774,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_005, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
