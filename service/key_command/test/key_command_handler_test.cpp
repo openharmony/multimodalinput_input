@@ -2963,7 +2963,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey, TestSize.
     repeatKey.keyCode = KeyEvent::KEYCODE_POWER;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
 /**
@@ -4661,7 +4661,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_002, TestS
     item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     item.times = 6;
     handler.count_ = 5;
-    ASSERT_TRUE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
+    ASSERT_FALSE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
 }
 
 /**
@@ -4685,7 +4685,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_003, TestS
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     handler.repeatKeyCountMap_.emplace(repeatKey.ability.bundleName, 2);
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 2);
-    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
 /**
@@ -4711,7 +4711,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_004, TestS
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     handler.repeatKeyCountMap_.emplace(repeatKey.ability.bundleName, 2);
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 5);
-    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
 /**
