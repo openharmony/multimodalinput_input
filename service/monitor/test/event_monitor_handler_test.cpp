@@ -65,9 +65,9 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_002, T
     std::shared_ptr<IInputEventHandler::IInputEventConsumer> callback = std::make_shared<MyInputEventConsumer>();
     int32_t ret = eventMonitorHandler.AddInputHandler(handlerType, eventType, callback);
     EXPECT_EQ(ret, RET_OK);
-    eventType = HANDLE_EVENT_TYPE_FINGERPRINT;
+    eventType = HANDLE_EVENT_TYPE_NONE;
     ret = eventMonitorHandler.AddInputHandler(handlerType, eventType, callback);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
@@ -610,17 +610,28 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddMonitor_001, TestSi
     HandleEventType eventType = 0;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
-    for (int32_t i = 0; i < MAX_N_INPUT_MONITORS - 1; i++) {
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    monitorCollection.monitors_.insert(sessionHandler);
+    for (int i = 0; i < MAX_N_INPUT_MONITORS - 2; i++) {
         SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
         EventMonitorHandler::SessionHandler sessionHandler = { handlerType, eventType, session };
+        sessionHandler.eventType_ = HANDLE_EVENT_TYPE_NONE;
         monitorCollection.monitors_.insert(sessionHandler);
     }
     int32_t ret = monitorCollection.AddMonitor(sessionHandler);
     EXPECT_EQ(ret, RET_OK);
+
+    monitorCollection.monitors_.erase(sessionHandler);
     SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler2 { handlerType, eventType, session2 };
     monitorCollection.monitors_.insert(sessionHandler2);
     ret = monitorCollection.AddMonitor(sessionHandler2);
+    EXPECT_EQ(ret, RET_OK);
+
+    SessionPtr session3 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler3 { handlerType, eventType, session3 };
+    monitorCollection.monitors_.insert(sessionHandler3);
+    ret = monitorCollection.AddMonitor(sessionHandler3);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -639,6 +650,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_001, Tes
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
     ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
     monitorCollection.monitors_.insert(sessionHandler);
     ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
     SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -973,6 +985,56 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_002
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
     handlerType = InputHandlerType::NONE;
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsPinch
+ * @tc.desc: Test IsPinch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsPinch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    bool ret = false;
+    ret = monitorCollection.IsPinch(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ret = monitorCollection.IsPinch(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = monitorCollection.IsPinch(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsRotate
+ * @tc.desc: Test IsRotate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsRotate, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    bool ret = false;
+    ret = monitorCollection.IsRotate(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
+    ret = monitorCollection.IsRotate(pointerEvent);
+    ASSERT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS
