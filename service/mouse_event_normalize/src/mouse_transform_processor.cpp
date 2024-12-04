@@ -375,6 +375,11 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
             MMI_HILOGD("Axis begin");
         }
     }
+    if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+        pointerEvent_->SetScrollRows(TouchPadTransformProcessor::GetTouchpadScrollRows());
+    } else {
+        pointerEvent_->SetScrollRows(MouseTransformProcessor::GetMouseScrollRows());
+    }
 
     const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {

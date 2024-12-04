@@ -37,42 +37,44 @@ namespace OHOS {
 namespace MMI {
 class DelegateInterface;
 class DisplayEventMonitor final {
-    DECLARE_DELAYED_SINGLETON(DisplayEventMonitor);
-    public:
-        DISALLOW_COPY_AND_MOVE(DisplayEventMonitor);
+DECLARE_DELAYED_SINGLETON(DisplayEventMonitor);
+public:
+    DISALLOW_COPY_AND_MOVE(DisplayEventMonitor);
 
-        void UpdateShieldStatusOnScreenOn();
-        void UpdateShieldStatusOnScreenOff();
-        void InitCommonEventSubscriber();
-        bool IsCommonEventSubscriberInit();
-        void SetScreenStatus(const std::string &screenStatus)
-        {
-            screenStatus_ = screenStatus;
-        }
-        const std::string GetScreenStatus()
-        {
-            return screenStatus_;
-        }
-        void SetScreenLocked(bool isLocked)
-        {
-            isScreenLocked_ = isLocked;
-        }
-        bool GetScreenLocked() const
-        {
-            return isScreenLocked_;
-        }
-        void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy)
-        {
-            delegateProxy_ = proxy;
-        }
-        void SendCancelEventWhenLock();
-    private:
-        int32_t shieldModeBeforeSreenOff_ { -1 };
-        std::atomic<bool> hasInit_ { false };
-        std::string screenStatus_;
-        bool isScreenLocked_ { true };
-        std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
+    void UpdateShieldStatusOnScreenOn();
+    void UpdateShieldStatusOnScreenOff();
+    void InitCommonEventSubscriber();
+    bool IsCommonEventSubscriberInit();
+    void SetScreenStatus(const std::string &screenStatus)
+    {
+        screenStatus_ = screenStatus;
+    }
+    const std::string GetScreenStatus()
+    {
+        return screenStatus_;
+    }
+    void SetScreenLocked(bool isLocked)
+    {
+        isScreenLocked_ = isLocked;
+    }
+    bool GetScreenLocked() const
+    {
+        return isScreenLocked_;
+    }
+    void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy)
+    {
+        delegateProxy_ = proxy;
+    }
+    void SendCancelEventWhenLock();
+
+private:
+    int32_t shieldModeBeforeSreenOff_ { -1 };
+    std::atomic<bool> hasInit_ { false };
+    std::string screenStatus_;
+    bool isScreenLocked_ { true };
+    std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
 };
+
 #define DISPLAY_MONITOR ::OHOS::DelayedSingleton<DisplayEventMonitor>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
