@@ -1964,7 +1964,7 @@ static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
         for (const auto &iter: it->second) {
             if (iter->callback == hotkeyInfo->callback) {
                 MMI_HILOGI("Callback already exist");
-                return INPUT_SUCCESS;
+                return INPUT_PARAMETER_ERROR;
             }
         }
     }

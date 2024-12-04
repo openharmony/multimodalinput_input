@@ -62,9 +62,9 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{private}d", keyCode);
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
-    keyCode = TransformVolumeKey(device, keyCode);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
+    keyCode = TransformVolumeKey(device, keyCode, keyAction);
     auto preAction = keyEvent->GetAction();
     if (preAction == KeyEvent::KEY_ACTION_UP) {
         std::optional<KeyEvent::KeyItem> preUpKeyItem = keyEvent->GetKeyItem();
@@ -210,9 +210,13 @@ void KeyEventNormalize::SetCurrentShieldMode(int32_t shieldMode)
     lastShieldMode_ = shieldMode;
 }
 
-int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32_t keyCode) const
+int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32_t keyCode, int32_t keyAction) const
 {
     static std::once_flag flag;
+    static std::map<int32_t, DisplayMode> displayModes {
+        { KeyEvent::KEYCODE_VOLUME_DOWN, DisplayMode::UNKNOWN },
+        { KeyEvent::KEYCODE_VOLUME_UP, DisplayMode::UNKNOWN },
+    };
     static std::string product;
     const std::string theProduct { "UNKNOWN_PRODUCT" };
 
@@ -222,10 +226,16 @@ int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32
     if (product != theProduct) {
         return keyCode;
     }
-    if (WIN_MGR->GetDisplayMode() != DisplayMode::SUB) {
+    auto iter = displayModes.find(keyCode);
+    if (iter == displayModes.end()) {
         return keyCode;
     }
-    if ((keyCode != KeyEvent::KEYCODE_VOLUME_DOWN) && (keyCode != KeyEvent::KEYCODE_VOLUME_UP)) {
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
+        iter->second = WIN_MGR->GetDisplayMode();
+        if (iter->second != DisplayMode::SUB) {
+            return keyCode;
+        }
+    } else if (iter->second != DisplayMode::SUB) {
         return keyCode;
     }
     const char *name = libinput_device_get_name(dev);
