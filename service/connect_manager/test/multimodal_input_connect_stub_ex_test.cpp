@@ -8128,5 +8128,135 @@ HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeHotkey_001, TestSize.Lev
     service->state_ = ServiceRunningState::STATE_RUNNING;
     EXPECT_NO_FATAL_FAILURE(stub->StubUnsubscribeHotkey(data, reply));
 }
+
+/**
+ * @tc.name: StubSubscribeLongPressEvent_001
+ * @tc.desc: Test the function StubSubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSubscribeLongPressEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubSubscribeLongPressEvent_002
+ * @tc.desc: Test the function StubSubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSubscribeLongPressEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubSubscribeLongPressEvent_003
+ * @tc.desc: Test the function StubSubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSubscribeLongPressEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubUnsubscribeLongPressEvent_001
+ * @tc.desc: Test the function StubUnsubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubUnsubscribeLongPressEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubUnsubscribeLongPressEvent_002
+ * @tc.desc: Test the function StubUnsubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubUnsubscribeLongPressEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubUnsubscribeLongPressEvent_003
+ * @tc.desc: Test the function StubUnsubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubUnsubscribeLongPressEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubSetClientInfo_002
+ * @tc.desc: Test the function StubSetClientInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetClientInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetClientInfo(data, reply));
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetClientInfo(data, reply));
+}
 } // namespace MMI
 } // namespace OHOS
