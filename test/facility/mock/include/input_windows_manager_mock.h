@@ -36,6 +36,7 @@ public:
     }
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>, int32_t));
+    MOCK_METHOD(bool, AdjustFingerFlag, (std::shared_ptr<PointerEvent>));
     void UpdateDisplayInfo(DisplayGroupInfo&) override {}
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo&, bool) override {}
     void UpdateWindowInfo(const WindowGroupInfo&) override {}

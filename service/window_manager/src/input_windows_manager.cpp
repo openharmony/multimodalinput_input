@@ -249,6 +249,10 @@ void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> 
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
         inputEventNormalizeHandler->HandleTouchEvent(tPointerEvent);
+        auto iter = touchItemDownInfos_.find(pointerId);
+        if (iter != touchItemDownInfos_.end()) {
+            iter->second.flag = false;
+        }
     }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
@@ -300,6 +304,16 @@ bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> point
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+bool InputWindowsManager::AdjustFingerFlag(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return false;
+    }
+    auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+    return (iter != touchItemDownInfos_.end() && !(iter->second.flag));
+}
+
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
