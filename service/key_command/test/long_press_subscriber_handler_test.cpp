@@ -16,6 +16,8 @@
 #include <gtest/gtest.h>
 #include "ipc_skeleton.h"
 
+#include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "long_press_subscriber_handler.h"
 #include "uds_session.h"
 
@@ -1037,6 +1039,373 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_StartFinge
 
     ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
     EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_StartFingerGesture_002
+ * @tc.desc: Verify if (!CheckFingerGestureAction(fingerCount))
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_StartFingerGesture_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+    int32_t subscribeId = 0;
+    LongPressRequest longPressRequest {
+        .fingerCount = 1,
+        .duration = 300,
+    };
+    int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
+    EXPECT_TRUE(ret >= 0);
+
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 320;
+    displayInfo.width = 1260;
+    displayInfo.height = 2720;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 600;
+    int32_t fingerCount = 1;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->StartFingerGesture(fingerCount));
+
+    ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
+    EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_CheckFingerGestureAction_001
+ * @tc.desc: Verify if (firstFinger.x <= leftLimit || firstFinger.x >= rightLimit ||
+ * firstFinger.y <= topLimit || firstFinger.y >= bottomLimit)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFingerGestureAction_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 320;
+    displayInfo.width = 1260;
+    displayInfo.height = 2720;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 600;
+    int32_t fingerCount = 1;
+    bool ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, true);
+
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 20;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 600;
+    ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 1250;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 600;
+    ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 10;
+    ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 2700;
+    ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_CheckFingerGestureAction_002
+ * @tc.desc: Verify if (secondFinger.x <= leftLimit || secondFinger.x >= rightLimit ||
+ * secondFinger.y <= topLimit || secondFinger.y >= bottomLimit)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFingerGestureAction_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 320;
+    displayInfo.width = 1260;
+    displayInfo.height = 2720;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    int32_t fingerCount = 2;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 600;
+    
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].x = 800;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].y = 600;
+    bool ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, true);
+
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].x = 10;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].y = 600;
+    ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].x = 1250;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].y = 600;
+    ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].x = 600;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].y = 10;
+    ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].x = 600;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].y = 2710;
+    ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_CheckFingerGestureAction_003
+ * @tc.desc: Verify if (distance < ConvertVPToPX(TWO_FINGERS_DISTANCE_LIMIT))
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFingerGestureAction_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 320;
+    displayInfo.width = 1260;
+    displayInfo.height = 2720;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    int32_t fingerCount = 2;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 600;
+    
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].x = 610;
+    LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[1].y = 600;
+    bool ret = LONG_PRESS_EVENT_HANDLER->CheckFingerGestureAction(fingerCount);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_InitSessionDeleteCallback_001
+ * @tc.desc: Verify if (callbackInitialized_)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_InitSessionDeleteCallback_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LONG_PRESS_EVENT_HANDLER->callbackInitialized_ = true;
+    bool ret = LONG_PRESS_EVENT_HANDLER->InitSessionDeleteCallback();
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_InitSessionDeleteCallback_002
+ * @tc.desc: Verify if (callbackInitialized_)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_InitSessionDeleteCallback_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LONG_PRESS_EVENT_HANDLER->callbackInitialized_ = false;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->InitSessionDeleteCallback());
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_ConvertVPToPX_001
+ * @tc.desc: Verify if (vp <= 0)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_ConvertVPToPX_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t vp = -1;
+    int32_t ret = LONG_PRESS_EVENT_HANDLER->ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+    ret = LONG_PRESS_EVENT_HANDLER->ConvertVPToPX(vp);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_ConvertVPToPX_002
+ * @tc.desc: Verify if (dpi <= 0)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_ConvertVPToPX_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t vp = 5;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = -1;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    int32_t ret = LONG_PRESS_EVENT_HANDLER->ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_GetBundleName_001
+ * @tc.desc: Verify if (userid < 0);
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_GetBundleName_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    int32_t currentUserId = -1;
+    inputWindowsManager->SetCurrentUser(currentUserId);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    std::string bundleName = "test";
+    int32_t windowPid = 0;
+    int32_t ret = LONG_PRESS_EVENT_HANDLER->GetBundleName(bundleName, windowPid);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_NotifySubscriber_001
+ * @tc.desc: Verify if (subscriber->sess_ == nullptr)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_NotifySubscriber_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<Subscriber> subscriber { nullptr };
+    int32_t result = 0;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->NotifySubscriber(subscriber, result));
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_NotifySubscriber_002
+ * @tc.desc: Verify if (windowPid == RET_ERR)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_NotifySubscriber_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+    int32_t subscribeId = 0;
+    LongPressRequest longPressRequest {
+        .fingerCount = 1,
+        .duration = 300,
+    };
+    auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, longPressRequest.fingerCount,
+        longPressRequest.duration);
+    auto pair = std::make_pair(longPressRequest.fingerCount, longPressRequest.duration);
+    LONG_PRESS_EVENT_HANDLER->subscriberInfos_[pair].push_back(subscriber);
+    int32_t result = 0;
+    UDSServer* udsServer = new UDSServer();
+    ASSERT_TRUE(udsServer != nullptr);
+    InputHandler->udsServer_ = udsServer;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->NotifySubscriber(subscriber, result));
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_NotifySubscriber_003
+ * @tc.desc: Verify if (GetBundleName(bundleName, windowPid) == RET_ERR)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_NotifySubscriber_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+    int32_t subscribeId = 0;
+    LongPressRequest longPressRequest {
+        .fingerCount = 1,
+        .duration = 300,
+    };
+    auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, longPressRequest.fingerCount,
+        longPressRequest.duration);
+    auto pair = std::make_pair(longPressRequest.fingerCount, longPressRequest.duration);
+    LONG_PRESS_EVENT_HANDLER->subscriberInfos_[pair].push_back(subscriber);
+    int32_t result = 0;
+    UDSServer* udsServer = new UDSServer();
+    ASSERT_TRUE(udsServer != nullptr);
+    InputHandler->udsServer_ = udsServer;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->NotifySubscriber(subscriber, result));
+}
+
+/**
+ * @tc.name: LongPressSubscribeHandlerTest_NotifySubscriber_004
+ * @tc.desc: Verify if (GetBundleName(bundleName, windowPid) == RET_ERR)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_NotifySubscriber_004,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
+        UDS_PID);
+    int32_t subscribeId = 0;
+    LongPressRequest longPressRequest {
+        .fingerCount = 1,
+        .duration = 300,
+    };
+
+    WindowInfo windowInfo;
+    windowInfo.id = 10000;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    auto pointerEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    int32_t pointerId = 0;
+    bool ret = pointerEvent->GetPointerItem(pointerId, item);
+    ASSERT_TRUE(ret);
+    item.SetTargetWindowId(windowInfo.id);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    LONG_PRESS_EVENT_HANDLER->touchEvent_ = pointerEvent;
+
+    auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, longPressRequest.fingerCount,
+        longPressRequest.duration);
+    auto pair = std::make_pair(longPressRequest.fingerCount, longPressRequest.duration);
+    LONG_PRESS_EVENT_HANDLER->subscriberInfos_[pair].push_back(subscriber);
+    int32_t result = 0;
+    UDSServer* udsServer = new UDSServer();
+    ASSERT_TRUE(udsServer != nullptr);
+    InputHandler->udsServer_ = udsServer;
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->NotifySubscriber(subscriber, result));
 }
 } // namespace MMI
 } // namespace OHOS
