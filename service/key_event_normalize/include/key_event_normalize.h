@@ -47,6 +47,7 @@ private:
         {SHIELD_MODE::OOBE_MODE, false},
     };
     int32_t lastShieldMode_ { -1 };
+    std::mutex mtx_;
 };
 #define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventNormalize>::GetInstance()
 } // namespace MMI

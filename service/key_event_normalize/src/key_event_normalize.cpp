@@ -153,24 +153,23 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
 
 int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
-    MMI_HILOGD("Last shield mode:%{public}d, set shield mode:%{public}d, status:%{public}d",
+    std::lock_guard<std::mutex> guard(mtx_);
+    MMI_HILOGI("Last shield mode:%{public}d, set shield mode:%{public}d, status:%{public}d",
         lastShieldMode_, shieldMode, isShield);
     auto iter = shieldStatus_.find(lastShieldMode_);
     if (isShield) {
         if (lastShieldMode_ == shieldMode) {
-            MMI_HILOGD("Last shield mode equal with shield mode");
-            return RET_OK;
+            MMI_HILOGI("Last shield mode equal with shield mode");
         } else if (iter != shieldStatus_.end()) {
             iter->second = false;
         } else {
-            MMI_HILOGD("Last shield mode unset");
+            MMI_HILOGI("Last shield mode unset");
         }
         lastShieldMode_ = shieldMode;
     } else if (lastShieldMode_ != shieldMode) {
-        MMI_HILOGD("Shield mode:%{public}d is already false", shieldMode);
-        return RET_OK;
+        MMI_HILOGI("Shield mode:%{public}d is already false", shieldMode);
     } else {
-        MMI_HILOGD("lastShieldMode_ unset");
+        MMI_HILOGI("lastShieldMode_ unset");
         lastShieldMode_ = SHIELD_MODE::UNSET_MODE;
     }
     iter = shieldStatus_.find(shieldMode);
@@ -179,7 +178,7 @@ int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
         return RET_ERR;
     }
     iter->second = isShield;
-    MMI_HILOGD("Last shield mode:%{public}d, set shield mode:%{public}d, status:%{public}d",
+    MMI_HILOGI("Last shield mode:%{public}d, set shield mode:%{public}d, status:%{public}d",
         lastShieldMode_, shieldMode, isShield);
     return RET_OK;
 }
@@ -187,24 +186,27 @@ int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
 int32_t KeyEventNormalize::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     auto iter = shieldStatus_.find(shieldMode);
     if (iter == shieldStatus_.end()) {
         MMI_HILOGE("Find shieldMode:%{public}d failed", shieldMode);
         return RET_ERR;
     }
     isShield = iter->second;
-    MMI_HILOGD("Last shield mode:%{public}d, get shield mode:%{public}d, status:%{public}d",
+    MMI_HILOGI("Last shield mode:%{public}d, get shield mode:%{public}d, status:%{public}d",
         lastShieldMode_, shieldMode, isShield);
     return RET_OK;
 }
 
 int32_t KeyEventNormalize::GetCurrentShieldMode()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     return lastShieldMode_;
 }
 
 void KeyEventNormalize::SetCurrentShieldMode(int32_t shieldMode)
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     lastShieldMode_ = shieldMode;
 }
 
