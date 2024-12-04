@@ -67,6 +67,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId) = 0;
+    virtual bool AdjustFingerFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     virtual void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo) = 0;
     virtual void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
