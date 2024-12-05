@@ -90,11 +90,11 @@ int32_t LongPressSubscriberHandler::UnsubscribeLongPressEvent(SessionPtr sess, i
         for (auto iter = subscribers.begin(); iter != subscribers.end(); ++iter) {
             if ((*iter)->sess_ == sess && (*iter)->id_ == subscribeId) {
                 subscribers.erase(iter);
+                auto fingerCount = it->first.first;
+                auto duration = it->first.second;
                 if (subscribers.empty()) {
                     subscriberInfos_.erase(it);
                 }
-                auto fingerCount = it->first.first;
-                auto duration = it->first.second;
                 RemoveDurationTimer(fingerCount, duration);
                 RemoveSessSubscriber(sess, subscribeId);
                 MMI_HILOGD("UnsubscribeLongPressEvent successed with %{public}d", subscribeId);
