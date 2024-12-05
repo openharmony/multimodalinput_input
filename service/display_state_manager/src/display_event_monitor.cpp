@@ -112,11 +112,12 @@ public:
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGI("Shield mode before screen on:%{public}d", shieldModeBeforeSreenOff_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(shieldModeBeforeSreenOff_);
     } else {
-        MMI_HILOGD("Shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("Shield mode before screen on:%{public}d", shieldModeBeforeSreenOff_);
     }
 #else
     MMI_HILOGW("Keyboard device does not support");
@@ -126,6 +127,7 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGI("Shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     shieldModeBeforeSreenOff_ = KeyEventHdr->GetCurrentShieldMode();
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
