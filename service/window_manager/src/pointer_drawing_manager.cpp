@@ -890,21 +890,27 @@ int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
     }
     return RequestNextVSync();
 }
-
-bool PointerDrawingManager::RetryGetSurfaceBuffer(sptr<OHOS::SurfaceBuffer> buffer, sptr<OHOS::Surface> layer)
+//
+sptr<OHOS::SurfaceBuffer> PointerDrawingManager::RetryGetSurfaceBuffer(sptr<OHOS::SurfaceBuffer> &buffer, sptr<OHOS::Surface> layer)
 {
-    bool ret = true;
+    
     if (hardwareCursorPointerManager_->IsSupported()) {
+        bool retried = false; 
         for (size_t i = 0; i < RETRY_TIMES; i++) {
             buffer = GetSurfaceBuffer(layer);
             if (buffer != nullptr && buffer->GetVirAddr() != nullptr) {
-                ret = false;
-                break;
+                retried = true;
+                return buffer;
             }
         }
+
+        if (!retried) {
+            MMI_HILOGE("Failed to get surface buffer after retries.");
+        }
     }
-    return ret;
+    return buffer;
 }
+
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
@@ -958,9 +964,10 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (RetryGetSurfaceBuffer(buffer, layer)) {
-            return RET_OK;
-        }
+    auto buffer = RetryGetSurfaceBuffer(buffer, layer);
+    if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
+        return RET_ERR;
+    }
 #else
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
