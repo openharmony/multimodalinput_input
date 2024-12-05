@@ -979,7 +979,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     }
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-    CHKPV(addr);
+    CHKPR(addr, RET_ERR);
     DoDraw(addr, buffer->GetWidth(), buffer->GetHeight(), mouseStyle);
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -1856,6 +1856,7 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(addr);
     currentFrame_ = 0;
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
