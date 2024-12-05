@@ -35,6 +35,8 @@ constexpr size_t MAX_EVENTIDS_SIZE = 1001;
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
+constexpr int32_t THREE_FINGERS { 3 };
+constexpr int32_t FOUR_FINGERS { 4 };
 } // namespace
 
 class EventMonitorHandlerTest : public testing::Test {
@@ -1034,6 +1036,172 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsRotate, TestSize.Lev
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
     ret = monitorCollection.IsRotate(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsThreeFingersSwipe
+ * @tc.desc: Test IsThreeFingersSwipe
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsThreeFingersSwipe, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    bool ret = false;
+    ret = monitorCollection.IsThreeFingersSwipe(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    ret = monitorCollection.IsThreeFingersSwipe(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsFourFingersSwipe
+ * @tc.desc: Test IsFourFingersSwipe
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFourFingersSwipe, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    bool ret = false;
+    ret = monitorCollection.IsFourFingersSwipe(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    pointerEvent->SetFingerCount(FOUR_FINGERS);
+    ret = monitorCollection.IsFourFingersSwipe(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsThreeFingersTap
+ * @tc.desc: Test IsThreeFingersTap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsThreeFingersTap, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    bool ret = false;
+    ret = monitorCollection.IsThreeFingersTap(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    ret = monitorCollection.IsThreeFingersTap(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendToClient_01
+ * @tc.desc: Test CheckIfNeedSendToClient
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClient_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_FINGERPRINT;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
+    bool ret = false;
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_SWIPEINWARD;
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_MOUSE;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_PINCH;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_THREEFINGERSSWIP;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendToClient_02
+ * @tc.desc: Test CheckIfNeedSendToClient
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClient_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_FOURFINGERSSWIP;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    pointerEvent->SetFingerCount(FOUR_FINGERS);
+    bool ret = false;
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_ROTATE;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_THREEFINGERSTAP;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 }
 } // namespace MMI
