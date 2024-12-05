@@ -894,20 +894,13 @@ int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
 sptr<OHOS::SurfaceBuffer> PointerDrawingManager::RetryGetSurfaceBuffer(
     sptr<OHOS::SurfaceBuffer> &buffer, sptr<OHOS::Surface> layer)
 {
-    if (buffer != nullptr || buffer->GetVirAddr() != nullptr) {
-        return buffer;
-    }
+    sptr<OHOS::SurfaceBuffer> buffer;
     if (hardwareCursorPointerManager_->IsSupported()) {
-        bool retried = false; 
         for (size_t i = 0; i < RETRY_TIMES; i++) {
             buffer = GetSurfaceBuffer(layer);
             if (buffer != nullptr && buffer->GetVirAddr() != nullptr) {
-                retried = true;
                 return buffer;
             }
-        }
-        if (!retried) {
-            MMI_HILOGE("Failed to get surface buffer after retries.");
         }
     }
     return buffer;
@@ -966,7 +959,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        buffer = RetryGetSurfaceBuffer(buffer, layer);
+        buffer = RetryGetSurfaceBuffer(layer);
         if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
             return RET_ERR;
         }
