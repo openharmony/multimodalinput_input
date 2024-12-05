@@ -5624,6 +5624,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseStatusConfigObserver_
     sequence.abilityStartDelay = 2;
     sequence.timerId = 2;
     handler.sequences_.push_back(sequence);
+    ASSERT_NO_FATAL_FAILURE(handler.ParseStatusConfigObserver());
 }
 
 /**
