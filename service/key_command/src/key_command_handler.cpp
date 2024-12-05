@@ -1766,6 +1766,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
         }
         repeatTimerId_ = TimerMgr->AddTimer(intervalTime / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
+            repeatTimerId_ = -1;
         });
         if (repeatTimerId_ < 0) {
             return false;
@@ -1863,6 +1864,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     if (lastMatchedKey_.timerId >= 0) {
         MMI_HILOGD("Remove timer:%{public}d", lastMatchedKey_.timerId);
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
+        lastMatchedKey_.timerId = -1;
     }
     ResetLastMatchedKey();
     if (MatchShortcutKeys(keyEvent)) {
@@ -2086,10 +2088,11 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
 
 bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility)
 {
-    sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, sequence] () {
+    sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, &sequence] () {
         MMI_HILOGI("Timer callback");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        sequence.timerId = -1;
         BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
@@ -2112,10 +2115,11 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
         isLaunchAbility = true;
         return true;
     }
-    sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
+    sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, &sequence] () {
         MMI_HILOGI("Timer callback");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        sequence.timerId = -1;
         BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
@@ -2238,8 +2242,9 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         BytraceAdapter::StopLaunchAbility();
         return true;
     }
-    shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
+    shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, &shortcutKey] () {
         MMI_HILOGI("Timer callback");
+        shortcutKey.timerId = -1;
 #ifdef SHORTCUT_KEY_RULES_ENABLED
         KEY_SHORTCUT_MGR->MarkShortcutConsumed(shortcutKey);
 #endif // SHORTCUT_KEY_RULES_ENABLED
@@ -2387,6 +2392,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
             repeatKeyCountMap_.clear();
             sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
                 isFreezePowerKey_ = false;
+                sosDelayTimerId_ = -1;
                 MMI_HILOGW("Timeout, restore the power button");
             });
             if (sosDelayTimerId_ < 0) {
