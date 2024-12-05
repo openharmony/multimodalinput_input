@@ -970,7 +970,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
             return RET_ERR;
         }
 #else
-        surfaceNode_->DetachToDispapply lay(screenId_);
+        surfaceNode_->DetachToDispapplylay(screenId_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
@@ -979,6 +979,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     }
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
+    CHKPV(addr);
     DoDraw(addr, buffer->GetWidth(), buffer->GetHeight(), mouseStyle);
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
