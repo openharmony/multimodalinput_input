@@ -1461,9 +1461,11 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
 {
     auto width = info.width;
     auto height = info.height;
-    if (info.direction == DIRECTION90 || info.direction == DIRECTION270) {
-        width = info.height;
-        height = info.width;
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        if (info.direction == DIRECTION90 || info.direction == DIRECTION270) {
+            width = info.height;
+            height = info.width;
+        }
     }
     PhysicalCoordinate coord {
         .x = libinput_event_touch_get_x_transformed(touch, width),
@@ -1898,6 +1900,12 @@ void InputWindowsManager::AdjustDisplayCoordinate(
 {
     int32_t width = displayInfo.width;
     int32_t height = displayInfo.height;
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
+            width = displayInfo.height;
+            height = displayInfo.width;
+        }
+    }
     if (physicalX <= 0) {
         physicalX = 0;
     }
