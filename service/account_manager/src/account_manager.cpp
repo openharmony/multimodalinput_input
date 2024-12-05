@@ -78,6 +78,7 @@ AccountManager::AccountSetting::~AccountSetting()
 {
     if (timerId_ >= 0) {
         TimerMgr->RemoveTimer(timerId_);
+        timerId_ = -1;
     }
     auto &setting = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     if (switchObserver_ != nullptr) {
@@ -183,6 +184,7 @@ void AccountManager::AccountSetting::InitializeSetting()
     if ((switchObserver_ == nullptr) || (onScreenLockedSwitchObserver_ == nullptr) || (configObserver_ == nullptr)) {
         timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
             InitializeSetting();
+            timerId_ = -1;
         });
         if (timerId_ < 0) {
             MMI_HILOGE("AddTimer fail, setting will not work");
@@ -310,6 +312,7 @@ AccountManager::~AccountManager()
     UnsubscribeCommonEvent();
     if (timerId_ >= 0) {
         TimerMgr->RemoveTimer(timerId_);
+        timerId_ = -1;
     }
     accounts_.clear();
 }
@@ -368,6 +371,7 @@ void AccountManager::SubscribeCommonEvent()
     MMI_HILOGI("SubscribeCommonEvent fail, retry later");
     timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
         SubscribeCommonEvent();
+        timerId_ = -1;
     });
     if (timerId_ < 0) {
         MMI_HILOGE("AddTimer fail, SubscribeCommonEvent fail");

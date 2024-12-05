@@ -872,6 +872,7 @@ bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscribe
         MMI_HILOGD("Timer callback");
         auto subscriber = weakSubscriber.lock();
         CHKPV(subscriber);
+        subscriber->timerId_ = -1;
         OnTimer(subscriber);
     });
 
