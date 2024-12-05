@@ -770,6 +770,7 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 {
     CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+        timerId_ = -1;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto keyEvent = KeyEventHdr->GetKeyEvent();
         CHKPV(keyEvent);

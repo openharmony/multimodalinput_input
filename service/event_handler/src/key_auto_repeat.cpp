@@ -168,6 +168,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 {
     CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+        timerId_ = -1;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
@@ -237,6 +238,7 @@ void KeyAutoRepeat::RemoveTimer()
 {
     CALL_DEBUG_ENTER;
     TimerMgr->RemoveTimer(timerId_);
+    timerId_ = -1;
 }
 
 int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t delay)
