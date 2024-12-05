@@ -970,7 +970,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
             return RET_ERR;
         }
 #else
-        surfaceNode_->DetachToDispapplylay(screenId_);
+        surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
