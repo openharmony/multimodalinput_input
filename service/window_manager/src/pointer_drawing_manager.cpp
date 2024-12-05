@@ -891,7 +891,8 @@ int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
     return RequestNextVSync();
 }
 
-sptr<OHOS::SurfaceBuffer> PointerDrawingManager::RetryGetSurfaceBuffer(sptr<OHOS::SurfaceBuffer> &buffer, sptr<OHOS::Surface> layer)
+sptr<OHOS::SurfaceBuffer> PointerDrawingManager::RetryGetSurfaceBuffer(
+    sptr<OHOS::SurfaceBuffer> &buffer, sptr<OHOS::Surface> layer)
 {
     if (buffer != nullptr || buffer->GetVirAddr() != nullptr) {
         return buffer;
