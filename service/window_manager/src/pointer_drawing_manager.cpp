@@ -891,20 +891,21 @@ int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
     return RequestNextVSync();
 }
 
-bool PointerDrawingManager::RetryGetSurfaceBuffer(sptr<OHOS::SurfaceBuffer> buffer, sptr<OHOS::Surface> layer)
+sptr<OHOS::SurfaceBuffer> PointerDrawingManager::RetryGetSurfaceBuffer(
+    sptr<OHOS::SurfaceBuffer> &buffer, sptr<OHOS::Surface> layer)
 {
-    bool ret = true;
+    sptr<OHOS::SurfaceBuffer> buffer;
     if (hardwareCursorPointerManager_->IsSupported()) {
         for (size_t i = 0; i < RETRY_TIMES; i++) {
             buffer = GetSurfaceBuffer(layer);
             if (buffer != nullptr && buffer->GetVirAddr() != nullptr) {
-                ret = false;
-                break;
+                return buffer;
             }
         }
     }
-    return ret;
+    return buffer;
 }
+
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
@@ -958,8 +959,9 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (RetryGetSurfaceBuffer(buffer, layer)) {
-            return RET_OK;
+        buffer = RetryGetSurfaceBuffer(layer);
+        if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
+            return RET_ERR;
         }
 #else
         surfaceNode_->DetachToDisplay(screenId_);
@@ -971,6 +973,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     }
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
+    CHKPR(addr, RET_ERR);
     DoDraw(addr, buffer->GetWidth(), buffer->GetHeight(), mouseStyle);
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -1847,6 +1850,7 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(addr);
     currentFrame_ = 0;
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
