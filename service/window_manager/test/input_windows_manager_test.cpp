@@ -57,6 +57,7 @@ public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void) {};
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
+    static SessionPtr CreateSessionPtr();
     void SetUp(void)
     {
         // 创建displayGroupInfo_
@@ -141,6 +142,17 @@ std::shared_ptr<Media::PixelMap> InputWindowsManagerTest::CreatePixelMap(int32_t
     }
     delete[] pixelColors;
     return pixelMap;
+}
+
+SessionPtr InputWindowsManagerTest::CreateSessionPtr()
+{
+    CALL_DEBUG_ENTER;
+    std::string programName = "uds_sesion_test";
+    int32_t moduleType = 3;
+        int32_t fd = -1;
+    int32_t uidRoot = 0;
+    int32_t pid = 9;
+    return std::make_shared<UDSSession>(programName, moduleType, fd, uidRoot, pid);
 }
 
 /**
@@ -6954,6 +6966,74 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_005, 
     EXPECT_EQ(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
     EXPECT_EQ(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ReissueEvent_001
+ * @tc.desc: Verify if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_CANCEL && focusWindowId_ != -1 &&
+ * focusWindowId_ != focusWindowId && keyEvent->IsRepeatKey())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    InputWindowsManager inputWindowsManager;
+    int32_t focusWindowId = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ReissueEvent(keyEvent, focusWindowId));
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    focusWindowId = -1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ReissueEvent(keyEvent, focusWindowId));
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    focusWindowId = 0;
+    inputWindowsManager.focusWindowId_ = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ReissueEvent(keyEvent, focusWindowId));
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    focusWindowId = 0;
+    inputWindowsManager.focusWindowId_ = -1;
+    keyEvent->SetRepeatKey(true);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ReissueEvent(keyEvent, focusWindowId));
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    focusWindowId = 0;
+    inputWindowsManager.focusWindowId_ = -1;
+    keyEvent->SetRepeatKey(false);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ReissueEvent(keyEvent, focusWindowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_JudgeCaramaInFore_001
+ * @tc.desc: Verify if (udsServer_ == nullptr)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgeCaramaInFore_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    EXPECT_EQ(inputWindowsManager.JudgeCaramaInFore(), false);
+
+    UDSServer udsServer;
+    inputWindowsManager.udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager.udsServer_, nullptr);
+    EXPECT_EQ(inputWindowsManager.JudgeCaramaInFore(), false);
+
+    int32_t udsPid = 20;
+    int32_t udsFd = 15;
+    udsServer.idxPidMap_.insert(std::make_pair(udsPid, udsFd));
+    SessionPtr session = CreateSessionPtr();
+    udsServer.sessionsMap_.insert(std::make_pair(udsPid, session));
+
+    WindowInfo windowInfo;
+    windowInfo.id = 20;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.displayGroupInfo_.focusWindowId = 20;
+    EXPECT_EQ(inputWindowsManager.JudgeCaramaInFore(), false);
 }
 } // namespace MMI
 } // namespace OHOS
