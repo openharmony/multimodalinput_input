@@ -1221,21 +1221,6 @@ public:
          * @since 12
          */
         int32_t GetRawDisplayY() const;
-
-        /**
-         * @brief Obtains the blobid in this event.
-         * @return Returns the blobid.
-         * @since 12
-         */
-        int32_t GetBlobId() const;
-        
-        /**
-         * @brief Sets the blobid in this event.
-         * @param blobId Indicates the blobid to set.
-         * @return void
-         * @since 12
-         */
-        void SetBlobId(int32_t blobId);
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
@@ -1270,7 +1255,6 @@ public:
         int32_t rawDy_ {};
         int32_t rawDisplayX_ {};
         int32_t rawDisplayY_ {};
-        int32_t blobId_ {};
     };
 
 public:
