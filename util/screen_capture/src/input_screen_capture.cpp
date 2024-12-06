@@ -29,14 +29,14 @@ namespace {
 sptr<InputScreenCaptureMonitorListener> g_screenCaptureMonitorListener { nullptr };
 }
 
-extern "C" int32_t IsScreenCaptureWorking()
+extern "C" int32_t IsScreenCaptureWorking(int32_t capturePid)
 {
     std::list<int32_t> pidList = Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
-    int32_t pid = -1;
-    if (!pidList.empty()) {
-        pid = pidList.front();
+    auto iter = std::find(pidList.begin(), pidList.end(), capturePid);
+    if (iter != pidList.end()) {
+        return true;
     }
-    return pid;
+    return false;
 }
 
 extern "C" void RegisterListener(ScreenCaptureCallback callback)

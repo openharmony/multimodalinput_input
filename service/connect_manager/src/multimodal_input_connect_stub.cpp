@@ -1204,9 +1204,8 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         if (handlerType == InputHandlerType::MONITOR) {
 #ifdef PLAYER_FRAMEWORK_EXISTS
             int32_t pid = GetCallingPid();
-            std::list<int32_t> pidList = InputScreenCaptureAgent::GetInstance().IsScreenCaptureWorking();
-            auto capturePid = std::find(pidList.begin(), pidList.end(), pid);
-            if (capturePid != pidList.end()) {
+            bool ret = InputScreenCaptureAgent::GetInstance().IsScreenCaptureWorking(pid);
+            if (!ret) {
                 MMI_HILOGE("Calling pid is: %{public}d", pid);
                 return ERROR_NO_PERMISSION;
             }
