@@ -31,7 +31,7 @@ static mut COMPENSATE_VALUEX: f64 = 0.0;
 static mut COMPENSATE_VALUEY: f64 = 0.0;
 static MOUSE_DPI: f64 = 800.0;
 static MS_2_US: f64 = 1000.0;
-static MOUSE_GAIN_TYPE: i32 = 1；
+static MOUSE_GAIN_TYPE: i32 = 1;
 
 struct CurveItem {
     pub speeds: Vec<f64>,
