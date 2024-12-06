@@ -5684,5 +5684,24 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_02, TestS
     bool ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
     ASSERT_FALSE(ret);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_PreHandleEvent_02
+ * @tc.desc: Test the funcation PreHandleEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+
+    handler.isParseConfig_ = false;
+    handler.isParseLongPressConfig_ = false;
+    handler.isParseMaxCount_ = false;
+    bool ret = false;
+    ret = handler.PreHandleEvent();
+    ASSERT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS

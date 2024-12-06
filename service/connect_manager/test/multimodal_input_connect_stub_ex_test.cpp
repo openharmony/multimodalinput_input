@@ -7095,7 +7095,8 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddVirtualInputDevice_004, TestSize
     EXPECT_CALL(*messageParcelMock_, ReadString(_))
         .WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint64(_))
+        .WillOnce(Return(true)).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadUint32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
     EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
@@ -7986,7 +7987,10 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSkipPointerLayer_001, TestSize.Leve
 HWTEST_F(MultimodalInputConnectStubTest, StubSkipPointerLayer_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_))
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;

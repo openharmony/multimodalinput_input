@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <cstdio>
 #include <gtest/gtest.h>
 
 #include "event_statistic.h"
@@ -24,109 +23,119 @@
 
 namespace OHOS {
 namespace MMI {
-using namespace testing;
+namespace {
 using namespace testing::ext;
+constexpr int32_t EVENT_OUT_SIZE = 30;
+} // namespace
 
 class EventStatisticTest : public testing::Test {
 public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+    void SetUp() {}
+    void TearDown() {}
 };
 
-void EventStatisticTest::SetUpTestCase(void)
-{}
-
-void EventStatisticTest::TearDownTestCase(void)
-{}
-
-void EventStatisticTest::SetUp()
-{}
-
-void EventStatisticTest::TearDown()
-{}
-
 /**
- * @tc.name: EventStatisticTest_PushPointerEvent_01
- * @tc.desc: Test PushPointerEvent
+ * @tc.name: EventDumpTest_ConvertEventToStr
+ * @tc.desc: Event dump ConvertEventToStr
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerEvent_01, TestSize.Level1)
+HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertEventToStr, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    auto inputEvent = std::make_shared<InputEvent>(3);
+    inputEvent->eventType_ = 3;
+    inputEvent->actionTime_ = 280000000;
+    inputEvent->deviceId_ = 2;
+    inputEvent->sourceType_ = 6;
+    std::string str = "";
+    str = eventStatistic.ConvertEventToStr(inputEvent);
+    ASSERT_FALSE(str.empty());
+}
+
+/**
+ * @tc.name: EventDumpTest_ConvertTimeToStr
+ * @tc.desc: Event dump ConvertTimeToStr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertTimeToStr, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    int64_t time = -1;
+    std::string str = "";
+    str = eventStatistic.ConvertTimeToStr(time);
+    ASSERT_EQ(str, "1970-01-01 07:59:59");
+
+    time = 280000000;
+    str = eventStatistic.ConvertTimeToStr(time);
+    ASSERT_EQ(str, "1978-11-16 01:46:40");
+}
+
+/**
+ * @tc.name: EventDumpTest_PushPointerEvent
+ * @tc.desc: Event dump PushPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerEvent, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventStatistic eventStatistic;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
-    pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
+    pointerEvent->SetAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->bitwise_ = 0x000040;
+    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushPointerEvent(pointerEvent));
+
+    pointerEvent->SetAction(PointerEvent::POINTER_ACTION_DOWN);
     ASSERT_NO_FATAL_FAILURE(eventStatistic.PushPointerEvent(pointerEvent));
 }
 
 /**
- * @tc.name: EventStatisticTest_PushPointerEvent_02
- * @tc.desc: Test PushPointerEvent
+ * @tc.name: EventDumpTest_PushEvent
+ * @tc.desc: Event dump PushEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerEvent_02, TestSize.Level1)
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushEvent, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventStatistic eventStatistic;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
-    pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
-    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushPointerEvent(pointerEvent));
-}
-
-/**
- * @tc.name: EventStatisticTest_PopEvent_02
- * @tc.desc: Test PopEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventStatisticTest, EventStatisticTest_PopEvent_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventStatistic eventStatistic;
-    eventStatistic.eventQueue_.push("event1");
-    eventStatistic.eventQueue_.push("event2");
-    eventStatistic.eventQueue_.push("event3");
-    ASSERT_NO_FATAL_FAILURE(eventStatistic.PopEvent());
-}
-
-/**
- * @tc.name: EventStatisticTest_ConvertTimeToStr_01
- * @tc.desc: Test ConvertTimeToStr
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertTimeToStr_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventStatistic eventStatistic;
-    int64_t timestamp = 50000;
-    ASSERT_NO_FATAL_FAILURE(eventStatistic.ConvertTimeToStr(timestamp));
-}
-
-/**
- * @tc.name: EventStatisticTest_PushEvent_01
- * @tc.desc: Test PushEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventStatisticTest, EventStatisticTest_PushEvent_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventStatistic eventStatistic;
-    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
-    EXPECT_NE(inputEvent, nullptr);
-    EventStatistic::writeFileEnabled_ = true;
+    auto inputEvent = std::make_shared<InputEvent>(3);
+    eventStatistic.writeFileEnabled_ = true;
     ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEvent(inputEvent));
-    EventStatistic::writeFileEnabled_ = false;
+
+    for (auto i = 0; i < EVENT_OUT_SIZE - 1; i++) {
+        auto inputEvent1 = std::make_shared<InputEvent>(2);
+        eventStatistic.dumperEventList_.push_back(EventStatistic::ConvertEventToStr(inputEvent1));
+    }
+    eventStatistic.writeFileEnabled_ = false;
+    auto inputEvent2 = std::make_shared<InputEvent>(1);
     ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEvent(inputEvent));
 }
-} // namespace MMI
-} // namespace OHOS
+
+/**
+ * @tc.name: EventDumpTest_Dump
+ * @tc.desc: Event dump Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_Dump, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    int32_t fd = 18;
+    std::vector<std::string> dumpStr;
+    for (auto i = 0; i < 5; i++) {
+        std::string str = "EventStatistic Test Dump ";
+        eventStatistic.dumperEventList_.push_back(str);
+        dumpStr.push_back(str);
+    }
+    ASSERT_NO_FATAL_FAILURE(eventStatistic.Dump(fd, dumpStr));
+}
+} // OHOS
+} // MMI
