@@ -348,7 +348,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
             (point->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END);
         if (isTrue) {
             MMI_HILOGE("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
-            "action:%{public}d)", point->GetDeviceId(), point->GetPointerAction());
+                "action:%{public}d)", point->GetDeviceId(), point->GetPointerAction());
         }
         MMI_HILOGD("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
             "action:%{public}s)", point->GetDeviceId(), point->DumpPointerAction());
