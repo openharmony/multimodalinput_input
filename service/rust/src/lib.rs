@@ -781,7 +781,7 @@ fn get_speed_dynamic_gain_mouse_new(vin: f64, gain: *mut f64, speed: i32, displa
     let speeds_radio = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
                         1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0];
     let slow_gain_params = [1.0342, 0.7127, 2.5814, 0.02];
-    let fast_gain_params = [1.3556, 2.5417, 6.1275, 13.2323];
+    let fast_gain_params = [1.3556, 2.5417, 6.1275, 3.2323];
     let standard_ppi = 264.16;
     unsafe {
         let ppi_ratio: f64 = display_ppi / standard_ppi;
