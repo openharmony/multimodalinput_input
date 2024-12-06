@@ -789,7 +789,8 @@ int32_t JsInputMonitor::TransformSwipeInwardEvent(std::shared_ptr<PointerEvent> 
             actionValue = GESTURE_UPDATE;
             break;
         }
-        case PointerEvent::POINTER_ACTION_UP: {
+        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_CANCEL: {
             actionValue = GESTURE_END;
             break;
         }
@@ -1816,7 +1817,8 @@ bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
         return false;
     } else if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
         MMI_HILOGE("Failed to do swipe inward, wrong action");
         return false;
     }
