@@ -61,7 +61,8 @@ public:
         TOUCHPAD_PINCH_SETTING,
         TOUCHPAD_POINTER_SPEED_SETTING,
         TOUCHPAD_RIGHT_CLICK_SETTING,
-        TOUCHPAD_ROTATE_SETTING
+        TOUCHPAD_ROTATE_SETTING,
+        TOUCHPAD_DOUBLE_TAP_DRAG_SETTING,
     };
 
     static void OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);

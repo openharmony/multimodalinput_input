@@ -137,6 +137,8 @@ enum class MultimodalinputConnectInterfaceCode {
     UNSUBSCRIBE_HOT_KEY = 304,
     SUBSCRIBE_LONG_PRESS = 305,
     UNSUBSCRIBE_LONG_PRESS = 306,
+    SET_DOUBLE_TAP_DRAG_STATE = 307,
+    GET_DOUBLE_TAP_DRAG_STATE = 308,
 };
 
 enum class MultimodalinputEventObserverCode {
