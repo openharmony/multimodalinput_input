@@ -361,7 +361,8 @@ HWTEST_F(InputWindowsManagerTest, PointerDrawingManagerOnDisplayInfo_007, TestSi
 
 /**
  * @tc.name: SendPointerEvent_001
- * @tc.desc: Test the function SendPointerEvent
+ * @tc.desc: Verify if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
+ * Rosen::SceneBoardJudgement::IsSceneBoardEnabled())
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -394,7 +395,8 @@ HWTEST_F(InputWindowsManagerTest, SendPointerEvent_001, TestSize.Level1)
 
 /**
  * @tc.name: SendPointerEvent_002
- * @tc.desc: Test the function SendPointerEvent
+ * @tc.desc: Verify if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
+ * Rosen::SceneBoardJudgement::IsSceneBoardEnabled())
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -412,6 +414,39 @@ HWTEST_F(InputWindowsManagerTest, SendPointerEvent_002, TestSize.Level1)
     ASSERT_NE(inputWindowsManager, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_ENTER_WINDOW ;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager->extraData_.appended = false;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendPointerEvent(pointerAction));
+    inputWindowsManager->udsServer_ = nullptr;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.clear();
+    inputWindowsManager->extraData_.sourceType = -1;
+}
+
+/**
+ * @tc.name: SendPointerEvent_003
+ * @tc.desc: Verify if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
+ * Rosen::SceneBoardJudgement::IsSceneBoardEnabled())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SendPointerEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
+
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     DisplayInfo displayInfo;
     displayInfo.id = 10;
@@ -420,6 +455,64 @@ HWTEST_F(InputWindowsManagerTest, SendPointerEvent_002, TestSize.Level1)
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendPointerEvent(pointerAction));
     inputWindowsManager->udsServer_ = nullptr;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.clear();
+    inputWindowsManager->extraData_.sourceType = -1;
+}
+
+/**
+ * @tc.name: SendPointerEvent_004
+ * @tc.desc: Verify if (!UpdateDisplayId(displayId))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SendPointerEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
+
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_ENTER_WINDOW;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendPointerEvent(pointerAction));
+    inputWindowsManager->udsServer_ = nullptr;
+}
+
+/**
+ * @tc.name: SendPointerEvent_005
+ * @tc.desc: Verify if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SendPointerEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
+
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendPointerEvent(pointerAction));
+    inputWindowsManager->udsServer_ = nullptr;
+    inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->displayGroupInfo_.displaysInfo.clear();
     inputWindowsManager->extraData_.sourceType = -1;
 }
