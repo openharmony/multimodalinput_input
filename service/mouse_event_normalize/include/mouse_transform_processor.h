@@ -141,7 +141,7 @@ public:
     static int32_t GetMouseScrollRows();
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
-    static int32_t SetPointerLocation(int32_t x, int32_t y);
+    static int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1);
     static int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag);
     static void GetTouchpadScrollSwitch(bool &switchFlag);
     static int32_t SetTouchpadScrollDirection(bool state);

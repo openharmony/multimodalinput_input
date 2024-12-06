@@ -1998,13 +1998,13 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
+int32_t MMIService::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
-        [x, y] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetPointerLocation(x, y);
+        [x, y, displayId] {
+            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetPointerLocation(x, y, displayId);
         }
         );
     if (ret != RET_OK) {

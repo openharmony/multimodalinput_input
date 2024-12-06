@@ -385,9 +385,9 @@ int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
     return InputMgrImpl.SetFunctionKeyState(funcKey, enable);
 }
 
-int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
+int32_t InputManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
-    return InputMgrImpl.SetPointerLocation(x, y);
+    return InputMgrImpl.SetPointerLocation(x, y, displayId);
 }
 
 int32_t InputManager::EnterCaptureMode(int32_t windowId)
