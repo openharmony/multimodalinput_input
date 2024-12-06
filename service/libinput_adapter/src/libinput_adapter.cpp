@@ -58,6 +58,7 @@ constexpr uint32_t VKEY_TP_SEAT_BTN_COUNT_NONE { 0 };
 constexpr uint32_t VKEY_TP_SEAT_BTN_COUNT_ONE { 1 };
 constexpr uint32_t VKEY_TP_AXES_ZERO { 0 };
 constexpr uint32_t VKEY_TP_AXES_ONE { 1 };
+constexpr uint32_t VKEY_TP_AXES_TWO { 2 };
 constexpr double VTP_SCALE_AND_ANGLE_FACTOR { 1000.0 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
@@ -769,7 +770,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPanUpdate(libinput_event_touch* touch,
     pEvent.delta_raw_x = msgPPosX;
     pEvent.delta_raw_y = msgPPosY;
     pEvent.source = libinput_pointer_axis_source::LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
-    pEvent.axes = VKEY_TP_AXES_ONE;
+    pEvent.axes = VKEY_TP_AXES_TWO;
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
