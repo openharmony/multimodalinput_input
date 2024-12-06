@@ -2017,7 +2017,7 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
     PointerStyle pointerStyle;
     WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle);
     if (pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-        MMI_HILOGE("Get pointer style failed, pid %{publid}d, pointerStyle %{public}d", pid, pointerStyle.id);
+        MMI_HILOGE("Get pointer style failed, pid %{public}d, pointerStyle %{public}d", pid, pointerStyle.id);
         return RET_ERR;
     }
     userIconHotSpotX_ = hotSpotX;
@@ -2358,7 +2358,7 @@ void PointerDrawingManager::DrawManager()
         MMI_HILOGD("Draw pointer begin");
         PointerStyle pointerStyle;
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
-        MMI_HILOGD("Get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
+        MMI_HILOGD("Get pid %{public}d with pointerStyle %{public}d", pid_, pointerStyle.id);
         Direction direction = static_cast<Direction>((
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         lastDrawPointerStyle_ = pointerStyle;
