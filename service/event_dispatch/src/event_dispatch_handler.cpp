@@ -340,6 +340,16 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     auto currentTime = GetSysClockTime();
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) {
+        bool isTrue = (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END);
+        if (isTrue) {
+            MMI_HILOGE("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
+            "action:%{public}d)", point->GetDeviceId(), point->GetPointerAction());
+        }
         MMI_HILOGD("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
             "action:%{public}s)", point->GetDeviceId(), point->DumpPointerAction());
         return;
