@@ -31,6 +31,7 @@ static mut COMPENSATE_VALUEX: f64 = 0.0;
 static mut COMPENSATE_VALUEY: f64 = 0.0;
 static MOUSE_DPI: f64 = 800.0;
 static MS_2_US: f64 = 1000.0;
+static MOUSE_GAIN_TYPE: i32 = 1；
 
 struct CurveItem {
     pub speeds: Vec<f64>,
@@ -706,6 +707,8 @@ extern {
     fn fabs(z: f64) -> f64;
     fn fmax(a: f64, b: f64) -> f64;
     fn fmin(a: f64, b: f64) -> f64;
+    fn log(a: f64) -> f64;
+    fn sqrt(a: f64) -> f64;
 }
 
 fn get_speed_dynamic_gain_mouse(vin: f64, gain: *mut f64, speed: i32, delta_time: u64, display_ppi: f64) -> bool {
@@ -756,6 +759,35 @@ fn get_speed_dynamic_gain_mouse(vin: f64, gain: *mut f64, speed: i32, delta_time
         }
         *gain = (slopes[3] * vin_new + diff_nums[3]) * speed_radio / vin_new;
         debug!(LOG_LABEL, "gain is set to {}", @public(slopes[3]));
+    }
+    debug!(LOG_LABEL, "get_speed_gain_mouse leave");
+    true
+}
+
+fn get_speed_dynamic_gain_mouse_new(vin: f64, gain: *mut f64, speed: i32, display_ppi: f64) -> bool {
+    if display_ppi < 1.0 {
+        error!(LOG_LABEL, "{} The display_ppi can't be less than 1", @public(display_ppi));
+        return false;
+    }
+    if !(1..=20).contains(&speed) {
+        error!(LOG_LABEL, "{} The speed value error", @public(speed));
+        return false;
+    }
+    let speeds_radio = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
+                        1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0];
+    let slow_gain_params = [1.0342, 0.7127, 2.5814, 0.02];
+    let fast_gain_params = [1.3556, 2.5417, 6.1275, 13.2323];
+    let standard_ppi = 264.16;
+    unsafe {
+        let ppi_ratio: f64 = display_ppi / standard_ppi;
+        let speed_radio: f64 = speeds_radio[speed as usize - 1];
+        let gain_tmp: f64 = if vin < 13.5 {
+            slow_gain_params[0] * log(slow_gain_params[1] * vin + slow_gain_params[2]) + slow_gain_params[3]
+        } else {
+            fast_gain_params[0] * log(fast_gain_params[1] * log(vin) - fast_gain_params[2]) + fast_gain_params[3]
+        };
+        *gain = gain_tmp * speed_radio * ppi_ratio;
+        debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
     }
     debug!(LOG_LABEL, "get_speed_gain_mouse leave");
     true
@@ -890,8 +922,7 @@ pub unsafe extern "C" fn HandleMotionDynamicAccelerateMouse (
     let dy: f64;
     unsafe {
         dx = (*offset).dx;
-        dy = (*offset).dy;
-        vin = (fmax(fabs(dx), fabs(dy))) + (fmin(fabs(dx), fabs(dy))) / 2.0;
+        dy = (*offset).dy;  
         debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
@@ -902,9 +933,18 @@ pub unsafe extern "C" fn HandleMotionDynamicAccelerateMouse (
             @private(dy),
             @public(gain)
         );
-        if !get_speed_dynamic_gain_mouse(vin, &mut gain as *mut f64, speed, delta_time, display_ppi) {
-            error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
-            return RET_ERR;
+        if MOUSE_GAIN_TYPE == 1 {
+            vin = sqrt(dx * dx + dy *dy);
+            if !get_speed_dynamic_gain_mouse_new(vin, &mut gain as *mut f64, speed, display_ppi) {
+                error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
+                return RET_ERR;
+            }    
+        } else {
+            vin = (fmax(fabs(dx), fabs(dy))) + (fmin(fabs(dx), fabs(dy))) / 2.0;
+            if !get_speed_dynamic_gain_mouse(vin, &mut gain as *mut f64, speed, delta_time, display_ppi) {
+                error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
+                return RET_ERR;
+            }
         }
         if !mode {
             *abs_x += dx * gain;
