@@ -960,9 +960,6 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     // judge
     if (g_isSwipeInward == true) {
         SwipeInwardProcess(pointerEvent, type, event, &angleTolerance, lastDirection);
-        if (angleTolerance == 0) {
-            g_isSwipeInward = false;
-        }
     }
     return g_isSwipeInward;
 }
