@@ -693,16 +693,16 @@ void PointerEvent::RemoveAllPointerItems()
 
 void PointerEvent::AddPointerItem(PointerItem &pointerItem)
 {
-    if (pointers_.size() >= MAX_N_POINTER_ITEMS) {
-        MMI_HILOGE("Exceed maximum allowed number of pointer items");
-        return;
-    }
     int32_t pointerId = pointerItem.GetPointerId();
     for (auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
             item = pointerItem;
             return;
         }
+    }
+    if (pointers_.size() >= MAX_N_POINTER_ITEMS) {
+        MMI_HILOGW("Exceed maximum allowed number of pointer items");
+        pointers_.erase(pointers_.begin());
     }
     pointers_.push_back(pointerItem);
 }
