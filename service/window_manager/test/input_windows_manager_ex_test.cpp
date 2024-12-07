@@ -3901,5 +3901,69 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWidthAndHeight, Tes
     displayInfo.direction = DIRECTION90;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWidthAndHeight(&displayInfo, width, height));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_004
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 50;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 1000, 1000 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_005
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 100, 1000 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_006
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 50;
+    std::vector<Rect> rects = { { 100, 100, 1000, 1000 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_007
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 1000, 100 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+}
 } // namespace MMI
 } // namespace OHOS

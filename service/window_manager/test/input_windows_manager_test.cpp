@@ -7035,5 +7035,95 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgeCaramaInFore_001,
     inputWindowsManager.displayGroupInfo_.focusWindowId = 20;
     EXPECT_EQ(inputWindowsManager.JudgeCaramaInFore(), false);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectPointerChangeArea_003
+ * @tc.desc: Test SelectPointerChangeArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectPointerChangeArea_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::vector<Rect> areas;
+    Rect rect {
+        .x = 100,
+        .y = 100,
+        .width = 1000,
+        .height = 1000,
+    };
+    areas.push_back(rect);
+    inputWindowsMgr.windowsHotAreas_.insert(std::make_pair(100, areas));
+
+    int32_t windowId = 100;
+    int32_t logicalX = 300;
+    int32_t logicalY = 300;
+    EXPECT_TRUE(inputWindowsMgr.SelectPointerChangeArea(windowId, logicalX, logicalY));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectPointerChangeArea_004
+ * @tc.desc: Test SelectPointerChangeArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectPointerChangeArea_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t windowId = 100;
+    int32_t logicalX = 300;
+    int32_t logicalY = 300;
+    EXPECT_FALSE(inputWindowsMgr.SelectPointerChangeArea(windowId, logicalX, logicalY));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_002
+ * @tc.desc: Test InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 500;
+    int32_t y = 800;
+    std::vector<Rect> rects;
+    rects = { { 100, 0, INT32_MAX, 0 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+    rects.clear();
+    rects = { { 150, 100, 300, INT32_MAX } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+    rects.clear();
+    rects = { { 150, 250, 300, 500 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+    x = 200;
+    y = 300;
+    EXPECT_TRUE(inputWindowsManager.InWhichHotArea(x, y, rects));
+    int32_t cycleNum = 7;
+    for (int32_t i = 0; i < cycleNum; ++i) {
+        rects.insert(rects.begin(), { 1000, 1000, 1500, 1500 });
+        EXPECT_TRUE(inputWindowsManager.InWhichHotArea(x, y, rects));
+    }
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleGestureInjection_001
+ * @tc.desc: Verify if (!gestureInject)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleGestureInjection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    bool gestureInject = false;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleGestureInjection(gestureInject));
+
+    gestureInject = true;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleGestureInjection(gestureInject));
+}
 } // namespace MMI
 } // namespace OHOS
