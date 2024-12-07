@@ -71,7 +71,6 @@
 #include "tokenid_kit.h"
 #include "touch_event_normalize.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-#include "touch_gesture_handler.h"
 #include "touch_gesture_manager.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #include "util.h"
@@ -3306,7 +3305,6 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
 void MMIService::SetupTouchGestureHandler()
 {
     touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
-    touchGestureHandler_ = std::make_shared<TouchGestureHandler>(delegateInterface_, touchGestureMgr_);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
