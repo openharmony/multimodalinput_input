@@ -3073,6 +3073,317 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, Test
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_003
+ * @tc.desc: Verify if (cursorPos_.displayDirection != info.displayDirection && cursorPos_.direction != info.direction)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    
+    info.direction = DIRECTION0;
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION0;
+    inputWindowsManager.cursorPos_.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION0;
+    inputWindowsManager.cursorPos_.direction = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_004
+ * @tc.desc: Verify if (cursorPos_.direction == Direction::DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION0;
+    inputWindowsManager.cursorPos_.direction = DIRECTION0;
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_005
+ * @tc.desc: Verify if (cursorPos_.direction == Direction::DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION90;
+    inputWindowsManager.cursorPos_.direction = DIRECTION90;
+    
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_006
+ * @tc.desc: Verify else if (cursorPos_.direction == Direction::DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION270;
+    inputWindowsManager.cursorPos_.direction = DIRECTION270;
+    
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_007
+ * @tc.desc: Verify if (direction == DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_008
+ * @tc.desc: Verify if (direction == DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_009
+ * @tc.desc: Verify if (direction == DIRECTION180)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_010
+ * @tc.desc: Verify if (direction == DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_011
+ * @tc.desc: Verify if (direction == DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_001
+ * @tc.desc: Verify if (displayDirection == DIRECTION0)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION0;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_002
+ * @tc.desc: Verify if (displayDirection == DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION90;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_003
+ * @tc.desc: Verify if (displayDirection == DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION90;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_004
+ * @tc.desc: Verify if (displayDirection == DIRECTION180)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION180;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_005
+ * @tc.desc: Verify if (displayDirection == DIRECTION180)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION180;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_006
+ * @tc.desc: Verify if (displayDirection == DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION270;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_007
+ * @tc.desc: Verify if (displayDirection == DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION270;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer
  * @tc.desc: Test the function IsNeedRefreshLayer
  * @tc.type: FUNC
