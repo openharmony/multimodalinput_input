@@ -412,6 +412,7 @@ void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physic
         int64_t nodeId = surfaceNode->GetId();
         Rosen::RSInterfaces::GetInstance().SetHwcNodeBounds(nodeId,
             physicalX, physicalY, hardwareCanvasSize_, hardwareCanvasSize_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
     });
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -448,8 +449,8 @@ bool PointerDrawingManager::SetTraditionsHardWareCursorLocation(int32_t displayI
         } else {
             surfaceNode_->SetBounds(physicalX, physicalY, surfaceNode_->GetStagingProperties().GetBounds().z_,
                 surfaceNode_->GetStagingProperties().GetBounds().w_);
+            Rosen::RSTransaction::FlushImplicitTransaction();
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
     }
 #else
     if (!magicCursorSetBounds) {
@@ -3004,9 +3005,6 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
         AttachToDisplay();
         DrawCursor(MOUSE_ICON(lastMouseStyle_.id));
-        MMI_HILOGI("Mouse traversal occurs, lastPhysicalX_:%{public}d, lastPhysicalY_:%{public}d",
-            lastPhysicalX_,
-            lastPhysicalY_);
         int32_t currnetPhysicalX =
             lastPhysicalX_ -
             CalculateHardwareXOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(lastDrawPointerStyle_.id)].alignmentWay));
