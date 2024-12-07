@@ -32,7 +32,6 @@ constexpr int32_t MODULE_TYPE = 1;
 constexpr int32_t UDS_FD = 1;
 constexpr int32_t UDS_UID = 100;
 constexpr int32_t UDS_PID = 100;
-constexpr int32_t sourceTemp_ { -1 };
 } // namespace
 
 class InputWindowsManagerTest : public testing::Test {
@@ -3075,8 +3074,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, Test
 
 /**
  * @tc.name: InputWindowsManagerTest_RotateScreen_003
- * @tc.desc: Verify if (cursorPos_.displayDirection != info.displayDirection && cursorPos_.direction != info.direction &&
- * sourceTemp_ == PointerEvent::SOURCE_TYPE_MOUSE)
+ * @tc.desc: Verify if (cursorPos_.displayDirection != info.displayDirection && cursorPos_.direction != info.direction)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3102,14 +3100,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_003, Test
     inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
     info.direction = DIRECTION0;
     inputWindowsManager.cursorPos_.direction = DIRECTION0;
-    sourceTemp_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
-
-    info.displayDirection = DIRECTION0;
-    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
-    info.direction = DIRECTION0;
-    inputWindowsManager.cursorPos_.direction = DIRECTION0;
-    sourceTemp_ = PointerEvent::SOURCE_TYPE_MOUSE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
 }
 
@@ -3130,7 +3120,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
     inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
     info.direction = DIRECTION0;
     inputWindowsManager.cursorPos_.direction = DIRECTION0;
-    sourceTemp_ = PointerEvent::SOURCE_TYPE_MOUSE;
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
 }
@@ -3152,7 +3141,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_005, Test
     inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
     info.direction = DIRECTION90;
     inputWindowsManager.cursorPos_.direction = DIRECTION90;
-    sourceTemp_ = PointerEvent::SOURCE_TYPE_MOUSE;
     
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
 }
@@ -3174,7 +3162,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_006, Test
     inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
     info.direction = DIRECTION270;
     inputWindowsManager.cursorPos_.direction = DIRECTION270;
-    sourceTemp_ = PointerEvent::SOURCE_TYPE_MOUSE;
     
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
 }
