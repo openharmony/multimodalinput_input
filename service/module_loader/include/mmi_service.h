@@ -37,7 +37,6 @@
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-class TouchGestureHandler;
 class TouchGestureManager;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -295,7 +294,6 @@ private:
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<TouchGestureHandler> touchGestureHandler_ { nullptr };
     std::shared_ptr<TouchGestureManager> touchGestureMgr_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<DelegateInterface> delegateInterface_ { nullptr };
