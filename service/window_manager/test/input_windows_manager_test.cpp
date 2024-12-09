@@ -7203,7 +7203,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_003, 
 
 /**
  * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_004
- * @tc.desc: Test else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))
+ * @tc.desc: Test AdjustFingerFlag
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7213,14 +7213,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_004, 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    uint32_t flag = 0x00000100;
+    pointerEvent->bitwise_ |=  flag;
     InputWindowsManager inputWindowsManager;
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
  * @tc.name: InputWindowsManagerTest_GetClientFd_007
- * @tc.desc: Test else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))
+ * @tc.desc: Test GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7231,7 +7232,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_007, TestS
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    uint32_t flag = 0x00000100;
+    pointerEvent->bitwise_ |=  flag;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
 }
 
@@ -7249,7 +7251,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_008, TestS
     ASSERT_NE(pointerEvent, nullptr);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    uint32_t flag = 0x00000100;
+    pointerEvent->bitwise_ |=  flag;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = true;
     inputWindowsManager.accessTouchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
@@ -7271,7 +7274,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_009, TestS
     ASSERT_NE(pointerEvent, nullptr);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    uint32_t flag = 0x00000100;
+    pointerEvent->bitwise_ |=  flag;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = false;
     inputWindowsManager.accessTouchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
@@ -7329,7 +7333,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_011, TestS
 
 /**
  * @tc.name: InputWindowsManagerTest_FoldScreenRotation_001
- * @tc.desc: Test else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))
+ * @tc.desc: Test FoldScreenRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7339,7 +7343,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_001
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    uint32_t flag = 0x00000100;
+    pointerEvent->bitwise_ |=  flag;
     InputWindowsManager inputWindowsManager;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
 }
@@ -7356,7 +7361,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_002
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    uint32_t flag = 0x00000100;
+    pointerEvent->bitwise_ |=  flag;
 
     InputWindowsManager inputWindowsManager;
     WindowInfoEX winInfoEx;
@@ -7375,7 +7381,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, Test
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    int32_t windowId = 1; 
+    int32_t windowId = 1;
     WindowInfo windowInfo1;
     windowInfo1.id = 2;
     WindowInfo windowInfo2;
@@ -7396,7 +7402,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_003, Test
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    int32_t windowId = 1; 
+    int32_t windowId = 1;
     WindowInfo windowInfo1;
     windowInfo1.id = 2;
     WindowInfo windowInfo2;
