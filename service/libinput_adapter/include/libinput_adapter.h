@@ -34,6 +34,7 @@ typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAl
 typedef std::function<void()> ClearTouchMessage;
 typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllKeyMessage;
 typedef std::function<void()> ClearKeyMessage;
+typedef std::function<void()> HardwareKeyEventDetected;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 enum VKeyboardMessageType {
     VNoMessage = -1,
@@ -85,7 +86,8 @@ public:
         GetAllTouchMessage getAllTouchMessage,
         ClearTouchMessage clearTouchMessage,
         GetAllKeyMessage getAllKeyMessage,
-        ClearKeyMessage clearKeyMessage);
+        ClearKeyMessage clearKeyMessage,
+        HardwareKeyEventDetected hardwareKeyEventDetected);
 
 private:
     void OnEventHandler();
@@ -140,6 +142,7 @@ private:
     int32_t ConvertToTouchEventType(libinput_event_type eventType);
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
+    void HandleHWKeyEventForVKeyboard(libinput_event_type eventType);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
@@ -151,6 +154,7 @@ private:
     ClearTouchMessage clearTouchMessage_ { nullptr };
     GetAllKeyMessage getAllKeyMessage_ { nullptr };
     ClearKeyMessage clearKeyMessage_ { nullptr };
+    HardwareKeyEventDetected hardwareKeyEventDetected_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
