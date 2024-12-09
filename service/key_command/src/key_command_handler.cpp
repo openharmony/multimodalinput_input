@@ -2395,6 +2395,8 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
             count_ = 0;
             launchAbilityCount_ = 0;
             repeatKeyCountMap_.clear();
+            repeatKey_.keyCode = -1;
+            repeatKey_.keyAction = -1;
             sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
                 isFreezePowerKey_ = false;
                 sosDelayTimerId_ = -1;
