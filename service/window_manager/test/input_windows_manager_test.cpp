@@ -7125,5 +7125,286 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleGestureInjection
     gestureInject = true;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleGestureInjection(gestureInject));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPhysicalDisplay_001
+ * @tc.desc: Test GetPhysicalDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t id = 1;
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetPhysicalDisplay(id, displayGroupInfo));
+
+    displayInfo.id = 1;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetPhysicalDisplay(id, displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_001
+ * @tc.desc: Test if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    InputWindowsManager inputWindowsManager;
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_002
+ * @tc.desc: Test if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+    InputWindowsManager inputWindowsManager;
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_003
+ * @tc.desc: Test if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+    InputWindowsManager inputWindowsManager;
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_004
+ * @tc.desc: Test else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    InputWindowsManager inputWindowsManager;
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_007
+ * @tc.desc: Test else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_008
+ * @tc.desc: Test if (iter != accessTouchItemDownInfos_.end() && !(iter->second.flag))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    WindowInfoEX winInfoEx;
+    winInfoEx.flag = true;
+    inputWindowsManager.accessTouchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_009
+ * @tc.desc: Test if (iter != accessTouchItemDownInfos_.end() && !(iter->second.flag))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    WindowInfoEX winInfoEx;
+    winInfoEx.flag = false;
+    inputWindowsManager.accessTouchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_010
+ * @tc.desc: Test if (uiExtentionWindowInfo.id == pointerEvent->GetTargetWindowId())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    int32_t id = 1;
+    pointerEvent->SetTargetWindowId(id);
+    
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.uiExtentionWindowInfo.push_back(windowInfo1);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo1);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_011
+ * @tc.desc: Test if (uiExtentionWindowInfo.id == pointerEvent->GetTargetWindowId())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    int32_t id = 2;
+    pointerEvent->SetTargetWindowId(id);
+    
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.uiExtentionWindowInfo.push_back(windowInfo1);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo1);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_001
+ * @tc.desc: Test else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    InputWindowsManager inputWindowsManager;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_002
+ * @tc.desc: Test  if (iter == accessTouchItemDownInfos_.end())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+
+    InputWindowsManager inputWindowsManager;
+    WindowInfoEX winInfoEx;
+    inputWindowsManager.accessTouchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowPid_002
+ * @tc.desc: Test if (uiExtentionWindow.id == windowId)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 1; 
+    WindowInfo windowInfo1;
+    windowInfo1.id = 2;
+    WindowInfo windowInfo2;
+    windowInfo2.id = 1;
+    windowInfo1.uiExtentionWindowInfo.push_back(windowInfo2);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo1);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWindowPid(windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowPid_003
+ * @tc.desc: Test if (uiExtentionWindow.id == windowId)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 1; 
+    WindowInfo windowInfo1;
+    windowInfo1.id = 2;
+    WindowInfo windowInfo2;
+    windowInfo2.id = 3;
+    windowInfo1.uiExtentionWindowInfo.push_back(windowInfo2);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo1);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWindowPid(windowId));
+}
 } // namespace MMI
 } // namespace OHOS
