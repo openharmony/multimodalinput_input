@@ -7127,12 +7127,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleGestureInjection
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetPhysicalDisplay_001
+ * @tc.name: InputWindowsManagerTest_GetPhysicalDisplay_003
  * @tc.desc: Test GetPhysicalDisplay
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
@@ -7179,7 +7179,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_002, 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+    uint32_t flag = 0x00000080;
+    pointerEvent->bitwise_ |=  flag;
     InputWindowsManager inputWindowsManager;
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
@@ -7196,7 +7197,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_003, 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+    uint32_t flag = 0x00000080;
+    pointerEvent->bitwise_ |=  flag;
     InputWindowsManager inputWindowsManager;
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
@@ -7239,7 +7241,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_007, TestS
 
 /**
  * @tc.name: InputWindowsManagerTest_GetClientFd_008
- * @tc.desc: Test if (iter != accessTouchItemDownInfos_.end() && !(iter->second.flag))
+ * @tc.desc: Test if (iter != touchItemDownInfos_.end() && !(iter->second.flag))
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7255,14 +7257,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_008, TestS
     pointerEvent->bitwise_ |=  flag;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = true;
-    inputWindowsManager.accessTouchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
 }
 
 /**
  * @tc.name: InputWindowsManagerTest_GetClientFd_009
- * @tc.desc: Test if (iter != accessTouchItemDownInfos_.end() && !(iter->second.flag))
+ * @tc.desc: Test if (iter != touchItemDownInfos_.end() && !(iter->second.flag))
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7278,7 +7280,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_009, TestS
     pointerEvent->bitwise_ |=  flag;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = false;
-    inputWindowsManager.accessTouchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
 }
@@ -7351,7 +7353,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_001
 
 /**
  * @tc.name: InputWindowsManagerTest_FoldScreenRotation_002
- * @tc.desc: Test  if (iter == accessTouchItemDownInfos_.end())
+ * @tc.desc: Test  if (iter == touchItemDownInfos_.end())
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7366,7 +7368,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_002
 
     InputWindowsManager inputWindowsManager;
     WindowInfoEX winInfoEx;
-    inputWindowsManager.accessTouchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
 }
