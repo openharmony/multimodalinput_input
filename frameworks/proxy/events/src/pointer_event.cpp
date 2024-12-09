@@ -383,16 +383,6 @@ void PointerEvent::PointerItem::SetRawDisplayY(int32_t rawDisplayY)
     rawDisplayY_ = rawDisplayY;
 }
 
-int32_t PointerEvent::PointerItem::GetBlobId() const
-{
-    return blobId_;
-}
-
-void PointerEvent::PointerItem::SetBlobId(int32_t blobId)
-{
-    blobId_ = blobId;
-}
-
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -427,8 +417,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(displayXPos_) &&
         out.WriteDouble(displayYPos_) &&
         out.WriteDouble(windowXPos_) &&
-        out.WriteDouble(windowYPos_) &&
-        out.WriteInt32(blobId_)
+        out.WriteDouble(windowYPos_)
     );
 }
 
@@ -466,8 +455,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(displayXPos_) &&
         in.ReadDouble(displayYPos_) &&
         in.ReadDouble(windowXPos_) &&
-        in.ReadDouble(windowYPos_) &&
-        in.ReadInt32(blobId_)
+        in.ReadDouble(windowYPos_)
     );
 }
 
