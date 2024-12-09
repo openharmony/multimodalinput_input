@@ -1422,6 +1422,11 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
         MMI_HILOGI("Handle power key DownStart:%{public}d", isDownStart_);
     }
+    if (key->GetKeyCode() != repeatKey_.keyCode && key->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        MMI_HILOGI("Combination key currentKey:%{public}d, repeatKey:%{public}d",
+            key->GetKeyCode(), repeatKey_.keyCode);
+        isDownStart_ = false;
+    }
     if (!isDownStart_) {
         HandleRepeatKeys(key);
         return false;
