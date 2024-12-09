@@ -3965,5 +3965,49 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_007, Te
     std::vector<Rect> rects = { { 100, 100, 1000, 100 } };
     EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
 }
+
+/**
+ * @tc.name: DrawTouchGraphic_004
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t displayId = 10;
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+
+    inputWindowsManager->knuckleDrawMgr_ = nullptr;
+    inputWindowsManager->knuckleDynamicDrawingManager_ = nullptr;
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
+}
+
+/**
+ * @tc.name: SetWindowStateNotifyPid_001
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SetWindowStateNotifyPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    int32_t pid = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(pid));
+
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(pid));
+}
 } // namespace MMI
 } // namespace OHOS
