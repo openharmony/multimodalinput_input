@@ -3965,5 +3965,135 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_007, Te
     std::vector<Rect> rects = { { 100, 100, 1000, 100 } };
     EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
 }
+
+/**
+ * @tc.name: DrawTouchGraphic_004
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t displayId = 10;
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+
+    inputWindowsManager->knuckleDrawMgr_ = nullptr;
+    inputWindowsManager->knuckleDynamicDrawingManager_ = nullptr;
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
+}
+
+/**
+ * @tc.name: SetWindowStateNotifyPid_001
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SetWindowStateNotifyPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    int32_t pid = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(pid));
+
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(pid));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_002
+ * @tc.desc: Test the funcation SendUIExtentionPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 100;
+    int32_t logicalY = 200;
+    
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    PointerEvent::PointerItem item;
+    item.pointerId_ = 1;
+    pointerEvent->pointers_.push_back(item);
+    int32_t displayId = 10;
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 11;
+    windowInfo.transform.push_back(1.1);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_003
+ * @tc.desc: Test the funcation SendUIExtentionPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointerEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(true));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 100;
+    int32_t logicalY = 200;
+    
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    PointerEvent::PointerItem item;
+    item.pointerId_ = 1;
+    pointerEvent->pointers_.push_back(item);
+    int32_t displayId = 10;
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 11;
+    windowInfo.transform.push_back(1.1);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
