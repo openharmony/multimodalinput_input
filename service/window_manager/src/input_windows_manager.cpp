@@ -280,7 +280,13 @@ void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> 
         int32_t pointerId = item.GetPointerId();
         auto tPointerEvent = std::make_shared<PointerEvent>(*pointerEvent);
         tPointerEvent->SetPointerId(pointerId);
-        tPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        bool isDragging = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+            (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId);
+        if (isDragging) {
+            tPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
+        } else {
+            tPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        }
         tPointerEvent->SetActionTime(GetSysClockTime());
         tPointerEvent->UpdateId();
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
