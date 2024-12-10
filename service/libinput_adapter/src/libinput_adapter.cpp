@@ -1050,9 +1050,9 @@ type: %{private}d",
                 MMI_HILOGD("inside vkeyboard area");
 
                 while (true) {
-                    int toggleCodeFirst(-1);
-                    int toggleCodeSecond(-1);
-                    int keyCode(-1);
+                    int32_t toggleCodeFirst(-1);
+                    int32_t toggleCodeSecond(-1);
+                    int32_t keyCode(-1);
                     VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(toggleCodeFirst, toggleCodeSecond,
                         keyCode);
                     MMI_HILOGD("get message type: %{private}d", static_cast<int32_t>(type));
