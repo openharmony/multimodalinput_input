@@ -227,7 +227,8 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     GetAllTouchMessage getAllTouchMessage,
     ClearTouchMessage clearTouchMessage,
     GetAllKeyMessage getAllKeyMessage,
-    ClearKeyMessage clearKeyMessage)
+    ClearKeyMessage clearKeyMessage,
+    HardwareKeyEventDetected hardwareKeyEventDetected)
 {
     handleTouchPoint_ = handleTouchPoint;
     getMessage_ = getMessage;
@@ -235,6 +236,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     clearTouchMessage_ = clearTouchMessage;
     getAllKeyMessage_ = getAllKeyMessage;
     clearKeyMessage_ = clearKeyMessage;
+    hardwareKeyEventDetected_ = hardwareKeyEventDetected;
 
     deviceId = -1;
 }
@@ -968,6 +970,18 @@ void LibinputAdapter::PrintVKeyTPGestureLog(event_gesture &gEvent)
     MMI_HILOGD("######## scale: %{public}f, angle: %{public}f",
         static_cast<double>(gEvent.scale), static_cast<double>(gEvent.angle));
 }
+
+void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event_type eventType)
+{
+    MMI_HILOGD("Hardware keyboard key event detected");
+    if (hardwareKeyEventDetected_ == nullptr) {
+        MMI_HILOGE("HardwareKeyEventDetected is nullptr");
+        return;
+    }
+    if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
+        hardwareKeyEventDetected_();
+    }
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void LibinputAdapter::OnEventHandler()
@@ -1078,6 +1092,7 @@ type: %{private}d",
                 libinput_event_destroy(event);
             }
         } else {
+            HandleHWKeyEventForVKeyboard(eventType);
             funInputEvent_(event, frameTime);
             libinput_event_destroy(event);
         }

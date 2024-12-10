@@ -165,6 +165,8 @@ typedef int32_t (*VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)(IRemoteObject* &vkeyboar
 VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE vkeyboard_createVKeyboardDevice_ = nullptr;
 typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcKeyEvent);
 VKEYBOARD_ONFUNCKEYEVENT_TYPE vkeyboard_onFuncKeyEvent_ = nullptr;
+typedef void (*VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)();
+VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE vkeyboard_hardwareKeyEventDetected_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
@@ -2889,12 +2891,15 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "TrackPadEngineGetAllKeyMessage");
             trackPadEngine_clearKeyMessage_ = (TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)dlsym(
                 g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
+            vkeyboard_hardwareKeyEventDetected_ = (VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)dlsym(
+                g_VKeyboardHandle, "HardwareKeyEventDetected");
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
                 statemachineMessageQueue_getLibinputMessage_,
                 trackPadEngine_getAllTouchMessage_,
                 trackPadEngine_clearTouchMessage_,
                 trackPadEngine_getAllKeyMessage_,
-                trackPadEngine_clearKeyMessage_);
+                trackPadEngine_clearKeyMessage_,
+                vkeyboard_hardwareKeyEventDetected_);
         }
     }
 }
