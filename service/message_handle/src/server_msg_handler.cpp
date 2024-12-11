@@ -347,7 +347,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     } else {
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
         static uint64_t preTime = -1;
-        uint64_t currentTime = pointerEvent->GetActionTime();
+        uint64_t currentTime = static_cast<uint64_t>(pointerEvent->GetActionTime());
         preTime = fmin(preTime, currentTime);
         uint64_t deltaTime = (currentTime - preTime);
         ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
