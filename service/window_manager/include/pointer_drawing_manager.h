@@ -201,6 +201,7 @@ private:
     void DrawTraditionsCursor(MOUSE_ICON mouseStyle);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void InitScreenInfo();
+    void DumpScreenInfo(std::ostringstream& oss);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
