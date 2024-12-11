@@ -666,6 +666,13 @@ int32_t MultimodalInputConnectManager::GetTouchpadTapSwitch(bool &switchFlag)
     return multimodalInputConnectService_->GetTouchpadTapSwitch(switchFlag);
 }
 
+int32_t MultimodalInputConnectManager::SetInputDeviceEnabled(int32_t deviceId, bool enable)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetInputDeviceEnabled(deviceId, enable);
+}
+
 int32_t MultimodalInputConnectManager::SetTouchpadPointerSpeed(int32_t speed)
 {
     std::lock_guard<std::mutex> guard(lock_);

@@ -464,6 +464,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_LONG_PRESS):
             ret = StubUnsubscribeLongPressEvent(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUTDEVICE_ENABLE):
+            ret = StubSetInputDeviceInputEnable(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2057,6 +2060,31 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data
     }
     WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touchpad tap switchFlag:%{public}d, ret:%{public}d", switchFlag, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    int32_t deviceId = 0;
+    bool enable = true;
+    READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetInputDeviceEnabled(deviceId, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set inputdevice device input failed ret:%{public}d", ret);
+        return ERROR_INVALID_DEVICEID;
+    }
     return RET_OK;
 }
 

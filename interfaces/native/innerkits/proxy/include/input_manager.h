@@ -721,6 +721,15 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag);
 
     /**
+     * @brief Turn on/off the device input data update.
+     * @param deviceID input device id.
+     * @param enable Indicates the device input value.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable);
+
+    /**
      * @brief Set the touchpad poniter speed.
      * @param speed Indicates the touchpad pointer speed.
      * @return if success; returns a non-0 value otherwise.
