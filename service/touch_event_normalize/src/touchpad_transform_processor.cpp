@@ -409,7 +409,7 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
-    RemoveSurplusPointerItem(); 
+    RemoveSurplusPointerItem();
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
 }
 
