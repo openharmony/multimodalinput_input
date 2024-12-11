@@ -1111,7 +1111,15 @@ int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessagePa
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    MMI_HILOGE("Hwl01 Stub inputDevice = %{public}p", inputDevice.get());
     int32_t ret = GetDevice(deviceId, inputDevice);
+    MMI_HILOGE("Hwl02 Stub inputDevice = %{public}p", inputDevice.get());
+    MMI_HILOGE("Hwl02 Stub Id:%{public}d, type:%{public}d, bus:%{public}d,"
+        "ver:%{public}d, product:%{public}d, vendor:%{public}d, name:%{public}s,"
+        "phys:%{public}s, uniq:%{public}s, axis.size:%{public}zu",
+        inputDevice->GetId(), inputDevice->GetType(), inputDevice->GetBus(), inputDevice->GetVersion(),
+        inputDevice->GetProduct(), inputDevice->GetVendor(), inputDevice->GetName().c_str(),
+        inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str(), inputDevice->GetAxisInfo().size());
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetDevice failed ret:%{public}d", ret);
         return RET_ERR;
