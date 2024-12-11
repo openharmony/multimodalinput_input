@@ -1158,14 +1158,26 @@ int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
     return RET_OK;
 }
 
-int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
+int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
     CALL_DEBUG_ENTER;
     if (INPUT_DEV_MGR->GetInputDevice(deviceId) == nullptr) {
         MMI_HILOGE("Input device not found");
         return COMMON_PARAMETER_ERROR;
     }
-    inputDevice = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    auto tmpDevice = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    inputDevice->SetId(tmpDevice->GetId());
+    inputDevice->SetType(tmpDevice->GetType());
+    inputDevice->SetName(tmpDevice->GetName());
+    inputDevice->SetBus(tmpDevice->GetBus());
+    inputDevice->SetVersion(tmpDevice->GetVersion());
+    inputDevice->SetProduct(tmpDevice->GetProduct());
+    inputDevice->SetVendor(tmpDevice->GetVendor());
+    inputDevice->SetPhys(tmpDevice->GetPhys());
+    inputDevice->SetUniq(tmpDevice->GetUniq());
+    inputDevice->SetCapabilities(tmpDevice->GetCapabilities());
+    inputDevice->SetAxisInfo(tmpDevice->GetAxisInfo());
+
     return RET_OK;
 }
 
@@ -1173,7 +1185,7 @@ int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &in
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, deviceId, &inputDevice] {
+        [this, deviceId, inputDevice] {
             return this->OnGetDevice(deviceId, inputDevice);
         }
         );
