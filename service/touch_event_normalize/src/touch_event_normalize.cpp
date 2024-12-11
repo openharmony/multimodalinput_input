@@ -142,6 +142,16 @@ void TouchEventNormalize::GetTouchpadRotateSwitch(bool &rotateSwitch) const
     TouchPadTransformProcessor::GetTouchpadRotateSwitch(rotateSwitch);
 }
 
+int32_t TouchEventNormalize::SetTouchpadDoubleTapAndDragState(bool switchFlag) const
+{
+    return TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
+void TouchEventNormalize::GetTouchpadDoubleTapAndDragState(bool &switchFlag) const
+{
+    TouchPadTransformProcessor::GetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
 int32_t TouchEventNormalize::SetTouchpadScrollRows(int32_t rows)
 {
     return TouchPadTransformProcessor::SetTouchpadScrollRows(rows);
