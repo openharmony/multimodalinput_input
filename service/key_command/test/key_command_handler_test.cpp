@@ -5750,12 +5750,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_008
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_009
  * @tc.desc: Test CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_008, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_009, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
