@@ -1990,6 +1990,17 @@ int32_t InputManagerImpl::GetTouchpadTapSwitch(bool &switchFlag)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::SetInputDeviceEnabled(int32_t deviceId, bool enable)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetInputDeviceEnabled(deviceId, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Operation input port failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t InputManagerImpl::SetTouchpadPointerSpeed(int32_t speed)
 {
     CALL_INFO_TRACE;

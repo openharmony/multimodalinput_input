@@ -171,6 +171,38 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     return ids;
 }
 
+int32_t InputDeviceManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    auto item = inputDevice_.find(deviceId);
+    if (item != inputDevice_.end()) {
+        item->second.enable = enable;
+        if (!enable) {
+            MMI_HILOGE("enable false, save to lastinputctl pid: %{public}d", pid);
+            lastinputctl_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
+            InitInputCtlSessionLostCallback();
+        }
+        return RET_OK;
+    }
+    MMI_HILOGD("Set inputDevice enabled failed, Invalid deviceId.");
+    return RET_ERR;
+}
+
+void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    for (auto item = lastinputctl_.begin(); item != lastinputctl_.end();) {
+        if (session->GetPid() == item->second) {
+            auto device = inputDevice_.find(item->first);
+            if (device != inputDevice_.end()) {
+                MMI_HILOGI("Recover input device : %{public}d", item->first);
+                device->second.enable = true;
+                lastinputctl_.erase(item++);
+            }
+        }
+    }
+}
+
 int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;
@@ -850,6 +882,22 @@ void InputDeviceManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
     devListeners_.remove(session);
+}
+
+void InputDeviceManager::InitInputCtlSessionLostCallback()
+{
+    if (sessionLostCallbackInitialized_) {
+        MMI_HILOGE("Init session is failed");
+        return;
+    }
+    auto udsServerPtr = InputHandler->GetUDSServer();
+    CHKPV(udsServerPtr);
+    udsServerPtr->AddSessionDeletedCallback([this] (SessionPtr session) {
+        return this->RecoverInputDeviceEnabled(session);
+    }
+    );
+    sessionLostCallbackInitialized_ = true;
+    MMI_HILOGD("The inputdevice ctl callback on session deleted is registered successfully");
 }
 
 std::vector<int32_t> InputDeviceManager::GetTouchPadIds()

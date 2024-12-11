@@ -125,6 +125,7 @@ protected:
     int32_t StubGetTouchpadScrollDirection(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadPinchSwitch(MessageParcel& data, MessageParcel& reply);

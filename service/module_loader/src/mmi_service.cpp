@@ -3019,6 +3019,16 @@ int32_t MMIService::ReadTouchpadTapSwitch(bool &switchFlag)
     return RET_OK;
 }
 
+int32_t MMIService::SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t pid)
+{
+    int32_t ret = INPUT_DEV_MGR->SetInputDeviceEnabled(deviceId, enable, pid);
+    if (RET_OK != ret) {
+        MMI_HILOGE("Set inputdevice enabled failed, return:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
 {
     MouseEventHdr->GetTouchpadPointerSpeed(speed);
@@ -3152,6 +3162,22 @@ int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, deviceId, enable, pid] {
+            return this->SetInputDeviceEnable(deviceId, enable, pid);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set inputdevice enable failed, return:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 
