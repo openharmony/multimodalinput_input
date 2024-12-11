@@ -37,6 +37,7 @@ private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
+    bool preDoubleTapDragSwitch_ { true };
     int32_t preScrollRows_ { 3 };
 };
 
@@ -58,6 +59,7 @@ void TouchEventNormalizeTest::SetUp()
     TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(preRotateSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadScrollRows();
+    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
 }
 
 void TouchEventNormalizeTest::TearDown()
@@ -66,6 +68,7 @@ void TouchEventNormalizeTest::TearDown()
     TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(preRotateSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadScrollRows(preScrollRows_);
+    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
 }
 
 /**
@@ -221,6 +224,35 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadScrollRows_
     TOUCH_EVENT_HDR->SetTouchpadScrollRows(rows);
     int32_t newRows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
     ASSERT_TRUE(rows == newRows);
+}
+
+/**
+ * @tc.name: TouchEventNormalizeTest_SetTouchpadDoubleTapAndDragState_09
+ * @tc.desc: Test SetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadDoubleTapAndDragState_09, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag) == RET_OK);
+}
+
+/**
+ * @tc.name: TouchEventNormalizeTest_GetTouchpadDoubleTapAndDragState_10
+ * @tc.desc: Test GetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadDoubleTapAndDragState_10, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(flag);
+    bool newFlag = true;
+    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(newFlag);
+    ASSERT_TRUE(flag == newFlag);
 }
 } // namespace MMI
 } // namespace OHOS

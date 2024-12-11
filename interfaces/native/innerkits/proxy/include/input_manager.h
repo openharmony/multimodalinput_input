@@ -905,6 +905,24 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
     /**
+     * @brief Set the switch of touchpad double tap and drag.
+     * @param switchFlag Indicates the touchpad double tap and drag switch state.
+     *  true: user can use double tap and drag function. otherwise can't use
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag);
+
+    /**
+     * @brief Get the switch of touchpad double tap and drag.
+     * @param switchFlag Indicates the touchpad double tap and drag switch state.
+     * true: user can use double tap and drag function. otherwise can't use
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag);
+
+    /**
      * @brief Set touch move event filters.
      * @param flag if set move event filters or not.
      * @return if success; returns a non-0 value otherwise.
