@@ -5703,5 +5703,138 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_02, TestSiz
     ret = handler.PreHandleEvent();
     ASSERT_TRUE(ret);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureDownEvent_004
+ * @tc.desc: Test HandleKnuckleGestureDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    int64_t downTime = 100;
+    item.SetDownTime(downTime);
+    item.SetTargetWindowId(0);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetTargetDisplayId(0);
+
+    KeyCommandHandler handler;
+    handler.knuckleSwitch_.statusConfigValue = false;
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_009
+ * @tc.desc: Test CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].downTime = 0;
+    handler.twoFingerGesture_.touches[1].downTime = 1;
+
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 320;
+    displayInfo.width = 1260;
+    displayInfo.height = 2720;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    handler.twoFingerGesture_.touches[0].x = 600;
+    handler.twoFingerGesture_.touches[0].y = 600;
+    
+    handler.twoFingerGesture_.touches[1].x = 800;
+    handler.twoFingerGesture_.touches[1].y = 600;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+
+    handler.twoFingerGesture_.touches[1].x = 10;
+    handler.twoFingerGesture_.touches[1].y = 600;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+
+    handler.twoFingerGesture_.touches[1].x = 1250;
+    handler.twoFingerGesture_.touches[1].y = 600;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+
+    handler.twoFingerGesture_.touches[1].x = 600;
+    handler.twoFingerGesture_.touches[1].y = 10;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+
+    handler.twoFingerGesture_.touches[1].x = 600;
+    handler.twoFingerGesture_.touches[1].y = 2710;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_005
+ * @tc.desc: Verify if (vp <= 0)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t vp = -1;
+    KeyCommandHandler handler;
+    int32_t ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+    ret = handler.ConvertVPToPX(vp);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_006
+ * @tc.desc: Verify if (dpi <= 0)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t vp = 5;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = -1;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    KeyCommandHandler handler;
+    int32_t ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+}
 } // namespace MMI
 } // namespace OHOS
