@@ -1178,27 +1178,12 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
     inputDevice->SetCapabilities(tmpDevice->GetCapabilities());
     inputDevice->SetAxisInfo(tmpDevice->GetAxisInfo());
 
-    MMI_HILOGE("Hwl OnGetDevice tmpDevice = %{public}p", tmpDevice.get());
-    MMI_HILOGE("Hwl OnGetDevice tmpDevice id:%{public}d, type:%{public}d, bus:%{public}d,"
-        "ver:%{public}d, product:%{public}d, vendor:%{public}d, name:%{public}s,"
-        "phys:%{public}s, uniq:%{public}s, axis.size:%{public}zu",
-        tmpDevice->GetId(), tmpDevice->GetType(), tmpDevice->GetBus(), tmpDevice->GetVersion(),
-        tmpDevice->GetProduct(), tmpDevice->GetVendor(), tmpDevice->GetName().c_str(),
-        tmpDevice->GetPhys().c_str(), tmpDevice->GetUniq().c_str(), tmpDevice->GetAxisInfo().size());
-
-    MMI_HILOGE("Hwl OnGetDevice inputDevice = %{public}p", inputDevice.get());
-    MMI_HILOGE("Hwl OnGetDevice inputDevice id:%{public}d, type:%{public}d, bus:%{public}d,"
-        "ver:%{public}d, product:%{public}d, vendor:%{public}d, name:%{public}s",
-        inputDevice->GetId(), inputDevice->GetType(), inputDevice->GetBus(), inputDevice->GetVersion(),
-        inputDevice->GetProduct(), inputDevice->GetVendor(), inputDevice->GetName().c_str());
-    MMI_HILOGE("Hwl OnGetDevice inputDevice.use_count() = %{public}ld", inputDevice.use_count());
     return RET_OK;
 }
 
 int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("Hwl02 Stub inputDevice = %{public}p", inputDevice.get());
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, deviceId, inputDevice] {
             return this->OnGetDevice(deviceId, inputDevice);
