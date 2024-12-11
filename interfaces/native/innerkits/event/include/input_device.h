@@ -111,6 +111,7 @@ public:
 
     void AddAxisInfo(AxisInfo axis);
     std::vector<AxisInfo> GetAxisInfo();
+    void SetAxisInfo(std::vector<AxisInfo> axis);
     InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version, int32_t product,
                 int32_t vendor, std::string phys, std::string uniq, const std::vector<AxisInfo>& axis);
 
