@@ -110,6 +110,7 @@ private:
     int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchPadToolType(struct libinput_device *device);
     void InitToolType();
+    void RemoveSurplusPointerItem();
 private:
     const int32_t deviceId_ { -1 };
     bool isRotateGesture_ { false };
