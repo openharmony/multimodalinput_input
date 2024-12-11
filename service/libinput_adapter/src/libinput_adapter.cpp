@@ -245,6 +245,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     auto vTrackpad = std::make_shared<InputDevice>();
     vTrackpad->SetName("VirtualTrackpad");
     vTrackpad->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    vTrackpad->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     int32_t trackpadId = VTRACKPAD_ID;
     InputDeviceManager::GetInstance()->AddVirtualInputDevice(vTrackpad, trackpadId);
 }
