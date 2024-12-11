@@ -47,6 +47,7 @@ constexpr int32_t DEFAULT_POINTER_ID { 0 };
 constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t DEFAULT_ROWS { 3 };
+constexpr int32_t MAX_N_POINTER_ITEMS { 10 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 std::string g_threeFingerTapKey = "touchpadThreeFingerTap";
@@ -105,6 +106,11 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *e
     item.SetToolHeight(static_cast<int32_t>(toolHeight));
     item.SetDeviceId(deviceId_);
     pointerEvent_->SetDeviceId(deviceId_);
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent_->GetAllPointerItems();
+    if (pointerItems.size() >= MAX_N_POINTER_ITEMS) {
+        MMI_HILOGW("Exceed maximum allowed number of pointer items");
+        pointerEvent_->RemovePointerItem(pointerItems.begin()->GetPointerId());
+    }
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
 
@@ -362,6 +368,11 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent_->GetAllPointerItems();
+    if (pointerItems.size() >= MAX_N_POINTER_ITEMS) {
+        MMI_HILOGW("Exceed maximum allowed number of pointer items");
+        pointerEvent_->RemovePointerItem(pointerItems.begin()->GetPointerId());
+    }
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     return RET_OK;
@@ -406,6 +417,11 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent_->GetAllPointerItems();
+    if (pointerItems.size() >= MAX_N_POINTER_ITEMS) {
+        MMI_HILOGW("Exceed maximum allowed number of pointer items");
+        pointerEvent_->RemovePointerItem(pointerItems.begin()->GetPointerId());
+    }    
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
 }
 
