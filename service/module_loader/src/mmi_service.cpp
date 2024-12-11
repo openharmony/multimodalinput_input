@@ -1191,7 +1191,7 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
         "ver:%{public}d, product:%{public}d, vendor:%{public}d, name:%{public}s",
         inputDevice->GetId(), inputDevice->GetType(), inputDevice->GetBus(), inputDevice->GetVersion(),
         inputDevice->GetProduct(), inputDevice->GetVendor(), inputDevice->GetName().c_str());
-    MMI_HILOGE("Hwl OnGetDevice inputDevice.use_count() = %{public}zu", inputDevice.use_count());
+    MMI_HILOGE("Hwl OnGetDevice inputDevice.use_count() = %{public}ld", inputDevice.use_count());
     return RET_OK;
 }
 
