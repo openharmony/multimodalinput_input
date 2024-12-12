@@ -80,5 +80,64 @@ HWTEST_F(AuthorizeHelperTest, AuthorizeHelperTest_AuthorizeProcessExit_001, Test
     AuthorizeHelper authorizeHelper;
     EXPECT_NO_FATAL_FAILURE(authorizeHelper.AuthorizeProcessExit());
 }
+
+/**
+ * @tc.name: AuthorizeHelperTest_AddAuthorizeProcess_001
+ * @tc.desc: Test the funcation AddAuthorizeProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthorizeHelperTest, AuthorizeHelperTest_AddAuthorizeProcess_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AuthorizeHelper authorizeHelper;
+    int32_t pid = -1;
+    AuthorizeExitCallback exitCallback = nullptr;
+    authorizeHelper.isInit_ = false;
+    int32_t ret = authorizeHelper.AddAuthorizeProcess(pid, exitCallback);
+    EXPECT_EQ(ret, RET_ERR);
+    authorizeHelper.isInit_ = true;
+    ret = authorizeHelper.AddAuthorizeProcess(pid, exitCallback);
+    EXPECT_EQ(ret, RET_ERR);
+    pid = 0;
+    ret = authorizeHelper.AddAuthorizeProcess(pid, exitCallback);
+    EXPECT_EQ(ret, RET_ERR);
+    pid = 1;
+    authorizeHelper.state_ = AuthorizeState::STATE_UNAUTHORIZE;
+    authorizeHelper.pid_ = -1;
+    ret = authorizeHelper.AddAuthorizeProcess(pid, exitCallback);
+    EXPECT_EQ(ret, RET_OK);
+    authorizeHelper.pid_ = 2;
+    ret = authorizeHelper.AddAuthorizeProcess(pid, exitCallback);
+    EXPECT_EQ(ret, RET_ERR);
+    authorizeHelper.state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+    ret = authorizeHelper.AddAuthorizeProcess(pid, exitCallback);
+    EXPECT_EQ(ret, RET_ERR);
+    authorizeHelper.pid_ = 1;
+    ret = authorizeHelper.AddAuthorizeProcess(pid, exitCallback);
+    EXPECT_EQ(ret, RET_OK);
+    authorizeHelper.state_ = AuthorizeState::STATE_AUTHORIZE;
+    ret = authorizeHelper.AddAuthorizeProcess(pid, exitCallback);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: AuthorizeHelperTest_CancelAuthorize_001
+ * @tc.desc: Test the funcation CancelAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthorizeHelperTest, AuthorizeHelperTest_CancelAuthorize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AuthorizeHelper authorizeHelper;
+    int32_t pid = -1;
+    EXPECT_NO_FATAL_FAILURE(authorizeHelper.CancelAuthorize(pid));
+    pid = 1;
+    authorizeHelper.pid_ = 0;
+    EXPECT_NO_FATAL_FAILURE(authorizeHelper.CancelAuthorize(pid));
+    authorizeHelper.pid_ = 1;
+    EXPECT_NO_FATAL_FAILURE(authorizeHelper.CancelAuthorize(pid));
+}
 } // namespace MMI
 } // namespace OHOS
