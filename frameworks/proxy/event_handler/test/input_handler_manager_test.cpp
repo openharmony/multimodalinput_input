@@ -512,5 +512,112 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource
     result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
     ASSERT_TRUE(result);
 }
+
+/**
+ * @tc.name: InputHandlerManagerTest_IsPinchType_001
+ * @tc.desc: Test the funcation IsPinchType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsPinchType_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    bool ret = manager.IsPinchType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = manager.IsPinchType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = manager.IsPinchType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = manager.IsPinchType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    ret = manager.IsPinchType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = manager.IsPinchType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = manager.IsPinchType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    ret = manager.IsPinchType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    ret = manager.IsPinchType(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_IsRotateType_001
+ * @tc.desc: Test the funcation IsRotateType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsRotateType_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
+    bool ret = manager.IsRotateType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
+    ret = manager.IsRotateType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_END);
+    ret = manager.IsRotateType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    ret = manager.IsRotateType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ret = manager.IsRotateType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
+    ret = manager.IsRotateType(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_IsThreeFingersSwipeType_001
+ * @tc.desc: Test the funcation IsThreeFingersSwipeType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsThreeFingersSwipeType_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetFingerCount(3);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    bool ret = manager.IsThreeFingersSwipeType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    ret = manager.IsThreeFingersSwipeType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    ret = manager.IsThreeFingersSwipeType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
+    ret = manager.IsThreeFingersSwipeType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetFingerCount(10);
+    ret = manager.IsThreeFingersSwipeType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    ret = manager.IsThreeFingersSwipeType(pointerEvent);
+    ASSERT_FALSE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
