@@ -265,6 +265,29 @@ napi_value JsInputDeviceManager::GetIntervalSinceLastInput(napi_env env)
     return ret;
 }
 
+napi_value JsInputDeviceManager::SetInputDeviceEnabled(napi_env env, int32_t deviceId, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    napi_value ret = nullptr;
+    int32_t errorCode = InputManager::GetInstance()->SetInputDeviceEnabled(deviceId, enable);
+    if (errorCode == ERROR_NOT_SYSAPI) {
+        MMI_HILOGE("System applications use only.");
+        THROWERR_CUSTOM(env, ERROR_NOT_SYSAPI,
+            "System applications use only");
+    }
+    if (errorCode == ERROR_INVALID_DEVICEID) {
+        MMI_HILOGE("Invalid deviceId.");
+        THROWERR_CUSTOM(env, ERROR_INVALID_DEVICEID,
+            "Invalid deviceId");
+    }
+    auto status = napi_create_int32(env, errorCode, &(ret));
+    if (status != napi_ok) {
+        MMI_HILOGE("get operation result fail");
+        return nullptr;
+    }
+    return ret;
+}
+
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_DEBUG_ENTER;

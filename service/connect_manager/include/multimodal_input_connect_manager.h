@@ -164,6 +164,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable);
 
 private:
     MultimodalInputConnectManager() = default;

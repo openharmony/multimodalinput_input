@@ -3349,6 +3349,42 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadRotateSwitch_001, TestSiz
 }
 
 /**
+ * @tc.name: InputManagerTest_SetInputDeviceEnable_001
+ * @tc.desc: Set input device enable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> aucids;
+    auto callback = [&aucids](std::vector<int32_t> ids) { aucids = std::move(ids); };
+    InputManager::GetInstance()->GetDeviceIds(callback);
+    for (const auto &iter : aucids) {
+        MMI_HILOGI("Set inputdevice %{public}d disable", iter);
+        InputManager::GetInstance()->SetInputDeviceEnabled(iter, false);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetInputDeviceEnable_002
+ * @tc.desc: Set input device enable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> aucids;
+    auto callback = [&aucids](std::vector<int32_t> ids) { aucids = std::move(ids); };
+    InputManager::GetInstance()->GetDeviceIds(callback);
+    for (const auto &iter : aucids) {
+        MMI_HILOGI("Set inputdevice %{public}d enable", iter);
+        InputManager::GetInstance()->SetInputDeviceEnabled(iter, true);
+    }
+}
+
+/**
  * @tc.name: InputManagerTest_GetTouchpadRotateSwitch_001
  * @tc.desc: Get touchpad rotate switch
  * @tc.type: FUNC

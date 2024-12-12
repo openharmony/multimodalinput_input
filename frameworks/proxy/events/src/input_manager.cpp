@@ -701,5 +701,10 @@ int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
 {
     return InputMgrImpl.ConvertToCapiKeyAction(keyAction);
 }
+
+int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable)
+{
+    return InputMgrImpl.SetInputDeviceEnabled(deviceId, enable);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -955,5 +955,12 @@ int32_t MultimodalInputConnectManager::GetAllSystemHotkeys(std::vector<std::uniq
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetAllSystemHotkeys(keyOptions);
 }
+
+int32_t MultimodalInputConnectManager::SetInputDeviceEnabled(int32_t deviceId, bool enable)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetInputDeviceEnabled(deviceId, enable);
+}
 } // namespace MMI
 } // namespace OHOS
