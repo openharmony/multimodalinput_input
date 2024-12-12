@@ -1204,9 +1204,6 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleDownEvent_003,
     pointerEvent->pointers_.push_back(item1);
     pointerEvent->pointers_.push_back(item2);
     pointerEvent->SetPointerId(2);
-    detector.gestureTimer_ = 5;
-    ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
-    detector.gestureTimer_ = -2;
     ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
     detector.gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
     ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
@@ -1231,16 +1228,8 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleMoveEvent_004,
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     detector.isRecognized_ = true;
-    detector.gestureTimer_ = 2;
-    ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
-    detector.isRecognized_ = true;
-    detector.gestureTimer_ = -3;
     ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
     detector.isRecognized_ = false;
-    detector.gestureTimer_ = 2;
-    ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
-    detector.isRecognized_ = false;
-    detector.gestureTimer_ = -3;
     ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
 }
 
@@ -1314,7 +1303,6 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleUpEvent_003, T
     pointerEvent->pointerId_ = 1;
     detector.downPoint_[1] = Point(1.0f, 2.0f);
     detector.downPoint_[2] = Point(3.0f, 4.0f);
-    detector.gestureTimer_ = 2;
     detector.isRecognized_ = true;
     detector.lastTouchEvent_ = pointerEvent;
     ASSERT_NO_FATAL_FAILURE(detector.HandleUpEvent(pointerEvent));
