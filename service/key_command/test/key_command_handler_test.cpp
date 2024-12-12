@@ -6202,5 +6202,167 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseJson_002
+ * @tc.desc: Test the funcation ParseJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
+    bool ret = handler.ParseJson(defaultConfig);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_003
+ * @tc.desc: Test the funcation HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int64_t time = 4000000;
+    keyEvent->SetActionTime(time);
+    KeyCommandHandler handler;
+    handler.powerUpTime_ = 0;
+    handler.sosLaunchTime_ = 0;
+    handler.isParseConfig_ = true;
+    handler.isParseLongPressConfig_ = true;
+    handler.isParseMaxCount_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_004
+ * @tc.desc: Test if ((key->GetActionTime() - powerUpTime_) > POWER_ACTION_INTERVAL * FREQUENCY &&
+ * (key->GetActionTime() - sosLaunchTime_) > SOS_WAIT_TIME * FREQUENCY)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int64_t time = 0;
+    keyEvent->SetActionTime(time);
+    KeyCommandHandler handler;
+    handler.powerUpTime_ = 0;
+    handler.sosLaunchTime_ = 0;
+    handler.isParseConfig_ = true;
+    handler.isParseLongPressConfig_ = true;
+    handler.isParseMaxCount_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_005
+ * @tc.desc: Test if ((key->GetActionTime() - powerUpTime_) > POWER_ACTION_INTERVAL * FREQUENCY &&
+ * (key->GetActionTime() - sosLaunchTime_) > SOS_WAIT_TIME * FREQUENCY)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int64_t time = 700000;
+    keyEvent->SetActionTime(time);
+    KeyCommandHandler handler;
+    handler.powerUpTime_ = 0;
+    handler.sosLaunchTime_ = 0;
+    handler.isParseConfig_ = true;
+    handler.isParseLongPressConfig_ = true;
+    handler.isParseMaxCount_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsMusicActivate_001
+ * @tc.desc: Test the funcation IsMusicActivate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMusicActivate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.IsMusicActivate());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_001
+ * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    repeatKey.ability.bundleName = "com.huawei.hmos.emergencycommunication";
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+
+    repeatKey.ability.bundleName = "test";
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_002
+ * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    repeatKey.ability.bundleName = "com.huawei.hmos.emergencycommunication";
+    repeatKey.delay = 10;
+    handler.downActionTime_ = 10;
+    handler.lastDownActionTime_  = 10;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+
+    handler.downActionTime_ = 100;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003
+ * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    repeatKey.ability.bundleName = "test";
+    repeatKey.delay = 10;
+    handler.upActionTime_  = 10;
+    handler.lastDownActionTime_  = 10;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+
+    handler.downActionTime_ = 100;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+}
 } // namespace MMI
 } // namespace OHOS
