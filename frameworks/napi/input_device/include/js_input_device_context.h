@@ -46,7 +46,8 @@ public:
     static napi_value SetVKeyboardArea(napi_env env, napi_callback_info info);
     static napi_value UpdateMotionSpace(napi_env env, napi_callback_info info);
     static napi_value GetVKeyboardFuncKeySwitchState(napi_env env, napi_callback_info info);
-
+    static napi_value SetInputDeviceEnabled(napi_env env, napi_callback_info info);
+	
 public:
     enum class MotionSpaceType : int32_t {
         NARROW = 0,

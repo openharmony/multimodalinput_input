@@ -235,6 +235,7 @@ public:
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

@@ -833,7 +833,7 @@ int32_t InputDeviceManager::NotifyMessage(SessionPtr sess, int32_t id, const std
 void InputDeviceManager::InitSessionLostCallback()
 {
     if (sessionLostCallbackInitialized_) {
-        MMI_HILOGE("Init session is failed");
+        MMI_HILOGD("Init session is failed");
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
@@ -843,12 +843,13 @@ void InputDeviceManager::InitSessionLostCallback()
     }
     );
     sessionLostCallbackInitialized_ = true;
-    MMI_HILOGD("The callback on session deleted is registered successfully");
+    MMI_HILOGI("The callback on session deleted is registered successfully");
 }
 
 void InputDeviceManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
+    RecoverInputDeviceEnabled(session);
     devListeners_.remove(session);
 }
 
@@ -885,6 +886,39 @@ bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevi
 {
     CHKPR(inputDevice, false);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+}
+
+int32_t InputDeviceManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
+    auto item = inputDevice_.find(deviceId);
+    if (item != inputDevice_.end()) {
+        item->second.enable = enable;
+        if (!enable) {
+            MMI_HILOGE("enable false, save to lastinputctl pid: %{public}d", pid);
+            lastinputctl_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
+            InitSessionLostCallback();
+        }
+        return RET_OK;
+    }
+    MMI_HILOGD("Set inputDevice enabled failed, Invalid deviceId.");
+    return RET_ERR;
+}
+
+void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    for (auto item = lastinputctl_.begin(); item != lastinputctl_.end();) {
+        if (session->GetPid() == item->second) {
+            auto device = inputDevice_.find(item->first);
+            if (device != inputDevice_.end()) {
+                MMI_HILOGI("Recover input device : %{public}d", item->first);
+                device->second.enable = true;
+            }
+            lastinputctl_.erase(item++);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

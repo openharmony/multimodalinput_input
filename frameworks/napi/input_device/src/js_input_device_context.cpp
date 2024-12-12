@@ -41,6 +41,7 @@ constexpr int32_t SET_VKEY_AREA_NUMBER_PARAMETERS { 4 };
 constexpr int32_t UPDATE_VKEY_MS_NUMBER_PARAMETERS { 1 };
 constexpr int32_t GET_VKEY_FUNC_KEY_SWITCH_STATE_NUM_PARAMETERS { 1 };
 constexpr uint32_t VKEY_MS_ARRAY_MAX_SIZE { 300 };
+
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 enum class VKeyResult : int32_t {
     FAILED = 0,
@@ -1079,6 +1080,45 @@ napi_value JsInputDeviceContext::CreateEnumVKeySwitchState(napi_env env, napi_va
     return exports;
 }
 
+napi_value JsInputDeviceContext::SetInputDeviceEnabled(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < INPUT_PARAMETER) {
+        MMI_HILOGE("At least 2 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("Rows parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        return nullptr;
+    }
+    int32_t deviceId = -1;
+    CHKRP(napi_get_value_int32(env, argv[0], &deviceId), GET_VALUE_INT32);
+    if (deviceId < 0) {
+        MMI_HILOGE("Invalid deviceId");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "deviceId is invalid");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[1], napi_boolean)) {
+        MMI_HILOGE("enable parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        return nullptr;
+    }
+    bool enable = true;
+    CHKRP(napi_get_value_bool(env, argv[1], &enable), GET_VALUE_BOOL);
+
+    JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsIds);
+    auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    return jsInputDeviceMgr->SetInputDeviceEnabled(env, deviceId, enable);
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1100,6 +1140,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatDelay", GetKeyboardRepeatDelay),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatRate", GetKeyboardRepeatRate),
         DECLARE_NAPI_STATIC_FUNCTION("getIntervalSinceLastInput", GetIntervalSinceLastInput),
+        DECLARE_NAPI_STATIC_FUNCTION("setInputDeviceEnabled", SetInputDeviceEnabled),
         DECLARE_NAPI_STATIC_FUNCTION("setVKeyboardArea", SetVKeyboardArea),
         DECLARE_NAPI_STATIC_FUNCTION("updateMotionSpace", UpdateMotionSpace),
         DECLARE_NAPI_STATIC_FUNCTION("getVKeyboardFuncKeySwitchState", GetVKeyboardFuncKeySwitchState),

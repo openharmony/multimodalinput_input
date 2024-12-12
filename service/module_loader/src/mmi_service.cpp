@@ -4292,5 +4292,31 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
     MMI_HILOGI("OnGetAllSystemHotkey function does not support");
     return ERROR_UNSUPPORT;
 }
+
+int32_t MMIService::SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t pid)
+{
+    int32_t ret = INPUT_DEV_MGR->SetInputDeviceEnabled(deviceId, enable, pid);
+    if (RET_OK != ret) {
+        MMI_HILOGE("Set inputdevice enabled failed, return:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, deviceId, enable, pid] {
+            return this->SetInputDeviceEnable(deviceId, enable, pid);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set inputdevice enable failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
