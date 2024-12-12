@@ -16,8 +16,6 @@
 #ifndef MMI_EVENT_OBSERVER_H
 #define MMI_EVENT_OBSERVER_H
 
-#include "iremote_broker.h"
-
 #include "key_event.h"
 #include "pointer_event.h"
 
