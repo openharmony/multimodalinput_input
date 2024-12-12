@@ -620,6 +620,11 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         return result;
     }
     PointerEvent::PointerItem pointerItem;
+    if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    } else if (type == LIBINPUT_EVENT_POINTER_MOTION || type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE) {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    }
     if (type == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN || type == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END) {
         HandleAxisPostInner(pointerItem);
     } else if (!HandlePostInner(data, pointerItem)) {
