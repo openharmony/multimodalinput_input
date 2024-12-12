@@ -1324,6 +1324,42 @@ void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
     filter->HandlePointerEvent(pointerEvent);
 }
 
+void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
+{
+    CHKPV(lastPointerEvent_);
+    MouseLocation mouseLocation = GetMouseInfo();
+    int32_t displayId = MouseEventHdr->GetDisplayId();
+    displayId = displayId < 0 ? displayGroupInfo_.displaysInfo[0].id : displayId;
+    auto displayInfo = GetPhysicalDisplay(displayId);
+    CHKPV(displayInfo);
+    DispatchPointerCancel(displayId);
+    int32_t logicX = mouseLocation.physicalX + displayInfo->x;
+    int32_t logicY = mouseLocation.physicalY + displayInfo->y;
+    lastLogicX_ = logicX;
+    lastLogicY_ = logicY;
+    std::optional<WindowInfo> windowInfo;
+    if (lastPointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
+        lastPointerEvent_->GetPressedButtons().empty()) {
+        PhysicalCoordinate coord {
+            .x = logicX,
+            .y = logicY,
+        };
+        if (cursorPos_.direction != displayInfo->direction &&
+            cursorPos_.displayDirection == displayInfo->displayDirection) {
+            coord.x = cursorPos_.cursorPos.x;
+            coord.y = cursorPos_.cursorPos.y;
+            RotateDisplayScreen(*displayInfo, coord);
+        }
+        windowInfo = GetWindowInfo(coord.x, coord.y);
+    } else {
+        windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEvent_);
+    }
+    CHKFRV(windowInfo, "The windowInfo is nullptr");
+    int32_t windowPid = GetWindowPid(windowInfo->id);
+    WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
+    IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
+}
+
 void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
