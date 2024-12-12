@@ -282,7 +282,8 @@ napi_value JsInputDeviceManager::SetInputDeviceEnabled(napi_env env, int32_t dev
     }
     auto status = napi_create_int32(env, errorCode, &(ret));
     if (status != napi_ok) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "get SetInputDeviceEnabled operation result fail");
+        MMI_HILOGE("get operation result fail");
+        return nullptr;
     }
     return ret;
 }

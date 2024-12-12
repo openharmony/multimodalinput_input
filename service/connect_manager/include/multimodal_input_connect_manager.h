@@ -115,7 +115,6 @@ public:
     int32_t GetTouchpadScrollDirection(bool &state);
     int32_t SetTouchpadTapSwitch(bool switchFlag);
     int32_t GetTouchpadTapSwitch(bool &switchFlag);
-    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable);
     int32_t SetTouchpadPointerSpeed(int32_t speed);
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
     int32_t SetTouchpadPinchSwitch(bool switchFlag);
@@ -165,6 +164,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable);
 
 private:
     MultimodalInputConnectManager() = default;

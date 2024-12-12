@@ -125,7 +125,6 @@ public:
     int32_t GetTouchpadScrollDirection(bool &state) override;
     int32_t SetTouchpadTapSwitch(bool switchFlag) override;
     int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
-    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable) override;
     int32_t SetTouchpadPointerSpeed(int32_t speed) override;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
     int32_t SetTouchpadPinchSwitch(bool switchFlag) override;
@@ -193,6 +192,7 @@ public:
 
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
@@ -219,7 +219,6 @@ protected:
     int32_t ReadTouchpadRightMenuType(int32_t &type);
     int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
     int32_t ReadTouchpadScrollRows(int32_t &rows);
-    int32_t SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t pid);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
@@ -279,6 +278,7 @@ protected:
     void InitVKeyboardPointerEventHandler();
     void InitVKeyboardFuncHandler();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t pid);
 private:
     MMIService();
     ~MMIService();

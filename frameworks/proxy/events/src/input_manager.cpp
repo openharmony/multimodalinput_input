@@ -480,11 +480,6 @@ int32_t InputManager::GetTouchpadTapSwitch(bool &switchFlag)
     return InputMgrImpl.GetTouchpadTapSwitch(switchFlag);
 }
 
-int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable)
-{
-    return InputMgrImpl.SetInputDeviceEnabled(deviceId, enable);
-}
-
 int32_t InputManager::SetTouchpadPointerSpeed(int32_t speed)
 {
     return InputMgrImpl.SetTouchpadPointerSpeed(speed);
@@ -705,6 +700,11 @@ int32_t InputManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>
 int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
 {
     return InputMgrImpl.ConvertToCapiKeyAction(keyAction);
+}
+
+int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable)
+{
+    return InputMgrImpl.SetInputDeviceEnabled(deviceId, enable);
 }
 } // namespace MMI
 } // namespace OHOS

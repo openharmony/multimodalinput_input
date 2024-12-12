@@ -2063,31 +2063,6 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-
-    int32_t deviceId = 0;
-    bool enable = true;
-    READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetInputDeviceEnabled(deviceId, enable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set inputdevice device input failed ret:%{public}d", ret);
-        return ERROR_INVALID_DEVICEID;
-    }
-    return RET_OK;
-}
-
 int32_t MultimodalInputConnectStub::StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2999,6 +2974,31 @@ int32_t MultimodalInputConnectStub::StubGetAllSystemHotkeys(MessageParcel& data,
         }
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    int32_t deviceId = 0;
+    bool enable = true;
+    READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetInputDeviceEnabled(deviceId, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set inputdevice device input failed ret:%{public}d", ret);
+        return ERROR_INVALID_DEVICEID;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

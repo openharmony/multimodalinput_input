@@ -61,8 +61,6 @@ public:
     bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
     int32_t GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType);
     int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType);
-    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t pid);
-    void RecoverInputDeviceEnabled(SessionPtr session);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug);
@@ -86,6 +84,7 @@ public:
     VendorConfig GetVendorConfig(int32_t deviceId) const;
     int32_t OnEnableInputDevice(bool enable);
     std::vector<int32_t> GetTouchPadIds();
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t pid);
 
     static std::shared_ptr<InputDeviceManager> GetInstance();
 
@@ -100,13 +99,13 @@ private:
     void NotifyDevRemoveCallback(int32_t deviceId, const InputDeviceInfo &deviceInfo);
     int32_t NotifyMessage(SessionPtr sess, int32_t id, const std::string &type);
     void InitSessionLostCallback();
-    void InitInputCtlSessionLostCallback();
     void OnSessionLost(SessionPtr session);
     int32_t MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo);
     int32_t GenerateVirtualDeviceId(int32_t &deviceId);
     bool IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const;
+    void RecoverInputDeviceEnabled(SessionPtr session);
 
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;

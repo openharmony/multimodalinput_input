@@ -172,7 +172,6 @@ public:
     int32_t GetTouchpadScrollDirection(bool &state);
     int32_t SetTouchpadTapSwitch(bool switchFlag);
     int32_t GetTouchpadTapSwitch(bool &switchFlag);
-    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable);
     int32_t SetTouchpadPointerSpeed(int32_t speed);
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
     int32_t SetTouchpadPinchSwitch(bool switchFlag);
@@ -236,6 +235,7 @@ public:
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
