@@ -3052,6 +3052,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_001, TestSize.L
     auto callback = [&aucids](std::vector<int32_t> ids) { aucids = std::move(ids); };
     InputManager::GetInstance()->GetDeviceIds(callback);
     for (const auto &iter : aucids) {
+        MMI_HILOGI("Set inputdevice %{public}d disable", iter);
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, false);
     }
 }
@@ -3069,6 +3070,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_002, TestSize.L
     auto callback = [&aucids](std::vector<int32_t> ids) { aucids = std::move(ids); };
     InputManager::GetInstance()->GetDeviceIds(callback);
     for (const auto &iter : aucids) {
+        MMI_HILOGI("Set inputdevice %{public}d enable", iter);
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, true);
     }
 }

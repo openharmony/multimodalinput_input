@@ -1793,29 +1793,6 @@ int32_t MultimodalInputConnectProxy::GetTouchpadInt32Data(int32_t &value, int32_
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetInputDeviceEnabled(int32_t deviceId, bool enable)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEINT32(data, deviceId, ERR_INVALID_VALUE);
-    WRITEBOOL(data, enable, ERR_INVALID_VALUE);
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUTDEVICE_ENABLE),
-        data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
 int32_t MultimodalInputConnectProxy::SetTouchpadScrollSwitch(bool switchFlag)
 {
     return SetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
@@ -2688,6 +2665,29 @@ int32_t MultimodalInputConnectProxy::GetAllSystemHotkeys(std::vector<std::unique
         keyOptions.push_back(std::move(keyOption));
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetInputDeviceEnabled(int32_t deviceId, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, deviceId, ERR_INVALID_VALUE);
+    WRITEBOOL(data, enable, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUTDEVICE_ENABLE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

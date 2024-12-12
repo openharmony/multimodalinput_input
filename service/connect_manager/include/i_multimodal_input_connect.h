@@ -127,7 +127,6 @@ public:
     virtual int32_t GetTouchpadScrollDirection(bool &state) = 0;
     virtual int32_t SetTouchpadTapSwitch(bool switchFlag) = 0;
     virtual int32_t GetTouchpadTapSwitch(bool &switchFlag) = 0;
-    virtual int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable) = 0;
     virtual int32_t SetTouchpadPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetTouchpadPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SetTouchpadPinchSwitch(bool switchFlag) = 0;
@@ -174,6 +173,7 @@ public:
     virtual int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) = 0;
     virtual int32_t SkipPointerLayer(bool isSkip) = 0;
     virtual int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) = 0;
+    virtual int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

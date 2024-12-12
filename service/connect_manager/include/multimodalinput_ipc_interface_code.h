@@ -130,6 +130,7 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_CLIENT_INFO = 104,
     ADD_GESTURE_MONITOR = 105,
     REMOVE_GESTURE_MONITOR = 106,
+    SET_INPUTDEVICE_ENABLE = 107,
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     SET_VKEYBOARD_AREA = 151,
     SET_MOTION_SPACE = 152,
@@ -139,7 +140,6 @@ enum class MultimodalinputConnectInterfaceCode {
     UNSUBSCRIBE_HOT_KEY = 304,
     SUBSCRIBE_LONG_PRESS = 305,
     UNSUBSCRIBE_LONG_PRESS = 306,
-	SET_INPUTDEVICE_ENABLE = 309,
 };
 
 enum class MultimodalinputEventObserverCode {

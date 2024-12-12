@@ -111,7 +111,6 @@ public:
     int32_t GetTouchpadScrollDirection(bool &state) override;
     int32_t SetTouchpadTapSwitch(bool switchFlag) override;
     int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
-    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable) override;
     int32_t SetTouchpadPointerSpeed(int32_t speed) override;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
     int32_t SetTouchpadPinchSwitch(bool switchFlag) override;
@@ -159,6 +158,7 @@ public:
 	int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

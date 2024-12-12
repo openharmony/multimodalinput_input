@@ -125,7 +125,6 @@ protected:
     int32_t StubGetTouchpadScrollDirection(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadPinchSwitch(MessageParcel& data, MessageParcel& reply);
@@ -174,6 +173,7 @@ protected:
     int32_t StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetAllSystemHotkeys(MessageParcel& data, MessageParcel& reply);
     int32_t ParseAddInputHandlerData(MessageParcel& data, ParseData& parseData);
+    int32_t StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);
