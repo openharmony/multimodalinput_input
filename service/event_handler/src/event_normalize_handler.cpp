@@ -588,6 +588,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             OHOS::ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
             OHOS::ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN_MMI,
             mapPayload);
+        mapPayload.clear();
     }
 #endif
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
