@@ -6316,7 +6316,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     RepeatKey repeatKey;
-    repeatKey.ability.bundleName = "communication";
+    repeatKey.ability.bundleName = SOS_BUNDLE_NAME;
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
 
     repeatKey.ability.bundleName = "test";
@@ -6334,7 +6334,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     RepeatKey repeatKey;
-    repeatKey.ability.bundleName = "communication";
+    repeatKey.ability.bundleName = SOS_BUNDLE_NAME;
     repeatKey.delay = 10;
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_  = 10;
