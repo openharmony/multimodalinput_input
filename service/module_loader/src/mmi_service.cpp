@@ -872,6 +872,7 @@ int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
+    WIN_MGR->UpdatePointerDrawingManagerWindowInfo();
     visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
     return RET_OK;
 }
