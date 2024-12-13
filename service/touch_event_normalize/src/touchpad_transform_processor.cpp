@@ -367,6 +367,14 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
     RemoveSurplusPointerItem();
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
+        pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_UPDATE ||
+        pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) &&
+        (pointerEvent_->GetTargetWindowId() > 0)) {
+        pointerEvent_->SetTargetWindowId(-1);
+        pointerEvent_->SetAgentWindowId(-1);
+        pointerItem.SetTargetWindowId(-1);
+    }
     return RET_OK;
 }
 
