@@ -6214,8 +6214,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_002, TestSize.Le
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
-    bool ret = handler.ParseJson(defaultConfig);
-    EXPECT_TRUE(ret);
+    ASSERT_NO_FATAL_FAILURE(handler.ParseJson(defaultConfig));
 }
 
 /**
