@@ -277,6 +277,7 @@ PointerDrawingManager::PointerDrawingManager()
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
     g_hardwareCanvasSize = GetCanvasSize();
     g_focalPoint = GetFocusCoordinates();
+    InitScreenInfo();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
@@ -2192,7 +2193,6 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPV(hardwareCursorPointerManager_);
     hardwareCursorPointerManager_->SetTargetDevice(displayInfo.id);
-    InitScreenInfo();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
@@ -2988,9 +2988,42 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
     DumpFullTable(oss, "Visible Info", pidTitles, pidInfos);
     oss << std::endl;
 
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    DumpScreenInfo(oss);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
     std::string dumpInfo = oss.str();
     dprintf(fd, dumpInfo.c_str());
 }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void PointerDrawingManager::DumpScreenInfo(std::ostringstream& oss)
+{
+    if (!g_screenSourceMode.empty()) {
+        std::vector<std::string> allScreenIds;
+        std::vector<std::string> allScreenSourceMode;
+        for (auto iter = g_screenSourceMode.begin(); iter != g_screenSourceMode.end(); ++iter) {
+            allScreenIds.push_back(std::to_string(iter->first));
+            if (iter->second->GetType() == Rosen::ScreenType::REAL &&
+                iter->second->GetSourceMode() == Rosen::ScreenSourceMode::SCREEN_MIRROR) {
+                allScreenSourceMode.push_back("SCREEN_MIRROR");
+            } else if (iter->second->GetSourceMode() == Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+                allScreenSourceMode.push_back("SCREEN_EXTEND");
+            } else if (iter->second->GetType() == Rosen::ScreenType::VIRTUAL) {
+                allScreenSourceMode.push_back("SCREEN_VIRTUAL");
+            } else if (iter->second->GetSourceMode() == Rosen::ScreenSourceMode::SCREEN_MAIN) {
+                allScreenSourceMode.push_back("SCREEN_MAIN");
+            } else {
+                MMI_HILOGE("No screenType match");
+            }
+        }
+        std::vector<std::vector<std::string>> data3;
+        data3.push_back(allScreenSourceMode);
+        DumpFullTable(oss, "ScreenInfo", allScreenIds, data3);
+        oss << std::endl;
+    }
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
