@@ -146,6 +146,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             LaunchAbility();
             AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
                 MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+                AUTH_DIALOG.CloseDialog();
             };
             AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
@@ -230,6 +231,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
+            AUTH_DIALOG.CloseDialog();
             AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
                 MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
             };
@@ -922,14 +924,18 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 void ServerMsgHandler::LaunchAbility()
 {
     CALL_DEBUG_ENTER;
-    OHOS::MMI::AuthorizationDialog authorizationDialog;
-    authorizationDialog.ConnectSystemUi();
+    AUTH_DIALOG.ConnectSystemUi();
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 {
     CALL_DEBUG_ENTER;
     if (isAuthorize) {
+        auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+        if (state == AuthorizeState::STATE_UNAUTHORIZE) {
+            MMI_HILOGE("Current not has authorizing pid:%{public}d ", CurrentPID_);
+            return ERR_OK;
+        }
         auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::AUTHORIZED));
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
@@ -962,6 +968,15 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
     }
     MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
+    auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+    if (state != AuthorizeState::STATE_UNAUTHORIZE) {
+        MMI_HILOGI("Cancel injection right,pid:%{public}d", AUTHORIZE_HELPER->GetAuthorizePid());
+        if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
+            AUTHORIZE_HELPER->CancelAuthorize(AUTHORIZE_HELPER->GetAuthorizePid());
+        } else {
+            CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
+        }
+    }
     return ERR_OK;
 }
 
