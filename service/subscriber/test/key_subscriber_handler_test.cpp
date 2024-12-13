@@ -25,6 +25,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "device_event_monitor.h"
+#include "display_event_monitor.h"
 #include "input_event_handler.h"
 #include "key_event.h"
 #include "mmi_log.h"
@@ -2334,11 +2335,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_
     std::shared_ptr<KeyOption> keyOption;
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
     NapProcess napProcess;
-    napProcess.napClientPid_ = REMOVE_OBSERVER;
+    napProcess.instance_->napClientPid_ = REMOVE_OBSERVER;
     ASSERT_NO_FATAL_FAILURE(handler.SubscriberNotifyNap(subscriber));
-    napProcess.napClientPid_ = UNOBSERVED;
+    napProcess.instance_->napClientPid_ = UNOBSERVED;
     ASSERT_NO_FATAL_FAILURE(handler.SubscriberNotifyNap(subscriber));
-    napProcess.napClientPid_ = 10;
+    napProcess.instance_->napClientPid_ = 10;
     ASSERT_NO_FATAL_FAILURE(handler.SubscriberNotifyNap(subscriber));
 }
 
@@ -2358,7 +2359,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_
     ASSERT_NE(subscriber, nullptr);
 
     NapProcess napProcess;
-    napProcess.napClientPid_ = ACTIVE_EVENT;
+    napProcess.instance_->napClientPid_ = ACTIVE_EVENT;
     OHOS::MMI::NapProcess::NapStatusData napData;
     napData.pid = 2;
     napData.uid = 3;
@@ -2580,6 +2581,121 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_DumpSubscriber, Test
     option->SetPreKeys(preKeys);
     subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, option);
     EXPECT_NO_FATAL_FAILURE(handler.DumpSubscriber(fd, subscriber));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_InitDataShareListener
+ * @tc.desc: Test InitDataShareListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_InitDataShareListener, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    EXPECT_NO_FATAL_FAILURE(handler.InitDataShareListener());
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RejectCallProcess
+ * @tc.desc: Test RejectCallProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RejectCallProcess, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    EXPECT_NO_FATAL_FAILURE(handler.RejectCallProcess());
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HangUpCallProcess
+ * @tc.desc: Test HangUpCallProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HangUpCallProcess, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    EXPECT_NO_FATAL_FAILURE(handler.HangUpCallProcess());
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
+ * @tc.desc: Test HandleCallEnded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    bool ret = false;
+    handler.callBahaviorState_ = false;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.callBahaviorState_ = true;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CAMERA);
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_DIALING;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+
+    DEVICE_MONITOR->callState_ = CALL_STATUS_INCOMING;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+
+    DEVICE_MONITOR->callState_ = 10;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberTimer
+ * @tc.desc: Test RemoveSubscriberTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTimer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    for (auto i = 0; i < 5; i++) {
+        KeyEvent::KeyItem keyItem;
+        keyItem.SetKeyCode(KeyEvent::KEYCODE_POWER);
+        keyItem.SetPressed(true);
+        keyEvent->keys_.push_back(keyItem);
+    }
+    EXPECT_NO_FATAL_FAILURE(handler.RemoveSubscriberTimer(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer
+ * @tc.desc: Test RemoveSubscriberKeyUpTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    EXPECT_NO_FATAL_FAILURE(handler.RemoveSubscriberKeyUpTimer(KeyEvent::KEYCODE_POWER));
 }
 } // namespace MMI
 } // namespace OHOS
