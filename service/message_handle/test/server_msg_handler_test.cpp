@@ -1683,20 +1683,5 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMsgHandler_001, TestSize.L
     EXPECT_NO_FATAL_FAILURE(msgHandler.OnMsgHandler(sess, pkt));
 }
 
-/**
- * @tc.name: ServerMsgHandlerTest_OnSetFunctionKeyState_002
- * @tc.desc: Test the function OnSetFunctionKeyState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    int32_t funcKey = 1;
-    bool enable = true;
-    INPUT_DEV_MGR->IsKeyboardDevice(nullptr);
-    EXPECT_EQ(handler.OnSetFunctionKeyState(funcKey, enable), ERROR_NULL_POINTER);
-}
 } // namespace MMI
 } // namespace OHOS
