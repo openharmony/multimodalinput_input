@@ -6363,5 +6363,138 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
     handler.downActionTime_ = 100;
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_001
+ * @tc.desc: Test if (bundleName.find(matchName) == std::string::npos)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+
+    repeatKey.ability.bundleName = ".test";
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_002
+ * @tc.desc: Test if (bundleName.find(matchName) == std::string::npos)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.focusWindowId = 0;
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    DISPLAY_MONITOR->SetScreenStatus("test");
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_003
+ * @tc.desc: Test if (WIN_MGR->JudgeCaramaInFore() &&
+ * (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.focusWindowId = 0;
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_004
+ * @tc.desc: Test if (WIN_MGR->JudgeCaramaInFore() &&
+ * (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.focusWindowId = 0;
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    DISPLAY_MONITOR->SetScreenStatus("test");
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
 } // namespace MMI
 } // namespace OHOS
