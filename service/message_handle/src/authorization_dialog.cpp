@@ -91,7 +91,7 @@ void AuthorizationDialog::DialogAbilityConnection::OnAbilityConnectDone(
     if (remoteObject_ == nullptr) {
         remoteObject_ = remoteObject;
     }
-    ffrt::submit([remoteObject] {
+    ffrt::submit([&] {
         this->OpenDialog();
     });
 }
