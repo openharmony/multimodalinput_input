@@ -1787,5 +1787,29 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveGestureMonitor, Test
     int32_t ret = handler.OnRemoveGestureMonitor(udsSe, inputHandlerType, eventType, gestureType, fingers);
     ASSERT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddGestureMonitor
+ * @tc.desc: Test the function OnAddGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddGestureMonitor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto udsSe = std::make_shared<UDSSession>("mytest", 2, 3, 4, 5);
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    uint32_t eventType = HANDLE_EVENT_TYPE_KEY;
+    uint32_t gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    uint32_t fingers = 3;
+    InputHandler->eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
+    int32_t ret = handler.OnAddGestureMonitor(udsSe, handlerType, eventType, gestureType, fingers);
+    ASSERT_NE(ret, RET_OK);
+
+    handlerType = InputHandlerType::NONE;
+    ret = handler.OnAddGestureMonitor(udsSe, handlerType, eventType, gestureType, fingers);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
