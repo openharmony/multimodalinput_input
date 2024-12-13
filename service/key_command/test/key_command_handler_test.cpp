@@ -6306,17 +6306,17 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMusicActivate_001, TestS
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_001
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003
  * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_001, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     RepeatKey repeatKey;
-    repeatKey.ability.bundleName = "com.huawei.hmos.emergencycommunication";
+    repeatKey.ability.bundleName = "communication";
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
 
     repeatKey.ability.bundleName = "test";
@@ -6324,17 +6324,17 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_002
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_004
  * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_002, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     RepeatKey repeatKey;
-    repeatKey.ability.bundleName = "com.huawei.hmos.emergencycommunication";
+    repeatKey.ability.bundleName = "communication";
     repeatKey.delay = 10;
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_  = 10;
@@ -6345,12 +6345,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_005
  * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
