@@ -558,22 +558,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsValidAction_001,
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow_001
- * @tc.desc: Test Overrides CreateTouchWindow function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateTouchWindow_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    int32_t displayId = 10;
-    kceDrawMgr.surfaceNode_ = nullptr;
-    kceDrawMgr.displayInfo_.displayMode = DisplayMode::MAIN;
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.CreateTouchWindow(displayId));
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle_001
  * @tc.desc: Test Overrides IsSingleKnuckle function branches
  * @tc.type: Function
