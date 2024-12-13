@@ -239,7 +239,7 @@ int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32
         return keyCode;
     }
     const char *name = libinput_device_get_name(dev);
-    int32_t busType = libinput_device_get_id_bustype(dev);
+    int32_t busType = static_cast<int32_t>(libinput_device_get_id_bustype(dev));
     MMI_HILOGD("Flip volume keys upon fold: Dev:%{public}s, Bus:%{public}d",
         name != nullptr ? name : "(null)", busType);
     if (busType != BUS_HOST) {
