@@ -20,6 +20,7 @@
 
 #include "key_option.h"
 #include "key_subscriber_handler.h"
+#include "key_shortcut_manager.h"
 #include "call_manager_client.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
@@ -1704,34 +1705,117 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_002, Tes
     bool ret = handler.HandleKeyUp(keyEvent);
     ASSERT_FALSE(ret);
     keyOption->isFinalKeyDown_ = false;
+    keyOption->finalKey_ = 2;
+    std::set<int32_t> tmp;
+    for (auto i = 0; i < 5; i++) {
+        tmp.insert(i);
+        KeyEvent::KeyItem keyItem;
+        keyItem.pressed_ = true;
+        keyItem.SetKeyCode(i);
+        keyItem.downTime_ = 2000;
+        keyEvent->keys_.push_back(keyItem);
+    }
+    tmp.clear();
+    keyOption->SetPreKeys(tmp);
+    keyOption->finalKeyDownDuration_ = 0;
     keyOption->finalKey_ = -1;
+    keyEvent->SetKeyCode(-1);
     subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
     subscribers.push_back(subscriber);
     handler.subscriberMap_.insert(std::make_pair(keyOption, subscribers));
+    KEY_SHORTCUT_MGR->isCheckShortcut_ = true;
     ret = handler.HandleKeyUp(keyEvent);
     ASSERT_FALSE(ret);
-    keyOption->finalKey_ = 0;
+    keyOption->finalKeyDownDuration_ = 3;
+    keyOption->finalKey_ = 3;
+    keyEvent->SetKeyCode(3);
     subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
     subscribers.push_back(subscriber);
     handler.subscriberMap_.insert(std::make_pair(keyOption, subscribers));
-    ret = handler.HandleKeyUp(keyEvent);
-    ASSERT_FALSE(ret);
-    std::set<int32_t> preKeys;
-    std::vector<int32_t> pressedKeys = {1, 2, 3};
-    subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    subscribers.push_back(subscriber);
-    handler.subscriberMap_.insert(std::make_pair(keyOption, subscribers));
-    ret = handler.HandleKeyUp(keyEvent);
-    ASSERT_FALSE(ret);
-    pressedKeys = {1, 2, 3};
-    preKeys = {1, 2, 3, 4};
-    subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    subscribers.push_back(subscriber);
-    handler.subscriberMap_.insert(std::make_pair(keyOption, subscribers));
+    KEY_SHORTCUT_MGR->isCheckShortcut_ = true;
     ret = handler.HandleKeyUp(keyEvent);
     ASSERT_FALSE(ret);
 }
 
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyUp_003
+ * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->isFinalKeyDown_ = false;
+    SessionPtr sess;
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
+    keyOption->finalKey_ = 0;
+    subscribers.push_back(subscriber);
+    handler.subscriberMap_.insert(std::make_pair(keyOption, subscribers));
+    KEY_SHORTCUT_MGR->isCheckShortcut_ = true;
+    keyEvent->SetKeyCode(-1);
+    bool ret = false;
+    ret = handler.HandleKeyUp(keyEvent);
+    ASSERT_FALSE(ret);
+    keyOption->finalKey_ = 2;
+    std::set<int32_t> tmp;
+    for (auto i = 0; i < 5; i++) {
+        tmp.insert(i);
+        KeyEvent::KeyItem keyItem;
+        keyItem.pressed_ = true;
+        keyItem.SetKeyCode(i);
+        keyItem.downTime_ = 2000;
+        keyEvent->keys_.push_back(keyItem);
+    }
+    keyOption->SetPreKeys(tmp);
+    subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    subscribers.push_back(subscriber);
+    handler.subscriberMap_.insert(std::make_pair(keyOption, subscribers));
+    keyEvent->SetKeyCode(2);
+    KEY_SHORTCUT_MGR->isCheckShortcut_ = true;
+    ret = handler.HandleKeyUp(keyEvent);
+    ASSERT_FALSE(ret);
+    tmp.clear();
+    keyOption->SetPreKeys(tmp);
+    keyOption->finalKey_ = 4;
+    keyEvent->SetKeyCode(4);
+    keyEvent->actionTime_ = 3000;
+    keyOption->finalKeyDownDuration_ = 3;
+    subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    subscribers.push_back(subscriber);
+    handler.subscriberMap_.insert(std::make_pair(keyOption, subscribers));
+    KEY_SHORTCUT_MGR->isCheckShortcut_ = true;
+    ret = handler.HandleKeyUp(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyUp_004
+ * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->isFinalKeyDown_ = true;
+    SessionPtr sess;
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
+    subscribers.push_back(subscriber);
+    handler.subscriberMap_.insert(std::make_pair(keyOption, subscribers));
+    bool ret = handler.HandleKeyUp(keyEvent);
+    ASSERT_FALSE(ret);
+}
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_01
  * @tc.desc: Test the funcation HandleRingMute
