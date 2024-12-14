@@ -1479,7 +1479,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
                 it->second.pop_front();
             }
             auto handler = InputHandler->GetSubscriberHandler();
-            CHKPF(handler);
+            CHKPV(handler);
             handler->HandleKeyEvent(tmpKey);
         });
         if (timerId < 0) {
