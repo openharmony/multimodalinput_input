@@ -502,6 +502,7 @@ void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEve
     MMI_HILOGW("Event is %{public}s", tempEvent->ToString().c_str());
     auto fd = WIN_MGR->GetClientFd(tempEvent);
     auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(tempEvent, pkt);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -1477,7 +1478,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
             if (it != specialTimers_.end() && !it->second.empty()) {
                 it->second.pop_front();
             }
-            InputHandler->GetSubscriberHandler()->HandleKeyEvent(tmpKey);
+            auto handler = InputHandler->GetSubscriberHandler();
+            CHKPV(handler);
+            handler->HandleKeyEvent(tmpKey);
         });
         if (timerId < 0) {
             MMI_HILOGE("Add timer failed");
@@ -1824,18 +1827,24 @@ void KeyCommandHandler::SendKeyEvent()
             if (count_ == repeatKeyMaxTimes_[keycode] - 1 && keycode == KeyEvent::KEYCODE_POWER) {
                 auto keyEventCancel = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_CANCEL, false);
                 CHKPV(keyEventCancel);
-                InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
+                auto handler = InputHandler->GetSubscriberHandler();
+                CHKPV(handler);
+                handler->HandleKeyEvent(keyEventCancel);
                 continue;
             }
             if (i != 0) {
                 auto keyEventDown = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_DOWN, true);
                 CHKPV(keyEventDown);
-                InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventDown);
+                auto handler = InputHandler->GetSubscriberHandler();
+                CHKPV(handler);
+                handler->HandleKeyEvent(keyEventDown);
             }
 
             auto keyEventUp = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_UP, false);
             CHKPV(keyEventUp);
-            InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventUp);
+            auto handler = InputHandler->GetSubscriberHandler();
+            CHKPV(handler);
+            handler->HandleKeyEvent(keyEventUp);
         }
     }
     count_ = 0;
@@ -2049,7 +2058,9 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
             if (IsSpecialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(item.keyCode, item.keyAction);
             }
-            InputHandler->GetSubscriberHandler()->RemoveSubscriberKeyUpTimer(item.keyCode);
+            auto handler = InputHandler->GetSubscriberHandler();
+            CHKPF(handler);
+            handler->RemoveSubscriberKeyUpTimer(item.keyCode);
             RemoveSubscribedTimer(item.keyCode);
         }
     }
@@ -2264,7 +2275,9 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     }
     MMI_HILOGI("Add timer success");
     lastMatchedKey_ = shortcutKey;
-    if (InputHandler->GetSubscriberHandler()->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
+    auto handler = InputHandler->GetSubscriberHandler();
+    CHKPF(handler);
+    if (handler->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
         MMI_HILOGI("current shortcutKey %d is subSubcribed", shortcutKey.finalKey);
         return false;
     }
