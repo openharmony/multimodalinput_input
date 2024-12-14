@@ -813,3 +813,5 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     bool isLaunched = false;
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
+} // namespace MMI
+} // namespace OHOS
