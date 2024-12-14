@@ -40,7 +40,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-const std::string SOS_BUNDLE_NAME { "com.huawei.hmos.emergencycommunication" };
+const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 } // namespace
 class KeyCmdHandleRepeatKeyTest : public testing::Test {
 public:
