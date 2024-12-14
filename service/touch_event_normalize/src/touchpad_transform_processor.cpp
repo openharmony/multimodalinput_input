@@ -603,8 +603,8 @@ int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(bool switch
 
     auto originDevice = INPUT_DEV_MGR->GetTouchPadDeviceOrigin();
     if (originDevice == nullptr) {
-        MMI_HILOGE("GetTouchPadDeviceOrigin failed");
-        return RET_ERR;
+        MMI_HILOGW("Not touchpad device");
+        return RET_OK;
     }
 
     auto state = LIBINPUT_CONFIG_DRAG_DISABLED;
