@@ -2415,7 +2415,7 @@ int32_t MMIService::ReadTouchpadRotateSwitch(bool &rotateSwitch)
     return RET_OK;
 }
 
-int32_t MMIService::ReadTouchpadDoubleTapAndDragSwitch(bool &switchFlag)
+int32_t MMIService::ReadTouchpadDoubleTapAndDragState(bool &switchFlag)
 {
     TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
     return RET_OK;
@@ -2721,7 +2721,7 @@ int32_t MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
-            return this->ReadTouchpadDoubleTapAndDragSwitch(switchFlag);
+            return this->ReadTouchpadDoubleTapAndDragState(switchFlag);
         }
         );
     if (ret != RET_OK) {

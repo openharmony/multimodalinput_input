@@ -218,7 +218,7 @@ protected:
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
     int32_t ReadTouchpadRightMenuType(int32_t &type);
     int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
-    int32_t ReadTouchpadDoubleTapAndDragSwitch(bool &switchFlag);
+    int32_t ReadTouchpadDoubleTapAndDragState(bool &switchFlag);
     int32_t ReadTouchpadScrollRows(int32_t &rows);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
