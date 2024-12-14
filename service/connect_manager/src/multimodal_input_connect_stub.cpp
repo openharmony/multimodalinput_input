@@ -2368,11 +2368,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadDoubleTapAndDragState(Message
     bool switchFlag = true;
     ret = GetTouchpadDoubleTapAndDragState(switchFlag);
     if (ret != RET_OK) {
-        MMI_HILOGE("GetTouchpadRotateSwitch failed ret:%{public}d", ret);
+        MMI_HILOGE("GetTouchpadDoubleTapAndDragState failed ret:%{public}d", ret);
         return ret;
     }
     WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad double tap and drag switch:%{public}d, ret:%{public}d", switchFlag, ret);
     return RET_OK;
 }
 
