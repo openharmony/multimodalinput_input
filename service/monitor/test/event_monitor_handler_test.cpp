@@ -1111,6 +1111,30 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsThreeFingersTap, Tes
     ASSERT_TRUE(ret);
 }
 
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+/**
+ * @tc.name: EventMonitorHandlerTest_IsFingerprint
+ * @tc.desc: Test IsFingerprint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFingerprint, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    bool ret = false;
+    ret = monitorCollection.IsFingerprint(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
+    ret = monitorCollection.IsFingerprint(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 /**
  * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendToClient_01
  * @tc.desc: Test CheckIfNeedSendToClient
