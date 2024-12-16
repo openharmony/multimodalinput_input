@@ -1743,5 +1743,20 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus, TestSize.Level1)
     PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
     ASSERT_NO_FATAL_FAILURE(pointerEvent->ClearAxisStatus(axis));
 }
+
+/**
+ * @tc.name: PointerEventTest_from
+ * @tc.desc: Verify the funcation from
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_from, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(PointerEvent::from(inputEvent));
+}
 } // namespace MMI
 } // namespace OHOS
