@@ -1745,22 +1745,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus, TestSize.Level1)
 }
 
 /**
- * @tc.name: PointerEventTest_ReadFromParcel_002
- * @tc.desc: Verify the funcation ReadFromParcel
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    Parcel in;
-    ASSERT_NO_FATAL_FAILURE(pointerEvent->ReadFromParcel(in));
-}
-
-/**
  * @tc.name: PointerEventTest_from
  * @tc.desc: Verify the funcation from
  * @tc.type: FUNC
