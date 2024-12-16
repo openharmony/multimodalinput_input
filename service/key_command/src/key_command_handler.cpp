@@ -1413,6 +1413,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
     bool sequencesHandleRet = HandleSequences(key);
     if (shortKeysHandleRet) {
+        launchAbilityCount_ = 0;
         isHandleSequence_ = false;
         return true;
     }
@@ -1543,6 +1544,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
 
     for (RepeatKey& item : repeatKeys_) {
         if (CheckSpecialRepeatKey(item, keyEvent)) {
+            launchAbilityCount_ = 0;
             MMI_HILOGI("Skip repeatKey");
             return false;
         }
