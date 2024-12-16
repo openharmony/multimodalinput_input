@@ -6496,5 +6496,28 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_004,
     DISPLAY_MONITOR->SetScreenLocked(false);
     ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount_001
+ * @tc.desc: Test if (walletLaunchDelayTimes_ != 0)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_POWER;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.walletLaunchDelayTimes_ = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyCount(repeatKey, keyEvent));
+
+    handler.walletLaunchDelayTimes_ = 1;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyCount(repeatKey, keyEvent));
+}
 } // namespace MMI
 } // namespace OHOS
