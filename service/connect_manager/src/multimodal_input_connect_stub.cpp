@@ -2592,9 +2592,9 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
         MMI_HILOGE("Invalid infoId:%{public}d", infoId);
         return RET_ERR;
     }
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap(Media::PixelMap::Unmarshalling(data));
+    OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
-    int32_t ret = SetPixelMapData(infoId, static_cast<void*>(pixelMap.get()));
+    int32_t ret = SetPixelMapData(infoId, static_cast<void*>(pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetPixelMapData, ret:%{public}d", ret);
     }
