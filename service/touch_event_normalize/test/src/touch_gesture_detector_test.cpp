@@ -407,18 +407,25 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_WhetherDiscardTouchE
 
     pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     detector.gestureEnable_ = true;
-    detector.gestureDisplayId_ = 3;
-    pointerEvent->targetDisplayId_ = 2;
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
     pointerEvent->SetPointerId(0);
     EXPECT_TRUE(detector.WhetherDiscardTouchEvent(pointerEvent));
 
     pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     detector.gestureEnable_ = true;
-    detector.gestureDisplayId_ = INT32_MAX;
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    detector.gestureDisplayId_ = INT32_MAX - 2;
+    pointerEvent->bitwise_ = 0;
+    pointerEvent->SetPointerId(7);
+    pointerEvent->targetDisplayId_ = INT32_MAX - 1;
     EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
 
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    detector.gestureDisplayId_ = INT32_MAX;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
+
+    detector.gestureDisplayId_ = INT32_MAX;
+    pointerEvent->targetDisplayId_ = INT32_MAX;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
 }
 
@@ -1146,8 +1153,12 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_NotifyGestureEvent_0
     mode = GestureMode::ACTION_UNKNOWN;
     EXPECT_FALSE(detector.NotifyGestureEvent(pointerEvent, mode));
 
-    mode = GestureMode::ACTION_PINCH_CLOSED;
-    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_MOUSE;
+    mode = GestureMode::ACTION_GESTURE_END;
+    for (auto i = 0; i < 5; i++) {
+        PointerEvent::PointerItem pointerItem;
+        detector.fingers_.insert(i + 1);
+        pointerEvent->pointers_.push_back(pointerItem);
+    }
     EXPECT_FALSE(detector.NotifyGestureEvent(pointerEvent, mode));
 }
 
