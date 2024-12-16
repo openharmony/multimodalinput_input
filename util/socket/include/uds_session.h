@@ -18,6 +18,7 @@
 
 #include <list>
 #include <memory>
+#include <unordered_map>
 
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -38,8 +39,8 @@ public:
     DISALLOW_COPY_AND_MOVE(UDSSession);
     virtual ~UDSSession() = default;
 
-    bool SendMsg(const char *buf, size_t size) const;
-    bool SendMsg(NetPacket &pkt) const;
+    bool SendMsg(const char *buf, size_t size);
+    bool SendMsg(NetPacket &pkt);
     void Close();
 
     int32_t GetUid() const
@@ -107,7 +108,7 @@ public:
     std::list<int32_t> DelEvents(int32_t type, int32_t id);
     int64_t GetEarliestEventTime(int32_t type = 0) const;
     bool IsEventQueueEmpty(int32_t type = 0);
-    void ReportSocketBufferFull() const;
+    void ReportSocketBufferFull();
 
 protected:
     struct EventTime {
@@ -125,6 +126,8 @@ protected:
     const int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };
     mutable bool invalidSocket_ { false };
+    int64_t lastReportTime_ = 0;
+    int32_t lastReportedPid_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS
