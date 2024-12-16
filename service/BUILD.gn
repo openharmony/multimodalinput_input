@@ -529,6 +529,7 @@ ohos_unittest("EventFilterHandlerTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "window_manager:libdm_lite",
     "window_manager:libwm",
   ]
 }
@@ -863,6 +864,7 @@ ohos_unittest("PointerDrawingManagerTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -917,6 +919,7 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -1155,6 +1158,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -1461,6 +1465,7 @@ ohos_unittest("MonitorTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "window_manager:libdm_lite",
     "window_manager:libwm",
   ]
 }
@@ -1893,6 +1898,7 @@ ohos_unittest("KeyAutoRepeatExTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "window_manager:libdm_lite",
   ]
 }
 
@@ -2212,6 +2218,7 @@ ohos_unittest("DisplayStateManagerTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "window_manager:libdm_lite",
     "window_manager:libwm",
   ]
 }
