@@ -4858,7 +4858,8 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
         MMI_HILOGE("The infoId is invalid or pixelMap is nullptr");
         return ERR_INVALID_VALUE;
     }
-    auto pixelMapSource = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMapSource(
+        static_cast<OHOS::Media::PixelMap*>(pixelMap));
     Media::InitializationOptions opts;
     auto pixelMapPtr = OHOS::Media::PixelMap::Create(*pixelMapSource, opts);
     CHKPR(pixelMapPtr, RET_ERR);
