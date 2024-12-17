@@ -560,6 +560,11 @@ impl AxisAccelerateCurvesTouchpad {
                         slopes: vec![4.74, 3.28, 2.53, 1.95, 1.63, 1.63, 2.17, 2.35],
                         diff_nums: vec![0.0, 0.53, 1.08, 1.93, 2.63, 1.05, 0.0, 0.0]
                     },
+                    CurveItem {//foldPc横屏显控比参数，待调参
+                        speeds: vec![0.36, 0.73, 1.46, 2.19, 2.92, 5.83, 10.94, 29.17],
+                        slopes: vec![4.74, 3.28, 2.53, 1.95, 1.63, 1.63, 2.17, 2.35],
+                        diff_nums: vec![0.0, 0.53, 1.08, 1.93, 2.63, 1.05, 0.0, 0.0]
+                    },
                 ],
             });
         });
@@ -646,59 +651,59 @@ impl FoldPcTouchpadAccelerateCurves {
             GLOBAL_CURVES = Some(FoldPcTouchpadAccelerateCurves {
                 data: vec![
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.08, 0.08, 0.19, 0.14, 0.15, 0.16, 0.15, 0.16, 0.65, 0.29, 1.05, 0.31],
-                        diff_nums: vec![0.0, 0.0, -0.54, -0.03, -0.2, -0.45, -0.19, -0.8, -21.27, -3.61, -46.92, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.08, 0.15, 0.51, 0.64],
+                        diff_nums: vec![0.0, -0.26, -15.40, -23.66],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.11, 0.11, 0.25, 0.18, 0.2, 0.21, 0.2, 0.22, 0.86, 0.38, 1.4, 0.41],
-                        diff_nums: vec![0.0, 0.0, -0.72, -0.04, -0.27, -0.6, -0.25, -1.07, -28.37, -4.81, -62.56, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.11, 0.2, 0.68, 0.85],
+                        diff_nums: vec![0.0, -0.35, -20.54, -31.55],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.14, 0.14, 0.31, 0.23, 0.25, 0.26, 0.25, 0.27, 1.08, 0.48, 1.74, 0.51],
-                        diff_nums: vec![0.0, 0.0, -0.9, -0.05, -0.34, -0.75, -0.32, -1.34, -35.46, -6.02, -78.2, 0.0]
-                    },  
-                    CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.17, 0.17, 0.37, 0.27, 0.29, 0.31, 0.3, 0.32, 1.29, 0.57, 2.09, 0.62],
-                        diff_nums: vec![0.0, 0.0, -1.08, -0.06, -0.4, -0.9, -0.38, -1.61, -42.55, -7.22, -93.84, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.14, 0.25, 0.85, 1.06],
+                        diff_nums: vec![0.0, -0.43, -25.67, -39.44],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.23, 0.23, 0.5, 0.36, 0.39, 0.42, 0.39, 0.43, 1.72, 0.76, 2.79, 0.82],
-                        diff_nums: vec![0.0, 0.0, -1.44, -0.07, -0.54, -1.2, -0.51, -2.15, -56.73, -9.63, -125.12, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.17, 0.3, 1.02, 1.28],
+                        diff_nums: vec![0.0, -0.52, -30.81, -47.33],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.28, 0.28, 0.62, 0.46, 0.49, 0.52, 0.49, 0.54, 2.15, 0.95, 3.49, 1.03],
-                        diff_nums: vec![0.0, 0.0, -1.8, -0.09, -0.67, -1.5, -0.63, -2.68, -70.92, -12.03, -156.4, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.22, 0.4, 1.36, 1.7],
+                        diff_nums: vec![0.0, -0.70, -41.08, -63.11],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.34, 0.34, 0.74, 0.55, 0.59, 0.63, 0.59, 0.65, 2.58, 1.14, 4.19, 1.24],
-                        diff_nums: vec![0.0, 0.0, -2.16, -0.11, -0.81, -1.8, -0.76, -3.22, -85.1, -14.44, -187.68, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.28, 0.5, 1.70, 2.13],
+                        diff_nums: vec![0.0, -0.87, -51.35, -78.88],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.42, 0.42, 0.93, 0.68, 0.74, 0.78, 0.74, 0.81, 3.23, 1.43, 5.23, 1.54],
-                        diff_nums: vec![0.0, 0.0, -2.71, -0.14, -1.01, -2.24, -0.95, -4.02, -106.37, -18.05, -234.59, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.33, 0.61, 2.03, 2.55],
+                        diff_nums: vec![0.0, -1.04, -61.62, -94.66],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.54, 0.54, 1.18, 0.87, 0.93, 0.99, 0.94, 1.03, 4.09, 1.81, 6.63, 1.96],
-                        diff_nums: vec![0.0, 0.0, -3.43, -0.18, -1.28, -2.84, -1.2, -5.09, -134.74, -22.86, -297.15, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.41, 0.76, 2.54, 3.19],
+                        diff_nums: vec![0.0, -1.30, -77.02, -118.32],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.65, 0.65, 1.42, 1.05, 1.13, 1.2, 1.13, 1.25, 4.95, 2.19, 8.02, 2.37],
-                        diff_nums: vec![0.0, 0.0, -4.15, -0.21, -1.55, -3.44, -1.46, -6.17, -163.11, -27.67, -359.71, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.52, 0.96, 3.22, 4.04],
+                        diff_nums: vec![0.0, -1.65, -97.56, -149.88],
                     },
                     CurveItem {
-                        speeds: vec![2.68, 5.36, 10.49, 16.96, 25.66, 29.01, 41.95, 42.4, 49.1, 56.91, 63.6, 93.73],
-                        slopes: vec![0.76, 0.76, 1.67, 1.23, 1.32, 1.41, 1.33, 1.46, 5.81, 2.57, 9.42, 2.78],
-                        diff_nums: vec![0.0, 0.0, -4.87, -0.25, -1.82, -4.04, -1.71, -7.24, -191.47, -32.49, -422.27, 0.0]
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.63, 1.16, 3.9, 4.9],
+                        diff_nums: vec![0.0, -2.0, -118.1, -181.43],
+                    },
+                    CurveItem {
+                        speeds: vec![3.79, 42.4, 63.6, 89.27],
+                        slopes: vec![0.74, 1.36, 4.58, 5.75],
+                        diff_nums: vec![0.0, -2.35, -138.64, -212.98],
                     },
                 ],
             });
@@ -854,20 +859,20 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         3 => HardPcProTouchpadAccelerateCurves::get_instance().hard_pc_pro_touchpad_get_curve_by_speed(speed as usize),  
         4 => TabletTouchpadAccelerateCurves::get_instance().tablet_touchpad_get_curve_by_speed(speed as usize),
         5 => FoldPcTouchpadAccelerateCurves::get_instance().fold_pc_touchpad_get_curve_by_speed(speed as usize),
+        6 => FoldPcTouchpadAccelerateCurves::get_instance().fold_pc_touchpad_get_curve_by_speed(speed as usize),
         _ => PCTouchpadAccelerateCurves::get_instance().pc_touchpad_get_curve_by_speed(speed as usize),
     };
     unsafe {
         let num: f64 = fabs(vin);
-        let len = item.speeds.len();
-        for i in 0..len {
+        for i in 0..4 {
             if num <= item.speeds[i] {
-                *gain = (item.slopes[i] * num + item.diff_nums[i]) / num;
-                debug!(LOG_LABEL, "gain is set to {}", @public((*gain * num - item.diff_nums[i]) / num));
+                *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
+                debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[i]) / vin));
                 return true;
             }
         }
-        *gain = (item.slopes[len-1] * num + item.diff_nums[len-1]) / num;
-        debug!(LOG_LABEL, "gain is set to {}", @public((*gain * num - item.diff_nums[len-1]) / num));
+        *gain = (item.slopes[3] * vin + item.diff_nums[3]) / vin;
+        debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[3]) / vin));
     }
     debug!(LOG_LABEL, "get_speed_gain_touchpad leave");
     true
@@ -880,6 +885,7 @@ fn get_axis_gain_touchpad(gain: *mut f64, axis_speed: f64, device_type: i32) -> 
         1..=2 => device_type,
         4 => 3,
         5 => 4,
+        6 => 5,
         _ => 1,
     };
     let item = AxisAccelerateCurvesTouchpad::get_instance().get_axis_curve_by_speed_touchpad(valid_device_type as usize);
