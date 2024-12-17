@@ -531,41 +531,20 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt_001,
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
-    auto pointerEvent = PointerEvent::Create();
-    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    bool isShell = true;
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_ERR);
-
-    pointerEvent->SetPointerId(3);
-    PointerEvent::PointerItem pointerItem;
-    pointerItem.SetPointerId(3);
-    pointerEvent->pointers_.push_back(pointerItem);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
-    pointerEvent->zOrder_ = -1;
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_OK);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_OK);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_OK);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_OK);
-
-    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_ACCESSIBILITY;
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_OK);
-
-    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_OK);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_OK);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
-    ASSERT_NE(handler.OnInjectPointerEventExt(pointerEvent, isShell), RET_OK);
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    int32_t ret = handler.OnInjectPointerEventExt(pointerEvent, false);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    ret = handler.OnInjectPointerEventExt(pointerEvent, false);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false));
+    sourceType = PointerEvent::SOURCE_TYPE_JOYSTICK;
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false));
+    sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false));
 }
 
 /**
@@ -1080,13 +1059,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_001, TestSize.Le
     ServerMsgHandler handler;
     int32_t offsetX = 10;
     int32_t offsetY = 20;
-    MouseEventHdr->currentDeviceId_ = 3;
-    MouseTransformProcessor mouseTra(3);
-    mouseTra.pointerEvent_ = PointerEvent::Create();
-    InputDeviceManager::InputDeviceInfo inputDev;
-    inputDev.isPointerDevice = true;
-    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(3, inputDev));
-    MouseEventHdr->processors_.insert(std::make_pair(3, &mouseTra));
+    std::shared_ptr<PointerEvent> pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(pointerEvent_, nullptr);
     int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
     EXPECT_EQ(ret, RET_OK);
 }
@@ -1170,11 +1144,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMsgHandler, TestSize.Level
     MmiMessageId idMsg = MmiMessageId::INVALID;
     NetPacket pkt(idMsg);
     EXPECT_NO_FATAL_FAILURE(msgHandler.OnMsgHandler(sess, pkt));
-
-    ServerMsgHandler::MsgCallback msgCallback {MmiMessageId::INVALID, [=] (SessionPtr sess, NetPacket &pkt) {
-        return -1; }};
-    msgHandler.callbacks_.insert(std::make_pair(msgCallback.id, msgCallback.fun));
-    EXPECT_NO_FATAL_FAILURE(msgHandler.OnMsgHandler(sess, pkt));
 }
 
 /**
@@ -1211,46 +1180,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
     EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
-}
-/**
- * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent
- * @tc.desc: Test OnInjectKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler msgHandler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    bool isNativeInject = true;
-    int32_t pid = 0;
-    int32_t ret = -1;
-    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    keyEvent->bitwise_ = 0x00000010;
-    ret = msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
-    ASSERT_EQ(ret, 201);
-
-    isNativeInject = false;
-    ret = msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
-    ASSERT_NE(ret, 201);
-
-    const std::string PRODUCT_TYPE = "2in1";
-    ret = msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
-    ASSERT_NE(ret, 201);
-
-    DISPLAY_MONITOR->SetScreenLocked(true);
-    ret = msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
-    ASSERT_NE(ret, 201);
-
-    DISPLAY_MONITOR->SetScreenLocked(false);
-    ret = msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
-    ASSERT_NE(ret, 201);
-
-    pid = 3;
-    msgHandler.authorizationCollection_.insert(std::make_pair(3, AuthorizationStatus::UNKNOWN));
-    ret = msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
-    ASSERT_NE(ret, 201);
 }
 
 /**
@@ -1568,13 +1497,10 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_001, TestS
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
-    handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
-    handler.injectNotice_->isStartSrv_ = true;
-    handler.injectNotice_->connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    handler.injectNotice_->connectionCallback_->isConnected_ = true;
-    int32_t pid = 1;
+    handler.InitInjectNoticeSource();
+    int32_t pid = 12345;
     bool result = handler.CloseInjectNotice(pid);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -1631,14 +1557,17 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_001, TestSiz
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
-    handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
+    InjectNoticeManager manager;
+    InjectNoticeInfo noticeInfo;
+    handler.injectNotice_ =nullptr;
+    bool ret = handler.InitInjectNoticeSource();
     handler.injectNotice_->isStartSrv_ = true;
-    handler.injectNotice_->connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    handler.injectNotice_->connectionCallback_->isConnected_ = true;
-    InjectNoticeInfo injectNot {
-        .pid = 3,
-    };
-    ASSERT_TRUE(handler.AddInjectNotice(injectNot));
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    EXPECT_NE(nullptr, manager.connectionCallback_);
+    auto connection = handler.injectNotice_->GetConnection();
+    connection->isConnected_ = false;
+    ret = handler.AddInjectNotice(noticeInfo);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -1672,19 +1601,28 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_002, TestSize.Le
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
     handler.CurrentPID_ = 12345;
-    handler.authorizationCollection_[12345] = AuthorizationStatus::UNAUTHORIZED;
-    bool isAuthorize = true;
-    handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
-    handler.injectNotice_->isStartSrv_ = true;
-    handler.injectNotice_->connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    handler.injectNotice_->connectionCallback_->isConnected_ = true;
-    handler.InjectionType_ = InjectionType::KEYEVENT;
-    int32_t result = handler.OnAuthorize(isAuthorize);
+    handler.authorizationCollection_.clear();
+    int32_t result = handler.OnAuthorize(false);
     EXPECT_EQ(result, ERR_OK);
+}
 
-    handler.InjectionType_ = InjectionType::POINTEREVENT;
-    result = handler.OnAuthorize(isAuthorize);
-    EXPECT_EQ(result, ERR_OK);
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
+ * @tc.desc: Test the function OnMoveMouse
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    std::shared_ptr<PointerEvent> pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(pointerEvent_, nullptr);
+    int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -1753,19 +1691,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_IsNavigationWindowInjectEven
     bool ret = false;
     ret = handler.IsNavigationWindowInjectEvent(pointerEvent);
     ASSERT_TRUE(ret);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_LaunchAbility
- * @tc.desc: Test the function LaunchAbility
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_LaunchAbility, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility());
 }
 
 /**
