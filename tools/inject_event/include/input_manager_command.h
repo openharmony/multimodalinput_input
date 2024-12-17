@@ -53,6 +53,9 @@ private:
     int32_t ProcessRotateGesture(int32_t argc, char *argv[]);
     int32_t ProcessTouchPadFingerAction(int32_t argc, char *argv[]);
     int32_t ActionEvent(int32_t fingerCount);
+    int32_t ProcessKeyboardTextInput(char *optarg, int32_t count);
+    int32_t PrintKeyboardTextChar(int32_t keyCode, bool isPressShift);
+    bool IsSpecialChar(char character, int32_t &keyCode, bool &isPressShift);
     int32_t ProcessTouchPadFingerSwipe(int32_t argc, char *argv[]);
     int32_t SwipeActionEvent(int32_t startX, int32_t startY, int32_t endX, int32_t endY);
     void SendTouchDownForPinch(int32_t topX, int32_t topY, int32_t bottomX, int32_t bottomY);
