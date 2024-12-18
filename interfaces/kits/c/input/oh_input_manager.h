@@ -1434,6 +1434,18 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
  * @since 13
  */
 Input_Result OH_Input_UnregisterDeviceListeners(void);
+
+/**
+ * @brief Obtains the interval since the last system input event.
+ *
+ * @param timeInterval Interval, in microseconds.
+ * @return OH_Input_GetIntervalSinceLastInput status code, specifically,
+ *         {@Link INPUT_SUCCESS} if the Operation is successful;
+ *         {@Link INPUT_SERVICE_EXCEPTION} otherwise.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t *timeInterval);
 #ifdef __cplusplus
 }
 #endif

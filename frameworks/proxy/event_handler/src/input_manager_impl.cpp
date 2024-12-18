@@ -2327,6 +2327,21 @@ int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
     return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
 }
 
+int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetIntervalSinceLastInput(timeInterval) != RET_OK) {
+        MMI_HILOGE("GetIntervalSinceLastInput failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
 {
     if (windowStatecallback_ != nullptr) {

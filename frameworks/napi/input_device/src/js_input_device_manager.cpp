@@ -250,6 +250,21 @@ napi_value JsInputDeviceManager::GetKeyboardRepeatRate(napi_env env, napi_value 
     return ret;
 }
 
+napi_value JsInputDeviceManager::GetIntervalSinceLastInput(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, nullptr, cb);
+    int64_t timeInterval = -1;
+    int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    EmitJsGetIntervalSinceLastInput(cb, timeInterval);
+    if (napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid get interval since last input");
+    }
+    return ret;
+}
+
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_DEBUG_ENTER;
