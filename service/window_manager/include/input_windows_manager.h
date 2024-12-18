@@ -140,7 +140,7 @@ public:
         Coordinate2D& cursorPos) const;
     void ScreenRotateAdjustDisplayXY(const DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
-    void RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
+    void RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
@@ -196,6 +196,9 @@ public:
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
     void CleanInvalidPiexMap();
     void HandleWindowPositionChange();
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    bool IsSupported();
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);

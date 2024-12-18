@@ -202,6 +202,7 @@ private:
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void InitScreenInfo();
     void DumpScreenInfo(std::ostringstream& oss);
+    bool IsSupported() override;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:

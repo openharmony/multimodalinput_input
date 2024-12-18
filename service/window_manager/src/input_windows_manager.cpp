@@ -1872,10 +1872,15 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordina
     }
 }
 
-void InputWindowsManager::RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const
+void InputWindowsManager::RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord)
 {
-    const Direction displayDirection = static_cast<Direction>((
-            ((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    Direction displayDirection = static_cast<Direction>((
+        ((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (IsSupported()) {
+        displayDirection = info.direction;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (displayDirection == DIRECTION0) {
         MMI_HILOGD("displayDirection is DIRECTION0");
         return;
@@ -2957,6 +2962,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = static_cast<Direction>((((physicalDisplayInfo->direction - physicalDisplayInfo->displayDirection) *
             ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (IsSupported()) {
+            direction = physicalDisplayInfo->direction;
+        }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
             physicalDisplayInfo->height, physicalX, physicalY);
     }
@@ -4130,6 +4140,11 @@ void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int3
 {
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (IsSupported()) {
+        displayDirection = displayInfo->direction;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = displayInfo->direction;
     }
@@ -4941,6 +4956,11 @@ bool InputWindowsManager::OnDisplayRemoved(const DisplayGroupInfo &displayGroupI
         return true;
     }
     return false;
+}
+
+bool InputWindowsManager::IsSupported()
+{
+    return IPointerDrawingManager::GetInstance()->IsSupported();
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 

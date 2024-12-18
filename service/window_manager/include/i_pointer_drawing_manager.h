@@ -149,6 +149,12 @@ public:
     virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
     virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    virtual bool IsSupported()
+    {
+        return false;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };
