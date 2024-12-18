@@ -119,7 +119,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         struct libinput_device *dev = libinput_event_get_device(event);
         const std::string devName = libinput_device_get_name(dev);
-        if (devName == "input_mt_wrapper") {
+        if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
             deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
         }
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
