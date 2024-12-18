@@ -937,7 +937,8 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         3 => HardPcProTouchpadAccelerateCurves::get_instance().hard_pc_pro_touchpad_get_curve_by_speed(speed as usize),  
         4 => TabletTouchpadAccelerateCurves::get_instance().tablet_touchpad_get_curve_by_speed(speed as usize),
         5 => FoldPcTouchpadAccelerateCurves::get_instance().fold_pc_touchpad_get_curve_by_speed(speed as usize),
-        6 => FoldPcVirtTouchpadAccelerateCurves::get_instance().fold_pc_virt_touchpad_get_curve_by_speed(speed as usize),
+        6 => FoldPcTouchpadAccelerateCurves::get_instance().fold_pc_touchpad_get_curve_by_speed(speed as usize),
+        7 => FoldPcVirtTouchpadAccelerateCurves::get_instance().fold_pc_virt_touchpad_get_curve_by_speed(speed as usize),
         _ => PCTouchpadAccelerateCurves::get_instance().pc_touchpad_get_curve_by_speed(speed as usize),
     };
     unsafe {
@@ -963,6 +964,7 @@ fn get_axis_gain_touchpad(gain: *mut f64, axis_speed: f64, device_type: i32) -> 
         1..=2 => device_type,
         4 => 3,
         5 => 4,
+        6 => 5,
         _ => 1,
     };
     let item = AxisAccelerateCurvesTouchpad::get_instance().get_axis_curve_by_speed_touchpad(valid_device_type as usize);
