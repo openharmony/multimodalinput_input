@@ -1196,11 +1196,6 @@ int32_t PointerDrawingManager::GetSurfaceInformation()
         MMI_HILOGE("Current mouse style is not equal to last mouse style");
         return RET_ERR;
     }
-    if (buffer_ != nullptr && buffer_->GetVirAddr() != nullptr) {
-        addr_ = std::make_shared<uint8_t *>(static_cast<uint8_t *>(buffer_->GetVirAddr()));
-        CHKPR(addr_, RET_ERR);
-        return RET_OK;
-    }
     layer_ = GetLayer();
     CHKPR(layer_, RET_ERR);
     buffer_ = GetSurfaceBuffer(layer_);
