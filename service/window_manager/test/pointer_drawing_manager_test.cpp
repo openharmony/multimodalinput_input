@@ -1999,7 +1999,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPixelMap, TestSiz
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager manager;
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
     ASSERT_NO_FATAL_FAILURE(manager.SetPixelMap(pixelMap));
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
