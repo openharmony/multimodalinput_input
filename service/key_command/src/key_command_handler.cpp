@@ -90,6 +90,8 @@ const std::string PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
+const std::string KEY_ENABLE { "enble" };
+const std::string KEY_STATUS { "status" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2747,19 +2749,21 @@ bool KeyCommandHandler::ParseLongPressJson(const std::string &configFile)
         return false;
     }
 
-    cJSON* bundleWhitelist = cJSON_GetObjectItemCaseSensitive(parser.json_, "whitelist");
-    if (!cJSON_IsArray(bundleWhitelist)) {
-        MMI_HILOGE("whitelist is not array");
-        return false;
-    }
-    int32_t bundleNameSize = cJSON_GetArraySize(bundleWhitelist);
-    for (int32_t i = 0; i < bundleNameSize; ++i) {
-        cJSON *bundleName = cJSON_GetArrayItem(bundleWhitelist, i);
-        if (!cJSON_IsString(bundleName)) {
-            MMI_HILOGE("bundleName is not string");
-            return false;
+    cJSON* item = nullptr;
+    cJSON* enable = nullptr;
+    cJSON* status = nullptr;
+    cJSON_ArrayForEach(item, parser.json_) {
+        if (!cJSON_IsObject(item)) {
+            continue;
         }
-        appWhiteList_.insert(bundleName->valuestring);
+        enable = cJSON_GetObjectItem(item, KEY_ENABLE.c_str());
+        status = cJSON_GetObjectItem(item, KEY_STATUS.c_str());
+        if (enable == NULL || status == NULL) {
+            continue;
+        }
+        if (enable->valueint == 1) {
+            appWhiteList_.insert(item->string);
+        }
     }
     return true;
 }
