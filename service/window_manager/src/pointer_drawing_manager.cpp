@@ -1568,6 +1568,11 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
     const int32_t cursorUnit = 16;
     Direction direction = static_cast<Direction>((
         ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        direction = displayInfo_.direction;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = displayInfo_.direction;
     }
@@ -3048,6 +3053,11 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         Rosen::RSTransaction::FlushImplicitTransaction();
         lastDisplayId_ = displayId;
     }
+}
+
+bool PointerDrawingManager::IsSupported()
+{
+    return hardwareCursorPointerManager_->IsSupported();
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 

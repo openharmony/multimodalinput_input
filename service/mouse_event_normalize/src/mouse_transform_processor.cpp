@@ -112,13 +112,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     Offset offset { unaccelerated_.dx, unaccelerated_.dy };
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
-#ifndef OHOS_BUILD_EMULATOR
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        Direction displayDirection = static_cast<Direction>((
-            ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        CalculateOffset(displayDirection, offset);
-    }
-#endif // OHOS_BUILD_EMULATOR
+    CalculateOffset(displayInfo, offset);
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
@@ -131,6 +125,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
         uint64_t dalta_time = filterInsertionPoint_.filterDeltaTime;
         HandleFilterMouseEvent(&offset);
+        CalculateOffset(displayInfo, offset);
         ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, dalta_time,
             static_cast<double>(displayInfo->ppi));
@@ -154,21 +149,32 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     return RET_OK;
 }
 
-void MouseTransformProcessor::CalculateOffset(Direction direction, Offset &offset)
+void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
 {
-    std::negate<double> neg;
-    if (direction == DIRECTION90) {
-        double tmp = offset.dx;
-        offset.dx = offset.dy;
-        offset.dy = neg(tmp);
-    } else if (direction == DIRECTION180) {
-        offset.dx = neg(offset.dx);
-        offset.dy = neg(offset.dy);
-    } else if (direction == DIRECTION270) {
-        double tmp = offset.dx;
-        offset.dx = neg(offset.dy);
-        offset.dy = tmp;
+#ifndef OHOS_BUILD_EMULATOR
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        Direction direction = static_cast<Direction>((
+            ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (WIN_MGR->IsSupported()) {
+            direction = displayInfo->direction;
+        }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        std::negate<double> neg;
+        if (direction == DIRECTION90) {
+            double tmp = offset.dx;
+            offset.dx = offset.dy;
+            offset.dy = neg(tmp);
+        } else if (direction == DIRECTION180) {
+            offset.dx = neg(offset.dx);
+            offset.dy = neg(offset.dy);
+        } else if (direction == DIRECTION270) {
+            double tmp = offset.dx;
+            offset.dx = neg(offset.dy);
+            offset.dy = tmp;
+        }
     }
+#endif // OHOS_BUILD_EMULATOR
 }
 
 int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event* event)
