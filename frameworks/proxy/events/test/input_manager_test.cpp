@@ -3126,5 +3126,67 @@ HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize
     int32_t ret = InputManager::GetInstance()->ConvertToCapiKeyAction(keyAction);
     EXPECT_NE(ret, -1);
 }
+
+/**
+ * @tc.name: InputManagerTest_GetIntervalSinceLastInput001
+ * @tc.desc: GetIntervalSinceLastInput interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t timeInterval = -1;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval));
+}
+
+/**
+ * @tc.name: InputManagerTest_GetIntervalSinceLastInput002
+ * @tc.desc: GetIntervalSinceLastInput interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    int64_t timeInterval = 0;
+    int32_t result =InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    ASSERT_EQ(result, RET_OK);
+    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_GetIntervalSinceLastInput003
+ * @tc.desc: GetIntervalSinceLastInput interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem itemSecond;
+    itemSecond.SetKeyCode(KeyEvent::KEYCODE_R);
+    itemSecond.SetPressed(true);
+    itemSecond.SetDownTime(500);
+    keyEvent->AddKeyItem(itemSecond);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    int64_t timeInterval = 0;
+    int32_t result =InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    ASSERT_EQ(result, RET_OK);
+    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
+}
 } // namespace MMI
 } // namespace OHOS
