@@ -162,6 +162,9 @@ public:
     virtual void CleanShellWindowIds() = 0;
     virtual bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    virtual bool IsSupported() = 0;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();
