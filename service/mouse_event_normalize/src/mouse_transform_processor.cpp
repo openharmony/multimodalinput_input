@@ -117,6 +117,11 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     int32_t ret = RET_ERR;
     DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
+        struct libinput_device *dev = libinput_event_get_device(event);
+        const std::string devName = libinput_device_get_name(dev);
+        if (devName == "input_mt_wrapper") {
+            deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
+        }
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
