@@ -144,7 +144,10 @@ private:
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
     int32_t OnEventTouchPadUp(struct libinput_event *event);
     int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
-    int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture, int32_t fingerCount);
+    int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture, int32_t fingerCount,
+        int32_t action);
+    int32_t SmoothMultifingerSwipeData(libinput_event_gesture *gesture, int32_t fingerCount, int32_t action,
+        Coords& avgCoord);
     int32_t OnEventTouchPadSwipeBegin(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeEnd(struct libinput_event *event);
@@ -166,6 +169,7 @@ private:
     bool isRotateGesture_ { false };
     double rotateAngle_ { 0.0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    std::vector<std::deque<Coords>> swipeHistory_;
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
