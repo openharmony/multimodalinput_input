@@ -3036,6 +3036,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
         mouseDownInfo_ = *touchWindow;
     }
+    if ((action == PointerEvent::POINTER_ACTION_MOVE && !pointerEvent->GetPressedButtons().empty()) ||
+        (action == PointerEvent::POINTER_ACTION_BUTTON_UP)) {
+        if (touchWindow->id != mouseDownInfo_.id) {
+            MMI_HILOGE("Mouse from:%{public}d move to new window:%{public}d", mouseDownInfo_.id, touchWindow->id);
+        }
+    }
     if (action == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         InitMouseDownInfo();
         MMI_HILOGD("Mouse up, clear mouse down info");
