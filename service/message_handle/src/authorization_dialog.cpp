@@ -105,6 +105,7 @@ void AuthorizationDialog::DialogAbilityConnection::OnAbilityDisconnectDone(
     // disconnted window must be shutdown
     isDialogShow_ = false;
 }
+
 void AuthorizationDialog::DialogAbilityConnection::CloseDialog()
 {
     CALL_DEBUG_ENTER;
