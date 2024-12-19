@@ -86,7 +86,8 @@ void ANRManager::RemoveTimers(SessionPtr sess)
 void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, SessionPtr sess)
 {
     CHKPV(sess);
-    if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION) {
+    if ((sess->GetTokenType() != TokenType::TOKEN_HAP && sess->GetTokenType() != TokenType::TOKEN_SYSTEM_HAP)
+        || sess->GetProgramName() == FOUNDATION) {
         MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return;
     }
@@ -136,7 +137,8 @@ bool ANRManager::TriggerANR(int32_t type, int64_t time, SessionPtr sess)
     CALL_DEBUG_ENTER;
     CHKPF(udsServer_);
     CHKPF(sess);
-    if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION) {
+    if ((sess->GetTokenType() != TokenType::TOKEN_HAP && sess->GetTokenType() != TokenType::TOKEN_SYSTEM_HAP)
+        || sess->GetProgramName() == FOUNDATION) {
         MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return false;
     }

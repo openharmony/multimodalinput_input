@@ -84,7 +84,7 @@ void ClientMsgHandler::InitProcessedCallback()
 {
     CALL_DEBUG_ENTER;
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
-    if (tokenType == TokenType::TOKEN_HAP) {
+    if (tokenType == TokenType::TOKEN_HAP || tokenType == TokenType::TOKEN_SYSTEM_HAP) {
         MMI_HILOGD("Current session is hap");
         dispatchCallback_ = std::bind(&ClientMsgHandler::OnDispatchEventProcessed, std::placeholders::_1,
             std::placeholders::_2);
