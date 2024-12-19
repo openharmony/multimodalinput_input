@@ -332,7 +332,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         return RET_ERR;
     }
 
-    AddItemForEventWhileSetSwipeData(time, gesture, fingerCount);
+    AddItemForEventWhileSetSwipeData(time, gesture, fingerCount, action);
     
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
         MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
@@ -343,24 +343,23 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
 }
 
 int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture,
-                                                                     int32_t fingerCount)
+                                                                     int32_t fingerCount, int32_t action)
 {
-    int32_t sumX = 0;
-    int32_t sumY = 0;
+    Coords avgCoord {0, 0};
     if (fingerCount == 0) {
         MMI_HILOGD("There is no finger in swipe action");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < fingerCount; i++) {
-        sumX += libinput_event_gesture_get_device_coords_x(gesture, i);
-        sumY += libinput_event_gesture_get_device_coords_y(gesture, i);
+    if (SmoothMultifingerSwipeData(gesture, fingerCount, action, avgCoord) != RET_OK) {
+        MMI_HILOGD("SmoothMultifingerSwipeData failed");
+        return RET_ERR;
     }
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
     pointerItem.SetDownTime(time);
-    pointerItem.SetDisplayX(sumX / fingerCount);
-    pointerItem.SetDisplayY(sumY / fingerCount);
+    pointerItem.SetDisplayX(avgCoord.x);
+    pointerItem.SetDisplayY(avgCoord.y);
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
@@ -375,6 +374,49 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
         pointerEvent_->SetAgentWindowId(-1);
         pointerItem.SetTargetWindowId(-1);
     }
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::SmoothMultifingerSwipeData(libinput_event_gesture *gesture, int32_t fingerCount, int32_t action,
+                                                                Coords& avgCoord)
+{
+    if (fingerCount == 0 || fingerCount > FINGER_COUNT_MAX) {
+        MMI_HILOGD("There is wrong finger counts in swipe action");
+        return RET_ERR;
+    }
+    std::array<Coords, FINGER_COUNT_MAX> fingerCoords;
+    Coords emptyCoord {0, 0};
+    Coords coordDelta {0, 0};
+    int32_t historyFingerCount = 0;
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        if (static_cast<int32_t>(swipeHistory_.size()) <= i){
+            swipeHistory_.emplace_back(std::deque<Coords>());
+        }
+        fingerCoords[i].x = libinput_event_gesture_get_device_coords_x(gesture, i);
+        fingerCoords[i].y = libinput_event_gesture_get_device_coords_y(gesture, i);
+        if (action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE && fingerCoords[i] != emptyCoord) {
+            swipeHistory_[i].push_back(fingerCoords[i]);
+        }
+        if (static_cast<int32_t>(swipeHistory_[i].size()) > fingerCount) {
+            swipeHistory_[i].pop_front();
+        }
+        int32_t historySize = static_cast<int32_t>(swipeHistory_[i].size()) - 1;
+        if (historySize > 0 && action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+            coordDelta += swipeHistory_[i][historySize] - swipeHistory_[i][0];
+            historyFingerCount += historySize;
+        }
+    }
+    if (historyFingerCount != 0) {
+        coordDelta /= historyFingerCount;
+    }
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        if (fingerCoords[i] == emptyCoord && action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+            fingerCoords[i] = swipeHistory_[i].back() + coordDelta;
+            swipeHistory_[i].push_back(fingerCoords[i]);
+        }
+        avgCoord += fingerCoords[i];
+    }
+    avgCoord /= fingerCount;
     return RET_OK;
 }
 
