@@ -216,6 +216,12 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t tokenType = sess->GetTokenType();
+    if (tokenType != TokenType::TOKEN_NATIVE && tokenType != TokenType::TOKEN_SHELL &&
+        tokenType !=TokenType::TOKEN_SYSTEM_HAP) {
+        MMI_HILOGW("Not native or systemapp skip, pid:%{public}d tokenType:%{public}d", sess->GetPid(), tokenType);
+        return RET_ERR;
+    }
     DisplayGroupInfo displayGroupInfo;
     pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
     uint32_t num = 0;
@@ -275,6 +281,12 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t tokenType = sess->GetTokenType();
+    if (tokenType != TokenType::TOKEN_NATIVE && tokenType != TokenType::TOKEN_SHELL &&
+        tokenType !=TokenType::TOKEN_SYSTEM_HAP) {
+        MMI_HILOGW("Not native or systemapp skip, pid:%{public}d tokenType:%{public}d", sess->GetPid(), tokenType);
+        return RET_ERR;
+    }
     WindowGroupInfo windowGroupInfo;
     pkt >> windowGroupInfo.focusWindowId >> windowGroupInfo.displayId;
     uint32_t num = 0;
