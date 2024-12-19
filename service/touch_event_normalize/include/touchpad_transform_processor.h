@@ -17,6 +17,8 @@
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
 #include <map>
+#include <deque>
+#include <vector>
 
 #include "nocopyable.h"
 #include "singleton.h"
@@ -33,6 +35,52 @@ enum class MulFingersTap : int32_t {
     QUAD_TAP = 4,
     QUINT_TAP = 5,
 };
+
+struct Coords {
+    int32_t x;
+    int32_t y;
+    Coords operator+(const Coords& other) const
+    {
+        Coords result{this->x, this->y};
+        result += other;
+        return result;
+    }
+    Coords operator-(const Coords& other) const
+    {
+        Coords result{this->x, this->y};
+        result -= other;
+        return result;
+    }
+    Coords& operator+=(const Coords& other)
+    {
+        this->x += other.x;
+        this->y += other.y;
+        return *this;
+    }
+    Coords& operator-=(const Coords& other)
+    {
+        this->x -= other.x;
+        this->y -= other.y;
+        return *this;
+    }
+    Coords& operator/=(const int32_t& divisor)
+    {
+        if (divisor == 0) {
+            return *this;
+        }
+        this->x /= divisor;
+        this->y /= divisor;
+        return *this;
+    }
+    bool operator==(const Coords& other)
+    {
+        return this->x == other.x && this.y == other.y;
+    }
+    bool operator!=(const Coords& other)
+    {
+        return this->x != other.x || this.y != other.y;
+    }
+}
 
 class MultiFingersTapHandler final {
     DECLARE_DELAYED_SINGLETON(MultiFingersTapHandler);
