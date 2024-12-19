@@ -248,6 +248,197 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_003, TestSize.Level1)
 }
 
 /**
+ * @tc.name:InjectEvent_InjectKey_009
+ * @tc.desc: test inject keyevent of text.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_009, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-t"};
+    char command4[] = {"abc ABC 123 ,-+*/.=~[{}]"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_010
+ * @tc.desc: test inject keyevent of illegal character text.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_010, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-t"};
+    char command4[] = {"abc一二三"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_NE(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_011
+ * @tc.desc: test inject keyevent of text.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_011, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"--text"};
+    char command4[] = {"abc ABC 123 ,-+*/.=~[{}]"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_012
+ * @tc.desc: test inject keyevent of illegal character text.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_012, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"--text"};
+    char command4[] = {"abc一二三"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_NE(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_013
+ * @tc.desc: test inject keyevent of text.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_013, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"--keyboard"};
+    char command3[] = {"-t"};
+    char command4[] = {"abc ABC 123 ,-+*/.=~[{}]"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_014
+ * @tc.desc: test inject keyevent of text.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_014, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"--keyboard"};
+    char command3[] = {"--text"};
+    char command4[] = {"abc ABC 123 ,-+*/.=~[{}]"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_015
+ * @tc.desc: test inject keyevent of text.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_015, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-t"};
+    char command4[2002] = { 0 };
+
+    for (int i = 0; i < 2001; ++i) {
+        command4[i] = 'a';
+    }
+    command4[2001] = '\n';
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_016
+ * @tc.desc: test inject keyevent of text. Combined commands is not supported.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_016, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-d"};
+    char command4[] = {"2017"};
+    char command5[] = {"-t"};
+    char command6[] = {"abc"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_NE(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_017
+ * @tc.desc: test inject keyevent of text. Combined commands is not supported.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_017, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-t"};
+    char command4[] = {"abc"};
+    char command5[] = {"-d"};
+    char command6[] = {"2017"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_NE(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_018
+ * @tc.desc: test inject keyevent of text. Combined commands is not supported.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_018, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-t"};
+    char command4[] = {"abc"};
+    char command5[] = {"-t"};
+    char command6[] = {"def"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_NE(OHOS::ERR_OK, result);
+}
+
+/**
  * @tc.name:InjectEvent_InjectTouch_001
  * @tc.desc: test inject touch screen smooth movement interface
  * @tc.type: FUNC

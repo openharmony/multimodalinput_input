@@ -168,6 +168,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"long_press", required_argument, nullptr, 'l'},
         {"repeat", required_argument, nullptr, 'r'},
         {"interval", required_argument, nullptr, 'i'},
+        {"text", required_argument, nullptr, 't'},
         {nullptr, 0, nullptr, 0}
     };
     struct option touchSensorOptions[] = {
@@ -702,7 +703,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
                 int64_t time = GetSysClockTime();
-                while ((c = getopt_long(argc, argv, "d:u:l:r:i:", keyboardSensorOptions, &optionIndex)) != -1) {
+                int32_t count = 0;
+                bool inputText = false;
+                while ((c = getopt_long(argc, argv, "d:u:l:r:i:t:", keyboardSensorOptions, &optionIndex)) != -1) {
+                    // Prompt when combining other commands after using the text command. Ex: "uinput -d 2017 -t text"
+                    if (inputText) {
+                        std::cout << "The text command cannot be used with other commands." << std::endl;
+                        return RET_ERR;
+                    }
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
@@ -932,6 +940,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
                             break;
                         }
+                        case 't': {
+                            int32_t ret = ProcessKeyboardTextInput(optarg, count);
+                            if (ret != ERR_OK) {
+                                return ret;
+                            }
+                            inputText = true;
+                            break;
+                        }
                         default: {
                             std::cout << "invalid command to keyboard key" << std::endl;
                             ShowUsage();
@@ -939,6 +955,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
+                    count++;
                 }
                 for (size_t i = 0; i < downKey.size(); i++) {
                     std::cout << "you have a key " << downKey[i] << " not release" << std::endl;
@@ -1637,6 +1654,147 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
+struct SpecialChar {
+    int32_t keyCode = 0;
+    bool isPressShift = false;
+};
+
+const std::map<char, SpecialChar> CHAR_TO_KEYCODE = {
+    { ' ',  { KeyEvent::KEYCODE_SPACE, false} },
+    { '!',  { KeyEvent::KEYCODE_1, true} },
+    { '\"', { KeyEvent::KEYCODE_APOSTROPHE, true} },
+    { '#',  { KeyEvent::KEYCODE_3, true} },
+    { '$',  { KeyEvent::KEYCODE_4, true} },
+    { '%',  { KeyEvent::KEYCODE_5, true} },
+    { '&',  { KeyEvent::KEYCODE_7, true} },
+    { '\'', { KeyEvent::KEYCODE_APOSTROPHE, false} },
+    { '(',  { KeyEvent::KEYCODE_9, true} },
+    { ')',  { KeyEvent::KEYCODE_0, true} },
+    { '*',  { KeyEvent::KEYCODE_8, true} },
+    { '+',  { KeyEvent::KEYCODE_EQUALS, true} },
+    { ',',  { KeyEvent::KEYCODE_COMMA, false} },
+    { '-',  { KeyEvent::KEYCODE_MINUS, false} },
+    { '.',  { KeyEvent::KEYCODE_PERIOD, false} },
+    { '/',  { KeyEvent::KEYCODE_SLASH, false} },
+    { ':',  { KeyEvent::KEYCODE_SEMICOLON, true} },
+    { ';',  { KeyEvent::KEYCODE_SEMICOLON, false} },
+    { '<',  { KeyEvent::KEYCODE_COMMA, true} },
+    { '=',  { KeyEvent::KEYCODE_EQUALS, false} },
+    { '>',  { KeyEvent::KEYCODE_PERIOD, true} },
+    { '?',  { KeyEvent::KEYCODE_SLASH, true} },
+    { '@',  { KeyEvent::KEYCODE_2, true} },
+    { '[',  { KeyEvent::KEYCODE_LEFT_BRACKET, false} },
+    { '\\', { KeyEvent::KEYCODE_BACKSLASH, false} },
+    { ']',  { KeyEvent::KEYCODE_RIGHT_BRACKET, false} },
+    { '^',  { KeyEvent::KEYCODE_6, true} },
+    { '_',  { KeyEvent::KEYCODE_MINUS, true} },
+    { '`',  { KeyEvent::KEYCODE_GRAVE, false} },
+    { '{',  { KeyEvent::KEYCODE_LEFT_BRACKET, true} },
+    { '|',  { KeyEvent::KEYCODE_BACKSLASH, true} },
+    { '}',  { KeyEvent::KEYCODE_RIGHT_BRACKET, true} },
+    { '~',  { KeyEvent::KEYCODE_GRAVE, true} },
+};
+
+bool InputManagerCommand::IsSpecialChar(char character, int32_t &keyCode, bool &isPressShift)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = CHAR_TO_KEYCODE.find(character);
+    if (iter == CHAR_TO_KEYCODE.end()) {
+        return false;
+    }
+    keyCode = iter->second.keyCode;
+    isPressShift = iter->second.isPressShift;
+    return true;
+}
+
+int32_t InputManagerCommand::PrintKeyboardTextChar(int32_t keyCode, bool isPressShift)
+{
+    auto keyEvent = KeyEvent::Create();
+    if (keyEvent == nullptr) {
+        std::cout << "Failed to create input event object" << std::endl;
+        return RET_ERR;
+    }
+    KeyEvent::KeyItem item;
+
+    if (isPressShift) {
+        keyEvent->SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+        item.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
+        item.SetPressed(true);
+        keyEvent->AddKeyItem(item);
+        InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    }
+
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item.SetKeyCode(keyCode);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.SetPressed(false);
+    keyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+
+    if (isPressShift) {
+        keyEvent->SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+        item.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
+        item.SetPressed(false);
+        keyEvent->AddKeyItem(item);
+        InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerCommand::ProcessKeyboardTextInput(char *optarg, int32_t count)
+{
+    if (count != 0) { // Prompt when combining the text command after using other commands. Ex: "uinput -t text -t text"
+        std::cout << "The text command cannot be used with other commands." << std::endl;
+        return RET_ERR;
+    }
+    constexpr int32_t textMaxLen = 2000; // 2000: max number of ascii characters
+
+    int32_t len = strlen(optarg);
+    if (len <= 0) {
+        std::cout << "The input is empty." << std::endl;
+        return RET_ERR;
+    } else if (len > textMaxLen) {
+        std::cout << "The input text length is "<< len;
+        std::cout << ", and it is processed according to the maximum processing length of ";
+        std::cout << textMaxLen << " bytes." << std::endl;
+        len = textMaxLen;
+    }
+
+    char textChar = optarg[0];
+    bool isPressShift = false;
+    int32_t keyCode = -1;
+    for (int32_t i = 0; i < len; ++i) {
+        textChar = optarg[i];
+        if ((textChar >= '0') && (textChar <= '9')) {
+            isPressShift = false;
+            keyCode = textChar - '0' + KeyEvent::KEYCODE_0;
+        } else if ((textChar >= 'a') && (textChar <= 'z')) {
+            isPressShift = false;
+            keyCode = textChar - 'a' + KeyEvent::KEYCODE_A;
+        } else if ((textChar >= 'A') && (textChar <= 'Z')) {
+            isPressShift = true;
+            keyCode = textChar - 'A' + KeyEvent::KEYCODE_A;
+        } else if (!IsSpecialChar(textChar, keyCode, isPressShift)) {
+            std::cout << "The character of index  "<< i << " is invalid." << std::endl;
+            return RET_ERR;
+        }
+
+        if (PrintKeyboardTextChar(keyCode, isPressShift) == RET_ERR) {
+            return RET_ERR;
+        }
+    }
+    return RET_OK;
+}
+
 int32_t InputManagerCommand::KnuckleGestureInputProcess(int32_t argc, char *argv[], int32_t c, int32_t optionIndex)
 {
     struct option knuckleGestureSensorOptions[] = {
@@ -2192,6 +2350,8 @@ void InputManagerCommand::PrintKeyboardUsage()
     std::cout << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
+    std::cout << "-t <text>                  --text <text>      -input text content. ";
+    std::cout << "The text command cannot be used with other commands." << std::endl;
 }
 
 void InputManagerCommand::PrintStylusUsage()
