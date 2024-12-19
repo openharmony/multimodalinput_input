@@ -387,7 +387,6 @@ int32_t TouchPadTransformProcessor::SmoothMultifingerSwipeData(libinput_event_ge
     }
     std::array<Coords, FINGER_COUNT_MAX> fingerCoords;
     Coords emptyCoord {0, 0};
-    Coords coordDelta {0, 0};
     int32_t historyFingerCount = 0;
     for (int32_t i = 0; i < fingerCount; ++i) {
         if (static_cast<int32_t>(swipeHistory_.size()) <= i) {
@@ -395,7 +394,7 @@ int32_t TouchPadTransformProcessor::SmoothMultifingerSwipeData(libinput_event_ge
         }
         fingerCoords[i].x = libinput_event_gesture_get_device_coords_x(gesture, i);
         fingerCoords[i].y = libinput_event_gesture_get_device_coords_y(gesture, i);
-        if (action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE && fingerCoords[i] != emptyCoord) {
+        if (action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE && (fingerCoords[i].x != 0 || fingerCoords[i].y != 0)) {
             swipeHistory_[i].push_back(fingerCoords[i]);
         }
         if (static_cast<int32_t>(swipeHistory_[i].size()) > fingerCount) {
@@ -411,7 +410,7 @@ int32_t TouchPadTransformProcessor::SmoothMultifingerSwipeData(libinput_event_ge
         coordDelta /= historyFingerCount;
     }
     for (int32_t i = 0; i < fingerCount; ++i) {
-        if (fingerCoords[i] == emptyCoord && action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+        if ((fingerCoords[i].x == 0 && ingerCoords[i].y == 0) && action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
             fingerCoords[i] = swipeHistory_[i].back() + coordDelta;
             swipeHistory_[i].push_back(fingerCoords[i]);
         }
