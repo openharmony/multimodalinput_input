@@ -359,7 +359,8 @@ bool Parcel::ReadDouble(double &value)
     return DfsMessageParcel::messageParcel->ReadDouble(value);
 }
 
-Media::PixelMap *Media::PixelMap::Unmarshalling(Parcel &parcel)
+Media::PixelMap *Media::PixelMap::Unmarshalling(Parcel &parcel,
+    std::function<int(Parcel &parcel, std::function<int(Parcel&)> readFdDefaultFunc)> readSafeFdFunc)
 {
     if (DfsMessageParcel::messageParcel == nullptr) {
         return nullptr;
