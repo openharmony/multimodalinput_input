@@ -72,14 +72,6 @@ struct Coords {
         this->y /= divisor;
         return *this;
     }
-    bool operator==(const Coords& other)
-    {
-        return this->x == other.x && this.y == other.y;
-    }
-    bool operator!=(const Coords& other)
-    {
-        return this->x != other.x || this.y != other.y;
-    }
 }
 
 class MultiFingersTapHandler final {
