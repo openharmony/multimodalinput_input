@@ -265,7 +265,7 @@ protected:
     int32_t UpdateCombineKeyState(bool enable);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
-    int32_t OnCancelInjection();
+    int32_t OnCancelInjection(int32_t callPid = 0);
     void InitPrintClientInfo();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void InitVKeyboardFuncHandler();
