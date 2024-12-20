@@ -1070,6 +1070,7 @@ int32_t ServerMsgHandler::OnTransferBinderClientSrv(const sptr<IRemoteObject> &b
     }
     return ERR_OK;
 }
+
 int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
 {
     CALL_DEBUG_ENTER;
