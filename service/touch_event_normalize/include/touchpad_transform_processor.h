@@ -72,7 +72,7 @@ struct Coords {
         this->y /= divisor;
         return *this;
     }
-}
+};
 
 class MultiFingersTapHandler final {
     DECLARE_DELAYED_SINGLETON(MultiFingersTapHandler);
