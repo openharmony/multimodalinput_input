@@ -1224,7 +1224,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
     CHKPV(lastPointerEvent_);
-    if (INPUT_DEV_MGR->HasPointerDevice() || IsMouseSimulate()) {
+    if (INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice()) {
         MouseLocation mouseLocation = GetMouseInfo();
         int32_t displayId = MouseEventHdr->GetDisplayId();
         displayId = displayId < 0 ? displayGroupInfo_.displaysInfo[0].id : displayId;
