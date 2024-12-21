@@ -1508,6 +1508,10 @@ bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActio
             currentPointerEvent->UpdatePointerItem(pointerId, item);
             currentPointerEvent->SetPointerAction(pointerActionEvent);
             OnPointerEvent(currentPointerEvent);
+            if (currentPointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+                currentPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+                OnPointerEvent(currentPointerEvent);
+            }
             return true;
         }
     }
@@ -1520,12 +1524,12 @@ void InputManagerImpl::OnDisconnected()
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::initializer_list<int32_t> pointerActionEvents { PointerEvent::POINTER_ACTION_MOVE,
-        PointerEvent::POINTER_ACTION_DOWN };
+        PointerEvent::POINTER_ACTION_DOWN, PointerEvent::POINTER_ACTION_BUTTON_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
     std::initializer_list<int32_t> pointerActionAxisEvents { PointerEvent::POINTER_ACTION_AXIS_UPDATE,
         PointerEvent::POINTER_ACTION_AXIS_BEGIN };
-    if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
+    if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_CANCEL)) {
         MMI_HILOGE("Up event for service exception re-sending");
         return;
     }
