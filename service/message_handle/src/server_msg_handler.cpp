@@ -126,7 +126,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
         int32_t checkReturn = NativeInjectCheck(pid);
         if (checkReturn != RET_OK) {
             return checkReturn;
-         }
+        }
     }
     int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
     keyEvent->SetKeyIntention(keyIntention);
