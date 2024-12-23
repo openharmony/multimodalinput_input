@@ -25,14 +25,14 @@ namespace MMI {
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
 void InputScreenCaptureMonitorListener::OnScreenCaptureStarted(int32_t pid)
 {
-    MMI_HILOGI("The process starts to record the screen, pid: %{public}d", pid);
+    MMI_HILOGI("The process starts to record the screen, pid:%{public}d", pid);
     CHKPV(callback_);
     callback_(pid, true);
 }
 
 void InputScreenCaptureMonitorListener::OnScreenCaptureFinished(int32_t pid)
 {
-    MMI_HILOGI("The process screen recording finishs, pid: %{public}d", pid);
+    MMI_HILOGI("The process screen recording finishs, pid:%{public}d", pid);
     CHKPV(callback_);
     callback_(pid, false);
 }
