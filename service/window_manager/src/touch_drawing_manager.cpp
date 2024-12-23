@@ -271,7 +271,7 @@ void TouchDrawingManager::CreateObserver()
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
             GetBoolValue(pointerPositionSwitchName, pointerMode_.isShow);
     }
-    MMI_HILOGD("bubbleMode_: %{public}d, pointerMode_: %{public}d", bubbleMode_.isShow, pointerMode_.isShow);
+    MMI_HILOGD("bubbleMode_:%{public}d, pointerMode_:%{public}d", bubbleMode_.isShow, pointerMode_.isShow);
 }
 
 template <class T>
@@ -287,14 +287,14 @@ void TouchDrawingManager::CreateBubbleObserver(T &item)
         }
         CHKPV(delegateProxy_);
         delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateBubbleData, this));
-        MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
+        MMI_HILOGI("key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.SwitchName, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
         RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-        MMI_HILOGE("Register setting observer failed, ret=%{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
         return;
     }
@@ -314,13 +314,13 @@ void TouchDrawingManager::CreatePointerObserver(T &item)
         }
         CHKPV(delegateProxy_);
         delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateLabels, this));
-        MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
+        MMI_HILOGI("key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.SwitchName, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-        MMI_HILOGE("Register setting observer failed, ret=%{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
         return;
     }
@@ -570,7 +570,7 @@ void TouchDrawingManager::Snapshot()
 
 bool TouchDrawingManager::IsWindowRotation()
 {
-    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+    MMI_HILOGD("ROTATE_POLICY:%{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
         ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
     return (ROTATE_POLICY == WINDOW_ROTATE ||
         (ROTATE_POLICY == FOLDABLE_DEVICE &&

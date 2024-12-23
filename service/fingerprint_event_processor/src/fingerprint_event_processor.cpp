@@ -143,7 +143,7 @@ void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
 void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool cancel)
 {
     int32_t flag = screenMissTouchFlag_ ? 1 : 0;
-    MMI_HILOGD("screenMissTouchFlag_ : %{private}d, screen : %{private}d, cancel : %{private}d", flag, screen, screen);
+    MMI_HILOGD("screenMissTouchFlag_ :%{private}d, screen:%{private}d, cancel:%{private}d", flag, screen, screen);
     if (screenMissTouchFlag_ == false) {
         if (screen == true) {
             screenMissTouchFlag_ = true;
@@ -182,7 +182,7 @@ bool FingerprintEventProcessor::CheckKeyMisTouchState()
     bool ret = false;
     for (auto &[key, value] : keyStateMap_) {
         auto keystate = value.first;
-        MMI_HILOGD("keycode : %{private}d, state : %{public}d", key, value.first);
+        MMI_HILOGD("keycode:%{private}d, state:%{public}d", key, value.first);
         if (keystate == MUTE_KEY_DOWN) {
             ret = true;
         } else if (keystate == MUTE_KEY_UP) {
@@ -194,7 +194,7 @@ bool FingerprintEventProcessor::CheckKeyMisTouchState()
                 time = VOLUME_KEY_UP_TIME;
             }
             if (durationMs < time) {
-                MMI_HILOGD("Dont report because time diff < threshold, keycode : %{private}d, state : %{public}d",
+                MMI_HILOGD("Dont report because time diff < threshold, keycode:%{private}d, state:%{public}d",
                     key, value.first);
                 ret = true;
             } else {
@@ -359,10 +359,10 @@ void FingerprintEventProcessor::CreateStatusConfigObserver(T& item)
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetStringValue(key, value);
         if (ret != RET_OK) {
-            MMI_HILOGE("Get value from settings db failed, ret: %{public}d", ret);
+            MMI_HILOGE("Get value from settings db failed, ret:%{public}d", ret);
             return;
         }
-        MMI_HILOGI("Config changed, key: %{public}s, value: %{public}s", key.c_str(), value.c_str());
+        MMI_HILOGI("Config changed, key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
         item.valueString = value;
     };
 
@@ -370,7 +370,7 @@ void FingerprintEventProcessor::CreateStatusConfigObserver(T& item)
         .CreateObserver(item.keyString, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != RET_OK) {
-        MMI_HILOGE("Register setting observer failed, ret: %{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
     }
 
@@ -378,10 +378,10 @@ void FingerprintEventProcessor::CreateStatusConfigObserver(T& item)
     ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .SettingDataShare::GetStringValue(item.keyString, value);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get value from settings db failed, ret: %{public}d", ret);
+        MMI_HILOGE("Get value from settings db failed, ret:%{public}d", ret);
         return;
     }
-    MMI_HILOGI("Get value success, key: %{public}s, value: %{public}s", item.keyString.c_str(), value.c_str());
+    MMI_HILOGI("Get value success, key:%{public}s, value:%{public}s", item.keyString.c_str(), value.c_str());
     item.valueString = value;
 }
 
@@ -391,7 +391,7 @@ void FingerprintEventProcessor::StartSmartKeyIfNeeded()
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .SettingDataShare::GetStringValue(IS_SMART_KEY_USE, isStartSmartKey);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get value from settings db failed, ret: %{public}d", ret);
+        MMI_HILOGE("Get value from settings db failed, ret:%{public}d", ret);
         return;
     }
     if (isStartSmartKey == SMART_KEY_IS_OPEN) {
@@ -416,7 +416,7 @@ void FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
 
         auto ret = abmc->StartExtensionAbility(want, nullptr, -1, AppExecFwk::ExtensionAbilityType::SERVICE);
         if (ret != RET_OK) {
-            MMI_HILOGE("StartExtensionAbility failed, ret: %{public}d", ret);
+            MMI_HILOGE("StartExtensionAbility failed, ret:%{public}d", ret);
             return false;
         }
         MMI_HILOGI("StartServiceExtAbility finished");

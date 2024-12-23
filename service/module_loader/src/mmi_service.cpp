@@ -629,7 +629,7 @@ void MMIService::OnDisconnected(SessionPtr s)
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (s->GetProgramName() == SHELL_ASSISTANT && shellAssitentPid_ == s->GetPid()) {
-        MMI_HILOGW("Clean all shell windows pid: %{public}d", s->GetPid());
+        MMI_HILOGW("Clean all shell windows pid:%{public}d", s->GetPid());
         shellAssitentPid_ = -1;
         IInputWindowsManager::GetInstance()->CleanShellWindowIds();
     }
@@ -3135,7 +3135,7 @@ int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(
         std::bind(&IPointerDrawingManager::GetPointerSnapshot, IPointerDrawingManager::GetInstance(), pixelMapPtr)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the pointer snapshot failed, ret: %{public}d", ret);
+        MMI_HILOGE("Get the pointer snapshot failed, ret:%{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER

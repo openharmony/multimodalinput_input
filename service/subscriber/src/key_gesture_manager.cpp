@@ -394,7 +394,7 @@ int32_t KeyGestureManager::PullUpAccessibility::AddHandler(int32_t pid,
 
 void KeyGestureManager::PullUpAccessibility::OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGI("[PullUpAccessibility] Current AccShortcutTimeout setting: %{public}dms",
+    MMI_HILOGI("[PullUpAccessibility] Current AccShortcutTimeout setting:%{public}dms",
         ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout());
     for (auto &handler : handlers_) {
         handler.SetLongPressTime(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout());
