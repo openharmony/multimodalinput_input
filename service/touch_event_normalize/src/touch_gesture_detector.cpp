@@ -242,7 +242,7 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
     int32_t pointerId = event->GetPointerId();
     auto iter = downPoint_.find(pointerId);
     if (iter == downPoint_.end()) {
-        MMI_HILOGW("Invalid pointer: %{public}d", pointerId);
+        MMI_HILOGW("Invalid pointer:%{public}d", pointerId);
         return;
     }
     downPoint_.erase(iter);
@@ -354,7 +354,7 @@ int64_t TouchGestureDetector::GetMaxDownInterval()
             earliestTime = touchTime;
         }
     }
-    MMI_HILOGI("Down interval: %{public}" PRId64, (latestTime - earliestTime));
+    MMI_HILOGI("Down interval:%{public}" PRId64, (latestTime - earliestTime));
     return latestTime - earliestTime;
 }
 
@@ -373,7 +373,7 @@ float TouchGestureDetector::GetMaxFingerSpacing()
             maxSpacing = std::max(maxSpacing, (float)hypot(pX - nX, pY - nY));
         }
     }
-    MMI_HILOGI("Down max spacing: %{public}.2f", maxSpacing);
+    MMI_HILOGI("Down max spacing:%{public}.2f", maxSpacing);
     return maxSpacing;
 }
 

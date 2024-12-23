@@ -3163,7 +3163,7 @@ bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
 
 bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32_t toolType)
 {
-    MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowType), toolType);
+    MMI_HILOGD("windowType:%{public}d, toolType:%{public}d", static_cast<int32_t>(windowType), toolType);
     if ((windowType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
         windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
@@ -4023,16 +4023,16 @@ void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
     CALL_INFO_TRACE;
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
-            MMI_HILOGE("Get settingdata failed, key: %{public}s", key.c_str());
+            MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());
         }
-        MMI_HILOGI("Anti mistake observer key: %{public}s, statusValue: %{public}d", key.c_str(), item.isOpen);
+        MMI_HILOGI("Anti mistake observer key:%{public}s, statusValue:%{public}d", key.c_str(), item.isOpen);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.switchName, updateFunc);
     CHKPV(statusObserver);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-        MMI_HILOGE("Register setting observer failed, ret: %{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
     }
 }

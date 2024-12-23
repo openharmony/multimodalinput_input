@@ -1447,13 +1447,13 @@ void InputManagerImpl::OnConnected()
     CALL_INFO_TRACE;
     ReAddInputEventFilter();
     if (!displayGroupInfo_.windowsInfo.empty() && !displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGD("displayGroupInfo_: windowsInfo size: %{public}zu, displaysInfo size: %{public}zu",
+        MMI_HILOGD("displayGroupInfo_: windowsInfo size:%{public}zu, displaysInfo size:%{public}zu",
             displayGroupInfo_.windowsInfo.size(), displayGroupInfo_.displaysInfo.size());
         SendDisplayInfo();
         PrintDisplayInfo();
     }
     if (!windowGroupInfo_.windowsInfo.empty()) {
-        MMI_HILOGD("windowGroupInfo_: windowsInfo size: %{public}zu", windowGroupInfo_.windowsInfo.size());
+        MMI_HILOGD("windowGroupInfo_: windowsInfo size:%{public}zu", windowGroupInfo_.windowsInfo.size());
         SendWindowInfo();
     }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT

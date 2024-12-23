@@ -376,7 +376,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId_ = FOLD_SCREEN_MAIN_ID;
     }
-    MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
+    MMI_HILOGI("screenId_:%{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     RotationCanvasNode(brushCanvasNode_, displayInfo_);
     RotationCanvasNode(trackCanvasNode_, displayInfo_);
@@ -417,7 +417,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId_ = FOLD_SCREEN_MAIN_ID;
     }
-    MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
+    MMI_HILOGI("screenId_:%{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     RotationCanvasNode(canvasNode_, displayInfo_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
@@ -929,7 +929,7 @@ void KnuckleDrawingManager::CreateObserver()
         screenReadState_.switchName = SCREEN_READING;
         CreateScreenReadObserver(screenReadState_);
     }
-    MMI_HILOGD("screenReadState_.state: %{public}s", screenReadState_.state.c_str());
+    MMI_HILOGD("screenReadState_.state:%{public}s", screenReadState_.state.c_str());
 }
 
 template <class T>
@@ -943,7 +943,7 @@ void KnuckleDrawingManager::CreateScreenReadObserver(T &item)
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        MMI_HILOGI("key: %{public}s, state: %{public}s", key.c_str(), item.state.c_str());
+        MMI_HILOGI("key:%{public}s, state:%{public}s", key.c_str(), item.state.c_str());
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.switchName, updateFunc);

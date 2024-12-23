@@ -78,7 +78,7 @@ void MouseLocation::OnClientDied(const ClientDiedEvent &event)
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
-    FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
+    FI_HILOGI("Remove client died listener, pid:%{public}d", event.pid);
     localListeners_.erase(event.pid);
     for (auto it = listeners_.begin(); it != listeners_.end();) {
         it->second.erase(event.pid);

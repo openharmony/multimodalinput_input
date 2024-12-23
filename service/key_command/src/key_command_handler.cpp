@@ -1089,7 +1089,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         !IsMusicActivate()) {
         return true;
     }
-    MMI_HILOGI("ScreenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
         return false;
     }
@@ -2155,7 +2155,7 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
 {
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    MMI_HILOGI("screenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("screenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     std::string bundleName = sequence.ability.bundleName;
     std::string matchName = ".screenshot";
     if (bundleName.find(matchName) != std::string::npos) {
@@ -2201,7 +2201,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     if (keysSize == sequenceKeysSize) {
         std::ostringstream oss;
         oss << sequence;
-        MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
+        MMI_HILOGI("SequenceKey matched:%{public}s", oss.str().c_str());
         return HandleMatchedSequence(sequence, isLaunchAbility);
     }
     return true;

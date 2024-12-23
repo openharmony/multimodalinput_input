@@ -47,7 +47,7 @@ int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
     CHKPR(delegateTasks_, ERROR_NULL_POINTER);
     int32_t ret = delegateTasks_(cb);
     if (ret != RET_OK) {
-        MMI_HILOGE("Failed to execute the task, ret: %{public}d", ret);
+        MMI_HILOGE("Failed to execute the task, ret:%{public}d", ret);
     }
     return ret;
 }

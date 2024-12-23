@@ -1212,7 +1212,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
             int32_t pid = GetCallingPid();
             bool ret = InputScreenCaptureAgent::GetInstance().IsScreenCaptureWorking(pid);
             if (!ret) {
-                MMI_HILOGE("Calling pid is: %{public}d", pid);
+                MMI_HILOGE("Calling pid is:%{public}d", pid);
                 return ERROR_NO_PERMISSION;
             }
 #else

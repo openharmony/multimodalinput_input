@@ -191,9 +191,9 @@ public:
                 MMI_HILOGI("Not match line:%{public}s", line.c_str());
                 continue;
             }
-            MMI_HILOGI("Line match: %{public}s", line.c_str());
+            MMI_HILOGI("Line match:%{public}s", line.c_str());
             if (match.size() != matchSize) {
-                MMI_HILOGI("Check itemRegex,it is error");
+                MMI_HILOGI("Check itemRegex, it is error");
                 continue;
             }
             std::string priority = match[1].str();
@@ -204,7 +204,7 @@ public:
             }
             auto ret = info.emplace(std::make_pair(priority, filterId));
             if (!ret.second) {
-                MMI_HILOGE("Duplicate priority:%{public}s,filterId:%{public}s,", priority.c_str(), filterId.c_str());
+                MMI_HILOGE("Duplicate priority:%{public}s, filterId:%{public}s,", priority.c_str(), filterId.c_str());
             }
             info.insert(std::make_pair(priority, filterId));
         };
@@ -343,7 +343,7 @@ struct KeyFilter002 : public IInputEventFilter {
     {}
     bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
     {
-        MMI_HILOGI("KeyFilter::OnInputEvent enter, pid: %{public}d, exceptKeyCode:%{public}d", getpid(),
+        MMI_HILOGI("KeyFilter::OnInputEvent enter, pid:%{public}d, exceptKeyCode:%{public}d", getpid(),
             exceptKeyCode);
         do {
             result = false;
@@ -451,7 +451,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter, pid:%{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -505,7 +505,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
  *     struct KeyFilter : public IInputEventFilter {
  *         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
  *         {
- *             MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+ *             MMI_HILOGI("KeyFilter::OnInputEvent enter, pid:%{public}d", getpid());
  *             return false;
  *         }
  *         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -542,7 +542,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_005, TestSize.Level1
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter, pid:%{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -577,7 +577,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_005, TestSize.Level1
 struct KeyFilter006 : public IInputEventFilter {
     bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
     {
-        MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+        MMI_HILOGI("KeyFilter::OnInputEvent enter, pid:%{public}d", getpid());
         return false;
     }
     bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -596,7 +596,7 @@ void PrintFilter(const std::string title, const std::set<std::pair<std::string, 
 {
     MMI_HILOGI("title:%{public}s, size:%{public}zu", title.c_str(), s.size());
     for (const auto &[priority, filterId] : s) {
-        MMI_HILOGI("priority:%{public}s,filterId:%{pulbic}s", priority.c_str(), filterId.c_str());
+        MMI_HILOGI("priority:%{public}s, filterId:%{pulbic}s", priority.c_str(), filterId.c_str());
     }
 };
 
