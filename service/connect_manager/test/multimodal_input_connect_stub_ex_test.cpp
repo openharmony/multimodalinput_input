@@ -204,7 +204,10 @@ public:
     int32_t AppendExtraData(const ExtraData& extraData) override { return extraData.sourceType; }
     int32_t EnableInputDevice(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override { return delay; }
-    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override { return retSetInputDeviceEnable_; }
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override
+    {
+        return retSetInputDeviceEnable_;
+    }
     int32_t SetTouchpadScrollSwitch(bool switchFlag) override
     {
         switchFlag_ = switchFlag;
