@@ -1635,6 +1635,22 @@ Input_Result OH_Input_RemoveInputEventInterceptor(void)
     return retCode;
 }
 
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(intervalSinceLastInput, INPUT_PARAMETER_ERROR);
+    int64_t interval = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(interval);
+    *intervalSinceLastInput = interval;
+    Input_Result retCode = INPUT_SUCCESS;
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Get Interval Since Last Input failed");
+        return retCode;
+    }
+    return INPUT_SUCCESS;
+}
+
 static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 {
     CALL_DEBUG_ENTER;

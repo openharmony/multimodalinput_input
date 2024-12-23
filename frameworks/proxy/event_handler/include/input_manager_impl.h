@@ -211,6 +211,7 @@ public:
     int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
     void OnWindowStateError(int32_t pid, int32_t windowId);
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

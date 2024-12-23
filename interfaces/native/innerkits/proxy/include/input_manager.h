@@ -901,6 +901,14 @@ public:
      */
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
 
+    /**
+     * @brief Get Interval Since Last Input.
+     * @param timeInterval the value which Indicates the time interval since last input.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
