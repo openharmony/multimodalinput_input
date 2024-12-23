@@ -435,7 +435,6 @@ void MMIService::OnStart()
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add system ability listener success");
     AddSystemAbilityListener(RENDER_SERVICE);
-    DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
@@ -1689,9 +1688,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         DISPLAY_MONITOR->InitCommonEventSubscriber();
-#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
@@ -2066,11 +2065,11 @@ void MMIService::OnThread()
     PreEventLoop();
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-#if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         if (isCesStart_ && !DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
             DISPLAY_MONITOR->InitCommonEventSubscriber();
         }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
         MMI_HILOGD("timeout:%{public}d", timeout);
