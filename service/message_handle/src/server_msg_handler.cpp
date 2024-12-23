@@ -44,7 +44,9 @@
 #include "parameters.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "touch_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -95,7 +97,9 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
             continue;
         }
     }
+#ifndef OHOS_BUILD_ENABLE_WATCH
     AUTHORIZE_HELPER->Init(clientDeathHandler_);
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
@@ -120,6 +124,7 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
@@ -127,8 +132,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             MMI_HILOGW("Current device has no permission");
             return COMMON_PERMISSION_CHECK_ERROR;
         }
-        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
-        if (screenLocked) {
+        if (DISPLAY_MONITOR->GetScreenLocked()) {
             MMI_HILOGW("Screen locked, no permission");
             return COMMON_PERMISSION_CHECK_ERROR;
         }
@@ -156,8 +160,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
-    int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
-    keyEvent->SetKeyIntention(keyIntention);
+    keyEvent->SetKeyIntention(KeyItemsTransKeyIntention(keyEvent->GetKeyItems()));
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
@@ -166,6 +169,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     } else {
         MMI_HILOGD("Inject keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -208,6 +212,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
         if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
@@ -243,6 +248,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return OnInjectPointerEventExt(pointerEvent, isShell);
 }
 
@@ -267,11 +273,13 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+#ifndef OHOS_BUILD_ENABLE_WATCH
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
                 !(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) &&
                 !IsNavigationWindowInjectEvent(pointerEvent)) {
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
             }
+#endif // OHOS_BUILD_ENABLE_WATCH
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
@@ -281,6 +289,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
 #ifdef OHOS_BUILD_ENABLE_POINTER
+#ifndef OHOS_BUILD_ENABLE_WATCH
             int32_t ret = AccelerateMotion(pointerEvent);
             if (ret != RET_OK) {
                 MMI_HILOGE("Failed to accelerate motion, error:%{public}d", ret);
@@ -298,6 +307,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0, false);
             }
+#endif // OHOS_BUILD_ENABLE_WATCH
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
@@ -311,6 +321,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
+#ifndef OHOS_BUILD_ENABLE_WATCH
 int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
@@ -376,6 +387,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 void ServerMsgHandler::CalculateOffset(Direction direction, Offset &offset)
 {
@@ -923,13 +935,16 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 
 void ServerMsgHandler::LaunchAbility()
 {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     CALL_DEBUG_ENTER;
     AUTH_DIALOG.ConnectSystemUi();
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     if (isAuthorize) {
         auto state = AUTHORIZE_HELPER->GetAuthorizeState();
         if (state == AuthorizeState::STATE_UNAUTHORIZE) {
@@ -943,8 +958,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         InjectNoticeInfo noticeInfo;
         noticeInfo.pid = CurrentPID_;
         AddInjectNotice(noticeInfo);
-        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-            [&] (int32_t pid) {
+        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, [&] (int32_t pid) {
                 CloseInjectNotice(pid);
         });
         if (result != RET_OK) {
@@ -977,26 +991,31 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
         }
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return ERR_OK;
 }
 
 int32_t ServerMsgHandler::OnCancelInjection()
 {
     CALL_DEBUG_ENTER;
-    auto iter = authorizationCollection_.find(CurrentPID_);
-    if (iter != authorizationCollection_.end()) {
-        authorizationCollection_.erase(iter);
-        AUTHORIZE_HELPER->CancelAuthorize(CurrentPID_);
-        auto state = AUTHORIZE_HELPER->GetAuthorizeState();
-        if (state != AuthorizeState::STATE_UNAUTHORIZE) {
-            CloseInjectNotice(CurrentPID_);
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+    int32_t curAuthPid = AUTHORIZE_HELPER->GetAuthorizePid();
+    MMI_HILOGD("Cancel application injection,s:%{public}d, authPid:%{public}d",
+        state, curAuthPid);
+    if (state != AuthorizeState::STATE_UNAUTHORIZE) {
+        if (callPid != curAuthPid) {
+            MMI_HILOGW("Authorized pid not callPid.");
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
-        MMI_HILOGD("Cancel application authorization,pid:%{public}d", CurrentPID_);
-        CurrentPID_ = -1;
-        InjectionType_ = InjectionType::UNKNOWN;
-        keyEvent_ = nullptr;
-        pointerEvent_ = nullptr;
+        AUTHORIZE_HELPER->CancelAuthorize(curAuthPid);
+        if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
+            AUTH_DIALOG.CloseDialog();
+        } else {
+            CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
+        }
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return ERR_OK;
 }
 
@@ -1022,6 +1041,7 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap) __attr
     return RET_OK;
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 bool ServerMsgHandler::InitInjectNoticeSource()
 {
     CALL_DEBUG_ENTER;
@@ -1053,6 +1073,7 @@ bool ServerMsgHandler::InitInjectNoticeSource()
     MMI_HILOGD("Injectnotice InitInjectNoticeSource end");
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
 {
@@ -1085,6 +1106,7 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
     return true;
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 bool ServerMsgHandler::CloseInjectNotice(int32_t pid)
 {
     CALL_DEBUG_ENTER;
@@ -1117,6 +1139,7 @@ bool ServerMsgHandler::CloseInjectNotice(int32_t pid)
     });
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 int32_t ServerMsgHandler::OnTransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject, int32_t pid)
 {

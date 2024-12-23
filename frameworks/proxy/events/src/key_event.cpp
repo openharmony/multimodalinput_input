@@ -25,6 +25,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     {KeyEvent::KEYCODE_FN, "KEYCODE_FN"},
     {KeyEvent::KEYCODE_UNKNOWN, "KEYCODE_UNKNOWN"},
     {KeyEvent::KEYCODE_HOME, "KEYCODE_HOME"},
@@ -416,6 +417,10 @@ const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_LAUNCHER_MENU, "KEYCODE_LAUNCHER_MENU"},
     {KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER, "KEYCODE_CALL_NOTIFICATION_CENTER"},
     {KeyEvent::KEYCODE_CALL_CONTROL_CENTER, "KEYCODE_CALL_CONTROL_CENTER"},
+#else
+    {KeyEvent::KEYCODE_FN, "KEYCODE_FN"},
+    {KeyEvent::KEYCODE_VOLUME_DOWN, "KEYCODE_VOLUME_DOWN"},
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 } // namespace
 const int32_t KeyEvent::UNKNOWN_FUNCTION_KEY = -1;

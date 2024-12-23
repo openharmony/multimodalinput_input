@@ -569,6 +569,7 @@ void PointerEvent::SetOriginPointerAction(int32_t pointerAction)
 }
 
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     { PointerEvent::POINTER_ACTION_CANCEL, "cancel" },
     { PointerEvent::POINTER_ACTION_DOWN, "down" },
     { PointerEvent::POINTER_ACTION_MOVE, "move" },
@@ -610,6 +611,7 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::TOUCH_ACTION_GESTURE_END, "touch-gesture-end" },
     { PointerEvent::POINTER_ACTION_PROXIMITY_IN, "pen-proximity-in" },
     { PointerEvent::POINTER_ACTION_PROXIMITY_OUT, "pen-proximity-out" },
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 
 const char* PointerEvent::DumpPointerAction() const

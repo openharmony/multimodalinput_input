@@ -53,6 +53,7 @@ const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 std::string g_threeFingerTapKey = "touchpadThreeFingerTap";
 } // namespace
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
     : deviceId_(deviceId)
 {
@@ -670,6 +671,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
 {
     return pointerEvent_;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 void TouchPadTransformProcessor::RemoveSurplusPointerItem()
 {
@@ -782,6 +784,7 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
     }
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     if (PutConfigDataToDatabase(g_threeFingerTapKey, switchFlag) != RET_OK) {
@@ -798,5 +801,6 @@ int32_t TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(bool &switc
     GetConfigDataFromDatabase(g_threeFingerTapKey, switchFlag);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace MMI
 } // namespace OHOS

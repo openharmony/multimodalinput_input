@@ -29,7 +29,9 @@
 #include "key_event_value_transformation.h"
 #include "key_map_manager.h"
 #include "net_packet.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "proto.h"
 #include "util_ex.h"
 
@@ -471,7 +473,9 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isPointerDevice = IsPointerDevice(inputDevice);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
     info.sysUid = GetInputIdentification(inputDevice);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)

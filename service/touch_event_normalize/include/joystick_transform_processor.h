@@ -54,6 +54,7 @@ class JoystickTransformProcessor final : public TransformProcessor {
         LIBINPUT_THUMBR_BUTTON_CODE = 318
     };
     const std::map<uint32_t, int32_t> LibinputChangeToPointer = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
         { LIBINPUT_TL2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TL2 },
         { LIBINPUT_TR2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TR2 },
         { LIBINPUT_TL_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TL },
@@ -81,6 +82,7 @@ class JoystickTransformProcessor final : public TransformProcessor {
         { LIBINPUT_C_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_C },
         { LIBINPUT_Z_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_Z },
         { LIBINPUT_MODE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_MODE }
+#endif // OHOS_BUILD_ENABLE_WATCH
     };
 
 public:

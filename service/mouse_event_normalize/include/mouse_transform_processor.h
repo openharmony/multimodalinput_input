@@ -108,6 +108,9 @@ public:
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    double HandleAxisAccelateTouchPad(double axisValue);
+#endif // OHOS_BUILD_ENABLE_WATCH
     int32_t HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
     int32_t HandleAxisBeginEndInner(struct libinput_event *event);
@@ -120,7 +123,6 @@ private:
     void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
     void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
-    double HandleAxisAccelateTouchPad(double axisValue);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
