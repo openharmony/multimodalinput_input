@@ -69,14 +69,12 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SelectAutoRepeat_001, TestSize.Lev
     int32_t timerId_ = 2;
     keyEvent->SetKeyCode(1);
     keyEvent->SetAction(KeyEvent::KEY_ACTION_DOWN);
-    keyAutoRepeat.SelectAutoRepeat(keyEvent);
-    EXPECT_EQ(timerId_, 2);
+    ASSERT_NO_FATAL_FAILURE(keyAutoRepeat.SelectAutoRepeat(keyEvent));
     timerId_ = TimerMgr->AddTimer(1, 1, nullptr);
     keyAutoRepeat.SelectAutoRepeat(keyEvent);
     EXPECT_EQ(timerId_, -1);
     keyEvent->SetAction(KeyEvent::KEY_ACTION_UP);
-    keyAutoRepeat.SelectAutoRepeat(keyEvent);
-    EXPECT_EQ(timerId_, -1);
+    ASSERT_NO_FATAL_FAILURE(keyAutoRepeat.SelectAutoRepeat(keyEvent));
 }
 
 /**
