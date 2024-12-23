@@ -613,7 +613,7 @@ void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler
     if (monitor.Expect(pointerEvent)) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
-            MMI_HILOGI("Swipe event sended in monitor! action type: %{public}d finger count: %{public}d",
+            MMI_HILOGI("Swipe event sended in monitor! action type:%{public}d finger count:%{public}d",
                 pointerEvent->GetPointerAction(),
                 pointerEvent->GetFingerCount());
         }

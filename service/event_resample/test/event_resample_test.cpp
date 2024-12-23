@@ -455,7 +455,7 @@ void EventResampleTest::ReadQueue(TestData &testData, Context &ctx, std::vector<
 
         outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, status);
         if ((outEvent != nullptr) && (PointerEvent::POINTER_ACTION_DOWN != outEvent->GetPointerAction())) {
-            MMI_HILOGE("Unexpected pointer action: %{public}d while %{public}d expected",
+            MMI_HILOGE("Unexpected pointer action:%{public}d while %{public}d expected",
                        outEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
             failCount_++;
         } else if (outEvent != nullptr) {
@@ -485,7 +485,7 @@ void EventResampleTest::SendTouchUp(TestData &testData, Context &ctx, std::vecto
     SetupPointerEvent(touchUp, testData);
     outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, status);
     if (outEvent != nullptr) {
-        MMI_HILOGD("Pointer Action: %{public}d", outEvent->GetPointerAction());
+        MMI_HILOGD("Pointer Action:%{public}d", outEvent->GetPointerAction());
         EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
         EXPECT_EQ(ERR_OK, status);
     } else {

@@ -497,7 +497,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     PointerStyle pointerStyle, Direction direction)
 {
     CHKPR(surfaceNode_, RET_ERR);
-    MMI_HILOGD("Pointer window move success, pointerStyle id: %{public}d", pointerStyle.id);
+    MMI_HILOGD("Pointer window move success, pointerStyle id:%{public}d", pointerStyle.id);
     displayId_ = displayId;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
@@ -1596,7 +1596,7 @@ void PointerDrawingManager::AttachToDisplay()
         && (screenId_ == FOLD_SCREEN_ID_FULL)) {
         screenId_ = FOLD_SCREEN_ID_MAIN;
     }
-    MMI_HILOGI("screenId_: %{public}" PRIu64"", screenId_);
+    MMI_HILOGI("screenId_:%{public}" PRIu64"", screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
 }
 
@@ -3035,7 +3035,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         surfaceNode_->DetachToDisplay(screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         screenId_ = static_cast<uint64_t>(displayId);
-        MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
+        MMI_HILOGI("screenId_:%{public}" PRIu64, screenId_);
         AttachToDisplay();
         DrawCursor(MOUSE_ICON(lastMouseStyle_.id));
         int32_t currnetPhysicalX =

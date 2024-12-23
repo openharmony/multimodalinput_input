@@ -134,7 +134,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
         }
     }
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
-    MMI_HILOGD("SUPER_PRIVACY_SWITCH: %{public}s", OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "").c_str());
+    MMI_HILOGD("SUPER_PRIVACY_SWITCH:%{public}s", OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "").c_str());
     return handled;
 }
 

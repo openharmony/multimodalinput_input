@@ -202,10 +202,10 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel, const std::str
     GetCooperateStateSyncParam param { udId };
     BooleanReply reply;
     if (tunnel.GetParam(Intention::COOPERATE, CooperateRequestID::GET_COOPERATE_STATE_SYNC, param, reply) != RET_OK) {
-        FI_HILOGE("Get cooperate state failed udId: %{public}s", Utility::Anonymize(udId).c_str());
+        FI_HILOGE("Get cooperate state failed udId:%{public}s", Utility::Anonymize(udId).c_str());
         return RET_ERR;
     }
-    FI_HILOGI("GetCooperateState for udId: %{public}s successfully,state: %{public}s",
+    FI_HILOGI("GetCooperateState for udId:%{public}s successfully, state:%{public}s",
         Utility::Anonymize(udId).c_str(), reply.state ? "true" : "false");
     state = reply.state;
     return RET_OK;
@@ -524,7 +524,7 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
         if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
             auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - iter->second).count();
-            FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed: %{public}lld ms", userData, curDuration);
+            FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed:%{public}lld ms", userData, curDuration);
             performanceInfo_.traces_.erase(iter);
             performanceInfo_.durationList.push_back(curDuration);
         } else {
@@ -580,7 +580,7 @@ void CooperateClient::DumpPerformanceInfo()
     for (auto duration : performanceInfo_.durationList) {
         durationStr += std::to_string(duration) + ", ";
     }
-    FI_HILOGI("[PERF] Duration: %{public}s", durationStr.c_str());
+    FI_HILOGI("[PERF] Duration:%{public}s", durationStr.c_str());
     performanceInfo_ = PerformanceInfo();
 }
 #endif // ENABLE_PERFORMANCE_CHECK
