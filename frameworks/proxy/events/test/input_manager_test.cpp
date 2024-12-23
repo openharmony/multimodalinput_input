@@ -3977,5 +3977,62 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadScrollRows_001, TestSize.
     int32_t ret = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
     ASSERT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_SetInputDeviceEnable_001
+ * @tc.desc: Set input device enable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> aucids;
+    auto callback = [&aucids](std::vector<int32_t> ids) { aucids = std::move(ids); };
+    InputManager::GetInstance()->GetDeviceIds(callback);
+    for (const auto &iter : aucids) {
+        MMI_HILOGI("Set inputdevice %{public}d disable", iter);
+        auto cb = [](int32_t result) {
+            MMI_HILOGI("set input device result: %{public}d ", result);
+        };
+        InputManager::GetInstance()->SetInputDeviceEnabled(iter, false, cb);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetInputDeviceEnable_002
+ * @tc.desc: Set input device enable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> aucids;
+    auto callback = [&aucids](std::vector<int32_t> ids) { aucids = std::move(ids); };
+    InputManager::GetInstance()->GetDeviceIds(callback);
+    for (const auto &iter : aucids) {
+        MMI_HILOGI("Set inputdevice %{public}d enable", iter);
+        auto cb = [](int32_t result) {
+            MMI_HILOGI("set input device result: %{public}d ", result);
+        };
+        InputManager::GetInstance()->SetInputDeviceEnabled(iter, true, cb);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetInputDeviceEnable_003
+ * @tc.desc: Set input device enable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto cb = [](int32_t result) {
+        MMI_HILOGD("set input device result: %{public}d ", result);
+    };
+    InputManager::GetInstance()->SetInputDeviceEnabled(10000, true, cb);
+}
 } // namespace MMI
 } // namespace OHOS

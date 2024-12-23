@@ -2606,5 +2606,17 @@ int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
     }
     return iter->second;
 }
+
+int32_t InputManagerImpl::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return INPUT_DEVICE_IMPL.RegisterInputdevice(deviceId, enable, callback);
+}
 } // namespace MMI
 } // namespace OHOS

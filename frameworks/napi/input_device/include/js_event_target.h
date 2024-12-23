@@ -48,6 +48,7 @@ public:
     void ResetEnv();
     void OnDeviceAdded(int32_t deviceId, const std::string &type) override;
     void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
+    static void EmitJsSetInputDeviceEnabled(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
 
 private:
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
@@ -70,6 +71,8 @@ private:
     static void EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData);
     static void EmitRemoveDeviceEvent(sptr<JsUtil::ReportData> reportData);
     static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
+    static void CallSetInputDeviceEnabledPromise(uv_work_t *work, int32_t status);
+
 private:
     inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devListener_ {};
     bool isListeningProcess_ { false };

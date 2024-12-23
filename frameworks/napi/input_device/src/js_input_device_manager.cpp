@@ -270,5 +270,21 @@ void JsInputDeviceManager::ResetEnv()
     CALL_DEBUG_ENTER;
     JsEventTarget::ResetEnv();
 }
+
+napi_value JsInputDeviceManager::SetInputDeviceEnabled(napi_env env, int32_t deviceId, bool enable, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, nullptr, cb);
+    auto callback = [cb] (int32_t errcode) { return EmitJsSetInputDeviceEnabled(cb, errcode); };
+    int32_t napiCode = InputManager::GetInstance()->SetInputDeviceEnabled(deviceId, enable, callback);
+    if (napiCode == ERROR_NOT_SYSAPI) {
+        MMI_HILOGE("System applications use only.");
+        THROWERR_CUSTOM(env, ERROR_NOT_SYSAPI,
+            "System applications use only");
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

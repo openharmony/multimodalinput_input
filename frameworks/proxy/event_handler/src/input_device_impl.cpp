@@ -224,5 +224,33 @@ int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;
 }
+
+int32_t InputDeviceImpl::RegisterInputdevice(int32_t deviceId, bool enable, std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
+    int32_t _id = -1;
+    _id = operationIndex_++;
+    inputdeviceList_[_id] = callback;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetInputDeviceEnabled(deviceId, enable, _id);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to register");
+        return ret;
+    }
+    return RET_OK;
+}
+
+void InputDeviceImpl::OnSetInputDeviceAck(int32_t index, int32_t result)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto iter = inputdeviceList_.find(index);
+    if (iter == inputdeviceList_.end()) {
+        MMI_HILOGE("Find index failed");
+        return;
+    }
+    iter->second(result);
+    inputdeviceList_.erase(index);
+}
 } // namespace MMI
 } // namespace OHOS

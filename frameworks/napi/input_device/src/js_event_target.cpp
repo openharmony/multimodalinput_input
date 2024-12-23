@@ -1375,5 +1375,79 @@ void JsEventTarget::ResetEnv()
     devListener_.clear();
     InputManager::GetInstance()->UnregisterDevListener("change", shared_from_this());
 }
+
+void JsEventTarget::CallSetInputDeviceEnabledPromise(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t *>(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+
+    napi_value callResult;
+    if (cb->errCode != RET_OK) {
+        if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
+            MMI_HILOGE("Other errors");
+            return;
+        }
+        NapiError codeMsg;
+        if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
+            MMI_HILOGE("Error code %{public}d not found", cb->errCode);
+            return;
+        }
+        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult == nullptr) {
+            MMI_HILOGE("The callResult is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
+        CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
+    } else {
+        CHKRV_SCOPE(
+            cb->env, napi_create_int32(cb->env, cb->errCode, &callResult), CREATE_INT32, scope);
+        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
+    }
+    napi_close_handle_scope(cb->env, scope);
+}
+
+void JsEventTarget::EmitJsSetInputDeviceEnabled(sptr<JsUtil::CallbackInfo> cb, int32_t errCode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->errCode = errCode;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallSetInputDeviceEnabledPromise, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
 } // namespace MMI
 } // namespace OHOS
