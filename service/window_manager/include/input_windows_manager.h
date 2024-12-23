@@ -30,6 +30,7 @@
 
 namespace OHOS {
 namespace MMI {
+constexpr uint32_t SCREEN_CONTROL_WINDOW_TYPE = 2137;
 struct WindowInfoEX {
     WindowInfo window;
     bool flag { false };
