@@ -3370,5 +3370,34 @@ void MMIService::SetupTouchGestureHandler()
     touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
+
+int32_t MMIService::SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess)
+{
+    CALL_INFO_TRACE;
+    CHKPR(sess, RET_ERR);
+    int32_t ret = INPUT_DEV_MGR->SetInputDeviceEnabled(deviceId, enable, index, pid, sess);
+    if (RET_OK != ret) {
+        MMI_HILOGE("Set inputdevice enabled failed, return:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    int32_t ret = delegateTasks_.PostAsyncTask(
+        [this, deviceId, enable, index, pid, sess] {
+            return this->SetInputDeviceEnable(deviceId, enable, index, pid, sess);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set inputdevice enable failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

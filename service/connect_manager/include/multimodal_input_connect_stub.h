@@ -173,6 +173,7 @@ protected:
     int32_t StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetAllSystemHotkeys(MessageParcel& data, MessageParcel& reply);
     int32_t ParseAddInputHandlerData(MessageParcel& data, ParseData& parseData);
+    int32_t StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

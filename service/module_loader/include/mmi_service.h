@@ -192,6 +192,7 @@ public:
 
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
@@ -270,6 +271,7 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void InitVKeyboardFuncHandler();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess);
 private:
     MMIService();
     ~MMIService();
