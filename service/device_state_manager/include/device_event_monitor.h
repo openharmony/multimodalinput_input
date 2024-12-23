@@ -58,6 +58,7 @@ private:
     int32_t callState_ { -1 };
     bool hasHandleRingMute_ { false };
     std::mutex stateMutex_;
+    std::mutex commonEventMutex_;
 };
 #define DEVICE_MONITOR ::OHOS::DelayedSingleton<DeviceEventMonitor>::GetInstance()
 } // namespace MMI
