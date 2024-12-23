@@ -1317,6 +1317,56 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sp
     return promise;
 }
 
+void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb, int64_t timeInterval)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.IntervalSinceLastInput = timeInterval;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = 0;
+    ret = uv_queue_work_with_qos(
+        loop, work,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work callback function is called");
+        },
+        CallIntervalSinceLastInputPromise, uv_qos_user_initiated);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        cb->DecStrongRef(nullptr);
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
+void JsEventTarget::CallIntervalSinceLastInputPromise(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t *>(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+    napi_value callResult;
+    CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult),
+        CREATE_INT64, scope);
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
+    napi_close_handle_scope(cb->env, scope);
+}
+
 void JsEventTarget::ResetEnv()
 {
     CALL_DEBUG_ENTER;

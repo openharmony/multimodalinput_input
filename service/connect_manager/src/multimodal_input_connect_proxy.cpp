@@ -2248,5 +2248,27 @@ int32_t MultimodalInputConnectProxy::SkipPointerLayer(bool isSkip)
     READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+        MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThree Send request fail, ret:%{public}d", ret);
+    } else {
+        READINT64(reply, timeInterval);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
