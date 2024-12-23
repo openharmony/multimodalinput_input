@@ -115,7 +115,9 @@ private:
     std::list<SessionPtr> devListeners_;
     inputDeviceCallback devCallbacks_ { nullptr };
     std::map<int32_t, std::string> displayInputBindInfos_;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     DeviceConfigManagement configManagement_;
+#endif // OHOS_BUILD_ENABLE_WATCH
     bool sessionLostCallbackInitialized_ { false };
 
     static std::shared_ptr<InputDeviceManager> instance_;

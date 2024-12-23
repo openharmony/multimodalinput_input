@@ -52,7 +52,9 @@
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 #include "gesturesense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "infrared_emitter_controller.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "input_device_manager.h"
 #include "ipc_skeleton.h"
 #include "i_input_windows_manager.h"
@@ -106,7 +108,7 @@ namespace {
 std::mutex g_instanceMutex;
 MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
-const std::string THREAD_NAME { "mmi_service" };
+const char* THREAD_NAME { "mmi_service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 [[ maybe_unused ]] constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
@@ -123,6 +125,7 @@ constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 const std::set<int32_t> g_keyCodeValueSet = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
     KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
     KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_TAB, KeyEvent::KEYCODE_ENTER,
@@ -134,6 +137,7 @@ const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_F3, KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_F5, KeyEvent::KEYCODE_F6, KeyEvent::KEYCODE_F7,
     KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
     KeyEvent::KEYCODE_NUM_LOCK
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t DEFAULT_USER_ID { 100 };
@@ -375,12 +379,12 @@ int32_t MMIService::Init()
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
     MMI_HILOGI("PointerDrawingManager Init");
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Create epoll failed");
@@ -417,7 +421,7 @@ void MMIService::OnStart()
     MMI_HILOGD("Started successfully");
     AddReloadDeviceTimer();
     t_ = std::thread([this] {this->OnThread();});
-    pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
+    pthread_setname_np(t_.native_handle(), THREAD_NAME);
     eventMonitorThread_ = std::thread(&EventStatistic::WriteEventFile);
     pthread_setname_np(eventMonitorThread_.native_handle(), "event-monitor");
     auto keyHandler = InputHandler->GetKeyCommandHandler();
@@ -442,8 +446,10 @@ void MMIService::OnStart()
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     APP_OBSERVER_MGR->InitAppStateObserver();
     MMI_HILOGI("Add app manager service listener end");
+#endif // OHOS_BUILD_ENABLE_WATCH
     AddAppDebugListener();
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -659,7 +665,7 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
 int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
         MMI_HILOGE("Check pid permission failed");
@@ -674,14 +680,14 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
         MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t pid = GetCallingPid();
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
@@ -697,14 +703,14 @@ int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
         MMI_HILOGE("Set the mouse icon failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
         MMI_HILOGE("Check pid permission failed");
@@ -719,7 +725,7 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
         MMI_HILOGE("Set the mouse hot spot failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -805,7 +811,7 @@ int32_t MMIService::GetPointerSize(int32_t &size)
 int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [primaryButton] {
             return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetMousePrimaryButton(primaryButton);
@@ -815,22 +821,22 @@ int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
         MMI_HILOGE("Set mouse primary button failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
 int32_t MMIService::ReadMousePrimaryButton(int32_t &primaryButton)
 {
     primaryButton = MouseEventHdr->GetMousePrimaryButton();
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
 
 int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &primaryButton] {
             return this->ReadMousePrimaryButton(primaryButton);
@@ -840,7 +846,7 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
         MMI_HILOGE("Get mouse primary button failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -956,7 +962,7 @@ int32_t MMIService::GetPointerColor(int32_t &color)
 int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [speed] {
             return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetPointerSpeed(speed);
@@ -966,22 +972,22 @@ int32_t MMIService::SetPointerSpeed(int32_t speed)
         MMI_HILOGE("Set pointer speed failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
 int32_t MMIService::ReadPointerSpeed(int32_t &speed)
 {
     speed = MouseEventHdr->GetPointerSpeed();
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
 
 int32_t MMIService::GetPointerSpeed(int32_t &speed)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &speed] {
             return this->ReadPointerSpeed(speed);
@@ -991,7 +997,7 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
         MMI_HILOGE("Get pointer speed failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -1012,7 +1018,7 @@ int32_t MMIService::RemoveInputEventObserver()
 int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, windowId, pointerStyle, isUiExtension] {
@@ -1024,14 +1030,14 @@ int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle,
         MMI_HILOGE("Set pointer style failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
         MMI_HILOGE("Check pid permission failed");
@@ -1046,14 +1052,14 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
         MMI_HILOGE("Set pointer style failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, windowId, &pointerStyle, isUiExtension] {
@@ -1065,7 +1071,7 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle
         MMI_HILOGE("Get pointer style failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -1684,9 +1690,11 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         isCesStart_ = true;
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifndef OHOS_BUILD_ENABLE_WATCH
     if (systemAbilityId == APP_MGR_SERVICE_ID) {
         APP_OBSERVER_MGR->InitAppStateObserver();
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
@@ -2365,7 +2373,7 @@ int32_t MMIService::SetKeyDownDuration(const std::string &businessId, int32_t de
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
 int32_t MMIService::ReadTouchpadScrollSwich(bool &switchFlag)
 {
     MouseEventHdr->GetTouchpadScrollSwitch(switchFlag);
@@ -2420,12 +2428,12 @@ int32_t MMIService::ReadTouchpadDoubleTapAndDragState(bool &switchFlag)
     return RET_OK;
 }
 
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
 
 int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, switchFlag] {
@@ -2437,14 +2445,14 @@ int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
         MMI_HILOGE("Set touchpad scroll switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
             return this->ReadTouchpadScrollSwich(switchFlag);
@@ -2454,14 +2462,14 @@ int32_t MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
         MMI_HILOGE("Get touchpad scroll switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetTouchpadScrollDirection(bool state)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [state] {
             return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadScrollDirection(state);
@@ -2471,14 +2479,14 @@ int32_t MMIService::SetTouchpadScrollDirection(bool state)
         MMI_HILOGE("Set touchpad scroll direction switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadScrollDirection(bool &state)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &state] {
             return this->ReadTouchpadScrollDirection(state);
@@ -2488,14 +2496,14 @@ int32_t MMIService::GetTouchpadScrollDirection(bool &state)
         MMI_HILOGE("Get touchpad scroll direction switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetTouchpadTapSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadTapSwitch(switchFlag);
@@ -2505,14 +2513,14 @@ int32_t MMIService::SetTouchpadTapSwitch(bool switchFlag)
         MMI_HILOGE("Set touchpad tap switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
             return this->ReadTouchpadTapSwitch(switchFlag);
@@ -2522,14 +2530,14 @@ int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
         MMI_HILOGE("Get touchpad tap switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetTouchpadPointerSpeed(int32_t speed)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [speed] {
             return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadPointerSpeed(speed);
@@ -2539,14 +2547,14 @@ int32_t MMIService::SetTouchpadPointerSpeed(int32_t speed)
         MMI_HILOGE("Set touchpad speed failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &speed] {
             return this->ReadTouchpadPointerSpeed(speed);
@@ -2556,14 +2564,14 @@ int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
         MMI_HILOGE("Get touchpad speed failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadPinchSwitch(switchFlag);
@@ -2573,14 +2581,14 @@ int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
         MMI_HILOGE("Set touch pad pinch switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
             return this->ReadTouchpadPinchSwitch(switchFlag);
@@ -2590,14 +2598,14 @@ int32_t MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
         MMI_HILOGE("Get touch pad pinch switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadSwipeSwitch(switchFlag);
@@ -2607,14 +2615,14 @@ int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
         MMI_HILOGE("Set touchpad swipe switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
             return this->ReadTouchpadSwipeSwitch(switchFlag);
@@ -2624,14 +2632,14 @@ int32_t MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
         MMI_HILOGE("Get touchpad swipe switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetTouchpadRightClickType(int32_t type)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [type] {
             return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadRightClickType(type);
@@ -2641,14 +2649,14 @@ int32_t MMIService::SetTouchpadRightClickType(int32_t type)
         MMI_HILOGE("Set touchpad right button menu type failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &type] {
             return this->ReadTouchpadRightMenuType(type);
@@ -2658,14 +2666,14 @@ int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
         MMI_HILOGE("Get touchpad right button menu type failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [rotateSwitch] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
@@ -2675,14 +2683,14 @@ int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
         MMI_HILOGE("Set touchpad rotate switch failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &rotateSwitch] {
             return this->ReadTouchpadRotateSwitch(rotateSwitch);
@@ -2692,7 +2700,7 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
         MMI_HILOGE("Get touchpad rotate switch failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -2840,6 +2848,7 @@ int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
 int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies)
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGI("Start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
     if (!InfraredEmitterController::GetInstance()->GetFrequencies(infos)) {
@@ -2859,12 +2868,14 @@ int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
         ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
     MMI_HILOGD("Data from hdf context:%{public}s", context.c_str());
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     std::string context = "infraredFrequency:" + std::to_string(number) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
@@ -2875,6 +2886,7 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
         MMI_HILOGE("Failed to transmit");
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -3028,7 +3040,7 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
 int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
@@ -3039,14 +3051,14 @@ int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
         MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [&switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
@@ -3057,7 +3069,7 @@ int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
         MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -3146,7 +3158,7 @@ int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
 int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [rows] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(rows);
@@ -3156,22 +3168,22 @@ int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
         MMI_HILOGE("Set the number of touchpad scrolling rows failed, return %{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
 int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
 {
     rows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
 
 int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &rows] {
             return this->ReadTouchpadScrollRows(rows);
@@ -3182,7 +3194,7 @@ int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
             GetCallingPid());
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 

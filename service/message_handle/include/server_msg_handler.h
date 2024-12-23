@@ -111,8 +111,10 @@ public:
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     bool InitInjectNoticeSource();
     bool AddInjectNotice(const InjectNoticeInfo& noticeInfo);
+#endif // OHOS_BUILD_ENABLE_WATCH
     int32_t OnTransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject, int32_t pid);
     int32_t RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt);
 
@@ -134,9 +136,9 @@ private:
     bool UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, int32_t targetWindowId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined OHOS_BUILD_ENABLE_WATCH
     int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -144,7 +146,9 @@ private:
     void CalculateOffset(Direction direction, Offset &offset);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     bool CloseInjectNotice(int32_t pid);
+#endif // OHOS_BUILD_ENABLE_WATCH
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     UDSServer *udsServer_ { nullptr };

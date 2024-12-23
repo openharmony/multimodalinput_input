@@ -106,10 +106,8 @@ declare_args() {
   libmmi_service_sources = [
     "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "$mmi_path/frameworks/proxy/event_handler/src/scene_board_judgement.cpp",
-    "app_state_manager/src/app_state_observer.cpp",
     "delegate_task/src/delegate_interface.cpp",
     "delegate_task/src/delegate_tasks.cpp",
-    "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
     "device_state_manager/src/device_event_monitor.cpp",
     "dfx/src/dfx_hisysevent.cpp",
@@ -122,17 +120,11 @@ declare_args() {
     "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
-    "fingersense_wrapper/src/fingersense_wrapper.cpp",
-    "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
-    "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
     "key_command/src/setting_datashare.cpp",
     "key_command/src/setting_observer.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
-    "message_handle/src/authorization_dialog.cpp",
-    "message_handle/src/authorize_helper.cpp",
     "message_handle/src/client_death_handler.cpp",
-    "message_handle/src/inject_notice_manager.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/mmi_service.cpp",
@@ -295,10 +287,6 @@ print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 
 input_default_defines = []
 
-if (input_new_knuckle_dynamic_enabled) {
-  input_default_defines += [ "OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC" ]
-}
-
 if (input_feature_pointer_drawing) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
 }
@@ -389,6 +377,25 @@ if (input_feature_product == "pc") {
   input_default_defines += [ "OHOS_BUILD_PC_PRIORITY" ]
 }
 
+if (input_feature_product == "watch") {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_WATCH" ]
+} else {
+  libmmi_service_sources += [
+    "app_state_manager/src/app_state_observer.cpp",
+    "device_config/src/device_config_file_parser.cpp",
+    "fingersense_wrapper/src/fingersense_wrapper.cpp",
+    "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
+    "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
+    "message_handle/src/authorization_dialog.cpp",
+    "message_handle/src/authorize_helper.cpp",
+    "message_handle/src/inject_notice_manager.cpp",
+  ]
+
+  if (input_new_knuckle_dynamic_enabled) {
+    input_default_defines += [ "OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC" ]
+  }
+}
+
 if (input_ext_feature_magiccursor) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
@@ -405,7 +412,8 @@ if (input_ext_feature_magiccursor) {
   ]
 }
 
-if (defined(global_parts_info.multimedia_player_framework)) {
+if (defined(global_parts_info.multimedia_player_framework) &&
+    input_feature_product != "watch") {
   enable_player_framework = true
   input_default_defines += [ "PLAYER_FRAMEWORK_EXISTS" ]
 } else {

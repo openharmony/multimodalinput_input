@@ -79,8 +79,10 @@ group("multimodalinput_mmi_service") {
   deps = [
     "service:libmmi-server",
     "tools/inject_event:uinput",
-    "util/screen_capture:libmmi-screen_capture",
   ]
+  if (input_feature_product != "watch") {
+    deps += [ "util/screen_capture:libmmi-screen_capture" ]
+  }
 }
 
 group("input-third-mmi") {

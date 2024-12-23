@@ -54,13 +54,15 @@ private:
     int32_t OnEventDeviceRemoved(libinput_event *event);
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
-    int32_t HandleTouchPadEvent(libinput_event* event);
     bool HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    int32_t HandleTouchPadEvent(libinput_event* event);
     int32_t HandleGestureEvent(libinput_event* event);
+    int32_t HandleTableToolEvent(libinput_event* event);
+#endif // OHOS_BUILD_ENABLE_WATCH
     int32_t HandleMouseEvent(libinput_event* event);
     int32_t HandleTouchEvent(libinput_event* event, int64_t frameTime);
     int32_t HandleSwitchInputEvent(libinput_event* event);
-    int32_t HandleTableToolEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     int32_t HandleJoystickButtonEvent(libinput_event *event);
     int32_t HandleJoystickAxisEvent(libinput_event *event);

@@ -46,6 +46,7 @@ public:
         int32_t physicalY { 0 };
     };
     const std::map<uint32_t, int32_t> mapLibinputChangeToPointer = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
         { LIBINPUT_LEFT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_LEFT },
         { LIBINPUT_RIGHT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_RIGHT },
         { LIBINPUT_MIDDLE_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_MIDDLE },
@@ -54,6 +55,7 @@ public:
         { LIBINPUT_FORWARD_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_FORWARD },
         { LIBINPUT_BACK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_BACK },
         { LIBINPUT_TASK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_TASK },
+#endif // OHOS_BUILD_ENABLE_WATCH
     };
 public:
     DISALLOW_COPY_AND_MOVE(MouseDeviceState);

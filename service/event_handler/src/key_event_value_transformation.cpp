@@ -35,6 +35,7 @@ constexpr int32_t MIN_KEY_SIZE { 1 };
 } // namespace
 
 const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     {11, {"KEY_0", 11, 2000, HOS_KEY_0}},
     {2, {"KEY_1", 2, 2001, HOS_KEY_1}},
     {3, {"KEY_2", 3, 2002, HOS_KEY_2}},
@@ -447,6 +448,10 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {760, {"DAGGER_PRESS", 760, 3211, DAGGER_PRESS}},
     {761, {"DAGGER_CLICK", 761, 3212, DAGGER_CLICK}},
     {762, {"DAGGER_LONG_PRESS", 762, 3213, DAGGER_LONG_PRESS}},
+#else
+    {766, {"KEY_FUNCTION", 766, 2078, HOS_KEY_FUNCTION}},
+    {116, {"KEY_POWER", 116, 18, HOS_KEY_POWER}},
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
@@ -477,6 +482,7 @@ int32_t InputTransformationKeyValue(int32_t keyCode)
 
 namespace {
 const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     {(int64_t)KeyEvent::KEYCODE_DPAD_UP, KeyEvent::INTENTION_UP},
     {(int64_t)KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::INTENTION_DOWN},
     {(int64_t)KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_LEFT},
@@ -512,6 +518,7 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
     {(int64_t)KeyEvent::KEYCODE_BUTTON_A, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_BUTTON_B, KeyEvent::INTENTION_BACK},
     {(int64_t)KeyEvent::KEYCODE_BUTTON_SELECT, KeyEvent::INTENTION_MENU},
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 } // namespace
 

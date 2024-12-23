@@ -172,6 +172,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+#ifndef OHOS_BUILD_ENABLE_WATCH
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
@@ -189,17 +190,18 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+        case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
+        case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
+        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
+            HandleTableToolEvent(event);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_WATCH
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             HandleTouchEvent(event, frameTime);
             DfxHisysevent::CalcPointerDispTimes();
-            break;
-        }
-        case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
-        case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
-        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
-            HandleTableToolEvent(event);
             break;
         }
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -490,6 +492,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(nextHandler_);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
@@ -499,9 +502,11 @@ bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<Pointer
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return false;
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
@@ -577,6 +582,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
@@ -675,6 +681,7 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
     }
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
@@ -696,6 +703,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
 int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)

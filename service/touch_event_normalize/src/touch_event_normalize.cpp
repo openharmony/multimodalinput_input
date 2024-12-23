@@ -14,10 +14,14 @@
  */
 
 #include "touch_event_normalize.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "gesture_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "input_device_manager.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "tablet_tool_tranform_processor.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "touch_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -67,6 +71,7 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(struct libinput_ev
     return processor->OnEvent(event);
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(int32_t deviceId,
     DeviceType deviceType) const
 {
@@ -99,6 +104,26 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
     }
     return processor;
 }
+#else
+std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(int32_t deviceId,
+    DeviceType deviceType) const
+{
+    std::shared_ptr<TransformProcessor> processor{ nullptr };
+    switch (deviceType) {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+        case DeviceType::TOUCH: {
+            processor = std::make_shared<TouchTransformProcessor>(deviceId);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_TOUCH
+        default: {
+            MMI_HILOGE("Unsupported device type:%{public}d", deviceType);
+            break;
+        }
+    }
+    return processor;
+}
+#endif //OHOS_BUILD_ENABLE_WATCH
 
 std::shared_ptr<PointerEvent> TouchEventNormalize::GetPointerEvent(int32_t deviceId)
 {
@@ -111,7 +136,7 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::GetPointerEvent(int32_t devic
     return nullptr;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_POINTER && !defined(OHOS_BUILD_ENABLE_WATCH)
 int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
 {
     return TouchPadTransformProcessor::SetTouchpadPinchSwitch(switchFlag);
@@ -171,6 +196,6 @@ int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(bool &switchFlag) 
 {
     return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
 } // namespace MMI
 } // namespace OHOS
