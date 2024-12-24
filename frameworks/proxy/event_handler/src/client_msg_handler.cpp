@@ -84,6 +84,8 @@ void ClientMsgHandler::Init()
             return this->NotifyBundleName(client, pkt); }},
         { MmiMessageId::WINDOW_STATE_ERROR_NOTIFY, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->NotifyWindowStateError(client, pkt); }},
+        { MmiMessageId::SET_INPUT_DEVICE_ENABLED, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->OnSetInputDeviceAck(client, pkt); }},
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -434,5 +436,18 @@ int32_t ClientMsgHandler::NotifyWindowStateError(const UDSClient& client, NetPac
     return RET_OK;
 }
 
+int32_t ClientMsgHandler::OnSetInputDeviceAck(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t index = 0;
+    int32_t result = 0;
+    pkt >> index >> result;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    INPUT_DEVICE_IMPL.OnSetInputDeviceAck(index, result);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

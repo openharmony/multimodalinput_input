@@ -367,4 +367,12 @@ Media::PixelMap *Media::PixelMap::Unmarshalling(Parcel &parcel,
     }
     return DfsMessageParcel::messageParcel->Unmarshalling(parcel);
 }
+
+bool PermissionHelper::CheckInputDeviceController()
+{
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
+    return DfsMessageParcel::messageParcel->CheckInputDeviceController();
+}
 } // namespace OHOS
