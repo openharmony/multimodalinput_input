@@ -2960,6 +2960,10 @@ int32_t MultimodalInputConnectStub::StubSetInputDeviceInputEnable(MessageParcel&
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckInputDeviceController()) {
+        MMI_HILOGE("Controller permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     int32_t deviceId = 0;
     bool enable = true;
     int32_t index = 0;

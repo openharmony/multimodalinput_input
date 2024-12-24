@@ -915,14 +915,14 @@ bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevi
 int32_t InputDeviceManager::NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(session, ERROR_NULL_POINTER);
     NetPacket pkt(MmiMessageId::SET_INPUT_DEVICE_ENABLED);
     pkt << index << result;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write data failed");
         return RET_ERR;
     }
-    if (!sess->SendMsg(pkt)) {
+    if (!session->SendMsg(pkt)) {
         MMI_HILOGE("Sending failed");
         return RET_ERR;
     }
@@ -936,7 +936,7 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     MMI_HILOGI("deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
-        NotifyInputdeviceMessage(sess, index, ERROR_DEVICE_NOT_EXIST);
+        NotifyInputdeviceMessage(session, index, ERROR_DEVICE_NOT_EXIST);
         MMI_HILOGD("Set inputDevice enabled failed, Invalid deviceId.");
         return RET_ERR;
     }
@@ -946,7 +946,7 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
         recoverList_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
         InitSessionLostCallback();
     }
-    NotifyInputdeviceMessage(sess, index, RET_OK);
+    NotifyInputdeviceMessage(session, index, RET_OK);
     return RET_OK;
 }
 
