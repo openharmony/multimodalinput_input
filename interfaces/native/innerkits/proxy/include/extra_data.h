@@ -63,6 +63,12 @@ struct ExtraData {
      * @since 13
      */
     int32_t pullId { -1 };
+    /*
+     * 开始拖拽实例的事件id
+     *
+     * @since 13
+     */
+    int32_t eventId { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

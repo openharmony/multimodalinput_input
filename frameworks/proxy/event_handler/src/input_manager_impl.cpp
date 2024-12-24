@@ -1867,17 +1867,18 @@ int32_t InputManagerImpl::LeaveCaptureMode(int32_t windowId)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-void InputManagerImpl::AppendExtraData(const ExtraData& extraData)
+int32_t InputManagerImpl::AppendExtraData(const ExtraData& extraData)
 {
     CALL_INFO_TRACE;
     if (extraData.buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
         MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}zu", extraData.buffer.size());
-        return;
+        return RET_ERR;
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->AppendExtraData(extraData);
     if (ret != RET_OK) {
         MMI_HILOGE("Append extra data failed:%{public}d", ret);
     }
+    return ret;
 }
 
 int32_t InputManagerImpl::EnableInputDevice(bool enable)
