@@ -1331,7 +1331,7 @@ public:
      * returns <b>false</b> otherwise.
      * @since 9
      */
-    bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);
+    bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem) const;
 
     /**
      * @brief Adds a pointer item.
