@@ -717,7 +717,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -744,7 +744,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -771,7 +771,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -3698,8 +3698,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequencies, TestSize.Lev
     infraredFrequency.min_ = 10;
     std::vector<InfraredFrequency> requencys;
     requencys.push_back(infraredFrequency);
-    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetInfraredFrequencies(requencys));
 }
 
 /**
@@ -3712,8 +3711,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
 {
     int64_t number = 10;
     std::vector<int64_t> pattern = { 10, 20, 30 };
-    int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->TransmitInfrared(number, pattern));
 }
 
 /**
