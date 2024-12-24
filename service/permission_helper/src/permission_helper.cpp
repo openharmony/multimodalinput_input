@@ -192,5 +192,12 @@ bool PermissionHelper::CheckInputEventFilter()
     std::string filterPermissionCode = "ohos.permission.FILTER_INPUT_EVENT";
     return CheckHapPermission(filterPermissionCode);
 }
+
+bool PermissionHelper::CheckInputDeviceController()
+{
+    CALL_DEBUG_ENTER;
+    std::string filterPermissionCode = "ohos.permission.INPUT_DEVICE_CONTROLLER";
+    return CheckHapPermission(filterPermissionCode);
+}
 } // namespace MMI
 } // namespace OHOS

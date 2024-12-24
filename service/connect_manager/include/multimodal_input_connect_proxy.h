@@ -158,6 +158,7 @@ public:
 	int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

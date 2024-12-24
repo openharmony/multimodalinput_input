@@ -71,6 +71,7 @@ public:
     virtual double ReadDouble() = 0;
     virtual bool ReadDouble(double &value) = 0;
     virtual Media::PixelMap *Unmarshalling(Parcel &parcel) = 0;
+    virtual bool CheckInputDeviceController() = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -118,6 +119,7 @@ public:
     MOCK_METHOD0(ReadDouble, double());
     MOCK_METHOD1(ReadDouble, bool(double &value));
     MOCK_METHOD1(Unmarshalling, Media::PixelMap *(Parcel &parcel));
+    MOCK_METHOD0(CheckInputDeviceController, bool());
 };
 } // namespace MMI
 } // namespace OHOS
