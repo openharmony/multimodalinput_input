@@ -617,10 +617,10 @@ public:
     /**
      * @brief pointer event添加辅助信息
      * @param extraData 添加的信息.
-     * @return void
+     * @return 设置拖拽数据成功或失败.
      * @since 9
      */
-    void AppendExtraData(const ExtraData& extraData);
+    int32_t AppendExtraData(const ExtraData& extraData);
 
     /**
      * @brief 使能或者禁用输入设备

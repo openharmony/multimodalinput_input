@@ -1634,6 +1634,7 @@ int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData& extraData)
     WRITEINT32(data, extraData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pointerId, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pullId, ERR_INVALID_VALUE);
+    WRITEINT32(data, extraData.eventId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
