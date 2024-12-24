@@ -50,6 +50,7 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
     }
     auto &listeners = iter->second;
 
+    std::lock_guard<std::mutex> guard(mtx_);
     if (!isListeningProcess_) {
         MMI_HILOGI("Start monitoring");
         isListeningProcess_ = true;
@@ -83,6 +84,7 @@ int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDev
         MMI_HILOGE("Find change failed");
         return RET_ERR;
     }
+    std::lock_guard<std::mutex> guard(mtx_);
     if (listener == nullptr) {
         iter->second.clear();
         goto listenerLabel;

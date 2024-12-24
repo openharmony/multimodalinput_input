@@ -150,11 +150,11 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGE("The subscribe Infos is empty");
         return RET_ERR;
@@ -221,11 +221,12 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeHotkey(int32_t subscribeId)
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
+
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGE("Subscribe Infos is empty");
         return RET_ERR;

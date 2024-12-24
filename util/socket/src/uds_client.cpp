@@ -39,7 +39,7 @@ int32_t UDSClient::ConnectTo()
         MMI_HILOGE("Socket failed");
         return RET_ERR;
     }
-    OnConnected();
+    isConnected_ = true;
     return RET_OK;
 }
 
