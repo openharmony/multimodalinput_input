@@ -229,8 +229,7 @@ int32_t InputDeviceImpl::RegisterInputdevice(int32_t deviceId, bool enable, std:
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
-    int32_t _id = -1;
-    _id = operationIndex_++;
+    int32_t _id = operationIndex_++;
     inputdeviceList_[_id] = callback;
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetInputDeviceEnabled(deviceId, enable, _id);
     if (ret != RET_OK) {

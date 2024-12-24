@@ -461,7 +461,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_LONG_PRESS):
             ret = StubUnsubscribeLongPressEvent(data, reply);
             break;
-        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUTDEVICE_ENABLE):
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUT_DEVICE_ENABLE):
             ret = StubSetInputDeviceInputEnable(data, reply);
             break;
         default: {

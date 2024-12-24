@@ -912,11 +912,11 @@ bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevi
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
 }
 
-int32_t InputDeviceManager::NotifyInputdeviceMessage(SessionPtr sess, int32_t index, int32_t result)
+int32_t InputDeviceManager::NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result)
 {
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-    NetPacket pkt(MmiMessageId::SET_INPUTDEVICE_ENABLED);
+    NetPacket pkt(MmiMessageId::SET_INPUT_DEVICE_ENABLED);
     pkt << index << result;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write data failed");
@@ -924,12 +924,13 @@ int32_t InputDeviceManager::NotifyInputdeviceMessage(SessionPtr sess, int32_t in
     }
     if (!sess->SendMsg(pkt)) {
         MMI_HILOGE("Sending failed");
+        return RET_ERR;
     }
     return RET_OK;
 }
 
 int32_t InputDeviceManager::SetInputDeviceEnabled(
-    int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess)
+    int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
@@ -942,7 +943,7 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     item->second.enable = enable;
     if (!enable) {
         MMI_HILOGD("Disable inputdevice, save calling pid: %{public}d to recoverlist.", pid);
-        lastinputctl_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
+        recoverList_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
         InitSessionLostCallback();
     }
     NotifyInputdeviceMessage(sess, index, RET_OK);
@@ -952,14 +953,14 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
 void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
-    for (auto item = lastinputctl_.begin(); item != lastinputctl_.end();) {
+    for (auto item = recoverList_.begin(); item != recoverList_.end();) {
         if (session->GetPid() == item->second) {
             auto device = inputDevice_.find(item->first);
             if (device != inputDevice_.end()) {
                 MMI_HILOGI("Recover input device : %{public}d", item->first);
                 device->second.enable = true;
             }
-            lastinputctl_.erase(item++);
+            recoverList_.erase(item++);
         }
     }
 }

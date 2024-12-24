@@ -3378,7 +3378,7 @@ int32_t MMIService::SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t 
     int32_t ret = INPUT_DEV_MGR->SetInputDeviceEnabled(deviceId, enable, index, pid, sess);
     if (RET_OK != ret) {
         MMI_HILOGE("Set inputdevice enabled failed, return:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
