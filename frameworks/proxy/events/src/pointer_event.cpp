@@ -653,7 +653,7 @@ void PointerEvent::SetPointerId(int32_t pointerId)
     pointerId_ = pointerId;
 }
 
-bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem)
+bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem) const
 {
     for (const auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
