@@ -284,6 +284,11 @@ napi_value JsInputDeviceManager::SetInputDeviceEnabled(napi_env env, int32_t dev
         THROWERR_CUSTOM(env, ERROR_NOT_SYSAPI,
             "System applications use only");
     }
+    if (napiCode == ERROR_NO_PERMISSION) {
+        MMI_HILOGE("Permission denied.");
+        THROWERR_CUSTOM(env, ERROR_NO_PERMISSION,
+            "Permission denied");
+    }
     return ret;
 }
 } // namespace MMI
