@@ -652,6 +652,45 @@ napi_value JsInputDeviceContext::GetIntervalSinceLastInput(napi_env env, napi_ca
     return jsInputDeviceMgr->GetIntervalSinceLastInput(env);
 }
 
+napi_value JsInputDeviceContext::SetInputDeviceEnabled(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < INPUT_PARAMETER) {
+        MMI_HILOGE("At least 2 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("Rows parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        return nullptr;
+    }
+    int32_t deviceId = -1;
+    CHKRP(napi_get_value_int32(env, argv[0], &deviceId), GET_VALUE_INT32);
+    if (deviceId < 0) {
+        MMI_HILOGE("Invalid deviceId");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "deviceId is invalid");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[1], napi_boolean)) {
+        MMI_HILOGE("enable parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        return nullptr;
+    }
+    bool enable = true;
+    CHKRP(napi_get_value_bool(env, argv[1], &enable), GET_VALUE_BOOL);
+
+    JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsIds);
+    auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    return jsInputDeviceMgr->SetInputDeviceEnabled(env, deviceId, enable);
+}
+
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -714,6 +753,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatDelay", GetKeyboardRepeatDelay),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatRate", GetKeyboardRepeatRate),
         DECLARE_NAPI_STATIC_FUNCTION("getIntervalSinceLastInput", GetIntervalSinceLastInput),
+        DECLARE_NAPI_STATIC_FUNCTION("setInputDeviceEnabled", SetInputDeviceEnabled),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     CHKPP(CreateEnumKeyboardType(env, exports));

@@ -136,7 +136,7 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::GetPointerEvent(int32_t devic
     return nullptr;
 }
 
-#if defined OHOS_BUILD_ENABLE_POINTER && !defined(OHOS_BUILD_ENABLE_WATCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
 {
     return TouchPadTransformProcessor::SetTouchpadPinchSwitch(switchFlag);
@@ -196,6 +196,6 @@ int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(bool &switchFlag) 
 {
     return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI
 } // namespace OHOS

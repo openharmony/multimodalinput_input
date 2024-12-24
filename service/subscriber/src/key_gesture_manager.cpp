@@ -17,9 +17,7 @@
 
 #include <algorithm>
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "account_manager.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
 #include "app_state_observer.h"
 #include "define_multimodal.h"
 #include "display_event_monitor.h"
@@ -130,7 +128,6 @@ void KeyGestureManager::KeyGesture::ResetTimers()
 std::set<int32_t> KeyGestureManager::KeyGesture::GetForegroundPids() const
 {
     std::set<int32_t> pids;
-#ifndef OHOS_BUILD_ENABLE_WATCH
     std::vector<AppExecFwk::AppStateData> appStates = APP_OBSERVER_MGR->GetForegroundAppData();
     std::for_each(appStates.cbegin(), appStates.cend(), [&pids](auto &appState) {
         pids.insert(appState.pid);
@@ -153,7 +150,6 @@ std::set<int32_t> KeyGestureManager::KeyGesture::GetForegroundPids() const
         }
     }
     MMI_HILOGI("Foreground pids: {%{public}zu}[%{public}s]", pids.size(), sPids.str().c_str());
-#endif // OHOS_BUILD_ENABLE_WATCH
     return pids;
 }
 
@@ -383,36 +379,26 @@ bool KeyGestureManager::PullUpAccessibility::IsWorking()
     if ((DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF)) {
         return false;
     }
-#ifndef OHOS_BUILD_ENABLE_WATCH
     if (DISPLAY_MONITOR->GetScreenLocked()) {
         return ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutEnabledOnScreenLocked();
     } else {
         return ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutEnabled();
     }
-#else
-    return false;
-#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 int32_t KeyGestureManager::PullUpAccessibility::AddHandler(int32_t pid,
     int32_t longPressTime, std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-#ifndef OHOS_BUILD_ENABLE_WATCH
     return KeyGesture::AddHandler(pid, ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout(), callback);
-#else
-    return INVALID_ENTITY_ID;
-#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 void KeyGestureManager::PullUpAccessibility::OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGI("[PullUpAccessibility] Current AccShortcutTimeout setting:%{public}dms",
         ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout());
     for (auto &handler : handlers_) {
         handler.SetLongPressTime(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout());
     }
-#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 KeyGestureManager::KeyGestureManager()

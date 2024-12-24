@@ -671,6 +671,5 @@ Aggregator::~Aggregator()
 {
     FlushRecords(MMI_LOG_HEADER);
 }
-
 } // namespace MMI
 } // namespace OHOS

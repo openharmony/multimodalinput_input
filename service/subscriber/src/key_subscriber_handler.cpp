@@ -415,13 +415,11 @@ bool KeySubscriberHandler::IsEqualKeyOption(std::shared_ptr<KeyOption> newOption
 void KeySubscriberHandler::GetForegroundPids(std::set<int32_t> &pids)
 {
     CALL_DEBUG_ENTER;
-#ifndef OHOS_BUILD_ENABLE_WATCH
     std::vector<AppExecFwk::AppStateData> list = APP_OBSERVER_MGR->GetForegroundAppData();
     for (auto iter = list.begin(); iter != list.end(); iter++) {
         MMI_HILOGD("Foreground process pid:%{public}d", (*iter).pid);
         pids.insert((*iter).pid);
     }
-#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 int32_t KeySubscriberHandler::EnableCombineKey(bool enable)

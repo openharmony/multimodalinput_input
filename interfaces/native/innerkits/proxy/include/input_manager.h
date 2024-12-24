@@ -1041,6 +1041,15 @@ public:
      */
     int32_t RemoveGestureMonitor(int32_t monitorId);
 
+    /**
+     * @brief Turn on/off the device input data update.
+     * @param deviceID input device id.
+     * @param enable Indicates the device input value.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 14
+     */
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

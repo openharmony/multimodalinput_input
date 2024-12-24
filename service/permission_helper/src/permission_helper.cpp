@@ -59,7 +59,7 @@ bool PermissionHelper::CheckInjectPermission()
     std::string injectPermissionCode = "ohos.permission.INJECT_INPUT_EVENT";
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, injectPermissionCode);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-        MMI_HILOGE("Check Permission: %{public}s fail for appId:%{public}d, and ret:%{public}d",
+        MMI_HILOGE("Check Permission:%{public}s fail for appId:%{public}d, and ret:%{public}d",
                    injectPermissionCode.c_str(), tokenId, ret);
         return false;
     }
@@ -134,7 +134,7 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string pe
     std::string context = "For CheckPerm. PermiCode" + permissionCode + ";appId:" + std::to_string(tokenId);
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, permissionCode);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-        MMI_HILOGE("Check Permi: %{public}s fail for appId:%{public}d, and ret:%{public}d",
+        MMI_HILOGE("Check Permi:%{public}s fail for appId:%{public}d, and ret:%{public}d",
                    permissionCode.c_str(), tokenId, ret);
         return false;
     }
@@ -190,6 +190,13 @@ bool PermissionHelper::CheckInputEventFilter()
 {
     CALL_DEBUG_ENTER;
     std::string filterPermissionCode = "ohos.permission.FILTER_INPUT_EVENT";
+    return CheckHapPermission(filterPermissionCode);
+}
+
+bool PermissionHelper::CheckInputDeviceController()
+{
+    CALL_DEBUG_ENTER;
+    std::string filterPermissionCode = "ohos.permission.INPUT_DEVICE_CONTROLLER";
     return CheckHapPermission(filterPermissionCode);
 }
 } // namespace MMI

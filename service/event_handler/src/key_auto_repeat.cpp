@@ -133,7 +133,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             MMI_HILOGI("Stop autorepeat, keyCode:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         } else {
-            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction: %d",
+            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction:%d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         }
         if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && repeatKeyCode_ != keyEvent_->GetKeyCode()) {

@@ -42,7 +42,6 @@ extern "C" {
         DEVICE_HARD_PC_PRO = 3,
         DEVICE_TABLET = 4,
         DEVICE_FOLD_PC = 5,
-        DEVICE_FOLD_PC_HORIZONTAL = 6,
         DEVICE_FOLD_PC_VIRT = 7,
     };
     int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
@@ -108,9 +107,6 @@ public:
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    double HandleAxisAccelateTouchPad(double axisValue);
-#endif // OHOS_BUILD_ENABLE_WATCH
     int32_t HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
     int32_t HandleAxisBeginEndInner(struct libinput_event *event);
@@ -118,10 +114,13 @@ private:
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
+    double HandleAxisAccelateTouchPad(double axisValue);
+#endif // OHOS_BUILD_ENABLE_WATCH
     void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);

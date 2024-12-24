@@ -356,7 +356,7 @@ void AccountManager::SubscribeCommonEvent()
     EventFwk::MatchingSkills matchingSkills;
 
     for (auto &item : handlers_) {
-        MMI_HILOGD("Add event: %{public}s", item.first.c_str());
+        MMI_HILOGD("Add event:%{public}s", item.first.c_str());
         matchingSkills.AddEvent(item.first);
     }
     EventFwk::CommonEventSubscribeInfo subscribeInfo { matchingSkills };
@@ -403,11 +403,11 @@ void AccountManager::OnCommonEvent(const EventFwk::CommonEventData &data)
 {
     std::lock_guard<std::mutex> guard { lock_ };
     std::string action = data.GetWant().GetAction();
-    MMI_HILOGI("Receive common event: %{public}s", action.c_str());
+    MMI_HILOGI("Receive common event:%{public}s", action.c_str());
     if (auto iter = handlers_.find(action); iter != handlers_.end()) {
         iter->second(data);
     } else {
-        MMI_HILOGW("Ignore event: %{public}s", action.c_str());
+        MMI_HILOGW("Ignore event:%{public}s", action.c_str());
     }
 }
 

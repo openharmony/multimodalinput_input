@@ -383,6 +383,16 @@ void PointerEvent::PointerItem::SetRawDisplayY(int32_t rawDisplayY)
     rawDisplayY_ = rawDisplayY;
 }
 
+int32_t PointerEvent::PointerItem::GetBlobId() const
+{
+    return blobId_;
+}
+
+void PointerEvent::PointerItem::SetBlobId(int32_t blobId)
+{
+    blobId_ = blobId;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -417,7 +427,8 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(displayXPos_) &&
         out.WriteDouble(displayYPos_) &&
         out.WriteDouble(windowXPos_) &&
-        out.WriteDouble(windowYPos_)
+        out.WriteDouble(windowYPos_) &&
+        out.WriteInt32(blobId_)
     );
 }
 
@@ -455,7 +466,8 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(displayXPos_) &&
         in.ReadDouble(displayYPos_) &&
         in.ReadDouble(windowXPos_) &&
-        in.ReadDouble(windowYPos_)
+        in.ReadDouble(windowYPos_) &&
+        in.ReadInt32(blobId_)
     );
 }
 
@@ -569,7 +581,6 @@ void PointerEvent::SetOriginPointerAction(int32_t pointerAction)
 }
 
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
-#ifndef OHOS_BUILD_ENABLE_WATCH
     { PointerEvent::POINTER_ACTION_CANCEL, "cancel" },
     { PointerEvent::POINTER_ACTION_DOWN, "down" },
     { PointerEvent::POINTER_ACTION_MOVE, "move" },
@@ -611,7 +622,6 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::TOUCH_ACTION_GESTURE_END, "touch-gesture-end" },
     { PointerEvent::POINTER_ACTION_PROXIMITY_IN, "pen-proximity-in" },
     { PointerEvent::POINTER_ACTION_PROXIMITY_OUT, "pen-proximity-out" },
-#endif // OHOS_BUILD_ENABLE_WATCH
 };
 
 const char* PointerEvent::DumpPointerAction() const
@@ -655,7 +665,7 @@ void PointerEvent::SetPointerId(int32_t pointerId)
     pointerId_ = pointerId;
 }
 
-bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem)
+bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem) const
 {
     for (const auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {

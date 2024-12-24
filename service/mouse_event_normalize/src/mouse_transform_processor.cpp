@@ -96,9 +96,9 @@ std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
 int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
-#ifndef OHOS_BUILD_ENABLE_WATCH
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
 
@@ -190,6 +190,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
     uint32_t button = libinput_event_pointer_get_button(data);
@@ -256,6 +257,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         MMI_HILOGE("Unknown state, state:%{public}u", state);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -429,25 +431,6 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     return RET_OK;
 }
 
-DeviceType GetFoldPcType()
-{
-    DeviceType deviceType = DeviceType::DEVICE_FOLD_PC;
-    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
-    if (cursorPos.displayId < 0) {
-        MMI_HILOGE("No display");
-        return static_cast<DeviceType>(RET_ERR);
-    }
-    auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
-    int width = displayInfo->width;
-    int height = displayInfo->height;
-    if (width == FOLD_PC_WIDTH && height == FOLD_PC_HEIGHT) {
-        deviceType = DeviceType::DEVICE_FOLD_PC;
-    } else if (width == FOLD_PC_HEIGHT && height == FOLD_PC_WIDTH) {
-        deviceType = DeviceType::DEVICE_FOLD_PC_HORIZONTAL;
-    }
-    return deviceType;
-}
-
 #ifndef OHOS_BUILD_ENABLE_WATCH
 double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
@@ -460,7 +443,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
         deviceType = DeviceType::DEVICE_TABLET;
     }
     if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
-        deviceType = GetFoldPcType();
+        deviceType = DeviceType::DEVICE_FOLD_PC;
     }
     int32_t ret =
         HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
@@ -814,11 +797,7 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
         }
     }
     if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
-        if (width == FOLD_PC_WIDTH && height == FOLD_PC_HEIGHT) {
-            ret = DeviceType::DEVICE_FOLD_PC;
-        } else if (width == FOLD_PC_HEIGHT && height == FOLD_PC_WIDTH) {
-            ret = DeviceType::DEVICE_FOLD_PC_HORIZONTAL;
-        }
+        ret = DeviceType::DEVICE_FOLD_PC;
     }
     return ret;
 }
@@ -904,6 +883,7 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
     return RET_OK;
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
@@ -1022,6 +1002,7 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         pressedButton_ = button;
     }
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(int32_t pid, bool switchFlag)
 {
