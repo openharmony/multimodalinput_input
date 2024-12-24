@@ -2646,7 +2646,7 @@ int32_t MultimodalInputConnectProxy::SetInputDeviceEnabled(int32_t deviceId, boo
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUTDEVICE_ENABLE),
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUT_DEVICE_ENABLE),
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
