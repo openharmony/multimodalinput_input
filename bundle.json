@@ -92,7 +92,9 @@
         "player_framework",
         "cJSON",
         "qos_manager",
-        "audio_framework"
+        "audio_framework",
+        "graphic_surface",
+        "ipc"
       ],
       "third_party": [
         "libuv",
