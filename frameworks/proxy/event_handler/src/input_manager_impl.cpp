@@ -1447,13 +1447,13 @@ void InputManagerImpl::OnConnected()
     CALL_INFO_TRACE;
     ReAddInputEventFilter();
     if (!displayGroupInfo_.windowsInfo.empty() && !displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGD("displayGroupInfo_: windowsInfo size: %{public}zu, displaysInfo size: %{public}zu",
+        MMI_HILOGD("displayGroupInfo_: windowsInfo size:%{public}zu, displaysInfo size:%{public}zu",
             displayGroupInfo_.windowsInfo.size(), displayGroupInfo_.displaysInfo.size());
         SendDisplayInfo();
         PrintDisplayInfo();
     }
     if (!windowGroupInfo_.windowsInfo.empty()) {
-        MMI_HILOGD("windowGroupInfo_: windowsInfo size: %{public}zu", windowGroupInfo_.windowsInfo.size());
+        MMI_HILOGD("windowGroupInfo_: windowsInfo size:%{public}zu", windowGroupInfo_.windowsInfo.size());
         SendWindowInfo();
     }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -1508,6 +1508,10 @@ bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActio
             currentPointerEvent->UpdatePointerItem(pointerId, item);
             currentPointerEvent->SetPointerAction(pointerActionEvent);
             OnPointerEvent(currentPointerEvent);
+            if (currentPointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+                currentPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+                OnPointerEvent(currentPointerEvent);
+            }
             return true;
         }
     }
@@ -1520,12 +1524,12 @@ void InputManagerImpl::OnDisconnected()
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::initializer_list<int32_t> pointerActionEvents { PointerEvent::POINTER_ACTION_MOVE,
-        PointerEvent::POINTER_ACTION_DOWN };
+        PointerEvent::POINTER_ACTION_DOWN, PointerEvent::POINTER_ACTION_BUTTON_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
     std::initializer_list<int32_t> pointerActionAxisEvents { PointerEvent::POINTER_ACTION_AXIS_UPDATE,
         PointerEvent::POINTER_ACTION_AXIS_BEGIN };
-    if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
+    if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_CANCEL)) {
         MMI_HILOGE("Up event for service exception re-sending");
         return;
     }
@@ -2605,6 +2609,18 @@ int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
         return INVALID_KEY_ACTION;
     }
     return iter->second;
+}
+
+int32_t InputManagerImpl::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return INPUT_DEVICE_IMPL.RegisterInputdevice(deviceId, enable, callback);
 }
 } // namespace MMI
 } // namespace OHOS

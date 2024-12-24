@@ -92,7 +92,7 @@ const char* PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const char* PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const char* PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const char* PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
-const std::string KEY_ENABLE { "enble" };
+const std::string KEY_ENABLE { "enable" };
 const std::string KEY_STATUS { "status" };
 } // namespace
 
@@ -1091,7 +1091,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         !IsMusicActivate()) {
         return true;
     }
-    MMI_HILOGI("ScreenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
         return false;
     }
@@ -2157,7 +2157,7 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
 {
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    MMI_HILOGI("screenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("screenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     std::string bundleName = sequence.ability.bundleName;
     std::string matchName = ".screenshot";
     if (bundleName.find(matchName) != std::string::npos) {
@@ -2203,7 +2203,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     if (keysSize == sequenceKeysSize) {
         std::ostringstream oss;
         oss << sequence;
-        MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
+        MMI_HILOGI("SequenceKey matched:%{public}s", oss.str().c_str());
         return HandleMatchedSequence(sequence, isLaunchAbility);
     }
     return true;
@@ -2266,11 +2266,11 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     }
     shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, &shortcutKey] () {
         MMI_HILOGI("Timer callback");
-        shortcutKey.timerId = -1;
 #ifdef SHORTCUT_KEY_RULES_ENABLED
         KEY_SHORTCUT_MGR->MarkShortcutConsumed(shortcutKey);
 #endif // SHORTCUT_KEY_RULES_ENABLED
         currentLaunchAbilityKey_ = shortcutKey;
+        shortcutKey.timerId = -1;
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
         BytraceAdapter::StopLaunchAbility();

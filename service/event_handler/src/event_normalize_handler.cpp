@@ -979,8 +979,6 @@ void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> poi
 {
     static int32_t lastPointerX;
     static int32_t lastPointerY;
-    int32_t pointerMotionX;
-    int32_t pointerMotionY;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {

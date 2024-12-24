@@ -145,7 +145,7 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 #ifdef ENABLE_PERFORMANCE_CHECK
     auto openSessionDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now() - startStamp).count();
-    FI_HILOGI("[PERF] OpenSessionLocked ret:%{public}d, elapsed: %{public}lld ms", ret, openSessionDuration);
+    FI_HILOGI("[PERF] OpenSessionLocked ret:%{public}d, elapsed:%{public}lld ms", ret, openSessionDuration);
 #endif // ENABLE_PERFORMANCE_CHECK
     if (ret != RET_OK) {
         CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
@@ -333,7 +333,7 @@ void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dat
             return (item.second.socket_ == socket);
         });
     if (iter == sessions_.end()) {
-        FI_HILOGE("Invalid socket: %{public}d", socket);
+        FI_HILOGE("Invalid socket:%{public}d", socket);
         return;
     }
     const std::string networkId = iter->first;

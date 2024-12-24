@@ -419,7 +419,7 @@ const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_CALL_CONTROL_CENTER, "KEYCODE_CALL_CONTROL_CENTER"},
 #else
     {KeyEvent::KEYCODE_FN, "KEYCODE_FN"},
-    {KeyEvent::KEYCODE_VOLUME_DOWN, "KEYCODE_VOLUME_DOWN"},
+    {KeyEvent::KEYCODE_POWER, "KEYCODE_POWER"},
 #endif // OHOS_BUILD_ENABLE_WATCH
 };
 } // namespace

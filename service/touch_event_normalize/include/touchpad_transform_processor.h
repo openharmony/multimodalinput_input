@@ -68,7 +68,6 @@ private:
 };
 #define MULTI_FINGERTAP_HDR ::OHOS::DelayedSingleton<MultiFingersTapHandler>::GetInstance()
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
 class TouchPadTransformProcessor final : public TransformProcessor {
 public:
     explicit TouchPadTransformProcessor(int32_t deviceId);
@@ -130,7 +129,6 @@ private:
             }
     };
 };
-#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace MMI
 } // namespace OHOS
 #endif // TOUCHPAD_TRANSFORM_PROCESSOR_H

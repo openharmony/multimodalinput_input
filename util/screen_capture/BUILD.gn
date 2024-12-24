@@ -13,46 +13,44 @@
 
 import("../../multimodalinput_mini.gni")
 
-if (input_feature_product != "watch") {
-  config("screen_capture_config") {
-    include_dirs = [
-      "${mmi_path}/util/common/include",
-      "${mmi_path}/util/screen_capture/include",
-    ]
+config("screen_capture_config") {
+  include_dirs = [
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/screen_capture/include",
+  ]
+}
+
+ohos_shared_library("libmmi-screen_capture") {
+  sources = [
+    "src/input_screen_capture.cpp",
+    "src/input_screen_capture_monitor_listener.cpp",
+  ]
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
 
-  ohos_shared_library("libmmi-screen_capture") {
-    sources = [
-      "src/input_screen_capture.cpp",
-      "src/input_screen_capture_monitor_listener.cpp",
-    ]
-    branch_protector_ret = "pac_ret"
-    sanitize = {
-      integer_overflow = true
-      ubsan = true
-      boundary_sanitize = true
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
-    }
+  configs = [ "${mmi_path}:coverage_flags" ]
 
-    configs = [ "${mmi_path}:coverage_flags" ]
+  public_configs = [ ":screen_capture_config" ]
 
-    public_configs = [ ":screen_capture_config" ]
+  deps = [ "${mmi_path}/util:libmmi-util" ]
 
-    deps = [ "${mmi_path}/util:libmmi-util" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
 
-    external_deps = [
-      "c_utils:utils",
-      "hilog:libhilog",
-    ]
-
-    if (enable_player_framework) {
-      external_deps += [ "player_framework:media_client" ]
-    }
-
-    innerapi_tags = [ "platformsdk" ]
-    part_name = "input"
-    subsystem_name = "multimodalinput"
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
   }
+
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "input"
+  subsystem_name = "multimodalinput"
 }

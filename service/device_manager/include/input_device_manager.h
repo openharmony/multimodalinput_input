@@ -86,7 +86,7 @@ public:
     int32_t OnEnableInputDevice(bool enable);
     std::vector<int32_t> GetTouchPadIds();
     struct libinput_device *GetTouchPadDeviceOrigin();
-
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session);
     static std::shared_ptr<InputDeviceManager> GetInstance();
 
 private:
@@ -106,9 +106,12 @@ private:
     bool IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const;
+    void RecoverInputDeviceEnabled(SessionPtr session);
+    int32_t NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result);
 
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
+    std::map<int32_t, int32_t> recoverList_;
     std::map<int32_t, std::shared_ptr<InputDevice>> virtualInputDevices_;
     std::map<std::string, std::string> inputDeviceScreens_;
     std::list<std::shared_ptr<IDeviceObserver>> observers_;

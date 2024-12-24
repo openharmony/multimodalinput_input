@@ -1049,7 +1049,7 @@ static bool IsScreenCaptureWorking()
         if (capturePid == pid) {
             return true;
         } else {
-            MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
+            MMI_HILOGE("Calling pid is:%{public}d, but screen capture pid is:%{public}d", pid, capturePid);
         }
     }
     return false;

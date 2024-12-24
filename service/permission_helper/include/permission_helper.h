@@ -48,6 +48,7 @@ public:
     bool CheckMouseCursor();
     bool CheckInputEventFilter();
     bool CheckAuthorize();
+    bool CheckInputDeviceController();
 
 private:
     PermissionHelper() {}

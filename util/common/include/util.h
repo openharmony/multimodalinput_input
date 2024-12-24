@@ -163,6 +163,27 @@ inline constexpr int64_t MS2US(int64_t ms)
     constexpr int64_t unit { 1000 };
     return (ms * unit);
 }
+
+template<typename, typename = std::void_t<>>
+struct IsStreamable : public std::false_type {};
+
+template<typename T>
+struct IsStreamable<T, std::void_t<decltype(operator<<(std::declval<std::ostream>(), std::declval<T>()))>>
+    : public std::true_type {};
+
+template<typename T>
+std::enable_if_t<IsStreamable<T>::value, std::string> DumpSet(const std::set<T> &items)
+{
+    std::ostringstream sItems;
+
+    if (auto iter = items.cbegin(); iter != items.cend()) {
+        sItems << *iter;
+        for (++iter; iter != items.cend(); ++iter) {
+            sItems << "," << *iter;
+        }
+    }
+    return std::move(sItems).str();
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H
