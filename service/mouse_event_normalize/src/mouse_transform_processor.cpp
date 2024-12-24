@@ -416,25 +416,6 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     return RET_OK;
 }
 
-DeviceType GetFoldPcType()
-{
-    DeviceType deviceType = DeviceType::DEVICE_FOLD_PC;
-    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
-    if (cursorPos.displayId < 0) {
-        MMI_HILOGE("No display");
-        return static_cast<DeviceType>(RET_ERR);
-    }
-    auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
-    int width = displayInfo->width;
-    int height = displayInfo->height;
-    if (width == FOLD_PC_WIDTH && height == FOLD_PC_HEIGHT) {
-        deviceType = DeviceType::DEVICE_FOLD_PC;
-    } else if (width == FOLD_PC_HEIGHT && height == FOLD_PC_WIDTH) {
-        deviceType = DeviceType::DEVICE_FOLD_PC_HORIZONTAL;
-    }
-    return deviceType;
-}
-
 double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
     const int32_t initRows = 3;
@@ -446,7 +427,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
         deviceType = DeviceType::DEVICE_TABLET;
     }
     if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
-        deviceType = GetFoldPcType();
+        deviceType = DeviceType::DEVICE_FOLD_PC;
     }
     int32_t ret =
         HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
@@ -799,11 +780,7 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
         }
     }
     if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
-        if (width == FOLD_PC_WIDTH && height == FOLD_PC_HEIGHT) {
-            ret = DeviceType::DEVICE_FOLD_PC;
-        } else if (width == FOLD_PC_HEIGHT && height == FOLD_PC_WIDTH) {
-            ret = DeviceType::DEVICE_FOLD_PC_HORIZONTAL;
-        }
+        ret = DeviceType::DEVICE_FOLD_PC;
     }
     return ret;
 }
