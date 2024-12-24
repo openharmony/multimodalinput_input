@@ -2264,11 +2264,11 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     }
     shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, &shortcutKey] () {
         MMI_HILOGI("Timer callback");
-        shortcutKey.timerId = -1;
 #ifdef SHORTCUT_KEY_RULES_ENABLED
         KEY_SHORTCUT_MGR->MarkShortcutConsumed(shortcutKey);
 #endif // SHORTCUT_KEY_RULES_ENABLED
         currentLaunchAbilityKey_ = shortcutKey;
+        shortcutKey.timerId = -1;
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
         BytraceAdapter::StopLaunchAbility();
