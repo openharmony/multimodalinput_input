@@ -2782,6 +2782,22 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerSize_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InputManagerTest_GetCursorSurfaceId_001
+ * @tc.desc: SetPointerSize and GetPointerSize interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetCursorSurfaceId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint64_t surfaceId {};
+    auto result = InputManager::GetInstance()->GetCursorSurfaceId(surfaceId);
+    ASSERT_EQ(result, RET_OK);
+    std::cout << "CursorSurfaceId:" << surfaceId << std::endl;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetCursorSurfaceId(surfaceId));
+}
+
+/**
  * @tc.name: InputManagerTest_MousePrimaryButton_001
  * @tc.desc: SetMousePrimaryButton and GetMousePrimaryButton interface detection
  * @tc.type: FUNC
