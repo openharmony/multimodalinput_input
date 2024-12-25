@@ -270,6 +270,8 @@ ohos_shared_library("libmmi-server") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "graphic_2d:librender_service_base",
+    "graphic_surface:surface",
+    "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
 
@@ -340,6 +342,7 @@ ohos_shared_library("libmmi-server") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "window_manager:libdm",
+    "window_manager:libdms",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
