@@ -391,6 +391,14 @@ public:
     int32_t GetPointerSize(int32_t &size);
 
     /**
+     * @brief Gets surface ID of the cursor.
+     * @param size Indicates surface ID of the cursor.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId);
+
+    /**
      * @brief Enable combine key
      * @param enable Indicates whether the combine key is enabled. The value true indicates that the combine key
      * is enabled, and the value false indicates the opposite.
