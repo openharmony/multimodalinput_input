@@ -203,6 +203,9 @@ private:
     void InitScreenInfo();
     void DumpScreenInfo(std::ostringstream& oss);
     bool IsSupported() override;
+    int32_t PrepareBuffer(uint32_t width, uint32_t height);
+    int32_t DrawHardwareCursor(const MOUSE_ICON mouseStyle);
+    int32_t DrawCursor(const MOUSE_ICON mouseStyle, uint32_t width, uint32_t height);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
@@ -269,6 +272,8 @@ private:
     std::mutex mtx_;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
+    std::vector<sptr<OHOS::SurfaceBuffer>> cursorBuffers_;
+    uint32_t bufferId_ { 0 };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR

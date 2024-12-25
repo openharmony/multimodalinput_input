@@ -47,6 +47,7 @@
 #include "util.h"
 #include "dfx_hisysevent.h"
 #include "timer_manager.h"
+#include "surface.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -108,6 +109,7 @@ constexpr uint64_t FOLD_SCREEN_ID_MAIN { 5 };
 constexpr float IMAGE_PIXEL { 0.0f };
 constexpr float CALCULATE_IMAGE_MIDDLE { 2.0f };
 constexpr int32_t QUEUE_SIZE { 5 };
+constexpr int32_t RETRY_COUNT { 2 };
 constexpr int32_t DYNAMIC_ROTATION_ANGLE { 12 };
 constexpr float CALCULATE_MOUSE_ICON_BAIS { 5.0f };
 constexpr int32_t SYNC_FENCE_WAIT_TIME { 3000 };
@@ -433,9 +435,11 @@ bool PointerDrawingManager::SetTraditionsHardWareCursorLocation(int32_t displayI
         hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
     if (hardwareCursorPointerManager_->IsSupported() && (hasLoadingPointerStyle_ || hasHardwareCursorAnimate_)) {
-        if (hardwareCursorPointerManager_->SetPosition((physicalX -
-            CalculateHardwareXOffset(iconType)), (physicalY -
-            CalculateHardwareYOffset(iconType))) != RET_OK) {
+        if (cursorBuffers_[bufferId_] && cursorBuffers_[bufferId_]->GetVirAddr() &&
+            hardwareCursorPointerManager_->SetPosition(
+                (physicalX - CalculateHardwareXOffset(iconType)),
+                (physicalY - CalculateHardwareYOffset(iconType)),
+                cursorBuffers_[bufferId_]->GetBufferHandle()) != RET_OK) {
             MMI_HILOGE("Set hardware cursor position fail");
             return false;
         }
@@ -464,8 +468,11 @@ bool PointerDrawingManager::SetTraditionsHardWareCursorLocation(int32_t displayI
     CHKPF(hardwareCursorPointerManager_);
     hardwareCursorPointerManager_->SetTargetDevice(displayId);
     if (hardwareCursorPointerManager_->IsSupported()) {
-        if (hardwareCursorPointerManager_->SetPosition((physicalX - CalculateHardwareXOffset(
-            iconType)), (physicalY - CalculateHardwareYOffset(iconType))) != RET_OK) {
+        if (cursorBuffers_[bufferId_] && cursorBuffers_[bufferId_]->GetVirAddr() &&
+            hardwareCursorPointerManager_->SetPosition(
+                (physicalX - CalculateHardwareXOffset(iconType)),
+                (physicalY - CalculateHardwareYOffset(iconType)),
+                cursorBuffers_[bufferId_]->GetBufferHandle()) != RET_OK) {
             MMI_HILOGE("Set hardware cursor position error");
         }
     }
@@ -586,9 +593,12 @@ void PointerDrawingManager::SetHardwareCursorPosition(int32_t displayId, int32_t
     hardwareCursorPointerManager_->SetTargetDevice(displayId);
     if (hardwareCursorPointerManager_->IsSupported() && lastMouseStyle_.id != MOUSE_ICON::LOADING &&
             lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
-        if (hardwareCursorPointerManager_->SetPosition((physicalX - CalculateHardwareXOffset(ICON_TYPE(
-            mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay))), (physicalY - CalculateHardwareYOffset(
-                ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay)))) != RET_OK) {
+        float XOffset = CalculateHardwareXOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay));
+        float YOffset = CalculateHardwareYOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay));
+        if (cursorBuffers_[bufferId_] && cursorBuffers_[bufferId_]->GetVirAddr() &&
+            hardwareCursorPointerManager_->SetPosition(
+                (physicalX - XOffset), (physicalY - YOffset),
+                cursorBuffers_[bufferId_]->GetBufferHandle()) != RET_OK) {
             MMI_HILOGE("Set hardware cursor position error");
         }
     }
@@ -930,6 +940,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
             hardwareCanvasSize_ = g_hardwareCanvasSize;
             // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
             // repeatedly obtain the surfaceBuffer.
+            DrawHardwareCursor(mouseStyle);
             DrawTraditionsCursor(mouseStyle);
             return RET_OK;
         }
@@ -1170,6 +1181,18 @@ void PointerDrawingManager::DoHardwareCursorDraw()
         MMI_HILOGE("Memcpy data is error, ret:%{public}d", ret);
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    auto canvasSize = static_cast<int32_t>(CALCULATE_CANVAS_SIZE_CHANGE);
+    PrepareBuffer(canvasSize, canvasSize);
+    auto addr = static_cast<uint8_t *>(cursorBuffers_[bufferId_]->GetVirAddr());
+    CHKPV(addr);
+    ret = memcpy_s(addr, addrSize, dynamicBitmap_->GetPixels(), addrSize);
+    if (ret != EOK) {
+        MMI_HILOGE("Memcpy data is error, ret:%{public}d", ret);
+        return;
+    }
+#endif //OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 int32_t PointerDrawingManager::FlushBuffer()
 {
@@ -3038,6 +3061,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         MMI_HILOGI("screenId_:%{public}" PRIu64, screenId_);
         AttachToDisplay();
         DrawCursor(MOUSE_ICON(lastMouseStyle_.id));
+        DrawHardwareCursor(MOUSE_ICON(lastMouseStyle_.id));
         int32_t currnetPhysicalX =
             lastPhysicalX_ -
             CalculateHardwareXOffset(ICON_TYPE(mouseIcons_[MOUSE_ICON(lastDrawPointerStyle_.id)].alignmentWay));
@@ -3076,5 +3100,76 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
     std::lock_guard<std::mutex> guard(mtx_);
     return userIcon_;
 }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+int32_t PointerDrawingManager::PrepareBuffer(uint32_t width, uint32_t height)
+{
+    if (cursorBuffers_.size() == QUEUE_SIZE) {
+        bufferId_++;
+        if (bufferId_ == cursorBuffers_.size()) {
+            bufferId_ = 0;
+        }
+        return RET_OK;
+    }
+
+    OHOS::BufferRequestConfig requestConfig = {
+        .width = width,
+        .height = height,
+        .strideAlignment = 0x8,
+        .format = GRAPHIC_PIXEL_FMT_RGBA_8888,
+        .usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA | BUFFER_USAGE_HW_COMPOSER,
+        .timeout = 150,
+    };
+
+    for (size_t i = 0; i < RETRY_COUNT * QUEUE_SIZE && cursorBuffers_.size() < QUEUE_SIZE; i++) {
+        sptr<OHOS::SurfaceBuffer> buffer = OHOS::SurfaceBuffer::Create();
+        if (buffer == nullptr) {
+            MMI_HILOGE("SurfaceBuffer Create failed");
+            continue;
+        }
+
+        OHOS::GSError ret = buffer->Alloc(requestConfig);
+        if (ret != OHOS::GSERROR_OK) {
+            MMI_HILOGE("SurfaceBuffer Alloc failed, %{public}s", GSErrorStr(ret).c_str());
+            continue;
+        }
+
+        cursorBuffers_.push_back(buffer);
+    }
+
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::DrawHardwareCursor(const MOUSE_ICON mouseStyle)
+{
+    CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) = GetCanvasSize();
+    auto canvasSize = static_cast<int32_t>(CALCULATE_CANVAS_SIZE_CHANGE);
+    int32_t width = canvasSize;
+    int32_t height = canvasSize;
+
+    DrawCursor(mouseStyle, width, height);
+
+    MMI_HILOGD("DrawHardwareCursor success");
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle, uint32_t width, uint32_t height)
+{
+    if (PrepareBuffer(width, height) != RET_OK ||
+        cursorBuffers_[bufferId_] == nullptr ||
+        cursorBuffers_[bufferId_]->GetVirAddr() == nullptr ||
+        hardwareCursorPointerManager_ == nullptr) {
+        MMI_HILOGE("buffer is null");
+        return RET_ERR;
+    }
+
+    auto addr = static_cast<uint8_t *>(cursorBuffers_[bufferId_]->GetVirAddr());
+    DoDraw(addr, cursorBuffers_[bufferId_]->GetWidth(), cursorBuffers_[bufferId_]->GetHeight(), mouseStyle);
+
+    MMI_HILOGD("DrawCursor success");
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
 } // namespace MMI
 } // namespace OHOS
