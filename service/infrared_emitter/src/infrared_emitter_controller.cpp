@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace MMI {
+#ifndef OHOS_BUILD_PC_UNIT_TEST
 namespace {
 const std::string IR_WRAPPER_PATH { "libconsumer_ir_service_1.0.z.so" };
 std::mutex mutex_;
@@ -155,6 +156,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
     }
     return true;
 }
+#endif OHOS_BUILD_PC_UNIT_TEST
 } // namespace MMI
 } // namespace OHOS
 
