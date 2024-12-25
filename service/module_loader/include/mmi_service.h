@@ -193,6 +193,7 @@ public:
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

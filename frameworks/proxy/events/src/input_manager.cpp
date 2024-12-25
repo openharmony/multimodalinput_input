@@ -706,5 +706,10 @@ int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::
 {
     return InputMgrImpl.SetInputDeviceEnabled(deviceId, enable, callback);
 }
+
+int32_t InputManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+{
+    return InputMgrImpl.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -199,6 +199,9 @@ public:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool IsSupported();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -336,6 +339,12 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
     void OnGestureSendEvent(std::shared_ptr<PointerEvent> event);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
+    void SendUpDownPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown,
+        int32_t sourceDisplayId, int32_t targetDisplayId,
+        std::optional<WindowInfo> &sourceWindowInfo, std::optional<WindowInfo> &targetWindowInfo);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     UDSServer* udsServer_ { nullptr };

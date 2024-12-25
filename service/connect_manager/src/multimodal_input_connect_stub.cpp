@@ -254,6 +254,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MOVE_MOUSE):
             ret = StubMoveMouseEvent(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SHIFT_APP_POINTER_EVENT):
+            ret = StubShiftAppPointerEvent(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_KEY_EVENT):
             ret = StubInjectKeyEvent(data, reply);
             break;
@@ -2977,6 +2980,30 @@ int32_t MultimodalInputConnectStub::StubSetInputDeviceInputEnable(MessageParcel&
         return ERROR_DEVICE_NOT_EXIST;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubShiftAppPointerEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t sourceWindowId = -1;
+    READINT32(data, sourceWindowId, ERR_INVALID_VALUE);
+    int32_t targetWindowId = -1;
+    READINT32(data, targetWindowId, ERR_INVALID_VALUE);
+    bool autoGenDown = true;
+    READBOOL(data, autoGenDown, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    if (ret != RET_OK) {
+        MMI_HILOGE("shift AppPointerEvent failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

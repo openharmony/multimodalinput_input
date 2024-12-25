@@ -3400,5 +3400,22 @@ int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t
     }
     return RET_OK;
 }
+
+int32_t MMIService::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [sourceWindowId, targetWindowId, autoGenDown]() {
+            return WIN_MGR->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Shift AppPointerEvent failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

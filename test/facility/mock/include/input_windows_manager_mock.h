@@ -131,6 +131,9 @@ public:
     MOCK_METHOD(void, CleanShellWindowIds, ());
     MOCK_METHOD(bool, IsKnuckleOnAncoWindow, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    MOCK_METHOD(int32_t, ShiftAppPointerEvent, (int32_t, int32_t, bool));
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
 
