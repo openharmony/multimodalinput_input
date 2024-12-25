@@ -999,6 +999,8 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH, &middle_btn_north), CREATE_INT32);
     napi_value middle_btn_north_south = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH, &middle_btn_north_south), CREATE_INT32);
+    napi_value middle_btn_east_west = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_EAST_WEST, &middle_btn_east_west), CREATE_INT32);
     napi_value middle_btn_north_east = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH_EAST, &middle_btn_north_east), CREATE_INT32);
     napi_value middle_btn_north_west = nullptr;
@@ -1058,6 +1060,7 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_SOUTH", middle_btn_south),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH", middle_btn_north),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH_SOUTH", middle_btn_north_south),
+        DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_EAST_WEST", middle_btn_east_west),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH_EAST", middle_btn_north_east),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH_WEST", middle_btn_north_west),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_SOUTH_EAST", middle_btn_south_east),
