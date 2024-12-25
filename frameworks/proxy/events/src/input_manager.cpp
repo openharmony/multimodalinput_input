@@ -251,6 +251,11 @@ int32_t InputManager::GetPointerSize(int32_t &size)
     return InputMgrImpl.GetPointerSize(size);
 }
 
+int32_t InputManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    return InputMgrImpl.GetCursorSurfaceId(surfaceId);
+}
+
 int32_t InputManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     return InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
