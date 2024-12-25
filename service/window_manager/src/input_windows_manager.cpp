@@ -3414,6 +3414,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             winMap.insert({item.id, item});
             continue;
         }
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) && item.windowType == SCREEN_CONTROL_WINDOW_TYPE) {
+            continue;
+        }
         MMI_HILOG_DISPATCHD("pointerItem.GetToolType():%{public}d, extraData_.toolType:%{public}d",
             pointerItem.GetToolType(), extraData_.toolType);
         bool checkToolType = false;
