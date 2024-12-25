@@ -45,6 +45,7 @@ public:
     int32_t SetPointerSize(int32_t size) override;
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override;
     int32_t GetPointerSize(int32_t &size) override;
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;

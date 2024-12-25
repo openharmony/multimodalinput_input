@@ -189,6 +189,13 @@ int32_t MultimodalInputConnectManager::GetPointerSize(int32_t &size)
     return multimodalInputConnectService_->GetPointerSize(size);
 }
 
+int32_t MultimodalInputConnectManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetCursorSurfaceId(surfaceId);
+}
+
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
 {
     std::lock_guard<std::mutex> guard(lock_);

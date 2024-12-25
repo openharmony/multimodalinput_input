@@ -83,6 +83,13 @@ public:
     }
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override { return pid; }
     int32_t GetPointerSize(int32_t &size) override { return size_; }
+
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override
+    {
+        surfaceId = {};
+        return RET_OK;
+    }
+
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override { return pid; }
     int32_t SetMousePrimaryButton(int32_t primaryButton) override
     {
