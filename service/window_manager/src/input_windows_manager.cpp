@@ -1560,7 +1560,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() && !HasMouseHideFlag()) {
         MMI_HILOGI("the mouse is hide");
         return;
     }
