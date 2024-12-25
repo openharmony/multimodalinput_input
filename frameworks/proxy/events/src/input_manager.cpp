@@ -400,9 +400,9 @@ int32_t InputManager::LeaveCaptureMode(int32_t windowId)
     return InputMgrImpl.LeaveCaptureMode(windowId);
 }
 
-void InputManager::AppendExtraData(const ExtraData& extraData)
+int32_t InputManager::AppendExtraData(const ExtraData& extraData)
 {
-    InputMgrImpl.AppendExtraData(extraData);
+    return InputMgrImpl.AppendExtraData(extraData);
 }
 
 int32_t InputManager::EnableInputDevice(bool enable)

@@ -376,6 +376,7 @@ private:
         bool isCaptureMode { false };
     } captureModeInfo_;
     ExtraData extraData_;
+    int32_t mouseDownEventId_ { -1 };
     bool haveSetObserver_ { false };
     bool dragFlag_ { false };
     bool isDragBorder_ { false };
