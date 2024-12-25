@@ -90,7 +90,7 @@ const std::string PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
-const std::string KEY_ENABLE { "enble" };
+const std::string KEY_ENABLE { "enable" };
 const std::string KEY_STATUS { "status" };
 } // namespace
 
