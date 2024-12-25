@@ -1050,6 +1050,16 @@ public:
      */
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
 
+    /**
+     * @brief shift AppPointerEvent from source window to target window
+     * @param sourceWindowId - source window id.
+     * @param targetWindowId - target window id.
+     * @param autoGenDown - send down event if true.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown = true);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

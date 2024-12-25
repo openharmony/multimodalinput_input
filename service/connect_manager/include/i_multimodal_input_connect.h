@@ -174,6 +174,7 @@ public:
     virtual int32_t SkipPointerLayer(bool isSkip) = 0;
     virtual int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) = 0;
     virtual int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) = 0;
+    virtual int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
