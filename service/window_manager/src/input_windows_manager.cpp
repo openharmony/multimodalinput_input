@@ -3035,6 +3035,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t action = pointerEvent->GetPointerAction();
     if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
         mouseDownInfo_ = *touchWindow;
+        mouseDownEventId_ = pointerEvent->GetId();
     }
     if ((action == PointerEvent::POINTER_ACTION_MOVE && !pointerEvent->GetPressedButtons().empty()) ||
         (action == PointerEvent::POINTER_ACTION_BUTTON_UP)) {
@@ -3044,7 +3045,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     if (action == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         InitMouseDownInfo();
+        mouseDownEventId_ = -1;
         MMI_HILOGD("Mouse up, clear mouse down info");
+    }
+    if (action == PointerEvent::POINTER_ACTION_CANCEL && mouseDownEventId_ > 0) {
+        mouseDownEventId_ = -1;
     }
     if (action == PointerEvent::POINTER_ACTION_AXIS_END) {
         axisBeginWindowInfo_ = std::nullopt;
@@ -4349,6 +4354,14 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.sourceType = extraData.sourceType;
     extraData_.pointerId = extraData.pointerId;
     extraData_.pullId = extraData.pullId;
+    extraData_.eventId = extraData.eventId;
+    if ((extraData.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (mouseDownEventId_ < 0 || extraData.eventId <= mouseDownEventId_)) {
+        MMI_HILOGE("Mouse drag failed, PI:%{public}d, EI:%{public}d, DEI:%{public}d",
+            extraData.pointerId, extraData.eventId, mouseDownEventId_);
+        ClearExtraData();
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -4361,6 +4374,7 @@ void InputWindowsManager::ClearExtraData()
     extraData_.sourceType = -1;
     extraData_.pointerId = -1;
     extraData_.pullId = -1;
+    extraData_.eventId = -1;
 }
 
 ExtraData InputWindowsManager::GetExtraData() const
