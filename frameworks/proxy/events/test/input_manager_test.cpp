@@ -4189,5 +4189,45 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_003, TestSize.L
     };
     InputManager::GetInstance()->SetInputDeviceEnabled(10000, true, cb);
 }
+
+/*
+ * @tc.name: InputManagerTest_ShiftAppPointerEvent_001
+ * @tc.desc: Test the funcation ShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t sourceWindowId = 99;
+    int32_t targetWindowId = 99;
+    bool autoGenDown = true;
+    int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    ASSERT_EQ(ret, ARGV_VALID);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
+
+/*
+ * @tc.name: InputManagerTest_ShiftAppPointerEvent_002
+ * @tc.desc: Test the funcation ShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t sourceWindowId = -150;
+    int32_t targetWindowId = -99;
+    bool autoGenDown = true;
+    int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    ASSERT_EQ(ret, RET_ERR);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
 } // namespace MMI
 } // namespace OHOS

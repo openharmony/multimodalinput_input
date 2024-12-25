@@ -333,6 +333,10 @@ public:
         return retCreateVKeyboardDevice_;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override
+    {
+        return static_cast<int32_t>(autoGenDown);
+    }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
