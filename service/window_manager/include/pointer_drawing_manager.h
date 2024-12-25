@@ -82,6 +82,7 @@ public:
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;

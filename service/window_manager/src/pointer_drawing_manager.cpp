@@ -1465,6 +1465,13 @@ int32_t PointerDrawingManager::GetPointerSize()
     return pointerSize;
 }
 
+int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    surfaceId = (surfaceNode_ != nullptr ? surfaceNode_->GetId() : Rosen::INVALID_NODEID);
+    MMI_HILOGI("CursorSurfaceId:%{public}" PRIu64, surfaceId);
+    return RET_OK;
+}
+
 void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
