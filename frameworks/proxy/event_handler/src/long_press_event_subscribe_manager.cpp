@@ -55,14 +55,14 @@ int32_t LongPressEventSubscribeManager::SubscribeLongPressEvent(
         MMI_HILOGE("FingerCount or duration is invalid");
         return RET_ERR;
     }
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return EVENT_REG_FAIL;
+    }
     std::lock_guard<std::mutex> guard(mtx_);
     if (LongPressEventSubscribeManager::subscribeManagerId_ >= INT_MAX) {
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
         return INVALID_SUBSCRIBE_ID;
-    }
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Client init failed");
-        return EVENT_REG_FAIL;
     }
     int32_t subscribeId = LongPressEventSubscribeManager::subscribeManagerId_;
     ++LongPressEventSubscribeManager::subscribeManagerId_;
@@ -133,6 +133,7 @@ int32_t LongPressEventSubscribeManager::OnSubscribeLongPressEventCallback(const 
 void LongPressEventSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGD("Leave, subscribeInfos_ is empty");
         return;

@@ -64,6 +64,7 @@ public:
 
 private:
     int32_t SetClientInfo(int32_t pid, uint64_t readThreadId);
+    std::mutex mtx_;
     MMIClientPtr client_ { nullptr };
 };
 
