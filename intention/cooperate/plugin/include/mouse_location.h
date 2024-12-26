@@ -32,12 +32,12 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 class MouseLocation {
-struct LocationInfo {
-    int32_t displayX { -1 };
-    int32_t displayY { -1 };
-    int32_t displayWidth { -1 };
-    int32_t displayHeight { -1 };
-};
+    struct LocationInfo {
+        int32_t displayX { -1 };
+        int32_t displayY { -1 };
+        int32_t displayWidth { -1 };
+        int32_t displayHeight { -1 };
+    };
 
 public:
     MouseLocation(IContext *context);

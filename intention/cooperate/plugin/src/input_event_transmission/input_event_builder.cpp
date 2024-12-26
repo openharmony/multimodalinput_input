@@ -32,10 +32,9 @@ namespace Cooperate {
 namespace {
 constexpr size_t LOG_PERIOD { 10 };
 constexpr int32_t DEFAULT_SCREEN_WIDTH { 512 };
-}
+} // namespace
 
-InputEventBuilder::InputEventBuilder(IContext *env)
-    : env_(env)
+InputEventBuilder::InputEventBuilder(IContext *env) : env_(env)
 {
     observer_ = std::make_shared<DSoftbusObserver>(*this);
     pointerEvent_ = MMI::PointerEvent::Create();
@@ -115,8 +114,8 @@ bool InputEventBuilder::OnPacket(const std::string &networkId, Msdp::NetPacket &
             break;
         }
         default: {
-            FI_HILOGW("Unexpected message(%{public}d) from \'%{public}s\'",
-                static_cast<int32_t>(packet.GetMsgId()), Utility::Anonymize(networkId).c_str());
+            FI_HILOGW("Unexpected message(%{public}d) from \'%{public}s\'", static_cast<int32_t>(packet.GetMsgId()),
+                Utility::Anonymize(networkId).c_str());
             return false;
         }
     }
@@ -136,8 +135,8 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
         return;
     }
     TagRemoteEvent(pointerEvent_);
-    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
-        pointerEvent_->GetId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction());
+    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)", pointerEvent_->GetId(),
+        pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction());
     if (IsActive(pointerEvent_)) {
         env_->GetInput().SimulateInputEvent(pointerEvent_);
     }
@@ -152,8 +151,8 @@ void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
         FI_HILOGE("Failed to deserialize key event");
         return;
     }
-    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
-        keyEvent_->GetId(), keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
+    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)", keyEvent_->GetId(), keyEvent_->GetKeyCode(),
+        keyEvent_->GetKeyAction());
     env_->GetInput().SimulateInputEvent(keyEvent_);
 }
 
@@ -180,9 +179,7 @@ bool InputEventBuilder::UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> po
 void InputEventBuilder::TagRemoteEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     pointerEvent->SetDeviceId(
-        (pointerEvent->GetDeviceId() >= 0) ?
-        -(pointerEvent->GetDeviceId() + 1) :
-        pointerEvent->GetDeviceId());
+        (pointerEvent->GetDeviceId() >= 0) ? -(pointerEvent->GetDeviceId() + 1) : pointerEvent->GetDeviceId());
 }
 
 bool InputEventBuilder::IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -192,7 +189,7 @@ bool InputEventBuilder::IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent
     }
     if ((pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
         ((pointerEvent->GetPointerAction() != MMI::PointerEvent::POINTER_ACTION_MOVE) &&
-         (pointerEvent->GetPointerAction() != MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
+            (pointerEvent->GetPointerAction() != MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
         return true;
     }
     MMI::PointerEvent::PointerItem item;
