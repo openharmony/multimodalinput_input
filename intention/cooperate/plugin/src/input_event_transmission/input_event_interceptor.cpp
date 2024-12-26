@@ -59,8 +59,12 @@ void InputEventInterceptor::Enable(Context &context)
     remoteNetworkId_ = context.Peer();
     sender_ = context.Sender();
     interceptorId_ = env_->GetInput().AddInterceptor(
-        [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) { this->OnPointerEvent(pointerEvent); },
-        [this](std::shared_ptr<MMI::KeyEvent> keyEvent) { this->OnKeyEvent(keyEvent); });
+        [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
+            this->OnPointerEvent(pointerEvent);
+        },
+        [this](std::shared_ptr<MMI::KeyEvent> keyEvent) {
+            this->OnKeyEvent(keyEvent);
+        });
     if (interceptorId_ < 0) {
         FI_HILOGE("Input::AddInterceptor fail");
     }
@@ -102,8 +106,8 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGE("Failed to serialize pointer event");
         return;
     }
-    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
-        pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
+    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)", pointerEvent->GetId(),
+        pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }
 
@@ -122,8 +126,8 @@ void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
         FI_HILOGE("Failed to serialize key event");
         return;
     }
-    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
-        keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)", keyEvent->GetId(), keyEvent->GetKeyCode(),
+        keyEvent->GetKeyAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }
 
@@ -135,17 +139,16 @@ void InputEventInterceptor::ReportPointerEvent(std::shared_ptr<MMI::PointerEvent
         FI_HILOGE("Corrupted pointer event");
         return;
     }
-    auto ret = sender_.Send(CooperateEvent(
-        CooperateEventType::INPUT_POINTER_EVENT,
+    auto ret = sender_.Send(CooperateEvent(CooperateEventType::INPUT_POINTER_EVENT,
         InputPointerEvent {
             .deviceId = pointerEvent->GetDeviceId(),
             .pointerAction = pointerEvent->GetPointerAction(),
             .sourceType = pointerEvent->GetSourceType(),
             .position = Coordinate {
-                .x = pointerItem.GetDisplayX(),
-                .y = pointerItem.GetDisplayY(),
-            }
-        }));
+                                    .x = pointerItem.GetDisplayX(),
+                                    .y = pointerItem.GetDisplayY(),
+                                    }
+    }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }

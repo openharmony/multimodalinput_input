@@ -15,9 +15,9 @@
 
 #include "input_adapter.h"
 
-#include "input_manager.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
+#include "input_manager.h"
 
 #include "devicestatus_define.h"
 
@@ -30,8 +30,7 @@ namespace DeviceStatus {
 
 class PointerFilter : public MMI::IInputEventFilter {
 public:
-    explicit PointerFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> filter)
-        : filter_(filter) {}
+    explicit PointerFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> filter) : filter_(filter) { }
 
     bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
     {
@@ -50,8 +49,10 @@ private:
 class InterceptorConsumer : public MMI::IInputEventConsumer {
 public:
     InterceptorConsumer(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
-                        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
-        : pointerCb_(pointerCb), keyCb_(keyCb) {}
+        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
+        : pointerCb_(pointerCb), keyCb_(keyCb)
+    {
+    }
 
     void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
     {
@@ -67,7 +68,7 @@ public:
         }
     }
 
-    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {}
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override { }
 
 private:
     std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb_;
@@ -108,7 +109,7 @@ int32_t InputAdapter::AddInterceptor(std::function<void(std::shared_ptr<MMI::Key
 }
 
 int32_t InputAdapter::AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
-                                     std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
+    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
 {
     uint32_t tags { 0u };
     if (pointerCb != nullptr) {
