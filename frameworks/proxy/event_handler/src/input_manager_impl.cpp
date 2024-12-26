@@ -281,7 +281,7 @@ int32_t InputManagerImpl::AddInputEventObserver(std::shared_ptr<MMIEventObserver
         return RET_ERR;
     }
     {
-        std::lock_guard<std::mutex> guard(mtx_);
+        std::lock_guard<std::mutex> guard(eventObserverMtx_);
         eventObserver_ = observer;
     }
     NotifyNapOnline();
@@ -292,7 +292,7 @@ int32_t InputManagerImpl::RemoveInputEventObserver(std::shared_ptr<MMIEventObser
 {
     CALL_INFO_TRACE;
     {
-        std::lock_guard<std::mutex> guard(mtx_);
+        std::lock_guard<std::mutex> guard(eventObserverMtx_);
         eventObserver_ = nullptr;
     }
     return MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputEventObserver();
@@ -466,19 +466,23 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
-    std::lock_guard<std::mutex> guard(resourceMtx_);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
+        eventHandler = eventHandler_;
+        inputConsumer = consumer_;
+    }
     MMI_HILOG_DISPATCHI("id:%{public}d recv", keyEvent->GetId());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(keyEvent);
-        if (!eventHandler_->PostTask([this, keyEvent] {
-                std::lock_guard<std::mutex> guard(this->resourceMtx_);
-                CHKPV(this->consumer_);
-                return this->OnKeyEventTask(this->consumer_, keyEvent);
+        if (!eventHandler->PostTask([this, inputConsumer, keyEvent] {
+                return this->OnKeyEventTask(inputConsumer, keyEvent);
             },
             std::string("MMI::OnKeyEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
@@ -488,7 +492,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         BytraceAdapter::StopPostTaskEvent();
     } else {
         BytraceAdapter::StartConsumer(keyEvent);
-        consumer_->OnInputEvent(keyEvent);
+        inputConsumer->OnInputEvent(keyEvent);
         BytraceAdapter::StopConsumer();
         MMI_HILOG_DISPATCHD("Key event report keyCode:%{private}d", keyEvent->GetKeyCode());
     }
@@ -517,10 +521,16 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    std::lock_guard<std::mutex> guard(resourceMtx_);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
-    lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
+        eventHandler = eventHandler_;
+        inputConsumer = consumer_;
+        lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
+    }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
@@ -536,10 +546,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     }
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
-        if (!eventHandler_->PostTask([this, pointerEvent] {
-                std::lock_guard<std::mutex> guard(this->resourceMtx_);
-                CHKPV(this->consumer_);
-                return this->OnPointerEventTask(this->consumer_, pointerEvent);
+        if (!eventHandler->PostTask([this, inputConsumer, pointerEvent] {
+                return this->OnPointerEventTask(inputConsumer, pointerEvent);
             },
             std::string("MMI::OnPointerEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
@@ -549,7 +557,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         BytraceAdapter::StopPostTaskEvent();
     } else {
         BytraceAdapter::StartConsumer(pointerEvent);
-        consumer_->OnInputEvent(pointerEvent);
+        inputConsumer->OnInputEvent(pointerEvent);
         BytraceAdapter::StopConsumer();
     }
     MMI_HILOG_DISPATCHD("Pointer event pointerId:%{public}d",
@@ -1554,7 +1562,7 @@ int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(in
     }
     CHKPR(callback, RET_ERR);
     {
-        std::lock_guard<std::mutex> guard(mtx_);
+        std::lock_guard<std::mutex> guard(winStatecallbackMtx_);
         windowStatecallback_ = callback;
     }
     if (!MMIEventHdl.InitClient()) {
@@ -2218,7 +2226,7 @@ int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, const std::stri
 void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, const std::string &bundleName, int32_t syncStatus)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::lock_guard<std::mutex> guard(eventObserverMtx_);
     CHKPV(eventObserver_);
     eventObserver_->SyncBundleName(pid, uid, bundleName, syncStatus);
 }
@@ -2495,7 +2503,7 @@ int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 
 void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::lock_guard<std::mutex> guard(winStatecallbackMtx_);
     if (windowStatecallback_ != nullptr) {
         windowStatecallback_(pid, windowId);
     } else {
