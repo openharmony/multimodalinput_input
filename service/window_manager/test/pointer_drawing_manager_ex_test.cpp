@@ -427,7 +427,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_CheckPointerStyleP
 
     pointerStyle.id = 46;
     bool ret2 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
-    EXPECT_FALSE(ret2);
+    EXPECT_TRUE(ret2);
 
     windowId = -3;
     bool ret3 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);

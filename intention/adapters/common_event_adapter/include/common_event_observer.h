@@ -28,11 +28,14 @@ namespace DeviceStatus {
 class CommonEventObserver : public ICommonEventObserver {
 public:
     CommonEventObserver(const OHOS::EventFwk::CommonEventSubscribeInfo &info, CommonEventHandleType handle)
-        : ICommonEventObserver(info), handle_(handle) {}
+        : ICommonEventObserver(info), handle_(handle)
+    {
+    }
     ~CommonEventObserver() = default;
 
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &event) override;
     static std::shared_ptr<CommonEventObserver> CreateCommonEventObserver(CommonEventHandleType handle);
+
 private:
     CommonEventHandleType handle_ { nullptr };
 };

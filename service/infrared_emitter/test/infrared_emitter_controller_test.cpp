@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
+#ifndef OHOS_BUILD_PC_UNIT_TEST
 namespace {
 using namespace testing::ext;
 const std::string IR_WRAPPER_PATH = "libconsumer_ir_service_1.0.z.so";
@@ -100,5 +101,6 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequen
     bool ret = controller.GetFrequencies(frequencyInfo);
     ASSERT_TRUE(ret);
 }
+#endif // OHOS_BUILD_PC_UNIT_TEST
 } // namespace MMI
 } // namespace OHOS

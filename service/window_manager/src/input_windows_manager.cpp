@@ -1564,7 +1564,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() && !HasMouseHideFlag()) {
         MMI_HILOGI("the mouse is hide");
         return;
     }
@@ -3041,6 +3041,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t action = pointerEvent->GetPointerAction();
     if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
         mouseDownInfo_ = *touchWindow;
+        mouseDownEventId_ = pointerEvent->GetId();
     }
     if ((action == PointerEvent::POINTER_ACTION_MOVE && !pointerEvent->GetPressedButtons().empty()) ||
         (action == PointerEvent::POINTER_ACTION_BUTTON_UP)) {
@@ -3050,7 +3051,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     if (action == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         InitMouseDownInfo();
+        mouseDownEventId_ = -1;
         MMI_HILOGD("Mouse up, clear mouse down info");
+    }
+    if (action == PointerEvent::POINTER_ACTION_CANCEL && mouseDownEventId_ > 0) {
+        mouseDownEventId_ = -1;
     }
     if (action == PointerEvent::POINTER_ACTION_AXIS_END) {
         axisBeginWindowInfo_ = std::nullopt;
@@ -3413,6 +3418,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         if (SkipNavigationWindow(item.windowInputType, pointerItem.GetToolType())) {
             winMap.insert({item.id, item});
+            continue;
+        }
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) && item.windowType == SCREEN_CONTROL_WINDOW_TYPE) {
             continue;
         }
         MMI_HILOG_DISPATCHD("pointerItem.GetToolType():%{public}d, extraData_.toolType:%{public}d",
@@ -4357,6 +4365,14 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.sourceType = extraData.sourceType;
     extraData_.pointerId = extraData.pointerId;
     extraData_.pullId = extraData.pullId;
+    extraData_.eventId = extraData.eventId;
+    if ((extraData.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (mouseDownEventId_ < 0 || extraData.eventId <= mouseDownEventId_)) {
+        MMI_HILOGE("Mouse drag failed, PI:%{public}d, EI:%{public}d, DEI:%{public}d",
+            extraData.pointerId, extraData.eventId, mouseDownEventId_);
+        ClearExtraData();
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -4369,6 +4385,7 @@ void InputWindowsManager::ClearExtraData()
     extraData_.sourceType = -1;
     extraData_.pointerId = -1;
     extraData_.pullId = -1;
+    extraData_.eventId = -1;
 }
 
 ExtraData InputWindowsManager::GetExtraData() const
@@ -5000,5 +5017,85 @@ const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id, const Dis
     MMI_HILOGW("Failed to obtain physical(%{public}d) display", id);
     return nullptr;
 }
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowId) const
+{
+    for (const std::pair<int32_t, WindowGroupInfo>& display: windowsPerDisplay_) {
+        int32_t displayId = display.first;
+        std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+        for (const auto& item : windowsInfo) {
+            if (item.id == windowId &&
+                (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) != WindowInfo::FLAG_BIT_UNTOUCHABLE &&
+                transparentWins_.find(item.id) == transparentWins_.end()) {
+                return std::make_optional(item);
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+void InputWindowsManager::SendUpDownPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown,
+    int32_t sourceDisplayId, int32_t targetDisplayId,
+    std::optional<WindowInfo> &sourceWindowInfo, std::optional<WindowInfo> &targetWindowInfo)
+{
+    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    pointerEvent->ClearButtonPressed();
+
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(pointerId, item);
+    item.SetWindowX(lastLogicX_ - sourceWindowInfo->area.x);
+    item.SetWindowY(lastLogicY_ - sourceWindowInfo->area.y);
+    item.SetPressed(false);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetTargetDisplayId(sourceDisplayId);
+    pointerEvent->SetTargetWindowId(sourceWindowInfo->id);
+    pointerEvent->SetAgentWindowId(sourceWindowInfo->agentWindowId);
+    ClearTargetWindowId(pointerId);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
+    if (autoGenDown) {
+        item.SetWindowX(lastLogicX_ - targetWindowInfo->area.x);
+        item.SetWindowY(lastLogicY_ - targetWindowInfo->area.y);
+        item.SetPressed(true);
+        pointerEvent->ClearButtonPressed();
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+        pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+        pointerEvent->UpdatePointerItem(pointerId, item);
+        pointerEvent->SetTargetDisplayId(targetDisplayId);
+        pointerEvent->SetTargetWindowId(targetWindowInfo->id);
+        pointerEvent->SetAgentWindowId(targetWindowInfo->agentWindowId);
+        InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
+    }
+}
+
+int32_t InputWindowsManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+{
+    MMI_HILOGI("start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
+               "autoGenDown: %{public}d", sourceWindowId, targetWindowId, static_cast<int32_t>(autoGenDown));
+    if (!lastPointerEvent_ || !lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
+        MMI_HILOGE("Failed shift pointerEvent, left mouse button is not pressed");
+        return RET_ERR;
+    }
+    int32_t sourceDisplayId = lastPointerEvent_->GetTargetDisplayId();
+    int32_t targetDisplayId = lastPointerEvent_->GetTargetDisplayId();
+    std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(sourceWindowId);
+    std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(targetWindowId);
+    if (!sourceWindowInfo || !targetWindowInfo) {
+        MMI_HILOGE("Failed shift pointerEvent,"
+                   "get null sourceWindowInfo, source:%{public}d, target:%{public}d",
+        static_cast<int32_t>(!!sourceWindowInfo), static_cast<int32_t>(!!targetWindowInfo));
+        return RET_ERR;
+    }
+    SendUpDownPointerEvent(sourceWindowId, targetWindowId, autoGenDown,
+        sourceDisplayId, targetDisplayId, sourceWindowInfo, targetWindowInfo);
+    firstBtnDownWindowInfo_.first = targetWindowId;
+    MMI_HILOGI("shift pointer event success");
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

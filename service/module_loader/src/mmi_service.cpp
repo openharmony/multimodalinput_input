@@ -805,6 +805,22 @@ int32_t MMIService::GetPointerSize(int32_t &size)
     return RET_OK;
 }
 
+int32_t MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    auto ret = delegateTasks_.PostSyncTask(
+        [&surfaceId] {
+            return IPointerDrawingManager::GetInstance()->GetCursorSurfaceId(surfaceId);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetCursorSurfaceId fail, error:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_INFO_TRACE;
@@ -1692,9 +1708,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
         DISPLAY_MONITOR->InitCommonEventSubscriber();
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
@@ -2069,11 +2085,11 @@ void MMIService::OnThread()
     PreEventLoop();
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
         if (isCesStart_ && !DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
             DISPLAY_MONITOR->InitCommonEventSubscriber();
         }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
         MMI_HILOGD("timeout:%{public}d", timeout);
@@ -3406,6 +3422,23 @@ int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t
         MMI_HILOGE("Set inputdevice enable failed, return:%{public}d", ret);
         return ret;
     }
+    return RET_OK;
+}
+
+int32_t MMIService::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [sourceWindowId, targetWindowId, autoGenDown]() {
+            return WIN_MGR->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Shift AppPointerEvent failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
 } // namespace MMI

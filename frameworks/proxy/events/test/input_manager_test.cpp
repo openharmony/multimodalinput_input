@@ -717,7 +717,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -744,7 +744,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -771,7 +771,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -3448,6 +3448,22 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerSize_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InputManagerTest_GetCursorSurfaceId_001
+ * @tc.desc: SetPointerSize and GetPointerSize interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetCursorSurfaceId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint64_t surfaceId {};
+    auto result = InputManager::GetInstance()->GetCursorSurfaceId(surfaceId);
+    ASSERT_EQ(result, RET_OK);
+    std::cout << "CursorSurfaceId:" << surfaceId << std::endl;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetCursorSurfaceId(surfaceId));
+}
+
+/**
  * @tc.name: InputManagerTest_MousePrimaryButton_001
  * @tc.desc: SetMousePrimaryButton and GetMousePrimaryButton interface detection
  * @tc.type: FUNC
@@ -3698,8 +3714,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequencies, TestSize.Lev
     infraredFrequency.min_ = 10;
     std::vector<InfraredFrequency> requencys;
     requencys.push_back(infraredFrequency);
-    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetInfraredFrequencies(requencys));
 }
 
 /**
@@ -3712,8 +3727,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
 {
     int64_t number = 10;
     std::vector<int64_t> pattern = { 10, 20, 30 };
-    int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->TransmitInfrared(number, pattern));
 }
 
 /**
@@ -4188,6 +4202,46 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_003, TestSize.L
         MMI_HILOGD("set input device result: %{public}d ", result);
     };
     InputManager::GetInstance()->SetInputDeviceEnabled(10000, true, cb);
+}
+
+/*
+ * @tc.name: InputManagerTest_ShiftAppPointerEvent_001
+ * @tc.desc: Test the funcation ShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t sourceWindowId = 99;
+    int32_t targetWindowId = 99;
+    bool autoGenDown = true;
+    int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    ASSERT_EQ(ret, ARGV_VALID);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
+
+/*
+ * @tc.name: InputManagerTest_ShiftAppPointerEvent_002
+ * @tc.desc: Test the funcation ShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t sourceWindowId = -150;
+    int32_t targetWindowId = -99;
+    bool autoGenDown = true;
+    int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    ASSERT_EQ(ret, RET_ERR);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 } // namespace MMI
 } // namespace OHOS

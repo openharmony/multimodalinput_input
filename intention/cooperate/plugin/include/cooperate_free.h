@@ -33,7 +33,7 @@ public:
     void OnEvent(Context &context, const CooperateEvent &event) override;
     void OnEnterState(Context &context) override;
     void OnLeaveState(Context &context) override;
-    IDeviceManager& GetDeviceManager()
+    IDeviceManager &GetDeviceManager()
     {
         return env_->GetDeviceManager();
     }

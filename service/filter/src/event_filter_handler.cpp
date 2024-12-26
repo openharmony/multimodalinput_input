@@ -197,7 +197,17 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
             continue;
         }
         if (i.filter->HandlePointerEvent(event)) {
-            MMI_HILOGD("Call HandlePointerEvent return true");
+            int32_t action = event->GetPointerAction();
+            if (action == PointerEvent::POINTER_ACTION_MOVE ||
+                action == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+                action == PointerEvent::POINTER_ACTION_ROTATE_UPDATE ||
+                action == PointerEvent::POINTER_ACTION_PULL_MOVE ||
+                action == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
+                action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+                MMI_HILOGD("Call HandlePointerEvent return true");
+            } else {
+                MMI_HILOGW("Call HandlePointerEvent return true");
+            }
             return true;
         }
     }

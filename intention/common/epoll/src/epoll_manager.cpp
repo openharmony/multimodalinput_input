@@ -60,7 +60,7 @@ void EpollManager::Close()
 int32_t EpollManager::Add(IEpollEventSource &source)
 {
     CALL_DEBUG_ENTER;
-    struct epoll_event ev {};
+    struct epoll_event ev { };
     ev.events = source.GetEvents();
     ev.data.ptr = &source;
 
@@ -84,7 +84,7 @@ void EpollManager::Remove(IEpollEventSource &source)
 int32_t EpollManager::Update(IEpollEventSource &source)
 {
     CALL_DEBUG_ENTER;
-    struct epoll_event ev {};
+    struct epoll_event ev { };
     ev.events = source.GetEvents();
     ev.data.ptr = &source;
 
