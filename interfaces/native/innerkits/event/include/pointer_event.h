@@ -193,6 +193,8 @@ public:
 
     static constexpr int32_t POINTER_ACTION_PROXIMITY_OUT = 36;
 
+    static constexpr int32_t POINTER_ACTION_PULL_CANCEL = 37;
+
     /**
      * 表示触屏手势动作
      *
