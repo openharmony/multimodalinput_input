@@ -197,7 +197,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override { return deviceId; }
     int32_t GetFunctionKeyState(int32_t funckey, bool &state) override { return funckey; }
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override { return funcKey; }
-    int32_t SetPointerLocation(int32_t x, int32_t y) override { return x; }
+    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1) override { return x; }
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override { return pid; }
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override { return windowId; }
     int32_t GetWindowPid(int32_t windowId) override { return windowId; }
