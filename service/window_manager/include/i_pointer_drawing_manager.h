@@ -19,7 +19,7 @@
 #include <map>
 #include <memory>
 
-#include "pixel_map.h"
+#include <pixel_map.h>
 
 #include "pointer_style.h"
 #include "window_info.h"
@@ -105,6 +105,9 @@ public:
     {
         return 0;
     }
+
+    virtual int32_t GetCursorSurfaceId(uint64_t &surfaceId);
+
     virtual PointerStyle GetLastMouseStyle()
     {
         return {};
