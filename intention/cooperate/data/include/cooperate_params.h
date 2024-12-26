@@ -37,8 +37,8 @@ enum CooperateRequestID : uint32_t {
 
 struct StartCooperateParam final : public ParamBase {
     StartCooperateParam() = default;
-    StartCooperateParam(int32_t userData, const std::string &remoteNetworkId,
-                        int32_t startDeviceId, bool checkPermission);
+    StartCooperateParam(
+        int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId, bool checkPermission);
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
 

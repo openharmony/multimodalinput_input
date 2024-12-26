@@ -121,7 +121,7 @@ int32_t DDMAdapterImpl::GetTrustedDeviceList(std::vector<DistributedHardware::Dm
     }
     return RET_OK;
 }
- 
+
 bool DDMAdapterImpl::CheckSameAccountToLocal(const std::string &networkId)
 {
     CALL_INFO_TRACE;
@@ -147,12 +147,11 @@ void DDMAdapterImpl::OnBoardOnline(const std::string &networkId)
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     FI_HILOGI("Board \'%{public}s\' is online", Utility::Anonymize(networkId).c_str());
-    std::for_each(observers_.cbegin(), observers_.cend(),
-        [&networkId](const auto &item) {
-            if (auto observer = item.Lock(); observer != nullptr) {
-                observer->OnBoardOnline(networkId);
-            }
-        });
+    std::for_each(observers_.cbegin(), observers_.cend(), [&networkId](const auto &item) {
+        if (auto observer = item.Lock(); observer != nullptr) {
+            observer->OnBoardOnline(networkId);
+        }
+    });
 }
 
 void DDMAdapterImpl::OnBoardOffline(const std::string &networkId)
@@ -160,12 +159,11 @@ void DDMAdapterImpl::OnBoardOffline(const std::string &networkId)
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     FI_HILOGI("Board \'%{public}s\' is offline", Utility::Anonymize(networkId).c_str());
-    std::for_each(observers_.cbegin(), observers_.cend(),
-        [&networkId](const auto &item) {
-            if (auto observer = item.Lock(); observer != nullptr) {
-                observer->OnBoardOffline(networkId);
-            }
-        });
+    std::for_each(observers_.cbegin(), observers_.cend(), [&networkId](const auto &item) {
+        if (auto observer = item.Lock(); observer != nullptr) {
+            observer->OnBoardOffline(networkId);
+        }
+    });
 }
 } // namespace DeviceStatus
 } // namespace Msdp

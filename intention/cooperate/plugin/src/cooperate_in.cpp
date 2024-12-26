@@ -26,8 +26,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-CooperateIn::CooperateIn(IStateMachine &parent, IContext *env)
-    : ICooperateState(parent), env_(env)
+CooperateIn::CooperateIn(IStateMachine &parent, IContext *env) : ICooperateState(parent), env_(env)
 {
     initial_ = std::make_shared<Initial>(*this);
     Initial::BuildChains(initial_, *this);
@@ -50,7 +49,7 @@ void CooperateIn::OnEnterState(Context &context)
     env_->GetInput().SetPointerVisibility(!context.NeedHideCursor());
 }
 
-void CooperateIn::OnLeaveState(Context & context)
+void CooperateIn::OnLeaveState(Context &context)
 {
     CALL_INFO_TRACE;
     UpdateCooperateFlagEvent event {
@@ -84,8 +83,7 @@ void CooperateIn::Initial::RemoveChains(std::shared_ptr<Initial> self)
     }
 }
 
-CooperateIn::Initial::Initial(CooperateIn &parent)
-    : ICooperateStep(parent, nullptr), parent_(parent)
+CooperateIn::Initial::Initial(CooperateIn &parent) : ICooperateStep(parent, nullptr), parent_(parent)
 {
     AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
         this->OnDisable(context, event);
@@ -105,29 +103,23 @@ CooperateIn::Initial::Initial(CooperateIn &parent)
     AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, [this](Context &context, const CooperateEvent &event) {
         this->OnBoardOffline(context, event);
     });
-    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnSwitchChanged(context, event);
+    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, [this](Context &context, const CooperateEvent &event) {
+        this->OnSwitchChanged(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusSessionClosed(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, [this](Context &context, const CooperateEvent &event) {
+        this->OnSoftbusSessionClosed(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteStart(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, [this](Context &context, const CooperateEvent &event) {
+        this->OnRemoteStart(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteStop(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, [this](Context &context, const CooperateEvent &event) {
+        this->OnRemoteStop(context, event);
     });
-    AddHandler(CooperateEventType::UPDATE_COOPERATE_FLAG,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnUpdateCooperateFlag(context, event);
+    AddHandler(CooperateEventType::UPDATE_COOPERATE_FLAG, [this](Context &context, const CooperateEvent &event) {
+        this->OnUpdateCooperateFlag(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteInputDevice(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC, [this](Context &context, const CooperateEvent &event) {
+        this->OnRemoteInputDevice(context, event);
     });
 }
 
@@ -143,10 +135,8 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
 
     if (context.IsLocal(startEvent.remoteNetworkId)) {
-        DSoftbusStartCooperateFinished result {
-            .success = false,
-            .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL)
-        };
+        DSoftbusStartCooperateFinished result { .success = false,
+            .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL) };
         context.eventMgr_.StartCooperateFinish(result);
         return;
     }
@@ -299,8 +289,8 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
     if (!context.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[softbus session closed] Disconnected with \'%{public}s\'",
-        Utility::Anonymize(notice.networkId).c_str());
+    FI_HILOGI(
+        "[softbus session closed] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
 }
@@ -341,11 +331,9 @@ void CooperateIn::Initial::OnUpdateCooperateFlag(Context &context, const Coopera
     }
 }
 
-void CooperateIn::Initial::OnProgress(Context &context, const CooperateEvent &event)
-{}
+void CooperateIn::Initial::OnProgress(Context &context, const CooperateEvent &event) { }
 
-void CooperateIn::Initial::OnReset(Context &context, const CooperateEvent &event)
-{}
+void CooperateIn::Initial::OnReset(Context &context, const CooperateEvent &event) { }
 
 CooperateIn::RelayConfirmation::RelayConfirmation(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev)
     : ICooperateStep(parent, prev), parent_(parent)
@@ -359,33 +347,27 @@ CooperateIn::RelayConfirmation::RelayConfirmation(CooperateIn &parent, std::shar
     AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
         this->OnAppClosed(context, event);
     });
-    AddHandler(CooperateEventType::INPUT_POINTER_EVENT,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnPointerEvent(context, event);
+    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, [this](Context &context, const CooperateEvent &event) {
+        this->OnPointerEvent(context, event);
     });
-    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnBoardOffline(context, event);
+    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, [this](Context &context, const CooperateEvent &event) {
+        this->OnBoardOffline(context, event);
     });
-    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnSwitchChanged(context, event);
+    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, [this](Context &context, const CooperateEvent &event) {
+        this->OnSwitchChanged(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusSessionClosed(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, [this](Context &context, const CooperateEvent &event) {
+        this->OnSoftbusSessionClosed(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
-        [this](Context &context, const CooperateEvent &event) {
+    AddHandler(
+        CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED, [this](Context &context, const CooperateEvent &event) {
             this->OnResponse(context, event);
+        });
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, [this](Context &context, const CooperateEvent &event) {
+        this->OnRemoteStart(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteStart(context, event);
-    });
-    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteStop(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, [this](Context &context, const CooperateEvent &event) {
+        this->OnRemoteStop(context, event);
     });
 }
 
@@ -423,8 +405,8 @@ void CooperateIn::RelayConfirmation::OnRemoteStart(Context &context, const Coope
         OnReset(context, event);
         return;
     }
-    parent_.env_->GetTimerManager().AddTimer(DEFAULT_COOLING_TIME, REPEAT_ONCE,
-        [sender = context.Sender(), event]() mutable {
+    parent_.env_->GetTimerManager().AddTimer(
+        DEFAULT_COOLING_TIME, REPEAT_ONCE, [sender = context.Sender(), event]() mutable {
             auto ret = sender.Send(event);
             if (ret != Channel<CooperateEvent>::NO_ERROR) {
                 FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
@@ -460,8 +442,7 @@ void CooperateIn::RelayConfirmation::OnPointerEvent(Context &context, const Coop
 {
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
 
-    if ((notice.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
-        !InputEventBuilder::IsLocalEvent(notice)) {
+    if ((notice.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) || !InputEventBuilder::IsLocalEvent(notice)) {
         return;
     }
     FI_HILOGI("[relay cooperate] Stop cooperation on operation of local pointer");
@@ -488,9 +469,7 @@ void CooperateIn::RelayConfirmation::OnSwitchChanged(Context &context, const Coo
 {
     DDPCooperateSwitchChanged notice = std::get<DDPCooperateSwitchChanged>(event.event);
 
-    if (notice.normal ||
-        (!context.IsPeer(notice.networkId) &&
-         !parent_.process_.IsPeer(notice.networkId))) {
+    if (notice.normal || (!context.IsPeer(notice.networkId) && !parent_.process_.IsPeer(notice.networkId))) {
         return;
     }
     FI_HILOGI("[relay cooperate] Peer(\'%{public}s\') switch off", Utility::Anonymize(notice.networkId).c_str());
@@ -567,10 +546,9 @@ void CooperateIn::RelayConfirmation::OnProgress(Context &context, const Cooperat
     };
     context.dsoftbus_.RelayCooperate(context.Peer(), notice);
 
-    timerId_ = parent_.env_->GetTimerManager().AddTimer(DEFAULT_TIMEOUT, REPEAT_ONCE,
-        [sender = context.Sender(), remoteNetworkId = context.Peer()]() mutable {
-            auto ret = sender.Send(CooperateEvent(
-                CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
+    timerId_ = parent_.env_->GetTimerManager().AddTimer(
+        DEFAULT_TIMEOUT, REPEAT_ONCE, [sender = context.Sender(), remoteNetworkId = context.Peer()]() mutable {
+            auto ret = sender.Send(CooperateEvent(CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
                 DSoftbusRelayCooperateFinished {
                     .networkId = remoteNetworkId,
                     .normal = false,
@@ -583,11 +561,9 @@ void CooperateIn::RelayConfirmation::OnProgress(Context &context, const Cooperat
 
 void CooperateIn::RelayConfirmation::OnReset(Context &context, const CooperateEvent &event)
 {
-    FI_HILOGI("[relay cooperate] reset cooperation with \'%{public}s\'",
-        Utility::Anonymize(parent_.process_.Peer()).c_str());
-    DSoftbusStartCooperateFinished result {
-        .success = false
-    };
+    FI_HILOGI(
+        "[relay cooperate] reset cooperation with \'%{public}s\'", Utility::Anonymize(parent_.process_.Peer()).c_str());
+    DSoftbusStartCooperateFinished result { .success = false };
     context.eventMgr_.StartCooperateFinish(result);
     Reset(context, event);
 }
