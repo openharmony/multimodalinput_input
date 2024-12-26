@@ -40,8 +40,7 @@ constexpr int32_t INVALID_INDEX { -1 };
 #endif // ENABLE_PERFORMANCE_CHECK
 } // namespace
 
-int32_t CooperateClient::RegisterListener(ITunnelClient &tunnel,
-    CooperateListenerPtr listener, bool isCheckPermission)
+int32_t CooperateClient::RegisterListener(ITunnelClient &tunnel, CooperateListenerPtr listener, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
@@ -68,8 +67,8 @@ int32_t CooperateClient::RegisterListener(ITunnelClient &tunnel,
     return RET_OK;
 }
 
-int32_t CooperateClient::UnregisterListener(ITunnelClient &tunnel,
-    CooperateListenerPtr listener, bool isCheckPermission)
+int32_t CooperateClient::UnregisterListener(
+    ITunnelClient &tunnel, CooperateListenerPtr listener, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -94,8 +93,7 @@ listenerLabel:
     return RET_OK;
 }
 
-int32_t CooperateClient::Enable(ITunnelClient &tunnel,
-    CooperateMessageCallback callback, bool isCheckPermission)
+int32_t CooperateClient::Enable(ITunnelClient &tunnel, CooperateMessageCallback callback, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -112,8 +110,7 @@ int32_t CooperateClient::Enable(ITunnelClient &tunnel,
     return RET_OK;
 }
 
-int32_t CooperateClient::Disable(ITunnelClient &tunnel,
-    CooperateMessageCallback callback, bool isCheckPermission)
+int32_t CooperateClient::Disable(ITunnelClient &tunnel, CooperateMessageCallback callback, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -133,8 +130,8 @@ int32_t CooperateClient::Disable(ITunnelClient &tunnel,
     return RET_OK;
 }
 
-int32_t CooperateClient::Start(ITunnelClient &tunnel, const std::string &remoteNetworkId,
-    int32_t startDeviceId, CooperateMessageCallback callback, bool isCheckPermission)
+int32_t CooperateClient::Start(ITunnelClient &tunnel, const std::string &remoteNetworkId, int32_t startDeviceId,
+    CooperateMessageCallback callback, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -157,8 +154,8 @@ int32_t CooperateClient::Start(ITunnelClient &tunnel, const std::string &remoteN
     return RET_OK;
 }
 
-int32_t CooperateClient::Stop(ITunnelClient &tunnel,
-    bool isUnchained, CooperateMessageCallback callback, bool isCheckPermission)
+int32_t CooperateClient::Stop(
+    ITunnelClient &tunnel, bool isUnchained, CooperateMessageCallback callback, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -177,8 +174,8 @@ int32_t CooperateClient::Stop(ITunnelClient &tunnel,
     return RET_OK;
 }
 
-int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel,
-    const std::string &networkId, CooperateStateCallback callback, bool isCheckPermission)
+int32_t CooperateClient::GetCooperateState(
+    ITunnelClient &tunnel, const std::string &networkId, CooperateStateCallback callback, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -205,14 +202,14 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel, const std::str
         FI_HILOGE("Get cooperate state failed udId:%{public}s", Utility::Anonymize(udId).c_str());
         return RET_ERR;
     }
-    FI_HILOGI("GetCooperateState for udId:%{public}s successfully, state:%{public}s",
-        Utility::Anonymize(udId).c_str(), reply.state ? "true" : "false");
+    FI_HILOGI("GetCooperateState for udId:%{public}s successfully, state:%{public}s", Utility::Anonymize(udId).c_str(),
+        reply.state ? "true" : "false");
     state = reply.state;
     return RET_OK;
 }
 
-int32_t CooperateClient::RegisterEventListener(ITunnelClient &tunnel,
-    const std::string &networkId, MouseLocationListenerPtr listener)
+int32_t CooperateClient::RegisterEventListener(
+    ITunnelClient &tunnel, const std::string &networkId, MouseLocationListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
     CHKPR(listener, COMMON_PARAMETER_ERROR);
@@ -234,8 +231,8 @@ int32_t CooperateClient::RegisterEventListener(ITunnelClient &tunnel,
     return RET_OK;
 }
 
-int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
-    const std::string &networkId, MouseLocationListenerPtr listener)
+int32_t CooperateClient::UnregisterEventListener(
+    ITunnelClient &tunnel, const std::string &networkId, MouseLocationListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -256,19 +253,20 @@ int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
         FI_HILOGI("Remove listener for networkId:%{public}s", Utility::Anonymize(networkId).c_str());
         if (eventListener_[networkId].empty()) {
             eventListener_.erase(networkId);
-            FI_HILOGD("No listener for networkId:%{public}s, clean current networkId",
-                Utility::Anonymize(networkId).c_str());
+            FI_HILOGD(
+                "No listener for networkId:%{public}s, clean current networkId", Utility::Anonymize(networkId).c_str());
         }
     }
     if (eventListener_.find(networkId) != eventListener_.end()) {
-        FI_HILOGD("UnregisterEventListener for networkId:%{public}s successfully",
-            Utility::Anonymize(networkId).c_str());
+        FI_HILOGD(
+            "UnregisterEventListener for networkId:%{public}s successfully", Utility::Anonymize(networkId).c_str());
         return RET_OK;
     }
     UnregisterEventListenerParam param { networkId };
     DefaultReply reply;
-    if (int32_t ret = tunnel.RemoveWatch(Intention::COOPERATE,
-        CooperateRequestID::UNREGISTER_EVENT_LISTENER, param, reply); ret != RET_OK) {
+    if (int32_t ret =
+            tunnel.RemoveWatch(Intention::COOPERATE, CooperateRequestID::UNREGISTER_EVENT_LISTENER, param, reply);
+        ret != RET_OK) {
         FI_HILOGE("UnregisterEventListener failed, ret:%{public}d", ret);
         return ret;
     }
@@ -286,8 +284,9 @@ int32_t CooperateClient::AddHotAreaListener(ITunnelClient &tunnel, HotAreaListen
     }
     RegisterHotAreaListenerParam param { GenerateRequestID(), false };
     DefaultReply reply;
-    if (int32_t ret = tunnel.AddWatch(Intention::COOPERATE,
-        CooperateRequestID::REGISTER_HOTAREA_LISTENER, param, reply); ret != RET_OK) {
+    if (int32_t ret =
+            tunnel.AddWatch(Intention::COOPERATE, CooperateRequestID::REGISTER_HOTAREA_LISTENER, param, reply);
+        ret != RET_OK) {
         FI_HILOGE("AddHotAreaListener failed, ret:%{public}d", ret);
         return ret;
     }
@@ -318,8 +317,9 @@ int32_t CooperateClient::RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaLis
     }
     UnregisterHotAreaListenerParam param { GenerateRequestID(), false };
     DefaultReply reply;
-    if (int32_t ret = tunnel.RemoveWatch(Intention::COOPERATE,
-        CooperateRequestID::UNREGISTER_HOTAREA_LISTENER, param, reply); ret != RET_OK) {
+    if (int32_t ret =
+            tunnel.RemoveWatch(Intention::COOPERATE, CooperateRequestID::UNREGISTER_HOTAREA_LISTENER, param, reply);
+        ret != RET_OK) {
         FI_HILOGE("RemoveHotAreaListener failed, ret:%{public}d", ret);
         return ret;
     }
@@ -379,16 +379,13 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
     FinishTrace(userData, CoordinationMessage(nType));
 #endif // ENABLE_PERFORMANCE_CHECK
     FI_HILOGI("NetworkId:%{public}s, nType:%{public}d", Utility::Anonymize(networkId).c_str(), nType);
-    CoordinationMsgInfo msgInfo {
-        .msg = static_cast<CoordinationMessage> (nType),
-        .errCode = errCode
-    };
+    CoordinationMsgInfo msgInfo { .msg = static_cast<CoordinationMessage>(nType), .errCode = errCode };
     OnCooperateMessageEvent(userData, networkId, msgInfo);
     return RET_OK;
 }
 
-void CooperateClient::OnCooperateMessageEvent(int32_t userData,
-    const std::string &networkId, const CoordinationMsgInfo &msgInfo)
+void CooperateClient::OnCooperateMessageEvent(
+    int32_t userData, const std::string &networkId, const CoordinationMsgInfo &msgInfo)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
@@ -465,8 +462,7 @@ int32_t CooperateClient::OnMouseLocationListener(const StreamClient &client, Net
     return RET_OK;
 }
 
-void CooperateClient::OnDevHotAreaListener(int32_t displayX,
-    int32_t displayY, HotAreaType type, bool isEdge)
+void CooperateClient::OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -484,12 +480,12 @@ void CooperateClient::OnDevMouseLocationListener(const std::string &networkId, c
         return;
     }
     for (const auto &listener : eventListener_[networkId]) {
-            CHKPC(listener);
-            listener->OnMouseLocationEvent(networkId, event);
-            FI_HILOGD("Trigger listener for networkId:%{public}s,"
-            "displayX:%{public}d, displayY:%{public}d, displayWidth:%{public}d, displayHeight:%{public}d",
-                Utility::Anonymize(networkId).c_str(), event.displayX, event.displayY,
-                event.displayWidth, event.displayHeight);
+        CHKPC(listener);
+        listener->OnMouseLocationEvent(networkId, event);
+        FI_HILOGD("Trigger listener for networkId:%{public}s,"
+                  "displayX:%{public}d, displayY:%{public}d, displayWidth:%{public}d, displayHeight:%{public}d",
+            Utility::Anonymize(networkId).c_str(), event.displayX, event.displayY, event.displayWidth,
+            event.displayHeight);
     }
 }
 
@@ -522,8 +518,9 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
     std::lock_guard guard { performanceLock_ };
     if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
         if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
-            auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::steady_clock::now() - iter->second).count();
+            auto curDuration =
+                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - iter->second)
+                    .count();
             FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed:%{public}lld ms", userData, curDuration);
             performanceInfo_.traces_.erase(iter);
             performanceInfo_.durationList.push_back(curDuration);
@@ -563,13 +560,14 @@ void CooperateClient::DumpPerformanceInfo()
     }
     int32_t validActivateNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess;
     if (validActivateNum > 0) {
-        performanceInfo_.successRate = (static_cast<float>(performanceInfo_.successNum) * PERCENTAGE) /
-            validActivateNum;
+        performanceInfo_.successRate =
+            (static_cast<float>(performanceInfo_.successNum) * PERCENTAGE) / validActivateNum;
     }
     if (int32_t successNumWithoutFirst = performanceInfo_.successNum - 1; successNumWithoutFirst > 0) {
         performanceInfo_.averageDuration = successDurationSumWithoutFirst / successNumWithoutFirst;
     }
-    FI_HILOGI("[PERF] performanceInfo:"
+    FI_HILOGI(
+        "[PERF] performanceInfo:"
         "activateNum:%{public}d successNum:%{public}d failNum:%{public}d successRate:%{public}.2f "
         "averageDuration:%{public}d ms maxDuration:%{public}d ms minDuration:%{public}d ms failBeforeSucc:%{public}d "
         "firstSuccessDuration:%{public}d ms",
