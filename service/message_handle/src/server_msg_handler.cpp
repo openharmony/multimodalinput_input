@@ -154,17 +154,32 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
-    auto device = INPUT_DEV_MGR->GetKeyboardDevice();
-    CHKPR(device, ERROR_NULL_POINTER);
-    if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
-        MMI_HILOGE("Failed to set the keyboard led");
-        return RET_ERR;
-    }
-    int32_t state = libinput_get_funckey_state(device, funcKey);
-
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    int32_t ret = keyEvent->SetFunctionKey(funcKey, state);
+    bool checkState = keyEvent->GetFunctionKey(funcKey);
+    if (checkState == enable) {
+        MMI_HILOGE("Current device no need to set up");
+        return RET_OK;
+    }
+    std::vector<struct libinput_device*> input_device;
+    int32_t DeviceId = -1;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
+    if (input_device.size() == 0) {
+        MMI_HILOGW("No keyboard device is currently available");
+        return RET_ERR;
+    }
+    for (auto it = input_device.begin(); it != input_device.end(); ++it) {
+        auto device = (*it);
+        DeviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+        if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
+            MMI_HILOGE("Failed to set the keyboard led, device id %{public}d", DeviceId);
+        }
+        int32_t state = libinput_get_funckey_state(device, funcKey);
+        if (state != enable) {
+            MMI_HILOGE("Failed to enable the function key, device id %{public}d", DeviceId);
+        }
+    }
+    int32_t ret = keyEvent->SetFunctionKey(funcKey, enable);
     if (ret != funcKey) {
         MMI_HILOGE("Failed to enable the function key");
         return RET_ERR;
