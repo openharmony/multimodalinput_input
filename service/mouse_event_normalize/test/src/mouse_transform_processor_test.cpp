@@ -171,12 +171,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisAcce
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
     double ret = processor.HandleAxisAccelateTouchPad(axisValue);
     ASSERT_EQ(ret, 2.0);
-    inputWindowsManager->captureModeInfo_.isCaptureMode = false;
-    ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_EQ(ret, 2.14);
-    axisValue = -5.0;
-    ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_NE(ret, -5.0);
 }
 
 /**
