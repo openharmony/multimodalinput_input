@@ -771,6 +771,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
     ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetInputDeviceById(0));
 }
 
+#ifndef OHOS_BUILD_PC_UNIT_TEST
 /**
  * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_05
  * @tc.desc: Test GetInputDeviceById
@@ -793,6 +794,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
     std::string ret = inputDisplayBindHelper.GetInputDeviceById(id);
     EXPECT_EQ(ret, "");
 }
+#endif // OHOS_BUILD_PC_UNIT_TEST
 
 /**
  * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_06
