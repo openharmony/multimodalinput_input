@@ -7409,5 +7409,55 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_003, Test
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWindowPid(windowId));
 }
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+/**
+ * @tc.name: InputWindowsManagerTest_ShiftAppPointerEvent_001
+ * @tc.desc: Test ShiftAppPointerEvent failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastPointerEvent_ = nullptr;
+    int32_t sourceWindowId = 50;
+    int32_t targetWindowId = 51;
+    bool autoGenDown = true;
+    int32_t displayId = 0;
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    inputWindowsManager.lastPointerEvent_ = pointerEvent;
+    ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = sourceWindowId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+    inputWindowsManager.windowsPerDisplay_.clear();
+    windowInfo.flags &= WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+    inputWindowsManager.windowsPerDisplay_.clear();
+    windowInfo.flags = windowInfo.flags & ~WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    inputWindowsManager.transparentWins_[sourceWindowId];
+    EXPECT_NE(ret, RET_OK);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

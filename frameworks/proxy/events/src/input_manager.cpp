@@ -295,6 +295,11 @@ int32_t InputManager::GetPointerSize(int32_t &size)
     return InputMgrImpl.GetPointerSize(size);
 }
 
+int32_t InputManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    return InputMgrImpl.GetCursorSurfaceId(surfaceId);
+}
+
 int32_t InputManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     return InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
@@ -400,9 +405,9 @@ int32_t InputManager::LeaveCaptureMode(int32_t windowId)
     return InputMgrImpl.LeaveCaptureMode(windowId);
 }
 
-void InputManager::AppendExtraData(const ExtraData& extraData)
+int32_t InputManager::AppendExtraData(const ExtraData& extraData)
 {
-    InputMgrImpl.AppendExtraData(extraData);
+    return InputMgrImpl.AppendExtraData(extraData);
 }
 
 int32_t InputManager::EnableInputDevice(bool enable)
@@ -705,6 +710,11 @@ int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
 int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback)
 {
     return InputMgrImpl.SetInputDeviceEnabled(deviceId, enable, callback);
+}
+
+int32_t InputManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+{
+    return InputMgrImpl.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
 }
 } // namespace MMI
 } // namespace OHOS

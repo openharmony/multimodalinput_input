@@ -438,6 +438,14 @@ public:
     int32_t GetPointerSize(int32_t &size);
 
     /**
+     * @brief Gets surface ID of the cursor.
+     * @param size Indicates surface ID of the cursor.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId);
+
+    /**
      * @brief Enable combine key
      * @param enable Indicates whether the combine key is enabled. The value true indicates that the combine key
      * is enabled, and the value false indicates the opposite.
@@ -617,10 +625,10 @@ public:
     /**
      * @brief pointer event添加辅助信息
      * @param extraData 添加的信息.
-     * @return void
+     * @return 设置拖拽数据成功或失败.
      * @since 9
      */
-    void AppendExtraData(const ExtraData& extraData);
+    int32_t AppendExtraData(const ExtraData& extraData);
 
     /**
      * @brief 使能或者禁用输入设备
@@ -1049,6 +1057,16 @@ public:
      * @since 14
      */
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief shift AppPointerEvent from source window to target window
+     * @param sourceWindowId - source window id.
+     * @param targetWindowId - target window id.
+     * @param autoGenDown - send down event if true.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown = true);
 
 private:
     InputManager() = default;

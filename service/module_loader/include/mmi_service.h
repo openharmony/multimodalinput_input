@@ -56,6 +56,7 @@ public:
     int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize(int32_t &size) override;
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
@@ -193,6 +194,7 @@ public:
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

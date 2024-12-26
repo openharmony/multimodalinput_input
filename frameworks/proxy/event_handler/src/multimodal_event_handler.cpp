@@ -150,6 +150,7 @@ int32_t MultimodalEventHandler::UnsubscribeLongPressEvent(int32_t subscribeId)
 bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (client_ != nullptr) {
         if (eventHandler != nullptr) {
             client_->MarkIsEventHandlerChanged(eventHandler);
@@ -176,6 +177,7 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 
 MMIClientPtr MultimodalEventHandler::GetMMIClient()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     CHKPP(client_);
     return client_->GetSharedPtr();
 }
