@@ -354,7 +354,7 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
     int32_t action = pointerEvent_->GetPointerAction();
     for (int32_t i = 0; i < fingerCount; ++i) {
         fingerCoords[i].x = libinput_event_gesture_get_device_coords_x(gesture, i);
-        fingerCoords[i].y = libinput_event_gesture_get_device_coords_y(gesture, i);   
+        fingerCoords[i].y = libinput_event_gesture_get_device_coords_y(gesture, i);
     }
     if (action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
         SmoothMultifingerSwipeData(fingerCoords, fingerCount);
@@ -419,7 +419,7 @@ void TouchPadTransformProcessor::SmoothMultifingerSwipeData(std::vector<Coords>&
         coordDelta /= historyFingerCount;
     }
     for (int32_t i = 0; i < fingerCount; ++i) {
-        if ((fingerCoords[i].x == 0 && fingerCoords[i].y == 0) ) {
+        if (fingerCoords[i].x == 0 && fingerCoords[i].y == 0) {
             fingerCoords[i] = swipeHistory_[i].back() + coordDelta;
             swipeHistory_[i].push_back(fingerCoords[i]);
         }
