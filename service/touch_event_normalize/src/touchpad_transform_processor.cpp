@@ -345,16 +345,24 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
 int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture,
                                                                      int32_t fingerCount)
 {
+    if (fingerCount == 0 || fingerCount > FINGER_COUNT_MAX) {
+        MMI_HILOGD("There are wrong finger counts in swipe action");
+        return RET_ERR;
+    }
     Coords avgCoord {0, 0};
-    if (fingerCount == 0) {
-        MMI_HILOGD("There is no finger in swipe action");
-        return RET_ERR;
-    }
+    std::vector<Coords> fingerCoords(FINGER_COUNT_MAX, avgCoord);
     int32_t action = pointerEvent_->GetPointerAction();
-    if (SmoothMultifingerSwipeData(gesture, fingerCount, action, avgCoord) != RET_OK) {
-        MMI_HILOGD("SmoothMultifingerSwipeData failed");
-        return RET_ERR;
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        fingerCoords[i].x = libinput_event_gesture_get_device_coords_x(gesture, i);
+        fingerCoords[i].y = libinput_event_gesture_get_device_coords_y(gesture, i);   
     }
+    if (action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+        SmoothMultifingerSwipeData(fingerCoords, fingerCount);
+    }
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        avgCoord += fingerCoords[i];
+    }
+    avgCoord /= fingerCount;
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
@@ -378,46 +386,47 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
     return RET_OK;
 }
 
-int32_t TouchPadTransformProcessor::SmoothMultifingerSwipeData(libinput_event_gesture *gesture, int32_t fingerCount,
-                                                               int32_t action, Coords& avgCoord)
+void TouchPadTransformProcessor::SmoothMultifingerSwipeData(std::vector<Coords>& fingerCoords,
+                                                            const int32_t fingerCount)
 {
-    if (fingerCount == 0 || fingerCount > FINGER_COUNT_MAX) {
-        MMI_HILOGD("There is wrong finger counts in swipe action");
-        return RET_ERR;
-    }
-    std::array<Coords, FINGER_COUNT_MAX> fingerCoords;
+    bool isMissing = false;
     Coords coordDelta {0, 0};
     int32_t historyFingerCount = 0;
     for (int32_t i = 0; i < fingerCount; ++i) {
         if (static_cast<int32_t>(swipeHistory_.size()) <= i) {
             swipeHistory_.emplace_back(std::deque<Coords>());
         }
-        fingerCoords[i].x = libinput_event_gesture_get_device_coords_x(gesture, i);
-        fingerCoords[i].y = libinput_event_gesture_get_device_coords_y(gesture, i);
-        if (action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE && (fingerCoords[i].x != 0 || fingerCoords[i].y != 0)) {
+        if (fingerCoords[i].x == 0 && fingerCoords[i].y == 0) {
+            isMissing = true;
+            continue;
+        }
+        swipeHistory_[i].push_back(fingerCoords[i]);
+        if (static_cast<int32_t>(swipeHistory_[i].size()) > fingerCount) {
+            swipeHistory_[i].pop_front();
+        }
+    }
+    if (!isMissing) {
+        return;
+    }
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        int32_t historySize = static_cast<int32_t>(swipeHistory_[i].size()) - 1;
+        if (historySize > 0) {
+            coordDelta += swipeHistory_[i][historySize] - swipeHistory_[i][0];
+            historyFingerCount += historySize;
+        }
+    }
+    if (historyFingerCount > 0) {
+        coordDelta /= historyFingerCount;
+    }
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        if ((fingerCoords[i].x == 0 && fingerCoords[i].y == 0) ) {
+            fingerCoords[i] = swipeHistory_[i].back() + coordDelta;
             swipeHistory_[i].push_back(fingerCoords[i]);
         }
         if (static_cast<int32_t>(swipeHistory_[i].size()) > fingerCount) {
             swipeHistory_[i].pop_front();
         }
-        int32_t historySize = static_cast<int32_t>(swipeHistory_[i].size()) - 1;
-        if (historySize > 0 && action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
-            coordDelta += swipeHistory_[i][historySize] - swipeHistory_[i][0];
-            historyFingerCount += historySize;
-        }
     }
-    if (historyFingerCount != 0) {
-        coordDelta /= historyFingerCount;
-    }
-    for (int32_t i = 0; i < fingerCount; ++i) {
-        if ((fingerCoords[i].x == 0 && fingerCoords[i].y == 0) && action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
-            fingerCoords[i] = swipeHistory_[i].back() + coordDelta;
-            swipeHistory_[i].push_back(fingerCoords[i]);
-        }
-        avgCoord += fingerCoords[i];
-    }
-    avgCoord /= fingerCount;
-    return RET_OK;
 }
 
 int32_t TouchPadTransformProcessor::OnEventTouchPadSwipeBegin(struct libinput_event *event)
