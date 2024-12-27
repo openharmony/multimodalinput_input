@@ -3083,6 +3083,27 @@ public:
      * @since 11
      */
     static const int32_t KEYCODE_CALL_CONTROL_CENTER;
+
+         /**
+     * Dagger Press
+     *
+     * @since 12
+     */
+    static const int32_t KEYCODE_DAGGER_PRESS;
+
+     /**
+     * Dagger Click
+     *
+     * @since 13
+     */
+    static const int32_t KEYCODE_DAGGER_CLICK;
+
+     /**
+     * Dagger Long Press
+     *
+     * @since 14
+     */
+    static const int32_t KEYCODE_DAGGER_LONG_PRESS;
 public:
     class KeyItem {
     public:
