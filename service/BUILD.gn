@@ -306,10 +306,7 @@ ohos_shared_library("libmmi-server") {
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
-    "ability_runtime:dataobs_manager",
-    "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
     "faultloggerd:libbacktrace_local",
@@ -337,8 +334,6 @@ ohos_shared_library("libmmi-server") {
     ]
 
     deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
-
-    external_deps += [ "graphic_2d:librender_service_base" ]
 
     if (input_feature_mouse || input_feature_touchscreen) {
       if (input_feature_mouse) {
@@ -1238,8 +1233,11 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
+    "ability_runtime:dataobs_manager",
+    "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
