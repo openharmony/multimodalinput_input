@@ -7173,7 +7173,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadThreeFingersTapSwitch_00
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
