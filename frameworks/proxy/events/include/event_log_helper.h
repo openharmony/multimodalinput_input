@@ -50,6 +50,7 @@ static constexpr std::string_view DebugTrackingDict =
         " XAV-XAbsValue, YAV-YAbsValue, ZAV-ZAbsValue, RAV-RotateAxisValue";
 
 const std::set<int32_t> g_keyCodeValue = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
     KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_TAB, KeyEvent::KEYCODE_ENTER,
     KeyEvent::KEYCODE_DEL, KeyEvent::KEYCODE_MENU, KeyEvent::KEYCODE_PAGE_UP, KeyEvent::KEYCODE_PAGE_DOWN,
@@ -64,6 +65,9 @@ const std::set<int32_t> g_keyCodeValue = {
     KeyEvent::KEYCODE_MUTE, KeyEvent::KEYCODE_SWITCHVIDEOMODE, KeyEvent::KEYCODE_WLAN, KeyEvent::KEYCODE_SEARCH,
     KeyEvent::KEYCODE_CONFIG, KeyEvent::KEYCODE_MEDIA_RECORD, KeyEvent::KEYCODE_SOUND, KeyEvent::KEYCODE_ASSISTANT,
     KeyEvent::KEYCODE_SCROLL_LOCK, KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_META_RIGHT
+#else
+    KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_POWER
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 class EventLogHelper final {
 public:

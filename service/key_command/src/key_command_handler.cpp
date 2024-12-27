@@ -45,7 +45,9 @@
 #include "mmi_log.h"
 #include "nap_process.h"
 #include "net_packet.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "proto.h"
 #include "setting_datashare.h"
 #include "stylus_key_handler.h"
@@ -76,20 +78,20 @@ constexpr int64_t SOS_DELAY_TIMES { 1000000 };
 constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 15000 };
-const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
-const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
-const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const char* AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
+const char* WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
+const char* SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const char* SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const char* SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 const std::string WALLET_BUNDLE_NAME { "com.hmos.wallet" };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int64_t POWER_ACTION_INTERVAL { 600 };
 constexpr int64_t SOS_WAIT_TIME { 3000 };
-const std::string PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const std::string PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const std::string PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const std::string PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
+const char* PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const char* PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const char* PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const char* PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
 const std::string KEY_ENABLE { "enable" };
 const std::string KEY_STATUS { "status" };
 } // namespace
