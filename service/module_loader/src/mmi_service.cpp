@@ -52,7 +52,9 @@
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 #include "gesturesense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "infrared_emitter_controller.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "input_device_manager.h"
 #include "ipc_skeleton.h"
 #include "i_input_windows_manager.h"
@@ -106,7 +108,7 @@ namespace {
 std::mutex g_instanceMutex;
 MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
-const std::string THREAD_NAME { "mmi_service" };
+const char* THREAD_NAME { "mmi_service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 [[ maybe_unused ]] constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
@@ -123,6 +125,7 @@ constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 const std::set<int32_t> g_keyCodeValueSet = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
     KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
     KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_TAB, KeyEvent::KEYCODE_ENTER,
@@ -134,6 +137,7 @@ const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_F3, KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_F5, KeyEvent::KEYCODE_F6, KeyEvent::KEYCODE_F7,
     KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
     KeyEvent::KEYCODE_NUM_LOCK
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t DEFAULT_USER_ID { 100 };
@@ -375,12 +379,12 @@ int32_t MMIService::Init()
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
     MMI_HILOGI("PointerDrawingManager Init");
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Create epoll failed");
@@ -417,7 +421,7 @@ void MMIService::OnStart()
     MMI_HILOGD("Started successfully");
     AddReloadDeviceTimer();
     t_ = std::thread([this] {this->OnThread();});
-    pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
+    pthread_setname_np(t_.native_handle(), THREAD_NAME);
     eventMonitorThread_ = std::thread(&EventStatistic::WriteEventFile);
     pthread_setname_np(eventMonitorThread_.native_handle(), "event-monitor");
     auto keyHandler = InputHandler->GetKeyCommandHandler();
@@ -2856,6 +2860,7 @@ int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
 int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies)
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGI("Start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
     if (!InfraredEmitterController::GetInstance()->GetFrequencies(infos)) {
@@ -2875,12 +2880,14 @@ int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
         ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
     MMI_HILOGD("Data from hdf context:%{public}s", context.c_str());
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     std::string context = "infraredFrequency:" + std::to_string(number) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
@@ -2891,6 +2898,7 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
         MMI_HILOGE("Failed to transmit");
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 

@@ -114,12 +114,14 @@ private:
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
-    void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
     double HandleAxisAccelateTouchPad(double axisValue);
+#endif // OHOS_BUILD_ENABLE_WATCH
+    void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);

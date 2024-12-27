@@ -44,7 +44,9 @@
 #include "parameters.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "touch_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -128,8 +130,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             return checkReturn;
         }
     }
-    int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
-    keyEvent->SetKeyIntention(keyIntention);
+    keyEvent->SetKeyIntention(KeyItemsTransKeyIntention(keyEvent->GetKeyItems()));
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
@@ -214,7 +215,9 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
                 !(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) &&
                 !IsNavigationWindowInjectEvent(pointerEvent)) {
+#ifndef OHOS_BUILD_ENABLE_WATCH
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_WATCH
             }
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
@@ -868,7 +871,9 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 void ServerMsgHandler::LaunchAbility()
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     AUTH_DIALOG.ConnectSystemUi();
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
@@ -887,12 +892,10 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             MMI_HILOGE("The injection permission has been granted. authPid:%{public}d ", authorPid);
             return ERR_OK;
         }
-
         InjectNoticeInfo noticeInfo;
         noticeInfo.pid = authorPid;
         AddInjectNotice(noticeInfo);
-        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(authorPid,
-            [&] (int32_t pid) {
+        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, [&] (int32_t pid) {
                 CloseInjectNotice(pid);
         });
         if (result != RET_OK) {
@@ -915,7 +918,6 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
         }
     }
-
     return ERR_OK;
 }
 
@@ -938,7 +940,6 @@ int32_t ServerMsgHandler::OnCancelInjection(int32_t callPid)
             CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
         }
     }
-
     return ERR_OK;
 }
 
