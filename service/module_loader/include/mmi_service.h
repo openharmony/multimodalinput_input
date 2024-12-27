@@ -208,13 +208,10 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ReadMouseScrollRows(int32_t &rows);
     int32_t ReadPointerSize(int32_t &size);
-#ifndef OHOS_BUILD_ENABLE_WATCH
     int32_t ReadMousePrimaryButton(int32_t &primaryButton);
     int32_t ReadPointerSpeed(int32_t &speed);
-#endif // OHOS_BUILD_ENABLE_WATCH
     int32_t ReadHoverScrollState(bool &state);
     int32_t ReadPointerColor(int32_t &color);
-#ifndef OHOS_BUILD_ENABLE_WATCH
     int32_t ReadTouchpadScrollSwich(bool &switchFlag);
     int32_t ReadTouchpadScrollDirection(bool &state);
     int32_t ReadTouchpadTapSwitch(bool &switchFlag);
@@ -225,7 +222,6 @@ protected:
     int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
     int32_t ReadTouchpadDoubleTapAndDragState(bool &switchFlag);
     int32_t ReadTouchpadScrollRows(int32_t &rows);
-#endif // OHOS_BUILD_ENABLE_WATCH
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
