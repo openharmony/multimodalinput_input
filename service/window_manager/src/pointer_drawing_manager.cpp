@@ -2157,14 +2157,6 @@ int32_t PointerDrawingManager::UpdateLoadingAndLoadingRightPixelMap()
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
-    if (surfaceNode_ != nullptr) {
-        float alphaRatio = (static_cast<uint32_t>(color) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
-        if (alphaRatio > 1) {
-            MMI_HILOGW("Invalid alphaRatio:%{public}f", alphaRatio);
-        } else {
-            surfaceNode_->SetAlpha(1 - alphaRatio);
-        }
-    }
     MMI_HILOGI("PointerColor:%{public}x", color);
     // ARGB从表面看比RGB多了个A，也是一种色彩模式，是在RGB的基础上添加了Alpha（透明度）通道。
     // 透明度也是以0到255表示的，所以也是总共有256级，透明是0，不透明是255。
@@ -2178,18 +2170,28 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         return ret;
     }
     MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
+    if (!WIN_MGR->GetExtraData().drawCursor) {
+        if (surfaceNode_ != nullptr) {
+            float alphaRatio = (static_cast<uint32_t>(color) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
+            if (alphaRatio > 1) {
+                MMI_HILOGW("Invalid alphaRatio:%{public}f", alphaRatio);
+            } else {
+                surfaceNode_->SetAlpha(1 - alphaRatio);
+            }
+        }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (HasMagicCursor()) {
-        ret = MAGIC_CURSOR->SetPointerColor(color);
-    } else {
-        ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    }
+        if (HasMagicCursor()) {
+            ret = MAGIC_CURSOR->SetPointerColor(color);
+        } else {
+            ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+        }
 #else
-    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+        ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (ret != RET_OK) {
-        MMI_HILOGE("Init layer failed");
-        return RET_ERR;
+        if (ret != RET_OK) {
+            MMI_HILOGE("Init layer failed");
+            return RET_ERR;
+        }
     }
     UpdatePointerVisible();
     SetHardwareCursorPosition(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, lastMouseStyle_);
@@ -2448,9 +2450,11 @@ void PointerDrawingManager::UpdatePointerVisible()
         MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s",
             mouseDisplayState_ ? "true" : "false");
     } else {
-        surfaceNode_->SetVisible(false);
-        MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s",
-            mouseDisplayState_ ? "true" : "false");
+        if (!WIN_MGR->GetExtraData().drawCursor) {
+            surfaceNode_->SetVisible(false);
+            MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s",
+                mouseDisplayState_ ? "true" : "false");
+        }
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -2771,7 +2775,9 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         // Draw mouse style only when the current window is the top-level window
         if (!WIN_MGR->SelectPointerChangeArea(windowId, lastPhysicalX_ + displayInfo_.x,
             lastPhysicalY_ + displayInfo_.y)) {
-            DrawPointerStyle(pointerStyle);
+            if (!WIN_MGR->GetExtraData().drawCursor) {
+                DrawPointerStyle(pointerStyle);
+            }
         } else {
             MMI_HILOGW("skip the pointerstyle");
         }
