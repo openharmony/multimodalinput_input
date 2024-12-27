@@ -336,6 +336,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
         MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
+        swipeHistory_.clear();
         DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
     }
 
