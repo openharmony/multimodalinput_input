@@ -486,13 +486,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_04, TestSize.Level
 }
 
 /**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_05
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_08
  * @tc.desc: Verify subscribe key event.
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_05, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_08, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::set<int32_t> preKeys;
