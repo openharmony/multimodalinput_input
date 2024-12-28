@@ -1899,6 +1899,7 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
     READINT32(data, extraData.pointerId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.pullId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.eventId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, extraData.drawCursor, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = AppendExtraData(extraData);
     if (ret != RET_OK) {
         MMI_HILOGE("Fail to call AppendExtraData, ret:%{public}d", ret);
