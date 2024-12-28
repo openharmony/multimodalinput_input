@@ -382,10 +382,10 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
-    KeyRepeat->SelectAutoRepeat(keyEvent);
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
 #endif // SHORTCUT_KEY_RULES_ENABLED
+    KeyRepeat->SelectAutoRepeat(keyEvent);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
