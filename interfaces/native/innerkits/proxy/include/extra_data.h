@@ -69,6 +69,12 @@ struct ExtraData {
      * @since 13
      */
     int32_t eventId { -1 };
+    /*
+     * 使用硬光标绘制功能
+     *
+     * @since 13
+     */
+    bool drawCursor { false };
 };
 } // namespace MMI
 } // namespace OHOS
