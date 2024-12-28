@@ -121,9 +121,9 @@ constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 std::map<Rosen::ScreenId, sptr<Rosen::ScreenInfo>> g_screenSourceMode;
-bool g_hasMirrorScreen { false };
-bool g_hasExtendScreen { false };
-bool g_hasVirtualScreen { false };
+std::atomic<bool> g_hasMirrorScreen { false };
+std::atomic<bool> g_hasExtendScreen { false };
+std::atomic<bool> g_hasVirtualScreen { false };
 std::mutex screenMtx;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace
@@ -151,17 +151,17 @@ void PointerDrawingManager::InitScreenInfo()
 
 void UpdateScreenModeChange()
 {
-    g_hasMirrorScreen = false;
-    g_hasExtendScreen = false;
-    g_hasVirtualScreen = false;
+    g_hasMirrorScreen.store(false);
+    g_hasExtendScreen.store(false);
+    g_hasVirtualScreen.store(false);
     for (auto iter = g_screenSourceMode.begin(); iter != g_screenSourceMode.end(); ++iter) {
         if (iter->second->GetType() == Rosen::ScreenType::REAL &&
             iter->second->GetSourceMode() == Rosen::ScreenSourceMode::SCREEN_MIRROR) {
-            g_hasMirrorScreen = true;
+            g_hasMirrorScreen.store(true);
         } else if (iter->second->GetSourceMode() == Rosen::ScreenSourceMode::SCREEN_EXTEND) {
-            g_hasExtendScreen = true;
+            g_hasExtendScreen.store(true);
         } else if (iter->second->GetType() == Rosen::ScreenType::VIRTUAL) {
-            g_hasVirtualScreen = true;
+            g_hasVirtualScreen.store(true);
         } else {
             MMI_HILOGE("no screenType match");
         }
@@ -403,11 +403,8 @@ bool PointerDrawingManager::SetDynamicHardWareCursorLocation
 void PointerDrawingManager::PostTaskRSLocation(int32_t physicalX, int32_t physicalY,
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode)
 {
-    {
-        std::lock_guard<std::mutex> guard(screenMtx);
-        if (!(g_hasMirrorScreen || g_hasVirtualScreen)) {
-            return;
-        }
+    if (!(g_hasMirrorScreen.load() || g_hasVirtualScreen.load())) {
+        return;
     }
     hardwareCanvasSize_ = g_hardwareCanvasSize;
     PostTask([this, physicalX, physicalY, surfaceNode]() -> void {
