@@ -41,7 +41,6 @@ constexpr int32_t MAGIC_POINTER_SIZE { 1 };
 constexpr int32_t POINTER_STYLE { 0 };
 constexpr int32_t ERROR_DELAY_VALUE { -1000 };
 constexpr bool BOOL_DEFAULT { true };
-constexpr bool BOOL_DEFAULT_FALSE { false };
 const std::string PATH { "/data/service/el1/public/multimodalinput/" };
 const std::string SHORT_KEY_FILE_NAME { "Settings.xml" };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
@@ -109,7 +108,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     touchpadScrollDirection_ = touchpadPref->GetBool(strTouchpadScrollDirection_, BOOL_DEFAULT);
     touchpadThreeFingerTapSwitch_ = touchpadPref->GetBool(strTouchpadThreeFingerTapSwitch_, BOOL_DEFAULT);
     touchpadScrollRows_ = touchpadPref->GetInt(strTouchpadScrollRows_, TOUCHPAD_SCROLL_ROWS);
-    touchpadDoubleTapAndDrag_ = touchpadPref->GetBool(strTouchpadDoubleTapAndDrag_, BOOL_DEFAULT_FALSE);
+    touchpadDoubleTapAndDrag_ = touchpadPref->GetBool(strTouchpadDoubleTapAndDrag_, BOOL_DEFAULT);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     magicPointerSize_ = mousePref->GetInt(strMagicPointerSize_, MAGIC_POINTER_SIZE);
     magicPointerColor_ = mousePref->GetInt(strMagicPointerColor_, POINTER_COLOR);
