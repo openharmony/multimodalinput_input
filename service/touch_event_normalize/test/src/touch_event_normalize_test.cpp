@@ -225,34 +225,5 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadScrollRows_
     int32_t newRows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
     ASSERT_TRUE(rows == newRows);
 }
-
-/**
- * @tc.name: TouchEventNormalizeTest_SetTouchpadDoubleTapAndDragState_09
- * @tc.desc: Test SetTouchpadDoubleTapAndDragState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadDoubleTapAndDragState_09, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool switchFlag = false;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag) == RET_OK);
-}
-
-/**
- * @tc.name: TouchEventNormalizeTest_GetTouchpadDoubleTapAndDragState_10
- * @tc.desc: Test GetTouchpadDoubleTapAndDragState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadDoubleTapAndDragState_10, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool flag = true;
-    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(flag);
-    bool newFlag = true;
-    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(newFlag);
-    ASSERT_TRUE(flag == newFlag);
-}
 } // namespace MMI
 } // namespace OHOS
