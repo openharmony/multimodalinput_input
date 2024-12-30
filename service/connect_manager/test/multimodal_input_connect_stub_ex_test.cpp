@@ -4977,7 +4977,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetShieldStatus_005, TestSize.Level
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, CheckDispatchControl()).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(true)));
     EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
