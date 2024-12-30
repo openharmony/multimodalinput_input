@@ -1924,6 +1924,10 @@ void InputWindowsManager::RotateDisplayScreen(const DisplayInfo& info, PhysicalC
 void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
     const DisplayInfo& info, EventTouch& touchInfo)
 {
+    MMI_HILOGI("DisplayInfo.width:%{public}d, DisplayInfo.height:%{public}d, "
+               "DisplayInfo.topLeftX:%{public}d, DisplayInfo.topLeftY:%{public}d, "
+                "DisplayInfo.offsetX:%{public}d, DisplayInfo.offsetY:%{public}d",
+                info.width, info.height, info.x, info.y, info.offsetX, info.offsetY);
     auto width = info.width;
     auto height = info.height;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
@@ -1938,6 +1942,8 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     };
     MMI_HILOGD("width:%{private}d, height:%{private}d, physicalX:%{private}f, physicalY:%{private}f",
         width, height, coord.x, coord.y);
+    coord.x = coord.x - info.offsetX;
+    coord.y = coord.y - info.offsetY;
     RotateScreen(info, coord);
     touchInfo.point.x = static_cast<int32_t>(coord.x);
     touchInfo.point.y = static_cast<int32_t>(coord.y);
