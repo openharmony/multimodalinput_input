@@ -704,7 +704,8 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.dpi << item.name << item.uniq << item.direction
-            << item.displayDirection << item.displayMode << item.transform << item.ppi;
+            << item.displayDirection << item.displayMode << item.transform << item.ppi << item.offsetX
+            << item.offsetY;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
