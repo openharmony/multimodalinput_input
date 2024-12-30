@@ -92,6 +92,7 @@ public:
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;
@@ -134,7 +135,7 @@ private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
-    bool RetryGetSurfaceBuffer(sptr<OHOS::SurfaceBuffer> buffer, sptr<OHOS::Surface> layer);
+    sptr<OHOS::SurfaceBuffer> RetryGetSurfaceBuffer(sptr<OHOS::Surface> layer);
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
     void DrawManager();
@@ -201,6 +202,11 @@ private:
     void DrawTraditionsCursor(MOUSE_ICON mouseStyle);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void InitScreenInfo();
+    void DumpScreenInfo(std::ostringstream& oss);
+    bool IsSupported() override;
+    int32_t PrepareBuffer(uint32_t width, uint32_t height);
+    int32_t DrawHardwareCursor(const MOUSE_ICON mouseStyle);
+    int32_t DrawCursor(const MOUSE_ICON mouseStyle, uint32_t width, uint32_t height);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
@@ -267,6 +273,8 @@ private:
     std::mutex mtx_;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
+    std::vector<sptr<OHOS::SurfaceBuffer>> cursorBuffers_;
+    uint32_t bufferId_ { 0 };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR

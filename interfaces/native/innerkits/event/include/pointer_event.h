@@ -1347,7 +1347,7 @@ public:
      * returns <b>false</b> otherwise.
      * @since 9
      */
-    bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);
+    bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem) const;
 
     /**
      * @brief Adds a pointer item.
@@ -1747,6 +1747,9 @@ public:
     double GetFingerprintDistanceY() const;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
+    void SetScrollRows(int32_t scrollRows);
+    int32_t GetScrollRows() const;
+
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
@@ -1767,6 +1770,10 @@ private:
     bool ReadAxisFromParcel(Parcel &in);
 
 private:
+    struct Settings {
+        int32_t scrollRows_ {};
+    };
+
     int32_t pointerId_ { -1 };
     std::list<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;
@@ -1794,6 +1801,7 @@ private:
     bool ancoDeal_ { false };
 #endif // OHOS_BUILD_ENABLE_ANCO
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
+    Settings settings_ {};
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

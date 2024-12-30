@@ -295,6 +295,11 @@ int32_t InputManager::GetPointerSize(int32_t &size)
     return InputMgrImpl.GetPointerSize(size);
 }
 
+int32_t InputManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    return InputMgrImpl.GetCursorSurfaceId(surfaceId);
+}
+
 int32_t InputManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     return InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
@@ -400,9 +405,9 @@ int32_t InputManager::LeaveCaptureMode(int32_t windowId)
     return InputMgrImpl.LeaveCaptureMode(windowId);
 }
 
-void InputManager::AppendExtraData(const ExtraData& extraData)
+int32_t InputManager::AppendExtraData(const ExtraData& extraData)
 {
-    InputMgrImpl.AppendExtraData(extraData);
+    return InputMgrImpl.AppendExtraData(extraData);
 }
 
 int32_t InputManager::EnableInputDevice(bool enable)
@@ -528,6 +533,16 @@ int32_t InputManager::SetTouchpadRotateSwitch(bool rotateSwitch)
 int32_t InputManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
     return InputMgrImpl.GetTouchpadRotateSwitch(rotateSwitch);
+}
+
+int32_t InputManager::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadDoubleTapAndDragState(switchFlag);
 }
 
 int32_t InputManager::EnableHardwareCursorStats(bool enable)
@@ -690,6 +705,16 @@ int32_t InputManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>
 int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
 {
     return InputMgrImpl.ConvertToCapiKeyAction(keyAction);
+}
+
+int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback)
+{
+    return InputMgrImpl.SetInputDeviceEnabled(deviceId, enable, callback);
+}
+
+int32_t InputManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+{
+    return InputMgrImpl.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -83,14 +83,12 @@ int32_t HotArea::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void HotArea::CheckInHotArea()
 {
     CALL_DEBUG_ENTER;
-    if (displayX_ <= HOT_AREA_WIDTH && displayY_ >= HOT_AREA_MARGIN &&
-        displayY_ <= (height_ - HOT_AREA_MARGIN)) {
+    if (displayX_ <= HOT_AREA_WIDTH && displayY_ >= HOT_AREA_MARGIN && displayY_ <= (height_ - HOT_AREA_MARGIN)) {
         type_ = HotAreaType::AREA_LEFT;
     } else if (displayX_ >= (width_ - HOT_AREA_WIDTH) && displayY_ >= HOT_AREA_MARGIN &&
         displayY_ <= (height_ - HOT_AREA_MARGIN)) {
         type_ = HotAreaType::AREA_RIGHT;
-    } else if (displayY_ <= HOT_AREA_WIDTH && displayX_ >= HOT_AREA_MARGIN &&
-        displayX_ <= (width_ - HOT_AREA_MARGIN)) {
+    } else if (displayY_ <= HOT_AREA_WIDTH && displayX_ >= HOT_AREA_MARGIN && displayX_ <= (width_ - HOT_AREA_MARGIN)) {
         type_ = HotAreaType::AREA_TOP;
     } else if (displayY_ >= (height_ - HOT_AREA_WIDTH) && displayX_ >= HOT_AREA_MARGIN &&
         displayX_ <= (width_ - HOT_AREA_MARGIN)) {
@@ -132,7 +130,7 @@ void HotArea::OnHotAreaMessage(HotAreaType msg, bool isEdge)
 
 void HotArea::OnClientDied(const ClientDiedEvent &event)
 {
-    FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
+    FI_HILOGI("Remove client died listener, pid:%{public}d", event.pid);
     callbacks_.erase(HotAreaInfo { .pid = event.pid });
 }
 

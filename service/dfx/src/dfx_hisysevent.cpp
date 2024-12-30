@@ -46,24 +46,24 @@ constexpr int32_t DOWN_TO_PREV_UP_MAX_TIME_THRESHOLD { 1000 * 1000 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string EMPTY_STRING { "" };
-const std::string LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
-const std::string ACC_PATH { "/sys/devices/platform/_sensor/acc_info" };
-const std::string ACC0_PATH { "/sys/class/sensors/acc_sensor/info" };
-const std::string TP_PATH { "/sys/touchscreen/touch_chip_info" };
-const std::string TP0_PATH { "/sys/touchscreen0/touch_chip_info" };
-const std::string TP1_PATH { "/sys/touchscreen1/touch_chip_info" };
+const char* LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
+const char* ACC_PATH { "/sys/devices/platform/_sensor/acc_info" };
+const char* ACC0_PATH { "/sys/class/sensors/acc_sensor/info" };
+const char* TP_PATH { "/sys/touchscreen/touch_chip_info" };
+const char* TP0_PATH { "/sys/touchscreen0/touch_chip_info" };
+const char* TP1_PATH { "/sys/touchscreen1/touch_chip_info" };
 } // namespace
 
-static std::string GetVendorInfo(const std::string &nodePath)
+static std::string GetVendorInfo(const char* nodePath)
 {
     char realPath[PATH_MAX] = {};
-    if (realpath(nodePath.c_str(), realPath) == nullptr) {
+    if (realpath(nodePath, realPath) == nullptr) {
         MMI_HILOGE("The realpath return nullptr");
         return "";
     }
     std::ifstream file(realPath);
     if (!file.is_open()) {
-        MMI_HILOGE("Unable to open file:%{public}s, error:%{public}d", nodePath.c_str(), errno);
+        MMI_HILOGE("Unable to open file:%{public}s, error:%{public}d", nodePath, errno);
         return "";
     }
     std::string vendorInfo;
@@ -510,6 +510,7 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
         { TOUCHPAD_TAP_SETTING, "TOUCHPAD_TAP_SETTING" },
         { TOUCHPAD_SWIPE_SETTING, "TOUCHPAD_SWIPE_SETTING" },
         { TOUCHPAD_PINCH_SETTING, "TOUCHPAD_PINCH_SETTING" },
+        { TOUCHPAD_DOUBLE_TAP_DRAG_SETTING, "TOUCHPAD_DOUBLE_TAP_DRAG_SETTING" },
     };
 
     auto it = mapSettingCodeToSettingType.find(settingCode);

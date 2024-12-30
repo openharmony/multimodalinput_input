@@ -488,7 +488,7 @@ FingersenseWrapper::FingersenseWrapper() {}
 
 FingersenseWrapper::~FingersenseWrapper() {}
 
-bool UDSSession::SendMsg(NetPacket &pkt) const
+bool UDSSession::SendMsg(NetPacket &pkt)
 {
     if (DfsMessageParcel::messageParcel == nullptr) {
         return false;

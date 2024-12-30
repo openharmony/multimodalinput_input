@@ -66,7 +66,7 @@ void CrownTransformProcessorTest::TearDownTestCase(void)
 void CrownTransformProcessorTest::SetupCrown()
 {
     ASSERT_TRUE(vCrown_.SetUp());
-    MMI_HILOGD("Device node name: %{public}s", vCrown_.GetDevPath().c_str());
+    MMI_HILOGD("Device node name:%{public}s", vCrown_.GetDevPath().c_str());
     ASSERT_TRUE(libinput_.AddPath(vCrown_.GetDevPath()));
 
     libinput_event *event = libinput_.Dispatch();
@@ -133,7 +133,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_0
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::string name = libinput_device_get_name(dev);
-    MMI_HILOGD("Pointer device: %{public}s", name.c_str());
+    MMI_HILOGD("Pointer device:%{public}s", name.c_str());
     ASSERT_TRUE(CROWN_EVENT_HDR->IsCrownEvent(event));
 }
 
@@ -154,7 +154,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotat
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::string name = libinput_device_get_name(dev);
-    MMI_HILOGD("Pointer device: %{public}s", name.c_str());
+    MMI_HILOGD("Pointer device:%{public}s", name.c_str());
     int32_t result = CROWN_EVENT_HDR->NormalizeRotateEvent(event);
     EXPECT_NE(result, RET_OK);
 }
@@ -175,7 +175,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::string name = libinput_device_get_name(dev);
-    MMI_HILOGD("Pointer device: %{public}s", name.c_str());
+    MMI_HILOGD("Pointer device:%{public}s", name.c_str());
     struct libinput_event_pointer *rawPointerEvent = libinput_event_get_pointer_event(event);
     ASSERT_TRUE(rawPointerEvent != nullptr);
     int32_t result = CROWN_EVENT_HDR->HandleCrownRotateBegin(rawPointerEvent);
@@ -198,7 +198,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::string name = libinput_device_get_name(dev);
-    MMI_HILOGD("Pointer device: %{public}s", name.c_str());
+    MMI_HILOGD("Pointer device:%{public}s", name.c_str());
     struct libinput_event_pointer *rawPointerEvent = libinput_event_get_pointer_event(event);
     ASSERT_TRUE(rawPointerEvent != nullptr);
     int32_t result = CROWN_EVENT_HDR->HandleCrownRotateUpdate(rawPointerEvent);
@@ -233,7 +233,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::string name = libinput_device_get_name(dev);
-    MMI_HILOGD("Pointer device: %{public}s", name.c_str());
+    MMI_HILOGD("Pointer device:%{public}s", name.c_str());
     struct libinput_event_pointer *rawPointerEvent = libinput_event_get_pointer_event(event);
     ASSERT_TRUE(rawPointerEvent != nullptr);
     int32_t result = CROWN_EVENT_HDR->HandleCrownRotateBeginAndUpdate(rawPointerEvent,

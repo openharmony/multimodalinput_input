@@ -17,6 +17,7 @@
 #include <cinttypes>
 
 #include <gtest/gtest.h>
+#include "display_event_monitor.h"
 #include "input_event_handler.h"
 #include "libinput.h"
 #include "pixel_map.h"
@@ -1603,25 +1604,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_002, TestSize.Le
     handler.authorizationCollection_.clear();
     int32_t result = handler.OnAuthorize(false);
     EXPECT_EQ(result, ERR_OK);
-    EXPECT_EQ(handler.authorizationCollection_[12345], AuthorizationStatus::UNAUTHORIZED);
 }
 
-/**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_004
- * @tc.desc: Test the function OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.CurrentPID_ = 12345;
-    handler.authorizationCollection_[12345] = AuthorizationStatus::UNAUTHORIZED;
-    int32_t result = handler.OnAuthorize(false);
-    EXPECT_EQ(result, ERR_OK);
-    EXPECT_EQ(handler.authorizationCollection_[12345], AuthorizationStatus::UNAUTHORIZED);
-}
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
@@ -1639,6 +1623,23 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_002, TestSize.Le
     ASSERT_NE(pointerEvent_, nullptr);
     int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_004
+ * @tc.desc: Test the function OnAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.CurrentPID_ = 12345;
+    handler.authorizationCollection_[12345] = AuthorizationStatus::UNAUTHORIZED;
+    int32_t result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(handler.authorizationCollection_[12345], AuthorizationStatus::UNAUTHORIZED);
 }
 
 /**
@@ -1673,6 +1674,67 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState_002, T
     bool enable = true;
     INPUT_DEV_MGR->IsKeyboardDevice(nullptr);
     EXPECT_EQ(handler.OnSetFunctionKeyState(funcKey, enable), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_IsNavigationWindowInjectEvent
+ * @tc.desc: Test the function IsNavigationWindowInjectEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_IsNavigationWindowInjectEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->zOrder_ = 1;
+    bool ret = false;
+    ret = handler.IsNavigationWindowInjectEvent(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveGestureMonitor
+ * @tc.desc: Test the function OnRemoveGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveGestureMonitor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto udsSe = std::make_shared<UDSSession>("mytest", 2, 3, 4, 5);
+    InputHandlerType inputHandlerType = InputHandlerType::MONITOR;
+    uint32_t eventType = HANDLE_EVENT_TYPE_KEY;
+    uint32_t gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    uint32_t fingers = 3;
+    InputHandler->eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
+    int32_t ret = handler.OnRemoveGestureMonitor(udsSe, inputHandlerType, eventType, gestureType, fingers);
+    ASSERT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddGestureMonitor
+ * @tc.desc: Test the function OnAddGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddGestureMonitor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto udsSe = std::make_shared<UDSSession>("mytest", 2, 3, 4, 5);
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    uint32_t eventType = HANDLE_EVENT_TYPE_KEY;
+    uint32_t gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    uint32_t fingers = 3;
+    InputHandler->eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
+    int32_t ret = handler.OnAddGestureMonitor(udsSe, handlerType, eventType, gestureType, fingers);
+    ASSERT_NE(ret, RET_OK);
+
+    handlerType = InputHandlerType::NONE;
+    ret = handler.OnAddGestureMonitor(udsSe, handlerType, eventType, gestureType, fingers);
+    ASSERT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -189,6 +189,13 @@ int32_t MultimodalInputConnectManager::GetPointerSize(int32_t &size)
     return multimodalInputConnectService_->GetPointerSize(size);
 }
 
+int32_t MultimodalInputConnectManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetCursorSurfaceId(surfaceId);
+}
+
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -736,6 +743,20 @@ int32_t MultimodalInputConnectManager::GetTouchpadRotateSwitch(bool &rotateSwitc
     return multimodalInputConnectService_->GetTouchpadRotateSwitch(rotateSwitch);
 }
 
+int32_t MultimodalInputConnectManager::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
 int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -939,6 +960,22 @@ int32_t MultimodalInputConnectManager::GetAllSystemHotkeys(std::vector<std::uniq
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetAllSystemHotkeys(keyOptions);
+}
+
+int32_t MultimodalInputConnectManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetInputDeviceEnabled(deviceId, enable, index);
+}
+
+int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(int32_t sourceWindowId,
+                                                            int32_t targetWindowId, bool autoGenDown)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -32,7 +32,7 @@ public:
 
 class ICooperateState {
 public:
-    ICooperateState(IStateMachine &parent) : parent_(parent) {}
+    ICooperateState(IStateMachine &parent) : parent_(parent) { }
     virtual ~ICooperateState() = default;
 
     virtual void OnEvent(Context &context, const CooperateEvent &event) = 0;
@@ -52,7 +52,7 @@ protected:
         void SetNext(std::shared_ptr<ICooperateStep> next);
 
     protected:
-        void AddHandler(CooperateEventType event, std::function<void(Context&, const CooperateEvent&)> handler)
+        void AddHandler(CooperateEventType event, std::function<void(Context &, const CooperateEvent &)> handler)
         {
             handlers_.emplace(event, handler);
         }
@@ -65,7 +65,7 @@ protected:
         ICooperateState &parent_;
         std::shared_ptr<ICooperateStep> prev_ { nullptr };
         std::shared_ptr<ICooperateStep> next_ { nullptr };
-        std::map<CooperateEventType, std::function<void(Context&, const CooperateEvent&)>> handlers_;
+        std::map<CooperateEventType, std::function<void(Context &, const CooperateEvent &)>> handlers_;
     };
 
     class Process final {

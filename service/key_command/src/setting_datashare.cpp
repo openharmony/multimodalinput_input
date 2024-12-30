@@ -45,7 +45,7 @@ const std::string SETTING_COLUMN_VALUE { "VALUE" };
 const std::string SETTING_URI_PROXY { "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true" };
 const std::string SETTING_URI_USER_PROXY {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true" };
-const std::string SETTINGS_DATA_EXT_URI { "datashare:///com.ohos.settingsdata.DataAbility" };
+const char* SETTINGS_DATA_EXT_URI { "datashare:///com.ohos.settingsdata.DataAbility" };
 constexpr int32_t DECIMAL_BASE { 10 };
 constexpr const int32_t E_OK{ 0 };
 constexpr const int32_t E_DATA_SHARE_NOT_READY { 1055 };
@@ -144,7 +144,10 @@ void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     BytraceAdapter::StartDataShare(observer->GetKey());
-    CHKPR(observer, RET_ERR);
+    if (observer == nullptr) {
+        BytraceAdapter::StopDataShare();
+        return RET_ERR;
+    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey(), strUri);
     auto helper = CreateDataShareHelper(strUri);
@@ -166,7 +169,10 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     BytraceAdapter::StartDataShare(observer->GetKey());
-    CHKPR(observer, RET_ERR);
+    if (observer == nullptr) {
+        BytraceAdapter::StopDataShare();
+        return RET_ERR;
+    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey(), strUri);
     auto helper = CreateDataShareHelper(strUri);
@@ -268,7 +274,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
     }
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
     if (strUri.empty()) {
-        ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
+        ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
     } else {
         ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, "");
     }

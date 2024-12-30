@@ -98,6 +98,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
 
@@ -112,17 +113,16 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     Offset offset { unaccelerated_.dx, unaccelerated_.dy };
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
-#ifndef OHOS_BUILD_EMULATOR
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        Direction displayDirection = static_cast<Direction>((
-            ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        CalculateOffset(displayDirection, offset);
-    }
-#endif // OHOS_BUILD_EMULATOR
+    CalculateOffset(displayInfo, offset);
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
+        struct libinput_device *dev = libinput_event_get_device(event);
+        const std::string devName = libinput_device_get_name(dev);
+        if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
+            deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
+        }
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
@@ -131,6 +131,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
         uint64_t dalta_time = filterInsertionPoint_.filterDeltaTime;
         HandleFilterMouseEvent(&offset);
+        CalculateOffset(displayInfo, offset);
         ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, dalta_time,
             static_cast<double>(displayInfo->ppi));
@@ -151,24 +152,36 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     pointerEvent_->SetTargetDisplayId(cursorPos.displayId);
     MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
-void MouseTransformProcessor::CalculateOffset(Direction direction, Offset &offset)
+void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
 {
-    std::negate<double> neg;
-    if (direction == DIRECTION90) {
-        double tmp = offset.dx;
-        offset.dx = offset.dy;
-        offset.dy = neg(tmp);
-    } else if (direction == DIRECTION180) {
-        offset.dx = neg(offset.dx);
-        offset.dy = neg(offset.dy);
-    } else if (direction == DIRECTION270) {
-        double tmp = offset.dx;
-        offset.dx = neg(offset.dy);
-        offset.dy = tmp;
+#ifndef OHOS_BUILD_EMULATOR
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        Direction direction = static_cast<Direction>((
+            ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (WIN_MGR->IsSupported()) {
+            direction = displayInfo->direction;
+        }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        std::negate<double> neg;
+        if (direction == DIRECTION90) {
+            double tmp = offset.dx;
+            offset.dx = offset.dy;
+            offset.dy = neg(tmp);
+        } else if (direction == DIRECTION180) {
+            offset.dx = neg(offset.dx);
+            offset.dy = neg(offset.dy);
+        } else if (direction == DIRECTION270) {
+            double tmp = offset.dx;
+            offset.dx = neg(offset.dy);
+            offset.dy = tmp;
+        }
     }
+#endif // OHOS_BUILD_EMULATOR
 }
 
 int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event* event)
@@ -177,6 +190,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
     uint32_t button = libinput_event_pointer_get_button(data);
@@ -243,6 +257,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         MMI_HILOGE("Unknown state, state:%{public}u", state);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -375,31 +390,48 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
             MMI_HILOGD("Axis begin");
         }
     }
-
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+        pointerEvent_->SetScrollRows(TouchPadTransformProcessor::GetTouchpadScrollRows());
+    } else {
+        pointerEvent_->SetScrollRows(MouseTransformProcessor::GetMouseScrollRows());
+    }
+#else
+    pointerEvent_->SetScrollRows(MouseTransformProcessor::GetMouseScrollRows());
+#endif // OHOS_BUILD_ENABLE_WATCH
     const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
+#ifndef OHOS_BUILD_ENABLE_WATCH
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
             axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
             axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
+#else
+        axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
+#endif // OHOS_BUILD_ENABLE_WATCH
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
+#ifndef OHOS_BUILD_ENABLE_WATCH
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
             axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
             axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
+#else
+        axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
+#endif // OHOS_BUILD_ENABLE_WATCH
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
     return RET_OK;
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
     const int32_t initRows = 3;
@@ -421,6 +453,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     }
     return axisValue;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *event)
 {
@@ -615,6 +648,11 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         return result;
     }
     PointerEvent::PointerItem pointerItem;
+    if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    } else if (type == LIBINPUT_EVENT_POINTER_MOTION || type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE) {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    }
     if (type == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN || type == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END) {
         HandleAxisPostInner(pointerItem);
     } else if (!HandlePostInner(data, pointerItem)) {
@@ -759,9 +797,7 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
         }
     }
     if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
-        if (width == FOLD_PC_WIDTH && height == FOLD_PC_HEIGHT) {
-            ret = DeviceType::DEVICE_FOLD_PC;
-        }
+        ret = DeviceType::DEVICE_FOLD_PC;
     }
     return ret;
 }
@@ -849,6 +885,7 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y, int32_
     return RET_OK;
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
@@ -967,6 +1004,7 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         pressedButton_ = button;
     }
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(int32_t pid, bool switchFlag)
 {

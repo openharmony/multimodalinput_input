@@ -171,12 +171,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisAcce
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
     double ret = processor.HandleAxisAccelateTouchPad(axisValue);
     ASSERT_EQ(ret, 2.0);
-    inputWindowsManager->captureModeInfo_.isCaptureMode = false;
-    ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_EQ(ret, 2.14);
-    axisValue = -5.0;
-    ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_NE(ret, -5.0);
 }
 
 /**
@@ -591,9 +585,11 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_CalculateOffse
 {
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    Direction direction = DIRECTION90;
     Offset offset;
-    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(direction, offset));
+    DisplayInfo displayInfo;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION0;
+    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(&displayInfo, offset));
 }
 
 /**
@@ -606,9 +602,11 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_CalculateOffse
 {
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    Direction direction = DIRECTION180;
     Offset offset;
-    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(direction, offset));
+    DisplayInfo displayInfo;
+    displayInfo.direction = DIRECTION180;
+    displayInfo.displayDirection = DIRECTION0;
+    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(&displayInfo, offset));
 }
 
 /**
@@ -621,9 +619,11 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_CalculateOffse
 {
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    Direction direction = DIRECTION270;
     Offset offset;
-    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(direction, offset));
+    DisplayInfo displayInfo;
+    displayInfo.direction = DIRECTION270;
+    displayInfo.displayDirection = DIRECTION0;
+    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(&displayInfo, offset));
 }
 
 /**

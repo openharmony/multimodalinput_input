@@ -60,29 +60,29 @@ int32_t InputScreenCaptureAgent::LoadLibrary()
         MMI_HILOGE("dlopen failed, reason:%{public}s", dlerror());
         return RET_ERR;
     }
-    handle_.isWorking = reinterpret_cast<std::list<int32_t> (*)()>(dlsym(handle_.handle, "IsScreenCaptureWorking"));
+    handle_.isWorking = reinterpret_cast<int32_t (*)(int32_t)>(dlsym(handle_.handle, "IsScreenCaptureWorking"));
     if (handle_.isWorking == nullptr) {
-        MMI_HILOGE("dlsym isWorking failed: error: %{public}s", dlerror());
+        MMI_HILOGE("dlsym isWorking failed: error:%{public}s", dlerror());
         handle_.Free();
         return RET_ERR;
     }
     handle_.registerListener = reinterpret_cast<void (*)(ScreenCaptureCallback)>(
         dlsym(handle_.handle, "RegisterListener"));
     if (handle_.registerListener == nullptr) {
-        MMI_HILOGE("dlsym registerListener failed: error: %{public}s", dlerror());
+        MMI_HILOGE("dlsym registerListener failed: error:%{public}s", dlerror());
         handle_.Free();
         return RET_ERR;
     }
     return RET_OK;
 }
 
-std::list<int32_t> InputScreenCaptureAgent::IsScreenCaptureWorking()
+bool InputScreenCaptureAgent::IsScreenCaptureWorking(int32_t capturePid)
 {
     if (LoadLibrary() != RET_OK) {
         MMI_HILOGE("LoadLibrary fail");
         return {};
     }
-    return handle_.isWorking();
+    return handle_.isWorking(capturePid);
 }
 
 void InputScreenCaptureAgent::RegisterListener(ScreenCaptureCallback callback)

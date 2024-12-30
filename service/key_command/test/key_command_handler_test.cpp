@@ -5624,6 +5624,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseStatusConfigObserver_
     sequence.abilityStartDelay = 2;
     sequence.timerId = 2;
     handler.sequences_.push_back(sequence);
+    ASSERT_NO_FATAL_FAILURE(handler.ParseStatusConfigObserver());
 }
 
 /**
@@ -5682,6 +5683,841 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_02, TestS
     upAbilities.push_back(shortcutKey);
     bool ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_PreHandleEvent_02
+ * @tc.desc: Test the funcation PreHandleEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+
+    handler.isParseConfig_ = false;
+    handler.isParseLongPressConfig_ = false;
+    handler.isParseMaxCount_ = false;
+    bool ret = false;
+    ret = handler.PreHandleEvent();
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureDownEvent_004
+ * @tc.desc: Test HandleKnuckleGestureDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    int64_t downTime = 100;
+    item.SetDownTime(downTime);
+    item.SetTargetWindowId(0);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetTargetDisplayId(0);
+
+    KeyCommandHandler handler;
+    handler.knuckleSwitch_.statusConfigValue = false;
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_009
+ * @tc.desc: Test CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].downTime = 0;
+    handler.twoFingerGesture_.touches[1].downTime = 1;
+
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 320;
+    displayInfo.width = 1260;
+    displayInfo.height = 2720;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    handler.twoFingerGesture_.touches[0].x = 600;
+    handler.twoFingerGesture_.touches[0].y = 600;
+    
+    handler.twoFingerGesture_.touches[1].x = 800;
+    handler.twoFingerGesture_.touches[1].y = 600;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+
+    handler.twoFingerGesture_.touches[1].x = 10;
+    handler.twoFingerGesture_.touches[1].y = 600;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+
+    handler.twoFingerGesture_.touches[1].x = 1250;
+    handler.twoFingerGesture_.touches[1].y = 600;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+
+    handler.twoFingerGesture_.touches[1].x = 600;
+    handler.twoFingerGesture_.touches[1].y = 10;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+
+    handler.twoFingerGesture_.touches[1].x = 600;
+    handler.twoFingerGesture_.touches[1].y = 2710;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_005
+ * @tc.desc: Verify if (vp <= 0)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t vp = -1;
+    KeyCommandHandler handler;
+    int32_t ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+    ret = handler.ConvertVPToPX(vp);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_006
+ * @tc.desc: Verify if (dpi <= 0)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t vp = 5;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = -1;
+    displayInfo.uniq = "default0";
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    KeyCommandHandler handler;
+    int32_t ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckKnuckleCondition_001
+ * @tc.desc: Test if (physicDisplayInfo != nullptr && physicDisplayInfo->direction != lastDirection_)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetTargetWindowId(0);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(0);
+
+    KeyCommandHandler handler;
+    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.singleKnuckleGesture_.state = false;
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.direction = DIRECTION0;
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    touchEvent->SetTargetDisplayId(1);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckKnuckleCondition(touchEvent));
+
+    touchEvent->SetTargetDisplayId(0);
+    handler.lastDirection_ = DIRECTION0;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckKnuckleCondition(touchEvent));
+
+    handler.lastDirection_ = DIRECTION90;
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckKnuckleCondition(touchEvent));
+
+    handler.lastDirection_ = DIRECTION90;
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckKnuckleCondition(touchEvent));
+
+    handler.lastDirection_ = DIRECTION90;
+    float pointer = 1.0;
+    handler.gesturePoints_.push_back(pointer);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckKnuckleCondition(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckKnuckleCondition_002
+ * @tc.desc: Test if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+ * touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetTargetWindowId(0);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(0);
+
+    KeyCommandHandler handler;
+    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.singleKnuckleGesture_.state = false;
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.direction = DIRECTION0;
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    touchEvent->SetTargetDisplayId(0);
+    handler.lastDirection_ = DIRECTION0;
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckKnuckleCondition(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckKnuckleCondition(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckKnuckleCondition(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_003
+ * @tc.desc: Test if (dx >= MOVE_TOLERANCE || dy >= MOVE_TOLERANCE)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetTargetWindowId(0);
+    item.SetRawDisplayX(3.0f);
+    item.SetRawDisplayY(3.0f);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(0);
+    touchEvent->SetTargetDisplayId(0);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.direction = DIRECTION0;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    handler.gestureLastX_ = 3.0f;
+    handler.gestureLastY_ = 3.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 3.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+
+    handler.gestureLastX_ = 3.0f;
+    handler.gestureLastY_ = 0.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_004
+ * @tc.desc: Test if (!isStartBase_ && IsMatchedAbility(gesturePoints_, gestureLastX_, gestureLastY_))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetTargetWindowId(0);
+    item.SetRawDisplayX(3.0f);
+    item.SetRawDisplayY(3.0f);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(0);
+    touchEvent->SetTargetDisplayId(0);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.direction = DIRECTION0;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    handler.isStartBase_ = true;
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+
+    handler.gesturePoints_.clear();
+    float pointer = 500.0f;
+    handler.gesturePoints_.emplace_back(pointer);
+    pointer = 500.0f;
+    handler.gesturePoints_.emplace_back(pointer);
+    handler.isStartBase_ = false;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_005
+ * @tc.desc: Test if (!isGesturing_)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetTargetWindowId(0);
+    item.SetRawDisplayX(3.0f);
+    item.SetRawDisplayY(3.0f);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(0);
+    touchEvent->SetTargetDisplayId(0);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.direction = DIRECTION0;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    handler.isStartBase_ = true;
+    handler.isGesturing_ = true;
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+
+    handler.isStartBase_ = true;
+    handler.isGesturing_ = false;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_006
+ * @tc.desc: Test if (gestureTrackLength_ > MIN_GESTURE_STROKE_LENGTH)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetTargetWindowId(0);
+    item.SetRawDisplayX(3.0f);
+    item.SetRawDisplayY(3.0f);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(0);
+    touchEvent->SetTargetDisplayId(0);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.direction = DIRECTION0;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    handler.gestureTrackLength_ = 0.0f;
+    handler.isStartBase_ = true;
+    handler.isGesturing_ = false;
+
+    handler.gestureTrackLength_ = 0.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+
+    handler.gestureTrackLength_ = 300.0f;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    handler.isStartBase_ = true;
+    handler.isGesturing_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_007
+ * @tc.desc: Test if (isGesturing_ && !isLetterGesturing_)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetTargetWindowId(0);
+    item.SetRawDisplayX(3.0f);
+    item.SetRawDisplayY(3.0f);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(0);
+    touchEvent->SetTargetDisplayId(0);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.direction = DIRECTION0;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    handler.gestureTrackLength_ = 0.0f;
+    handler.isStartBase_ = true;
+    handler.isGesturing_ = true;
+    handler.isLetterGesturing_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+
+    handler.isStartBase_ = true;
+    handler.isGesturing_ = true;
+    handler.isLetterGesturing_ = false;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_008
+ * @tc.desc: Test if (boundingSquareness > MIN_LETTER_GESTURE_SQUARENESS)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetTargetWindowId(0);
+    item.SetRawDisplayX(3.0f);
+    item.SetRawDisplayY(3.0f);
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(0);
+    touchEvent->SetTargetDisplayId(0);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.direction = DIRECTION0;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    handler.gestureLastX_ = 0.0f;
+    handler.gestureLastY_ = 0.0f;
+    handler.gestureTrackLength_ = 0.0f;
+    handler.isStartBase_ = true;
+    handler.isGesturing_ = true;
+    handler.isLetterGesturing_ = false;
+    
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseJson_002
+ * @tc.desc: Test the funcation ParseJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
+    ASSERT_NO_FATAL_FAILURE(handler.ParseJson(defaultConfig));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_003
+ * @tc.desc: Test the funcation HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int64_t time = 4000000;
+    keyEvent->SetActionTime(time);
+    KeyCommandHandler handler;
+    handler.powerUpTime_ = 0;
+    handler.sosLaunchTime_ = 0;
+    handler.isParseConfig_ = true;
+    handler.isParseLongPressConfig_ = true;
+    handler.isParseMaxCount_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_004
+ * @tc.desc: Test if ((key->GetActionTime() - powerUpTime_) > POWER_ACTION_INTERVAL * FREQUENCY &&
+ * (key->GetActionTime() - sosLaunchTime_) > SOS_WAIT_TIME * FREQUENCY)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int64_t time = 0;
+    keyEvent->SetActionTime(time);
+    KeyCommandHandler handler;
+    handler.powerUpTime_ = 0;
+    handler.sosLaunchTime_ = 0;
+    handler.isParseConfig_ = true;
+    handler.isParseLongPressConfig_ = true;
+    handler.isParseMaxCount_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_005
+ * @tc.desc: Test if ((key->GetActionTime() - powerUpTime_) > POWER_ACTION_INTERVAL * FREQUENCY &&
+ * (key->GetActionTime() - sosLaunchTime_) > SOS_WAIT_TIME * FREQUENCY)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int64_t time = 700000;
+    keyEvent->SetActionTime(time);
+    KeyCommandHandler handler;
+    handler.powerUpTime_ = 0;
+    handler.sosLaunchTime_ = 0;
+    handler.isParseConfig_ = true;
+    handler.isParseLongPressConfig_ = true;
+    handler.isParseMaxCount_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsMusicActivate_001
+ * @tc.desc: Test the funcation IsMusicActivate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMusicActivate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.IsMusicActivate());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003
+ * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    repeatKey.ability.bundleName = SOS_BUNDLE_NAME;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+
+    repeatKey.ability.bundleName = "test";
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_004
+ * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    repeatKey.ability.bundleName = SOS_BUNDLE_NAME;
+    repeatKey.delay = 10;
+    handler.downActionTime_ = 10;
+    handler.lastDownActionTime_  = 10;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+
+    handler.downActionTime_ = 100;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_005
+ * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    repeatKey.ability.bundleName = "test";
+    repeatKey.delay = 10;
+    handler.upActionTime_  = 10;
+    handler.lastDownActionTime_  = 10;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+
+    handler.downActionTime_ = 100;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_001
+ * @tc.desc: Test if (bundleName.find(matchName) == std::string::npos)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+
+    repeatKey.ability.bundleName = ".test";
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_002
+ * @tc.desc: Test if (bundleName.find(matchName) == std::string::npos)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.focusWindowId = 0;
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    DISPLAY_MONITOR->SetScreenStatus("test");
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_003
+ * @tc.desc: Test if (WIN_MGR->JudgeCaramaInFore() &&
+ * (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.focusWindowId = 0;
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_004
+ * @tc.desc: Test if (WIN_MGR->JudgeCaramaInFore() &&
+ * (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager->displayGroupInfo_.focusWindowId = 0;
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    DISPLAY_MONITOR->SetScreenStatus("test");
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount_001
+ * @tc.desc: Test if (walletLaunchDelayTimes_ != 0)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_POWER;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.walletLaunchDelayTimes_ = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyCount(repeatKey, keyEvent));
+
+    handler.walletLaunchDelayTimes_ = 1;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyCount(repeatKey, keyEvent));
 }
 } // namespace MMI
 } // namespace OHOS

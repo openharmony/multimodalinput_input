@@ -36,6 +36,7 @@ struct KeyUnicode {
 constexpr uint32_t DEFAULT_UNICODE = 0x0000;
 
 const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     { HOS_KEY_A,                { 0x0061, 0x0041 } },
     { HOS_KEY_B,                { 0x0062, 0x0042 } },
     { HOS_KEY_C,                { 0x0063, 0x0043 } },
@@ -98,6 +99,7 @@ const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
     { HOS_KEY_NUMPAD_SUBTRACT,  { 0x002D, 0x0000 } },
     { HOS_KEY_NUMPAD_ADD,       { 0x002B, 0x0000 } },
     { HOS_KEY_NUMPAD_DOT,       { 0x002E, 0x0000 } }
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 } // namespace
 

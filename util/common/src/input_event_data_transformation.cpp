@@ -288,6 +288,10 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("Marshalling pointer event failed");
         return RET_ERR;
     }
+    if (!SerializeSettings(event, pkt)) {
+        MMI_HILOGE("SerializeSettings fail");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -415,6 +419,11 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     }
     event->SetBuffer(buffer);
     event->SetPullId(tField);
+
+    if (!DeserializeSettings(pkt, event)) {
+        MMI_HILOGE("DeserializeSettings fail");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -580,5 +589,25 @@ int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, s
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+bool InputEventDataTransformation::SerializeSettings(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
+{
+    int32_t setting {};
+
+    setting = event->GetScrollRows();
+    pkt << setting;
+
+    return !pkt.ChkRWError();
+}
+
+bool InputEventDataTransformation::DeserializeSettings(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
+{
+    int32_t setting {};
+
+    pkt >> setting;
+    event->SetScrollRows(setting);
+
+    return !pkt.ChkRWError();
+}
 } // namespace MMI
 } // namespace OHOS

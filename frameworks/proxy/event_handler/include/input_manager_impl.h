@@ -147,6 +147,7 @@ public:
     int32_t GetMouseScrollRows(int32_t &rows);
     int32_t SetPointerSize(int32_t size);
     int32_t GetPointerSize(int32_t &size);
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId);
     int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
@@ -182,6 +183,8 @@ public:
     int32_t GetTouchpadRightClickType(int32_t &type);
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
+    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag);
+    int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
     int32_t GetPointerSnapshot(void *pixelMapPtr);
@@ -200,7 +203,7 @@ public:
     // 快捷键拉起Ability
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
-    void AppendExtraData(const ExtraData& extraData);
+    int32_t AppendExtraData(const ExtraData& extraData);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 
@@ -233,6 +236,8 @@ public:
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -277,7 +282,8 @@ private:
     DisplayGroupInfo displayGroupInfo_ {};
     WindowGroupInfo windowGroupInfo_ {};
     std::mutex mtx_;
-    std::mutex handleMtx_;
+    std::mutex eventObserverMtx_;
+    std::mutex winStatecallbackMtx_;
     mutable std::mutex resourceMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;

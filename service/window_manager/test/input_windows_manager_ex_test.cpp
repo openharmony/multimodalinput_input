@@ -361,7 +361,8 @@ HWTEST_F(InputWindowsManagerTest, PointerDrawingManagerOnDisplayInfo_007, TestSi
 
 /**
  * @tc.name: SendPointerEvent_001
- * @tc.desc: Test the function SendPointerEvent
+ * @tc.desc: Verify if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
+ * Rosen::SceneBoardJudgement::IsSceneBoardEnabled())
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -394,7 +395,8 @@ HWTEST_F(InputWindowsManagerTest, SendPointerEvent_001, TestSize.Level1)
 
 /**
  * @tc.name: SendPointerEvent_002
- * @tc.desc: Test the function SendPointerEvent
+ * @tc.desc: Verify if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
+ * Rosen::SceneBoardJudgement::IsSceneBoardEnabled())
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -412,6 +414,39 @@ HWTEST_F(InputWindowsManagerTest, SendPointerEvent_002, TestSize.Level1)
     ASSERT_NE(inputWindowsManager, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_ENTER_WINDOW ;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager->extraData_.appended = false;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendPointerEvent(pointerAction));
+    inputWindowsManager->udsServer_ = nullptr;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.clear();
+    inputWindowsManager->extraData_.sourceType = -1;
+}
+
+/**
+ * @tc.name: SendPointerEvent_003
+ * @tc.desc: Verify if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
+ * Rosen::SceneBoardJudgement::IsSceneBoardEnabled())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SendPointerEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
+
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     DisplayInfo displayInfo;
     displayInfo.id = 10;
@@ -420,6 +455,64 @@ HWTEST_F(InputWindowsManagerTest, SendPointerEvent_002, TestSize.Level1)
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendPointerEvent(pointerAction));
     inputWindowsManager->udsServer_ = nullptr;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.clear();
+    inputWindowsManager->extraData_.sourceType = -1;
+}
+
+/**
+ * @tc.name: SendPointerEvent_004
+ * @tc.desc: Verify if (!UpdateDisplayId(displayId))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SendPointerEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
+
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_ENTER_WINDOW;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendPointerEvent(pointerAction));
+    inputWindowsManager->udsServer_ = nullptr;
+}
+
+/**
+ * @tc.name: SendPointerEvent_005
+ * @tc.desc: Verify if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SendPointerEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
+
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendPointerEvent(pointerAction));
+    inputWindowsManager->udsServer_ = nullptr;
+    inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->displayGroupInfo_.displaysInfo.clear();
     inputWindowsManager->extraData_.sourceType = -1;
 }
@@ -2980,6 +3073,317 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, Test
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_003
+ * @tc.desc: Verify if (cursorPos_.displayDirection != info.displayDirection && cursorPos_.direction != info.direction)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    
+    info.direction = DIRECTION0;
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION0;
+    inputWindowsManager.cursorPos_.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION0;
+    inputWindowsManager.cursorPos_.direction = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_004
+ * @tc.desc: Verify if (cursorPos_.direction == Direction::DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION0;
+    inputWindowsManager.cursorPos_.direction = DIRECTION0;
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_005
+ * @tc.desc: Verify if (cursorPos_.direction == Direction::DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION90;
+    inputWindowsManager.cursorPos_.direction = DIRECTION90;
+    
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_006
+ * @tc.desc: Verify else if (cursorPos_.direction == Direction::DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.displayDirection = DIRECTION0;
+    inputWindowsManager.cursorPos_.displayDirection = DIRECTION0;
+    info.direction = DIRECTION270;
+    inputWindowsManager.cursorPos_.direction = DIRECTION270;
+    
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_007
+ * @tc.desc: Verify if (direction == DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_008
+ * @tc.desc: Verify if (direction == DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_009
+ * @tc.desc: Verify if (direction == DIRECTION180)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_010
+ * @tc.desc: Verify if (direction == DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_011
+ * @tc.desc: Verify if (direction == DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+    info.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_001
+ * @tc.desc: Verify if (displayDirection == DIRECTION0)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION0;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_002
+ * @tc.desc: Verify if (displayDirection == DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION90;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_003
+ * @tc.desc: Verify if (displayDirection == DIRECTION90)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION90;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_004
+ * @tc.desc: Verify if (displayDirection == DIRECTION180)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION180;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_005
+ * @tc.desc: Verify if (displayDirection == DIRECTION180)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION180;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_006
+ * @tc.desc: Verify if (displayDirection == DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION270;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateDisplayScreen_007
+ * @tc.desc: Verify if (displayDirection == DIRECTION270)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    PhysicalCoordinate coord;
+    DisplayInfo info;
+    InputWindowsManager inputWindowsManager;
+
+    info.direction = DIRECTION270;
+    info.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer
  * @tc.desc: Test the function IsNeedRefreshLayer
  * @tc.type: FUNC
@@ -3496,6 +3900,200 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWidthAndHeight, Tes
     int32_t height = 300;
     displayInfo.direction = DIRECTION90;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWidthAndHeight(&displayInfo, width, height));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_004
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 50;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 1000, 1000 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_005
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 100, 1000 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_006
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 50;
+    std::vector<Rect> rects = { { 100, 100, 1000, 1000 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_007
+ * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 300;
+    int32_t y = 300;
+    std::vector<Rect> rects = { { 100, 100, 1000, 100 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects));
+}
+
+/**
+ * @tc.name: DrawTouchGraphic_004
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t displayId = 10;
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+
+    inputWindowsManager->knuckleDrawMgr_ = nullptr;
+    inputWindowsManager->knuckleDynamicDrawingManager_ = nullptr;
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
+}
+
+/**
+ * @tc.name: SetWindowStateNotifyPid_001
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SetWindowStateNotifyPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    int32_t pid = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(pid));
+
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(pid));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_002
+ * @tc.desc: Test the funcation SendUIExtentionPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 100;
+    int32_t logicalY = 200;
+    
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    PointerEvent::PointerItem item;
+    item.pointerId_ = 1;
+    pointerEvent->pointers_.push_back(item);
+    int32_t displayId = 10;
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 11;
+    windowInfo.transform.push_back(1.1);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_003
+ * @tc.desc: Test the funcation SendUIExtentionPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointerEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(true));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 100;
+    int32_t logicalY = 200;
+    
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    PointerEvent::PointerItem item;
+    item.pointerId_ = 1;
+    pointerEvent->pointers_.push_back(item);
+    int32_t displayId = 10;
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 11;
+    windowInfo.transform.push_back(1.1);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS

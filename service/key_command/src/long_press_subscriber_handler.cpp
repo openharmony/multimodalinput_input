@@ -213,11 +213,11 @@ void LongPressSubscriberHandler::OnSessionDelete(SessionPtr sess)
         std::vector<std::shared_ptr<Subscriber>> &subscribers = it->second;
         for (auto iter = subscribers.begin(); iter != subscribers.end();) {
             if ((*iter)->sess_ == sess) {
+                RemoveSessSubscriber(sess, (*iter)->id_);
+                iter = subscribers.erase(iter);
                 auto fingerCount = it->first.first;
                 auto duration = it->first.second;
                 RemoveDurationTimer(fingerCount, duration);
-                RemoveSessSubscriber(sess, (*iter)->id_);
-                iter = subscribers.erase(iter);
                 continue;
             }
             ++iter;

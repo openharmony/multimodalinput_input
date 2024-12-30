@@ -407,18 +407,25 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_WhetherDiscardTouchE
 
     pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     detector.gestureEnable_ = true;
-    detector.gestureDisplayId_ = 3;
-    pointerEvent->targetDisplayId_ = 2;
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
     pointerEvent->SetPointerId(0);
     EXPECT_TRUE(detector.WhetherDiscardTouchEvent(pointerEvent));
 
     pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     detector.gestureEnable_ = true;
-    detector.gestureDisplayId_ = INT32_MAX;
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    detector.gestureDisplayId_ = INT32_MAX - 2;
+    pointerEvent->bitwise_ = 0;
+    pointerEvent->SetPointerId(7);
+    pointerEvent->targetDisplayId_ = INT32_MAX - 1;
     EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
 
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    detector.gestureDisplayId_ = INT32_MAX;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
+
+    detector.gestureDisplayId_ = INT32_MAX;
+    pointerEvent->targetDisplayId_ = INT32_MAX;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
 }
 
@@ -1146,9 +1153,170 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_NotifyGestureEvent_0
     mode = GestureMode::ACTION_UNKNOWN;
     EXPECT_FALSE(detector.NotifyGestureEvent(pointerEvent, mode));
 
-    mode = GestureMode::ACTION_PINCH_CLOSED;
-    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_MOUSE;
+    mode = GestureMode::ACTION_GESTURE_END;
+    for (auto i = 0; i < 5; i++) {
+        PointerEvent::PointerItem pointerItem;
+        detector.fingers_.insert(i + 1);
+        pointerEvent->pointers_.push_back(pointerItem);
+    }
     EXPECT_FALSE(detector.NotifyGestureEvent(pointerEvent, mode));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_003
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    detector.gestureEnable_ = true;
+    inputEvent->bitwise_ = 0x00000000;
+    pointerEvent->SetPointerId(5);
+    detector.gestureDisplayId_ = INT32_MAX;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_FALSE(detector.OnTouchEvent(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_FALSE(detector.OnTouchEvent(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_FALSE(detector.OnTouchEvent(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    EXPECT_FALSE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleDownEvent_003
+ * @tc.desc: Test HandleDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleDownEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    detector.isRecognized_ = false;
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(2);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->pointers_.push_back(item2);
+    pointerEvent->SetPointerId(2);
+    ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
+    detector.gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
+    detector.gestureType_ = TOUCH_GESTURE_TYPE_PINCH;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
+    detector.gestureType_ = TOUCH_GESTURE_TYPE_NONE;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleMoveEvent_004
+ * @tc.desc: Test HandleMoveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleMoveEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    detector.isRecognized_ = true;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
+    detector.isRecognized_ = false;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandlePinchMoveEvent_003
+ * @tc.desc: Test HandlePinchMoveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandlePinchMoveEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
+    detector.downPoint_[3] = Point(5.0f, 6.0f);
+    detector.downPoint_[4] = Point(7.0f, 8.0f);
+    detector.lastDistance_[1] = 1.0;
+    detector.lastDistance_[2] = 2.0;
+    detector.lastDistance_[3] = 3.0;
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(2);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->pointers_.push_back(item2);
+    pointerEvent->SetPointerId(2);
+    ASSERT_NO_FATAL_FAILURE(detector.HandlePinchMoveEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_IsPhysicalPointer_001
+ * @tc.desc: Test IsPhysicalPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_IsPhysicalPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->bitwise_ = 0x00000000;
+    pointerEvent->SetPointerId(5);
+    bool ret = detector.IsPhysicalPointer(pointerEvent);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleUpEvent_003
+ * @tc.desc: Test HandleUpEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleUpEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
+    detector.isRecognized_ = true;
+    detector.lastTouchEvent_ = pointerEvent;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleUpEvent(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
