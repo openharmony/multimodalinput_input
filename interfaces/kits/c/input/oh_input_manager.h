@@ -243,11 +243,20 @@ typedef enum Input_Result {
     INPUT_NOT_SYSTEM_APPLICATION = 202,
     /** Parameter check failed */
     INPUT_PARAMETER_ERROR = 401,
+    /** @error Device not support */
+    INPUT_DEVICE_NOT_SUPPORTED = 801,
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
     /** Interceptor repeatedly created for an application */
     INPUT_REPEAT_INTERCEPTOR = 4200001
 } Input_Result;
+
+/**
+ * @brief Defines the hot key structure.
+ *
+ * @since 14
+ */
+typedef struct Input_Hotkey Input_Hotkey;
 
 /**
  * @brief Defines a lifecycle callback for **keyEvent**.
@@ -276,6 +285,12 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
  * @since 12
  */
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
+
+/**
+ * @brief Callback used to return shortcut key events.
+ * @since 14
+ */
+typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
 
 /**
  * @brief Defines the callback for device addition events.
@@ -1245,6 +1260,172 @@ Input_Result OH_Input_RemoveKeyEventInterceptor(void);
  * @since 12
  */
 Input_Result OH_Input_RemoveInputEventInterceptor(void);
+
+/**
+ * @brief Creates an array of {@Link Input_Hotkey} instances.
+ *
+ * @param count Number of {@Link Input_Hotkey} instances to be created. The count must be the same as the number of
+ * system shortcut keys.
+ * @return If the operation is successful, the pointer to an array of {@Link Input_Hotkey} instances is returned.
+ * If the operation fails, a null pointer is returned. The possible cause is memory allocation failure or count is
+ * not equal to the number of system hotkeys.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count);
+
+/**
+ * @brief Destroys an array of {@link Input_Hotkey} instances and reclaims memory.
+ *
+ * @param hotkeys Pointer to an array of {@Link Input_Hotkey } instances created by the
+ * {@Link OH_Input_CreateAllSystemHotkeys} method.
+ * @param count Count of the array to be destroyed, which must be the same as the number of system shortcut keys.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
+
+/**
+ * @brief Obtains all hot keys supported by the system.
+ *
+ * @param hotkey Array of {@Link Input_Hotkey} instances.
+ * When calling this API for the first time, you can pass NULL to obtain the array length.
+ * @param count Number of hot keys supported by the system.
+ * @return OH_Input_GetAllSystemHotkeys status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} The hotkey or count is NULL, or the value of count does not match the number
+ *         of system shortcut keys supported by the system;\n
+ *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
+
+/**
+ * @brief Creates a hot key object.
+ *
+ * @return Returns an {@Link Input_Hotkey} pointer object if the operation is successful. Otherwise, a null pointer is
+ * returned. The possible cause is memory allocation failure.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Hotkey *OH_Input_CreateHotkey(void);
+
+/**
+ * @brief Destroys a hot key object.
+ *
+ * @param hotkey Hot key object.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+void OH_Input_DestroyHotkey(Input_Hotkey **hotkey);
+
+/**
+ * @brief Sets a modifier key.
+ *
+ * @param hotkey Hotkey key object.
+ * @param preKeys List of modifier keys.
+ * @param size Number of modifier keys. One or two modifier keys are supported.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+void OH_Input_SetPreKeys(Input_Hotkey *hotkey, int32_t *preKeys, int32_t size);
+
+/**
+ * @brief Obtains a modifier key.
+ *
+ * @param hotkey Hotkey key object.
+ * @param preKeys List of modifier keys.
+ * @param preKeyCount Number of modifier keys.
+ * @return OH_Input_GetPreKeys status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} The hotkey is NULL or the pressedKeys is NULL or the pressedKeyCount
+ *         is NULL;\n
+ *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, int32_t *preKeyCount);
+
+/**
+ * @brief Sets a modified key.
+ *
+ * @param hotkey Hotkey key object.
+ * @param finalKey Modified key. Only one modified key is supported.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+void OH_Input_SetFinalKey(Input_Hotkey *hotkey, int32_t finalKey);
+
+/**
+ * @brief Obtains a modified key.
+ *
+ * @param hotkey Hotkey key object.
+ * @param finalKeyCode Returns the key value of the decorated key.
+ * @return OH_Input_GetfinalKey status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} The hotkey is NULL or the finalKeyCode is NULL;\n
+ *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyCode);
+
+/**
+ * @brief Specifies whether to report repeated key events.
+ *
+ * @param hotkey Shortcut key object.
+ * @param isRepeat Whether to report repeated key events.
+ * The value <b>true</b> means to report repeated key events, and the value <b>false</b> means the opposite.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
+
+/**
+ * @brief Checks whether to report repeated key events.
+ *
+ * @param hotkey Shortcut key object.
+ * @param isRepeat Whether a key event is repeated.
+ * @return OH_Input_GetIsRepeat status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} otherwise;\n
+ *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Result OH_Input_GetRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
+
+/**
+ * @brief Subscribes to shortcut key events.
+ *
+ * @param hotkey Shortcut key object.
+ * @param callback Callback used to return shortcut key events.
+ * @return OH_Input_AddHotkeyMonitor status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if hotkey or callback is NULL;\n
+ *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported;\n
+ *         {@link INPUT_HOTKEY_ALREADY_REGISTER} Subscription has been enabled;\n
+ *         {@link INPUT_REPEAT_INTERCEPTOR} The shortcut key has been occupied.
+ *         You can use {@link getAllSystemHotkeys} to query all system shortcut keys.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
+
+/**
+ * @brief Unsubscribes from shortcut key events.
+ *
+ * @param hotkey Shortcut key object.
+ * @param callback Callback used to return shortcut key events.
+ * @return OH_Input_RemoveHotkeyMonitor status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if hotkey or callback is NULL;\n
+ *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
 
 /**
  * @brief Obtains the IDs of all input devices.
