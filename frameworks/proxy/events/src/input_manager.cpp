@@ -716,5 +716,10 @@ int32_t InputManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targe
 {
     return InputMgrImpl.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
 }
+
+int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+{
+    return InputMgrImpl.SetCustomCursor(windowId, cursor, options);
+}
 } // namespace MMI
 } // namespace OHOS
