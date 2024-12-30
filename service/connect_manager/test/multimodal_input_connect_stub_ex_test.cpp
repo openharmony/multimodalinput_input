@@ -75,6 +75,10 @@ public:
     {
         return pid;
     }
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override
+    {
+        return windowId;
+    }
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override { return retSetMouseIcon_; }
     int32_t SetPointerSize(int32_t size) override
     {
