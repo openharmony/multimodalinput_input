@@ -428,6 +428,8 @@ struct DisplayInfo {
      *
      * @since 12
      */
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
     float ppi;
 };
 
