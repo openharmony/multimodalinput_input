@@ -276,10 +276,11 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLoca
 {
     int32_t idNames = -1;
     int32_t deviceId = 0;
+    int32_t displayId = -1;
     MouseTransformProcessor processor(deviceId);
     int32_t x = 0;
     int32_t y = 0;
-    ASSERT_EQ(processor.SetPointerLocation(x, y), idNames);
+    ASSERT_EQ(processor.SetPointerLocation(x, y, displayId), idNames);
 }
 
 /**
