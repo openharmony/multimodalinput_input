@@ -3189,7 +3189,7 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
     CursorOptions options)
 {
     CALL_DEBUG_ENTER;
-    if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+    if (windowId < 0 || WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
         MMI_HILOGE("The windowId not in right pid");
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
@@ -3222,7 +3222,10 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     CHKPR(newPixelMap, RET_ERR);
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
- 
+    if (imageInfo.size.width < cursor.focusX || imageInfo.size.width < cursor.focusY) {
+        MMI_HILOGE("focus is invalid");
+        return RET_ERR;
+    }
     float scale = 1.0f;
     if (imageInfo.size.width > MAX_CUSTOM_CURSOR_SIZE || imageInfo.size.height > MAX_CUSTOM_CURSOR_SIZE) {
         scale = MAX_CUSTOM_CURSOR_DIMENSION / std::max(imageInfo.size.width, imageInfo.size.height);
