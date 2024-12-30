@@ -74,6 +74,7 @@ public:
     bool IsPointerDevice(struct libinput_device* device) const;
     bool IsTouchDevice(struct libinput_device* device) const;
     struct libinput_device* GetKeyboardDevice() const;
+    void GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
     bool HasVirtualPointerDevice();

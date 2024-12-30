@@ -49,6 +49,12 @@ public:
     void OnDeviceAdded(int32_t deviceId, const std::string &type) override;
     void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
     static void EmitJsSetInputDeviceEnabled(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
+    static void EmitJsSetFunctionKeyState(sptr<JsUtil::CallbackInfo> cb, int32_t funcKey, bool state);
+    static void EmitJsGetFunctionKeyState(sptr<JsUtil::CallbackInfo> cb, int32_t funcKey);
+    static void CallFunctionKeyStateTask(uv_work_t *work);
+    static void CallFunctionKeyState(uv_work_t *work, int32_t status);
+    static bool GetFunctionKeyStateErrCode(sptr<JsUtil::CallbackInfo> cb,
+        napi_handle_scope scope, napi_value &callResult);
 
 private:
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);

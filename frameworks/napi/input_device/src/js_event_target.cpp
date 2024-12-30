@@ -1449,5 +1449,155 @@ void JsEventTarget::EmitJsSetInputDeviceEnabled(sptr<JsUtil::CallbackInfo> cb, i
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
+
+void JsEventTarget::EmitJsSetFunctionKeyState(sptr<JsUtil::CallbackInfo> cb, int32_t funcKey, bool state)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    int32_t keyState = state ? 1 : 0;
+    cb->uData.keys.push_back(funcKey);
+    cb->uData.keys.push_back(keyState);
+    cb->errCode = -1;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    // data heap point cb pointer
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    ret = uv_queue_work_with_qos(
+        loop, work,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work callback function is called");
+            CallFunctionKeyStateTask(work);
+        },
+        CallFunctionKeyState, uv_qos_user_initiated);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        cb->DecStrongRef(nullptr);
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
+void JsEventTarget::EmitJsGetFunctionKeyState(sptr<JsUtil::CallbackInfo> cb, int32_t funcKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    cb->uData.keys.push_back(funcKey);
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    ret = uv_queue_work_with_qos(
+        loop, work,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work callback function is called");
+            CallFunctionKeyStateTask(work);
+        },
+        CallFunctionKeyState, uv_qos_user_initiated);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        cb->DecStrongRef(nullptr);
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
+void JsEventTarget::CallFunctionKeyStateTask(uv_work_t *work)
+{
+    CHKPV(work);
+    int32_t size = 2;
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    CHKPV(cb->env);
+    if (cb->uData.keys.size() == size - 1) {
+        auto funcKey = cb->uData.keys.front();
+        int32_t napiCode = InputManager::GetInstance()->GetFunctionKeyState(funcKey);
+        cb->errCode = RET_OK;
+        cb->uData.keys.push_back(napiCode);
+    } else if (cb->uData.keys.size() == size) {
+        int32_t backState = -1;
+        auto funcKey = cb->uData.keys.front();
+        auto state = cb->uData.keys.back();
+        int32_t napiCode = InputManager::GetInstance()->SetFunctionKeyState(funcKey, state);
+        cb->errCode = napiCode;
+        if (cb->errCode == RET_OK) {
+            backState = 1;
+        } else {
+            backState = 0;
+        }
+        cb->uData.keys.push_back(backState);
+    }
+}
+
+bool JsEventTarget::GetFunctionKeyStateErrCode(sptr<JsUtil::CallbackInfo> cb, napi_handle_scope scope,
+    napi_value &callResult)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(cb);
+    if (cb->errCode == RET_ERR) {
+        napi_close_handle_scope(cb->env, scope);
+        MMI_HILOGE("return value errors");
+        return false;
+    }
+    NapiError codeMsg;
+    if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+        napi_close_handle_scope(cb->env, scope);
+        MMI_HILOGE("Error code %{public}d not found", cb->errCode);
+        return false;
+    }
+    callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+    if (callResult == nullptr) {
+        MMI_HILOGE("The callResult is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+        return false;
+    }
+    return true;
+}
+
+void JsEventTarget::CallFunctionKeyState(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t *>(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+    napi_value callResult = nullptr;
+    if (cb->deferred) {
+        if (cb->errCode != RET_OK) {
+            if (!GetFunctionKeyStateErrCode(cb, scope, callResult)) {
+                MMI_HILOGE("promise get function key state error");
+                return;
+            }
+            CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
+        } else {
+            int32_t argc = 2;
+            auto keysSize = cb->uData.keys.size();
+            if (keysSize == argc) {
+                auto state = cb->uData.keys.back();
+                CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, state, &callResult), CREATE_INT32, scope);
+            } else {
+                CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult), GET_UNDEFINED, scope);
+            }
+            CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
+        }
+    }
+    napi_close_handle_scope(cb->env, scope);
+}
 } // namespace MMI
 } // namespace OHOS
