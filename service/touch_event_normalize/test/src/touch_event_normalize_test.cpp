@@ -37,6 +37,7 @@ private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
+    bool preDoubleTapDragSwitch_ { true };
     int32_t preScrollRows_ { 3 };
 };
 
@@ -58,6 +59,7 @@ void TouchEventNormalizeTest::SetUp()
     TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(preRotateSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadScrollRows();
+    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
 }
 
 void TouchEventNormalizeTest::TearDown()
@@ -66,6 +68,7 @@ void TouchEventNormalizeTest::TearDown()
     TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(preRotateSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadScrollRows(preScrollRows_);
+    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
 }
 
 /**

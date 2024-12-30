@@ -47,6 +47,7 @@ constexpr int32_t DEFAULT_POINTER_ID { 0 };
 constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t DEFAULT_ROWS { 3 };
+constexpr int32_t MAX_N_POINTER_ITEMS { 10 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 std::string g_threeFingerTapKey = "touchpadThreeFingerTap";
@@ -105,6 +106,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *e
     item.SetToolHeight(static_cast<int32_t>(toolHeight));
     item.SetDeviceId(deviceId_);
     pointerEvent_->SetDeviceId(deviceId_);
+    RemoveSurplusPointerItem();
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
 
@@ -334,6 +336,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
         MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
+        swipeHistory_.clear();
         DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
     }
 
@@ -343,28 +346,88 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
 int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture,
                                                                      int32_t fingerCount)
 {
-    int32_t sumX = 0;
-    int32_t sumY = 0;
-    if (fingerCount == 0) {
-        MMI_HILOGD("There is no finger in swipe action");
+    if (fingerCount == 0 || fingerCount > FINGER_COUNT_MAX) {
+        MMI_HILOGD("There are wrong finger counts in swipe action");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < fingerCount; i++) {
-        sumX += libinput_event_gesture_get_device_coords_x(gesture, i);
-        sumY += libinput_event_gesture_get_device_coords_y(gesture, i);
+    Coords avgCoord {0, 0};
+    std::vector<Coords> fingerCoords(FINGER_COUNT_MAX, avgCoord);
+    int32_t action = pointerEvent_->GetPointerAction();
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        fingerCoords[i].x = libinput_event_gesture_get_device_coords_x(gesture, i);
+        fingerCoords[i].y = libinput_event_gesture_get_device_coords_y(gesture, i);
     }
+    if (action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+        SmoothMultifingerSwipeData(fingerCoords, fingerCount);
+    }
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        avgCoord += fingerCoords[i];
+    }
+    avgCoord /= fingerCount;
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
     pointerItem.SetDownTime(time);
-    pointerItem.SetDisplayX(sumX / fingerCount);
-    pointerItem.SetDisplayY(sumY / fingerCount);
+    pointerItem.SetDisplayX(avgCoord.x);
+    pointerItem.SetDisplayY(avgCoord.y);
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
+    RemoveSurplusPointerItem();
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
+        pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_UPDATE ||
+        pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) &&
+        (pointerEvent_->GetTargetWindowId() > 0)) {
+        pointerEvent_->SetTargetWindowId(-1);
+        pointerEvent_->SetAgentWindowId(-1);
+        pointerItem.SetTargetWindowId(-1);
+    }
     return RET_OK;
+}
+
+void TouchPadTransformProcessor::SmoothMultifingerSwipeData(std::vector<Coords>& fingerCoords,
+                                                            const int32_t fingerCount)
+{
+    bool isMissing = false;
+    Coords coordDelta {0, 0};
+    int32_t historyFingerCount = 0;
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        if (static_cast<int32_t>(swipeHistory_.size()) <= i) {
+            swipeHistory_.emplace_back(std::deque<Coords>());
+        }
+        if (fingerCoords[i].x == 0 && fingerCoords[i].y == 0) {
+            isMissing = true;
+            continue;
+        }
+        swipeHistory_[i].push_back(fingerCoords[i]);
+        if (static_cast<int32_t>(swipeHistory_[i].size()) > fingerCount) {
+            swipeHistory_[i].pop_front();
+        }
+    }
+    if (!isMissing) {
+        return;
+    }
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        int32_t historySize = static_cast<int32_t>(swipeHistory_[i].size()) - 1;
+        if (historySize > 0) {
+            coordDelta += swipeHistory_[i][historySize] - swipeHistory_[i][0];
+            historyFingerCount += historySize;
+        }
+    }
+    if (historyFingerCount > 0) {
+        coordDelta /= historyFingerCount;
+    }
+    for (int32_t i = 0; i < fingerCount; ++i) {
+        if (fingerCoords[i].x == 0 && fingerCoords[i].y == 0) {
+            fingerCoords[i] = swipeHistory_[i].back() + coordDelta;
+            swipeHistory_[i].push_back(fingerCoords[i]);
+        }
+        if (static_cast<int32_t>(swipeHistory_[i].size()) > fingerCount) {
+            swipeHistory_[i].pop_front();
+        }
+    }
 }
 
 int32_t TouchPadTransformProcessor::OnEventTouchPadSwipeBegin(struct libinput_event *event)
@@ -406,6 +469,7 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    RemoveSurplusPointerItem();
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
 }
 
@@ -589,6 +653,42 @@ void TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
     GetConfigDataFromDatabase(name, rotateSwitch);
 }
 
+int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    std::string name = "touchpadDoubleTapAndDrag";
+    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
+        MMI_HILOGE("PutConfigDataToDatabase failed");
+        return RET_ERR;
+    }
+
+    auto originDevice = INPUT_DEV_MGR->GetTouchPadDeviceOrigin();
+    if (originDevice == nullptr) {
+        MMI_HILOGW("Not touchpad device");
+        return RET_OK;
+    }
+
+    auto state = LIBINPUT_CONFIG_DRAG_DISABLED;
+    if (switchFlag) {
+        state = LIBINPUT_CONFIG_DRAG_ENABLED;
+    }
+    auto ret = libinput_device_config_tap_set_drag_enabled(originDevice, state);
+    if (ret != LIBINPUT_CONFIG_STATUS_SUCCESS) {
+        MMI_HILOGE("Set drag failed");
+        return RET_ERR;
+    }
+    MMI_HILOGI("Touchpad set double tap and drag state successfully, state:%{public}d", state);
+
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_DOUBLE_TAP_DRAG_SETTING,
+        switchFlag);
+    return RET_OK;
+}
+
+void TouchPadTransformProcessor::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    std::string name = "touchpadDoubleTapAndDrag";
+    GetConfigDataFromDatabase(name, switchFlag);
+}
+
 int32_t TouchPadTransformProcessor::SetTouchpadScrollRows(int32_t rows)
 {
     CALL_DEBUG_ENTER;
@@ -621,6 +721,15 @@ void TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, boo
 std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
 {
     return pointerEvent_;
+}
+
+void TouchPadTransformProcessor::RemoveSurplusPointerItem()
+{
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent_->GetAllPointerItems();
+    if (pointerItems.size() >= MAX_N_POINTER_ITEMS) {
+        MMI_HILOGW("Exceed maximum allowed number of pointer items");
+        pointerEvent_->RemovePointerItem(pointerItems.begin()->GetPointerId());
+    }
 }
 
 MultiFingersTapHandler::MultiFingersTapHandler() {}

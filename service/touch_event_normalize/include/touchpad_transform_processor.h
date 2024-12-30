@@ -17,6 +17,8 @@
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
 #include <map>
+#include <deque>
+#include <vector>
 
 #include "nocopyable.h"
 #include "singleton.h"
@@ -32,6 +34,44 @@ enum class MulFingersTap : int32_t {
     TRIPLE_TAP = 3,
     QUAD_TAP = 4,
     QUINT_TAP = 5,
+};
+
+struct Coords {
+    int32_t x;
+    int32_t y;
+    Coords operator+(const Coords& other) const
+    {
+        Coords result{this->x, this->y};
+        result += other;
+        return result;
+    }
+    Coords operator-(const Coords& other) const
+    {
+        Coords result{this->x, this->y};
+        result -= other;
+        return result;
+    }
+    Coords& operator+=(const Coords& other)
+    {
+        this->x += other.x;
+        this->y += other.y;
+        return *this;
+    }
+    Coords& operator-=(const Coords& other)
+    {
+        this->x -= other.x;
+        this->y -= other.y;
+        return *this;
+    }
+    Coords& operator/=(const int32_t& divisor)
+    {
+        if (divisor == 0) {
+            return *this;
+        }
+        this->x /= divisor;
+        this->y /= divisor;
+        return *this;
+    }
 };
 
 class MultiFingersTapHandler final {
@@ -83,6 +123,8 @@ public:
     static void GetTouchpadSwipeSwitch(bool &switchFlag);
     static int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
     static void GetTouchpadRotateSwitch(bool &rotateSwitch);
+    static int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag);
+    static void GetTouchpadDoubleTapAndDragState(bool &switchFlag);
     static int32_t SetTouchpadScrollRows(int32_t rows);
     static int32_t GetTouchpadScrollRows();
 
@@ -95,6 +137,7 @@ private:
     int32_t OnEventTouchPadUp(struct libinput_event *event);
     int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
     int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture, int32_t fingerCount);
+    void SmoothMultifingerSwipeData(std::vector<Coords>& fingerCoords, const int32_t fingerCount);
     int32_t OnEventTouchPadSwipeBegin(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeEnd(struct libinput_event *event);
@@ -110,11 +153,13 @@ private:
     int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchPadToolType(struct libinput_device *device);
     void InitToolType();
+    void RemoveSurplusPointerItem();
 private:
     const int32_t deviceId_ { -1 };
     bool isRotateGesture_ { false };
     double rotateAngle_ { 0.0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    std::vector<std::deque<Coords>> swipeHistory_;
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {

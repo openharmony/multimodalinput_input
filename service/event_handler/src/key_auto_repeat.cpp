@@ -133,7 +133,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             MMI_HILOGI("Stop autorepeat, keyCode:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         } else {
-            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction: %d",
+            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction:%d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         }
         if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && repeatKeyCode_ != keyEvent_->GetKeyCode()) {
@@ -168,6 +168,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 {
     CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+        timerId_ = -1;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
@@ -237,6 +238,7 @@ void KeyAutoRepeat::RemoveTimer()
 {
     CALL_DEBUG_ENTER;
     TimerMgr->RemoveTimer(timerId_);
+    timerId_ = -1;
 }
 
 int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t delay)

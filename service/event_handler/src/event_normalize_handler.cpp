@@ -66,6 +66,7 @@ constexpr int32_t USELIB_ABS_MT_POSITION_Y { 0x36 };
 constexpr int32_t SWIPE_INWARD_EDGE_X_THRE { 8 };
 constexpr int32_t SWIPE_INWARD_ANGLE_TOLERANCE { 8 };
 constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
+constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
 int32_t g_touchPadDeviceAxisX { 1 }; // max axis size
@@ -171,6 +172,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+#ifndef OHOS_BUILD_ENABLE_WATCH
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
@@ -188,17 +190,18 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+        case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
+        case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
+        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
+            HandleTableToolEvent(event);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_WATCH
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             HandleTouchEvent(event, frameTime);
             DfxHisysevent::CalcPointerDispTimes();
-            break;
-        }
-        case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
-        case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
-        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
-            HandleTableToolEvent(event);
             break;
         }
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -379,10 +382,10 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
-    KeyRepeat->SelectAutoRepeat(keyEvent);
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
 #endif // SHORTCUT_KEY_RULES_ENABLED
+    KeyRepeat->SelectAutoRepeat(keyEvent);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
@@ -489,6 +492,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(nextHandler_);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
@@ -498,9 +502,11 @@ bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<Pointer
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return false;
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
@@ -576,6 +582,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
@@ -587,6 +594,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             OHOS::ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
             OHOS::ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN_MMI,
             mapPayload);
+        mapPayload.clear();
     }
 #endif
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
@@ -673,6 +681,7 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
     }
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
@@ -694,6 +703,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
 int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
@@ -770,6 +780,7 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 {
     CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+        timerId_ = -1;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto keyEvent = KeyEventHdr->GetKeyEvent();
         CHKPV(keyEvent);
@@ -936,7 +947,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         auto touchPadDevice = libinput_event_get_device(event);
         // product isolation
         uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
-        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID) {
+        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID) {
             return g_isSwipeInward;
         }
         // get touchpad physic size
@@ -959,9 +970,6 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     // judge
     if (g_isSwipeInward == true) {
         SwipeInwardProcess(pointerEvent, type, event, &angleTolerance, lastDirection);
-        if (angleTolerance == 0) {
-            g_isSwipeInward = false;
-        }
     }
     return g_isSwipeInward;
 }
@@ -971,8 +979,6 @@ void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> poi
 {
     static int32_t lastPointerX;
     static int32_t lastPointerY;
-    int32_t pointerMotionX;
-    int32_t pointerMotionY;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {

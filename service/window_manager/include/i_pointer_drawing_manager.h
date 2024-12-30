@@ -19,7 +19,7 @@
 #include <map>
 #include <memory>
 
-#include "pixel_map.h"
+#include <pixel_map.h>
 
 #include "pointer_style.h"
 #include "window_info.h"
@@ -105,6 +105,9 @@ public:
     {
         return 0;
     }
+
+    virtual int32_t GetCursorSurfaceId(uint64_t &surfaceId);
+
     virtual PointerStyle GetLastMouseStyle()
     {
         return {};
@@ -149,6 +152,12 @@ public:
     virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
     virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    virtual bool IsSupported()
+    {
+        return false;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

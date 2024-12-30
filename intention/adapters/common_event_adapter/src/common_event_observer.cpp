@@ -24,14 +24,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-    std::set<std::string> g_commonEvents = {
-        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
-        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF,
-        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED,
-        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
-        EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_LOW,
-        EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_OKAY
-    };
+std::set<std::string> g_commonEvents = { EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
+    EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF, EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED, EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_LOW,
+    EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_OKAY };
 }
 
 std::shared_ptr<CommonEventObserver> CommonEventObserver::CreateCommonEventObserver(CommonEventHandleType handle)

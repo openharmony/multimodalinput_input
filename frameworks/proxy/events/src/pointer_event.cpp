@@ -490,8 +490,8 @@ PointerEvent::PointerEvent(const PointerEvent& other)
 #ifdef OHOS_BUILD_ENABLE_ANCO
       ancoDeal_(other.ancoDeal_),
 #endif // OHOS_BUILD_ENABLE_ANCO
-      handleEventType_(other.handleEventType_)
-      {}
+      handleEventType_(other.handleEventType_),
+      settings_(other.settings_) {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -665,7 +665,7 @@ void PointerEvent::SetPointerId(int32_t pointerId)
     pointerId_ = pointerId;
 }
 
-bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem)
+bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem) const
 {
     for (const auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
@@ -1428,6 +1428,16 @@ std::string_view PointerEvent::ActionToShortStr(int32_t action)
         default:
             return "P:?:";
     }
+}
+
+void PointerEvent::SetScrollRows(int32_t scrollRows)
+{
+    settings_.scrollRows_ = scrollRows;
+}
+
+int32_t PointerEvent::GetScrollRows() const
+{
+    return settings_.scrollRows_;
 }
 } // namespace MMI
 } // namespace OHOS

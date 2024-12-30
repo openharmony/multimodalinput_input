@@ -61,7 +61,7 @@ std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullp
 const std::string CALL_BEHAVIOR_KEY { "incall_power_button_behavior" };
 const std::string SETTINGS_DATA_SYSTEM_URI {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true" };
-const std::string SETTINGS_DATA_EXT_URI {
+const char* SETTINGS_DATA_EXT_URI {
     "datashare:///com.ohos.USER_SETTINGSDATA_100.DataAbility" };
 } // namespace
 
@@ -443,7 +443,6 @@ bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEven
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MUTE
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SWITCHVIDEOMODE
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SEARCH
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MEDIA_RECORD) {
         return true;
     }
@@ -872,6 +871,7 @@ bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscribe
         MMI_HILOGD("Timer callback");
         auto subscriber = weakSubscriber.lock();
         CHKPV(subscriber);
+        subscriber->timerId_ = -1;
         OnTimer(subscriber);
     });
 

@@ -83,6 +83,13 @@ public:
     }
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override { return pid; }
     int32_t GetPointerSize(int32_t &size) override { return size_; }
+
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override
+    {
+        surfaceId = {};
+        return RET_OK;
+    }
+
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override { return pid; }
     int32_t SetMousePrimaryButton(int32_t primaryButton) override
     {
@@ -204,6 +211,10 @@ public:
     int32_t AppendExtraData(const ExtraData& extraData) override { return extraData.sourceType; }
     int32_t EnableInputDevice(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override { return delay; }
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override
+    {
+        return retSetInputDeviceEnable_;
+    }
     int32_t SetTouchpadScrollSwitch(bool switchFlag) override
     {
         switchFlag_ = switchFlag;
@@ -313,6 +324,15 @@ public:
     {
         return getAllSystemHotkeys_;
     }
+    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) override
+    {
+        doubleTapAndDragState_ = switchFlag;
+        return static_cast<int32_t>(doubleTapAndDragState_);
+    }
+    int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag) override
+    {
+        return static_cast<int32_t>(doubleTapAndDragState_);
+    }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) override
@@ -320,6 +340,10 @@ public:
         return retCreateVKeyboardDevice_;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override
+    {
+        return static_cast<int32_t>(autoGenDown);
+    }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
@@ -365,6 +389,8 @@ public:
     int32_t retSetClientInfo_ = 0;
     int32_t retGetIntervalSinceLastInput_ = 0;
     int32_t retCreateVKeyboardDevice_ = 0;
+    bool doubleTapAndDragState_ = false;
+    int32_t retSetInputDeviceEnable_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
@@ -7095,7 +7121,8 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddVirtualInputDevice_004, TestSize
     EXPECT_CALL(*messageParcelMock_, ReadString(_))
         .WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint64(_))
+        .WillOnce(Return(true)).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadUint32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
     EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
@@ -7153,7 +7180,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadThreeFingersTapSwitch_00
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -7479,7 +7506,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerSnapshot_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillRepeatedly(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -7986,7 +8013,10 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSkipPointerLayer_001, TestSize.Leve
 HWTEST_F(MultimodalInputConnectStubTest, StubSkipPointerLayer_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_))
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -8261,5 +8291,121 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetClientInfo_002, TestSize.Level1)
     service->state_ = ServiceRunningState::STATE_RUNNING;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetClientInfo(data, reply));
 }
+
+/**
+ * @tc.name: StubSetTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Test the function StubSetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadDoubleTapAndDragState(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadDoubleTapAndDragState_002
+ * @tc.desc: Test the function StubSetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadDoubleTapAndDragState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadDoubleTapAndDragState(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadDoubleTapAndDragState_003
+ * @tc.desc: Test the function StubSetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadDoubleTapAndDragState_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadDoubleTapAndDragState(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Test the function StubGetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadDoubleTapAndDragState(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadDoubleTapAndDragState_002
+ * @tc.desc: Test the function StubGetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadDoubleTapAndDragState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadDoubleTapAndDragState(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadDoubleTapAndDragState(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadDoubleTapAndDragState_003
+ * @tc.desc: Test the function StubGetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadDoubleTapAndDragState_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadDoubleTapAndDragState(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadDoubleTapAndDragState(data, reply));
+}
+
 } // namespace MMI
 } // namespace OHOS

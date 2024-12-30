@@ -37,7 +37,6 @@
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-class TouchGestureHandler;
 class TouchGestureManager;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -57,6 +56,7 @@ public:
     int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize(int32_t &size) override;
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
@@ -139,6 +139,8 @@ public:
     int32_t GetTouchpadRightClickType(int32_t &type) override;
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch) override;
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) override;
+    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) override;
+    int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag) override;
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
@@ -191,6 +193,8 @@ public:
 
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
@@ -216,12 +220,13 @@ protected:
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
     int32_t ReadTouchpadRightMenuType(int32_t &type);
     int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
+    int32_t ReadTouchpadDoubleTapAndDragState(bool &switchFlag);
     int32_t ReadTouchpadScrollRows(int32_t &rows);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
     int32_t OnGetDeviceIds(std::vector<int32_t> &ids);
-    int32_t OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice);
+    int32_t OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice);
     int32_t OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType);
     int32_t OnGetWindowPid(int32_t windowId, int32_t &windowPid);
@@ -263,11 +268,12 @@ protected:
     int32_t UpdateCombineKeyState(bool enable);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
-    int32_t OnCancelInjection();
+    int32_t OnCancelInjection(int32_t callPid = 0);
     void InitPrintClientInfo();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void InitVKeyboardFuncHandler();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess);
 private:
     MMIService();
     ~MMIService();
@@ -295,7 +301,6 @@ private:
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<TouchGestureHandler> touchGestureHandler_ { nullptr };
     std::shared_ptr<TouchGestureManager> touchGestureMgr_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<DelegateInterface> delegateInterface_ { nullptr };

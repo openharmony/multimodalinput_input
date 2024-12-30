@@ -398,6 +398,28 @@ int32_t MultimodalInputConnectProxy::GetPointerSize(int32_t &size)
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    auto ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_CURSOR_SURFACE_ID),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SendRequest fail, error:%{public}d", ret);
+        return ret;
+    }
+    READUINT64(reply, surfaceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_DEBUG_ENTER;
@@ -1635,6 +1657,8 @@ int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData& extraData)
     WRITEINT32(data, extraData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pointerId, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pullId, ERR_INVALID_VALUE);
+    WRITEINT32(data, extraData.eventId, ERR_INVALID_VALUE);
+    WRITEBOOL(data, extraData.drawCursor, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -1891,6 +1915,18 @@ int32_t MultimodalInputConnectProxy::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
     return GetTouchpadBoolData(rotateSwitch, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
         GET_TP_ROTATE_SWITCH));
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    return SetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_DOUBLE_TAP_DRAG_STATE));
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    return GetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_DOUBLE_TAP_DRAG_STATE));
 }
 
 int32_t MultimodalInputConnectProxy::SetShieldStatus(int32_t shieldMode, bool isShield)
@@ -2615,6 +2651,56 @@ int32_t MultimodalInputConnectProxy::GetAllSystemHotkeys(std::vector<std::unique
             return IPC_PROXY_DEAD_OBJECT_ERR;
         }
         keyOptions.push_back(std::move(keyOption));
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, deviceId, ERR_INVALID_VALUE);
+    WRITEBOOL(data, enable, ERR_INVALID_VALUE);
+    WRITEINT32(data, index, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUT_DEVICE_ENABLE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(int32_t sourceWindowId,
+    int32_t targetWindowId, bool autoGenDown)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, sourceWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, targetWindowId, ERR_INVALID_VALUE);
+    WRITEBOOL(data, autoGenDown, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SHIFT_APP_POINTER_EVENT),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::ShiftAppPointerEvent Send request fail, ret:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }

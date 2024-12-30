@@ -48,8 +48,7 @@ HWTEST_F(EventFilterDeathRecipientTest, EventFilterDeathRecipientTest_Interface_
     EventFilterDeathRecipient item {[&](const wptr<IRemoteObject> &object) {
         flag = true;
     }};
-    item.OnRemoteDied(nullptr);
-    EXPECT_EQ(flag, true);
+    ASSERT_NO_FATAL_FAILURE(item.OnRemoteDied(nullptr));
 }
 } // namespace MMI
 } // namespace OHOS

@@ -61,6 +61,7 @@ protected:
     int32_t StubGetMouseScrollRows(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSize(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSize(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetCursorSurfaceId(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCustomCursor(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMouseIcon(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMouseHotSpot(MessageParcel& data, MessageParcel& reply);
@@ -135,6 +136,8 @@ protected:
     int32_t StubGetTouchpadRightClickType(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadRotateSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadRotateSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadDoubleTapAndDragState(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadDoubleTapAndDragState(MessageParcel& data, MessageParcel& reply);
     int32_t StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetShieldStatus(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetShieldStatus(MessageParcel& data, MessageParcel& reply);
@@ -171,6 +174,8 @@ protected:
     int32_t StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetAllSystemHotkeys(MessageParcel& data, MessageParcel& reply);
     int32_t ParseAddInputHandlerData(MessageParcel& data, ParseData& parseData);
+    int32_t StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply);
+    int32_t StubShiftAppPointerEvent(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

@@ -73,6 +73,7 @@ public:
 void DeviceEventMonitor::InitCommonEventSubscriber()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(commonEventMutex_);
     if (hasInit_) {
         MMI_HILOGE("Current common event has subscribered");
         return;

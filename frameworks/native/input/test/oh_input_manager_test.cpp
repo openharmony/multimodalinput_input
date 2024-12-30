@@ -1303,5 +1303,31 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyDeviceInfo_001, 
     OH_Input_DestroyDeviceInfo(&deviceInfo);
     EXPECT_EQ(deviceInfo, nullptr);
 }
+
+static void HotkeyCallback(Input_Hotkey* hotkey)
+{}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddHotkeyMonitor_001
+ * @tc.desc: Duplicate subscription of identical hotkey will fail.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_001, TestSize.Level1)
+{
+    Input_Hotkey *hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    int32_t preKeys[] { KEYCODE_CTRL_LEFT };
+    OH_Input_SetPreKeys(hotkey, preKeys, sizeof(preKeys) / sizeof(int32_t));
+    OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
+    OH_Input_SetRepeat(hotkey, false);
+    Input_Result result = OH_Input_AddHotkeyMonitor(hotkey, &HotkeyCallback);
+    EXPECT_EQ(result, Input_Result::INPUT_SUCCESS);
+    result = OH_Input_AddHotkeyMonitor(hotkey, &HotkeyCallback);
+    EXPECT_EQ(result, Input_Result::INPUT_PARAMETER_ERROR);
+    result = OH_Input_RemoveHotkeyMonitor(hotkey, &HotkeyCallback);
+    EXPECT_EQ(result, Input_Result::INPUT_SUCCESS);
+    OH_Input_DestroyHotkey(&hotkey);
+}
 } // namespace MMI
 } // namespace OHOS

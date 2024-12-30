@@ -25,11 +25,14 @@
 #include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_manager.h"
 #include "knuckle_dynamic_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 namespace OHOS {
 namespace MMI {
+constexpr uint32_t SCREEN_CONTROL_WINDOW_TYPE = 2137;
 struct WindowInfoEX {
     WindowInfo window;
     bool flag { false };
@@ -120,6 +123,7 @@ public:
     void SendPointerEvent(int32_t pointerAction);
     bool IsMouseSimulate() const;
     bool HasMouseHideFlag() const;
+    void UpdatePointerDrawingManagerWindowInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     PointerStyle GetLastPointerStyle() const;
@@ -139,7 +143,7 @@ public:
         Coordinate2D& cursorPos) const;
     void ScreenRotateAdjustDisplayXY(const DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
-    void RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
+    void RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
@@ -195,6 +199,12 @@ public:
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
     void CleanInvalidPiexMap();
     void HandleWindowPositionChange();
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    bool IsSupported();
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -332,6 +342,12 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
     void OnGestureSendEvent(std::shared_ptr<PointerEvent> event);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
+    void SendUpDownPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown,
+        int32_t sourceDisplayId, int32_t targetDisplayId,
+        std::optional<WindowInfo> &sourceWindowInfo, std::optional<WindowInfo> &targetWindowInfo);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     UDSServer* udsServer_ { nullptr };
@@ -372,6 +388,7 @@ private:
         bool isCaptureMode { false };
     } captureModeInfo_;
     ExtraData extraData_;
+    int32_t mouseDownEventId_ { -1 };
     bool haveSetObserver_ { false };
     bool dragFlag_ { false };
     bool isDragBorder_ { false };
@@ -382,13 +399,17 @@ private:
         bool isOpen { false };
     } antiMistake_;
     bool isOpenAntiMisTakeObserver_ { false };
+#ifndef OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_WATCH
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetTouchWinIds_;
     std::map<int32_t, std::vector<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
+#ifndef OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<PointerEvent> lastPointerEventforWindowChange_ { nullptr };
     bool cancelTouchStatus_ { false };
     Direction lastDirection_ = static_cast<Direction>(-1);

@@ -62,7 +62,7 @@ public:
         int32_t pid { -1 };
         MessageId msgId { MessageId::INVALID };
         int32_t userData { -1 };
-        bool state{ false };
+        bool state { false };
         int32_t errCode { static_cast<int32_t>(CoordinationErrCode::COORDINATION_OK) };
     };
 
@@ -98,9 +98,9 @@ private:
     std::list<std::shared_ptr<EventInfo>> listeners_;
     std::map<EventType, std::shared_ptr<EventInfo>> calls_ {
         { EventType::ENABLE, nullptr },
-        { EventType::START, nullptr },
-        { EventType::STOP, nullptr },
-        { EventType::STATE, nullptr }
+        { EventType::START,  nullptr },
+        { EventType::STOP,   nullptr },
+        { EventType::STATE,  nullptr }
     };
 };
 } // namespace Cooperate

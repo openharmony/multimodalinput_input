@@ -66,7 +66,6 @@ private:
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
     CircleStreamBuffer circBuf_;
-    std::mutex mtx_;
     EventHandlerPtr eventHandler_ { nullptr };
     bool isEventHandlerChanged_ { false };
     bool isListening_ { false };

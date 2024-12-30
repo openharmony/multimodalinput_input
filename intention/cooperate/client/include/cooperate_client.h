@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,15 +42,15 @@ namespace Msdp {
 namespace DeviceStatus {
 class CooperateClient final {
 public:
-    using CooperateMessageCallback = std::function<void(const std::string&, const CoordinationMsgInfo&)>;
+    using CooperateMessageCallback = std::function<void(const std::string &, const CoordinationMsgInfo &)>;
     using CooperateStateCallback = std::function<void(bool)>;
     using CooperateListenerPtr = std::shared_ptr<ICoordinationListener>;
     using HotAreaListenerPtr = std::shared_ptr<IHotAreaListener>;
     using MouseLocationListenerPtr = std::shared_ptr<IEventListener>;
 
     struct CooperateEvent {
-        CooperateEvent(CooperateMessageCallback callback) : msgCb(callback) {}
-        CooperateEvent(CooperateStateCallback callback) : stateCb(callback) {}
+        CooperateEvent(CooperateMessageCallback callback) : msgCb(callback) { }
+        CooperateEvent(CooperateStateCallback callback) : stateCb(callback) { }
 
         CooperateMessageCallback msgCb;
         CooperateStateCallback stateCb;
@@ -60,28 +60,21 @@ public:
     ~CooperateClient() = default;
     DISALLOW_COPY_AND_MOVE(CooperateClient);
 
-    int32_t RegisterListener(ITunnelClient &tunnel,
-        CooperateListenerPtr listener, bool isCheckPermission = false);
-    int32_t UnregisterListener(ITunnelClient &tunnel,
-        CooperateListenerPtr listener, bool isCheckPermission = false);
-    int32_t Enable(ITunnelClient &tunnel,
+    int32_t RegisterListener(ITunnelClient &tunnel, CooperateListenerPtr listener, bool isCheckPermission = false);
+    int32_t UnregisterListener(ITunnelClient &tunnel, CooperateListenerPtr listener, bool isCheckPermission = false);
+    int32_t Enable(ITunnelClient &tunnel, CooperateMessageCallback callback, bool isCheckPermission = false);
+    int32_t Disable(ITunnelClient &tunnel, CooperateMessageCallback callback, bool isCheckPermission = false);
+    int32_t Start(ITunnelClient &tunnel, const std::string &remoteNetworkId, int32_t startDeviceId,
         CooperateMessageCallback callback, bool isCheckPermission = false);
-    int32_t Disable(ITunnelClient &tunnel,
-        CooperateMessageCallback callback, bool isCheckPermission = false);
-    int32_t Start(ITunnelClient &tunnel,
-        const std::string &remoteNetworkId, int32_t startDeviceId,
-        CooperateMessageCallback callback, bool isCheckPermission = false);
-    int32_t Stop(ITunnelClient &tunnel,
-        bool isUnchained, CooperateMessageCallback callback,
-        bool isCheckPermission = false);
-    int32_t GetCooperateState(ITunnelClient &tunnel,
-        const std::string &networkId, CooperateStateCallback callback,
+    int32_t Stop(
+        ITunnelClient &tunnel, bool isUnchained, CooperateMessageCallback callback, bool isCheckPermission = false);
+    int32_t GetCooperateState(ITunnelClient &tunnel, const std::string &networkId, CooperateStateCallback callback,
         bool isCheckPermission = false);
     int32_t GetCooperateState(ITunnelClient &tunnel, const std::string &udId, bool &state);
-    int32_t RegisterEventListener(ITunnelClient &tunnel, const std::string &networkId,
-        MouseLocationListenerPtr listener);
-    int32_t UnregisterEventListener(ITunnelClient &tunnel, const std::string &networkId,
-        MouseLocationListenerPtr listener = nullptr);
+    int32_t RegisterEventListener(
+        ITunnelClient &tunnel, const std::string &networkId, MouseLocationListenerPtr listener);
+    int32_t UnregisterEventListener(
+        ITunnelClient &tunnel, const std::string &networkId, MouseLocationListenerPtr listener = nullptr);
     int32_t AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener);
     int32_t RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener = nullptr);
 

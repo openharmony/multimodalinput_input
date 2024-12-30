@@ -104,6 +104,8 @@ public:
     napi_value GetTouchpadRightClickType(napi_env env, napi_value handle = nullptr);
     napi_value SetTouchpadRotateSwitch(napi_env env, bool rotateSwitch, napi_value handle = nullptr);
     napi_value GetTouchpadRotateSwitch(napi_env env, napi_value handle = nullptr);
+    napi_value SetTouchpadDoubleTapAndDragState(napi_env env, bool switchFlag, napi_value handle = nullptr);
+    napi_value GetTouchpadDoubleTapAndDragState(napi_env env, napi_value handle = nullptr);
     napi_value SetMoveEventFilters(napi_env env, bool flag);
     napi_value SetTouchpadThreeFingersTapSwitch(napi_env env, bool switchFlag, napi_value handle = nullptr);
     napi_value GetTouchpadThreeFingersTapSwitch(napi_env env, napi_value handle = nullptr);

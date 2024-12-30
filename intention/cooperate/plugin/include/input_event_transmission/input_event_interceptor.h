@@ -30,7 +30,7 @@ class Context;
 
 class InputEventInterceptor final {
 public:
-    InputEventInterceptor(IContext *env) : env_(env) {}
+    InputEventInterceptor(IContext *env) : env_(env) { }
     ~InputEventInterceptor();
     DISALLOW_COPY_AND_MOVE(InputEventInterceptor);
 

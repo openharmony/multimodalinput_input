@@ -115,12 +115,14 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         MMI_HILOGE("PreKeys number invalid");
         return INVALID_SUBSCRIBE_ID;
     }
+    MMI_HILOGI("PRE:[%{private}s],FINAL:%{private}d,KA:%{public}s,HT:%{public}d",
+        DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
+        (keyOption->IsFinalKeyDown() ? "down" : "up"), keyOption->GetFinalKeyDownDuration());
 
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
-
     std::lock_guard<std::mutex> guard(mtx_);
     auto [tIter, isOk] = subscribeInfos_.emplace(keyOption, callback);
     if (!isOk) {
@@ -133,15 +135,10 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         subscribeInfos_.erase(tIter);
         return ret;
     }
-
-    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{private}d,"
+    MMI_HILOGI("subscribeId:%{public}d, preKeys:[%{private}s], finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
-        tIter->GetSubscribeId(), keyOption->GetFinalKey(),
-        keyOption->IsFinalKeyDown() ? "true" : "false",
-        keyOption->GetFinalKeyDownDuration());
-    for (const auto &preKey : preKeys) {
-        MMI_HILOGD("prekey:%{private}d", preKey);
-    }
+        tIter->GetSubscribeId(), DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
+        keyOption->IsFinalKeyDown() ? "true" : "false", keyOption->GetFinalKeyDownDuration());
     return tIter->GetSubscribeId();
 }
 
@@ -153,11 +150,11 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGE("The subscribe Infos is empty");
         return RET_ERR;
@@ -187,6 +184,9 @@ int32_t KeyEventInputSubscribeManager::SubscribeHotkey(std::shared_ptr<KeyOption
         MMI_HILOGE("PreKeys number invalid");
         return INVALID_SUBSCRIBE_ID;
     }
+    MMI_HILOGI("PRE:[%{private}s],FINAL:%{private}d,KA:%{public}s,HT:%{public}d",
+        DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
+        (keyOption->IsFinalKeyDown() ? "down" : "up"), keyOption->GetFinalKeyDownDuration());
 
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -206,14 +206,10 @@ int32_t KeyEventInputSubscribeManager::SubscribeHotkey(std::shared_ptr<KeyOption
         return ret;
     }
 
-    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{private}d,"
+    MMI_HILOGI("subscribeId:%{public}d, preKeys:%{private}s, finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
-        tIter->GetSubscribeId(), keyOption->GetFinalKey(),
-        keyOption->IsFinalKeyDown() ? "true" : "false",
-        keyOption->GetFinalKeyDownDuration());
-    for (const auto &preKey : preKeys) {
-        MMI_HILOGD("prekey:%{private}d", preKey);
-    }
+        tIter->GetSubscribeId(), DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
+        keyOption->IsFinalKeyDown() ? "true" : "false", keyOption->GetFinalKeyDownDuration());
     return tIter->GetSubscribeId();
 }
 
@@ -225,11 +221,12 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeHotkey(int32_t subscribeId)
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
+
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGE("Subscribe Infos is empty");
         return RET_ERR;

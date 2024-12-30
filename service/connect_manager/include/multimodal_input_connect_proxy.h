@@ -45,6 +45,7 @@ public:
     int32_t SetPointerSize(int32_t size) override;
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override;
     int32_t GetPointerSize(int32_t &size) override;
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
@@ -121,6 +122,8 @@ public:
     int32_t GetTouchpadRightClickType(int32_t &type) override;
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch) override;
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) override;
+    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) override;
+    int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag) override;
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
@@ -156,6 +159,8 @@ public:
 	int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
+    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
+    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string EVENT_FILE_NAME = "/data/service/el1/public/multimodalinput/multimodal_event.dmp";
-const std::string EVENT_FILE_NAME_HISTORY = "/data/service/el1/public/multimodalinput/multimodal_event_history.dmp";
+const char* EVENT_FILE_NAME = "/data/service/el1/public/multimodalinput/multimodal_event.dmp";
+const char* EVENT_FILE_NAME_HISTORY = "/data/service/el1/public/multimodalinput/multimodal_event_history.dmp";
 constexpr int32_t FILE_MAX_SIZE = 100 * 1024 * 1024;
 constexpr int32_t EVENT_OUT_SIZE = 30;
 constexpr int32_t FUNC_EXE_OK = 0;
@@ -111,15 +111,15 @@ void EventStatistic::WriteEventFile()
         std::string eventStr = PopEvent();
         struct stat statbuf;
         int32_t fileSize = 0;
-        if (stat(EVENT_FILE_NAME.c_str(), &statbuf) == FUNC_EXE_OK) {
+        if (stat(EVENT_FILE_NAME, &statbuf) == FUNC_EXE_OK) {
             fileSize = static_cast<int32_t>(statbuf.st_size);
         }
         if (fileSize >= FILE_MAX_SIZE) {
-            if (access(EVENT_FILE_NAME_HISTORY.c_str(), F_OK) == FUNC_EXE_OK &&
-                remove(EVENT_FILE_NAME_HISTORY.c_str()) != FUNC_EXE_OK) {
+            if (access(EVENT_FILE_NAME_HISTORY, F_OK) == FUNC_EXE_OK &&
+                remove(EVENT_FILE_NAME_HISTORY) != FUNC_EXE_OK) {
                 MMI_HILOGE("Remove history file failed");
             }
-            if (rename(EVENT_FILE_NAME.c_str(), EVENT_FILE_NAME_HISTORY.c_str()) != FUNC_EXE_OK) {
+            if (rename(EVENT_FILE_NAME, EVENT_FILE_NAME_HISTORY) != FUNC_EXE_OK) {
                 MMI_HILOGE("Rename file failed");
             }
         }

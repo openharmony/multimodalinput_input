@@ -41,6 +41,7 @@ public:
     using FunInputDevKeys = std::function<void(std::vector<bool>&)>;
     using FunKeyboardTypes = std::function<void(int32_t)>;
     using InputDevListenerPtr = std::shared_ptr<IInputDeviceListener>;
+    using FunSetInputDeviceAck = std::function<void(int32_t)>;
 
     int32_t RegisterDevListener(const std::string &type, InputDevListenerPtr listener);
     int32_t UnregisterDevListener(const std::string &type, InputDevListenerPtr listener = nullptr);
@@ -58,6 +59,8 @@ public:
     void OnDevListener(int32_t deviceId, const std::string &type);
     void OnKeyboardType(int32_t userData, int32_t keyboardType);
     int32_t GetUserData();
+    int32_t RegisterInputdevice(int32_t deviceId, bool enable, FunSetInputDeviceAck callback);
+    void OnSetInputDeviceAck(int32_t index, int32_t result);
 
 private:
     InputDeviceImpl() = default;
@@ -65,6 +68,8 @@ private:
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
     std::mutex mtx_;
+    std::map<int32_t, FunSetInputDeviceAck> inputdeviceList_;
+    int32_t operationIndex_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

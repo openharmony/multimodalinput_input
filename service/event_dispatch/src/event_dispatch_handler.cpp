@@ -19,7 +19,9 @@
 
 #include <linux/input-event-codes.h>
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "transaction/rs_interfaces.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #include "anr_manager.h"
 #include "app_debug_listener.h"
@@ -220,7 +222,9 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
     uint32_t pid, int32_t pointCnt)
 {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
@@ -340,6 +344,16 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     auto currentTime = GetSysClockTime();
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) {
+        bool isTrue = (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
+            (point->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END);
+        if (isTrue) {
+            MMI_HILOGE("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
+                "action:%{public}d)", point->GetDeviceId(), point->GetPointerAction());
+        }
         MMI_HILOGD("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
             "action:%{public}s)", point->GetDeviceId(), point->DumpPointerAction());
         return;

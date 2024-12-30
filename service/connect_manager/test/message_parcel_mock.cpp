@@ -359,11 +359,20 @@ bool Parcel::ReadDouble(double &value)
     return DfsMessageParcel::messageParcel->ReadDouble(value);
 }
 
-Media::PixelMap *Media::PixelMap::Unmarshalling(Parcel &parcel)
+Media::PixelMap *Media::PixelMap::Unmarshalling(Parcel &parcel,
+    std::function<int(Parcel &parcel, std::function<int(Parcel&)> readFdDefaultFunc)> readSafeFdFunc)
 {
     if (DfsMessageParcel::messageParcel == nullptr) {
         return nullptr;
     }
     return DfsMessageParcel::messageParcel->Unmarshalling(parcel);
+}
+
+bool PermissionHelper::CheckInputDeviceController()
+{
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
+    return DfsMessageParcel::messageParcel->CheckInputDeviceController();
 }
 } // namespace OHOS

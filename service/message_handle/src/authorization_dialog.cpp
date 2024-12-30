@@ -32,8 +32,6 @@ namespace MMI {
 namespace {
 constexpr int32_t INVALID_USERID { -1 };
 constexpr int32_t MESSAGE_PARCEL_KEY_SIZE { 3 };
-std::atomic_bool g_isDialogShow = false;
-sptr<IRemoteObject> g_remoteObject = nullptr;
 }
 
 std::string AuthorizationDialog::bundleName_ = "com.ohos.powerdialog";
@@ -44,18 +42,26 @@ AuthorizationDialog::AuthorizationDialog() : dialogConnectionCallback_(new Dialo
 
 AuthorizationDialog::~AuthorizationDialog()
 {
+    CALL_DEBUG_ENTER;
+    CloseDialog();
     dialogConnectionCallback_ = nullptr;
 }
 
 bool AuthorizationDialog::ConnectSystemUi()
 {
+    CALL_DEBUG_ENTER;
     CHKPR(dialogConnectionCallback_, false);
-    if (g_isDialogShow) {
-        AppExecFwk::ElementName element;
-        dialogConnectionCallback_->OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
+    if (dialogConnectionCallback_->DialogIsOpen()) {
         MMI_HILOGW("Power dialog has been show");
         return true;
     }
+
+    if (dialogConnectionCallback_->IsConnected()) {
+        MMI_HILOGW("Dialog reopens");
+        dialogConnectionCallback_->OpenDialog();
+        return true;
+    }
+    MMI_HILOGI("ConnectAbility systemui beigin");
     auto abilityMgr = AAFwk::AbilityManagerClient::GetInstance();
     CHKPF(abilityMgr);
 
@@ -70,38 +76,23 @@ bool AuthorizationDialog::ConnectSystemUi()
     return true;
 }
 
+void AuthorizationDialog::CloseDialog()
+{
+    CALL_DEBUG_ENTER;
+    dialogConnectionCallback_->CloseDialog();
+}
+
 void AuthorizationDialog::DialogAbilityConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard lock(mutex_);
     CHKPV(remoteObject);
-    if (g_remoteObject == nullptr) {
-        g_remoteObject = remoteObject;
+    if (remoteObject_ == nullptr) {
+        remoteObject_ = remoteObject;
     }
-    ffrt::submit([remoteObject] {
-        MessageParcel data;
-        MessageParcel reply;
-        MessageOption option;
-        data.WriteInt32(MESSAGE_PARCEL_KEY_SIZE);
-        data.WriteString16(u"bundleName");
-        data.WriteString16(Str8ToStr16(AuthorizationDialog::GetBundleName()));
-        data.WriteString16(u"abilityName");
-        data.WriteString16(Str8ToStr16(AuthorizationDialog::GetAbilityName()));
-        data.WriteString16(u"parameters");
-        std::string midStr = "\"";
-        std::string paramStr = "{\"ability.want.params.uiExtensionType\":"+ midStr +
-            AuthorizationDialog::GetUiExtensionType() + midStr + ",\"sysDialogZOrder\":2,\"isInputDlg\":true}";
-        data.WriteString16(Str8ToStr16(paramStr));
-        MMI_HILOGI("Show power dialog is begin");
-        const uint32_t cmdCode = 1;
-        int32_t ret = remoteObject->SendRequest(cmdCode, data, reply, option);
-        if (ret != ERR_OK) {
-            MMI_HILOGW("Show power dialog is failed:%{public}d", ret);
-            return;
-        }
-        g_isDialogShow = true;
-        MMI_HILOGI("Show power dialog is success");
+    ffrt::submit([&] {
+        this->OpenDialog();
     });
 }
 
@@ -110,8 +101,77 @@ void AuthorizationDialog::DialogAbilityConnection::OnAbilityDisconnectDone(
 {
     CALL_DEBUG_ENTER;
     std::lock_guard lock(mutex_);
-    g_isDialogShow = false;
-    g_remoteObject = nullptr;
+    remoteObject_ = nullptr;
+    // disconnted window must be shutdown
+    isDialogShow_ = false;
+}
+
+void AuthorizationDialog::DialogAbilityConnection::CloseDialog()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard lock(mutex_);
+    CHKPV(remoteObject_);
+    if (!isDialogShow_) {
+        MMI_HILOGI("Has closed!");
+        return;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    const uint32_t cmdCode = 3;
+    int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
+    int32_t replyCode = -1;
+    bool success = false;
+    if (ret == ERR_OK) {
+        success = reply.ReadInt32(replyCode);
+    }
+    isDialogShow_ = false;
+    MMI_HILOGI("CloseDialog: ret=%d, %d, %d", ret, success, replyCode);
+}
+
+void AuthorizationDialog::DialogAbilityConnection::OpenDialog()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInt32(MESSAGE_PARCEL_KEY_SIZE);
+    data.WriteString16(u"bundleName");
+    data.WriteString16(Str8ToStr16(AuthorizationDialog::GetBundleName()));
+    data.WriteString16(u"abilityName");
+    data.WriteString16(Str8ToStr16(AuthorizationDialog::GetAbilityName()));
+    data.WriteString16(u"parameters");
+    std::string midStr = "\"";
+    std::string paramStr = "{\"ability.want.params.uiExtensionType\":"+ midStr +
+        AuthorizationDialog::GetUiExtensionType() + midStr + ",\"sysDialogZOrder\":2,\"isInputDlg\":true}";
+    data.WriteString16(Str8ToStr16(paramStr));
+    MMI_HILOGI("Show power dialog is begin");
+    const uint32_t cmdCode = 1;
+    std::lock_guard lock(mutex_);
+    CHKPV(remoteObject_);
+    int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
+    if (ret != ERR_OK) {
+        MMI_HILOGW("Show power dialog is failed:%{public}d", ret);
+        return;
+    }
+    isDialogShow_ = true;
+    MMI_HILOGI("Show power dialog is success");
+}
+
+bool AuthorizationDialog::DialogAbilityConnection::DialogIsOpen()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard lock(mutex_);
+    return isDialogShow_;
+}
+
+bool AuthorizationDialog::DialogAbilityConnection::IsConnected()
+{
+    std::lock_guard lock(mutex_);
+    if (remoteObject_ != nullptr) {
+        return true;
+    }
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -1049,7 +1049,7 @@ static bool IsScreenCaptureWorking()
         if (capturePid == pid) {
             return true;
         } else {
-            MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
+            MMI_HILOGE("Calling pid is:%{public}d, but screen capture pid is:%{public}d", pid, capturePid);
         }
     }
     return false;
@@ -1964,7 +1964,7 @@ static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
         for (const auto &iter: it->second) {
             if (iter->callback == hotkeyInfo->callback) {
                 MMI_HILOGI("Callback already exist");
-                return INPUT_SUCCESS;
+                return INPUT_PARAMETER_ERROR;
             }
         }
     }

@@ -31,10 +31,10 @@
 #include "dsoftbus_handler.h"
 #include "event_manager.h"
 #include "hot_area.h"
+#include "i_context.h"
 #include "input_device_mgr.h"
 #include "input_event_transmission/input_event_builder.h"
 #include "input_event_transmission/input_event_interceptor.h"
-#include "i_context.h"
 #include "mouse_location.h"
 
 namespace OHOS {

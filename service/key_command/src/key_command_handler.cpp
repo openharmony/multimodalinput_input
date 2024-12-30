@@ -45,7 +45,9 @@
 #include "mmi_log.h"
 #include "nap_process.h"
 #include "net_packet.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "proto.h"
 #include "setting_datashare.h"
 #include "stylus_key_handler.h"
@@ -76,20 +78,22 @@ constexpr int64_t SOS_DELAY_TIMES { 1000000 };
 constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 15000 };
-const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
-const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
-const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const char* AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
+const char* WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
+const char* SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const char* SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const char* SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 const std::string WALLET_BUNDLE_NAME { "com.hmos.wallet" };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int64_t POWER_ACTION_INTERVAL { 600 };
 constexpr int64_t SOS_WAIT_TIME { 3000 };
-const std::string PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const std::string PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const std::string PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const std::string PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
+const char* PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const char* PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const char* PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const char* PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
+const std::string KEY_ENABLE { "enable" };
+const std::string KEY_STATUS { "status" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -502,6 +506,7 @@ void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEve
     MMI_HILOGW("Event is %{public}s", tempEvent->ToString().c_str());
     auto fd = WIN_MGR->GetClientFd(tempEvent);
     auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(tempEvent, pkt);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -1086,7 +1091,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         !IsMusicActivate()) {
         return true;
     }
-    MMI_HILOGI("ScreenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
         return false;
     }
@@ -1412,6 +1417,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
     bool sequencesHandleRet = HandleSequences(key);
     if (shortKeysHandleRet) {
+        launchAbilityCount_ = 0;
         isHandleSequence_ = false;
         return true;
     }
@@ -1421,6 +1427,11 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
         MMI_HILOGI("Handle power key DownStart:%{public}d", isDownStart_);
+    }
+    if (key->GetKeyCode() != repeatKey_.keyCode && key->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        MMI_HILOGI("Combination key currentKey:%{public}d, repeatKey:%{public}d",
+            key->GetKeyCode(), repeatKey_.keyCode);
+        isDownStart_ = false;
     }
     if (!isDownStart_) {
         HandleRepeatKeys(key);
@@ -1472,7 +1483,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
             if (it != specialTimers_.end() && !it->second.empty()) {
                 it->second.pop_front();
             }
-            InputHandler->GetSubscriberHandler()->HandleKeyEvent(tmpKey);
+            auto handler = InputHandler->GetSubscriberHandler();
+            CHKPV(handler);
+            handler->HandleKeyEvent(tmpKey);
         });
         if (timerId < 0) {
             MMI_HILOGE("Add timer failed");
@@ -1535,6 +1548,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
 
     for (RepeatKey& item : repeatKeys_) {
         if (CheckSpecialRepeatKey(item, keyEvent)) {
+            launchAbilityCount_ = 0;
             MMI_HILOGI("Skip repeatKey");
             return false;
         }
@@ -1766,6 +1780,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
         }
         repeatTimerId_ = TimerMgr->AddTimer(intervalTime / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
+            repeatTimerId_ = -1;
         });
         if (repeatTimerId_ < 0) {
             return false;
@@ -1818,18 +1833,24 @@ void KeyCommandHandler::SendKeyEvent()
             if (count_ == repeatKeyMaxTimes_[keycode] - 1 && keycode == KeyEvent::KEYCODE_POWER) {
                 auto keyEventCancel = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_CANCEL, false);
                 CHKPV(keyEventCancel);
-                InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
+                auto handler = InputHandler->GetSubscriberHandler();
+                CHKPV(handler);
+                handler->HandleKeyEvent(keyEventCancel);
                 continue;
             }
             if (i != 0) {
                 auto keyEventDown = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_DOWN, true);
                 CHKPV(keyEventDown);
-                InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventDown);
+                auto handler = InputHandler->GetSubscriberHandler();
+                CHKPV(handler);
+                handler->HandleKeyEvent(keyEventDown);
             }
 
             auto keyEventUp = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_UP, false);
             CHKPV(keyEventUp);
-            InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventUp);
+            auto handler = InputHandler->GetSubscriberHandler();
+            CHKPV(handler);
+            handler->HandleKeyEvent(keyEventUp);
         }
     }
     count_ = 0;
@@ -1863,6 +1884,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     if (lastMatchedKey_.timerId >= 0) {
         MMI_HILOGD("Remove timer:%{public}d", lastMatchedKey_.timerId);
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
+        lastMatchedKey_.timerId = -1;
     }
     ResetLastMatchedKey();
     if (MatchShortcutKeys(keyEvent)) {
@@ -2042,7 +2064,9 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
             if (IsSpecialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(item.keyCode, item.keyAction);
             }
-            InputHandler->GetSubscriberHandler()->RemoveSubscriberKeyUpTimer(item.keyCode);
+            auto handler = InputHandler->GetSubscriberHandler();
+            CHKPF(handler);
+            handler->RemoveSubscriberKeyUpTimer(item.keyCode);
             RemoveSubscribedTimer(item.keyCode);
         }
     }
@@ -2086,10 +2110,11 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
 
 bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility)
 {
-    sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, sequence] () {
+    sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, &sequence] () {
         MMI_HILOGI("Timer callback");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        sequence.timerId = -1;
         BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
@@ -2112,10 +2137,11 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
         isLaunchAbility = true;
         return true;
     }
-    sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
+    sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, &sequence] () {
         MMI_HILOGI("Timer callback");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        sequence.timerId = -1;
         BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
@@ -2131,7 +2157,7 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
 {
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    MMI_HILOGI("screenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("screenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     std::string bundleName = sequence.ability.bundleName;
     std::string matchName = ".screenshot";
     if (bundleName.find(matchName) != std::string::npos) {
@@ -2177,7 +2203,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     if (keysSize == sequenceKeysSize) {
         std::ostringstream oss;
         oss << sequence;
-        MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
+        MMI_HILOGI("SequenceKey matched:%{public}s", oss.str().c_str());
         return HandleMatchedSequence(sequence, isLaunchAbility);
     }
     return true;
@@ -2238,12 +2264,13 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         BytraceAdapter::StopLaunchAbility();
         return true;
     }
-    shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
+    shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, &shortcutKey] () {
         MMI_HILOGI("Timer callback");
 #ifdef SHORTCUT_KEY_RULES_ENABLED
         KEY_SHORTCUT_MGR->MarkShortcutConsumed(shortcutKey);
 #endif // SHORTCUT_KEY_RULES_ENABLED
         currentLaunchAbilityKey_ = shortcutKey;
+        shortcutKey.timerId = -1;
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
         BytraceAdapter::StopLaunchAbility();
@@ -2254,7 +2281,9 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     }
     MMI_HILOGI("Add timer success");
     lastMatchedKey_ = shortcutKey;
-    if (InputHandler->GetSubscriberHandler()->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
+    auto handler = InputHandler->GetSubscriberHandler();
+    CHKPF(handler);
+    if (handler->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
         MMI_HILOGI("current shortcutKey %d is subSubcribed", shortcutKey.finalKey);
         return false;
     }
@@ -2385,8 +2414,11 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
             count_ = 0;
             launchAbilityCount_ = 0;
             repeatKeyCountMap_.clear();
+            repeatKey_.keyCode = -1;
+            repeatKey_.keyAction = -1;
             sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
                 isFreezePowerKey_ = false;
+                sosDelayTimerId_ = -1;
                 MMI_HILOGW("Timeout, restore the power button");
             });
             if (sosDelayTimerId_ < 0) {
@@ -2719,19 +2751,21 @@ bool KeyCommandHandler::ParseLongPressJson(const std::string &configFile)
         return false;
     }
 
-    cJSON* bundleWhitelist = cJSON_GetObjectItemCaseSensitive(parser.json_, "whitelist");
-    if (!cJSON_IsArray(bundleWhitelist)) {
-        MMI_HILOGE("whitelist is not array");
-        return false;
-    }
-    int32_t bundleNameSize = cJSON_GetArraySize(bundleWhitelist);
-    for (int32_t i = 0; i < bundleNameSize; ++i) {
-        cJSON *bundleName = cJSON_GetArrayItem(bundleWhitelist, i);
-        if (!cJSON_IsString(bundleName)) {
-            MMI_HILOGE("bundleName is not string");
-            return false;
+    cJSON* item = nullptr;
+    cJSON* enable = nullptr;
+    cJSON* status = nullptr;
+    cJSON_ArrayForEach(item, parser.json_) {
+        if (!cJSON_IsObject(item)) {
+            continue;
         }
-        appWhiteList_.insert(bundleName->valuestring);
+        enable = cJSON_GetObjectItem(item, KEY_ENABLE.c_str());
+        status = cJSON_GetObjectItem(item, KEY_STATUS.c_str());
+        if (enable == NULL || status == NULL) {
+            continue;
+        }
+        if (enable->valueint == 1) {
+            appWhiteList_.insert(item->string);
+        }
     }
     return true;
 }

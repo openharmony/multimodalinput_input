@@ -28,7 +28,7 @@ namespace MMI {
 
 struct ScreenCaptureHandle {
     void *handle;
-    std::list<int32_t> (*isWorking)();
+    int32_t (*isWorking)(int32_t);
     void (*registerListener)(ScreenCaptureCallback);
 
     ScreenCaptureHandle(): handle(nullptr), isWorking(nullptr), registerListener(nullptr) {}
@@ -47,7 +47,7 @@ struct ScreenCaptureHandle {
 class InputScreenCaptureAgent : public Singleton<InputScreenCaptureAgent> {
 public:
     ~InputScreenCaptureAgent() override;
-    std::list<int32_t> IsScreenCaptureWorking();
+    bool IsScreenCaptureWorking(int32_t capturePid);
     void RegisterListener(ScreenCaptureCallback callback);
 
 private:

@@ -1625,5 +1625,240 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerUp_003, TestSize.
     shortcut.callback(keyEvent);
     EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
 }
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadHotkey_001
+ * @tc.desc: Test the funcation ReadHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonHotkey = cJSON_CreateString("not an object");
+    int32_t ret = shortcutMgr.ReadHotkey(jsonHotkey) ;
+    EXPECT_EQ(ret, RET_ERR);
+    cJSON_Delete(jsonHotkey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadHotkey_002
+ * @tc.desc: Test the funcation ReadHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonHotkey = cJSON_CreateObject();
+    int32_t ret = shortcutMgr.ReadHotkey(jsonHotkey) ;
+    EXPECT_EQ(ret, RET_ERR);
+    cJSON_Delete(jsonHotkey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadHotkey_003
+ * @tc.desc: Test the funcation ReadHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonHotkey = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonHotkey, "businessId", cJSON_CreateNumber(123));
+    int32_t ret = shortcutMgr.ReadHotkey(jsonHotkey) ;
+    EXPECT_EQ(ret, RET_ERR);
+    cJSON_Delete(jsonHotkey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadHotkey_004
+ * @tc.desc: Test the funcation ReadHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonHotkey = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    for (int i = 0; i < 5; ++i) {
+        cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
+    }
+    cJSON_AddItemToObject(jsonHotkey, "preKey", preKey);
+    int32_t ret = shortcutMgr.ReadHotkey(jsonHotkey) ;
+    EXPECT_EQ(ret, RET_ERR);
+    cJSON_Delete(jsonHotkey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadHotkey_005
+ * @tc.desc: Test the funcation ReadHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonHotkey = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    for (int i = 0; i < 5; ++i) {
+        cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
+    }
+    cJSON_AddItemToObject(jsonHotkey, "preKey", preKey);
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    int32_t ret = shortcutMgr.ReadHotkey(jsonHotkey) ;
+    EXPECT_EQ(ret, RET_ERR);
+    cJSON_Delete(jsonHotkey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKey_001
+ * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateString("not an object");
+    int32_t ret = shortcutMgr.ReadSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKey_002
+ * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    int32_t ret = shortcutMgr.ReadSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKey_003
+ * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonSysKey, "preKey", preKey);
+    int32_t ret = shortcutMgr.ReadSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_001
+ * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateString("not an object");
+    int32_t ret = shortcutMgr.ReadExceptionalSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_002
+ * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    int32_t ret = shortcutMgr.ReadExceptionalSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_003
+ * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonSysKey, "preKey", preKey);
+    int32_t ret = shortcutMgr.ReadExceptionalSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_004
+ * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    for (int i = 0; i < 5; ++i) {
+        cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
+    }
+    cJSON_AddItemToObject(jsonSysKey, "preKey", preKey);
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    int32_t ret = shortcutMgr.ReadExceptionalSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_005
+ * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    for (int i = 0; i < 5; ++i) {
+        cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
+    }
+    cJSON_AddItemToObject(jsonSysKey, "longPressTime", preKey);
+    int32_t ret = shortcutMgr.ReadExceptionalSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
 } // namespace MMI
 } // namespace OHOS

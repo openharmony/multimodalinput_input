@@ -29,7 +29,9 @@
 #include "key_event_value_transformation.h"
 #include "key_map_manager.h"
 #include "net_packet.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "proto.h"
 #include "util_ex.h"
 
@@ -159,10 +161,6 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
-        if (!item.second.enable) {
-            MMI_HILOGD("The current device has been disabled");
-            continue;
-        }
         ids.push_back(item.first);
     }
     for (const auto &item : virtualInputDevices_) {
@@ -471,7 +469,9 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isPointerDevice = IsPointerDevice(inputDevice);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
     info.sysUid = GetInputIdentification(inputDevice);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
@@ -843,7 +843,7 @@ int32_t InputDeviceManager::NotifyMessage(SessionPtr sess, int32_t id, const std
 void InputDeviceManager::InitSessionLostCallback()
 {
     if (sessionLostCallbackInitialized_) {
-        MMI_HILOGE("Init session is failed");
+        MMI_HILOGD("Init session is failed");
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
@@ -853,12 +853,13 @@ void InputDeviceManager::InitSessionLostCallback()
     }
     );
     sessionLostCallbackInitialized_ = true;
-    MMI_HILOGD("The callback on session deleted is registered successfully");
+    MMI_HILOGI("The callback on session deleted is registered successfully");
 }
 
 void InputDeviceManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
+    RecoverInputDeviceEnabled(session);
     devListeners_.remove(session);
 }
 
@@ -879,6 +880,24 @@ std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
     return ids;
 }
 
+struct libinput_device *InputDeviceManager::GetTouchPadDeviceOrigin()
+{
+    CALL_DEBUG_ENTER;
+    struct libinput_device *touchPadDevice = nullptr;
+    for (const auto &item : inputDevice_) {
+        auto inputDevice = item.second.inputDeviceOrigin;
+        if (inputDevice == nullptr) {
+            continue;
+        }
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
+        if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
+            touchPadDevice = inputDevice;
+            break;
+        }
+    }
+    return touchPadDevice;
+}
+
 bool InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
     CHKPR(inputDevice, false);
@@ -895,6 +914,59 @@ bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevi
 {
     CHKPR(inputDevice, false);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+}
+
+int32_t InputDeviceManager::NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(session, ERROR_NULL_POINTER);
+    NetPacket pkt(MmiMessageId::SET_INPUT_DEVICE_ENABLED);
+    pkt << index << result;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    if (!session->SendMsg(pkt)) {
+        MMI_HILOGE("Sending failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::SetInputDeviceEnabled(
+    int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        NotifyInputdeviceMessage(session, index, ERROR_DEVICE_NOT_EXIST);
+        MMI_HILOGD("Set inputDevice enabled failed, Invalid deviceId.");
+        return RET_ERR;
+    }
+    item->second.enable = enable;
+    if (!enable) {
+        MMI_HILOGD("Disable inputdevice, save calling pid: %{public}d to recoverlist.", pid);
+        recoverList_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
+        InitSessionLostCallback();
+    }
+    NotifyInputdeviceMessage(session, index, RET_OK);
+    return RET_OK;
+}
+
+void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    for (auto item = recoverList_.begin(); item != recoverList_.end();) {
+        if (session->GetPid() == item->second) {
+            auto device = inputDevice_.find(item->first);
+            if (device != inputDevice_.end()) {
+                MMI_HILOGI("Recover input device : %{public}d", item->first);
+                device->second.enable = true;
+            }
+            recoverList_.erase(item++);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

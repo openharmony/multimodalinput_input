@@ -43,6 +43,7 @@ public:
     static napi_value GetKeyboardRepeatRate(napi_env env, napi_callback_info info);
     static napi_value GetIntervalSinceLastInput(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
+    static napi_value SetInputDeviceEnabled(napi_env env, napi_callback_info info);
 
 private:
     static napi_value CreateInstance(napi_env env);

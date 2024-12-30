@@ -27,7 +27,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-MouseLocation::MouseLocation(IContext *context) : context_(context) {}
+MouseLocation::MouseLocation(IContext *context) : context_(context) { }
 
 void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
 {
@@ -78,7 +78,7 @@ void MouseLocation::OnClientDied(const ClientDiedEvent &event)
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
-    FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
+    FI_HILOGI("Remove client died listener, pid:%{public}d", event.pid);
     localListeners_.erase(event.pid);
     for (auto it = listeners_.begin(); it != listeners_.end();) {
         it->second.erase(event.pid);
@@ -164,16 +164,14 @@ void MouseLocation::OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notic
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (listeners_.find(notice.networkId) == listeners_.end()) {
-        FI_HILOGE("No listener for networkId:%{public}s stored in listeners",
-            Utility::Anonymize(notice.networkId).c_str());
+        FI_HILOGE(
+            "No listener for networkId:%{public}s stored in listeners", Utility::Anonymize(notice.networkId).c_str());
         return;
     }
-    LocationInfo locationInfo {
-        .displayX = notice.mouseLocation.displayX,
+    LocationInfo locationInfo { .displayX = notice.mouseLocation.displayX,
         .displayY = notice.mouseLocation.displayY,
         .displayWidth = notice.mouseLocation.displayWidth,
-        .displayHeight = notice.mouseLocation.displayHeight
-        };
+        .displayHeight = notice.mouseLocation.displayHeight };
     for (auto pid : listeners_[notice.networkId]) {
         ReportMouseLocationToListener(notice.networkId, locationInfo, pid);
     }
@@ -288,8 +286,8 @@ int32_t MouseLocation::SyncMouseLocation(const DSoftbusSyncMouseLocation &event)
 {
     CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_MOUSE_LOCATION);
-    packet << event.networkId << event.remoteNetworkId << event.mouseLocation.displayX <<
-        event.mouseLocation.displayY << event.mouseLocation.displayWidth << event.mouseLocation.displayHeight;
+    packet << event.networkId << event.remoteNetworkId << event.mouseLocation.displayX << event.mouseLocation.displayY
+           << event.mouseLocation.displayWidth << event.mouseLocation.displayHeight;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
@@ -301,16 +299,16 @@ int32_t MouseLocation::SyncMouseLocation(const DSoftbusSyncMouseLocation &event)
     return RET_OK;
 }
 
-void MouseLocation::ReportMouseLocationToListener(const std::string &networkId, const LocationInfo &locationInfo,
-    int32_t pid)
+void MouseLocation::ReportMouseLocationToListener(
+    const std::string &networkId, const LocationInfo &locationInfo, int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHKPV(context_);
     auto session = context_->GetSocketSessionManager().FindSessionByPid(pid);
     CHKPV(session);
     NetPacket pkt(MessageId::MOUSE_LOCATION_ADD_LISTENER);
-    pkt << networkId << locationInfo.displayX << locationInfo.displayY <<
-        locationInfo.displayWidth << locationInfo.displayHeight;
+    pkt << networkId << locationInfo.displayX << locationInfo.displayY << locationInfo.displayWidth
+        << locationInfo.displayHeight;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;

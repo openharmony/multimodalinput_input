@@ -50,6 +50,7 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
     }
     auto &listeners = iter->second;
 
+    std::lock_guard<std::mutex> guard(mtx_);
     if (!isListeningProcess_) {
         MMI_HILOGI("Start monitoring");
         isListeningProcess_ = true;
@@ -83,6 +84,7 @@ int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDev
         MMI_HILOGE("Find change failed");
         return RET_ERR;
     }
+    std::lock_guard<std::mutex> guard(mtx_);
     if (listener == nullptr) {
         iter->second.clear();
         goto listenerLabel;
@@ -223,6 +225,33 @@ int32_t InputDeviceImpl::GetKeyboardRepeatRate(std::function<void(int32_t)> call
 int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;
+}
+
+int32_t InputDeviceImpl::RegisterInputdevice(int32_t deviceId, bool enable, std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
+    int32_t _id = operationIndex_++;
+    inputdeviceList_[_id] = callback;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetInputDeviceEnabled(deviceId, enable, _id);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to register");
+        return ret;
+    }
+    return RET_OK;
+}
+
+void InputDeviceImpl::OnSetInputDeviceAck(int32_t index, int32_t result)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto iter = inputdeviceList_.find(index);
+    if (iter == inputdeviceList_.end()) {
+        MMI_HILOGE("Find index failed");
+        return;
+    }
+    iter->second(result);
+    inputdeviceList_.erase(index);
 }
 } // namespace MMI
 } // namespace OHOS

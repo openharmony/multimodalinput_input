@@ -53,7 +53,7 @@ private:
 
 private:
     void TransiteTo(Context &context, CooperateState state) override;
-    void AddHandler(CooperateEventType event, std::function<void(Context&, const CooperateEvent&)> handler);
+    void AddHandler(CooperateEventType event, std::function<void(Context &, const CooperateEvent &)> handler);
     void OnQuit(Context &context);
     void AddObserver(Context &context, const CooperateEvent &event);
     void RemoveObserver(Context &context, const CooperateEvent &event);
@@ -97,7 +97,7 @@ private:
     void RemoveWatches(Context &context);
 
     IContext *env_ { nullptr };
-    std::map<CooperateEventType, std::function<void(Context&, const CooperateEvent&)>> handlers_;
+    std::map<CooperateEventType, std::function<void(Context &, const CooperateEvent &)>> handlers_;
     size_t current_ { COOPERATE_STATE_FREE };
     std::array<std::shared_ptr<ICooperateState>, N_COOPERATE_STATES> states_;
     std::set<std::string> onlineBoards_;

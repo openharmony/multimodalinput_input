@@ -999,6 +999,8 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH, &middle_btn_north), CREATE_INT32);
     napi_value middle_btn_north_south = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH, &middle_btn_north_south), CREATE_INT32);
+    napi_value middle_btn_east_west = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_EAST_WEST, &middle_btn_east_west), CREATE_INT32);
     napi_value middle_btn_north_east = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH_EAST, &middle_btn_north_east), CREATE_INT32);
     napi_value middle_btn_north_west = nullptr;
@@ -1058,6 +1060,7 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_SOUTH", middle_btn_south),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH", middle_btn_north),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH_SOUTH", middle_btn_north_south),
+        DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_EAST_WEST", middle_btn_east_west),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH_EAST", middle_btn_north_east),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH_WEST", middle_btn_north_west),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_SOUTH_EAST", middle_btn_south_east),
@@ -1599,6 +1602,32 @@ napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback
     return GetTouchpadData(env, info, func);
 }
 
+napi_value JsPointerContext::SetTouchpadDoubleTapAndDragState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadDoubleTapAndDragState(env, switchFlag, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadDoubleTapAndDragState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadDoubleTapAndDragState(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
 napi_value JsPointerContext::SetTouchpadThreeFingersTapSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1774,6 +1803,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRightClickType", GetTouchpadRightClickType),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadRotateSwitch", SetTouchpadRotateSwitch),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRotateSwitch", GetTouchpadRotateSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadDoubleTapAndDragState", SetTouchpadDoubleTapAndDragState),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadDoubleTapAndDragState", GetTouchpadDoubleTapAndDragState),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursor", SetCustomCursor),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursorSync", SetCustomCursorSync),

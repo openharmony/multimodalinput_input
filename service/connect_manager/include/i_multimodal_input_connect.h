@@ -16,8 +16,8 @@
 #ifndef I_MULTIMODAL_INPUT_CONNECT_H
 #define I_MULTIMODAL_INPUT_CONNECT_H
 
-#include "iremote_broker.h"
-#include "system_ability_definition.h"
+#include <iremote_broker.h>
+#include <system_ability_definition.h>
 
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -63,6 +63,7 @@ public:
     virtual int32_t SetPointerSize(int32_t size) = 0;
     virtual int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) = 0;
     virtual int32_t GetPointerSize(int32_t &size) = 0;
+    virtual int32_t GetCursorSurfaceId(uint64_t &surfaceId) = 0;
     virtual int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
@@ -137,6 +138,8 @@ public:
     virtual int32_t GetTouchpadRightClickType(int32_t &type) = 0;
     virtual int32_t SetTouchpadRotateSwitch(bool rotateSwitch) = 0;
     virtual int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) = 0;
+    virtual int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag) = 0;
     virtual int32_t SetShieldStatus(int32_t shieldMode, bool isShield) = 0;
     virtual int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) = 0;
     virtual int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) = 0;
@@ -171,6 +174,8 @@ public:
     virtual int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) = 0;
     virtual int32_t SkipPointerLayer(bool isSkip) = 0;
     virtual int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) = 0;
+    virtual int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) = 0;
+    virtual int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
