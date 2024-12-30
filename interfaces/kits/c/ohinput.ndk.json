@@ -378,5 +378,57 @@
     {
         "first_introduced": "13",
         "name": "OH_Input_GetIntervalSinceLastInput"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_CreateAllSystemHotkeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_DestroyAllSystemHotkeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_GetAllSystemHotkeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_CreateHotkey"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_DestroyHotkey"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_SetPreKeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_GetPreKeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_SetFinalKey"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_GetFinalKey"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_SetRepeat"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_GetRepeat"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_AddHotkeyMonitor"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_RemoveHotkeyMonitor"
     }
 ]
