@@ -119,6 +119,9 @@ constexpr int32_t REPEAT_COOLING_TIME { 10000 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
+constexpr int32_t MAX_CUSTOM_CURSOR_SIZE { 256 };
+constexpr float MAX_CUSTOM_CURSOR_DIMENSION { 256.0f };
+const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 std::map<Rosen::ScreenId, sptr<Rosen::ScreenInfo>> g_screenSourceMode;
 std::atomic<bool> g_hasMirrorScreen { false };
@@ -3182,5 +3185,77 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle, uint32_t 
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
+int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor,
+    CursorOptions options)
+{
+    CALL_DEBUG_ENTER;
+    if (windowId < 0 || WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+        MMI_HILOGE("The windowId not in right pid");
+        return ERROR_WINDOW_ID_PERMISSION_DENIED;
+    }
+    if (options.followSystem) {
+        return SetCustomCursor(cursor.pixelMap, pid, windowId, cursor.focusX, cursor.focusY);
+    }
+    int32_t ret = UpdateCursorProperty(cursor);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UpdateCursorProperty is failed");
+        return ret;
+    }
+    mouseIconUpdate_ = true;
+    PointerStyle style;
+    style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    lastMouseStyle_ = style;
+
+    ret = SetPointerStyle(pid, windowId, style);
+    if (ret == RET_ERR) {
+        MMI_HILOGE("SetPointerStyle is failed");
+    }
+    MMI_HILOGD("style.id:%{public}d, userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
+        style.id, userIconHotSpotX_, userIconHotSpotY_);
+    return ret;
+}
+
+int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
+{
+    CHKPR(cursor.pixelMap, RET_ERR);
+    Media::PixelMap* newPixelMap = static_cast<Media::PixelMap*>(cursor.pixelMap);
+    CHKPR(newPixelMap, RET_ERR);
+    Media::ImageInfo imageInfo;
+    newPixelMap->GetImageInfo(imageInfo);
+    if (imageInfo.size.width < cursor.focusX || imageInfo.size.width < cursor.focusY) {
+        MMI_HILOGE("focus is invalid");
+        return RET_ERR;
+    }
+    float scale = 1.0f;
+    if (imageInfo.size.width > MAX_CUSTOM_CURSOR_SIZE || imageInfo.size.height > MAX_CUSTOM_CURSOR_SIZE) {
+        scale = MAX_CUSTOM_CURSOR_DIMENSION / std::max(imageInfo.size.width, imageInfo.size.height);
+        newPixelMap->scale(scale, scale, Media::AntiAliasingOption::LOW);
+    }
+ 
+    int32_t cursorSize = GetPointerSize();
+    cursorWidth_ = pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
+    cursorHeight_ = pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
+ 
+    cursorWidth_ = cursorWidth_ < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorWidth_;
+    cursorHeight_ = cursorHeight_ < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorHeight_;
+ 
+    float xAxis = static_cast<float>(cursorWidth_) / static_cast<float>(imageInfo.size.width);
+    float yAxis = static_cast<float>(cursorHeight_) / static_cast<float>(imageInfo.size.height);
+ 
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        userIcon_.reset(newPixelMap);
+    }
+ 
+    userIconHotSpotX_ = static_cast<int32_t>((float)cursor.focusX * xAxis * scale);
+    userIconHotSpotY_ = static_cast<int32_t>((float)cursor.focusY * yAxis * scale);
+ 
+    MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
+        "focusX:%{public}d, focusY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"
+        "userIconHotSpotY_:%{public}d", cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
+        cursor.focusX, cursor.focusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
+ 
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

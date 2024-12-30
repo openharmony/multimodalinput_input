@@ -3441,5 +3441,23 @@ int32_t MMIService::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetW
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
+
+int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+{
+    CALL_INFO_TRACE;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+        [pid, windowId, cursor, options] {
+            return IPointerDrawingManager::GetInstance()->SetCustomCursor(pid, windowId, cursor, options);
+        }
+        ));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

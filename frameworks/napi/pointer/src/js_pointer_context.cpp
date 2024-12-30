@@ -518,10 +518,17 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
     }
 
     int32_t windowId = GetWindowId(env, argv[0]);
-    if (windowId == INVALID_VALUE) {
+    if (windowId < 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "windowId is invalid");
         return nullptr;
     }
-
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    napi_value result = HandleFollowSystemCase(env, jsPointerMgr, windowId, argc, argv);
+    if (result != nullptr) {
+        return result;
+    }
     if (!JsCommon::TypeOf(env, argv[1], napi_object)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pixelMap", "napi_object");
         return nullptr;
@@ -531,9 +538,6 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
         return nullptr;
     }
-    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
-    CHKPP(jsPointer);
-    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     CursorFocus cursorFocus;
     if (argc == INPUT_PARAMETER) {
         return jsPointerMgr->SetCustomCursor(env, windowId, (void *)pixelMap.get(), cursorFocus);
@@ -1830,6 +1834,91 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         return nullptr;
     }
     return exports;
+}
+
+bool JsPointerContext::GetCursorOptions(napi_env env, napi_value obj, CursorOptions& options)
+{
+    if (!JsCommon::TypeOf(env, obj, napi_object)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "CursorOptions", "napi_object");
+        return false;
+    }
+    napi_value followSystemValue;
+    CHKRF(napi_get_named_property(env, obj, "followSystem", &followSystemValue), GET_NAMED_PROPERTY);
+    if (!JsCommon::TypeOf(env, followSystemValue, napi_boolean)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "followSystem", "napi_boolean");
+        return false;
+    }
+    CHKRF(napi_get_value_bool(env, followSystemValue, &options.followSystem), GET_VALUE_BOOL);
+    return true;
+}
+
+bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomCursor& cursor, int32_t& pixelMapSize)
+{
+    if (!JsCommon::TypeOf(env, obj, napi_object)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "CustomCursor", "napi_object");
+        return false;
+    }
+    napi_value pixelMapValue;
+    CHKRF(napi_get_named_property(env, obj, "pixelMap", &pixelMapValue), GET_NAMED_PROPERTY);
+    if (!JsCommon::TypeOf(env, pixelMapValue, napi_object)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pixelMap", "napi_object");
+        return false;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMapNapi::GetPixelMap(env, pixelMapValue);
+    if (pixelMap == nullptr) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
+        return false;
+    }
+    pixelMapSize = pixelMap->GetWidth() * pixelMap->GetHeight() * pixelMap->GetPixelBytes();
+    cursor.pixelMap = (void*)pixelMap.get();
+    napi_value focusXValue;
+    if (napi_get_named_property(env, obj, "focusX", &focusXValue) == napi_ok) {
+        if (!JsCommon::TypeOf(env, focusXValue, napi_number)) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "focusX", "napi_number");
+            return false;
+        }
+        CHKRF(napi_get_value_int32(env, focusXValue, &cursor.focusX), GET_VALUE_INT32);
+        if (cursor.focusX < 0 || cursor.focusX > pixelMap->GetWidth()) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusX is invalid");
+            return false;
+        }
+    }
+    napi_value focusYValue;
+    if (napi_get_named_property(env, obj, "focusY", &focusYValue) == napi_ok) {
+        if (!JsCommon::TypeOf(env, focusYValue, napi_number)) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "focusY", "napi_number");
+            return false;
+        }
+        CHKRF(napi_get_value_int32(env, focusYValue, &cursor.focusY), GET_VALUE_INT32);
+        if (cursor.focusY < 0 || cursor.focusY > pixelMap->GetHeight()) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusY is invalid");
+            return false;
+        }
+    }
+    return true;
+}
+
+napi_value JsPointerContext::HandleFollowSystemCase(napi_env env, std::shared_ptr<JsPointerManager> jsPointerMgr,
+    int32_t windowId, size_t argc, napi_value* argv)
+{
+    bool followSystemValue = false;
+    if (argc > INPUT_PARAMETER && JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_object) &&
+        napi_has_named_property(env, argv[INPUT_PARAMETER], "followSystem", &followSystemValue) == napi_ok &&
+        followSystemValue) {
+        CustomCursor cursor;
+        CursorOptions options;
+        int32_t pixelMapSize = 0;
+        if (!GetCustomCursorInfo(env, argv[1], cursor, pixelMapSize)) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "cursor", "CustomCursor");
+            return nullptr;
+        }
+        if (!GetCursorOptions(env, argv[INPUT_PARAMETER], options)) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "options", "CursorOptions");
+            return nullptr;
+        }
+        return jsPointerMgr->SetCustomCursor(env, windowId, cursor, options, pixelMapSize);
+    }
+    return nullptr;
 }
 } // namespace MMI
 } // namespace OHOS

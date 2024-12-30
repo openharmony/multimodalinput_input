@@ -1068,6 +1068,15 @@ public:
      */
     int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown = true);
 
+    /**
+     * @brief Sets the custom cursor. You can set whether to adjust the cursor size based on the system settings.
+     * @param windowId Indicates the windowId of the window
+     * @param cursor Custom cursor, including the custom cursor resource and focus position.
+     * @param options Custom cursor option
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 14
+     */
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
