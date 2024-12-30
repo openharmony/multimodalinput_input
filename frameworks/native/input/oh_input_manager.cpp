@@ -1651,6 +1651,61 @@ int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
     return INPUT_SUCCESS;
 }
 
+Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
+{
+    return nullptr;
+}
+
+void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count)
+{}
+
+Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
+{
+    return INPUT_DEVICE_NOT_SUPPORTED;
+}
+
+Input_Hotkey* OH_Input_CreateHotkey(void)
+{
+    return nullptr;
+}
+
+void OH_Input_DestroyHotkey(Input_Hotkey **hotkey)
+{}
+
+void OH_Input_SetPreKeys(Input_Hotkey *hotkey, int32_t *preKeys, int32_t size)
+{}
+
+Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, int32_t *preKeyCount)
+{
+    return INPUT_DEVICE_NOT_SUPPORTED;
+}
+
+void OH_Input_SetFinalKey(Input_Hotkey *hotkey, int32_t finalKey)
+{}
+
+Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyCode)
+{
+    return INPUT_DEVICE_NOT_SUPPORTED;
+}
+
+void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat)
+{}
+
+Input_Result OH_Input_GetRepeat(const Input_Hotkey* hotkey, bool *isRepeat)
+{
+    return INPUT_DEVICE_NOT_SUPPORTED;
+}
+
+Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback)
+{
+    return INPUT_DEVICE_NOT_SUPPORTED;
+}
+
+Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_HotkeyCallback callback)
+{
+    return INPUT_DEVICE_NOT_SUPPORTED;
+}
+
 static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 {
     CALL_DEBUG_ENTER;

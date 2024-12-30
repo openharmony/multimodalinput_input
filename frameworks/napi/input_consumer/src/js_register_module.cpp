@@ -88,8 +88,12 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
     CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
     if (type != SUBSCRIBE_TYPE) {
-        MMI_HILOGE("Type is not key");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "type must be key");
+        if (type == HOTKEY_SUBSCRIBE_TYPE) {
+            THROWERR_CUSTOM(env, COMMON_CAPABILITY_NOT_SUPPORTED, "Capability not supported");
+        } else {
+            MMI_HILOGE("Type is not key");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "type must be key");
+        }
         return nullptr;
     }
     napi_value receiveValue = nullptr;
@@ -412,6 +416,12 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
     return result;
 }
 
+static napi_value GetAllSystemHotkeys(napi_env env, napi_callback_info info)
+{
+    THROWERR_CUSTOM(env, COMMON_CAPABILITY_NOT_SUPPORTED, "Capability not supported");
+    return nullptr;
+}
+
 static napi_value EnumConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -463,7 +473,8 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
         DECLARE_NAPI_FUNCTION("setShieldStatus", SetShieldStatus),
-        DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus)
+        DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus),
+        DECLARE_NAPI_FUNCTION("getAllSystemHotkeys", GetAllSystemHotkeys)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     if (CreateShieldMode(env, exports) == nullptr) {
