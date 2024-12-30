@@ -115,7 +115,7 @@ public:
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
-    virtual int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1) = 0;
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId) = 0;
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) = 0;

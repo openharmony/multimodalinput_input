@@ -198,7 +198,7 @@ public:
     int32_t LeaveCaptureMode(int32_t windowId);
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
-    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1);
+    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId);
     int32_t EnableInputDevice(bool enable);
     // 快捷键拉起Ability
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
