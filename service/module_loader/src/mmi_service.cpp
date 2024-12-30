@@ -1716,6 +1716,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == RENDER_SERVICE) {
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
     }
+    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
+        IPointerDrawingManager::GetInstance()->InitScreenInfo();
+    }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         WIN_MGR->SetFoldState();
