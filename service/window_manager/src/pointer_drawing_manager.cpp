@@ -282,7 +282,6 @@ PointerDrawingManager::PointerDrawingManager()
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
     g_hardwareCanvasSize = GetCanvasSize();
     g_focalPoint = GetFocusCoordinates();
-    InitScreenInfo();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
