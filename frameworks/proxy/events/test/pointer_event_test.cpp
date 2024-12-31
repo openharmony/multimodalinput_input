@@ -1758,5 +1758,40 @@ HWTEST_F(PointerEventTest, PointerEventTest_from, TestSize.Level1)
     ASSERT_NE(inputEvent, nullptr);
     ASSERT_NO_FATAL_FAILURE(PointerEvent::from(inputEvent));
 }
+
+/**
+ * @tc.name: PointerEventTest_GetBlobId
+ * @tc.desc: Verify the funcation GetBlobId
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetBlobId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    auto item = PointerEvent::PointerItem();
+    item.blobId_ = 0;
+    int32_t bloBid = item.GetBlobId();
+    ASSERT_EQ(bloBid, item.blobId_);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetBlobId
+ * @tc.desc: Verify the funcation SetBlobId
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetBlobId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    auto item = PointerEvent::PointerItem();
+    item.SetBlobId(32);
+    ASSERT_EQ(32, item.blobId_);
+}
 } // namespace MMI
 } // namespace OHOS
