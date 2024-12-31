@@ -570,8 +570,8 @@ impl AxisAccelerateCurvesTouchpad {
                     },
                     CurveItem {
                         speeds: vec![0.43, 0.86, 1.59, 2.16, 2.67, 3.17, 4.76, 28.83],
-                        slopes: vec![3.2, 1.6, 1.92, 1.24, 1.19, 0.91, 1.5, 1.6],
-                        diff_nums: vec![0.0, 0.69, 0.42, 1.49, 1.6, 2.35, 0.48, 0.0]
+                        slopes: vec![3.2, 1.6, 1.92, 1.13, 1.32, 0.72, 1.53, 1.59],
+                        diff_nums: vec![0.0, 0.69, 0.42, 1.66, 1.26, 2.85, 0.29, 0.0]
                     },
                 ],
             });
@@ -659,59 +659,59 @@ impl FoldPcTouchpadAccelerateCurves {
             GLOBAL_CURVES = Some(FoldPcTouchpadAccelerateCurves {
                 data: vec![
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.08, 0.15, 0.51, 0.64],
-                        diff_nums: vec![0.0, -0.26, -15.40, -23.66],
+                        speeds: vec![4.25, 47.49, 71.23, 99.98],
+                        slopes: vec![0.08, 0.16, 0.62, 0.74],
+                        diff_nums: vec![0.0, -0.32, -22.18, -31.08],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.11, 0.2, 0.68, 0.85],
-                        diff_nums: vec![0.0, -0.35, -20.54, -31.55],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.11, 0.21, 0.82, 0.99],
+                        diff_nums: vec![0.0, -0.43, -29.58, -41.44],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.14, 0.25, 0.85, 1.06],
-                        diff_nums: vec![0.0, -0.43, -25.67, -39.44],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.14, 0.26, 1.03, 1.24],
+                        diff_nums: vec![0.0, -0.54, -39.97, -51.79],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.17, 0.3, 1.02, 1.28],
-                        diff_nums: vec![0.0, -0.52, -30.81, -47.33],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.16, 0.32, 1.24, 1.49],
+                        diff_nums: vec![0.0, -0.65, -44.36, -62.15],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.22, 0.4, 1.36, 1.7],
-                        diff_nums: vec![0.0, -0.70, -41.08, -63.11],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.22, 0.42, 1.65, 1.98],
+                        diff_nums: vec![0.0, -0.86, -59.15, -82.87],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.28, 0.5, 1.70, 2.13],
-                        diff_nums: vec![0.0, -0.87, -51.35, -78.88],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.27, 0.53, 2.06, 2.48],
+                        diff_nums: vec![0.0, -1.08, -73.94, -103.59],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.33, 0.61, 2.03, 2.55],
-                        diff_nums: vec![0.0, -1.04, -61.62, -94.66],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.33, 0.63, 2.47, 2.97],
+                        diff_nums: vec![0.0, -1.29, -88.73, -124.31],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.41, 0.76, 2.54, 3.19],
-                        diff_nums: vec![0.0, -1.30, -77.02, -118.32],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.41, 0.79, 3.09, 3.72],
+                        diff_nums: vec![0.0, -1.61, -110.91, -155.38],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.52, 0.96, 3.22, 4.04],
-                        diff_nums: vec![0.0, -1.65, -97.56, -149.88],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.52, 1.0, 3.92, 4.71],
+                        diff_nums: vec![0.0, -2.05, -140.49, -196.82],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.63, 1.16, 3.9, 4.9],
-                        diff_nums: vec![0.0, -2.0, -118.1, -181.43],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.63, 1.21, 4.74, 5.7],
+                        diff_nums: vec![0.0, -2.48, -170.06, -238.25],
                     },
                     CurveItem {
-                        speeds: vec![3.79, 42.4, 63.6, 89.27],
-                        slopes: vec![0.74, 1.36, 4.58, 5.75],
-                        diff_nums: vec![0.0, -2.35, -138.64, -212.98],
+                        speeds: vec![4.25, 47.49, 71.23, 99.9],
+                        slopes: vec![0.74, 1.42, 5.57, 6.69],
+                        diff_nums: vec![0.0, -2.91, -199.64, -279.69],
                     },
                 ],
             });
