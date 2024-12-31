@@ -200,7 +200,9 @@ int32_t MMIClient::Reconnect()
         MMI_HILOGE("Client connection failed");
         return RET_ERR;
     }
-    OnConnected();
+    if (funConnected_) {
+        funConnected_(*this);
+    }
     return RET_OK;
 }
 
@@ -256,10 +258,8 @@ void MMIClient::OnConnected()
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
+    isConnected_ = true;
     msgHandler_.InitProcessedCallback();
-    if (funConnected_) {
-        funConnected_(*this);
-    }
     if (!isExit && !isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {
             MMI_HILOGE("Add fd listener failed");
