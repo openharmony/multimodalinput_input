@@ -51,7 +51,7 @@ namespace fs = std::filesystem;
 
 static bool IsDualDisplayFoldDevice()
 {
-    return (!FOLD_SCREEN_FLAG.empty() && FOLD_SCREEN_FLAG[0] == '2');
+    return (!FOLD_SCREEN_FLAG.empty() && (FOLD_SCREEN_FLAG[0] == '2' || FOLD_SCREEN_FLAG[0] == '4'));
 }
 
 int32_t BindInfo::GetInputDeviceId() const
