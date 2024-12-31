@@ -127,6 +127,9 @@ public:
     }
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    void InitScreenInfo() override;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -203,7 +206,6 @@ private:
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     void DrawTraditionsCursor(MOUSE_ICON mouseStyle);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
-    void InitScreenInfo();
     void DumpScreenInfo(std::ostringstream& oss);
     bool IsSupported() override;
     int32_t PrepareBuffer(uint32_t width, uint32_t height);
