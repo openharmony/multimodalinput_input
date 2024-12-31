@@ -5027,9 +5027,13 @@ const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id, const Dis
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowId) const
 {
-    for (const std::pair<int32_t, WindowGroupInfo>& display: windowsPerDisplay_) {
-        int32_t displayId = display.first;
-        std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    for (auto iter = windowsPerDisplay_.begin(); iter != windowsPerDisplay_.end(); ++iter) {
+        int32_t displayId = iter->first;
+        const std::vector<WindowInfo> &windowsInfo = iter->second.windowsInfo;
+        if (displayId < 0) {
+            MMI_HILOGE("windowsPerDisplay_ contain invalid displayId: %{public}d", displayId);
+            continue;
+        }
         for (const auto& item : windowsInfo) {
             if (item.id == windowId &&
                 (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) != WindowInfo::FLAG_BIT_UNTOUCHABLE &&
@@ -5041,10 +5045,22 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
     return std::nullopt;
 }
 
-void InputWindowsManager::SendUpDownPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown,
-    int32_t sourceDisplayId, int32_t targetDisplayId,
-    std::optional<WindowInfo> &sourceWindowInfo, std::optional<WindowInfo> &targetWindowInfo)
+int32_t InputWindowsManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
 {
+    MMI_HILOGI("start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
+               "autoGenDown: %{public}d", sourceWindowId, targetWindowId, static_cast<int32_t>(autoGenDown));
+    if (!lastPointerEvent_ || !lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
+        MMI_HILOGE("Failed shift pointerEvent, left mouse button is not pressed");
+        return RET_ERR;
+    }
+    std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(sourceWindowId);
+    std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(targetWindowId);
+    if (!sourceWindowInfo || !targetWindowInfo) {
+        MMI_HILOGE("Failed shift pointerEvent,"
+                   "get null sourceWindowInfo, source:%{public}d, target:%{public}d",
+        static_cast<int32_t>(!!sourceWindowInfo), static_cast<int32_t>(!!targetWindowInfo));
+        return RET_ERR;
+    }
     std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     pointerEvent->ClearButtonPressed();
 
@@ -5057,7 +5073,7 @@ void InputWindowsManager::SendUpDownPointerEvent(int32_t sourceWindowId, int32_t
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetTargetDisplayId(sourceDisplayId);
+    pointerEvent->SetTargetDisplayId(sourceWindowInfo->displayId);
     pointerEvent->SetTargetWindowId(sourceWindowInfo->id);
     pointerEvent->SetAgentWindowId(sourceWindowInfo->agentWindowId);
     ClearTargetWindowId(pointerId);
@@ -5071,33 +5087,11 @@ void InputWindowsManager::SendUpDownPointerEvent(int32_t sourceWindowId, int32_t
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
         pointerEvent->UpdatePointerItem(pointerId, item);
-        pointerEvent->SetTargetDisplayId(targetDisplayId);
+        pointerEvent->SetTargetDisplayId(targetWindowInfo->displayId);
         pointerEvent->SetTargetWindowId(targetWindowInfo->id);
         pointerEvent->SetAgentWindowId(targetWindowInfo->agentWindowId);
         InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
     }
-}
-
-int32_t InputWindowsManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
-{
-    MMI_HILOGI("start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
-               "autoGenDown: %{public}d", sourceWindowId, targetWindowId, static_cast<int32_t>(autoGenDown));
-    if (!lastPointerEvent_ || !lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
-        MMI_HILOGE("Failed shift pointerEvent, left mouse button is not pressed");
-        return RET_ERR;
-    }
-    int32_t sourceDisplayId = lastPointerEvent_->GetTargetDisplayId();
-    int32_t targetDisplayId = lastPointerEvent_->GetTargetDisplayId();
-    std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(sourceWindowId);
-    std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(targetWindowId);
-    if (!sourceWindowInfo || !targetWindowInfo) {
-        MMI_HILOGE("Failed shift pointerEvent,"
-                   "get null sourceWindowInfo, source:%{public}d, target:%{public}d",
-        static_cast<int32_t>(!!sourceWindowInfo), static_cast<int32_t>(!!targetWindowInfo));
-        return RET_ERR;
-    }
-    SendUpDownPointerEvent(sourceWindowId, targetWindowId, autoGenDown,
-        sourceDisplayId, targetDisplayId, sourceWindowInfo, targetWindowInfo);
     firstBtnDownWindowInfo_.first = targetWindowId;
     MMI_HILOGI("shift pointer event success");
     return RET_OK;

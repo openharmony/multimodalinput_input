@@ -344,9 +344,6 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     void OnGestureSendEvent(std::shared_ptr<PointerEvent> event);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
-    void SendUpDownPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown,
-        int32_t sourceDisplayId, int32_t targetDisplayId,
-        std::optional<WindowInfo> &sourceWindowInfo, std::optional<WindowInfo> &targetWindowInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
