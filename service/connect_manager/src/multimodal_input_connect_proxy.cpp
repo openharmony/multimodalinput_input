@@ -1595,7 +1595,7 @@ int32_t MultimodalInputConnectProxy::SetFunctionKeyState(int32_t funcKey, bool e
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerLocation(int32_t x, int32_t y)
+int32_t MultimodalInputConnectProxy::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -1607,6 +1607,7 @@ int32_t MultimodalInputConnectProxy::SetPointerLocation(int32_t x, int32_t y)
     MessageOption option;
     WRITEINT32(data, x, ERR_INVALID_VALUE);
     WRITEINT32(data, y, ERR_INVALID_VALUE);
+    WRITEINT32(data, displayId, ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_LOCATION),

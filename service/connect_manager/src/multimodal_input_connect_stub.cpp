@@ -1828,9 +1828,11 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
 
     int32_t x = 0;
     int32_t y = 0;
+    int32_t displayId = 0;
     READINT32(data, x, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, y, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetPointerLocation(x, y);
+    READINT32(data, displayId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerLocation(x, y, displayId);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
     }
