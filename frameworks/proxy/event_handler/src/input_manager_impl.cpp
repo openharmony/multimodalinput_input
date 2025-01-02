@@ -1800,11 +1800,11 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerLocation(x, y);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerLocation(x, y, displayId);
     if (ret != RET_OK) {
         MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
     }

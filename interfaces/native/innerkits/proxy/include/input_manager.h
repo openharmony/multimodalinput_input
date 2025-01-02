@@ -599,10 +599,11 @@ public:
      * @brief Sets the absolute coordinate of mouse.
      * @param x Specifies the x coordinate of the mouse to be set.
      * @param y Specifies the y coordinate of the mouse to be set.
+     * @param displayId Specifies the id of the physical screen to be set.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
-    int32_t SetPointerLocation(int32_t x, int32_t y);
+    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1);
 
     /**
      * @brief 进入捕获模式

@@ -866,9 +866,9 @@ int32_t MouseTransformProcessor::GetTouchpadSpeed()
     return speed;
 }
 
-int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
+int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
-    MMI_HILOGI("SetPointerLocation x:%d, y:%d", x, y);
+    MMI_HILOGI("SetPointerLocation x:%d, y:%d, displayId:%d", x, y, displayId);
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
@@ -876,7 +876,9 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
     }
     cursorPos.cursorPos.x = x;
     cursorPos.cursorPos.y = y;
-
+    if (displayId >= 0) {
+        cursorPos.displayId = displayId;
+    }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y, false);
     auto mouseLoc = WIN_MGR->GetMouseInfo();
     IPointerDrawingManager::GetInstance()->SetPointerLocation(mouseLoc.physicalX, mouseLoc.physicalY);

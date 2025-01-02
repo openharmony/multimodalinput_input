@@ -505,11 +505,11 @@ int32_t MultimodalInputConnectManager::SetFunctionKeyState(int32_t funcKey, bool
     return multimodalInputConnectService_->SetFunctionKeyState(funcKey, enable);
 }
 
-int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
+int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetPointerLocation(x, y);
+    return multimodalInputConnectService_->SetPointerLocation(x, y, displayId);
 }
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService() __attribute__((no_sanitize("cfi")))
