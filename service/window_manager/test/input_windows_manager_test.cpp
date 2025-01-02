@@ -7175,7 +7175,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_002, 
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t flag = 0x00000080;
-    pointerEvent->bitwise_ |=  flag;
+    pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
@@ -7193,7 +7193,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_003, 
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t flag = 0x00000080;
-    pointerEvent->bitwise_ |=  flag;
+    pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
@@ -7211,7 +7211,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_004, 
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t flag = 0x00000100;
-    pointerEvent->bitwise_ |=  flag;
+    pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
@@ -7230,7 +7230,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_007, TestS
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t flag = 0x00000100;
-    pointerEvent->bitwise_ |=  flag;
+    pointerEvent->bitwise_ |= flag;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
 }
 
@@ -7249,7 +7249,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_008, TestS
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t flag = 0x00000100;
-    pointerEvent->bitwise_ |=  flag;
+    pointerEvent->bitwise_ |= flag;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = true;
     inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
@@ -7272,7 +7272,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_009, TestS
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t flag = 0x00000100;
-    pointerEvent->bitwise_ |=  flag;
+    pointerEvent->bitwise_ |= flag;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = false;
     inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
@@ -7341,14 +7341,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_001
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t flag = 0x00000100;
-    pointerEvent->bitwise_ |=  flag;
+    pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
 }
 
 /**
  * @tc.name: InputWindowsManagerTest_FoldScreenRotation_002
- * @tc.desc: Test  if (iter == touchItemDownInfos_.end())
+ * @tc.desc: Test if (iter == touchItemDownInfos_.end())
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7359,7 +7359,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_002
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t flag = 0x00000100;
-    pointerEvent->bitwise_ |=  flag;
+    pointerEvent->bitwise_ |= flag;
 
     InputWindowsManager inputWindowsManager;
     WindowInfoEX winInfoEx;
