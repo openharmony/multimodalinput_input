@@ -3957,22 +3957,7 @@ int32_t InputWindowsManager::UpdateCrownTarget(std::shared_ptr<PointerEvent> poi
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t focusWindowId = displayGroupInfo_.focusWindowId;
-    const WindowInfo* windowInfo = nullptr;
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
-    for (const auto &item : windowsInfo) {
-        if (item.id == focusWindowId) {
-            windowInfo = &item;
-            break;
-        }
-    }
-    CHKPR(windowInfo, ERROR_NULL_POINTER);
-    SetPrivacyModeFlag(windowInfo->privacyMode, pointerEvent);
-    pointerEvent->SetTargetWindowId(windowInfo->id);
-    pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
-    MMI_HILOG_DISPATCHD("focusWindow:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
-
-    return RET_OK;
+    return UpdateMouseTarget(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
 
