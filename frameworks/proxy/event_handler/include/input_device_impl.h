@@ -22,14 +22,14 @@
 #include <mutex>
 #include <vector>
 
-#include "nocopyable.h"
+#include <nocopyable.h>
 
 #include "i_input_device_listener.h"
 #include "input_device.h"
+#include "napi_constants.h"
 
 namespace OHOS {
 namespace MMI {
-class NetPacket;
 class InputDeviceImpl final {
 public:
     static InputDeviceImpl& GetInstance();
@@ -62,9 +62,17 @@ public:
     int32_t RegisterInputdevice(int32_t deviceId, bool enable, FunSetInputDeviceAck callback);
     void OnSetInputDeviceAck(int32_t index, int32_t result);
 
+    void OnConnected();
+    void OnDisconnected();
+
 private:
     InputDeviceImpl() = default;
-    std::map<std::string, std::list<InputDevListenerPtr>> devListener_ = { { "change", {} } };
+    int32_t StartListeningToServer();
+    void StopListeningToServer();
+
+    std::map<std::string, std::list<InputDevListenerPtr>> devListener_ {
+        { CHANGED_TYPE, {} }
+    };
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
     std::mutex mtx_;
