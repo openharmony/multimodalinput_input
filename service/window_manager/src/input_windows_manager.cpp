@@ -1604,15 +1604,13 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         }
     }
     PointerEvent::PointerItem currentPointerItem;
+    currentPointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
+    currentPointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW && windowId > 0) {
-        currentPointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
-        currentPointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
         currentPointerItem.SetDisplayX(mouseLocation_.physicalX);
         currentPointerItem.SetDisplayY(mouseLocation_.physicalY);
         pointerEvent->SetTargetDisplayId(mouseLocation_.displayId);
     } else {
-        currentPointerItem.SetWindowX(lastPointerItem.GetWindowX());
-        currentPointerItem.SetWindowY(lastPointerItem.GetWindowY());
         currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
         currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
         pointerEvent->SetTargetDisplayId(lastPointerEvent_->GetTargetDisplayId());
