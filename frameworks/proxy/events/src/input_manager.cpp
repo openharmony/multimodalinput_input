@@ -238,6 +238,106 @@ void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEv
     InputMgrImpl.SimulateTouchPadEvent(pointerEvent);
 }
 
+const std::map<int32_t, int32_t> MouseToTouchParamMap = {
+    {PointerEvent::SOURCE_TYPE_MOUSE, PointerEvent::SOURCE_TYPE_TOUCHSCREEN},
+    {PointerEvent::POINTER_ACTION_BUTTON_DOWN, PointerEvent::POINTER_ACTION_DOWN},
+    {PointerEvent::POINTER_ACTION_BUTTON_UP, PointerEvent::POINTER_ACTION_UP},
+    {PointerEvent::TOOL_TYPE_MOUSE, PointerEvent::TOOL_TYPE_FINGER},
+    {PointerEvent::MOUSE_BUTTON_LEFT, PointerEvent::POINTER_INITIAL_VALUE}
+};
+
+const std::map<int32_t, int32_t> TouchToMouseParamMap = {
+    {PointerEvent::SOURCE_TYPE_TOUCHSCREEN, PointerEvent::SOURCE_TYPE_MOUSE},
+    {PointerEvent::POINTER_ACTION_DOWN, PointerEvent::POINTER_ACTION_BUTTON_DOWN},
+    {PointerEvent::POINTER_ACTION_UP, PointerEvent::POINTER_ACTION_BUTTON_UP},
+    {PointerEvent::TOOL_TYPE_FINGER, PointerEvent::TOOL_TYPE_MOUSE}
+};
+
+bool InputManager::ParamNeedToConverted(const std::map<int32_t, int32_t> &ParamMap, const int &param, int32_t &result)
+{  
+    auto it = ParamMap.find(param);  
+    if (it != ParamMap.end()) {
+        result = it->second;
+        return true;
+    } else {  
+        return false;  
+    }  
+} 
+
+bool InputManager::PointerEventMouseToTouch(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if(pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        MMI_HILOGD("It's not MouseEvent, don't need to transform");
+        return true;
+    }
+
+    int32_t result = -1;
+    if(ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetSourceType(), result)){
+        pointerEvent->SetSourceType(result);
+    }
+
+    if(ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetPointerAction(), result)){
+        pointerEvent->SetPointerAction(result);
+        pointerEvent->SetOriginPointerAction(result);
+    }
+
+    if(ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetButtonId(), result)){
+        pointerEvent->SetButtonId(result);
+    }
+
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return false;
+    }
+
+    if(ParamNeedToConverted(MouseToTouchParamMap, pointerItem.GetToolType(), result)){
+        pointerItem.SetToolType(result);
+    }
+
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    return true;
+}
+
+bool InputManager::PointerEventTouchToMouse(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if(pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGD("It's not MouseEvent, don't need to transform");
+        return true;
+    }
+
+    int32_t result = -1;
+    if(ParamNeedToConverted(TouchToMouseParamMap, pointerEvent->GetSourceType(), result)){
+        pointerEvent->SetSourceType(result);
+    }
+
+    if(ParamNeedToConverted(TouchToMouseParamMap, pointerEvent->GetPointerAction(), result)){
+        pointerEvent->SetPointerAction(result);
+        pointerEvent->SetOriginPointerAction(result);
+    }
+
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return false;
+    }
+
+    if(ParamNeedToConverted(TouchToMouseParamMap, pointerItem.GetToolType(), result)){
+        pointerItem.SetToolType(result);
+    }
+
+    if(pointerItem.GetTargetWindowId() > 0){
+        pointerItem.SetTargetWindowId(PointerEvent::POINTER_INITIAL_VALUE);
+    }
+
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    return true;
+}
+
 int32_t InputManager::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
 {
     return InputMgrImpl.RegisterDevListener(type, listener);

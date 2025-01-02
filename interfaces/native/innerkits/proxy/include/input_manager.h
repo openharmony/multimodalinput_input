@@ -323,11 +323,26 @@ public:
      * @brief Simulates a touchpad input event.
      * because some event for touchpad is very different from other input,
      *  especially pointer.id must be same as actual data 0, 1, 2.
-     * @param pointerEvent Indicates the touchpad input event.
-     * @return void
-     * @since 12
+     * @param pointerEvent PointerEvent object.
+     * @return bool
+     * @since 9
      */
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent);
+
+    /**
+     * @brief Convert mouse events to touch events.
+     * @param pointerEvent PointerEvent object.
+     * @return bool
+     * @since 9
+     */
+    bool PointerEventMouseToTouch(std::shared_ptr<PointerEvent> pointerEvent);
+        /**
+     * @brief Convert touch events to mouse events.
+     * @param pointerEvent PointerEvent object.
+     * @return bool
+     * @since 9
+     */
+    bool PointerEventTouchToMouse(std::shared_ptr<PointerEvent> pointerEvent);
 
     /**
      * @brief Starts listening for an input device event.

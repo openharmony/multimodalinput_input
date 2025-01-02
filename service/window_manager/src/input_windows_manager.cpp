@@ -2508,7 +2508,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                     (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
                     (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
-                    (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
+                    (action == PointerEvent::POINTER_ACTION_AXIS_END)||
+                    (PointerEvent::MOUSE_BUTTON_LEFT != pointerEvent->GetButtonId()))) {
                     continue;
                 }
                 firstBtnDownWindowInfo_.first = item.id;

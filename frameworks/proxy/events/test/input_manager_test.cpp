@@ -4551,6 +4551,195 @@ HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_002, TestSize.L
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+std::shared_ptr<PointerEvent> CreatePointerEventTest()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(504);
+    item.SetPressed(true);
+    item.SetDisplayX(503);
+    item.SetWindowX(701);
+    item.SetPointerId(1);
+    item.SetWindowY(702);
+    item.SetDeviceId(0);
+    item.SetWidth(20);
+    item.SetHeight(60);
+    item.SetPressure(0);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+/*
+ * @tc.name: InputManagerTest_PointerEventMouseToTouch_001
+ * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = MMI::InputManager::GetInstance()->PointerEventMouseToTouch(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_PointerEventMouseToTouch_002
+ * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    ret = MMI::InputManager::GetInstance()->PointerEventMouseToTouch(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_PointerEventMouseToTouch_003
+ * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    ret = MMI::InputManager::GetInstance()->PointerEventMouseToTouch(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_PointerEventMouseToTouch_004
+ * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerId(1);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, false);
+}
+
+/*
+ * @tc.name: InputManagerTest_PointerEventTouchToMouse_001
+ * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    ret = MMI::InputManager::GetInstance()->PointerEventTouchToMouse(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_PointerEventTouchToMouse_002
+ * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    ret = MMI::InputManager::GetInstance()->PointerEventTouchToMouse(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_PointerEventTouchToMouse_003
+ * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    ret = MMI::InputManager::GetInstance()->PointerEventTouchToMouse(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_PointerEventTouchToMouse_001
+ * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(1);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, false);
+}
 }
 } // namespace MMI
 } // namespace OHOS
