@@ -329,6 +329,7 @@ public:
      */
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
+    bool ParamNeedToConverted(const std::map<int32_t, int32_t> &ParamMap, const int &param, int32_t &result);
     /**
      * @brief Convert mouse events to touch events.
      * @param pointerEvent PointerEvent object.

@@ -259,9 +259,8 @@ bool InputManager::ParamNeedToConverted(const std::map<int32_t, int32_t> &ParamM
     if (it != ParamMap.end()) {
         result = it->second;
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 bool InputManager::PointerEventMouseToTouch(std::shared_ptr<PointerEvent> pointerEvent)
