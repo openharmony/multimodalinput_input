@@ -684,7 +684,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_05, TestSize.Level
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_09, TestSize.Level1) 
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_09, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::set<int32_t> preKeys;
@@ -728,7 +728,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_09, TestSize.Level
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_10, TestSize.Level1) 
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_10, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::set<int32_t> preKeys;
@@ -772,7 +772,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_10, TestSize.Level
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_13, TestSize.Level1) 
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_13, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::set<int32_t> preKeys;
@@ -816,7 +816,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_13, TestSize.Level
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_11, TestSize.Level1) 
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_11, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::set<int32_t> preKeys;
@@ -860,7 +860,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_11, TestSize.Level
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_12, TestSize.Level1) 
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_12, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::set<int32_t> preKeys;
@@ -873,7 +873,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_12, TestSize.Level
     subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("[YKP] Subscribe key event KEYCODE_KEY_PEN_END_DOUBLE_CLICK down trigger callback");
-    });      
+    });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     EXPECT_TRUE(subscribeId >= 0);
 #else

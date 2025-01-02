@@ -2779,26 +2779,26 @@ public:
     static const int32_t KEYCODE_KEY_PEN_LIGHT_PINCH;
 
     /**
-     * KEYCODE_PEN_AI
+     * KEYCODE_KEY_PEN_AI
      *
      * @since 9
      */
     static const int32_t KEYCODE_KEY_PEN_AI;
 
     /**
-     * KEYCODE_PEN_AI
+     * KEYCODE_KEY_PEN_END_CLICK
      *
      * @since 9
      */
     static const int32_t KEYCODE_KEY_PEN_END_CLICK;
 
     /**
-     * KEYCODE_PEN_AI
+     * KEYCODE_KEY_PEN_END_DOUBLE_CLICK
      *
      * @since 9
      */
-    static const int32_t KEYCODE_KEY_PEN_END_DOUBLE_CLICK; 
-    
+    static const int32_t KEYCODE_KEY_PEN_END_DOUBLE_CLICK;
+
     /**
      * Left Knob roll-up
      * <p>In contrast to {@link #static const int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN},
