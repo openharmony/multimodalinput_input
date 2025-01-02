@@ -259,29 +259,29 @@ bool InputManager::ParamNeedToConverted(const std::map<int32_t, int32_t> &ParamM
     if (it != ParamMap.end()) {
         result = it->second;
         return true;
-    }else{  
+    } else {
         return false;
-    }  
+    }
 }
 
 bool InputManager::PointerEventMouseToTouch(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if(pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI_HILOGD("It's not MouseEvent, don't need to transform");
         return true;
     }
 
     int32_t result = -1;
-    if(ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetSourceType(), result)) {
+    if (ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetSourceType(), result)) {
         pointerEvent->SetSourceType(result);
     }
 
-    if(ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetPointerAction(), result)) {
+    if (ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetPointerAction(), result)) {
         pointerEvent->SetPointerAction(result);
         pointerEvent->SetOriginPointerAction(result);
     }
 
-    if(ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetButtonId(), result)) {
+    if (ParamNeedToConverted(MouseToTouchParamMap, pointerEvent->GetButtonId(), result)) {
         pointerEvent->SetButtonId(result);
     }
 
@@ -292,7 +292,7 @@ bool InputManager::PointerEventMouseToTouch(std::shared_ptr<PointerEvent> pointe
         return false;
     }
 
-    if(ParamNeedToConverted(MouseToTouchParamMap, pointerItem.GetToolType(), result)) {
+    if (ParamNeedToConverted(MouseToTouchParamMap, pointerItem.GetToolType(), result)) {
         pointerItem.SetToolType(result);
     }
 
@@ -302,17 +302,17 @@ bool InputManager::PointerEventMouseToTouch(std::shared_ptr<PointerEvent> pointe
 
 bool InputManager::PointerEventTouchToMouse(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if(pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_HILOGD("It's not MouseEvent, don't need to transform");
         return true;
     }
 
     int32_t result = -1;
-    if(ParamNeedToConverted(TouchToMouseParamMap, pointerEvent->GetSourceType(), result)) {
+    if (ParamNeedToConverted(TouchToMouseParamMap, pointerEvent->GetSourceType(), result)) {
         pointerEvent->SetSourceType(result);
     }
 
-    if(ParamNeedToConverted(TouchToMouseParamMap, pointerEvent->GetPointerAction(), result)) {
+    if (ParamNeedToConverted(TouchToMouseParamMap, pointerEvent->GetPointerAction(), result)) {
         pointerEvent->SetPointerAction(result);
         pointerEvent->SetOriginPointerAction(result);
     }
@@ -324,11 +324,11 @@ bool InputManager::PointerEventTouchToMouse(std::shared_ptr<PointerEvent> pointe
         return false;
     }
 
-    if(ParamNeedToConverted(TouchToMouseParamMap, pointerItem.GetToolType(), result)) {
+    if (ParamNeedToConverted(TouchToMouseParamMap, pointerItem.GetToolType(), result)) {
         pointerItem.SetToolType(result);
     }
 
-    if(pointerItem.GetTargetWindowId() > 0) {
+    if (pointerItem.GetTargetWindowId() > 0) {
         pointerItem.SetTargetWindowId(PointerEvent::POINTER_INITIAL_VALUE);
     }
 
