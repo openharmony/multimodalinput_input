@@ -4551,6 +4551,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_002, TestSize.L
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
 
 std::shared_ptr<PointerEvent> CreatePointerEventTest()
 {
@@ -4739,7 +4740,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_004, TestSi
     PointerEvent::PointerItem pointerItem;
     ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
     ASSERT_EQ(ret, false);
-}
 }
 } // namespace MMI
 } // namespace OHOS
