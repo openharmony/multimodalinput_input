@@ -376,6 +376,13 @@ public:
     static constexpr int32_t SOURCE_TYPE_CROWN = 6;
 
     /**
+     * Indicates that the input source generates a msdp event.
+     *
+     * @since 12
+     */
+    static constexpr int32_t SOURCE_TYPE_MSDP = 7;
+
+    /**
      * Indicates an invalid button ID.
      *
      * @since 9
@@ -1595,6 +1602,10 @@ public:
      */
     std::vector<uint8_t> GetBuffer() const;
 
+    void SetHandOption(int32_t handOption);
+
+    int32_t GetHandOption() const;
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.
@@ -1802,6 +1813,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_ANCO
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
     Settings settings_ {};
+    int32_t handOption_ { -1 };
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

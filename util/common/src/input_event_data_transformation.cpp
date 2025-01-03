@@ -300,7 +300,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
 
 void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
-    pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
+    pkt << event->GetHandOption() << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
         << event->GetButtonId() << event->GetFingerCount()
         << event->GetZOrder() << event->GetDispatchTimes() << event->GetHandlerEventType()
         << event->GetAxes();
@@ -322,6 +322,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
 {
     CHKPR(event, ERROR_NULL_POINTER);
     int32_t tField;
+    pkt >> tField;
+    event->SetHandOption(tField);
     pkt >> tField;
     event->SetPointerAction(tField);
     pkt >> tField;

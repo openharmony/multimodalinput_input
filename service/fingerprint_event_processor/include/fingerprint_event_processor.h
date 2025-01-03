@@ -55,6 +55,7 @@ public:
 private:
     int32_t AnalyseKeyEvent(struct libinput_event* event);
     int32_t AnalysePointEvent(struct libinput_event *event);
+    int32_t AnalyseMsdpPointEvent(struct libinput_event *event);
     int32_t SendFingerprintCancelEvent();
     void ChangeScreenMissTouchFlag(bool screenState, bool cancel);
     bool CheckMisTouchState();
@@ -70,6 +71,7 @@ private:
 
     const std::string FINGERPRINT_SOURCE_KEY { "fingerprint" };
     const std::string FINGERPRINT_SOURCE_POINT { "hw_fingerprint_mouse" };
+    const std::string FINGERPRINT_SOURCE_MSDP { "huawei,hand_status_dev" };
 
     using keyTimeMap = std::pair<int32_t, std::chrono::time_point<std::chrono::steady_clock>>;
     std::map<int32_t, keyTimeMap> keyStateMap_ {
