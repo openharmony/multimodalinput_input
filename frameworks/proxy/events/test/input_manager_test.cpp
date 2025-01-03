@@ -4568,7 +4568,7 @@ std::shared_ptr<PointerEvent> CreatePointerEventTest()
     item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
     item.SetWindowX(POINTER_ITEM_WINDOW_X);
     item.SetPointerId(1);
-    item.SetWindowY(POINTER_ITEM_WINDOW_y);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y);
     item.SetDeviceId(0);
     item.SetWidth(ITEM_WIDTH);
     item.SetHeight(ITEM_HEIGHT);
