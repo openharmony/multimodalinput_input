@@ -30,7 +30,7 @@ constexpr int32_t KEYBOARD_REPEATRATE { 50 };
 constexpr int32_t KEYBOARD_REPEATDELAY { 500 };
 constexpr int32_t MOUSE_SCROLL_ROWS { 3 };
 constexpr int32_t PRIMARY_BUTTON { 0 };
-constexpr int32_t POINTER_SPEED { 10 };
+constexpr int32_t POINTER_SPEED { 7 };
 constexpr int32_t TOUCHPAD_POINTER_SPEED { 6 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t RIGHT_CLICK_TYPE { 1 };
