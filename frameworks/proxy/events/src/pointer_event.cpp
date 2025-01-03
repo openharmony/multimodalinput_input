@@ -491,7 +491,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       ancoDeal_(other.ancoDeal_),
 #endif // OHOS_BUILD_ENABLE_ANCO
       handleEventType_(other.handleEventType_),
-      settings_(other.settings_) {}
+      settings_(other.settings_), handOption_(other.handOption_) {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -505,6 +505,7 @@ std::shared_ptr<PointerEvent> PointerEvent::Create()
 void PointerEvent::Reset()
 {
     InputEvent::Reset();
+    handOption_ = -1;
     pointerId_ = -1;
     pointers_.clear();
     pressedButtons_.clear();
@@ -578,6 +579,16 @@ int32_t PointerEvent::GetOriginPointerAction() const
 void PointerEvent::SetOriginPointerAction(int32_t pointerAction)
 {
     originPointerAction_ = pointerAction;
+}
+
+int32_t PointerEvent::GetHandOption() const
+{
+    return handOption_;
+}
+
+void PointerEvent::SetHandOption(int32_t handOption)
+{
+    handOption_ = handOption;
 }
 
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
@@ -906,6 +917,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
+    WRITEINT32(out, handOption_);
+
     WRITEINT32(out, pointerId_);
 
     WRITEINT32(out, static_cast<int32_t>(pointers_.size()));
@@ -975,6 +988,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!InputEvent::ReadFromParcel(in)) {
         return false;
     }
+
+    READINT32(in, handOption_);
 
     READINT32(in, pointerId_);
 
