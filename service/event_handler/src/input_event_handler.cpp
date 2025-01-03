@@ -122,15 +122,15 @@ void InputEventHandler::UpdateDwtTouchpadRecord(libinput_event *event)
     auto touchpadEvent = libinput_event_get_touchpad_event(event);
     CHKPV(touchpadEvent);
     auto type = libinput_event_get_type(event);
+    auto touchpadDevice = libinput_event_get_device(event); // guaranteed valid during event lifetime
+    CHKPV(touchpadDevice);
+    double touchpadSizeX;
+    double touchpadSizeY;
+    if (libinput_device_get_size(touchpadDevice, &touchpadSizeX, &touchpadSizeY) != 0) {
+        MMI_HILOGW("Failed to get touchpad device size");
+        return;
+    }
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
-        auto touchpadDevice = libinput_event_get_device(event); // guaranteed valid during event lifetime
-        CHKPV(touchpadDevice);
-        double touchpadSizeX;
-        double touchpadSizeY;
-        if (libinput_device_get_size(touchpadDevice, &touchpadSizeX, &touchpadSizeY) != 0) {
-            MMI_HILOGW("Failed to get touchpad device size");
-            return;
-        }
         touchpadEventDownAbsX_ = libinput_event_touchpad_get_x(touchpadEvent);
         touchpadEventDownAbsY_ = libinput_event_touchpad_get_y(touchpadEvent);
         touchpadEventAbsX_ = touchpadEventDownAbsX_;
@@ -154,6 +154,12 @@ void InputEventHandler::UpdateDwtTouchpadRecord(libinput_event *event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
         touchpadEventAbsX_ = libinput_event_touchpad_get_x(touchpadEvent);
         touchpadEventAbsY_ = libinput_event_touchpad_get_y(touchpadEvent);
+
+        if (touchpadEventAbsX_ > TOUCHPAD_EDGE_WIDTH_RELEASE &&
+            touchpadEventAbsX_ < touchpadSizeX - TOUCHPAD_EDGE_WIDTH_RELEASE) {
+            isDwtEdgeAreaForTouchpadMotionActing_ = false;
+            MMI_HILOGD("Pointer edge dwt unlocked, coordX = %{public}f", touchpadEventDownAbsX_);
+        }
     }
 }
 
@@ -219,7 +225,7 @@ bool InputEventHandler::IsModifierKey(uint32_t keycode)
 void InputEventHandler::RefreshDwtActingState()
 {
     isDwtEdgeAreaForTouchpadMotionActing_ = true;
-    isDwtEdgeAreaForTouchpadButtonActing_ = true;
+    isDwtEdgeAreaForTouchpadButtonActing_ = false;
     isDwtEdgeAreaForTouchpadTapActing_ = true;
 }
 
