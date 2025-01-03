@@ -17,6 +17,7 @@
 
 #include <config_policy_utils.h>
 
+#include "input_event_handler.h"
 #include "key_command_handler_util.h"
 
 #undef MMI_LOG_DOMAIN
@@ -34,6 +35,7 @@ TouchGestureManager::TouchGestureManager(std::shared_ptr<DelegateInterface> dele
     : delegate_(delegate)
 {
     touchGesture_ = TouchGestureAdapter::GetGestureFactory();
+    SetupSessionObserver();
 }
 
 TouchGestureManager::~TouchGestureManager()
@@ -77,6 +79,12 @@ void TouchGestureManager::RemoveHandler(int32_t session, TouchGestureType gestur
     MMI_HILOGI("Stop monitoring touch gesture(Session:%{public}d, Gesture:%{public}u, nFingers:%{public}d)",
         session, gestureType, nFingers);
     StopRecognization(gestureType, nFingers);
+}
+
+void TouchGestureManager::HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent)
+{
+    CHKPV(touchGesture_);
+    touchGesture_->HandleGestureWindowEmerged(windowId, lastTouchEvent);
 }
 
 void TouchGestureManager::StartRecognization(TouchGestureType gestureType, int32_t nFingers)
@@ -143,6 +151,35 @@ void TouchGestureManager::RemoveAllHandlers()
     for (auto iter = handlers_.cbegin(); iter != handlers_.cend(); iter = handlers_.cbegin()) {
         RemoveHandler(iter->session_, iter->gesture_, iter->nFingers_);
     }
+}
+
+void TouchGestureManager::SetupSessionObserver()
+{
+    auto udsServerPtr = InputHandler->GetUDSServer();
+    CHKPV(udsServerPtr);
+    udsServerPtr->AddSessionDeletedCallback([this](SessionPtr session) {
+        CHKPV(session);
+        OnSessionLost(session->GetPid());
+    });
+}
+
+void TouchGestureManager::OnSessionLost(int32_t session)
+{
+    MMI_HILOGI("Clear handlers related to lost session(%{public}d)", session);
+    std::set<Handler> handlers;
+
+    std::for_each(handlers_.cbegin(), handlers_.cend(),
+        [session, &handlers](const auto &handler) {
+            if (handler.session_ == session) {
+                handlers.emplace(handler);
+            }
+        });
+    std::for_each(handlers.cbegin(), handlers.cend(),
+        [this](const auto &handler) {
+            MMI_HILOGI("Remove handler(%{public}u, %{public}d) related to lost session(%{public}d)",
+                handler.gesture_, handler.nFingers_, handler.session_);
+            RemoveHandler(handler.session_, handler.gesture_, handler.nFingers_);
+        });
 }
 } // namespace MMI
 } // namespace OHOS

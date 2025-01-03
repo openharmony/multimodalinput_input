@@ -43,20 +43,12 @@ public:
     InputHandlerType GetHandlerType() const override;
 
 private:
-    virtual bool CheckMonitorValid(TouchGestureType type, int32_t fingers) override;
-
-public:
-    static bool IsValidMonitorId(int32_t monitorId);
+    bool CheckMonitorValid(TouchGestureType type, int32_t fingers) override;
 };
 
 inline InputHandlerType InputMonitorManager::GetHandlerType() const
 {
     return InputHandlerType::MONITOR;
-}
-
-inline bool InputMonitorManager::IsValidMonitorId(int32_t monitorId)
-{
-    return IsValidHandlerId(monitorId);
 }
 
 #define IMonitorMgr ::OHOS::DelayedSingleton<InputMonitorManager>::GetInstance()

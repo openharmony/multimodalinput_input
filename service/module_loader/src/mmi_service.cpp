@@ -3398,6 +3398,7 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
 void MMIService::SetupTouchGestureHandler()
 {
     touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
+    WIN_MGR->AttachTouchGestureMgr(touchGestureMgr_);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 

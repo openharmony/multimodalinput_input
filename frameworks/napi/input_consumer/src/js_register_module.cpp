@@ -103,7 +103,7 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEve
         MMI_HILOGE("Get preKeys failed");
         return nullptr;
     }
-    if (preKeys.size() > INPUT_PARAMETER_MIDDLE) {
+    if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("PreKeys size invalid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "PreKeys size invalid");
         return nullptr;

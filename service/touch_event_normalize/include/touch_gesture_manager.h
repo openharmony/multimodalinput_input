@@ -21,7 +21,6 @@
 #include <nocopyable.h>
 
 #include "delegate_interface.h"
-#include "key_command_handler.h"
 #include "touch_gesture_adapter.h"
 
 namespace OHOS {
@@ -51,11 +50,14 @@ public:
 
     void AddHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers);
     void RemoveHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers);
+    void HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent);
 
 private:
     void StartRecognization(TouchGestureType gestureType, int32_t nFingers);
     void StopRecognization(TouchGestureType gestureType, int32_t nFingers);
     void RemoveAllHandlers();
+    void SetupSessionObserver();
+    void OnSessionLost(int32_t session);
 
     std::weak_ptr<DelegateInterface> delegate_;
     std::shared_ptr<TouchGestureAdapter> touchGesture_;

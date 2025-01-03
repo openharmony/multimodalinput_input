@@ -43,6 +43,7 @@ ohos_unittest("key_shortcut_manager_test") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
   ]
 
