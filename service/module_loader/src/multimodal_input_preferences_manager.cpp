@@ -46,6 +46,7 @@ const std::string SHORT_KEY_FILE_NAME { "Settings.xml" };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string KEYBOARD_FILE_NAME { "keyboard_settings.xml" };
 const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
+const std::string DEFAULT_MOUSE_SPEED_NAME { "const.multimodalinput.default_mouse_speed" };
 } // namespace
 
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
@@ -124,6 +125,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
 
 int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
 {
+    pointerSpeed_ = OHOS::system::GetIntParameter(DEFAULT_MOUSE_SPEED_NAME, pointerSpeed_);
     preferencesMap_[strPointerSize_] = {MOUSE_FILE_NAME, pointerSize_};
     preferencesMap_[strPointerSpeed_] = {MOUSE_FILE_NAME, pointerSpeed_};
     preferencesMap_[strPointerColor_] = {MOUSE_FILE_NAME, pointerColor_};
