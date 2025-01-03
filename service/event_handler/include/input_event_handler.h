@@ -108,6 +108,7 @@ private:
     int64_t lastEventBeginTime_ { 0 };
 
     static constexpr double TOUCHPAD_EDGE_WIDTH = 15.0;
+    static constexpr double TOUCHPAD_EDGE_WIDTH_RELEASE = 20.0;
     static constexpr double TOUCHPAD_EDGE_WIDTH_FOR_BUTTON = 15.0;
     static constexpr double TOUCHPAD_EDGE_WIDTH_FOR_TAP = 25.0;
 };
