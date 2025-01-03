@@ -433,12 +433,13 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif // OHOS_RSS_CLIENT
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    MMI_HILOGI("Add SA listener COMMON_EVENT_SERVICE_ID start");
+    AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
+    MMI_HILOGI("Add SA listener COMMON_EVENT_SERVICE_ID success");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
     FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
-    MMI_HILOGI("Add system ability listener start");
-    AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
-    MMI_HILOGI("Add system ability listener success");
-    AddSystemAbilityListener(RENDER_SERVICE);
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
@@ -447,6 +448,7 @@ void MMIService::OnStart()
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
     MMI_HILOGI("Add app manager service listener end");
+    AddSystemAbilityListener(RENDER_SERVICE);
     AddAppDebugListener();
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
