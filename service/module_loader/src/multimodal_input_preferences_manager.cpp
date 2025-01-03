@@ -93,7 +93,8 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
         NativePreferences::PreferencesHelper::GetPreferences(PATH + TOUCHPAD_FILE_NAME, errCode);
     CHKPR(touchpadPref, errno);
     pointerSize_ = mousePref->GetInt(strPointerSize_, POINTER_SIZE);
-    pointerSpeed_ = mousePref->GetInt(strPointerSpeed_, OHOS::system::GetIntParameter(DEFAULT_MOUSE_SPEED_NAME, POINTER_SPEED));
+    pointerSpeed_ = mousePref->GetInt(strPointerSpeed_,
+        OHOS::system::GetIntParameter(DEFAULT_MOUSE_SPEED_NAME, POINTER_SPEED));
     pointerColor_ = mousePref->GetInt(strPointerColor_, POINTER_COLOR);
     pointerStyle_ = mousePref->GetInt(strPointerStyle_, POINTER_STYLE);
     mouseScrollRows_ = mousePref->GetInt(strMouseScrollRows_, MOUSE_SCROLL_ROWS);
