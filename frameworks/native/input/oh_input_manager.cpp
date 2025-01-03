@@ -101,7 +101,7 @@ struct Input_DeviceInfo {
 typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
 static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
-static constexpr size_t PRE_KEYS_SIZE { 2 };
+static constexpr size_t PRE_KEYS_SIZE { 4 };
 static constexpr size_t KEYS_SIZE { 3 };
 static std::mutex g_hotkeyCountsMutex;
 static std::unordered_map<Input_Hotkey**, int32_t> g_hotkeyCounts;

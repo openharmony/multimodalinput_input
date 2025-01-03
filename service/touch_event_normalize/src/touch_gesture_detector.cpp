@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <numeric>
 
+#include "input_event_handler.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
 
@@ -50,6 +51,7 @@ constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE { 3.0 };
 constexpr double MINIMUM_GRAVITY_OFFSET { 0.5 };
 constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS { 2 };
 constexpr int32_t MINIMUM_FINGER_COUNT_OFFSET { 1 };
+constexpr size_t SINGLE_TOUCH { 1 };
 } // namespace
 
 bool TouchGestureDetector::OnTouchEvent(std::shared_ptr<PointerEvent> event)
@@ -68,7 +70,8 @@ bool TouchGestureDetector::OnTouchEvent(std::shared_ptr<PointerEvent> event)
             HandleMoveEvent(event);
             break;
         }
-        case PointerEvent::POINTER_ACTION_UP: {
+        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_CANCEL: {
             HandleUpEvent(event);
             break;
         }
@@ -83,21 +86,28 @@ bool TouchGestureDetector::OnTouchEvent(std::shared_ptr<PointerEvent> event)
 void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
 {
     CALL_INFO_TRACE;
-    CHKPV(event);
-    int32_t pointerId = event->GetPointerId();
     if (isRecognized_) {
-        MMI_HILOGW("The gestures begin, point down:%{public}d", pointerId);
-        return;
+        if (haveGestureWinEmerged_) {
+            return;
+        }
+        MMI_HILOGI("Touch-down while touch gesture is pending");
+        isRecognized_ = false;
+
+        if (lastTouchEvent_ != nullptr) {
+            auto now = GetSysClockTime();
+            lastTouchEvent_->SetActionTime(now);
+            NotifyGestureEvent(lastTouchEvent_, GestureMode::ACTION_GESTURE_END);
+        }
     }
-    PointerEvent::PointerItem item;
+    int32_t pointerId = event->GetPointerId();
+    PointerEvent::PointerItem item {};
+
     if (!event->GetPointerItem(pointerId, item)) {
         MMI_HILOGE("Get pointer item:%{public}d fail", pointerId);
         return;
     }
-    int32_t x = item.GetDisplayX();
-    int32_t y = item.GetDisplayY();
-    int64_t time = item.GetDownTime();
-    auto iter = downPoint_.insert_or_assign(pointerId, Point(x, y, time));
+    auto iter = downPoint_.insert_or_assign(
+        pointerId, Point { item.GetDisplayX(), item.GetDisplayY(), item.GetDownTime() });
     if (!iter.second) {
         MMI_HILOGE("Insert value failed, duplicated pointerId:%{public}d", pointerId);
     }
@@ -110,9 +120,8 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         CalcAndStoreDistance(downPoint_);
     }
-    MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, "
-        "pointerId:%{public}d, x:%{private}d, y:%{private}d",
-        gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId, x, y);
+    MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
+        gestureType_, downPoint_.size(), (isFingerReady_ ? "true" : "false"), pointerId);
     movePoint_ = downPoint_;
 }
 
@@ -125,11 +134,11 @@ void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
     if (downPoint_.size() < THREE_FINGER_COUNT) {
         return;
     }
-    CheckGestureTrend(event);
-
     if (!IsMatchGesture(event->GetPointerCount()) && !IsMatchGesture(ALL_FINGER_COUNT)) {
         return;
     }
+    CheckGestureTrend(event);
+
     if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
         HandleSwipeMoveEvent(event);
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
@@ -214,29 +223,34 @@ bool TouchGestureDetector::InOppositeDirections(const std::unordered_set<SlideSt
 
 void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
 {
-    CHKPV(event);
-    int32_t pointerId = event->GetPointerId();
-    auto iter = downPoint_.find(pointerId);
-    if (iter == downPoint_.end()) {
-        MMI_HILOGW("Invalid pointer:%{public}d", pointerId);
-        return;
-    }
-    downPoint_.erase(iter);
+    downPoint_.erase(event->GetPointerId());
     if (gestureTimer_ >= 0) {
         TimerMgr->RemoveTimer(gestureTimer_);
         gestureTimer_ = -1;
     }
-    if (isRecognized_ && (lastTouchEvent_ != nullptr)) {
-        PointerEvent::PointerItem pointerItem {};
-        if (event->GetPointerItem(event->GetPointerId(), pointerItem)) {
-            lastTouchEvent_->UpdatePointerItem(event->GetPointerId(), pointerItem);
+    if (isRecognized_) {
+        if (lastTouchEvent_ != nullptr) {
+            PointerEvent::PointerItem pointerItem {};
+
+            if (event->GetPointerItem(event->GetPointerId(), pointerItem)) {
+                lastTouchEvent_->UpdatePointerItem(event->GetPointerId(), pointerItem);
+            }
+        }
+        if (!haveGestureWinEmerged_) {
+            MMI_HILOGI("Touch-up while touch gesture is pending");
+            isRecognized_ = false;
+
+            if (lastTouchEvent_ != nullptr) {
+                auto now = GetSysClockTime();
+                lastTouchEvent_->SetActionTime(now);
+                NotifyGestureEvent(lastTouchEvent_, GestureMode::ACTION_GESTURE_END);
+            }
         }
     }
-    MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
-        gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId);
-    if (downPoint_.empty()) {
+    if (IsLastTouchUp(event)) {
         if (isRecognized_ && (lastTouchEvent_ != nullptr)) {
-            lastTouchEvent_->SetActionTime(GetSysClockTime());
+            auto now = GetSysClockTime();
+            lastTouchEvent_->SetActionTime(now);
             NotifyGestureEvent(lastTouchEvent_, GestureMode::ACTION_GESTURE_END);
         }
         ReleaseData();
@@ -258,6 +272,7 @@ void TouchGestureDetector::ReleaseData()
     isRecognized_ = false;
     isFingerReady_ = false;
     haveLastDistance_ = false;
+    haveGestureWinEmerged_ = false;
     lastTouchEvent_ = nullptr;
     continuousCloseCount_ = 0;
     continuousOpenCount_ = 0;
@@ -655,6 +670,15 @@ void TouchGestureDetector::RemoveGestureFingers(int32_t fingers)
     }
 }
 
+void TouchGestureDetector::HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent)
+{
+    if ((gestureType_ == TOUCH_GESTURE_TYPE_PINCH) && isRecognized_ && !haveGestureWinEmerged_) {
+        MMI_HILOGI("Gesture window of UNI-CUBIC emerges, redirect touches");
+        haveGestureWinEmerged_ = true;
+        OnGestureSendEvent(lastTouchEvent);
+    }
+}
+
 bool TouchGestureDetector::IsMatchGesture(int32_t count) const
 {
     return fingers_.find(count) != fingers_.end();
@@ -726,6 +750,44 @@ void TouchGestureDetector::CheckGestureTrend(std::shared_ptr<PointerEvent> event
     }
     if (nMovements >= THREE_FINGER_COUNT) {
         listener_->OnGestureTrend(event);
+    }
+}
+
+bool TouchGestureDetector::IsLastTouchUp(std::shared_ptr<PointerEvent> event) const
+{
+    return ((event->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) &&
+            (event->GetPointerIds().size() == SINGLE_TOUCH));
+}
+
+void TouchGestureDetector::OnGestureSendEvent(std::shared_ptr<PointerEvent> event) const
+{
+    CALL_INFO_TRACE;
+    CHKPV(event);
+    event->SetTargetWindowId(-1);
+    auto pointerEvent = std::make_shared<PointerEvent>(*event);
+    pointerEvent->RemoveAllPointerItems();
+    auto items = event->GetAllPointerItems();
+    for (auto &item : items) {
+        if (!item.IsPressed()) {
+            continue;
+        }
+        int32_t pointerId = item.GetPointerId();
+        pointerEvent->SetPointerId(pointerId);
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+        auto now = GetSysClockTime();
+        pointerEvent->SetActionTime(now);
+        pointerEvent->UpdateId();
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+
+        item.SetTargetWindowId(-1);
+        event->UpdatePointerItem(pointerId, item);
+        pointerEvent->AddPointerItem(item);
+
+        MMI_HILOGI("Redirect touch on transparent window of UNI-CUBIC, No:%{public}d, PI:%{public}d",
+            pointerEvent->GetId(), pointerEvent->GetPointerId());
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+        CHKPV(inputEventNormalizeHandler);
+        inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
     }
 }
 } // namespace MMI

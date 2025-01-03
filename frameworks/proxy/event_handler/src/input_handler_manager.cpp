@@ -62,7 +62,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
             eventType |= HANDLE_EVENT_TYPE_POINTER;
         }
     }
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    std::lock_guard guard(mtxHandlers_);
     CHKFR(((monitorHandlers_.size() + interHandlers_.size()) < MAX_N_INPUT_HANDLERS), ERROR_EXCEED_MAX_COUNT,
           "The number of handlers exceeds the maximum");
     int32_t handlerId = GetNextId();
@@ -104,7 +104,7 @@ int32_t InputHandlerManager::AddGestureMonitor(
     HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
 {
     CHKPR(consumer, INVALID_HANDLER_ID);
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    std::lock_guard guard(mtxHandlers_);
     CHKFR(((monitorHandlers_.size() + interHandlers_.size()) < MAX_N_INPUT_HANDLERS), ERROR_EXCEED_MAX_COUNT,
           "The number of handlers exceeds the maximum");
     int32_t handlerId = GetNextId();
@@ -134,7 +134,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
 {
     CALL_DEBUG_ENTER;
     CHKPR(consumer, INVALID_HANDLER_ID);
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    std::lock_guard guard(mtxHandlers_);
     CHKFR(((actionsMonitorHandlers_.size() + monitorHandlers_.size() + interHandlers_.size()) <
         MAX_N_INPUT_HANDLERS), ERROR_EXCEED_MAX_COUNT, "The number of handlers exceeds the maximum");
     int32_t handlerId = GetNextId();
@@ -161,7 +161,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
 
 int32_t InputHandlerManager::RemoveGestureMonitor(int32_t handlerId, InputHandlerType handlerType)
 {
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    std::lock_guard guard(mtxHandlers_);
     auto iter = monitorHandlers_.find(handlerId);
     if (iter == monitorHandlers_.end()) {
         MMI_HILOGE("No handler(%{public}d) with specified", handlerId);
@@ -199,7 +199,7 @@ int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType h
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    std::lock_guard guard(mtxHandlers_);
     uint32_t deviceTags = 0;
     auto iter = monitorHandlers_.find(handlerId);
     bool isInterHandlers = false;
@@ -456,7 +456,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         std::map<int32_t, Handler> tempMonitorHandlers;
         {
-            std::lock_guard<std::mutex> guard(mtxHandlers_);
+            std::lock_guard guard(mtxHandlers_);
             tempMonitorHandlers = monitorHandlers_;
         }
         for (const auto &item : tempMonitorHandlers) {
@@ -467,7 +467,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
             {
-                std::lock_guard<std::mutex> guard(mtxHandlers_);
+                std::lock_guard guard(mtxHandlers_);
                 auto iter = monitorHandlers_.find(handlerId);
                 if (iter == monitorHandlers_.end()) {
                     MMI_HILOGE("No handler with specified");
@@ -480,7 +480,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
         }
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
-        std::lock_guard<std::mutex> guard(mtxHandlers_);
+        std::lock_guard guard(mtxHandlers_);
         for (const auto &item : interHandlers_) {
             if ((item.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
                 continue;
@@ -518,7 +518,7 @@ bool InputHandlerManager::CheckInputDeviceSource(
 void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
 {
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    std::lock_guard guard(mtxHandlers_);
     int32_t consumerCount = 0;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
@@ -760,7 +760,7 @@ template<typename T>
 bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
     CALL_INFO_TRACE;
-    std::unique_lock<std::mutex> lock(mtxHandlers_);
+    std::unique_lock lock(mtxHandlers_);
     CHKPF(lastPointerEvent_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
@@ -799,7 +799,10 @@ void InputHandlerManager::OnDisconnected()
 
 void InputHandlerManager::OnConnected()
 {
-    CALL_DEBUG_ENTER;
+    std::lock_guard guard(mtxHandlers_);
+    MMI_HILOGI("Reregister gesture monitors on reconnection");
+    RegisterGestureMonitors();
+    MMI_HILOGI("Enable event monitors(interceptors) on reconnection");
     HandleEventType eventType = GetEventType();
     int32_t priority = GetPriority();
     uint32_t deviceTags = GetDeviceTags();
@@ -812,7 +815,7 @@ void InputHandlerManager::OnConnected()
 
 bool InputHandlerManager::HasHandler(int32_t handlerId)
 {
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    std::lock_guard guard(mtxHandlers_);
     bool hasHandler = false;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         auto iter = monitorHandlers_.find(handlerId);
@@ -892,7 +895,7 @@ std::vector<int32_t> InputHandlerManager::GetActionsType() const
 
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    std::lock_guard guard(mtxHandlers_);
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
@@ -948,6 +951,23 @@ bool InputHandlerManager::IsMatchGesture(const Handler &handler, int32_t action,
         return true;
     }
     return false;
+}
+
+void InputHandlerManager::RegisterGestureMonitors() const
+{
+    for (const auto &[_, handler] : monitorHandlers_) {
+        if ((handler.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+            continue;
+        }
+        MMI_HILOGI("AddGestureMonitor(%{public}u, %{public}d) to server",
+            handler.gestureHandler_.gestureType, handler.gestureHandler_.fingers);
+        auto ret = MULTIMODAL_INPUT_CONNECT_MGR->AddGestureMonitor(
+            InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_TOUCH_GESTURE,
+            handler.gestureHandler_.gestureType, handler.gestureHandler_.fingers);
+        if (ret != RET_OK) {
+            MMI_HILOGE("AddGestureMonitor to server fail, ret:%{public}d", ret);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

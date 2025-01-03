@@ -205,6 +205,10 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
+    void CancelAllTouches(std::shared_ptr<PointerEvent> event);
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -341,10 +345,12 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     bool OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
-    void OnGestureSendEvent(std::shared_ptr<PointerEvent> event);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    bool CancelTouch(int32_t touch);
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
     UDSServer* udsServer_ { nullptr };
@@ -369,6 +375,7 @@ private:
     WindowInfo lastTouchWindowInfo_;
     std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
     std::shared_ptr<PointerEvent> lastTouchEventOnBackGesture_ { nullptr };
+    std::weak_ptr<TouchGestureManager> touchGestureMgr_;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     DisplayGroupInfo displayGroupInfoTmp_;
     DisplayGroupInfo displayGroupInfo_;
@@ -416,7 +423,6 @@ private:
     int32_t windowStateNotifyPid_ { -1 };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
-    bool isSendGestureDown_ { false };
     static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
