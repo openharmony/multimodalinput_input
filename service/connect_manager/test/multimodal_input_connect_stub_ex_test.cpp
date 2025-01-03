@@ -8396,5 +8396,64 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadDoubleTapAndDragState_00
     EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadDoubleTapAndDragState(data, reply));
 }
 
+/**
+ * @tc.name: StubSetInputDeviceInputEnable_001
+ * @tc.desc: Test the function StubSetInputDeviceInputEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceInputEnable_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInputDeviceController()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetInputDeviceInputEnable(data, reply));
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetInputDeviceInputEnable(data, reply));
+}
+
+/**
+ * @tc.name: StubSetInputDeviceInputEnable_002
+ * @tc.desc: Test the function StubSetInputDeviceInputEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceInputEnable_002, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, CheckInputDeviceController()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetInputDeviceInputEnable(data, reply));
+}
+
+/**
+ * @tc.name: StubSetInputDeviceInputEnable_003
+ * @tc.desc: Test the function StubSetInputDeviceInputEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceInputEnable_003, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInputDeviceController()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetInputDeviceInputEnable(data, reply));
+}
 } // namespace MMI
 } // namespace OHOS
