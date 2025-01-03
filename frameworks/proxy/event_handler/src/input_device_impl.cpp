@@ -16,12 +16,12 @@
 #include "input_device_impl.h"
 
 #include <algorithm>
+#include <string_view>
 
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "bytrace_adapter.h"
-#include "napi_constants.h"
 #include "net_packet.h"
 
 #undef MMI_LOG_TAG
@@ -29,6 +29,11 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr std::string_view INPUT_DEV_CHANGE_ADD_DEV { "add" };
+constexpr std::string_view INPUT_DEV_CHANGE_REMOVE_DEV { "remove" };
+}
+
 InputDeviceImpl& InputDeviceImpl::GetInstance()
 {
     static InputDeviceImpl instance;
@@ -37,69 +42,54 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
 
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
-    CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
-    if (type != CHANGED_TYPE) {
-        MMI_HILOGE("Failed to register, listener event must be \"change\"");
-        return RET_ERR;
-    }
-    auto iter = devListener_.find(CHANGED_TYPE);
+    MMI_HILOGI("Register listener of change of input devices");
+    std::lock_guard guard(mtx_);
+
+    auto iter = devListener_.find(type);
     if (iter == devListener_.end()) {
-        MMI_HILOGE("Find change failed");
+        MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
         return RET_ERR;
     }
     auto &listeners = iter->second;
 
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!isListeningProcess_) {
-        MMI_HILOGI("Start monitoring");
-        isListeningProcess_ = true;
-        int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RegisterDevListener();
-        if (ret != RET_OK) {
-            MMI_HILOGE("Failed to register");
-            return ret;
-        }
+    auto ret = StartListeningToServer();
+    if (ret != RET_OK) {
+        MMI_HILOGE("StartListeningToServer fail, error:%{public}d", ret);
+        return ret;
     }
-    if (std::all_of(listeners.cbegin(), listeners.cend(),
-                    [listener](InputDevListenerPtr tListener) {
-                        return (tListener != listener);
-                    })) {
-        MMI_HILOGI("Add device listener");
+    bool isNew = std::all_of(listeners.cbegin(), listeners.cend(),
+        [listener](InputDevListenerPtr tListener) {
+            return (tListener != listener);
+        });
+    if (isNew) {
         listeners.push_back(listener);
-    } else {
-        MMI_HILOGW("The listener already exists");
     }
+    MMI_HILOGI("Succeed to register listener of change of input devices");
     return RET_OK;
 }
 
 int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
-    CALL_DEBUG_ENTER;
-    if (type != CHANGED_TYPE) {
-        MMI_HILOGE("Failed to cancel registration, listener event must be \"change\"");
-        return RET_ERR;
-    }
-    auto iter = devListener_.find(CHANGED_TYPE);
+    std::lock_guard guard(mtx_);
+    auto iter = devListener_.find(type);
     if (iter == devListener_.end()) {
-        MMI_HILOGE("Find change failed");
+        MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (listener == nullptr) {
-        iter->second.clear();
-        goto listenerLabel;
-    }
-    for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
-        if (*it == listener) {
-            iter->second.erase(it);
-            goto listenerLabel;
-        }
-    }
+    auto &listeners = iter->second;
 
-listenerLabel:
-    if (isListeningProcess_ && iter->second.empty()) {
-        isListeningProcess_ = false;
-        return MULTIMODAL_INPUT_CONNECT_MGR->UnregisterDevListener();
+    if (listener == nullptr) {
+        MMI_HILOGI("Unregister all listeners of change of input devices");
+        listeners.clear();
+    } else {
+        MMI_HILOGI("Unregister listener of change of input devices");
+        listeners.remove_if([listener](const auto &item) {
+            return (item == listener);
+        });
+    }
+    if (listeners.empty()) {
+        StopListeningToServer();
     }
     return RET_OK;
 }
@@ -107,22 +97,23 @@ listenerLabel:
 void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = devListener_.find("change");
+    MMI_HILOGI("Change(%{public}s) of input device(%{public}d)", type.c_str(), deviceId);
+    std::lock_guard guard(mtx_);
+    auto iter = devListener_.find(CHANGED_TYPE);
     if (iter == devListener_.end()) {
         MMI_HILOGE("Find change failed");
         return;
     }
+    BytraceAdapter::StartDevListener(type, deviceId);
+
     for (const auto &item : iter->second) {
-        if (type == "add") {
+        if (type == INPUT_DEV_CHANGE_ADD_DEV) {
             item->OnDeviceAdded(deviceId, type);
-            continue;
+        } else if (type == INPUT_DEV_CHANGE_REMOVE_DEV) {
+            item->OnDeviceRemoved(deviceId, type);
         }
-        item->OnDeviceRemoved(deviceId, type);
-        BytraceAdapter::StartDevListener(type, deviceId);
-        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d", type.c_str(), deviceId);
-        BytraceAdapter::StopDevListener();
     }
+    BytraceAdapter::StopDevListener();
 }
 
 int32_t InputDeviceImpl::GetInputDeviceIds(FunInputDevIds callback)
@@ -244,7 +235,7 @@ int32_t InputDeviceImpl::RegisterInputdevice(int32_t deviceId, bool enable, std:
 void InputDeviceImpl::OnSetInputDeviceAck(int32_t index, int32_t result)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::lock_guard guard(mtx_);
     auto iter = inputdeviceList_.find(index);
     if (iter == inputdeviceList_.end()) {
         MMI_HILOGE("Find index failed");
@@ -252,6 +243,54 @@ void InputDeviceImpl::OnSetInputDeviceAck(int32_t index, int32_t result)
     }
     iter->second(result);
     inputdeviceList_.erase(index);
+}
+
+void InputDeviceImpl::OnConnected()
+{
+    std::lock_guard guard(mtx_);
+    auto iter = devListener_.find(CHANGED_TYPE);
+    if ((iter == devListener_.end()) || iter->second.empty()) {
+        return;
+    }
+    auto ret = StartListeningToServer();
+    if (ret != RET_OK) {
+        MMI_HILOGE("StartListeningToServer fail, error:%{public}d", ret);
+    }
+}
+
+void InputDeviceImpl::OnDisconnected()
+{
+    MMI_HILOGI("Disconnected from server");
+    std::lock_guard guard(mtx_);
+    isListeningProcess_ = false;
+}
+
+int32_t InputDeviceImpl::StartListeningToServer()
+{
+    if (isListeningProcess_) {
+        return RET_OK;
+    }
+    MMI_HILOGI("Start monitoring changes of input devices");
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RegisterDevListener();
+    if (ret != RET_OK) {
+        MMI_HILOGE("RegisterDevListener to server fail, error:%{public}d", ret);
+        return ret;
+    }
+    isListeningProcess_ = true;
+    return RET_OK;
+}
+
+void InputDeviceImpl::StopListeningToServer()
+{
+    if (!isListeningProcess_) {
+        return;
+    }
+    MMI_HILOGI("Stop monitoring changes of input devices");
+    auto ret = MULTIMODAL_INPUT_CONNECT_MGR->UnregisterDevListener();
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnregisterDevListener from server fail, error:%{public}d", ret);
+    }
+    isListeningProcess_ = false;
 }
 } // namespace MMI
 } // namespace OHOS
