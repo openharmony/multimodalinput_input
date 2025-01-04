@@ -23,6 +23,7 @@
 #include "tablet_tool_tranform_processor.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
 #include "touch_transform_processor.h"
+#include "tv_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #include "touchpad_transform_processor.h"
