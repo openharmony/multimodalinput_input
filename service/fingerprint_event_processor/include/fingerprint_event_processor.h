@@ -71,7 +71,6 @@ private:
 
     const std::string FINGERPRINT_SOURCE_KEY { "fingerprint" };
     const std::string FINGERPRINT_SOURCE_POINT { "hw_fingerprint_mouse" };
-    const std::string FINGERPRINT_SOURCE_MSDP { "huawei,hand_status_dev" };
 
     using keyTimeMap = std::pair<int32_t, std::chrono::time_point<std::chrono::steady_clock>>;
     std::map<int32_t, keyTimeMap> keyStateMap_ {
