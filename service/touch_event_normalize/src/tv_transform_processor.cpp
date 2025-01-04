@@ -117,7 +117,7 @@ bool TVTransformProcessor::OnEventTvTouchMotion(struct libinput_event* event)
     double x = touchInfo.point.x;
     double y = touchInfo.point.y;
     MMI_HILOGI("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
-       x, y, logicalDisplayId);
+        x, y, logicalDisplayId);
     WIN_MGR->UpdateAndAdjustMouseLocation(logicalDisplayId, x, y);
     pointerEvent_->SetTargetDisplayId(logicalDisplayId);
     MMI_HILOGI("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
