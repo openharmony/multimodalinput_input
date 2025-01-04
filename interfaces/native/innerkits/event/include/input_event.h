@@ -268,7 +268,7 @@ public:
      * @return Returns the time when sensor perceive the event.
      * @since 9
      */
-    uint64_t GetSensorInputTime();
+    uint64_t GetSensorInputTime() const;
 
     /**
      * @brief Obtains the action for this input event.
