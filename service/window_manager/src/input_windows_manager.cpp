@@ -2928,7 +2928,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             timerId_ = DEFAULT_VALUE;
         }
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+            pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
@@ -2986,7 +2987,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsMouseDrawing(pointerEvent->GetPointerAction())) {
-        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER) ||
+            pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         } else {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
