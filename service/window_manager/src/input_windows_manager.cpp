@@ -96,6 +96,7 @@ constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
+constexpr int32_t POINTER_MOVEFLAG = { 7 };
 } // namespace
 
 enum PointerHotArea : int32_t {
