@@ -33,7 +33,7 @@ public:
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
 
-private:    
+private:
     bool OnEventTvTouchMotion(struct libinput_event *event);
     bool DumpInner();
     bool HandlePostInner(struct libinput_event* event, PointerEvent::PointerItem &pointerItem);
