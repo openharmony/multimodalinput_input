@@ -126,7 +126,8 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
 
     auto device = libinput_event_get_device(event);
     std::string name = libinput_device_get_name(device);
-    if (name == "huawei,hand_status_dev" && type == LIBINPUT_EVENT_MSDP) {
+    size_t pos = name.find("hand_status_dev");
+    if ((pos != std::string::npos) && (type == LIBINPUT_EVENT_MSDP) {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
         FingerprintEventHdr->HandleFingerprintEvent(event);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
