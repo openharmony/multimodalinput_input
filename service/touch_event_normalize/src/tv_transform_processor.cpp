@@ -33,8 +33,8 @@
 
 namespace OHOS {
 namespace MMI {
-namespace{
-    constexpr int32_t POINTER_MOVEFLAG = { 7 };
+namespace {
+constexpr int32_t POINTER_MOVEFLAG = { 7 };
 }
 
 TVTransformProcessor::TVTransformProcessor(int32_t deviceId)
@@ -121,7 +121,7 @@ bool TVTransformProcessor::OnEventTvTouchMotion(struct libinput_event* event)
     WIN_MGR->UpdateAndAdjustMouseLocation(logicalDisplayId, x, y);
     pointerEvent_->SetTargetDisplayId(logicalDisplayId);
     MMI_HILOGI("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
-       x, y, logicalDisplayId);
+        x, y, logicalDisplayId);
 #endif // OHOS_BUILD_ENABLE_WATCH
     return true;
 }
