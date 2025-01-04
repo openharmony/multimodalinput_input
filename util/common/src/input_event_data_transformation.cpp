@@ -300,8 +300,8 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
 
 void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
-    pkt << event->GetHandOption() << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
-        << event->GetButtonId() << event->GetFingerCount()
+    pkt << event->GetHandOption() << event->GetPointerAction() << event->GetOriginPointerAction()
+        << event->GetPointerId() << event->GetButtonId() << event->GetFingerCount()
         << event->GetZOrder() << event->GetDispatchTimes() << event->GetHandlerEventType()
         << event->GetAxes();
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
