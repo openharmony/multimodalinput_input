@@ -234,12 +234,13 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
     auto device = libinput_event_get_device(event);
     CHKPR(device, PARAM_INPUT_INVALID);
     std::string name = libinput_device_get_name(device);
+    size_t pos = name.find("hand_status_dev");
     if (name == FINGERPRINT_SOURCE_KEY) {
         return AnalyseKeyEvent(event);
     } else if (name == FINGERPRINT_SOURCE_POINT) {
         ProcessSlideEvent();
         return AnalysePointEvent(event);
-    } else if (name == FINGERPRINT_SOURCE_MSDP) {
+    } else if (pos != std::string::npos) {
         ProcessSlideEvent();
         return AnalyseMsdpPointEvent(event);
     } else {
