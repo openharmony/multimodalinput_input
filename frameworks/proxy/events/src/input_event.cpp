@@ -144,7 +144,7 @@ void InputEvent::SetSensorInputTime(uint64_t sensorInputTime)
     sensorInputTime_ = sensorInputTime;
 }
 
-uint64_t InputEvent::GetSensorInputTime()
+uint64_t InputEvent::GetSensorInputTime() const
 {
     return sensorInputTime_;
 }
