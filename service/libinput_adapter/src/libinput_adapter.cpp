@@ -26,7 +26,7 @@
 
 #include "define_multimodal.h"
 #include "i_input_windows_manager.h"
-#include "i_pointer_drawing_manager.h
+#include "i_pointer_drawing_manager.h"
 #include "param_wrapper.h"
 #include "util.h"
 #include "input_device_manager.h"
