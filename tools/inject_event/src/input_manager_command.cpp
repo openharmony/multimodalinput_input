@@ -1560,6 +1560,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                 }
+                std::cout << "If the command does not work as expected, check whether the specified coordinates exceed"
+                    "the screen boundary" << std::endl;
                 break;
             }
             case 'J': {
