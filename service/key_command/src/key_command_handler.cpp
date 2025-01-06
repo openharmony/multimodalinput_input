@@ -1711,11 +1711,11 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
     BytraceAdapter::StopLaunchAbility();
     repeatKeyCountMap_.clear();
     isLaunched = true;
-    if (InputHandler->GetSubscriberHandler() != nullptr) {
-        auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
-        keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
-        InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
-    }
+    auto subscriberHandler = InputHandler->GetSubscriberHandler();
+    CHKPV(subscriberHandler);
+    auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
+    keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    subscriberHandler->HandleKeyEvent(keyEventCancel);
 }
 
 int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
