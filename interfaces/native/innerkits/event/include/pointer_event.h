@@ -378,7 +378,7 @@ public:
     /**
      * Indicates that the input source generates left and right hand event.
      *
-     * @since 12
+     * @since 16
      */
     static constexpr int32_t SOURCE_TYPE_MSDP_HAND_OPTINON = 7;
 
