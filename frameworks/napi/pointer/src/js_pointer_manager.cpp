@@ -1224,7 +1224,6 @@ void JsPointerManager::HandleSetCustomCursorCompletion(napi_env env, napi_status
     CHKPV(data);
     sptr<CustomCursorAsyncContext> asyncContext(static_cast<CustomCursorAsyncContext*>(data));
     CHKPV(asyncContext);
-
     napi_value results[2] = { 0 };
     int32_t size = 2;
     if (!GetResult(asyncContext, results, size)) {

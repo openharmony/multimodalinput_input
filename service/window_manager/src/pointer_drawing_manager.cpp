@@ -3232,10 +3232,10 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
         MMI_HILOGE("focus is invalid");
         return RET_ERR;
     }
-    float scale = 1.0f;
+
     if (imageInfo.size.width > MAX_CUSTOM_CURSOR_SIZE || imageInfo.size.height > MAX_CUSTOM_CURSOR_SIZE) {
-        scale = MAX_CUSTOM_CURSOR_DIMENSION / std::max(imageInfo.size.width, imageInfo.size.height);
-        newPixelMap->scale(scale, scale, Media::AntiAliasingOption::LOW);
+        MMI_HILOGE("PixelMap is invalid");
+        return RET_ERR;
     }
  
     int32_t cursorSize = GetPointerSize();
@@ -3253,8 +3253,8 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
         userIcon_.reset(newPixelMap);
     }
  
-    userIconHotSpotX_ = static_cast<int32_t>((float)cursor.focusX * xAxis * scale);
-    userIconHotSpotY_ = static_cast<int32_t>((float)cursor.focusY * yAxis * scale);
+    userIconHotSpotX_ = static_cast<int32_t>((float)cursor.focusX * xAxis);
+    userIconHotSpotY_ = static_cast<int32_t>((float)cursor.focusY * yAxis);
  
     MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
         "focusX:%{public}d, focusY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"

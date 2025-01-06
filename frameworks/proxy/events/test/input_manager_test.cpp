@@ -4787,5 +4787,29 @@ HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_002, TestSize.L
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
+
+/**
+ * @tc.name: InputManagerTest_SetCustomCursorEx
+ * @tc.desc: Test SetCustomCursorEx
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fakeWindowId = 100;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    CustomCursor cursor;
+    cursor.pixelMap = (void *)pixelMap.get();
+    cursor.focusX = 32;
+    cursor.focusY = 32;
+    CursorOptions options;
+    options.followSystem = true;
+    ASSERT_FALSE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) == RET_ERR);
+    options.followSystem = false;
+    ASSERT_FALSE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) == RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
