@@ -42,6 +42,7 @@ enum VKeyboardMessageType {
     VCombinationKeyPressed = 1,
     VStartLongPressControl = 16,
     VStopLongPressControl = 17,
+    VSwitchLayout = 18,
 };
 enum class VTPStateMachineMessageType : int32_t {
     UNKNOWN = 0,
@@ -143,6 +144,7 @@ private:
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
     void HandleHWKeyEventForVKeyboard(libinput_event_type eventType);
+    void HideMouseCursorTemporary();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
