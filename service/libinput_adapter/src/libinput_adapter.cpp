@@ -26,6 +26,7 @@
 
 #include "define_multimodal.h"
 #include "i_input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "param_wrapper.h"
 #include "util.h"
 #include "input_device_manager.h"
@@ -995,6 +996,15 @@ void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event_type eventType
         hardwareKeyEventDetected_();
     }
 }
+
+void LibinputAdapter::HideMouseCursorTemporary()
+{
+    MMI_HILOGD("Switch layout");
+    if (IPointerDrawingManager::GetInstance() != nullptr &&
+        IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    }
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void LibinputAdapter::OnEventHandler()
@@ -1093,6 +1103,10 @@ type:%{private}d",
                         case VKeyboardMessageType::VStopLongPressControl: {
                             MMI_HILOGD("long press stop:%{private}d", keyCode);
                             InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
+                            break;
+                        }
+                        case VKeyboardMessageType::VSwitchLayout: {
+                            HideMouseCursorTemporary();
                             break;
                         }
                         default: break;
