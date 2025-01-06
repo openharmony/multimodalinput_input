@@ -1602,8 +1602,19 @@ public:
      */
     std::vector<uint8_t> GetBuffer() const;
 
+    /**
+     * @brief Sets a hand option for this event.
+     * @param pointerAction Indicates the hand option to set.
+     * @return void
+     * @since 16
+     */
     void SetHandOption(int32_t handOption);
-
+    
+    /**
+     * @brief Obtains the hand option in this event.
+     * @return Returns the hand option.
+     * @since 16
+     */
     int32_t GetHandOption() const;
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
