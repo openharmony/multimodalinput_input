@@ -303,7 +303,7 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
     pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
         << event->GetButtonId() << event->GetFingerCount()
         << event->GetZOrder() << event->GetDispatchTimes() << event->GetHandlerEventType()
-        << event->GetAxes();
+        << event->GetAxes() << event->GetHandOption();
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
     }
@@ -341,6 +341,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     pkt >> type;
     event->SetHandlerEventType(type);
     SetAxisInfo(pkt, event);
+    pkt >> tField;
+    event->SetHandOption(tField);
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
