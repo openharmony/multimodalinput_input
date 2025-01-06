@@ -1813,6 +1813,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_ANCO
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
     Settings settings_ {};
+    //Left and right hand steady-state reporting status
     int32_t handOption_ { -1 };
 };
 
