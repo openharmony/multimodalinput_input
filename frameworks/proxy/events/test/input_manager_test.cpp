@@ -4583,7 +4583,7 @@ std::shared_ptr<PointerEvent> CreatePointerEventTest()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = CreatePointerEventTest();
@@ -4594,7 +4594,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_001, TestSi
     ASSERT_EQ(ret, true);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    ret = MMI::InputManager::GetInstance()->PointerEventMouseToTouch(pointerEvent);
+    ret = MMI::InputManager::GetInstance()->TransformMouseEventToTouchEvent(pointerEvent);
     ASSERT_EQ(ret, true);
 }
 
@@ -4604,7 +4604,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_001, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = CreatePointerEventTest();
@@ -4616,7 +4616,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_002, TestSi
     ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
     ASSERT_EQ(ret, true);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
-    ret = MMI::InputManager::GetInstance()->PointerEventMouseToTouch(pointerEvent);
+    ret = MMI::InputManager::GetInstance()->TransformMouseEventToTouchEvent(pointerEvent);
     ASSERT_EQ(ret, true);
 }
 
@@ -4626,7 +4626,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_002, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_003, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = CreatePointerEventTest();
@@ -4638,7 +4638,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_003, TestSi
     ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
     ASSERT_EQ(ret, true);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
-    ret = MMI::InputManager::GetInstance()->PointerEventMouseToTouch(pointerEvent);
+    ret = MMI::InputManager::GetInstance()->TransformMouseEventToTouchEvent(pointerEvent);
     ASSERT_EQ(ret, true);
 }
 
@@ -4648,7 +4648,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_003, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_004, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -4668,7 +4668,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventMouseToTouch_004, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = CreatePointerEventTest();
@@ -4679,7 +4679,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_001, TestSi
     PointerEvent::PointerItem pointerItem;
     ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
     ASSERT_EQ(ret, true);
-    ret = MMI::InputManager::GetInstance()->PointerEventTouchToMouse(pointerEvent);
+    ret = MMI::InputManager::GetInstance()->TransformTouchEventToMouseEvent(pointerEvent);
     ASSERT_EQ(ret, true);
 }
 
@@ -4689,7 +4689,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_001, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = CreatePointerEventTest();
@@ -4701,7 +4701,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_002, TestSi
     ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
     ASSERT_EQ(ret, true);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
-    ret = MMI::InputManager::GetInstance()->PointerEventTouchToMouse(pointerEvent);
+    ret = MMI::InputManager::GetInstance()->TransformTouchEventToMouseEvent(pointerEvent);
     ASSERT_EQ(ret, true);
 }
 
@@ -4711,7 +4711,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_002, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_003, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = CreatePointerEventTest();
@@ -4722,7 +4722,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_003, TestSi
     ASSERT_EQ(ret, true);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    ret = MMI::InputManager::GetInstance()->PointerEventTouchToMouse(pointerEvent);
+    ret = MMI::InputManager::GetInstance()->TransformTouchEventToMouseEvent(pointerEvent);
     ASSERT_EQ(ret, true);
 }
 
@@ -4732,7 +4732,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_003, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_PointerEventTouchToMouse_004, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
