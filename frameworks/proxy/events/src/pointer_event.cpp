@@ -953,7 +953,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
-
+    WRITEDOUBLE(out, velocity_);
     WRITEINT32(out, axisEventType_);
     WRITEINT32(out, pullId_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -1032,6 +1032,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!ReadAxisFromParcel(in)) {
         return false;
     }
+    READDOUBLE(in, velocity_);
 
     READINT32(in, axisEventType_);
     READINT32(in, pullId_);
