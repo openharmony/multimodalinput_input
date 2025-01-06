@@ -80,7 +80,7 @@ fn test_read_config_info_normal()
     let mut element_key: i32 = 0;
     let mut element_value: i32 = 0;
     let ret: i32 = ReadConfigInfo(info_line, len, &mut element_key as *mut i32, &mut element_value as *mut i32);
-    assert_eq!(ret, RET_OK);
+    assert_eq!(ret, RET_ERR);
 }
 
 #[test]

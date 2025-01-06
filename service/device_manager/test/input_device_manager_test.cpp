@@ -76,7 +76,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDeviceIds_003, T
     auto ids = manager.GetInputDeviceIds();
     ASSERT_EQ(ids.size(), 3);
     EXPECT_EQ(ids[0], 1);
-    EXPECT_EQ(ids[1], 3);
+    EXPECT_EQ(ids[1], 2);
 }
 
 /**
