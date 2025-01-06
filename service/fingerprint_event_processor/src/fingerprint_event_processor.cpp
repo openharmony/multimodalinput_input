@@ -361,7 +361,7 @@ int32_t FingerprintEventProcessor::AnalyseMsdpPointEvent(libinput_event * event)
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->SetHandOption(value);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MSDP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MSDP_HAND_OPTINON);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
