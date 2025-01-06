@@ -223,6 +223,12 @@ void PointerDrawingManager::InitPointerCallback()
         MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
+    if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
+        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::DestroyPointerWindow()
@@ -2930,12 +2936,6 @@ void PointerDrawingManager::InitStyle()
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
     };
     CheckMouseIconPath();
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
-    if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
-        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::RotateDegree(Direction direction)
