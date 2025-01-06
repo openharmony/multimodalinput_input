@@ -376,6 +376,13 @@ public:
     static constexpr int32_t SOURCE_TYPE_CROWN = 6;
 
     /**
+     * Indicates that the input source generates left and right hand event.
+     *
+     * @since 16
+     */
+    static constexpr int32_t SOURCE_TYPE_MSDP_HAND_OPTINON = 7;
+
+    /**
      * Indicates an invalid button ID.
      *
      * @since 9
@@ -1595,6 +1602,21 @@ public:
      */
     std::vector<uint8_t> GetBuffer() const;
 
+    /**
+     * @brief Sets a hand option for this event.
+     * @param pointerAction Indicates the hand option to set.
+     * @return void
+     * @since 16
+     */
+    void SetHandOption(int32_t handOption);
+    
+    /**
+     * @brief Obtains the hand option in this event.
+     * @return Returns the hand option.
+     * @since 16
+     */
+    int32_t GetHandOption() const;
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.
@@ -1802,6 +1824,8 @@ private:
 #endif // OHOS_BUILD_ENABLE_ANCO
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
     Settings settings_ {};
+    //Left and right hand steady-state reporting status
+    int32_t handOption_ { -1 };
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

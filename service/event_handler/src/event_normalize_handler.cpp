@@ -123,6 +123,17 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
     DfxHisysevent::GetDispStartTime();
     auto type = libinput_event_get_type(event);
+
+    auto device = libinput_event_get_device(event);
+    std::string name = libinput_device_get_name(device);
+    size_t pos = name.find("hand_status_dev");
+    if ((pos != std::string::npos) && (type == LIBINPUT_EVENT_MSDP)) {
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+        FingerprintEventHdr->HandleFingerprintEvent(event);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+        return;
+    }
+    
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
