@@ -16,6 +16,7 @@
 #include "multimodal_input_preferences_manager.h"
 
 #include "mmi_log.h"
+#include "param_wrapper.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -46,6 +47,7 @@ const std::string SHORT_KEY_FILE_NAME { "Settings.xml" };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string KEYBOARD_FILE_NAME { "keyboard_settings.xml" };
 const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
+const std::string DEFAULT_MOUSE_SPEED_NAME { "const.multimodalinput.default_mouse_speed" };
 } // namespace
 
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
@@ -91,7 +93,8 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
         NativePreferences::PreferencesHelper::GetPreferences(PATH + TOUCHPAD_FILE_NAME, errCode);
     CHKPR(touchpadPref, errno);
     pointerSize_ = mousePref->GetInt(strPointerSize_, POINTER_SIZE);
-    pointerSpeed_ = mousePref->GetInt(strPointerSpeed_, POINTER_SPEED);
+    pointerSpeed_ = mousePref->GetInt(strPointerSpeed_,
+        OHOS::system::GetIntParameter(DEFAULT_MOUSE_SPEED_NAME, POINTER_SPEED));
     pointerColor_ = mousePref->GetInt(strPointerColor_, POINTER_COLOR);
     pointerStyle_ = mousePref->GetInt(strPointerStyle_, POINTER_STYLE);
     mouseScrollRows_ = mousePref->GetInt(strMouseScrollRows_, MOUSE_SCROLL_ROWS);
