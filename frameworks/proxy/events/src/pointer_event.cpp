@@ -917,8 +917,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    WRITEINT32(out, handOption_);
-
     WRITEINT32(out, pointerId_);
 
     WRITEINT32(out, static_cast<int32_t>(pointers_.size()));
@@ -980,6 +978,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     WRITEDOUBLE(out, fingerprintDistanceX_);
     WRITEDOUBLE(out, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    WRITEINT32(out, handOption_);
     return true;
 }
 
@@ -988,8 +987,6 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!InputEvent::ReadFromParcel(in)) {
         return false;
     }
-
-    READINT32(in, handOption_);
 
     READINT32(in, pointerId_);
 
@@ -1060,6 +1057,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     READDOUBLE(in, fingerprintDistanceX_);
     READDOUBLE(in, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    READINT32(in, handOption_);
     return true;
 }
 
