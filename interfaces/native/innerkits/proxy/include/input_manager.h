@@ -329,21 +329,20 @@ public:
      */
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
-    bool ParamNeedToConverted(const std::map<int32_t, int32_t> &ParamMap, const int &param, int32_t &result);
     /**
      * @brief Convert mouse events to touch events.
      * @param pointerEvent PointerEvent object.
      * @return bool
      * @since 9
      */
-    bool PointerEventMouseToTouch(std::shared_ptr<PointerEvent> pointerEvent);
+    bool TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
         /**
      * @brief Convert touch events to mouse events.
      * @param pointerEvent PointerEvent object.
      * @return bool
      * @since 9
      */
-    bool PointerEventTouchToMouse(std::shared_ptr<PointerEvent> pointerEvent);
+    bool TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
     /**
      * @brief Starts listening for an input device event.
