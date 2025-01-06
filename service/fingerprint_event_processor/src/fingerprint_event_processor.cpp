@@ -240,7 +240,7 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
     } else if (name == FINGERPRINT_SOURCE_POINT) {
         ProcessSlideEvent();
         return AnalysePointEvent(event);
-    } else if (pos != std::string::npos) {
+    } else if (pos != std::string::npos) { // 设备名称包含hand_status_dev的即为合法设备
         ProcessSlideEvent();
         return AnalyseMsdpPointEvent(event);
     } else {
