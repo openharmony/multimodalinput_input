@@ -898,7 +898,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
     if (isAuthorize) {
         auto state = AUTHORIZE_HELPER->GetAuthorizeState();
         int32_t authorPid = AUTHORIZE_HELPER->GetAuthorizePid();
-        MMI_HILOGE("OnAuthorize  not has authorizing s:%{public}d, authPid:%{public}d",
+        MMI_HILOGE("OnAuthorize not has authorizing s:%{public}d, authPid:%{public}d",
             state, authorPid);
         if (state == AuthorizeState::STATE_UNAUTHORIZE) {
             MMI_HILOGE("Current not has authorizing");
