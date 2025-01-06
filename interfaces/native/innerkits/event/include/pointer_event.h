@@ -376,11 +376,11 @@ public:
     static constexpr int32_t SOURCE_TYPE_CROWN = 6;
 
     /**
-     * Indicates that the input source generates a msdp event.
+     * Indicates that the input source generates left and right hand event.
      *
      * @since 12
      */
-    static constexpr int32_t SOURCE_TYPE_MSDP = 7;
+    static constexpr int32_t SOURCE_TYPE_MSDP_HAND_OPTINON = 7;
 
     /**
      * Indicates an invalid button ID.
