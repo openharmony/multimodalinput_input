@@ -67,6 +67,7 @@ enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
     TOUCH_MOVE = 2,
+    TOUCH_FRAME = 3,
 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
@@ -943,6 +944,8 @@ int32_t LibinputAdapter::ConvertToTouchEventType(
         return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_DOWN);
     } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
         return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_UP);
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
+        return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_FRAME);
     } else {
         return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_MOVE);
     }
