@@ -37,7 +37,6 @@ const std::map<int32_t, int32_t> MOUSE_TO_TOUCH_PARAM_MAP = {
 };
 
 const std::map<int32_t, int32_t> TOUCH_TO_MOUSE_PARAM_MAP = {
-    {PointerEvent::SOURCE_TYPE_TOUCHSCREEN, PointerEvent::SOURCE_TYPE_MOUSE},
     {PointerEvent::POINTER_ACTION_DOWN, PointerEvent::POINTER_ACTION_BUTTON_DOWN},
     {PointerEvent::POINTER_ACTION_UP, PointerEvent::POINTER_ACTION_BUTTON_UP},
     {PointerEvent::TOOL_TYPE_FINGER, PointerEvent::TOOL_TYPE_MOUSE}
@@ -301,10 +300,7 @@ bool InputManager::TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent>
     }
 
     int32_t result = -1;
-    if (TOUCH_TO_MOUSE_PARAM_MAP.count(pointerEvent->GetSourceType()) > 0) {
-        result = TOUCH_TO_MOUSE_PARAM_MAP.at(pointerEvent->GetSourceType());
-        pointerEvent->SetSourceType(result);
-    }
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     if (TOUCH_TO_MOUSE_PARAM_MAP.count(pointerEvent->GetPointerAction()) > 0) {
         result = TOUCH_TO_MOUSE_PARAM_MAP.at(pointerEvent->GetPointerAction());
