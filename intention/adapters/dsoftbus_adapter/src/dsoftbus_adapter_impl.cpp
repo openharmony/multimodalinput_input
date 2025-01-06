@@ -357,7 +357,7 @@ int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int
         return RET_ERR;
     }
     QosTV socketQos[] {
-        { .qos = QOS_TYPE_MIN_BW,      .value = MIN_BW  },
+        { .qos = QOS_TYPE_MIN_BW,      .value = MIN_BW },
         { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
         { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
     };
