@@ -4578,7 +4578,7 @@ std::shared_ptr<PointerEvent> CreatePointerEventTest()
 }
 
 /*
- * @tc.name: InputManagerTest_PointerEventMouseToTouch_001
+ * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_001
  * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
  * @tc.type: FUNC
  * @tc.require:
@@ -4599,7 +4599,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_001,
 }
 
 /*
- * @tc.name: InputManagerTest_PointerEventMouseToTouch_002
+ * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_002
  * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
  * @tc.type: FUNC
  * @tc.require:
@@ -4621,7 +4621,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_002,
 }
 
 /*
- * @tc.name: InputManagerTest_PointerEventMouseToTouch_003
+ * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_003
  * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
  * @tc.type: FUNC
  * @tc.require:
@@ -4643,7 +4643,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_003,
 }
 
 /*
- * @tc.name: InputManagerTest_PointerEventMouseToTouch_004
+ * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_004
  * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
  * @tc.type: FUNC
  * @tc.require:
@@ -4663,7 +4663,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_004,
 }
 
 /*
- * @tc.name: InputManagerTest_PointerEventTouchToMouse_001
+ * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_001
  * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
  * @tc.type: FUNC
  * @tc.require:
@@ -4684,7 +4684,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_001,
 }
 
 /*
- * @tc.name: InputManagerTest_PointerEventTouchToMouse_002
+ * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_002
  * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
  * @tc.type: FUNC
  * @tc.require:
@@ -4706,7 +4706,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_002,
 }
 
 /*
- * @tc.name: InputManagerTest_PointerEventTouchToMouse_003
+ * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_003
  * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
  * @tc.type: FUNC
  * @tc.require:
@@ -4727,7 +4727,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_003,
 }
 
 /*
- * @tc.name: InputManagerTest_PointerEventTouchToMouse_001
+ * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_004
  * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
  * @tc.type: FUNC
  * @tc.require:
