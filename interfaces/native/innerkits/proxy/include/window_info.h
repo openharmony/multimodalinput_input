@@ -431,6 +431,16 @@ struct DisplayInfo {
     int32_t offsetX = 0;
     int32_t offsetY = 0;
     float ppi;
+
+    /**
+     * Use for off screen policy
+     *
+     * @since 12
+     */
+    bool isCurrentOffScreenRendering = false;
+    int32_t offScreenRealWidth = 0;
+    int32_t offScreenRealHeight = 0;
+    float offScreenRealPPI = 0.0f;
 };
 
 /**
