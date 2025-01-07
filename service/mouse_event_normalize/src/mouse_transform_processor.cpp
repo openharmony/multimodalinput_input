@@ -342,9 +342,6 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         MMI_HILOGD("Libinput event axis source type is finger");
-        if (!isAxisBegin_) {
-            return RET_ERR;
-        }
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
     } else {
@@ -454,6 +451,29 @@ int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *
     }
     MMI_HILOGE("Axis is invalid");
     return RET_ERR;
+}
+
+int32_t MouseTransformProcessor::HandleScrollFingerInner(struct libinput_event *event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+    if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
+        pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
+    }
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+        pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
+        MMI_HILOGD("Axis begin");
+    } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+        pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
+        MMI_HILOGD("Axis end");
+    } else {
+        MMI_HILOGE("Axis is invalid");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &pointerItem)
@@ -577,9 +597,9 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         case LIBINPUT_EVENT_POINTER_AXIS:
             result = HandleAxisInner(data);
             break;
-        case LIBINPUT_EVENT_TOUCHPAD_DOWN:
-        case LIBINPUT_EVENT_TOUCHPAD_UP:
-            result = HandleAxisBeginEndInner(event);
+        case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN:
+        case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END:
+            result = HandleScrollFingerInner(event);
             break;
         default:
             MMI_HILOGE("Unknown type:%{public}d", type);
@@ -589,7 +609,7 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         return result;
     }
     PointerEvent::PointerItem pointerItem;
-    if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
+    if (type == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN || type == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END) {
         HandleAxisPostInner(pointerItem);
     } else if (!HandlePostInner(data, pointerItem)) {
         CHKPL(pointerEvent_);
