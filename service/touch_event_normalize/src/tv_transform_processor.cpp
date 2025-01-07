@@ -78,7 +78,7 @@ std::shared_ptr<PointerEvent> TVTransformProcessor::OnEvent(struct libinput_even
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            CHKFR(OnEventTvTouchMotion(event), nullptr, "Get OnEventTvTouchMotion failed");
+            CHKFR(OnEventTouchMotion(event), nullptr, "Get OnEventTvTouchMotion failed");
             break;
         }
         default: {
@@ -86,20 +86,17 @@ std::shared_ptr<PointerEvent> TVTransformProcessor::OnEvent(struct libinput_even
             return nullptr;
         }
     }
-    PointerEvent::PointerItem pointerItem;
 
-    if (!HandlePostInner(event, pointerItem)) {
+    if (!HandlePostInner(event)) {
         CHKPP(pointerEvent_);
         return nullptr;
     }
-    MMI_HILOGI("TW:%{public}d", pointerEvent_->GetTargetWindowId());
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
-    MMI_HILOGI("TW:%{public}d", pointerEvent_->GetTargetWindowId());
     DumpInner();
     return pointerEvent_;
 }
 
-bool TVTransformProcessor::OnEventTvTouchMotion(struct libinput_event* event)
+bool TVTransformProcessor::OnEventTouchMotion(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
@@ -126,11 +123,12 @@ bool TVTransformProcessor::OnEventTvTouchMotion(struct libinput_event* event)
     return true;
 }
 
-bool TVTransformProcessor::HandlePostInner(struct libinput_event* event, PointerEvent::PointerItem &pointerItem)
+bool TVTransformProcessor::HandlePostInner(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
     auto mouseInfo = WIN_MGR->GetMouseInfo();
+    PointerEvent::PointerItem pointerItem;
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetWindowX(0);
