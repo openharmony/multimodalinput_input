@@ -77,7 +77,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         const HandleEventType newType = GetEventType();
         if (currentType != newType || ((currentTags & deviceTags) != deviceTags)) {
             uint32_t allDeviceTags = GetDeviceTags();
-            MMI_HILOGD("handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
+            MMI_HILOGD("The handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
                 handlerType, newType, allDeviceTags, priority);
             int32_t ret = AddToServer(handlerType, newType, priority, allDeviceTags);
             if (ret != RET_OK) {
@@ -143,7 +143,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
     if (RET_OK == AddLocal(handlerId, handlerType, actionsType, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
         if (IsNeedAddToServer(actionsType)) {
-            MMI_HILOGD("handlerType:%{public}d", handlerType);
+            MMI_HILOGD("The handlerType:%{public}d", handlerType);
             int32_t ret = AddToServer(handlerType, HANDLE_EVENT_TYPE_NONE, 0, 0, actionsType);
             if (ret != RET_OK) {
                 MMI_HILOGE("Add Handler:%{public}d:%{public}d to server failed", handlerType, handlerId);

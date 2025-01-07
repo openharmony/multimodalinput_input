@@ -291,7 +291,7 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
         } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
             buttonId = PointerEvent::MOUSE_BUTTON_LEFT;
         } else {
-            MMI_HILOGD("buttonId does not switch");
+            MMI_HILOGD("The buttonId does not switch");
         }
     }
 

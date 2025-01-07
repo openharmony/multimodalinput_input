@@ -476,7 +476,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
-    MMI_HILOGD("get clientFd by %{public}d", pid);
+    MMI_HILOGD("Get clientFd by %{public}d", pid);
     return udsServer_->GetClientFd(pid);
 }
 
@@ -731,7 +731,7 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
     CALL_DEBUG_ENTER;
     int32_t windowPid = INVALID_PID;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        MMI_HILOGD("get windowId:%{public}d", item.id);
+        MMI_HILOGD("Get windowId:%{public}d", item.id);
         if (item.id == windowId) {
             windowPid = item.pid;
             break;
@@ -4873,7 +4873,7 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
     Media::InitializationOptions opts;
     auto pixelMapPtr = OHOS::Media::PixelMap::Create(*pixelMapSource, opts);
     CHKPR(pixelMapPtr, RET_ERR);
-    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
+    MMI_HILOGD("The byteCount:%{public}d, width:%{public}d, height:%{public}d",
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
     return RET_OK;
