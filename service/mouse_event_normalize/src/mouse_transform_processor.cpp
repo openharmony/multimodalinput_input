@@ -128,13 +128,12 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+        uint64_t dalta_time = 0;
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+        dalta_time = filterInsertionPoint_.filterDeltaTime;
         HandleFilterMouseEvent(&offset);
         CalculateOffset(displayInfo, offset);
-        ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, static_cast<int32_t>(deviceType));
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
-        uint64_t dalta_time = 0;
         ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, dalta_time,
             static_cast<double>(displayInfo->ppi));
