@@ -718,7 +718,7 @@ bool KeySubscriberHandler::IsMatchForegroundPid(std::list<std::shared_ptr<Subscr
             isForegroundExits_ = true;
         }
     }
-    MMI_HILOGD("isForegroundExits_:%{public}d, foregroundPids:%{public}zu",
+    MMI_HILOGD("The isForegroundExits_:%{public}d, foregroundPids:%{public}zu",
         isForegroundExits_, foregroundPids_.size());
     return isForegroundExits_;
 }

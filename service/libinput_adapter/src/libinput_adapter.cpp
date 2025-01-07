@@ -1065,7 +1065,7 @@ type:%{private}d",
                 static_cast<int32_t>(eventType));
 
             if (handleTouchPoint_ != nullptr && handleTouchPoint_(x, y, touchId, touchEventType) == 0) {
-                MMI_HILOGD("inside vkeyboard area");
+                MMI_HILOGD("Inside vkeyboard area");
 
                 while (true) {
                     int32_t toggleCodeFirst(-1);
@@ -1073,7 +1073,7 @@ type:%{private}d",
                     int32_t keyCode(-1);
                     VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(toggleCodeFirst, toggleCodeSecond,
                         keyCode);
-                    MMI_HILOGD("get message type:%{private}d", static_cast<int32_t>(type));
+                    MMI_HILOGD("Get message type:%{private}d", static_cast<int32_t>(type));
                     if (type == VNoMessage) {
                         break;
                     }

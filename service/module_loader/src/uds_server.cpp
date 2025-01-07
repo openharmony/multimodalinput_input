@@ -360,7 +360,7 @@ SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
 bool UDSServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
-    MMI_HILOGI("pid:%{public}d, fd:%{public}d", ses->GetPid(), ses->GetFd());
+    MMI_HILOGI("The pid:%{public}d, fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     if (fd < 0) {
         MMI_HILOGE("The fd is less than 0");
@@ -385,13 +385,13 @@ bool UDSServer::AddSession(SessionPtr ses)
 void UDSServer::DelSession(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("fd:%{public}d", fd);
+    MMI_HILOGI("The fd:%{public}d", fd);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
     }
     auto pid = GetClientPid(fd);
-    MMI_HILOGI("pid:%{public}d", pid);
+    MMI_HILOGI("The pid:%{public}d", pid);
     if (pid > 0) {
         idxPidMap_.erase(pid);
     }

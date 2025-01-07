@@ -181,7 +181,7 @@ void TransformPointTest::GetInputDeviceNodes(std::map<std::string, std::string>&
     const std::string kevent { "event" };
     std::string name;
     for (const auto &item : results) {
-        MMI_HILOGD("item:%{public}s.", item.c_str());
+        MMI_HILOGD("The item:%{public}s.", item.c_str());
         if (item[0] == 'N') {
             std::string::size_type spos = item.find(kname);
             if (spos != std::string::npos) {
