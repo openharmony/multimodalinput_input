@@ -149,7 +149,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
         case LIBINPUT_EVENT_POINTER_BUTTON:
         case LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD:
+        case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN:
         case LIBINPUT_EVENT_POINTER_AXIS:
+        case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END:
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
             if (g_isSwipeInward) {
@@ -406,7 +408,6 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     BytraceAdapter::StartPackageEvent("package mouseEvent");
     TerminateRotate(event);
-    TerminateAxis(event);
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
         BytraceAdapter::StopPackageEvent();
@@ -464,9 +465,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     buttonIds_.insert(seatSlot);
     if (buttonIds_.size() == FINGER_NUM &&
         (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP)) {
-        MMI_HILOGD("Handle mouse axis event");
         g_isSwipeInward = false;
-        HandleMouseEvent(event);
     }
     if (buttonIds_.size() == SWIPE_INWARD_FINGER_ONE && JudgeIfSwipeInward(pointerEvent, type, event)) {
         nextHandler_->HandlePointerEvent(pointerEvent);
@@ -547,15 +546,10 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
-        MMI_HILOGI("Prepare to send a axis-end event");
-        CancelTwoFingerAxis(event);
-    }
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     PointerEventSetPressedKeys(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
-    type = libinput_event_get_type(event);
+    auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch pad event is up remove this finger");
