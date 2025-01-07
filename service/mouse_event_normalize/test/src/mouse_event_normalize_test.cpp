@@ -293,7 +293,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerLocation_008
     int32_t idNames = -1;
     int32_t x = 0;
     int32_t y = 0;
-    ASSERT_EQ(MouseEventHdr->SetPointerLocation(x, y), idNames);
+    int32_t displayId = -1;
+    ASSERT_EQ(MouseEventHdr->SetPointerLocation(x, y, displayId), idNames);
 }
 
 /**
