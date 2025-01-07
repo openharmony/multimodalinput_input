@@ -346,8 +346,7 @@ enum class ScreenCombination : uint32_t {
     SCREEN_MIRROR,
     SCREEN_UNIQUE,
     SCREEN_EXTEND,
-    SCREEN_MAIN,
-    SCREEN_UNKNOWN,
+    SCREEN_MAIN
 };
 
 struct DisplayInfo {
@@ -450,8 +449,8 @@ struct DisplayInfo {
     bool isCurrentOffScreenRendering = false;
     int32_t screenRealWidth = 0;
     int32_t screenRealHeight = 0;
-    float screenPPI = 0.0f;
-    ScreenCombination screenCombination = ScreenCombination::SCREEN_UNKNOWN;
+    float screenRealPPI = 0.0f;
+    ScreenCombination screenCombination = ScreenCombination::SCREEN_MAIN;
 };
 
 /**
