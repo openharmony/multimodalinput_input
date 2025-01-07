@@ -39,7 +39,7 @@ int32_t UDSSocket::EpollCreate(int32_t size)
     if (epollFd_ < 0) {
         MMI_HILOGE("epoll_create return %{public}d", epollFd_);
     } else {
-        MMI_HILOGI("epoll_create, epollFd_:%{public}d", epollFd_);
+        MMI_HILOGI("The epoll_create, epollFd_:%{public}d", epollFd_);
     }
     return epollFd_;
 }

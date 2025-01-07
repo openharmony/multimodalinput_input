@@ -4486,7 +4486,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_001, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d disable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("set input device result: %{public}d ", result);
+            MMI_HILOGI("Set input device result: %{public}d ", result);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, false, cb);
     }
@@ -4507,7 +4507,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_002, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d enable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("set input device result: %{public}d ", result);
+            MMI_HILOGI("Set input device result: %{public}d ", result);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, true, cb);
     }

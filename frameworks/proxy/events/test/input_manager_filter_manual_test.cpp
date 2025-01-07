@@ -150,7 +150,7 @@ public:
         int32_t buffSize = 255;
         char buf[buffSize];
         std::string cmd = "pidof " + std::string(procName);
-        MMI_HILOGI("cmd:%{public}s", cmd.c_str());
+        MMI_HILOGI("The cmd:%{public}s", cmd.c_str());
         if ((fp = popen(cmd.c_str(), "r")) != nullptr) {
             if (fgets(buf, buffSize, fp) != nullptr) {
                 pid = atoi(buf);
@@ -594,9 +594,9 @@ int32_t AddFilter()
 }
 void PrintFilter(const std::string title, const std::set<std::pair<std::string, std::string>> &s)
 {
-    MMI_HILOGI("title:%{public}s, size:%{public}zu", title.c_str(), s.size());
+    MMI_HILOGI("The title:%{public}s, size:%{public}zu", title.c_str(), s.size());
     for (const auto &[priority, filterId] : s) {
-        MMI_HILOGI("priority:%{public}s, filterId:%{pulbic}s", priority.c_str(), filterId.c_str());
+        MMI_HILOGI("The priority:%{public}s, filterId:%{pulbic}s", priority.c_str(), filterId.c_str());
     }
 };
 
