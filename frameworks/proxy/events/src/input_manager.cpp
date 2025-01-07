@@ -486,6 +486,16 @@ int32_t InputManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
     return InputMgrImpl.GetTouchpadRotateSwitch(rotateSwitch);
 }
 
+int32_t InputManager::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
 int32_t InputManager::EnableHardwareCursorStats(bool enable)
 {
     return InputMgrImpl.EnableHardwareCursorStats(enable);

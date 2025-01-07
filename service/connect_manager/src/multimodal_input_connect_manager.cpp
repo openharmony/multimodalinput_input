@@ -687,6 +687,20 @@ int32_t MultimodalInputConnectManager::GetTouchpadRotateSwitch(bool &rotateSwitc
     return multimodalInputConnectService_->GetTouchpadRotateSwitch(rotateSwitch);
 }
 
+int32_t MultimodalInputConnectManager::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
 int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     std::lock_guard<std::mutex> guard(lock_);

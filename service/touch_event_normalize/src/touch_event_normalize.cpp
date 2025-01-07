@@ -135,6 +135,17 @@ void TouchEventNormalize::GetTouchpadRotateSwitch(bool &rotateSwitch) const
 {
     TouchPadTransformProcessor::GetTouchpadRotateSwitch(rotateSwitch);
 }
+
+int32_t TouchEventNormalize::SetTouchpadDoubleTapAndDragState(bool switchFlag) const
+{
+    return TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
+void TouchEventNormalize::GetTouchpadDoubleTapAndDragState(bool &switchFlag) const
+{
+    TouchPadTransformProcessor::GetTouchpadDoubleTapAndDragState(switchFlag);
+}
+
 #endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI
 } // namespace OHOS
