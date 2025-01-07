@@ -67,6 +67,7 @@ enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
     TOUCH_MOVE = 2,
+    TOUCH_FRAME = 3,
 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
@@ -943,6 +944,8 @@ int32_t LibinputAdapter::ConvertToTouchEventType(
         return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_DOWN);
     } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
         return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_UP);
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
+        return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_FRAME);
     } else {
         return static_cast<int32_t>(VKeyboardTouchEventType::TOUCH_MOVE);
     }
@@ -1062,7 +1065,7 @@ type:%{private}d",
                 static_cast<int32_t>(eventType));
 
             if (handleTouchPoint_ != nullptr && handleTouchPoint_(x, y, touchId, touchEventType) == 0) {
-                MMI_HILOGD("inside vkeyboard area");
+                MMI_HILOGD("Inside vkeyboard area");
 
                 while (true) {
                     int32_t toggleCodeFirst(-1);
@@ -1070,7 +1073,7 @@ type:%{private}d",
                     int32_t keyCode(-1);
                     VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(toggleCodeFirst, toggleCodeSecond,
                         keyCode);
-                    MMI_HILOGD("get message type:%{private}d", static_cast<int32_t>(type));
+                    MMI_HILOGD("Get message type:%{private}d", static_cast<int32_t>(type));
                     if (type == VNoMessage) {
                         break;
                     }

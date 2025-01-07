@@ -123,6 +123,17 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
     DfxHisysevent::GetDispStartTime();
     auto type = libinput_event_get_type(event);
+
+    auto device = libinput_event_get_device(event);
+    std::string name = libinput_device_get_name(device);
+    size_t pos = name.find("hand_status_dev");
+    if ((pos != std::string::npos) && (type == LIBINPUT_EVENT_MSDP)) {
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+        FingerprintEventHdr->HandleFingerprintEvent(event);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+        return;
+    }
+    
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
@@ -484,7 +495,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
     }
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
     if (toolType == MT_TOOL_PALM) {
-        MMI_HILOGI("toolType is MT_TOOL_PALM");
+        MMI_HILOGI("The toolType is MT_TOOL_PALM");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     }
 }
@@ -757,7 +768,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
     enum libinput_switch sw = libinput_event_switch_get_switch(swev);
-    MMI_HILOGI("libinput_event_switch type:%{public}d, state:%{public}d", sw, state);
+    MMI_HILOGI("The libinput_event_switch type:%{public}d, state:%{public}d", sw, state);
     if (sw == LIBINPUT_SWITCH_PRIVACY && state == LIBINPUT_SWITCH_STATE_OFF) {
         MMI_HILOGD("Privacy switch event ignored");
         return RET_OK;

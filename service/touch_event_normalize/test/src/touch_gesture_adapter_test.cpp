@@ -199,22 +199,6 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_002, Test
 }
 
 /**
- * @tc.name: TouchGestureAdapterTest_OnGestureSuccessful_001
- * @tc.desc: Test the funcation OnGestureSuccessful
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnGestureSuccessful_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchGestureType adapterType = 5;
-    std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
-    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
-    std::shared_ptr<PointerEvent> event = PointerEvent::Create();
-    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnGestureSuccessful(event));
-}
-
-/**
  * @tc.name: TouchGestureAdapterTest_OnSwipeGesture_001
  * @tc.desc: Test the funcation OnSwipeGesture
  * @tc.type: FUNC

@@ -30,6 +30,7 @@ public:
     static std::shared_ptr<TouchGestureAdapter> GetGestureFactory();
     void process(std::shared_ptr<PointerEvent> event);
     void SetGestureCondition(bool flag, TouchGestureType type, int32_t fingers);
+    void HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent);
 
 private:
     enum class GestureState {
@@ -50,10 +51,8 @@ private:
     void OnTouchEvent(std::shared_ptr<PointerEvent> event);
     void OnSwipeGesture(std::shared_ptr<PointerEvent> event);
     void OnPinchGesture(std::shared_ptr<PointerEvent> event);
-    void OnGestureSuccessful(std::shared_ptr<PointerEvent> event);
     bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode) override;
     void OnGestureTrend(std::shared_ptr<PointerEvent> event) override;
-    void UpdateTouchMovement(std::shared_ptr<PointerEvent> event);
 
 private:
     bool gestureStarted_ { false };
@@ -62,7 +61,6 @@ private:
     inline static GestureState state_ { GestureState::IDLE };
     std::shared_ptr<TouchGestureDetector> gestureDetector_ { nullptr };
     std::shared_ptr<TouchGestureAdapter> nextAdapter_ { nullptr };
-    std::map<int32_t, TouchItem> touches_;
 };
 } // namespace MMI
 } // namespace OHOS

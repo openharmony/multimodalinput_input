@@ -32,6 +32,8 @@ namespace {
 constexpr int32_t TUPLE_PID = 0;
 constexpr int32_t TUPLE_UID = 1;
 constexpr int32_t TUPLE_NAME = 2;
+constexpr int32_t ITEM_WIDTH = 20;
+constexpr int32_t ITEM_HEIGHT = 60;
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SLEEP_MILLISECONDS = 1000;
@@ -42,6 +44,8 @@ constexpr int32_t POINTER_ITEM_DISPLAY_X_ONE = 147;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_TWO = 456;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_ONE = 123;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_TWO = 258;
+constexpr int32_t POINTER_ITEM_WINDOW_X = 701;
+constexpr int32_t POINTER_ITEM_WINDOW_Y = 702;
 constexpr int32_t KEY_DOWN_DURATION = 300;
 constexpr int32_t FINAL_KEY_DOWN_DURATION_ONE = 10;
 constexpr int32_t FINAL_KEY_DOWN_DURATION_TWO = 2000;
@@ -678,226 +682,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_05, TestSize.Level
 }
 
 /**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_09
- * @tc.desc: Verify subscribe key event.
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_09, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_KEY_PEN_AIR_MOUSE);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(0);
-    int32_t subscribeId = INVAID_VALUE;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("[YKP] Subscribe key event KEYCODE_KEY_PEN_AIR_MOUSE down trigger callback");
-    });
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_TRUE(subscribeId >= 0);
-#else
-    EXPECT_TRUE(subscribeId < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_AIR_MOUSE);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_AIR_MOUSE);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-}
-
-/**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_10
- * @tc.desc: Verify subscribe key event.
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_10, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_KEY_PEN_LIGHT_PINCH);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(0);
-    int32_t subscribeId = INVAID_VALUE;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("[YKP] Subscribe key event KEYCODE_KEY_PEN_LIGHT_PINCH down trigger callback");
-    });
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_TRUE(subscribeId >= 0);
-#else
-    EXPECT_TRUE(subscribeId < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_LIGHT_PINCH);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_LIGHT_PINCH);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-}
-
-/**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_13
- * @tc.desc: Verify subscribe key event.
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_13, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_KEY_PEN_AI);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(0);
-    int32_t subscribeId = INVAID_VALUE;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("[YKP] Subscribe key event KEYCODE_KEY_PEN_AI down trigger callback");
-    });
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_TRUE(subscribeId >= 0);
-#else
-    EXPECT_TRUE(subscribeId < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_AI);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_AI);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-}
-
-/**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_11
- * @tc.desc: Verify subscribe key event.
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_11, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_KEY_PEN_END_CLICK);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(0);
-    int32_t subscribeId = INVAID_VALUE;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("[YKP] Subscribe key event KEYCODE_KEY_PEN_END_CLICK down trigger callback");
-    });
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_TRUE(subscribeId >= 0);
-#else
-    EXPECT_TRUE(subscribeId < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_END_CLICK);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_END_CLICK);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-}
-
-/**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_12
- * @tc.desc: Verify subscribe key event.
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_12, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_KEY_PEN_END_DOUBLE_CLICK);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(0);
-    int32_t subscribeId = INVAID_VALUE;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("[YKP] Subscribe key event KEYCODE_KEY_PEN_END_DOUBLE_CLICK down trigger callback");
-    });
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_TRUE(subscribeId >= 0);
-#else
-    EXPECT_TRUE(subscribeId < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_END_DOUBLE_CLICK);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_KEY_PEN_END_DOUBLE_CLICK);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-}
-
-/**
  * @tc.name: TestGetKeystrokeAbility_001
  * @tc.desc: Verify SupportKeys
  * @tc.type: FUNC
@@ -919,27 +703,27 @@ static void GetKeyboardTypeCallback(int32_t keyboardType)
 {
     switch (keyboardType) {
         case KEYBOARD_TYPE_NONE: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "None");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "None");
             break;
         }
         case KEYBOARD_TYPE_UNKNOWN: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "unknown");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "unknown");
             break;
         }
         case KEYBOARD_TYPE_ALPHABETICKEYBOARD: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "alphabetickeyboard");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "alphabetickeyboard");
             break;
         }
         case KEYBOARD_TYPE_DIGITALKEYBOARD: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "digitalkeyboard");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "digitalkeyboard");
             break;
         }
         case KEYBOARD_TYPE_HANDWRITINGPEN: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "handwritingpen");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "handwritingpen");
             break;
         }
         case KEYBOARD_TYPE_REMOTECONTROL: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "remotecontrol");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "remotecontrol");
             break;
         }
         default: {
@@ -961,7 +745,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
     for (int32_t i = 0; i < KEYBOARD_TYPE_SIZE; ++i) {
         g_deviceIDtest = i;
         ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetKeyboardType(i, GetKeyboardTypeCallback));
-        MMI_HILOGD("i:%{public}d", i);
+        MMI_HILOGD("The i:%{public}d", i);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -4706,7 +4490,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_001, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d disable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("set input device result: %{public}d ", result);
+            MMI_HILOGI("Set input device result: %{public}d ", result);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, false, cb);
     }
@@ -4727,7 +4511,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_002, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d enable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("set input device result: %{public}d ", result);
+            MMI_HILOGI("Set input device result: %{public}d ", result);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, true, cb);
     }
@@ -4810,6 +4594,196 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx, TestSize.Level1)
     ASSERT_FALSE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) == RET_ERR);
     options.followSystem = false;
     ASSERT_FALSE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) == RET_ERR);
+
+}
+
+std::shared_ptr<PointerEvent> CreatePointerEventTest()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetPressed(true);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetWindowX(POINTER_ITEM_WINDOW_X);
+    item.SetPointerId(1);
+    item.SetWindowY(POINTER_ITEM_WINDOW_Y);
+    item.SetDeviceId(0);
+    item.SetWidth(ITEM_WIDTH);
+    item.SetHeight(ITEM_HEIGHT);
+    item.SetPressure(POINTER_ITEM_PRESSURE);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+/*
+ * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_001
+ * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = MMI::InputManager::GetInstance()->TransformMouseEventToTouchEvent(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_002
+ * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    ret = MMI::InputManager::GetInstance()->TransformMouseEventToTouchEvent(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_003
+ * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    ret = MMI::InputManager::GetInstance()->TransformMouseEventToTouchEvent(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_004
+ * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerId(1);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, false);
+}
+
+/*
+ * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_001
+ * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    ret = MMI::InputManager::GetInstance()->TransformTouchEventToMouseEvent(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_002
+ * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    ret = MMI::InputManager::GetInstance()->TransformTouchEventToMouseEvent(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_003
+ * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = CreatePointerEventTest();
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, true);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    ret = MMI::InputManager::GetInstance()->TransformTouchEventToMouseEvent(pointerEvent);
+    ASSERT_EQ(ret, true);
+}
+
+/*
+ * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_004
+ * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(1);
+    bool ret = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
+    ASSERT_EQ(ret, false);
 }
 } // namespace MMI
 } // namespace OHOS

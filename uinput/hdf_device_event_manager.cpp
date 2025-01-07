@@ -91,7 +91,7 @@ int32_t main() __attribute__((no_sanitize("cfi")))
         MMI_HILOGE("%{public}s, get device memory failed.", __func__);
     }
     dlclose(libMemMgrClientHandle);
-    MMI_HILOGI("notify_process_status execute end");
+    MMI_HILOGI("The notify_process_status execute end");
 
 nextStep:
     MMI_HILOGI("Start thread loop");

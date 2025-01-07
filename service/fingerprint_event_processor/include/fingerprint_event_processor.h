@@ -55,6 +55,7 @@ public:
 private:
     int32_t AnalyseKeyEvent(struct libinput_event* event);
     int32_t AnalysePointEvent(struct libinput_event *event);
+    int32_t AnalyseMsdpPointEvent(struct libinput_event *event);
     int32_t SendFingerprintCancelEvent();
     void ChangeScreenMissTouchFlag(bool screenState, bool cancel);
     bool CheckMisTouchState();
