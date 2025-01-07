@@ -33,6 +33,7 @@ namespace OHOS {
 namespace MMI {
 class PointerEvent : public InputEvent {
 public:
+    static constexpr int32_t POINTER_INITIAL_VALUE = -1;
     /**
      * Indicates an unknown pointer action. It is usually used as initial value.
      *
