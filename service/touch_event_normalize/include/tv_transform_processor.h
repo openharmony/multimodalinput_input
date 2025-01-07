@@ -34,9 +34,9 @@ public:
     std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
 
 private:
-    bool OnEventTvTouchMotion(struct libinput_event *event);
+    bool OnEventTouchMotion(struct libinput_event *event);
     bool DumpInner();
-    bool HandlePostInner(struct libinput_event* event, PointerEvent::PointerItem &pointerItem);
+    bool HandlePostInner(struct libinput_event* event);
     void InitToolTypes();
 private:
     int32_t buttonId_ { -1 };
