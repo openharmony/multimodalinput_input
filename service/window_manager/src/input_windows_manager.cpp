@@ -4745,10 +4745,11 @@ void InputWindowsManager::PrintChangedWindowBySync(const DisplayGroupInfo &newDi
             continue;
         }
         if (item.direction != iter->direction) {
-            MMI_HILOGI("displayInfos,id:%{public}d,x:%d,y:%d,width:%{public}d,height:%{public}d,name:%{public}s,"
-                "uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d, oldDirection:%{public}d",
-                item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
-                item.uniq.c_str(), item.direction, item.displayDirection, iter->direction);
+            MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d,"
+                "name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
+                "oldDirection:%{public}d,oldDisplayDirection:%{public}d", item.id, item.x, item.y, item.width,
+                item.height, item.name.c_str(), item.uniq.c_str(), item.direction, item.displayDirection,
+                iter->direction, iter->displayDirection);
         }
     }
 }
