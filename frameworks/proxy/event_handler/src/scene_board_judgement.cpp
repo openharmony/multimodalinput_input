@@ -41,7 +41,7 @@ bool MMISceneBoardJudgement::IsResampleEnabled()
         MMI_HILOGD("Resample algorithm switch is not inited");
         isResampleEnabled =
         (std::atoi((OHOS::system::GetParameter("persist.sys.input.resampleEnabled", "0")).c_str()) != 0);
-        MMI_HILOGD("isResampleEnabled is set to %{public}d", isResampleEnabled);
+        MMI_HILOGD("The isResampleEnabled is set to %{public}d", isResampleEnabled);
         resampleInited = true;
     }
     return isResampleEnabled;

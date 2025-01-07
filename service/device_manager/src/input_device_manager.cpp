@@ -688,7 +688,7 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
     if (pos != std::string::npos) {
         isRemote = true;
     }
-    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    MMI_HILOGD("The isRemote:%{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
 
@@ -699,7 +699,7 @@ bool InputDeviceManager::IsRemote(int32_t id) const
     if (device != inputDevice_.end()) {
         isRemote = device->second.isRemote;
     }
-    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    MMI_HILOGD("The isRemote:%{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
 

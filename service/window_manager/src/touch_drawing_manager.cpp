@@ -271,7 +271,7 @@ void TouchDrawingManager::CreateObserver()
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
             GetBoolValue(pointerPositionSwitchName, pointerMode_.isShow);
     }
-    MMI_HILOGD("bubbleMode_:%{public}d, pointerMode_:%{public}d", bubbleMode_.isShow, pointerMode_.isShow);
+    MMI_HILOGD("The bubbleMode_:%{public}d, pointerMode_:%{public}d", bubbleMode_.isShow, pointerMode_.isShow);
 }
 
 template <class T>

@@ -882,7 +882,7 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(std::vector<int32_t> &ids)
         MMI_HILOGE("Read vector failed");
         return RET_ERR;
     }
-    MMI_HILOGD("ids size:%{public}zu", ids.size());
+    MMI_HILOGD("The ids size:%{public}zu", ids.size());
     return RET_OK;
 }
 
@@ -2178,7 +2178,7 @@ int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixel
         MMI_HILOGE("pixelMap is empty");
         return RET_ERR;
     }
-    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
+    MMI_HILOGD("The byteCount:%{public}d, width:%{public}d, height:%{public}d",
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
 
     MessageParcel data;

@@ -699,27 +699,27 @@ static void GetKeyboardTypeCallback(int32_t keyboardType)
 {
     switch (keyboardType) {
         case KEYBOARD_TYPE_NONE: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "None");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "None");
             break;
         }
         case KEYBOARD_TYPE_UNKNOWN: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "unknown");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "unknown");
             break;
         }
         case KEYBOARD_TYPE_ALPHABETICKEYBOARD: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "alphabetickeyboard");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "alphabetickeyboard");
             break;
         }
         case KEYBOARD_TYPE_DIGITALKEYBOARD: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "digitalkeyboard");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "digitalkeyboard");
             break;
         }
         case KEYBOARD_TYPE_HANDWRITINGPEN: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "handwritingpen");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "handwritingpen");
             break;
         }
         case KEYBOARD_TYPE_REMOTECONTROL: {
-            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "remotecontrol");
+            MMI_HILOGD("The g_deviceIDtest:%{public}d, KeyboardType:%{public}s", g_deviceIDtest, "remotecontrol");
             break;
         }
         default: {
@@ -741,7 +741,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
     for (int32_t i = 0; i < KEYBOARD_TYPE_SIZE; ++i) {
         g_deviceIDtest = i;
         ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetKeyboardType(i, GetKeyboardTypeCallback));
-        MMI_HILOGD("i:%{public}d", i);
+        MMI_HILOGD("The i:%{public}d", i);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));

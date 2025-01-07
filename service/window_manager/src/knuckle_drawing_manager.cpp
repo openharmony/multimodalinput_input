@@ -823,7 +823,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         canvas->DrawPath(path_);
         canvas->DetachPaint();
     } else {
-        MMI_HILOGD("isActionUp_ is true");
+        MMI_HILOGD("The isActionUp_ is true");
         isActionUp_ = false;
         return DestoryWindow();
     }

@@ -666,7 +666,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
     HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_HILOGD("handlerType:%{public}d", handlerType);
+    MMI_HILOGD("The handlerType:%{public}d", handlerType);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();

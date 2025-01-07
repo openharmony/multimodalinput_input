@@ -265,7 +265,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEven
 {
     CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(pointerEvent);
-    MMI_HILOGD("before:%{public}s", before.c_str());
+    MMI_HILOGD("The before:%{public}s", before.c_str());
     strEventDump_.clear();
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::string after = GetEventDump();
@@ -280,7 +280,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(keyEvent);
-    MMI_HILOGD("before:%{public}s", before.c_str());
+    MMI_HILOGD("The before:%{public}s", before.c_str());
     strEventDump_.clear();
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::string after = GetEventDump();

@@ -2356,7 +2356,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     bool isHotPlug)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
+    MMI_HILOGD("The hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
         hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
