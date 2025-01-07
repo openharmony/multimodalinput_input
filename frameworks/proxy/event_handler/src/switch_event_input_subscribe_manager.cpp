@@ -71,7 +71,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
         subscribeInfos_.erase(subscribeId);
         return INVALID_SUBSCRIBE_ID;
     }
-    MMI_HILOGI("subscribeId:%{public}d, switchType:%{public}d", subscribeId, switchType);
+    MMI_HILOGI("The subscribeId:%{public}d, switchType:%{public}d", subscribeId, switchType);
 
     return subscribeId;
 }

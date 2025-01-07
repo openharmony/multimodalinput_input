@@ -576,7 +576,7 @@ void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 
 void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug)
 {
-    MMI_HILOGI("observers_ size:%{public}zu", observers_.size());
+    MMI_HILOGI("The observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
         (*observer)->UpdatePointerDevice(hasPointerDevice, isVisible, isHotPlug);
     }
@@ -688,7 +688,7 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
     if (pos != std::string::npos) {
         isRemote = true;
     }
-    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    MMI_HILOGD("The isRemote:%{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
 
@@ -699,7 +699,7 @@ bool InputDeviceManager::IsRemote(int32_t id) const
     if (device != inputDevice_.end()) {
         isRemote = device->second.isRemote;
     }
-    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    MMI_HILOGD("The isRemote:%{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
 
@@ -952,7 +952,7 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
+    MMI_HILOGI("The deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
         NotifyInputdeviceMessage(session, index, ERROR_DEVICE_NOT_EXIST);
