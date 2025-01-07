@@ -510,6 +510,7 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
         { TOUCHPAD_TAP_SETTING, "TOUCHPAD_TAP_SETTING" },
         { TOUCHPAD_SWIPE_SETTING, "TOUCHPAD_SWIPE_SETTING" },
         { TOUCHPAD_PINCH_SETTING, "TOUCHPAD_PINCH_SETTING" },
+        { TOUCHPAD_DOUBLE_TAP_DRAG_SETTING, "TOUCHPAD_DOUBLE_TAP_DRAG_SETTING" },
     };
 
     auto it = mapSettingCodeToSettingType.find(settingCode);

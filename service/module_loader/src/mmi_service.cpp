@@ -402,6 +402,11 @@ void MMIService::OnStart()
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     PREFERENCES_MGR->InitPreferences();
+#if OHOS_BUILD_ENABLE_POINTER
+    bool switchFlag = false;
+    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
+    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
+#endif
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -2134,6 +2139,12 @@ int32_t MMIService::ReadTouchpadRotateSwitch(bool &rotateSwitch)
     return RET_OK;
 }
 
+int32_t MMIService::ReadTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
+    return RET_OK;
+}
+
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
@@ -2403,6 +2414,41 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad rotate switch failed, ret:%{public}d", ret);
         return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [switchFlag] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadDoubleTapAndDragState(
+                switchFlag);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to SetTouchpadDoubleTapAndDragState status, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &switchFlag] {
+            return this->ReadTouchpadDoubleTapAndDragState(switchFlag);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetTouchpadDoubleTapAndDragState status, ret:%{public}d", ret);
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;

@@ -50,6 +50,7 @@ private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
+    bool preDoubleTapDragSwitch_ { true };
 };
 
 GeneralTouchpad TouchPadTransformProcessorTest::vTouchpad_;
@@ -91,6 +92,7 @@ void TouchPadTransformProcessorTest::SetUp()
     g_processor_.GetTouchpadPinchSwitch(prePinchSwitch_);
     g_processor_.GetTouchpadSwipeSwitch(preSwipeSwitch_);
     g_processor_.GetTouchpadRotateSwitch(preRotateSwitch_);
+    g_processor_.GetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
 }
 
 void TouchPadTransformProcessorTest::TearDown()
@@ -98,6 +100,7 @@ void TouchPadTransformProcessorTest::TearDown()
     g_processor_.SetTouchpadPinchSwitch(prePinchSwitch_);
     g_processor_.SetTouchpadSwipeSwitch(preSwipeSwitch_);
     g_processor_.SetTouchpadRotateSwitch(preRotateSwitch_);
+    g_processor_.SetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
 }
 
 /**
@@ -197,6 +200,41 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     bool newRotateSwitch = false;
     processor.GetTouchpadRotateSwitch(newRotateSwitch);
     ASSERT_TRUE(rotateSwitch == newRotateSwitch);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_SetTouchpadDoubleTapAndDragState_07
+ * @tc.desc: Test SetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchpadDoubleTapAndDragState_07,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    TouchPadTransformProcessor processor(deviceId);
+    bool flag = false;
+    ASSERT_TRUE(processor.SetTouchpadDoubleTapAndDragState(flag) == RET_OK);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_GetTouchpadDoubleTapAndDragState_08
+ * @tc.desc: Test GetTouchpadDoubleTapAndDragState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouchpadDoubleTapAndDragState_08,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    TouchPadTransformProcessor processor(deviceId);
+    bool flag = false;
+    processor.SetTouchpadDoubleTapAndDragState(flag);
+    bool newFlag = false;
+    processor.GetTouchpadDoubleTapAndDragState(newFlag);
+    ASSERT_TRUE(flag == newFlag);
 }
 
 /**

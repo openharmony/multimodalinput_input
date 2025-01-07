@@ -896,6 +896,25 @@ std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
     }
     return ids;
 }
+
+struct libinput_device *InputDeviceManager::GetTouchPadDeviceOrigin()
+{
+    CALL_DEBUG_ENTER;
+    struct libinput_device *touchPadDevice = nullptr;
+    for (const auto &item : inputDevice_) {
+        auto inputDevice = item.second.inputDeviceOrigin;
+        if (inputDevice == nullptr) {
+            continue;
+        }
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
+        if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
+            touchPadDevice = inputDevice;
+            break;
+        }
+    }
+    return touchPadDevice;
+}
+
 std::string InputDeviceManager::GetMaskedDeviceId(const std::string& str)
 {
     return GetMaskedStr(str, RESERVE_LEN);

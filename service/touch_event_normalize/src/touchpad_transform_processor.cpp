@@ -553,6 +553,42 @@ void TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
     GetConfigDataFromDatabase(name, rotateSwitch);
 }
 
+int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    std::string name = "touchpadDoubleTapAndDrag";
+    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
+        MMI_HILOGE("PutConfigDataToDatabase failed");
+        return RET_ERR;
+    }
+
+    auto originDevice = INPUT_DEV_MGR->GetTouchPadDeviceOrigin();
+    if (originDevice == nullptr) {
+        MMI_HILOGW("Not touchpad device");
+        return RET_ERR;
+    }
+
+    auto state = LIBINPUT_CONFIG_DRAG_DISABLED;
+    if (switchFlag) {
+        state = LIBINPUT_CONFIG_DRAG_ENABLED;
+    }
+    auto ret = libinput_device_config_tap_set_drag_enabled(originDevice, state);
+    if (ret != LIBINPUT_CONFIG_STATUS_SUCCESS) {
+        MMI_HILOGE("Set drag failed");
+        return RET_ERR;
+    }
+    MMI_HILOGI("Touchpad set double tap and drag state successfully, state:%{public}d", state);
+
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_DOUBLE_TAP_DRAG_SETTING,
+        switchFlag);
+    return RET_OK;
+}
+
+void TouchPadTransformProcessor::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    std::string name = "touchpadDoubleTapAndDrag";
+    GetConfigDataFromDatabase(name, switchFlag);
+}
+
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
     return PREFERENCES_MGR->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);

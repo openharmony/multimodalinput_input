@@ -2992,6 +2992,36 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InputManagerTest_SetTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Set Touchpad Double Tap And Drag State
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Get touchpad tap switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(newFlag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+}
+
+/**
  * @tc.name: InputManagerTest_SetTouchpadRotateSwitch_001
  * @tc.desc: Set touchpad rotate switch
  * @tc.type: FUNC

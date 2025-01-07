@@ -842,6 +842,24 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
     /**
+     * @brief Set the switch of touchpad double tap and drag.
+     * @param switchFlag Indicates the touchpad double tap and drag switch state.
+     *  true: user can use double tap and drag function. otherwise can't use
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag);
+
+    /**
+     * @brief Get the switch of touchpad double tap and drag.
+     * @param switchFlag Indicates the touchpad double tap and drag switch state.
+     * true: user can use double tap and drag function. otherwise can't use
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag);
+
+    /**
      * @brief Get whether System has IrEmitter.
      * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not.
      * @return 0 if success; returns a non-0 value otherwise.

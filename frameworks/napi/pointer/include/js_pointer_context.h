@@ -75,6 +75,8 @@ public:
     static napi_value GetTouchpadRightClickType(napi_env env, napi_callback_info info);
     static napi_value SetTouchpadRotateSwitch(napi_env env, napi_callback_info info);
     static napi_value GetTouchpadRotateSwitch(napi_env env, napi_callback_info info);
+    static napi_value SetTouchpadDoubleTapAndDragState(napi_env env, napi_callback_info info);
+    static napi_value GetTouchpadDoubleTapAndDragState(napi_env env, napi_callback_info info);
     static napi_value SetCustomCursor(napi_env env, napi_callback_info info);
     static napi_value SetCustomCursorSync(napi_env env, napi_callback_info info);
     static napi_value EnableHardwareCursorStats(napi_env env, napi_callback_info info);

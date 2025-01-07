@@ -52,6 +52,7 @@ private:
     int32_t touchpadRightClickType_ { 1 };
     int32_t touchpadPointerSpeed_ { 9 };
     bool touchpadTapSwitch_ { true };
+    bool touchpadDoubleTapAndDrag_ { false };
     bool touchpadScrollDirection_ { true };
     bool touchpadScrollSwitch_ { true };
     bool touchpadPinchSwitch_ { true };
@@ -76,6 +77,7 @@ private:
     const std::string strPointerColor_ = "pointerColor";
     const std::string strPointerSize_ = "pointerSize";
     const std::string strPointerStyle_ = "pointerStyle";
+    const std::string strTouchpadDoubleTapAndDrag_ = "touchpadDoubleTapAndDrag";
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t magicPointerColor_ { -1 };
     int32_t magicPointerSize_ { 1 };

@@ -139,6 +139,7 @@ private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
+    bool preDoubleTapAndDragState_ { true };
 };
 
 void InputManagerPointerTest::SetUpTestCase()
@@ -161,6 +162,7 @@ void InputManagerPointerTest::SetUp()
     InputManager::GetInstance()->GetTouchpadSwipeSwitch(preSwipeSwitch_);
     InputManager::GetInstance()->GetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->GetTouchpadRotateSwitch(preRotateSwitch_);
+    InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(preDoubleTapAndDragState_);
     InputManager::GetInstance()->GetPointerSize(prePointerSize_);
     InputManager::GetInstance()->GetPointerColor(prePointerColor_);
 }
@@ -180,6 +182,7 @@ void InputManagerPointerTest::TearDown()
     InputManager::GetInstance()->SetTouchpadPinchSwitch(prePinchSwitch_);
     InputManager::GetInstance()->SetTouchpadSwipeSwitch(preSwipeSwitch_);
     InputManager::GetInstance()->SetTouchpadRotateSwitch(preRotateSwitch_);
+    InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(preDoubleTapAndDragState_);
     InputManager::GetInstance()->SetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->SetPointerSize(prePointerSize_);
     InputManager::GetInstance()->SetPointerColor(prePointerColor_);
@@ -1483,6 +1486,35 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadTapSwitch_0
     InputManager::GetInstance()->SetTouchpadTapSwitch(flag);
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadTapSwitch(newFlag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Set touchpad double tap and drag switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(flag) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_GetTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Get touchpad double tap and drag switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
 }
 

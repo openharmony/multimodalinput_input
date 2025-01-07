@@ -170,6 +170,8 @@ public:
     int32_t GetTouchpadRightClickType(int32_t &type);
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
+    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag);
+    int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
     int32_t GetPointerSnapshot(void *pixelMapPtr);
