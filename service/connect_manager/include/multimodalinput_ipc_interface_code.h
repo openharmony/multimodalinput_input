@@ -121,6 +121,8 @@ enum class MultimodalinputConnectInterfaceCode {
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     SKIP_POINTER_LAYER = 101,
     GET_SYSTEM_EVENT_TIME_INTERVAL = 102,
+    SET_DOUBLE_TAP_DRAG_STATE = 307,
+    GET_DOUBLE_TAP_DRAG_STATE = 308,
 };
 
 enum class MultimodalinputEventObserverCode {

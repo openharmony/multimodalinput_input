@@ -972,6 +972,21 @@ napi_value JsPointerManager::GetTouchpadRotateSwitch(napi_env env, napi_value ha
     return GetTouchpadBoolData(env, handle, rotateSwitch, ret);
 }
 
+napi_value JsPointerManager::SetTouchpadDoubleTapAndDragState(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadDoubleTapAndDragState(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+
 napi_value JsPointerManager::EnableHardwareCursorStats(napi_env env, bool enable)
 {
     CALL_DEBUG_ENTER;

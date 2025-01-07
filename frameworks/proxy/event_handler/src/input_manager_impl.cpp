@@ -2030,6 +2030,38 @@ int32_t InputManagerImpl::GetTouchpadRotateSwitch(bool &rotateSwitch)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+{
+    CALL_INFO_TRACE;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetTouchpadDoubleTapAndDragState(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touchpad double tap and drag switch failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadDoubleTapAndDragState(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get touchpad tap and drag switch failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 int32_t InputManagerImpl::EnableHardwareCursorStats(bool enable)
 {
     CALL_INFO_TRACE;

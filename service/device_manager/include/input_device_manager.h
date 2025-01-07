@@ -84,6 +84,7 @@ public:
     VendorConfig GetVendorConfig(int32_t deviceId) const;
     int32_t OnEnableInputDevice(bool enable);
     std::vector<int32_t> GetTouchPadIds();
+    struct libinput_device *GetTouchPadDeviceOrigin();
 
     static std::shared_ptr<InputDeviceManager> GetInstance();
 

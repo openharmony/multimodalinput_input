@@ -58,6 +58,8 @@ public:
     void GetTouchpadSwipeSwitch(bool &switchFlag) const;
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch) const;
     void GetTouchpadRotateSwitch(bool &rotateSwitch) const;
+    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) const;
+    void GetTouchpadDoubleTapAndDragState(bool &switchFlag) const;
 #endif // OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
 

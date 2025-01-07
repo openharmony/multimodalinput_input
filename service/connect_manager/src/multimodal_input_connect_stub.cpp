@@ -340,6 +340,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_ROTATE_SWITCH):
             return StubGetTouchpadRotateSwitch(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DOUBLE_TAP_DRAG_STATE):
+            ret = StubSetTouchpadDoubleTapAndDragState(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DOUBLE_TAP_DRAG_STATE):
+            ret = StubGetTouchpadDoubleTapAndDragState(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_DELAY):
             ret = StubGetKeyboardRepeatDelay(data, reply);
             break;
@@ -2123,6 +2129,44 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& d
     }
     WRITEBOOL(reply, rotateSwitch, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touchpad rotate switch:%{public}d, ret:%{public}d", rotateSwitch, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadDoubleTapAndDragState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed");
+        return ret;
+    }
+
+    bool switchFlag = true;
+    READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
+    ret = SetTouchpadDoubleTapAndDragState(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touchpad double tap and drag switch failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadDoubleTapAndDragState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed");
+        return ret;
+    }
+
+    bool switchFlag = true;
+    ret = GetTouchpadDoubleTapAndDragState(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetTouchpadDoubleTapAndDragState failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
 }
 
