@@ -128,6 +128,8 @@ public:
     virtual int32_t GetTouchpadRightClickType(int32_t &type) = 0;
     virtual int32_t SetTouchpadRotateSwitch(bool rotateSwitch) = 0;
     virtual int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) = 0;
+    virtual int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag) = 0;
     virtual int32_t SetShieldStatus(int32_t shieldMode, bool isShield) = 0;
     virtual int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) = 0;
     virtual int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) = 0;

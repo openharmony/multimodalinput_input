@@ -1570,6 +1570,32 @@ napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback
     return GetTouchpadData(env, info, func);
 }
 
+napi_value JsPointerContext::SetTouchpadDoubleTapAndDragState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadDoubleTapAndDragState(env, switchFlag, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadDoubleTapAndDragState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadDoubleTapAndDragState(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
 napi_value JsPointerContext::EnableHardwareCursorStats(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1663,6 +1689,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRightClickType", GetTouchpadRightClickType),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadRotateSwitch", SetTouchpadRotateSwitch),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRotateSwitch", GetTouchpadRotateSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadDoubleTapAndDragState", SetTouchpadDoubleTapAndDragState),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadDoubleTapAndDragState", GetTouchpadDoubleTapAndDragState),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursor", SetCustomCursor),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursorSync", SetCustomCursorSync),
