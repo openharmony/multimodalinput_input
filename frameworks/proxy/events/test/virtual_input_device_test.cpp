@@ -43,7 +43,7 @@ public:
     ~VirtualInputDeviceListener() override = default;
     void OnDeviceAdded(int32_t deviceId, const std::string &type) override
     {
-        MMI_HILOGI("deviceId:%{public}d added, type:%{public}s", deviceId, type.c_str());
+        MMI_HILOGI("Added deviceId:%{public}d, type:%{public}s", deviceId, type.c_str());
         KeyboardType keyType { KeyboardType::KEYBOARD_TYPE_NONE };
         auto keyboardCallback = [&keyType] (int32_t keyboardType) {
             MMI_HILOGI("KeyboardType:%{public}d", keyboardType);

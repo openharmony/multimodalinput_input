@@ -630,7 +630,7 @@ int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetP
     CALL_DEBUG_ENTER;
     int32_t pid = sess->GetPid();
     WIN_MGR->SetWindowStateNotifyPid(pid);
-    MMI_HILOGI("pid:%{public}d", pid);
+    MMI_HILOGI("The pid:%{public}d", pid);
     return RET_OK;
 }
 

@@ -495,7 +495,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
     }
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
     if (toolType == MT_TOOL_PALM) {
-        MMI_HILOGI("toolType is MT_TOOL_PALM");
+        MMI_HILOGI("The toolType is MT_TOOL_PALM");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     }
 }
@@ -768,7 +768,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
     enum libinput_switch sw = libinput_event_switch_get_switch(swev);
-    MMI_HILOGI("libinput_event_switch type:%{public}d, state:%{public}d", sw, state);
+    MMI_HILOGI("The libinput_event_switch type:%{public}d, state:%{public}d", sw, state);
     if (sw == LIBINPUT_SWITCH_PRIVACY && state == LIBINPUT_SWITCH_STATE_OFF) {
         MMI_HILOGD("Privacy switch event ignored");
         return RET_OK;

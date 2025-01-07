@@ -269,7 +269,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEven
     strEventDump_.clear();
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::string after = GetEventDump();
-    MMI_HILOGD("after:%{public}s", after.c_str());
+    MMI_HILOGD("The after:%{public}s", after.c_str());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     std::string result = DumpInputEvent(pointerEvent);
     MMI_HILOGD("result:%{public}s", result.c_str());
@@ -284,7 +284,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<KeyEvent>& keyEvent)
     strEventDump_.clear();
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::string after = GetEventDump();
-    MMI_HILOGD("after:%{public}s", after.c_str());
+    MMI_HILOGD("The after:%{public}s", after.c_str());
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     std::string result = DumpInputEvent(keyEvent);
     MMI_HILOGD("result:%{public}s", result.c_str());

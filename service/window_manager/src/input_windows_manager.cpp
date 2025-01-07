@@ -471,7 +471,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             if (pid < 0) {
                 pid = axisBeginWindowInfo_->pid;
             }
-            MMI_HILOGD("axisBeginEvent occurs, update the pid:%{public}d", pid);
+            MMI_HILOGD("The axisBeginEvent occurs, update the pid:%{public}d", pid);
             axisBeginWindowInfo_ = std::nullopt;
         }
     }
@@ -1539,7 +1539,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     CHKPV(udsServer_);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() && !HasMouseHideFlag()) {
-        MMI_HILOGI("the mouse is hide");
+        MMI_HILOGI("The mouse is hide");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -2866,7 +2866,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         }
         pointerEvent->SetOriginPointerAction(pointerAction);
-        MMI_HILOGI("mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
+        MMI_HILOGI("Mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
     }
 
     bool checkFlag = pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
@@ -5005,7 +5005,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
 
 int32_t InputWindowsManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
 {
-    MMI_HILOGI("start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
+    MMI_HILOGI("Start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
                "autoGenDown: %{public}d", sourceWindowId, targetWindowId, static_cast<int32_t>(autoGenDown));
     if (!lastPointerEvent_ || !lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
         MMI_HILOGE("Failed shift pointerEvent, left mouse button is not pressed");
@@ -5051,7 +5051,7 @@ int32_t InputWindowsManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_
         InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
     }
     firstBtnDownWindowInfo_.first = targetWindowId;
-    MMI_HILOGI("shift pointer event success");
+    MMI_HILOGI("Shift pointer event success");
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

@@ -997,7 +997,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     if (!EventLogHelper::IsBetaVersion()) {
-        MMI_HILOGI("action:%{public}d", keyEvent->GetKeyAction());
+        MMI_HILOGI("Key action:%{public}d", keyEvent->GetKeyAction());
     } else {
         MMI_HILOGI("KeyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
