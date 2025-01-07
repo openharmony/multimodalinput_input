@@ -28,6 +28,20 @@ namespace OHOS {
 namespace MMI {
 InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
 
+const std::map<int32_t, int32_t> MOUSE_TO_TOUCH_PARAM_MAP = {
+    {PointerEvent::SOURCE_TYPE_MOUSE, PointerEvent::SOURCE_TYPE_TOUCHSCREEN},
+    {PointerEvent::POINTER_ACTION_BUTTON_DOWN, PointerEvent::POINTER_ACTION_DOWN},
+    {PointerEvent::POINTER_ACTION_BUTTON_UP, PointerEvent::POINTER_ACTION_UP},
+    {PointerEvent::TOOL_TYPE_MOUSE, PointerEvent::TOOL_TYPE_FINGER},
+    {PointerEvent::MOUSE_BUTTON_LEFT, PointerEvent::POINTER_INITIAL_VALUE}
+};
+
+const std::map<int32_t, int32_t> TOUCH_TO_MOUSE_PARAM_MAP = {
+    {PointerEvent::POINTER_ACTION_DOWN, PointerEvent::POINTER_ACTION_BUTTON_DOWN},
+    {PointerEvent::POINTER_ACTION_UP, PointerEvent::POINTER_ACTION_BUTTON_UP},
+    {PointerEvent::TOOL_TYPE_FINGER, PointerEvent::TOOL_TYPE_MOUSE}
+};
+
 InputManager *InputManager::GetInstance()
 {
     return instance_;
@@ -236,6 +250,84 @@ void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEv
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateTouchPadEvent(pointerEvent);
+}
+
+bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        MMI_HILOGD("It's not MouseEvent, don't need to transform");
+        return true;
+    }
+
+    int32_t result = -1;
+    if (MOUSE_TO_TOUCH_PARAM_MAP.count(pointerEvent->GetSourceType()) > 0) {
+        result = MOUSE_TO_TOUCH_PARAM_MAP.at(pointerEvent->GetSourceType());
+        pointerEvent->SetSourceType(result);
+    }
+
+    if (MOUSE_TO_TOUCH_PARAM_MAP.count(pointerEvent->GetPointerAction()) > 0) {
+        result = MOUSE_TO_TOUCH_PARAM_MAP.at(pointerEvent->GetPointerAction());
+        pointerEvent->SetPointerAction(result);
+        pointerEvent->SetOriginPointerAction(result);
+    }
+
+    if (MOUSE_TO_TOUCH_PARAM_MAP.count(pointerEvent->GetButtonId()) > 0) {
+        result = MOUSE_TO_TOUCH_PARAM_MAP.at(pointerEvent->GetButtonId());
+        pointerEvent->SetButtonId(result);
+    }
+
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return false;
+    }
+
+    if (MOUSE_TO_TOUCH_PARAM_MAP.count(pointerItem.GetToolType()) > 0) {
+        result = MOUSE_TO_TOUCH_PARAM_MAP.at(pointerItem.GetToolType());
+        pointerItem.SetToolType(result);
+    }
+
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    return true;
+}
+
+bool InputManager::TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGD("It's not MouseEvent, don't need to transform");
+        return true;
+    }
+
+    int32_t result = -1;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    if (TOUCH_TO_MOUSE_PARAM_MAP.count(pointerEvent->GetPointerAction()) > 0) {
+        result = TOUCH_TO_MOUSE_PARAM_MAP.at(pointerEvent->GetPointerAction());
+        pointerEvent->SetPointerAction(result);
+        pointerEvent->SetOriginPointerAction(result);
+    }
+
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return false;
+    }
+
+    if (TOUCH_TO_MOUSE_PARAM_MAP.count(pointerItem.GetToolType()) > 0) {
+        result = TOUCH_TO_MOUSE_PARAM_MAP.at(pointerItem.GetToolType());
+        pointerItem.SetToolType(result);
+    }
+
+    if (pointerItem.GetTargetWindowId() > 0) {
+        pointerItem.SetTargetWindowId(PointerEvent::POINTER_INITIAL_VALUE);
+    }
+
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    return true;
 }
 
 int32_t InputManager::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)

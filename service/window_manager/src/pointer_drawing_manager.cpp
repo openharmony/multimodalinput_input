@@ -179,7 +179,7 @@ void ScreenModeChangeListener::NotifyScreenModeChange(const std::vector<sptr<Ros
     }
     g_screenSourceMode.clear();
     for (auto screenInfo : screenInfos) {
-        MMI_HILOGI("insert current screenId:%{public}ld", static_cast<uint64_t>(screenInfo->GetScreenId()));
+        MMI_HILOGI("Insert current screenId:%{public}ld", static_cast<uint64_t>(screenInfo->GetScreenId()));
         g_screenSourceMode.emplace(screenInfo->GetScreenId(), screenInfo);
     }
     UpdateScreenModeChange();
@@ -226,6 +226,12 @@ void PointerDrawingManager::InitPointerCallback()
         MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
+    if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
+        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::DestroyPointerWindow()
@@ -273,7 +279,7 @@ static float GetFocusCoordinates()
 PointerDrawingManager::PointerDrawingManager()
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MMI_HILOGI("magiccurosr InitStyle");
+    MMI_HILOGI("The magiccurosr InitStyle");
     hasMagicCursor_.name = "isMagicCursor";
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -481,7 +487,7 @@ bool PointerDrawingManager::SetTraditionsHardWareCursorLocation(int32_t displayI
 
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {
-    MMI_HILOGI("force clear all pointer visiable status");
+    MMI_HILOGI("Force clear all pointer visiable status");
     pidInfos_.clear();
     UpdatePointerVisible();
 }
@@ -1563,7 +1569,7 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
         if (mouseDisplayState_) {
             InitLayer(MOUSE_ICON(lastMouseStyle_.id));
         }
-        MMI_HILOGI("state:%{public}s", state ? "true" : "false");
+        MMI_HILOGI("The state:%{public}s", state ? "true" : "false");
         UpdatePointerVisible();
     }
 }
@@ -1618,7 +1624,7 @@ void PointerDrawingManager::AttachToDisplay()
         && (screenId_ == FOLD_SCREEN_ID_FULL)) {
         screenId_ = FOLD_SCREEN_ID_MAIN;
     }
-    MMI_HILOGI("screenId_:%{public}" PRIu64"", screenId_);
+    MMI_HILOGI("The screenId_:%{public}" PRIu64"", screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
 }
 
@@ -2350,7 +2356,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     bool isHotPlug)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
+    MMI_HILOGD("The hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
         hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
@@ -2497,7 +2503,7 @@ bool PointerDrawingManager::IsPointerVisible()
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("g_isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
+    MMI_HILOGI("The g_isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
     if (g_isRsRemoteDied && surfaceNode_ != nullptr) {
         g_isRsRemoteDied = false;
         surfaceNode_->DetachToDisplay(screenId_);
@@ -2559,7 +2565,7 @@ void PointerDrawingManager::OnSessionLost(int32_t pid)
 
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
 {
-    MMI_HILOGI("pid:%{public}d,visible:%{public}s,priority:%{public}d,isHap:%{public}s", pid,
+    MMI_HILOGI("The pid:%{public}d,visible:%{public}s,priority:%{public}d,isHap:%{public}s", pid,
         visible ? "true" : "false", priority, isHap ? "true" : "false");
     if (isHap) {
         for (auto it = hapPidInfos_.begin(); it != hapPidInfos_.end(); ++it) {
@@ -2949,12 +2955,6 @@ void PointerDrawingManager::InitStyle()
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
     };
     CheckMouseIconPath();
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
-    if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
-        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::RotateDegree(Direction direction)
@@ -3078,7 +3078,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         surfaceNode_->DetachToDisplay(screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         screenId_ = static_cast<uint64_t>(displayId);
-        MMI_HILOGI("screenId_:%{public}" PRIu64, screenId_);
+        MMI_HILOGI("The screenId_:%{public}" PRIu64, screenId_);
         AttachToDisplay();
         DrawCursor(MOUSE_ICON(lastMouseStyle_.id));
         DrawHardwareCursor(MOUSE_ICON(lastMouseStyle_.id));

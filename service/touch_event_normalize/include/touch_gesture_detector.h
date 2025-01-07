@@ -60,6 +60,7 @@ public:
     bool OnTouchEvent(std::shared_ptr<PointerEvent> event);
     void AddGestureFingers(int32_t fingers);
     void RemoveGestureFingers(int32_t fingers);
+    void HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent);
 
     static bool IsPhysicalPointer(std::shared_ptr<PointerEvent> event);
 
@@ -102,6 +103,8 @@ private:
     double GetAngle(float startX, float startY, float endX, float endY);
     SlideState ClacFingerMoveDirection(std::shared_ptr<PointerEvent> event);
     void CheckGestureTrend(std::shared_ptr<PointerEvent> event) const;
+    bool IsLastTouchUp(std::shared_ptr<PointerEvent> event) const;
+    void OnGestureSendEvent(std::shared_ptr<PointerEvent> event) const;
 
 private:
     std::set<int32_t> fingers_;
@@ -110,6 +113,7 @@ private:
     bool gestureEnable_ { false };
     bool isFingerReady_ { false };
     bool haveLastDistance_ { false };
+    bool haveGestureWinEmerged_ { false };
     int32_t gestureDisplayId_ { INT32_MAX };
     int32_t continuousCloseCount_ { 0 };
     int32_t continuousOpenCount_ { 0 };

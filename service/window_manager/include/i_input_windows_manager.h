@@ -28,6 +28,9 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "struct_multimodal.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+#include "touch_gesture_manager.h"
+#endif // OHOS_BUILD_ENABLE_TOUCH
 #include "uds_server.h"
 #include "window_info.h"
 
@@ -168,6 +171,10 @@ public:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     virtual bool IsSupported() = 0;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    virtual void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr) = 0;
+    virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event) = 0;
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();

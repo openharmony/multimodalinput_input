@@ -330,6 +330,21 @@ public:
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
     /**
+     * @brief Convert mouse events to touch events.
+     * @param pointerEvent PointerEvent object.
+     * @return bool
+     * @since 9
+     */
+    bool TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
+        /**
+     * @brief Convert touch events to mouse events.
+     * @param pointerEvent PointerEvent object.
+     * @return bool
+     * @since 9
+     */
+    bool TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent> pointerEvent);
+
+    /**
      * @brief Starts listening for an input device event.
      * @param type Indicates the type of the input device event, which is <b>change</b>.
      * @param listener Indicates the listener for the input device event.

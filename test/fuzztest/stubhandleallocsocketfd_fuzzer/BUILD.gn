@@ -41,6 +41,7 @@ ohos_fuzztest("StubHandleAllocSocketFdFuzzTest") {
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
+    "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/common/anco/comm/include",
   ]

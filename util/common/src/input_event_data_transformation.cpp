@@ -309,6 +309,7 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
     }
     pkt << event->GetVelocity();
     pkt << event->GetAxisEventType();
+    pkt << event->GetHandOption();
 }
 
 void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
@@ -341,6 +342,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     pkt >> type;
     event->SetHandlerEventType(type);
     SetAxisInfo(pkt, event);
+    pkt >> tField;
+    event->SetHandOption(tField);
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;

@@ -72,7 +72,7 @@ int32_t LongPressEventSubscribeManager::SubscribeLongPressEvent(
         subscribeInfos_.erase(subscribeId);
         return INVALID_SUBSCRIBE_ID;
     }
-    MMI_HILOGI("subscribeId:%{public}d, fingerCount:%{public}d, duration:%{public}d", subscribeId,
+    MMI_HILOGI("The subscribeId:%{public}d, fingerCount:%{public}d, duration:%{public}d", subscribeId,
         longPressRequest.fingerCount, longPressRequest.duration);
     return subscribeId;
 }

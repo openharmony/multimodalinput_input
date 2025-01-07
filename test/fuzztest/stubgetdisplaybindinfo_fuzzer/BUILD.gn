@@ -41,6 +41,7 @@ ohos_fuzztest("StubGetDisplayBindInfoFuzzTest") {
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
+    "${mmi_path}/service/touch_event_normalize/include",
   ]
   cflags = [
     "-g",
