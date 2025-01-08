@@ -347,6 +347,8 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
+    int32_t ShiftAppMousePointerEvent(std::optional<WindowInfo> &sourceWindowInfo,
+        std::optional<WindowInfo> &targetWindowInfo, bool autoGenDown);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool CancelTouch(int32_t touch);
