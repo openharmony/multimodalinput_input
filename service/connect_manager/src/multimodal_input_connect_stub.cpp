@@ -491,8 +491,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
     MMI_HILOGD("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    if (req->data.clientName.empty())
-    {
+    if (req->data.clientName.empty()){
         MMI_HILOGE("Invalid clientName:empty");
         return RET_ERR;
     }
@@ -617,8 +616,7 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
-    if(focusX > pixelMap->GetWidth() || focusY > pixelMap->GetHeight() || focusX < 0 || focusY < 0)
-    {
+    if(focusX > pixelMap->GetWidth() || focusY > pixelMap->GetHeight() || focusX < 0 || focusY < 0) {
         MMI_HILOGE("Invalid focusX or focusY, focusX:%{public}d, focusY:%{public}d", focusX, focusY);
         return RET_ERR;
     }
@@ -890,8 +888,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
     READBOOL(data, visible, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t priority = 0;
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (priority < 0)
-    {
+    if (priority < 0){
         MMI_HILOGE("Invalid priority:%{public}d", priority);
         return RET_ERR;
     }
@@ -1080,8 +1077,7 @@ int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& d
     int32_t pid = GetCallingPid();
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
-    if (windowId <= 0)
-    {
+    if (windowId <= 0) {
         MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
     }
@@ -1125,8 +1121,7 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
     CALL_DEBUG_ENTER;
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (deviceId < 0)
-    {
+    if (deviceId < 0) {
         MMI_HILOGE("invalid deviceId :%{public}d", deviceId);
         return RET_ERR;
     }
@@ -1229,8 +1224,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (deviceId < 0)
-    {
+    if (deviceId < 0) {
         MMI_HILOGE("invalid deviceId :%{public}d", deviceId);
         return RET_ERR;
     }
@@ -1899,8 +1893,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data,
     bool isCaptureMode = false;
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, isCaptureMode, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (windowId <= 0)
-    {
+    if (windowId <= 0) {
         MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
     }
@@ -1920,7 +1913,7 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
     }
 
     int32_t windowId = 0;
-    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);    
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = GetWindowPid(windowId);
     if (ret == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
@@ -1959,15 +1952,14 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
     READINT32(data, extraData.pullId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.eventId, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, extraData.drawCursor, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (extraData.sourceType != InputEvent::SOURCE_TYPE_TOUCHSCREEN && extraData.sourceType != InputEvent::SOURCE_TYPE_MOUSE)
-    {
+    if (extraData.sourceType != InputEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        extraData.sourceType != InputEvent::SOURCE_TYPE_MOUSE){
         MMI_HILOGE("Invalid extraData.sourceType:%{public}d", extraData.sourceType);
         return RET_ERR;
     }
-    if (extraData.pointerId < 0 || extraData.pullId < 0 || extraData.eventId < 0)
-    {
-        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, sourceType:%{public}d, pullId:%{public}d, eventId:%{public}d", 
-        extraData.sourceType, extraData.pullId, extraData.eventId);
+    if (extraData.pointerId < 0 || extraData.pullId < 0 || extraData.eventId < 0){
+        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, sourceType:%{public}d, pullId:%{public}d,
+            eventId:%{public}d", extraData.sourceType, extraData.pullId, extraData.eventId);
         return RET_ERR;
     }
     
@@ -2377,8 +2369,8 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadRightClickType(MessageParcel&
 
     int32_t type = 1;
     READINT32(data, type, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (type != TOUCHPAD_RIGHT_BUTTON && type != TOUCHPAD_LEFT_BUTTON && type != TOUCHPAD_TWO_FINGER_TAP)
-    {
+    if (type != RightClickType::TOUCHPAD_RIGHT_BUTTON && type != RightClickType::TOUCHPAD_LEFT_BUTTON &&
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP) {
         MMI_HILOGE("Invalid type:%{public}d", type);
         return RET_ERR;
     }
@@ -2660,8 +2652,7 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
         READINT64(data, value);
         pattern.push_back(value);
     }
-    if (number < 0)
-    {
+    if (number < 0){
         MMI_HILOGE("Transmit infrared number is invalid");
         return false;
     }
@@ -2934,12 +2925,11 @@ int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& 
     }
     int32_t deviceId { -1 };
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (deviceId < 0)
-    {
+    if (deviceId < 0) {
         MMI_HILOGE("invalid deviceId :%{public}d", deviceId);
         return RET_ERR;
     }
-    int32_t ret = RemoveVirtualInputDevice(deviceId);    
+    int32_t ret = RemoveVirtualInputDevice(deviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("RemoveVirtualInputDevice failed");
         return ret;
@@ -3026,8 +3016,7 @@ int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, Messa
     int32_t pid = GetCallingPid();
     uint64_t readThreadId = 0;
     READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (readThreadId < 0)
-    {
+    if (readThreadId < 0){
         MMI_HILOGE("invalid readThreadId :%{public}llu", readThreadId);
         return RET_ERR;
     }
@@ -3092,8 +3081,7 @@ int32_t MultimodalInputConnectStub::StubSetInputDeviceInputEnable(MessageParcel&
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, index, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (deviceId < 0)
-    {
+    if (deviceId < 0) {
         MMI_HILOGE("invalid deviceId :%{public}d", deviceId);
         return RET_ERR;
     }
@@ -3120,9 +3108,9 @@ int32_t MultimodalInputConnectStub::StubShiftAppPointerEvent(MessageParcel& data
     READINT32(data, sourceWindowId, ERR_INVALID_VALUE);
     int32_t targetWindowId = -1;
     READINT32(data, targetWindowId, ERR_INVALID_VALUE);
-    if (sourceWindowId <= 0 || targetWindowId <= 0)
-    {
-        MMI_HILOGE("Invalid sourceWindowId or targetWindowId,sourceWindowId:%{public}d, targetWindowId:%{public}d", sourceWindowId, targetWindowId);
+    if (sourceWindowId <= 0 || targetWindowId <= 0){
+        MMI_HILOGE("Invalid sourceWindowId or targetWindowId,sourceWindowId:%{public}d, targetWindowId:%{public}d",
+            sourceWindowId, targetWindowId);
         return RET_ERR;
     }
     
