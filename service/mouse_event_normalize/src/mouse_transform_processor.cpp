@@ -268,7 +268,7 @@ void MouseTransformProcessor::DeletePressedButton(uint32_t originButton)
     }
 }
 
-int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t button,
+int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t& button,
     int32_t type)
 {
     CALL_DEBUG_ENTER;
@@ -286,8 +286,10 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     if (type == LIBINPUT_EVENT_POINTER_BUTTON && primaryButton == RIGHT_BUTTON) {
         if (buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
             buttonId = PointerEvent::MOUSE_BUTTON_RIGHT;
+            button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
         } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
             buttonId = PointerEvent::MOUSE_BUTTON_LEFT;
+            button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
         } else {
             MMI_HILOGD("The buttonId does not switch");
         }
