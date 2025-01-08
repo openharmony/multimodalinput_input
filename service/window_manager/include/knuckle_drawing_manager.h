@@ -74,6 +74,7 @@ private:
     uint32_t DrawTrackColorPink(int32_t pathValue);
     uint32_t DrawTrackColorOrangeRed(int32_t pathValue);
     uint32_t DrawTrackColorYellow(int32_t pathValue);
+    int32_t ProcessUpEvent(bool isNeedUpAnimation);
 #else
     void CreateCanvasNode();
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
@@ -92,6 +93,7 @@ private:
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     bool isActionUp_ { false };
+    bool isNeedInitParticleEmitter_ { true };
     PointerInfo lastDownPointer_ {};
     int64_t lastUpTime_ { 0 };
     bool isRotate_ { false };
