@@ -164,6 +164,7 @@ enum MOUSE_ICON {
     RUNNING_LEFT = 45,
     RUNNING_RIGHT = 46,
     DEVELOPER_DEFINED_ICON = -100,
+    TRANSPARENT_ICON = -101,
 };
 
 enum RightClickType {

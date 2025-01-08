@@ -204,7 +204,11 @@ ohos_shared_library("libmmi-server") {
         "touch_event_normalize/src/touchpad_transform_processor.cpp",
       ]
       if (input_feature_pointer_drawing) {
-        sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
+        sources += [
+          "window_manager/src/pointer_drawing_manager.cpp",
+          "window_manager/src/pointer_renderer.cpp",
+          "window_manager/src/screen_pointer.cpp",
+        ]
       } else {
         sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
       }
@@ -1263,6 +1267,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
