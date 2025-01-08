@@ -110,7 +110,7 @@ int32_t SwitchSubscriberHandler::UnsubscribeSwitchEvent(SessionPtr sess, int32_t
 bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent> switchEvent)
 {
     CHKPF(switchEvent);
-    MMI_HILOGI("switchValue:%{public}d", switchEvent->GetSwitchValue());
+    MMI_HILOGI("The switchValue:%{public}d", switchEvent->GetSwitchValue());
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
         DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
     }
@@ -120,7 +120,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
         if (subscriber->switchType_ == switchEvent->GetSwitchType() ||
             (subscriber->switchType_ == SwitchEvent::SwitchType::SWITCH_DEFAULT &&
                 switchEvent->GetSwitchType() != SwitchEvent::SwitchType::SWITCH_PRIVACY)) {
-            MMI_HILOGI("subscriber:%{public}d", subscriber->sess_->GetPid());
+            MMI_HILOGI("The subscriber:%{public}d", subscriber->sess_->GetPid());
             NotifySubscriber(switchEvent, subscriber);
             handled = true;
         }

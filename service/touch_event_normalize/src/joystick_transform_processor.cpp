@@ -74,7 +74,7 @@ bool JoystickTransformProcessor::OnEventJoystickButton(struct libinput_event* ev
         MMI_HILOGE("Unknown state, state:%{public}u", state);
         return false;
     }
-    MMI_HILOGD("button:%{public}u, buttonId:%{public}d, state:%{public}d", button, buttonId, state);
+    MMI_HILOGD("The button:%{public}u, buttonId:%{public}d, state:%{public}d", button, buttonId, state);
     return true;
 }
 

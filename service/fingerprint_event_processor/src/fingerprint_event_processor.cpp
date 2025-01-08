@@ -172,7 +172,7 @@ bool FingerprintEventProcessor::CheckMisTouchState()
 bool FingerprintEventProcessor::CheckScreenMisTouchState()
 {
     int32_t flag = screenMissTouchFlag_ ? 1 : 0;
-    MMI_HILOGI("screenMissTouchFlag_ is %{public}d", flag);
+    MMI_HILOGI("The screenMissTouchFlag_ is %{public}d", flag);
     return screenMissTouchFlag_;
 }
  
@@ -277,7 +277,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
         case FINGERPRINT_CODE_CANCEL: {
             cancelState_ = true;
             ChangeScreenMissTouchFlag(screenState_, cancelState_);
-            MMI_HILOGI("change cancel state and dont send point event");
+            MMI_HILOGI("Change cancel state and dont send point event");
             return RET_OK;
         }
         case FINGERPRINT_CODE_UP: {
@@ -311,7 +311,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGI("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
     if (CheckMisTouchState()) {
-        MMI_HILOGD("in mistouch state, dont report event");
+        MMI_HILOGD("In mistouch state, dont report event");
         return ERR_OK;
     }
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -342,7 +342,7 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGI("Fingerprint key:%{public}d, ux:%f, uy:%f", pointerEvent->GetPointerAction(), ux, uy);
     if (CheckMisTouchState()) {
-        MMI_HILOGD("in mistouch state, dont report event");
+        MMI_HILOGD("In mistouch state, dont report event");
         return ERR_OK;
     }
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
