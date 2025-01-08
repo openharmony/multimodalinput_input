@@ -1136,8 +1136,8 @@ type:%{private}d",
                 libinput_event_destroy(event);
             }
         } else if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
-			struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
-			if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED
+            struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
+            if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED
 			   && libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK) {
                   std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
                 if (keyEvent != nullptr) {
