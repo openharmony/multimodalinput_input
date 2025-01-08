@@ -253,7 +253,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     auto eventData = std::make_shared<mmi_epoll_event>();
     eventData->fd = fd;
     eventData->event_type = type;
-    MMI_HILOGI("userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
+    MMI_HILOGI("The userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -597,7 +597,7 @@ int32_t MMIService::RemoveInputEventFilter(int32_t filterId)
 void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
-    MMI_HILOGI("fd:%{public}d", s->GetFd());
+    MMI_HILOGI("Get fd:%{public}d", s->GetFd());
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (s->GetProgramName() != SHELL_ASSISTANT) {
         return;
@@ -1694,7 +1694,7 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGI("systemAbilityId is %{public}d", systemAbilityId);
+    MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);
 #if defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         OnAddResSchedSystemAbility(systemAbilityId, deviceId);
@@ -2138,7 +2138,7 @@ void MMIService::SetMmiServicePriority()
     if (schRet != 0) {
         MMI_HILOGE("mmi_service Couldn't set SCHED_FIFO, schRet:%{public}d", schRet);
     } else {
-        MMI_HILOGI("mmi_service set SCHED_FIFO succeed, schRet:%{public}d", schRet);
+        MMI_HILOGI("The mmi_service set SCHED_FIFO succeed, schRet:%{public}d", schRet);
     }
 }
 #endif // OHOS_BUILD_PC_PRIORITY

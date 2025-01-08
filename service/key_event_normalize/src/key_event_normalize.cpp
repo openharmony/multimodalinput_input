@@ -169,7 +169,7 @@ int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
     } else if (lastShieldMode_ != shieldMode) {
         MMI_HILOGI("Shield mode:%{public}d is already false", shieldMode);
     } else {
-        MMI_HILOGI("lastShieldMode_ unset");
+        MMI_HILOGI("The lastShieldMode_ unset");
         lastShieldMode_ = SHIELD_MODE::UNSET_MODE;
     }
     iter = shieldStatus_.find(shieldMode);

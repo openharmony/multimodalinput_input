@@ -99,7 +99,7 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
         return;
     }
     callState = eventData.GetWant().GetIntParam("state", -1);
-    MMI_HILOGI("state %{public}d", callState);
+    MMI_HILOGI("The state %{public}d", callState);
     if (hasHandleRingMute_ && (callState_ == CALL_STATUS_INCOMING || callState_ == CALL_STATUS_WAITING)) {
         MMI_HILOGI("Mute reply success");
         hasHandleRingMute_ = false;

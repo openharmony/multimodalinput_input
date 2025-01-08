@@ -120,7 +120,7 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         CalcAndStoreDistance(downPoint_);
     }
-    MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
+    MMI_HILOGI("The gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
         gestureType_, downPoint_.size(), (isFingerReady_ ? "true" : "false"), pointerId);
     movePoint_ = downPoint_;
 }
@@ -445,7 +445,7 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
             directions.insert(direction);
             ++recognizedCount;
         }
-        MMI_HILOGI("pointerId:%{public}d,angle:%{public}.2f,direction:%{public}d", pointerId, angle, direction);
+        MMI_HILOGI("The pointerId:%{public}d,angle:%{public}.2f,direction:%{public}d", pointerId, angle, direction);
     }
     if (recognizedCount < downPoint_.size() || directions.size() > MAXIMUM_SAME_DIRECTION_OFFSET) {
         return state;
@@ -609,7 +609,7 @@ GestureMode TouchGestureDetector::JudgeOperationMode(std::map<int32_t, Point> &m
             ++openCount;
         }
         tempDistance.emplace(pointerId, currentDistance);
-        MMI_HILOGI("pointerId:%{public}d,lastDistance:%{public}.2f,"
+        MMI_HILOGI("The pointerId:%{public}d,lastDistance:%{public}.2f,"
             "currentDistance:%{public}.2f,closeCount:%{public}d,openCount:%{public}d",
             pointerId, lastDistance, currentDistance, closeCount, openCount);
     }

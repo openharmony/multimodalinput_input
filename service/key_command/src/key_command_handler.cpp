@@ -369,7 +369,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 
     lastPointerDownTime_[id] = currentDownTime;
     auto items = touchEvent->GetAllPointerItems();
-    MMI_HILOGI("itemsSize:%{public}zu", items.size());
+    MMI_HILOGI("The itemsSize:%{public}zu", items.size());
     for (const auto &item : items) {
         if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
             MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
@@ -896,7 +896,7 @@ void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
         ability.abilityName = WAKEUP_ABILITY_NAME;
         ability.bundleName = AIBASE_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
-        MMI_HILOGI("isStartBase_:%{public}d, sessionKey_:%{public}s", isStartBase_, sessionKey_.c_str());
+        MMI_HILOGI("The isStartBase_:%{public}d, sessionKey_:%{public}s", isStartBase_, sessionKey_.c_str());
         if (!isStartBase_) {
             ability.params.emplace(std::make_pair("fingerPath", ""));
             ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture_pre"));
@@ -1164,12 +1164,12 @@ void KeyCommandHandler::Print()
     MMI_HILOGI("ShortcutKey count:%{public}zu", shortcutKeys_.size());
     int32_t row = 0;
     for (const auto &item : shortcutKeys_) {
-        MMI_HILOGI("row:%{public}d", row++);
+        MMI_HILOGI("The row:%{public}d", row++);
         auto &shortcutKey = item.second;
         for (const auto &prekey : shortcutKey.preKeys) {
-            MMI_HILOGI("preKey:%d", prekey);
+            MMI_HILOGI("The preKey:%d", prekey);
         }
-        MMI_HILOGI("finalKey:%d, keyDownDuration:%{public}d, triggerType:%{public}d,"
+        MMI_HILOGI("The finalKey:%d, keyDownDuration:%{public}d, triggerType:%{public}d,"
                    " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
                    shortcutKey.keyDownDuration, shortcutKey.triggerType,
                    shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
@@ -1190,12 +1190,12 @@ void KeyCommandHandler::PrintSeq()
     MMI_HILOGI("Sequences count:%{public}zu", sequences_.size());
     int32_t row = 0;
     for (const auto &item : sequences_) {
-        MMI_HILOGI("row:%{public}d", row++);
+        MMI_HILOGI("The row:%{public}d", row++);
         for (const auto& sequenceKey : item.sequenceKeys) {
-            MMI_HILOGI("keyCode:%d, keyAction:%{public}d, delay:%{public}" PRId64,
+            MMI_HILOGI("The keyCode:%d, keyAction:%{public}d, delay:%{public}" PRId64,
                        sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
         }
-        MMI_HILOGI("bundleName:%{public}s, abilityName:%{public}s",
+        MMI_HILOGI("Ability bundleName:%{public}s, abilityName:%{public}s",
                    item.ability.bundleName.c_str(), item.ability.abilityName.c_str());
     }
 }
@@ -1620,7 +1620,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     }
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
         (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
-        MMI_HILOGI("isDownStart:%{public}d", isDownStart_);
+        MMI_HILOGI("The isDownStart:%{public}d", isDownStart_);
         if (isDownStart_) {
             HandleSpecialKeys(keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         }
@@ -2025,7 +2025,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
     MarkActiveSequence(false);
     if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        MMI_HILOGI("screen locked, remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
+        MMI_HILOGI("Screen locked, remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
         matchedSequence_.timerId = -1;
     }
@@ -2157,7 +2157,7 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
 {
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    MMI_HILOGI("screenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("The screenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     std::string bundleName = sequence.ability.bundleName;
     std::string matchName = ".screenshot";
     if (bundleName.find(matchName) != std::string::npos) {
@@ -2284,7 +2284,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     auto handler = InputHandler->GetSubscriberHandler();
     CHKPF(handler);
     if (handler->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
-        MMI_HILOGI("current shortcutKey %d is subSubcribed", shortcutKey.finalKey);
+        MMI_HILOGI("Current shortcutKey %d is subSubcribed", shortcutKey.finalKey);
         return false;
     }
     return true;
@@ -2314,7 +2314,7 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     }
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
-    MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
+    MMI_HILOGI("The upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
 
     if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * FREQUENCY) {
@@ -2333,7 +2333,7 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_HILOGI("timerId:%{public}d", timerId);
+    MMI_HILOGI("The timerId:%{public}d", timerId);
     return false;
 }
 

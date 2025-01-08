@@ -271,7 +271,7 @@ void TouchDrawingManager::CreateObserver()
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
             GetBoolValue(pointerPositionSwitchName, pointerMode_.isShow);
     }
-    MMI_HILOGD("bubbleMode_:%{public}d, pointerMode_:%{public}d", bubbleMode_.isShow, pointerMode_.isShow);
+    MMI_HILOGD("The bubbleMode_:%{public}d, pointerMode_:%{public}d", bubbleMode_.isShow, pointerMode_.isShow);
 }
 
 template <class T>
@@ -287,7 +287,7 @@ void TouchDrawingManager::CreateBubbleObserver(T &item)
         }
         CHKPV(delegateProxy_);
         delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateBubbleData, this));
-        MMI_HILOGI("key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
+        MMI_HILOGI("The key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.SwitchName, updateFunc);
@@ -314,7 +314,7 @@ void TouchDrawingManager::CreatePointerObserver(T &item)
         }
         CHKPV(delegateProxy_);
         delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateLabels, this));
-        MMI_HILOGI("key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
+        MMI_HILOGI("The key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.SwitchName, updateFunc);
@@ -493,8 +493,8 @@ void TouchDrawingManager::DrawBubble()
         if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
             pointerEvent_->GetPointerId() == pointerId) {
             MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{private}d,"
-                " physicalY:%{private}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
-                displayXY.first, displayXY.second);
+                " physicalY:%{private}d, width:%{public}d, height:%{public}d", pointerEvent_->GetPointerAction(),
+                pointerEvent_->GetPointerId(), displayXY.first, displayXY.second, scaleW_, scaleH_);
         }
     }
     bubbleCanvasNode_->FinishRecording();
