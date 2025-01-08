@@ -80,7 +80,10 @@ if (is_arkui_x) {
   ohos_source_set("libmmi-client-crossplatform") {
     sources = libmmi_common_sources
     public_configs = [ ":libmmi_public_client_config" ]
-    include_dirs = [ "${c_utils_root}/base/include" ]
+    include_dirs = [
+      "${c_utils_root}/base/include",
+      "${mmi_path}/frameworks/proxy/events/include",
+    ]
 
     if (target_os == "android") {
       defines += [ "ANDROID_PLATFORM" ]
