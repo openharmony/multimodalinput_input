@@ -53,15 +53,15 @@ private:
     int32_t ProcessRotateGesture(int32_t argc, char *argv[]);
     int32_t ProcessTouchPadFingerAction(int32_t argc, char *argv[]);
     int32_t ActionEvent(int32_t fingerCount);
-    int32_t ProcessKeyboardTextInput(char *optarg, int32_t count);
-    int32_t PrintKeyboardTextChar(int32_t keyCode, bool isPressShift);
-    bool IsSpecialChar(char character, int32_t &keyCode, bool &isPressShift);
     int32_t ProcessTouchPadFingerSwipe(int32_t argc, char *argv[]);
     int32_t SwipeActionEvent(int32_t startX, int32_t startY, int32_t endX, int32_t endY);
     void SendTouchDownForPinch(int32_t topX, int32_t topY, int32_t bottomX, int32_t bottomY);
     std::shared_ptr<PointerEvent> CreateEvent(int32_t id, int32_t type, int32_t pId, int32_t srcType, int32_t finCount);
     void FillPointerItem(PointerEvent::PointerItem &itemFirst, int32_t pointX, int32_t pointY, int32_t id, bool press);
     int32_t ActionPinchEvent(int32_t centerX, int32_t centerY, int32_t scalePercentNumerator);
+    int32_t ProcessKeyboardTextInput(char *optarg, int32_t count);
+    int32_t PrintKeyboardTextChar(int32_t keyCode, bool isPressShift);
+    bool IsSpecialChar(char character, int32_t &keyCode, bool &isPressShift);
 };
 } // namespace MMI
 } // namespace OHOS
