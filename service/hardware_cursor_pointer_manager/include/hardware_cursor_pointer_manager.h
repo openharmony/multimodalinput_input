@@ -32,7 +32,7 @@ public:
     void SetTargetDevice(uint32_t devId);
     void SetHdiServiceState(bool hdiServiceState);
     bool IsSupported();
-    int32_t SetPosition(int32_t x, int32_t y, BufferHandle* buffer);
+    int32_t SetPosition(uint32_t devId, int32_t x, int32_t y, BufferHandle* buffer);
     int32_t EnableStats(bool enable);
     int32_t GetCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 private:

@@ -64,6 +64,7 @@
         "eventhandler",
         "image_framework",
         "graphic_2d",
+        "graphic_surface",
         "drivers_interface_input",
         "drivers_interface_display",
         "safwk",

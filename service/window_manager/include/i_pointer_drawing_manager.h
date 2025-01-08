@@ -157,6 +157,7 @@ public:
     virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
     virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
+    virtual void SubscribeScreenModeChange() {}
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     virtual bool IsSupported()
     {
