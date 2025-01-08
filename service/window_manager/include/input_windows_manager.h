@@ -210,7 +210,7 @@ private:
     void UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
-    void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
+    void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height, bool isRealData);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

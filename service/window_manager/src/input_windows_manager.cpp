@@ -3682,14 +3682,15 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
     }
 }
 
-void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height)
+void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height,
+    bool isRealData)
 {
     if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
         if (displayInfo->direction == DIRECTION0 || displayInfo->direction == DIRECTION180) {
             width = displayInfo->width;
             height = displayInfo->height;
         } else {
-            if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || !isRealData) {
                 width = displayInfo->width;
                 height = displayInfo->height;
                 return;
@@ -3768,7 +3769,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
     int32_t width = 0;
     int32_t height = 0;
-    GetWidthAndHeight(displayInfo, width, height);
+    GetWidthAndHeight(displayInfo, width, height, isRealData);
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
