@@ -30,6 +30,7 @@
 #include "param_wrapper.h"
 #include "util.h"
 #include "input_device_manager.h"
+#include "key_event_normalize.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -63,6 +64,7 @@ constexpr uint32_t VKEY_TP_AXES_ZERO { 0 };
 constexpr uint32_t VKEY_TP_AXES_ONE { 1 };
 constexpr uint32_t VKEY_TP_AXES_TWO { 2 };
 constexpr double VTP_SCALE_AND_ANGLE_FACTOR { 1000.0 };
+constexpr uint32_t KEY_CAPSLOCK { 58 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
@@ -262,6 +264,17 @@ void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCod
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     libinput_event_keyboard* key_event_pressed =
             libinput_create_keyboard_event(touch, keyCode, state);
+
+    if (keyCode == KEY_CAPSLOCK && state == libinput_key_state::LIBINPUT_KEY_STATE_PRESSED) {
+        struct libinput_device * device = INPUT_DEV_MGR->GetKeyboardDevice();
+        if (device != nullptr) {
+            std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+            bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+
+            DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+            keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+        }
+    }
 
     funInputEvent_((libinput_event*)key_event_pressed, frameTime);
     free(key_event_pressed);
@@ -992,7 +1005,6 @@ void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event_type eventType
 {
     MMI_HILOGD("Hardware keyboard key event detected");
     if (hardwareKeyEventDetected_ == nullptr) {
-        MMI_HILOGE("HardwareKeyEventDetected is nullptr");
         return;
     }
     if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
@@ -1122,9 +1134,39 @@ type:%{private}d",
                 libinput_event_destroy(event);
             }
         } else {
-            HandleHWKeyEventForVKeyboard(eventType);
-            funInputEvent_(event, frameTime);
-            libinput_event_destroy(event);
+            if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
+                struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
+
+                if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED
+                   && libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK) {
+
+                    std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+                    bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+
+                    libinput_device* device = libinput_event_get_device(event);
+                    int libinputCaps = libinput_get_funckey_state(device, MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+
+                    HandleHWKeyEventForVKeyboard(eventType);
+                    funInputEvent_(event, frameTime);
+                    libinput_event_destroy(event);
+
+                    DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
+                    
+                    keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
+                    bool newCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+
+                    libinput_toggle_caps_key();
+
+                } else {
+                    HandleHWKeyEventForVKeyboard(eventType);
+                    funInputEvent_(event, frameTime);
+                    libinput_event_destroy(event);
+                }
+            } else {
+                HandleHWKeyEventForVKeyboard(eventType);
+                funInputEvent_(event, frameTime);
+                libinput_event_destroy(event);
+            }
         }
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
         funInputEvent_(event, frameTime);
