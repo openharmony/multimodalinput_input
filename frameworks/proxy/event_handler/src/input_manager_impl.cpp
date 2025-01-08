@@ -53,6 +53,9 @@ constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
 constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
 constexpr int32_t INVALID_KEY_ACTION { -1 };
 constexpr int32_t MAX_WINDOW_SIZE { 15 };
+constexpr int32_t INPUT_SUCCESS { 0 };
+constexpr int32_t INPUT_PERMISSION_DENIED { 201 };
+[[ maybe_unused ]] constexpr int32_t INPUT_OCCUPIED_BY_OTHER { 4200003 };
 const std::map<int32_t, int32_t> g_keyActionMap = {
     {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
     {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
@@ -959,11 +962,11 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
     }
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
+int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    CHKPV(pointerEvent);
+    CHKPR(pointerEvent, RET_ERR);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
@@ -977,25 +980,27 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
         MMI_HILOGW("Pointer device does not support");
-        return;
+        return INPUT_OCCUPIED_BY_OTHER;
 #endif
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
 #ifndef OHOS_BUILD_ENABLE_TOUCH
         MMI_HILOGW("Touchscreen device does not support");
-        return;
+        return INPUT_OCCUPIED_BY_OTHER;
 #endif
     }
 #ifndef OHOS_BUILD_ENABLE_JOYSTICK
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
         MMI_HILOGW("Joystick device does not support");
-        return;
+        return INPUT_OCCUPIED_BY_OTHER;
     }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
     HandleSimulateInputEvent(pointerEvent);
     if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
+        return INPUT_PERMISSION_DENIED;
     }
+    return INPUT_SUCCESS;
 #else
     MMI_HILOGW("Pointer and touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
