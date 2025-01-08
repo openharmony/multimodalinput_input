@@ -340,6 +340,15 @@ struct WindowInfo {
  *
  * @since 9
  */
+enum class ScreenCombination : uint32_t {
+    SCREEN_ALONE,
+    SCREEN_EXPAND,
+    SCREEN_MIRROR,
+    SCREEN_UNIQUE,
+    SCREEN_EXTEND,
+    SCREEN_MAIN
+};
+
 struct DisplayInfo {
     /**
      * Unique ID of the physical display
@@ -431,6 +440,17 @@ struct DisplayInfo {
     int32_t offsetX = 0;
     int32_t offsetY = 0;
     float ppi;
+
+    /**
+     * Use for off screen policy
+     *
+     * @since 12
+     */
+    bool isCurrentOffScreenRendering = false;
+    int32_t screenRealWidth = 0;
+    int32_t screenRealHeight = 0;
+    float screenRealPPI = 0.0f;
+    ScreenCombination screenCombination = ScreenCombination::SCREEN_MAIN;
 };
 
 /**
