@@ -25,7 +25,17 @@
 namespace OHOS {
 namespace MMI {
 class KeyEventNormalize final {
+    enum class VolumeSwapConfig {
+        NO_CONFIG,
+        NO_VOLUME_SWAP,
+        SWAP_ON_FOLD,
+    };
+
+    struct InputProductConfig {
+        VolumeSwapConfig volumeSwap_ { VolumeSwapConfig::NO_CONFIG };
+    };
     DECLARE_DELAYED_SINGLETON(KeyEventNormalize);
+
 public:
     DISALLOW_COPY_AND_MOVE(KeyEventNormalize);
     std::shared_ptr<KeyEvent> GetKeyEvent();
@@ -37,6 +47,9 @@ public:
     int32_t GetCurrentShieldMode();
 
 private:
+    void ReadProductConfig(InputProductConfig &config) const;
+    void ReadProductConfig(const std::string &cfgPath, InputProductConfig &config) const;
+    void CheckProductParam(InputProductConfig &productConfig) const;
     int32_t TransformVolumeKey(struct libinput_device *dev, int32_t keyCode, int32_t keyAction) const;
     void HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item, std::shared_ptr<KeyEvent> keyEvent);
 

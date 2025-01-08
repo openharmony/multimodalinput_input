@@ -71,7 +71,8 @@ bool TouchGestureDetector::OnTouchEvent(std::shared_ptr<PointerEvent> event)
             break;
         }
         case PointerEvent::POINTER_ACTION_UP:
-        case PointerEvent::POINTER_ACTION_CANCEL: {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
             HandleUpEvent(event);
             break;
         }
