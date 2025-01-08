@@ -46,6 +46,8 @@ constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
+constexpr int32_t MAX_SPEED { 20 };
+constexpr int32_t MIN_SPEED { 1 };
 
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
@@ -489,7 +491,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
     MMI_HILOGD("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    if (req->data.clientName.c_str().empty())
+    if (req->data.clientName.empty())
     {
         MMI_HILOGE("Invalid clientName:empty");
         return RET_ERR;
@@ -1846,7 +1848,7 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
     bool enable { false };
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (funcKey != NUM_LOCK_FUNCTION_KEY && funcKey != CAPS_LOCK_FUNCTION_KEY && funcKey != SCROLL_LOCK_FUNCTION_KEY)
+    if (funcKey != KeyEvent::NUM_LOCK_FUNCTION_KEY && funcKey != KeyEvent::CAPS_LOCK_FUNCTION_KEY && funcKey != KeyEvent::SCROLL_LOCK_FUNCTION_KEY)
     {
         MMI_HILOGE("Invalid funcKey:%{public}d", funcKey);
         return RET_ERR;
@@ -3026,7 +3028,7 @@ int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, Messa
     READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
     if (readThreadId < 0)
     {
-        MMI_HILOGE("invalid readThreadId :%{public}d", readThreadId);
+        MMI_HILOGE("invalid readThreadId :%{public}llu", readThreadId);
         return RET_ERR;
     }
     int32_t ret = SetClientInfo(pid, readThreadId);
