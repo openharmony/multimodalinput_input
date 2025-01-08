@@ -269,10 +269,12 @@ void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCod
         struct libinput_device* device = INPUT_DEV_MGR->GetKeyboardDevice();
         if (device != nullptr) {
             std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
-            bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+			if (keyEvent != nullptr) {
+                bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
 
-            DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
-            keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+                DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+                keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+			}
         }
     }
 
@@ -1139,19 +1141,25 @@ type:%{private}d",
                 if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED
                    && libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK) {
                     std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
-                    bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
-                    libinput_device* device = libinput_event_get_device(event);
-                    int libinputCaps = libinput_get_funckey_state(device, MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+					if (keyEvent != nullptr) {
+                        bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+                        libinput_device* device = libinput_event_get_device(event);
+                        int libinputCaps = libinput_get_funckey_state(device, MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
 
-                    HandleHWKeyEventForVKeyboard(eventType);
-                    funInputEvent_(event, frameTime);
-                    libinput_event_destroy(event);
-                    DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
+                        HandleHWKeyEventForVKeyboard(eventType);
+                        funInputEvent_(event, frameTime);
+                        libinput_event_destroy(event);
+                        DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
                     
-                    keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
-                    bool newCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+                        keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
+                        bool newCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
 
-                    libinput_toggle_caps_key();
+                        libinput_toggle_caps_key();
+					} else {
+						HandleHWKeyEventForVKeyboard(eventType);
+                        funInputEvent_(event, frameTime);
+                        libinput_event_destroy(event);
+					}
                 } else {
                     HandleHWKeyEventForVKeyboard(eventType);
                     funInputEvent_(event, frameTime);
