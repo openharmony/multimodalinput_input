@@ -1137,12 +1137,11 @@ type:%{private}d",
             }
         } else if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
             struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
-			std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+            std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
 
             if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED
 			   && libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK
 			   && keyEvent != nullptr) {
-                
                 bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
                 libinput_device* device = libinput_event_get_device(event);
                 int libinputCaps = libinput_get_funckey_state(device, MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
