@@ -497,6 +497,42 @@
             "finalKey": 3213,
             "longPressTime": 0,
             "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2698,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [2012],
+            "finalKey": 2698,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [2013],
+            "finalKey": 2699,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2699,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2657,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2675,
+            "longPressTime": 0,
+            "triggerType": "down"
         }
     ]
 }
