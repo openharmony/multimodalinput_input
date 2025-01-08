@@ -832,7 +832,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_11, TestSize.Level
     int32_t subscribeId = INVAID_VALUE;
     subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("[YKP] Subscribe key event KEYCODE_KEY_PEN_END_CLICK down trigger callback");
+        MMI_HILOGD("Subscribe key event KEYCODE_KEY_PEN_END_CLICK down trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     EXPECT_TRUE(subscribeId >= 0);
