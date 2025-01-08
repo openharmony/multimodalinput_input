@@ -491,7 +491,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
     MMI_HILOGD("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    if (req->data.clientName.empty()){
+    if (req->data.clientName.empty()) {
         MMI_HILOGE("Invalid clientName:empty");
         return RET_ERR;
     }
@@ -616,7 +616,7 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
-    if(focusX > pixelMap->GetWidth() || focusY > pixelMap->GetHeight() || focusX < 0 || focusY < 0) {
+    if (focusX > pixelMap->GetWidth() || focusY > pixelMap->GetHeight() || focusX < 0 || focusY < 0) {
         MMI_HILOGE("Invalid focusX or focusY, focusX:%{public}d, focusY:%{public}d", focusX, focusY);
         return RET_ERR;
     }
@@ -888,7 +888,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
     READBOOL(data, visible, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t priority = 0;
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (priority < 0){
+    if (priority < 0) {
         MMI_HILOGE("Invalid priority:%{public}d", priority);
         return RET_ERR;
     }
@@ -1842,8 +1842,8 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
     bool enable { false };
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (funcKey != KeyEvent::NUM_LOCK_FUNCTION_KEY && funcKey != KeyEvent::CAPS_LOCK_FUNCTION_KEY && funcKey != KeyEvent::SCROLL_LOCK_FUNCTION_KEY)
-    {
+    if (funcKey != KeyEvent::NUM_LOCK_FUNCTION_KEY && funcKey != KeyEvent::CAPS_LOCK_FUNCTION_KEY &&
+        funcKey != KeyEvent::SCROLL_LOCK_FUNCTION_KEY) {
         MMI_HILOGE("Invalid funcKey:%{public}d", funcKey);
         return RET_ERR;
     }
@@ -1953,13 +1953,13 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
     READINT32(data, extraData.eventId, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, extraData.drawCursor, IPC_PROXY_DEAD_OBJECT_ERR);
     if (extraData.sourceType != InputEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        extraData.sourceType != InputEvent::SOURCE_TYPE_MOUSE){
+        extraData.sourceType != InputEvent::SOURCE_TYPE_MOUSE) {
         MMI_HILOGE("Invalid extraData.sourceType:%{public}d", extraData.sourceType);
         return RET_ERR;
     }
-    if (extraData.pointerId < 0 || extraData.pullId < 0 || extraData.eventId < 0){
-        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, sourceType:%{public}d, pullId:%{public}d,
-            eventId:%{public}d", extraData.sourceType, extraData.pullId, extraData.eventId);
+    if (extraData.pointerId < 0 || extraData.pullId < 0 || extraData.eventId < 0) {
+        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, sourceType:%{public}d, pullId:%{public}d, eventId:%{public}d",
+            extraData.sourceType, extraData.pullId, extraData.eventId);
         return RET_ERR;
     }
     
@@ -2652,7 +2652,7 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
         READINT64(data, value);
         pattern.push_back(value);
     }
-    if (number < 0){
+    if (number < 0) {
         MMI_HILOGE("Transmit infrared number is invalid");
         return false;
     }
@@ -3016,7 +3016,7 @@ int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, Messa
     int32_t pid = GetCallingPid();
     uint64_t readThreadId = 0;
     READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (readThreadId < 0){
+    if (readThreadId < 0) {
         MMI_HILOGE("invalid readThreadId :%{public}llu", readThreadId);
         return RET_ERR;
     }
@@ -3108,7 +3108,7 @@ int32_t MultimodalInputConnectStub::StubShiftAppPointerEvent(MessageParcel& data
     READINT32(data, sourceWindowId, ERR_INVALID_VALUE);
     int32_t targetWindowId = -1;
     READINT32(data, targetWindowId, ERR_INVALID_VALUE);
-    if (sourceWindowId <= 0 || targetWindowId <= 0){
+    if (sourceWindowId <= 0 || targetWindowId <= 0) {
         MMI_HILOGE("Invalid sourceWindowId or targetWindowId,sourceWindowId:%{public}d, targetWindowId:%{public}d",
             sourceWindowId, targetWindowId);
         return RET_ERR;
