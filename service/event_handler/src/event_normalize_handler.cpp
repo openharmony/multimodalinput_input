@@ -609,7 +609,8 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     auto touch = libinput_event_get_touch_event(event);
     CHKPR(touch, ERROR_NULL_POINTER);
     int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
-	int32_t type = libinput_event_get_type(event);
+    
+    int32_t type = libinput_event_get_type(event);
     if (moveFlag == POINTER_MOVEFLAG && type != LIBINPUT_EVENT_TOUCH_MOTION) {
         MMI_HILOGD("Tv Touch event is not Motion");
         return RET_OK;
