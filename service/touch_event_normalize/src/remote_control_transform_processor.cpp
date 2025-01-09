@@ -33,7 +33,7 @@
 
 namespace OHOS {
 namespace MMI {
-namespace{
+namespace {
     constexpr int32_t POINTER_MOVEFLAG = { 7 };
 }
 
@@ -116,11 +116,11 @@ bool Remote_ControlTransformProcessor::OnEventTouchMotion(struct libinput_event*
     double x = touchInfo.point.x;
     double y = touchInfo.point.y;
     MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
-       x, y, logicalDisplayId);
+        x, y, logicalDisplayId);
     WIN_MGR->UpdateAndAdjustMouseLocation(logicalDisplayId, x, y);
     pointerEvent_->SetTargetDisplayId(logicalDisplayId);
     MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
-       x, y, logicalDisplayId);
+        x, y, logicalDisplayId);
 #endif // OHOS_BUILD_ENABLE_WATCH
     return true;
 }
