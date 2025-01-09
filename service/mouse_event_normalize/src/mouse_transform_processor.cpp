@@ -394,7 +394,8 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
             auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
             CHKPR(displayInfo, ERROR_NULL_POINTER);
             if (cursorPos.direction != displayInfo->direction) {
-                WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+                WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId,
+                    cursorPos.cursorPos.x, cursorPos.cursorPos.y);
             }
         }
     }
