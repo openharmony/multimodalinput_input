@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "tv_transform_processor.h"
+#include "remote_control_transform_processor.h"
 
 #include <linux/input.h>
 
@@ -29,21 +29,21 @@
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "TVTransformProcessor"
+#define MMI_LOG_TAG "Remote_ControlTransformProcessor"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int32_t POINTER_MOVEFLAG = { 7 };
+namespace{
+    constexpr int32_t POINTER_MOVEFLAG = { 7 };
 }
 
-TVTransformProcessor::TVTransformProcessor(int32_t deviceId)
+Remote_ControlTransformProcessor::Remote_ControlTransformProcessor(int32_t deviceId)
     : deviceId_(deviceId)
 {
     InitToolTypes();
 }
 
-bool TVTransformProcessor::DumpInner()
+bool Remote_ControlTransformProcessor::DumpInner()
 {
     static int32_t lastDeviceId = -1;
     static std::string lastDeviceName("default");
@@ -60,7 +60,7 @@ bool TVTransformProcessor::DumpInner()
     return true;
 }
 
-std::shared_ptr<PointerEvent> TVTransformProcessor::OnEvent(struct libinput_event *event)
+std::shared_ptr<PointerEvent> Remote_ControlTransformProcessor::OnEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPP(event);
@@ -91,12 +91,14 @@ std::shared_ptr<PointerEvent> TVTransformProcessor::OnEvent(struct libinput_even
         CHKPP(pointerEvent_);
         return nullptr;
     }
+    MMI_HILOGD("TW:%{public}d", pointerEvent_->GetTargetWindowId());
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
+    MMI_HILOGD("TW:%{public}d", pointerEvent_->GetTargetWindowId());
     DumpInner();
     return pointerEvent_;
 }
 
-bool TVTransformProcessor::OnEventTouchMotion(struct libinput_event* event)
+bool Remote_ControlTransformProcessor::OnEventTouchMotion(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
@@ -113,17 +115,17 @@ bool TVTransformProcessor::OnEventTouchMotion(struct libinput_event* event)
     }
     double x = touchInfo.point.x;
     double y = touchInfo.point.y;
-    MMI_HILOGI("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
-        x, y, logicalDisplayId);
+    MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
+       x, y, logicalDisplayId);
     WIN_MGR->UpdateAndAdjustMouseLocation(logicalDisplayId, x, y);
     pointerEvent_->SetTargetDisplayId(logicalDisplayId);
-    MMI_HILOGI("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
-        x, y, logicalDisplayId);
+    MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
+       x, y, logicalDisplayId);
 #endif // OHOS_BUILD_ENABLE_WATCH
     return true;
 }
 
-bool TVTransformProcessor::HandlePostInner(struct libinput_event* event)
+bool Remote_ControlTransformProcessor::HandlePostInner(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
@@ -167,7 +169,7 @@ bool TVTransformProcessor::HandlePostInner(struct libinput_event* event)
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     return true;
 }
-void TVTransformProcessor::InitToolTypes()
+void Remote_ControlTransformProcessor::InitToolTypes()
 {
     vecToolType_.emplace_back(std::make_pair(BTN_TOOL_PEN, PointerEvent::TOOL_TYPE_PEN));
     vecToolType_.emplace_back(std::make_pair(BTN_TOOL_RUBBER, PointerEvent::TOOL_TYPE_RUBBER));

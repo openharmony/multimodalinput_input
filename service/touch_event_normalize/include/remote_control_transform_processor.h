@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TV_TRANSFORM_PROCESSOR_H
-#define TV_TRANSFORM_PROCESSOR_H
+#ifndef REMOTE_CONTROL_TRANSFORM_PROCESSOR_H
+#define REMOTE_CONTROL_TRANSFORM_PROCESSOR_H
 
 #include "nocopyable.h"
 
@@ -25,15 +25,15 @@
 
 namespace OHOS {
 namespace MMI {
-class TVTransformProcessor final : public TransformProcessor {
+class Remote_ControlTransformProcessor final : public TransformProcessor {
 public:
-    explicit TVTransformProcessor(int32_t deviceId);
-    DISALLOW_COPY_AND_MOVE(TVTransformProcessor);
-    ~TVTransformProcessor() = default;
+    explicit Remote_ControlTransformProcessor(int32_t deviceId);
+    DISALLOW_COPY_AND_MOVE(Remote_ControlTransformProcessor);
+    ~Remote_ControlTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
 
-private:
+private:    
     bool OnEventTouchMotion(struct libinput_event *event);
     bool DumpInner();
     bool HandlePostInner(struct libinput_event* event);

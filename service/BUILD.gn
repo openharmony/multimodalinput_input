@@ -216,7 +216,7 @@ ohos_shared_library("libmmi-server") {
         "touch_event_normalize/src/touch_gesture_detector.cpp",
         "touch_event_normalize/src/touch_gesture_manager.cpp",
         "touch_event_normalize/src/touch_transform_processor.cpp",
-        "touch_event_normalize/src/tv_transform_processor.cpp",
+        "touch_event_normalize/src/remote_control_transform_processor.cpp",
       ]
     }
   }
