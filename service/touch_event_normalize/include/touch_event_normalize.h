@@ -46,7 +46,6 @@ public:
         KNUCKLE,
         TRACKPAD5,
         GAMEPAD,
-        TV,
     };
 
 public:
@@ -75,7 +74,7 @@ private:
 private:
     std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;
     std::map<int32_t, std::shared_ptr<TransformProcessor>> touchpad_processors_;
-    std::map<int32_t, std::shared_ptr<TransformProcessor>> TV_processors_;
+    std::map<int32_t, std::shared_ptr<TransformProcessor>> remote_control_processors_;
 };
 
 #define TOUCH_EVENT_HDR ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()
