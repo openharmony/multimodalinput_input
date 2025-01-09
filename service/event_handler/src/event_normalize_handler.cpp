@@ -108,6 +108,7 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_SWITCH_TOGGLE)
 };
 constexpr int32_t MAX_N_PRESSED_KEYS { 10 };
+constexpr int32_t POINTER_MOVEFLAG = { 7 };
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -603,6 +604,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
+    CHKPR(event, ERROR_NULL_POINTER);
 #ifdef OHOS_RSS_CLIENT
     if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCH_DOWN) {
         std::unordered_map<std::string, std::string> mapPayload;
@@ -620,11 +622,22 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     BytraceAdapter::StartPackageEvent("package touchEvent");
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     LogTracer lt;
-    if (event != nullptr) {
+    auto touch = libinput_event_get_touch_event(event);
+    CHKPR(touch, ERROR_NULL_POINTER);
+    int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
+    if (moveFlag == POINTER_MOVEFLAG) {
+        pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::REMOTE_CONTROL);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    } else {
         pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
-        lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
+    if (moveFlag == POINTER_MOVEFLAG && pointerEvent->GetPointerAction() != POINTER_ACTION_MOVE) {
+        MMI_HILOGD("Tv Touch event is not Motion");
+        return RET_OK;
+    }
+    lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     if (HandleTouchEventWithFlag(pointerEvent)) {
         MMI_HILOGD("Touch event is filtered with flag");
@@ -651,7 +664,11 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         MMI_HILOGE("Failed to set origin pointerId");
         return RET_ERR;
     }
-    nextHandler_->HandleTouchEvent(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    } else {
+        nextHandler_->HandleTouchEvent(pointerEvent);
+    }
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
     }
