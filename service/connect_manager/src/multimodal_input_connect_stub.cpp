@@ -1890,7 +1890,7 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
     }
 
     int32_t windowId = 0;
-    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);    
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = GetWindowPid(windowId);
     if (ret == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
@@ -2469,7 +2469,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadDoubleTapAndDragState(Message
         MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
-    
+
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
@@ -2953,7 +2953,7 @@ int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& 
     }
     int32_t deviceId { -1 };
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = RemoveVirtualInputDevice(deviceId);    
+    int32_t ret = RemoveVirtualInputDevice(deviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("RemoveVirtualInputDevice failed");
         return ret;
