@@ -972,6 +972,8 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
 void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(session);
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto item = recoverList_.begin(); item != recoverList_.end();) {
         if (session->GetPid() == item->second) {
             auto device = inputDevice_.find(item->first);
@@ -979,9 +981,24 @@ void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
                 MMI_HILOGI("Recover input device : %{public}d", item->first);
                 device->second.enable = true;
             }
-            recoverList_.erase(item++);
+            item = recoverList_.erase(item);
+        } else {
+            item++;
         }
     }
+}
+
+bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId)
+{
+    bool enable = false;
+    CALL_DEBUG_ENTER;
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGD("Get inputDevice enabled failed, Invalid deviceId.");
+        return enable;
+    }
+    enable = item->second.enable;
+    return enable;
 }
 } // namespace MMI
 } // namespace OHOS
