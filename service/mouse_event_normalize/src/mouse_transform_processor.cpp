@@ -388,6 +388,17 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
             pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
             MMI_HILOGD("Axis begin");
+            CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+            if (cursorPos.displayId < 0) {
+                MMI_HILOGE("No display");
+                return RET_ERR;
+            }
+            auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
+            CHKPR(displayInfo, ERROR_NULL_POINTER);
+            if (cursorPos.direction != displayInfo->direction) {
+                WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId,
+                    cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+            }
         }
     }
 #ifndef OHOS_BUILD_ENABLE_WATCH
