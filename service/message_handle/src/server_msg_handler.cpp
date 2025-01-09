@@ -175,7 +175,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
         if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
             MMI_HILOGE("Failed to set the keyboard led, device id %{public}d", DeviceId);
         }
-    int32_t state = libinput_get_funckey_state(device, funcKey);
+        int32_t state = libinput_get_funckey_state(device, funcKey);
         if (state != enable) {
             MMI_HILOGE("Failed to enable the function key, device id %{public}d", DeviceId);
         }
