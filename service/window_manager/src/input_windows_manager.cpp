@@ -1889,6 +1889,15 @@ bool InputWindowsManager::IsMouseSimulate() const
         lastPointerEvent_->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
 }
 
+bool InputWindowsManager::HasMouseHideFlag() const
+{
+    if (lastPointerEvent_ == nullptr) {
+        MMI_HILOG_CURSORD("The lastPointerEvent is nullptr");
+        return false;
+    }
+    return lastPointerEvent_->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
+}
+
 int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
@@ -1955,6 +1964,7 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
     pointerStyle = iter->second;
     return RET_OK;
 }
+
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1977,7 +1987,6 @@ void InputWindowsManager::InitPointerStyle()
     }
     MMI_HILOGD("Number of pointer style:%{public}zu", pointerStyle_.size());
 }
-
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -2573,6 +2582,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsMouseDrawing(pointerEvent->GetPointerAction())) {
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+            MMI_HILOGE("SetMouseDisplayState false");
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        } else {
+            MMI_HILOGE("SetMouseDisplayState true");
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+        }
         IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
