@@ -38,6 +38,8 @@
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
+#include "pointer_renderer.h"
+#include "screen_pointer.h"
 #include "setting_observer.h"
 #include "struct_multimodal.h"
 
@@ -65,6 +67,24 @@ struct PixelMapReleaseContext {
 private:
     std::shared_ptr<Media::PixelMap> pixelMap_ { nullptr };
 };
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+class ScreenModeChangeListener final : public OHOS::Rosen::ScreenManagerLite::IScreenModeChangeListener {
+public:
+    using callback_t = std::function<void(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &)>;
+    explicit ScreenModeChangeListener(callback_t func): callback_(func) {}
+    virtual ~ScreenModeChangeListener() = default;
+    
+    void NotifyScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens) override
+    {
+        return callback_(screens);
+    }
+
+private:
+    callback_t callback_;
+};
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
 class DelegateInterface;
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
@@ -114,6 +134,7 @@ public:
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
+    void SubscribeScreenModeChange() override;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -128,7 +149,7 @@ public:
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    void InitScreenInfo() override;
+    void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
@@ -185,32 +206,42 @@ private:
     void SetSurfaceNodeVisible(bool visible);
     float CalculateHardwareXOffset(ICON_TYPE iconType);
     float CalculateHardwareYOffset(ICON_TYPE iconType);
-    bool SetTraditionsHardWareCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY,
-        ICON_TYPE iconType);
+    bool SetCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
     void SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle);
-    void CreateDynamicCanvas();
     int32_t ParsingDynamicImage(MOUSE_ICON mouseStyle);
     void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
+    bool DrawDynamicCanvas();
+    std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> DrawDynamicBitmap();
+    void DrawDynamicCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
+        int32_t px, int32_t py, ICON_TYPE align);
+    ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
     int32_t RequestNextVSync();
     void OnVsync(uint64_t timestamp);
-    void PostTask(Rosen::RSTaskMessage::RSTask task);
-    void DoHardwareCursorDraw();
+    void PostTask(std::function<void()> task);
+    void DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
+        int32_t px, int32_t py, ICON_TYPE align);
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
     void UpdateBindDisplayId(int32_t displayId);
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
-    void DrawTraditionsCursor(MOUSE_ICON mouseStyle);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void DumpScreenInfo(std::ostringstream& oss);
     bool IsSupported() override;
-    int32_t PrepareBuffer(uint32_t width, uint32_t height);
-    int32_t DrawHardwareCursor(const MOUSE_ICON mouseStyle);
-    int32_t DrawCursor(const MOUSE_ICON mouseStyle, uint32_t width, uint32_t height);
+    int32_t DrawCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
+    int32_t DrawCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
+    std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
+    std::shared_ptr<ScreenPointer> GetScreenPointer(uint32_t screenId);
+    void SoftwareCursorRender(MOUSE_ICON mouseStyle);
+    void HardwareCursorRender(MOUSE_ICON mouseStyle);
+    void SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
+    void SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_TYPE align);
+    void HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
+    void HideHardwareCursors();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
@@ -277,8 +308,9 @@ private:
     std::mutex mtx_;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
-    std::vector<sptr<OHOS::SurfaceBuffer>> cursorBuffers_;
-    uint32_t bufferId_ { 0 };
+    sptr<ScreenModeChangeListener> screenModeChangeListener_ { nullptr };
+    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers_;
+    PointerRenderer pointerRenderer_;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -290,22 +322,6 @@ private:
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
     int releaseFence_ { -1 };
 };
-
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-class ScreenModeChangeListener : public Rosen::ScreenManagerLite::IScreenModeChangeListener {
-public:
-    ScreenModeChangeListener() = default;
-    virtual ~ScreenModeChangeListener() = default;
-    void NotifyScreenModeChange(const std::vector<sptr<Rosen::ScreenInfo>> &screenInfos) override;
-};
-
-class ScreenListener : public Rosen::ScreenManagerLite::IScreenListener {
-public:
-    void OnConnect(Rosen::ScreenId screenId) override{};
-    void OnDisconnect(Rosen::ScreenId screenId) override;
-    void OnChange(Rosen::ScreenId screenId) override{};
-};
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_DRAWING_MANAGER_H
