@@ -20,6 +20,7 @@
 #include <functional>
 
 #include <linux/input-event-codes.h>
+#include <linux/input.h>
 
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
@@ -1162,6 +1163,12 @@ void MouseTransformProcessor::HandleFilterMouseEvent(Offset* offset)
 bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event)
 {
     CHKPF(event);
+    struct libinput_device *device = libinput_event_get_device(event);
+    CHKPF(device);
+
+    if (libinput_device_get_id_bustype(device) != BUS_USB) {
+        return false;
+    }
     if (libinput_event_get_type(event) != LIBINPUT_EVENT_POINTER_MOTION) {
         return false;
     }
