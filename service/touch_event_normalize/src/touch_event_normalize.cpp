@@ -23,6 +23,7 @@
 #include "tablet_tool_tranform_processor.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
 #include "touch_transform_processor.h"
+#include "remote_control_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #include "touchpad_transform_processor.h"
@@ -56,6 +57,17 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(struct libinput_ev
                 MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
             }
         }
+    } else if (deviceType == TouchEventNormalize::DeviceType::REMOTE_CONTROL) {
+        if (auto it = remote_control_processors_.find(deviceId); it != remote_control_processors_.end()) {
+            processor = it->second;
+        } else {
+            processor = MakeTransformProcessor(deviceId, deviceType);
+            CHKPP(processor);
+            auto [tIter, isOk] = remote_control_processors_.emplace(deviceId, processor);
+            if (!isOk) {
+                MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
+            }
+        }
     } else {
         if (auto it = processors_.find(deviceId); it != processors_.end()) {
             processor = it->second;
@@ -84,6 +96,10 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
         }
         case DeviceType::TABLET_TOOL: {
             processor = std::make_shared<TabletToolTransformProcessor>(deviceId);
+            break;
+        }
+        case DeviceType::REMOTE_CONTROL: {
+            processor = std::make_shared<Remote_ControlTransformProcessor>(deviceId);
             break;
         }
 #endif // OHOS_BUILD_ENABLE_TOUCH
