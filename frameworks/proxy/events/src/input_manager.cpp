@@ -20,6 +20,7 @@
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
+#include "hitrace_meter.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManager"
@@ -806,6 +807,7 @@ int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::
 
 int32_t InputManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event entry");
     return InputMgrImpl.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
 }
 
