@@ -175,7 +175,9 @@ void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {
     MMI_HILOGI("force clear all pointer visiable status");
     pidInfos_.clear();
-    UpdatePointerVisible();
+    if (!WIN_MGR->HasMouseHideFlag() || INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice()) {
+        UpdatePointerVisible();
+    }
 }
 
 bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY)
