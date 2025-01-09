@@ -120,6 +120,7 @@ bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey, std::
 bool GetKeyCode(const cJSON* jsonData, int32_t &keyCodeInt);
 bool GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt);
 bool GetDelay(const cJSON* jsonData, int64_t &delayInt);
+bool GetRepeatKeyDelay(const cJSON* jsonData, int64_t &delayInt);
 bool GetRepeatTimes(const cJSON* jsonData, int32_t &repeatTimesInt);
 bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt);
 bool PackageSequenceKey(const cJSON* sequenceKeysJson, SequenceKey &sequenceKey);
