@@ -101,18 +101,22 @@ void InjectNoticeManager::InjectNoticeConnection::OnAbilityConnectDone(const App
     const sptr<IRemoteObject>& remoteObject, int resultCode)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex>  lock(mutex_);
     CHKPV(remoteObject);
     if (remoteObject_ == nullptr) {
         remoteObject_ = remoteObject;
     }
     isConnected_ = true;
+    MMI_HILOGI("InjectNotice connected,remoteObject_:%{private}p", &remoteObject_);
 }
 
 void InjectNoticeManager::InjectNoticeConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName& element,
     int resultCode)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex>  lock(mutex_);
     isConnected_ = false;
+    MMI_HILOGI("InjectNotice disconnected,remoteObject_:%{private}p", &remoteObject_);
     remoteObject_ = nullptr;
 }
 
@@ -124,8 +128,9 @@ bool InjectNoticeManager::InjectNoticeConnection::SendNotice(const InjectNoticeI
     MessageOption option;
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_SEND;
-    MMI_HILOGD("Requst send notice begin");
+    std::lock_guard<std::mutex>  lock(mutex_);
     CHKPF(remoteObject_);
+    MMI_HILOGD("Requst send notice begin");
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
         MMI_HILOGW("Requst send notice failed:%{public}d", ret);
@@ -143,11 +148,12 @@ bool InjectNoticeManager::InjectNoticeConnection::CancelNotice(const InjectNotic
     MessageOption option;
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_CLOSE;
-    MMI_HILOGD("Requst send close notice begin");
+    std::lock_guard<std::mutex>  lock(mutex_);
     CHKPF(remoteObject_);
+    MMI_HILOGD("Requst send close notice begin");
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
-        MMI_HILOGW("Requst send close notice failed: %{public}d", ret);
+        MMI_HILOGW("Requst send close notice failed:%{public}d", ret);
         return false;
     }
     MMI_HILOGI("Requst send close notice ok");

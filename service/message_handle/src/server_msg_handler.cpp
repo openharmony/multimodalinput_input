@@ -119,36 +119,9 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
-        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
-            MMI_HILOGW("Current device has no permission");
-            return COMMON_PERMISSION_CHECK_ERROR;
-        }
-        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
-        if (screenLocked) {
-            MMI_HILOGW("Screen locked, no permission");
-            return COMMON_PERMISSION_CHECK_ERROR;
-        }
-        auto iter = authorizationCollection_.find(pid);
-        if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
-            auto state = AUTHORIZE_HELPER->GetAuthorizeState();
-            if (state != AuthorizeState::STATE_UNAUTHORIZE) {
-                MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
-                    state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
-                return COMMON_PERMISSION_CHECK_ERROR;
-            }
-            CurrentPID_ = pid;
-            InjectionType_ = InjectionType::KEYEVENT;
-            keyEvent_ = keyEvent;
-            LaunchAbility();
-            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
-                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
-            };
-            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
-            return COMMON_PERMISSION_CHECK_ERROR;
-        }
-        CurrentPID_ = pid;
-        if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
-            return COMMON_PERMISSION_CHECK_ERROR;
+        int32_t checkReturn = NativeInjectCheck(pid);
+        if (checkReturn != RET_OK) {
+            return checkReturn;
         }
     }
     int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
@@ -205,36 +178,9 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
-        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
-            MMI_HILOGW("Current device has no permission");
-            return COMMON_PERMISSION_CHECK_ERROR;
-        }
-        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
-        if (screenLocked) {
-            MMI_HILOGW("Screen locked, no permission");
-            return COMMON_PERMISSION_CHECK_ERROR;
-        }
-        auto iter = authorizationCollection_.find(pid);
-        if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
-            auto state = AUTHORIZE_HELPER->GetAuthorizeState();
-            if (state != AuthorizeState::STATE_UNAUTHORIZE) {
-                MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
-                    state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
-                return COMMON_PERMISSION_CHECK_ERROR;
-            }
-            CurrentPID_ = pid;
-            InjectionType_ = InjectionType::POINTEREVENT;
-            pointerEvent_ = pointerEvent;
-            LaunchAbility();
-            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
-                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
-            };
-            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
-            return COMMON_PERMISSION_CHECK_ERROR;
-        }
-        CurrentPID_ = pid;
-        if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
-            return COMMON_PERMISSION_CHECK_ERROR;
+        int32_t checkReturn = NativeInjectCheck(pid);
+        if (checkReturn != RET_OK) {
+            return checkReturn;
         }
     }
     return OnInjectPointerEventExt(pointerEvent, isShell);
@@ -814,65 +760,74 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 void ServerMsgHandler::LaunchAbility()
 {
     CALL_DEBUG_ENTER;
-    OHOS::MMI::AuthorizationDialog authorizationDialog;
-    authorizationDialog.ConnectSystemUi();
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    AUTH_DIALOG.ConnectSystemUi();
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 {
     CALL_DEBUG_ENTER;
     if (isAuthorize) {
-        auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::AUTHORIZED));
-        if (!ret.second) {
-            MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
+        auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+        int32_t authorPid = AUTHORIZE_HELPER->GetAuthorizePid();
+        MMI_HILOGE("OnAuthorize not has authorizing s:%{public}d, authPid:%{public}d",
+            state, authorPid);
+        if (state == AuthorizeState::STATE_UNAUTHORIZE) {
+            MMI_HILOGE("Current not has authorizing");
+            return ERR_OK;
+        }
+        if (state == AuthorizeState::STATE_UNAUTHORIZE) {
+            MMI_HILOGE("The injection permission has been granted. authPid:%{public}d ", authorPid);
+            return ERR_OK;
         }
         InjectNoticeInfo noticeInfo;
-        noticeInfo.pid = CurrentPID_;
+        noticeInfo.pid = authorPid;
         AddInjectNotice(noticeInfo);
-        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-            [&] (int32_t pid) {
+        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, [&] (int32_t pid) {
                 CloseInjectNotice(pid);
         });
         if (result != RET_OK) {
-            MMI_HILOGI("Authorize process failed, pid:%{public}d", CurrentPID_);
+            MMI_HILOGI("Authorize process failed, pid:%{public}d", authorPid);
         }
-        MMI_HILOGD("Agree to apply injection,pid:%{public}d", CurrentPID_);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        if (InjectionType_ == InjectionType::KEYEVENT) {
-            OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
-        }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        if (InjectionType_ == InjectionType::POINTEREVENT) {
-            OnInjectPointerEvent(pointerEvent_, CurrentPID_, true, false);
-        }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+        MMI_HILOGD("Agree to apply injection,pid:%{public}d", authorPid);
         return ERR_OK;
     }
-    auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
-    if (!ret.second) {
-        MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
+
+    auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+    int32_t curAuthPid = AUTHORIZE_HELPER->GetAuthorizePid();
+    MMI_HILOGD("Reject application injection,s:%{public}d, authPid:%{public}d",
+        state, curAuthPid);
+    if (state != AuthorizeState::STATE_UNAUTHORIZE) {
+        MMI_HILOGI("Cancel injection right,pid:%{public}d", curAuthPid);
+        AUTHORIZE_HELPER->CancelAuthorize(curAuthPid);
+        if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
+            AUTH_DIALOG.CloseDialog();
+        } else {
+            CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
+        }
     }
-    MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
     return ERR_OK;
 }
 
-int32_t ServerMsgHandler::OnCancelInjection()
+int32_t ServerMsgHandler::OnCancelInjection(int32_t callPid)
 {
     CALL_DEBUG_ENTER;
-    auto iter = authorizationCollection_.find(CurrentPID_);
-    if (iter != authorizationCollection_.end()) {
-        authorizationCollection_.erase(iter);
-        AUTHORIZE_HELPER->CancelAuthorize(CurrentPID_);
-        auto state = AUTHORIZE_HELPER->GetAuthorizeState();
-        if (state != AuthorizeState::STATE_UNAUTHORIZE) {
-            CloseInjectNotice(CurrentPID_);
+    auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+    int32_t curAuthPid = AUTHORIZE_HELPER->GetAuthorizePid();
+    MMI_HILOGD("Cancel application injection,s:%{public}d, authPid:%{public}d",
+        state, curAuthPid);
+    if (state != AuthorizeState::STATE_UNAUTHORIZE) {
+        if (callPid != curAuthPid) {
+            MMI_HILOGW("Authorized pid not callPid.");
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
-        MMI_HILOGD("Cancel application authorization,pid:%{public}d", CurrentPID_);
-        CurrentPID_ = -1;
-        InjectionType_ = InjectionType::UNKNOWN;
-        keyEvent_ = nullptr;
-        pointerEvent_ = nullptr;
+        AUTHORIZE_HELPER->CancelAuthorize(curAuthPid);
+        if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
+            AUTH_DIALOG.CloseDialog();
+        } else {
+            CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
+        }
     }
     return ERR_OK;
 }
@@ -939,7 +894,7 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
         MMI_HILOGE("InitinjectNotice_ Source error");
         return false;
     }
-    MMI_HILOGD("SendNotice submit  begin");
+    MMI_HILOGD("SendNotice submit begin");
     ffrt::submit([this, noticeInfo] {
         MMI_HILOGD("SendNotice submit enter");
         CHKPV(injectNotice_);
@@ -1004,6 +959,52 @@ int32_t ServerMsgHandler::OnTransferBinderClientSrv(const sptr<IRemoteObject> &b
         return RET_ERR;
     }
     return ERR_OK;
+}
+
+int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+        MMI_HILOGW("Current device has no permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    if (screenLocked) {
+        MMI_HILOGW("Screen locked, no permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    if (pid <= 0) {
+        MMI_HILOGW("Invalid process id pid:%{public}d", pid);
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+    MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
+        state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
+    if (state == AuthorizeState::STATE_UNAUTHORIZE) {
+        LaunchAbility();
+        AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+            MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+            AUTH_DIALOG.CloseDialog();
+        };
+        AUTHORIZE_HELPER->AddAuthorizeProcess(pid, fnCallback);
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+
+    if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
+        if (pid == AUTHORIZE_HELPER->GetAuthorizePid()) {
+            MMI_HILOGI("The current PID is waiting for user authorization");
+        } else {
+            MMI_HILOGI("Another PID is waiting for user authorization");
+        }
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+
+    // Currently, a process is authorized.state is AuthorizeState::STATE_AUTHORIZE
+    if (pid != AUTHORIZE_HELPER->GetAuthorizePid()) {
+        MMI_HILOGI("Other processes have been authorized.");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
