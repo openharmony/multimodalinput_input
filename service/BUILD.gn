@@ -212,11 +212,11 @@ ohos_shared_library("libmmi-server") {
     if (input_feature_touchscreen) {
       sources += [
         "event_resample/src/event_resample.cpp",
+        "touch_event_normalize/src/remote_control_transform_processor.cpp",
         "touch_event_normalize/src/touch_gesture_adapter.cpp",
         "touch_event_normalize/src/touch_gesture_detector.cpp",
         "touch_event_normalize/src/touch_gesture_manager.cpp",
         "touch_event_normalize/src/touch_transform_processor.cpp",
-        "touch_event_normalize/src/remote_control_transform_processor.cpp",
       ]
     }
   }

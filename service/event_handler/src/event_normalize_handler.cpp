@@ -609,12 +609,6 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     auto touch = libinput_event_get_touch_event(event);
     CHKPR(touch, ERROR_NULL_POINTER);
     int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
-    
-    int32_t type = libinput_event_get_type(event);
-    if (moveFlag == POINTER_MOVEFLAG && type != LIBINPUT_EVENT_TOUCH_MOTION) {
-        MMI_HILOGD("Tv Touch event is not Motion");
-        return RET_OK;
-    }
     if (moveFlag == POINTER_MOVEFLAG) {
         pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::REMOTE_CONTROL);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -622,8 +616,12 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
     }
+    if (moveFlag == POINTER_MOVEFLAG && pointerEvent->GetPointerAction() != POINTER_ACTION_MOVE) {
+        MMI_HILOGD("Tv Touch event is not Motion");
+        return RET_OK;
+    }
     lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-
+    
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     if (HandleTouchEventWithFlag(pointerEvent)) {
         MMI_HILOGD("Touch event is filtered with flag");

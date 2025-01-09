@@ -45,17 +45,13 @@ Remote_ControlTransformProcessor::Remote_ControlTransformProcessor(int32_t devic
 
 bool Remote_ControlTransformProcessor::DumpInner()
 {
-    static int32_t lastDeviceId = -1;
-    static std::string lastDeviceName("default");
-    auto nowId = pointerEvent_->GetDeviceId();
-    if (lastDeviceId != nowId) {
-        auto device = INPUT_DEV_MGR->GetInputDevice(nowId);
-        CHKPF(device);
-        lastDeviceId = nowId;
-        lastDeviceName = device->GetName();
-    }
+    static std::string deviceName("default");
+    auto deviceId = pointerEvent_->GetDeviceId();
+    auto device = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    CHKPF(device);
+    deviceName = device->GetName();
     EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_FREEZE);
-    aggregator_.Record(MMI_LOG_FREEZE, lastDeviceName + ", TW: " +
+    aggregator_.Record(MMI_LOG_FREEZE, deviceName + ", TW: " +
         std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
     return true;
 }
@@ -72,10 +68,12 @@ std::shared_ptr<PointerEvent> Remote_ControlTransformProcessor::OnEvent(struct l
     pointerEvent_->ClearAxisValue();
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            break;
+            MMI_HILOGD("Tv Touch event is not Motion");
+            return pointerEvent_;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            break;
+            MMI_HILOGD("Tv Touch event is not Motion");
+            return pointerEvent_;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             CHKFR(OnEventTouchMotion(event), nullptr, "Get OnEventTvTouchMotion failed");
