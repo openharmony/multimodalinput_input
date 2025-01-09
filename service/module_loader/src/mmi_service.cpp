@@ -2528,9 +2528,10 @@ int32_t MMIService::OnAuthorize(bool isAuthorize)
 int32_t MMIService::CancelInjection()
 {
     CALL_DEBUG_ENTER;
+    int32_t callPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this] {
-            return this->OnCancelInjection();
+        [this, callPid] {
+            return this->OnCancelInjection(callPid);
         }
         );
     if (ret != RET_OK) {
@@ -2540,9 +2541,9 @@ int32_t MMIService::CancelInjection()
     return RET_OK;
 }
 
-int32_t MMIService::OnCancelInjection()
+int32_t MMIService::OnCancelInjection(int32_t callPid)
 {
-    return sMsgHandler_.OnCancelInjection();
+    return sMsgHandler_.OnCancelInjection(callPid);
 }
 
 int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
