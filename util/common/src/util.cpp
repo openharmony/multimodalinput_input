@@ -58,6 +58,7 @@ const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
 const std::string CURSORSTYLE_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/";
+const std::string SYS_PROD_PATH = "/sys_prod/";
 const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE { 10 };
 constexpr size_t BUF_CMD_SIZE { 512 };
@@ -281,7 +282,9 @@ static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
 
 bool IsValidJsonPath(const std::string &filePath)
 {
-    return IsValidPath(DATA_PATH, filePath) || IsValidPath(INPUT_PATH, filePath);
+    return (IsValidPath(DATA_PATH, filePath) ||
+            IsValidPath(INPUT_PATH, filePath) ||
+            IsValidPath(SYS_PROD_PATH, filePath));
 }
 
 static bool IsValidProPath(const std::string &filePath)
