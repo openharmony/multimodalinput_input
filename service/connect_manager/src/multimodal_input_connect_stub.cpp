@@ -489,10 +489,14 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
         MMI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PER_HELPER->CheckInputEventFilter()) {
+        MMI_HILOGE("Filter permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
     MMI_HILOGD("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-
+    
     int32_t clientFd = INVALID_SOCKET_FD;
     int32_t tokenType = PER_HELPER->GetTokenType();
     int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd, tokenType);
@@ -624,6 +628,10 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1079,6 +1087,10 @@ int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& d
 int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
     bool isUiExtension;
@@ -1100,6 +1112,10 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t size = 0;
@@ -1424,6 +1440,10 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
     }
 
     int32_t subscribeId = 0;
@@ -1864,9 +1884,13 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 
     int32_t windowId = 0;
-    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);    
     int32_t ret = GetWindowPid(windowId);
     if (ret == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
@@ -1986,6 +2010,10 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadScrollSwitch(MessageParcel& d
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadScrollSwitch(switchFlag);
@@ -2005,6 +2033,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollSwitch(MessageParcel& d
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     ret = GetTouchpadScrollSwitch(switchFlag);
     if (ret != RET_OK) {
@@ -2025,6 +2057,10 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadScrollDirection(MessageParcel
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool state = true;
     READBOOL(data, state, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadScrollDirection(state);
@@ -2044,6 +2080,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollDirection(MessageParcel
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool state = true;
     ret = GetTouchpadScrollDirection(state);
     if (ret != RET_OK) {
@@ -2064,6 +2104,10 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadTapSwitch(MessageParcel& data
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadTapSwitch(switchFlag);
@@ -2083,6 +2127,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     ret = GetTouchpadTapSwitch(switchFlag);
     if (ret != RET_OK) {
@@ -2103,6 +2151,10 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadPointerSpeed(MessageParcel& d
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t speed = 1;
     READINT32(data, speed, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadPointerSpeed(speed);
@@ -2122,6 +2174,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPointerSpeed(MessageParcel& d
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t speed = 1;
     ret = GetTouchpadPointerSpeed(speed);
     if (ret != RET_OK) {
@@ -2226,6 +2282,10 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadPinchSwitch(MessageParcel& da
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadPinchSwitch(switchFlag);
@@ -2245,6 +2305,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPinchSwitch(MessageParcel& da
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     ret = GetTouchpadPinchSwitch(switchFlag);
     if (ret != RET_OK) {
@@ -2265,6 +2329,10 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadSwipeSwitch(MessageParcel& da
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadSwipeSwitch(switchFlag);
@@ -2284,6 +2352,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadSwipeSwitch(MessageParcel& da
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     ret = GetTouchpadSwipeSwitch(switchFlag);
     if (ret != RET_OK) {
@@ -2304,6 +2376,10 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadRightClickType(MessageParcel&
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t type = 1;
     READINT32(data, type, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadRightClickType(type);
@@ -2323,6 +2399,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRightClickType(MessageParcel&
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t type = 1;
     ret = GetTouchpadRightClickType(type);
     if (ret != RET_OK) {
@@ -2343,6 +2423,10 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadRotateSwitch(MessageParcel& d
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool rotateSwitch = true;
     READBOOL(data, rotateSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadRotateSwitch(rotateSwitch);
@@ -2362,6 +2446,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& d
         return ret;
     }
 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool rotateSwitch = true;
     ret = GetTouchpadRotateSwitch(rotateSwitch);
     if (ret != RET_OK) {
@@ -2381,7 +2469,11 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadDoubleTapAndDragState(Message
         MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
-
+    
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool switchFlag = true;
     READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
     ret = SetTouchpadDoubleTapAndDragState(switchFlag);
@@ -2721,6 +2813,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(Message
 int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool enable = false;
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = EnableHardwareCursorStats(enable);
@@ -2734,6 +2830,10 @@ int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel&
 int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     uint32_t frameCount = 0;
     uint32_t vsyncCount = 0;
     int32_t ret = GetHardwareCursorStats(frameCount, vsyncCount);
@@ -2853,7 +2953,7 @@ int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& 
     }
     int32_t deviceId { -1 };
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = RemoveVirtualInputDevice(deviceId);
+    int32_t ret = RemoveVirtualInputDevice(deviceId);    
     if (ret != RET_OK) {
         MMI_HILOGE("RemoveVirtualInputDevice failed");
         return ret;
@@ -2919,6 +3019,10 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
 int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool isSkip = true;
     READBOOL(data, isSkip, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SkipPointerLayer(isSkip);
