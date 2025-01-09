@@ -1722,8 +1722,22 @@ Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
         return nullptr;
     }
     auto hotkeys = new (std::nothrow)Input_Hotkey *[count];
+    if (hotkeys == nullptr) {
+        MMI_HILOGE("Memory allocation failed");
+        return nullptr;
+    }
     for (int32_t i = 0; i < count; ++i) {
         hotkeys[i] = new (std::nothrow)Input_Hotkey();
+        if (hotkeys[i] == nullptr) {
+            MMI_HILOGE("Memory allocation failed");
+            for (int32_t j = 0; j < i; ++j) {
+                delete hotkeys[j];
+                hotkeys[j] = nullptr;
+            }
+            delete[] hotkeys;
+            hotkeys = nullptr;
+            return nullptr;
+        }
     }
     std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
     g_hotkeyCounts.insert(std::make_pair(hotkeys, count));
