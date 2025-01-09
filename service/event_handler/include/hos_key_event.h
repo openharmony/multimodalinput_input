@@ -1321,11 +1321,14 @@ enum HosKeyEventEnum {
     HOS_KEY_BRL_DOT8 = 3208,
     HOS_KEY_BRL_DOT9 = 3209,
     HOS_KEY_BRL_DOT10 = 3210,
-
     DAGGER_PRESS = 3211,
     DAGGER_CLICK = 3212,
     DAGGER_LONG_PRESS = 3213,
-
+    HOS_KEY_PEN_AIR_MOUSE = 3214,
+    HOS_KEY_PEN_LIGHT_PINCH = 3215,
+    HOS_KEY_PEN_AI = 3216,
+    HOS_KEY_PEN_END_CLICK = 3217,
+    HOS_KEY_PEN_END_DOUBLE_CLICK = 3218,
     /**
      * Left Knob roll-up
      * <p>In contrast to {@link #KEY_LEFT_KNOB_ROLL_DOWN}, it means rolling the left knob upwards. The knob function
