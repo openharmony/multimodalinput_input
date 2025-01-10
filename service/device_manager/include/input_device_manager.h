@@ -89,6 +89,7 @@ public:
     struct libinput_device *GetTouchPadDeviceOrigin();
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session);
     static std::shared_ptr<InputDeviceManager> GetInstance();
+    bool IsInputDeviceEnable(int32_t deviceId);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
