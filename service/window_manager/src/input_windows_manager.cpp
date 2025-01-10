@@ -4336,7 +4336,7 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.eventId = extraData.eventId;
     extraData_.drawCursor = extraData.drawCursor;
     if ((extraData.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (mouseDownEventId_ < 0 || extraData.eventId <= mouseDownEventId_)) {
+        (mouseDownEventId_ < 0 || extraData.eventId < mouseDownEventId_)) {
         MMI_HILOGE("Mouse drag failed, PI:%{public}d, EI:%{public}d, DEI:%{public}d",
             extraData.pointerId, extraData.eventId, mouseDownEventId_);
         ClearExtraData();
