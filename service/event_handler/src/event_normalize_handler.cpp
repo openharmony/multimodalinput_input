@@ -126,6 +126,16 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     auto type = libinput_event_get_type(event);
 
     auto device = libinput_event_get_device(event);
+    CHKPV(device);
+
+    if (LIBINPUT_EVENT_DEVICE_ADDED != type && LIBINPUT_EVENT_DEVICE_REMOVED != type) {
+        auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+        auto enable = INPUT_DEV_MGR->IsInputDeviceEnable(deviceId);
+        if (!enable) {
+            MMI_HILOGE("The current device has been disabled");
+            return;
+        }
+    }
     std::string name = libinput_device_get_name(device);
     size_t pos = name.find("hand_status_dev");
     if ((pos != std::string::npos) && (type == LIBINPUT_EVENT_MSDP)) {
