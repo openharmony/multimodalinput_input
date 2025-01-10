@@ -159,9 +159,12 @@ void PointerDrawingManager::InitPointerCallback()
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
-    if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
-        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+    if (!initEventhandlerFlag_.load()) {
+        std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
+        if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
+            renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+        }
+        initEventhandlerFlag_.store(true);
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
