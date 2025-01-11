@@ -54,6 +54,7 @@ declare_args() {
   input_shortcut_key_rules_enabled = true
   input_new_knuckle_dynamic_enabled = true
   input_feature_virtual_keyboard = false
+  input_feature_dfx_radar_enable = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -443,4 +444,8 @@ if (defined(global_parts_info) &&
 
 if (input_feature_virtual_keyboard) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_VKEYBOARD" ]
+}
+
+if (input_feature_dfx_radar_enable) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_DFX_RADAR" ]
 }
