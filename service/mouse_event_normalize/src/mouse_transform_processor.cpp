@@ -39,6 +39,7 @@
 #include "touchpad_transform_processor.h"
 #include "util.h"
 #include "util_ex.h"
+#include "linux/input.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -114,6 +115,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
     CalculateOffset(displayInfo, offset);
+    CalculateMouseResponseTimeProbability(event);
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
@@ -152,6 +154,119 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
 #endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
+}
+
+void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libinput_event *event)
+{
+    struct libinput_device *dev = libinput_event_get_device(event);
+    const std::string mouseName = libinput_event_get_name(event);
+    const int32_t devType = libinput_event_get_type(event);
+    MMI_HILOGD("mouseName: %{public}s, devType: %{public}d", mouseName.c_str(), devType);
+    if (devType == BUS_USB || devType == BUS_BLUETOOTH)
+    {
+        std::string connectType = devType == BUS_USB ? 'USB' : 'BLUETOOTH';
+        auto curMouseTimeMap = mouseMap.fins(mouseName);
+        if (curMouseTimeMap == mouseMap.end())
+        {
+            MMI_HILOGD("start to collect");
+            mouseMap[mouseName] = std::chrono::steady_clock::now();
+            mouseResponseMap[mouseName] = {};
+        }
+        else
+        {
+            std::chrono::time_point<std::chrono::steady_clock> curTime = std::chrono::steady_clock::now();
+            long long gap = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
+            mouseMap[mouseName] = curTime;
+            MMI_HILOGD("current time difference: %{public}lld", gap);
+            if (gap < 20)
+            {
+                auto curMapIt = mouseResponseMap.find(mouseName)->second.find(gap);
+                if (curMapIt == mouseResponseMap.find(mouseName)->second.end())
+                {
+                    mouseResponseMap.find(mouseName)->second[gap] = 1;
+                }
+                else
+                {
+                    mouseResponseMap.find(mouseName)->second[gap] = curMapIt->second + 1;
+                }
+            }
+            else if (gap >= 20 && gap < 40)
+            {
+                long long tempNum = gap - gap % 5;
+                auto curMapIt = mouseResponseMap.find(mouseName)->second.find(tempNum);
+                if (curMapIt == mouseResponseMap.find(mouseName)->second.end())
+                {
+                    mouseResponseMap.find(mouseName)->second[tempNum] = 1;
+                }
+                else
+                {
+                    mouseResponseMap.find(mouseName)->second[tempNum] = curMapIt->second + 1;
+                }
+            }
+            else if (gap >= 40 && gap < 5000)
+            {
+                auto curMapIt = mouseResponseMap.find(mouseName)->second.find(40);
+                if (curMapIt == mouseResponseMap.find(mouseName)->second.end())
+                {
+                    mouseResponseMap.find(mouseName)->second[40] = 1;
+                }
+                else
+                {
+                    mouseResponseMap.find(mouseName)->second[40] = curMapIt->second + 1;
+                }
+            }
+            else if (gap > 5000)
+            {
+                MMI_HILOGD("start to report");
+                long total = 0;
+                for (const auto &[key, value] : mouseResponseMap.find(mouseName)->second)
+                {
+                    total += value;
+                }
+                MMI_HILOGD("total mouse movements: %{public}ld", total);
+                int32_t ret = HiSysEventWrite(
+                    OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+                    "COLLECT_MOUSE_RESPONSE_TIME",
+                    OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                    "MOUSE_CONNECT_TYPE",
+                    connectType,
+                    "MOVING_TOTAL",
+                    total,
+                    "1ms", mouseResponseMap.find(mouseName)->second.find(1)->second / total,
+                    "2ms", mouseResponseMap.find(mouseName)->second.find(2)->second / total,
+                    "3ms", mouseResponseMap.find(mouseName)->second.find(3)->second / total,
+                    "4ms", mouseResponseMap.find(mouseName)->second.find(4)->second / total,
+                    "5ms", mouseResponseMap.find(mouseName)->second.find(5)->second / total,
+                    "6ms", mouseResponseMap.find(mouseName)->second.find(6)->second / total,
+                    "7ms", mouseResponseMap.find(mouseName)->second.find(7)->second / total,
+                    "8ms", mouseResponseMap.find(mouseName)->second.find(8)->second / total,
+                    "9ms", mouseResponseMap.find(mouseName)->second.find(9)->second / total,
+                    "10ms", mouseResponseMap.find(mouseName)->second.find(10)->second / total,
+                    "11ms", mouseResponseMap.find(mouseName)->second.find(11)->second / total,
+                    "12ms", mouseResponseMap.find(mouseName)->second.find(12)->second / total,
+                    "13ms", mouseResponseMap.find(mouseName)->second.find(13)->second / total,
+                    "14ms", mouseResponseMap.find(mouseName)->second.find(14)->second / total,
+                    "15ms", mouseResponseMap.find(mouseName)->second.find(15)->second / total,
+                    "16ms", mouseResponseMap.find(mouseName)->second.find(16)->second / total,
+                    "17ms", mouseResponseMap.find(mouseName)->second.find(17)->second / total,
+                    "18ms", mouseResponseMap.find(mouseName)->second.find(18)->second / total,
+                    "19ms", mouseResponseMap.find(mouseName)->second.find(19)->second / total,
+                    "20ms", mouseResponseMap.find(mouseName)->second.find(20)->second / total,
+                    "25ms", mouseResponseMap.find(mouseName)->second.find(25)->second / total,
+                    "30ms", mouseResponseMap.find(mouseName)->second.find(30)->second / total,
+                    "35ms", mouseResponseMap.find(mouseName)->second.find(35)->second / total,
+                    "40ms", mouseResponseMap.find(mouseName)->second.find(40)->second / total,
+                    "MSG", "collectiong mouse response time probability");
+                if (ret != RET_OK)
+                {
+                    MMI_HILOGE("mouse write failed , ret:%{public}d", ret);
+                }
+                MMI_HILOGD("mouse write end , ret:%{public}d", ret);
+                mouseResponseMap.erase(mouseName);
+                mouseMap.erase(mouseName);
+            }
+        }
+    }
 }
 
 void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
