@@ -790,6 +790,7 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 int32_t ServerMsgHandler::OnSubscribeHotkey(IUdsServer *server, int32_t pid,
     int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
     auto sess = server->GetSessionByPid(pid);
@@ -797,10 +798,15 @@ int32_t ServerMsgHandler::OnSubscribeHotkey(IUdsServer *server, int32_t pid,
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->SubscribeHotkey(sess, subscribeId, option);
+#else
+    MMI_HILOGI("OnSubscribeHotkey function does not support");
+    return ERROR_UNSUPPORT;
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 }
 
 int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, int32_t subscribeId)
 {
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
     auto sess = server->GetSessionByPid(pid);
@@ -808,6 +814,10 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->UnsubscribeHotkey(sess, subscribeId);
+#else
+    MMI_HILOGI("OnUnsubscribeHotkey function does not support");
+    return ERROR_UNSUPPORT;
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
