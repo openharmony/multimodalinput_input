@@ -56,6 +56,8 @@ public:
         CallbackData data;
         UserData uData;
         bool isApi9 { false };
+        bool setFuncKeyType { false };
+        bool getFuncKeyType { false };
     };
     struct DeviceType {
         std::string sourceTypeName;
