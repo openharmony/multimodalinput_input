@@ -492,7 +492,6 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
     MMI_HILOGD("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    
     int32_t clientFd = INVALID_SOCKET_FD;
     int32_t tokenType = PER_HELPER->GetTokenType();
     int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd, tokenType);
@@ -1083,10 +1082,6 @@ int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& d
 int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
     bool isUiExtension;
@@ -1108,10 +1103,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t size = 0;
