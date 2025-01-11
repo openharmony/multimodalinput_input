@@ -2450,3 +2450,21 @@ Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *ven
     *vendor = deviceInfo->vendor;
     return INPUT_SUCCESS;
 }
+
+Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state)
+{
+    CALL_DEBUG_ENTER;
+    if (keyCode < 0 || keyCode != OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK) {
+        MMI_HILOGE("Invalid keycode:%{public}d", keyCode);
+        return INPUT_PARAMETER_ERROR;
+    }
+    CHKPR(state, INPUT_PARAMETER_ERROR);
+    bool resultState = false;
+    int32_t napiCode = OHOS::MMI::InputManager::GetInstance()->GetFunctionKeyState(keyCode, resultState);
+    *state = resultState ? 1 : 0;
+    if (napiCode == INPUT_DEVICE_NOT_EXIST) {
+        MMI_HILOGE("GetFunctionKeyState fail, no keyboard device connected");
+        return INPUT_DEVICE_NOT_EXIST;
+    }
+    return INPUT_SUCCESS;
+}
