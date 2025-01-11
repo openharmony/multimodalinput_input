@@ -153,7 +153,7 @@ bool InjectNoticeManager::InjectNoticeConnection::CancelNotice(const InjectNotic
     MMI_HILOGD("Requst send close notice begin");
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
-        MMI_HILOGW("Requst send close notice failed:%{public}d", ret);
+        MMI_HILOGW("Requst send close notice failed: %{public}d", ret);
         return false;
     }
     MMI_HILOGI("Requst send close notice ok");
