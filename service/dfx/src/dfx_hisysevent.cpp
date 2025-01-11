@@ -1138,5 +1138,45 @@ void DfxHisysevent::ReportSetCurrentUser(int32_t userId)
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+void DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t durationMS)
+{
+    apiDurationStatics_.RecordDuration(api, durationMS);
+    if (!apiDurationStatics_.IsLimitMatched()) {
+        return;
+    }
+    auto apiDurations = apiDurationStatics_.GetDurationBox();
+    for (const auto &apiDuration : apiDurations) {
+        auto api = apiDuration.first;
+        std::vector<int32_t> thresholds;
+        std::vector<int32_t> durationCounts;
+        for (const auto &durationBox : apiDuration.second) {
+            thresholds.push_back(durationBox.first);
+            durationCounts.push_back(durationBox.second);
+        }
+        HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "MMI_API_DURATION",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "API_NAME", apiDurationStatics_.ApiToString(api),
+            "DURATION_THRESHOLDS", threshold,
+            "DURATION_THRESHOLD_COUNTS", durationCounts,
+            "USER_ID", userId);
+    }
+    apiDurationStatics_.ResetApiStatistics();
+}
+
+void DfxHisysevent::ReportMMiServiceThreadLongTask(const std::string &taskName)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MMI_LONG_TASK",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "TASK_NAME", taskName);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 } // namespace MMI
 } // namespace OHOS

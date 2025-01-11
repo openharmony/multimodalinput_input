@@ -20,6 +20,10 @@
 
 #include "hisysevent.h"
 
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "api_duration_statistics.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+
 #include "input_device_manager.h"
 #include "key_event.h"
 #include "mmi_log.h"
@@ -139,12 +143,19 @@ public:
     static void ReportAppendExtraData();
     static void ReportTransmitInfrared(int64_t number);
     static void ReportSetCurrentUser(int32_t userId);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    static void ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t durationMS);
+    static void ReportMMiServiceThreadLongTask(const std::string &taskName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
     static inline int64_t comboStartTime_ { 0 };
     static inline DispCastTime dispCastTime_ { 0 };
     static inline ComboStartCastTime comboStartCastTime_ { 0 };
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    static inline ApiDurationStatistics apiDurationStatics_;
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 };
 } // namespace MMI
 } // namespace OHOS
