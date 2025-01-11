@@ -374,6 +374,10 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     FingerprintEventHdr->SetPowerAndVolumeKeyState(event);
     if (FingerprintEventHdr->IsFingerprintEvent(event)) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        auto key = KeyEventHdr->GetKeyEvent();
+        DfxHisysevent::ReportAbility(key->GetKeyCode(), key->GetKeyAction(), "");
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT

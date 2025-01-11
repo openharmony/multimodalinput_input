@@ -135,7 +135,11 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
         sess->GetProgramName(), sess->GetPid());
-
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportKeyEvent(keyOption->GetFinalKey(),
+        keyOption->IsFinalKeyDown() ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP,
+        sess->GetProgramName(), DfxHisysevent::KEY_CONSUMPTION_TYPE::NO_TYPE, subscribeId);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         auto ret = AddKeyGestureSubscriber(subscriber, keyOption);

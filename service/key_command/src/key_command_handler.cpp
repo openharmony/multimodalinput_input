@@ -1397,6 +1397,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     if (STYLUS_HANDLER->HandleStylusKey(key)) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportAbility(key->GetKeyCode(), key->GetKeyAction(), "com.hmos.hinote");
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return true;
     }
 
@@ -2261,6 +2264,9 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 #endif // SHORTCUT_KEY_RULES_ENABLED
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportAbility(shortcutKey.finalKey, shortcutKey.keyDownDuration, shortcutKey.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         BytraceAdapter::StopLaunchAbility();
         return true;
     }
@@ -2273,6 +2279,9 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         shortcutKey.timerId = -1;
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportAbility(shortcutKey.finalKey, shortcutKey.keyDownDuration, shortcutKey.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         BytraceAdapter::StopLaunchAbility();
     });
     if (shortcutKey.timerId < 0) {
@@ -2440,6 +2449,11 @@ void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 {
     CALL_INFO_TRACE;
+    auto sequenceKeys = sequence.sequenceKeys;
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportAbility(sequenceKeys[0].keyCode,
+        sequenceKeys[0].keyAction, sequence.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     LaunchAbility(sequence.ability, sequence.abilityStartDelay);
 }
 
