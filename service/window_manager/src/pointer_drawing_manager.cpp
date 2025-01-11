@@ -131,7 +131,7 @@ namespace OHOS {
 namespace MMI {
 static bool IsSingleDisplayFoldDevice()
 {
-    return (!FOLD_SCREEN_FLAG.empty() && FOLD_SCREEN_FLAG[0] == '1');
+    return (!FOLD_SCREEN_FLAG.empty() && (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4'));
 }
 
 void RsRemoteDiedCallback()
