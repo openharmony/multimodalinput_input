@@ -332,6 +332,16 @@ bool InputDeviceManager::HasPointerDevice()
     }
     return false;
 }
+
+bool InputDeviceManager::HasVirtualPointerDevice()
+{
+    for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
+        if (it->second->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+            return true;
+        }
+    }
+    return false;
+}
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 bool InputDeviceManager::HasTouchDevice()
