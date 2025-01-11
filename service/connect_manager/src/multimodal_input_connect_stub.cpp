@@ -616,9 +616,15 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
-    if (focusX > pixelMap->GetWidth() || focusY > pixelMap->GetHeight() || focusX < 0 || focusY < 0) {
-        MMI_HILOGE("Invalid focusX or focusY, focusX:%{public}d, focusY:%{public}d", focusX, focusY);
-        return RET_ERR;
+    if (focusX < 0) {
+        focusX = 0;
+    } else if (focusY < 0) {
+        focusY = 0;
+    }
+    if (focusX > pixelMap->GetWidth()) {
+        focusX = pixelMap->GetWidth();
+    } else if (focusY > pixelMap->GetHeight()) {
+        focusY = pixelMap->GetHeight();
     }
     int32_t ret = SetCustomCursor(windowPid, windowId, focusX, focusY, (void*)pixelMap);
     if (ret != RET_OK) {
