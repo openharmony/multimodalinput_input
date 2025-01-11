@@ -489,10 +489,6 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
         MMI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!PER_HELPER->CheckInputEventFilter()) {
-        MMI_HILOGE("Filter permission check failed");
-        return ERROR_NO_PERMISSION;
-    }
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
     MMI_HILOGD("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
