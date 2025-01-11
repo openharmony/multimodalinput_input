@@ -47,6 +47,9 @@ namespace MMI {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
+constexpr int64_t MAX_REPEATKEY_DELAY_TIME = 1000;
+constexpr int64_t MAX_KEYDOWNDURATION_TIME = 10000;
+constexpr int64_t MAX_ABILITYSTARTDELAY_TIME = 3000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;

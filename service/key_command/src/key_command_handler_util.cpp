@@ -114,7 +114,7 @@ bool GetKeyDownDuration(const cJSON* jsonData, int32_t &keyDownDurationInt)
         MMI_HILOGE("keyDownDuration is not number");
         return false;
     }
-    if (keyDownDuration->valueint < 0 || keyDownDuration->valueint > 10000) {
+    if (keyDownDuration->valueint < 0 || keyDownDuration->valueint > MAX_KEYDOWNDURATION_TIME) {
         MMI_HILOGE("keyDownDuration must be number and bigger and equal zero");
         return false;
     }
@@ -370,7 +370,7 @@ bool GetRepeatKeyDelay(const cJSON* jsonData, int64_t &delayInt)
         MMI_HILOGE("delay is not number");
         return false;
     }
-    if ((delay->valueint < 0) || (delay->valueint > 1000)) {
+    if ((delay->valueint < 0) || (delay->valueint > MAX_REPEATKEY_DELAY_TIME)) {
         MMI_HILOGE("delay must be number and bigger and equal zero and less than max delay");
         return false;
     }
@@ -416,7 +416,7 @@ bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
         MMI_HILOGE("abilityStartDelay is not number");
         return false;
     }
-    if ((abilityStartDelay->valueint < 0) || (abilityStartDelay->valueint > 3000)) {
+    if ((abilityStartDelay->valueint < 0) || (abilityStartDelay->valueint > MAX_ABILITYSTARTDELAY_TIME)) {
         MMI_HILOGE("abilityStartDelay must be number and bigger and equal zero and less than max delay time");
         return false;
     }
