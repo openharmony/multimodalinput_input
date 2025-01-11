@@ -40,7 +40,8 @@
       "input_feature_coverage",
       "input_shortcut_key_manager_enabled",
       "input_shortcut_key_rules_enabled",
-      "input_feature_virtual_keyboard"
+      "input_feature_virtual_keyboard",
+      "input_feature_dfx_radar_enable"
     ],
     "adapted_system_type": [
       "standard"
