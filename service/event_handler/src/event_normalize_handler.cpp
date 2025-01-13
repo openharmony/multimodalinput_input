@@ -579,14 +579,14 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
             mapPayload);
     }
 }
-#endif
+#endif //OHOS_RSS_CLIENT
 
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_RSS_CLIENT
     ReportTouchDownToRSS(event);
-#endif
+#endif //OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     FingerprintEventHdr->SetScreenState(event);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
