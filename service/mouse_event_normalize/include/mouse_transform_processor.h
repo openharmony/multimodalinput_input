@@ -84,7 +84,7 @@ public:
         uint64_t filterPrePointTime{ 0 };
         uint64_t filterDeltaTime{ 0 };
         bool filterFlag{ false };
-        static constexpr int32_t FILTER_THRESHOLD_US = 909; // <=1ms
+        static constexpr int32_t FILTER_THRESHOLD_US = 800; // <=1ms
     };
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 
