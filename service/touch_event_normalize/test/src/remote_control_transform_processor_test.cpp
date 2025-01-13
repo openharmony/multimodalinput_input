@@ -134,7 +134,7 @@ HWTEST_F(RemoteControlTransformProcessorTest, Remote_ControlTransformProcessorTe
     ASSERT_TRUE(processor.pointerEvent_ != nullptr);
     int32_t varMoveFlag = POINTER_MOVEFLAG;
     std::cout << "varMoveFlag: " << POINTER_MOVEFLAG << std::endl;
-    for(int32_t index = 1; index < POINTER_MOVEFLAG; ++index){
+    for (int32_t index = 1; index < POINTER_MOVEFLAG; ++index) {
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 0);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 5190 + index*30);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 8306);
