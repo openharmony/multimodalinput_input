@@ -196,7 +196,14 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
 
 int32_t MMIClient::Reconnect()
 {
-    return ConnectTo();
+    if (ConnectTo() != RET_OK) {
+        MMI_HILOGE("Client connection failed");
+        return RET_ERR;
+    }
+    if (funConnected_) {
+        funConnected_(*this);
+    }
+    return RET_OK;
 }
 
 void MMIClient::OnReconnect()
@@ -253,9 +260,6 @@ void MMIClient::OnConnected()
     MMI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
     msgHandler_.InitProcessedCallback();
-    if (funConnected_) {
-        funConnected_(*this);
-    }
     if (!isExit && !isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {
             MMI_HILOGE("Add fd listener failed");

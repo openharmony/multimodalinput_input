@@ -53,11 +53,11 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return EVENT_REG_FAIL;
     }
+    std::lock_guard<std::mutex> guard(mtx_);
     if (SwitchEventInputSubscribeManager::subscribeManagerId_ >= INT_MAX) {
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
         return INVALID_SUBSCRIBE_ID;
@@ -71,7 +71,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
         subscribeInfos_.erase(subscribeId);
         return INVALID_SUBSCRIBE_ID;
     }
-    MMI_HILOGI("subscribeId:%{public}d, switchType:%{public}d", subscribeId, switchType);
+    MMI_HILOGI("The subscribeId:%{public}d, switchType:%{public}d", subscribeId, switchType);
 
     return subscribeId;
 }
@@ -84,11 +84,12 @@ int32_t SwitchEventInputSubscribeManager::UnsubscribeSwitchEvent(int32_t subscri
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
+
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGE("The subscribeInfos is empty");
         return RET_ERR;
@@ -132,6 +133,7 @@ int32_t SwitchEventInputSubscribeManager::OnSubscribeSwitchEventCallback(std::sh
 void SwitchEventInputSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGD("Leave, subscribeInfos_ is empty");
         return;

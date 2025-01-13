@@ -26,12 +26,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
-template<typename Event>
+template <typename Event>
 class Channel {
     static_assert(std::is_enum_v<Event> || std::is_integral_v<Event> ||
-                  (std::is_class_v<Event> &&
-                   std::is_default_constructible_v<Event> &&
-                   std::is_copy_constructible_v<Event>));
+        (std::is_class_v<Event> && std::is_default_constructible_v<Event> && std::is_copy_constructible_v<Event>));
 
 public:
     enum ChannelError {
@@ -48,23 +46,20 @@ public:
         Sender() = default;
         ~Sender() = default;
 
-        Sender(const Sender &other)
-            : channel_(other.channel_)
-        {}
+        Sender(const Sender &other) : channel_(other.channel_) { }
 
-        Sender(Sender &&other)
-            : channel_(other.channel_)
+        Sender(Sender &&other) : channel_(other.channel_)
         {
             other.channel_ = nullptr;
         }
 
-        Sender& operator=(const Sender &other)
+        Sender &operator=(const Sender &other)
         {
             channel_ = other.channel_;
             return *this;
         }
 
-        Sender& operator=(Sender &&other)
+        Sender &operator=(Sender &&other)
         {
             channel_ = other.channel_;
             other.channel_ = nullptr;
@@ -80,9 +75,7 @@ public:
         }
 
     private:
-        Sender(std::shared_ptr<Channel<Event>> channel)
-            : channel_(channel)
-        {}
+        Sender(std::shared_ptr<Channel<Event>> channel) : channel_(channel) { }
 
         std::shared_ptr<Channel<Event>> channel_ { nullptr };
     };
@@ -94,23 +87,20 @@ public:
         Receiver() = default;
         ~Receiver() = default;
 
-        Receiver(const Receiver &other)
-            : channel_(other.channel_)
-        {}
+        Receiver(const Receiver &other) : channel_(other.channel_) { }
 
-        Receiver(Receiver &&other)
-            : channel_(other.channel_)
+        Receiver(Receiver &&other) : channel_(other.channel_)
         {
             other.channel_ = nullptr;
         }
 
-        Receiver& operator=(const Receiver &other)
+        Receiver &operator=(const Receiver &other)
         {
             channel_ = other.channel_;
             return *this;
         }
 
-        Receiver& operator=(Receiver &&other)
+        Receiver &operator=(Receiver &&other)
         {
             channel_ = other.channel_;
             other.channel_ = nullptr;
@@ -149,9 +139,7 @@ public:
         }
 
     private:
-        Receiver(std::shared_ptr<Channel<Event>> channel)
-            : channel_(channel)
-        {}
+        Receiver(std::shared_ptr<Channel<Event>> channel) : channel_(channel) { }
 
         std::shared_ptr<Channel<Event>> channel_ { nullptr };
     };
@@ -177,21 +165,21 @@ private:
     std::deque<Event> queue_;
 };
 
-template<typename Event>
+template <typename Event>
 std::pair<typename Channel<Event>::Sender, typename Channel<Event>::Receiver> Channel<Event>::OpenChannel()
 {
     std::shared_ptr<Channel<Event>> channel = std::make_shared<Channel<Event>>();
     return std::make_pair(Channel<Event>::Sender(channel), Channel<Event>::Receiver(channel));
 }
 
-template<typename Event>
+template <typename Event>
 void Channel<Event>::Enable()
 {
     std::unique_lock<std::mutex> lock(lock_);
     isActive_ = true;
 }
 
-template<typename Event>
+template <typename Event>
 void Channel<Event>::Disable()
 {
     std::unique_lock<std::mutex> lock(lock_);
@@ -199,7 +187,7 @@ void Channel<Event>::Disable()
     queue_.clear();
 }
 
-template<typename Event>
+template <typename Event>
 int32_t Channel<Event>::Send(const Event &event)
 {
     std::unique_lock<std::mutex> lock(lock_);
@@ -217,7 +205,7 @@ int32_t Channel<Event>::Send(const Event &event)
     return ChannelError::NO_ERROR;
 }
 
-template<typename Event>
+template <typename Event>
 Event Channel<Event>::Peek()
 {
     std::unique_lock<std::mutex> lock(lock_);
@@ -229,7 +217,7 @@ Event Channel<Event>::Peek()
     return queue_.front();
 }
 
-template<typename Event>
+template <typename Event>
 void Channel<Event>::Pop()
 {
     std::unique_lock<std::mutex> lock(lock_);
@@ -241,7 +229,7 @@ void Channel<Event>::Pop()
     queue_.pop_front();
 }
 
-template<typename Event>
+template <typename Event>
 Event Channel<Event>::Receive()
 {
     std::unique_lock<std::mutex> lock(lock_);

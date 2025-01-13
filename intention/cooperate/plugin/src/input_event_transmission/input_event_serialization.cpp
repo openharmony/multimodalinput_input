@@ -33,8 +33,7 @@ namespace {
 constexpr int32_t MAX_KEY_SIZE { 395 };
 } // namespace
 
-int32_t InputEventSerialization::KeyEventToNetPacket(
-    const std::shared_ptr<MMI::KeyEvent> key, NetPacket &pkt)
+int32_t InputEventSerialization::KeyEventToNetPacket(const std::shared_ptr<MMI::KeyEvent> key, NetPacket &pkt)
 {
     CHKPR(key, RET_ERR);
     if (SerializeInputEvent(key, pkt) != RET_OK) {
@@ -50,8 +49,7 @@ int32_t InputEventSerialization::KeyEventToNetPacket(
     }
     pkt << size;
     for (const auto &item : keys) {
-        pkt << item.GetKeyCode() << item.GetDownTime()
-            << item.GetDeviceId() << item.IsPressed() << item.GetUnicode();
+        pkt << item.GetKeyCode() << item.GetDownTime() << item.GetDeviceId() << item.IsPressed() << item.GetUnicode();
     }
     pkt << key->GetFunctionKey(MMI::KeyEvent::NUM_LOCK_FUNCTION_KEY)
         << key->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY)
@@ -124,8 +122,7 @@ void InputEventSerialization::ReadFunctionKeys(NetPacket &pkt, std::shared_ptr<M
     key->SetFunctionKey(MMI::KeyEvent::SCROLL_LOCK_FUNCTION_KEY, state);
 }
 
-int32_t InputEventSerialization::SwitchEventToNetPacket(
-    const std::shared_ptr<MMI::SwitchEvent> swEvent, NetPacket &pkt)
+int32_t InputEventSerialization::SwitchEventToNetPacket(const std::shared_ptr<MMI::SwitchEvent> swEvent, NetPacket &pkt)
 {
     if (SerializeInputEvent(swEvent, pkt) != RET_OK) {
         FI_HILOGE("Serialize input event failed");
@@ -156,10 +153,9 @@ int32_t InputEventSerialization::NetPacketToSwitchEvent(NetPacket &pkt, std::sha
 int32_t InputEventSerialization::SerializeInputEvent(std::shared_ptr<MMI::InputEvent> event, NetPacket &pkt)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
-        << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
-        << event->GetSourceType() << event->GetTargetDisplayId() << event->GetTargetWindowId()
-        << event->GetAgentWindowId() << event->GetFlag();
+    pkt << event->GetEventType() << event->GetId() << event->GetActionTime() << event->GetAction()
+        << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId() << event->GetSourceType()
+        << event->GetTargetDisplayId() << event->GetTargetWindowId() << event->GetAgentWindowId() << event->GetFlag();
     if (pkt.ChkRWError()) {
         FI_HILOGE("Serialize packet is failed");
         return RET_ERR;
@@ -543,7 +539,7 @@ int32_t InputEventSerialization::MarshallingEnhanceData(std::shared_ptr<MMI::Poi
         FI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    SecCompPointEvent *secCompPointEvent = static_cast<SecCompPointEvent*>(malloc(sizeof(SecCompPointEvent)));
+    SecCompPointEvent *secCompPointEvent = static_cast<SecCompPointEvent *>(malloc(sizeof(SecCompPointEvent)));
     if (secCompPointEvent == NULL) {
         FI_HILOGE("Malloc failed");
         return RET_ERR;
@@ -553,10 +549,10 @@ int32_t InputEventSerialization::MarshallingEnhanceData(std::shared_ptr<MMI::Poi
     secCompPointEvent->timeStamp = event->GetActionTime();
     uint32_t dataLen = sizeof(*secCompPointEvent);
     uint8_t outBuf[MAX_HMAC_SIZE] = { 0 };
-    uint8_t* enHanceData = reinterpret_cast<uint8_t *>(&outBuf[0]);
+    uint8_t *enHanceData = reinterpret_cast<uint8_t *>(&outBuf[0]);
     uint32_t enHanceDataLen = MAX_HMAC_SIZE;
-    int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(secCompPointEvent,
-        dataLen, enHanceData, enHanceDataLen);
+    int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(
+        secCompPointEvent, dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
         pkt << 0;
         free(secCompPointEvent);
@@ -613,10 +609,10 @@ int32_t InputEventSerialization::MarshallingEnhanceData(std::shared_ptr<MMI::Key
     secCompKeyEvent.keyCode = event->GetKeyCode();
     uint32_t dataLen = sizeof(secCompKeyEvent);
     uint8_t outBuf[MAX_HMAC_SIZE] = { 0 };
-    uint8_t* enHanceData = reinterpret_cast<uint8_t *>(&outBuf[0]);
+    uint8_t *enHanceData = reinterpret_cast<uint8_t *>(&outBuf[0]);
     uint32_t enHanceDataLen = MAX_HMAC_SIZE;
-    int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(&secCompKeyEvent,
-        dataLen, enHanceData, enHanceDataLen);
+    int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(
+        &secCompKeyEvent, dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
         pkt << 0;
         FI_HILOGD("GetKeyEventEnhanceData failed!");

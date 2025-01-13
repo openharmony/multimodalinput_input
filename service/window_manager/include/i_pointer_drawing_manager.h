@@ -19,7 +19,7 @@
 #include <map>
 #include <memory>
 
-#include "pixel_map.h"
+#include <pixel_map.h>
 
 #include "pointer_style.h"
 #include "window_info.h"
@@ -89,6 +89,10 @@ public:
     {
         return 0;
     }
+    virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options)
+    {
+        return 0;
+    }
     virtual int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
     {
         return 0;
@@ -105,6 +109,9 @@ public:
     {
         return 0;
     }
+
+    virtual int32_t GetCursorSurfaceId(uint64_t &surfaceId);
+
     virtual PointerStyle GetLastMouseStyle()
     {
         return {};
@@ -125,6 +132,7 @@ public:
     virtual void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) {}
     virtual void InitPointerCallback() {}
+    virtual void InitScreenInfo() {}
     virtual int32_t EnableHardwareCursorStats(int32_t pid, bool enable)
     {
         return 0;
@@ -149,6 +157,7 @@ public:
     virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
     virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
+    virtual void SubscribeScreenModeChange() {}
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     virtual bool IsSupported()
     {

@@ -16,8 +16,8 @@
 #include "cooperate.h"
 
 #ifdef ENABLE_PERFORMANCE_CHECK
-#include <sstream>
 #include "utility.h"
+#include <sstream>
 #endif // ENABLE_PERFORMANCE_CHECK
 
 #include "devicestatus_define.h"
@@ -30,8 +30,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-Cooperate::Cooperate(IContext *env)
-    : env_(env), context_(env), sm_(env)
+Cooperate::Cooperate(IContext *env) : env_(env), context_(env), sm_(env)
 {
     auto [sender, receiver] = Channel<CooperateEvent>::OpenChannel();
     receiver_ = receiver;
@@ -50,11 +49,8 @@ Cooperate::~Cooperate()
 void Cooperate::AddObserver(std::shared_ptr<ICooperateObserver> observer)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::ADD_OBSERVER,
-        AddObserverEvent {
-            .observer = observer
-        }));
+    auto ret = context_.Sender().Send(
+        CooperateEvent(CooperateEventType::ADD_OBSERVER, AddObserverEvent { .observer = observer }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }
@@ -63,11 +59,8 @@ void Cooperate::AddObserver(std::shared_ptr<ICooperateObserver> observer)
 void Cooperate::RemoveObserver(std::shared_ptr<ICooperateObserver> observer)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::REMOVE_OBSERVER,
-        RemoveObserverEvent {
-            .observer = observer
-        }));
+    auto ret = context_.Sender().Send(
+        CooperateEvent(CooperateEventType::REMOVE_OBSERVER, RemoveObserverEvent { .observer = observer }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }
@@ -76,11 +69,8 @@ void Cooperate::RemoveObserver(std::shared_ptr<ICooperateObserver> observer)
 int32_t Cooperate::RegisterListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::REGISTER_LISTENER,
-        RegisterListenerEvent {
-            .pid = pid
-        }));
+    auto ret = context_.Sender().Send(
+        CooperateEvent(CooperateEventType::REGISTER_LISTENER, RegisterListenerEvent { .pid = pid }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }
@@ -90,11 +80,8 @@ int32_t Cooperate::RegisterListener(int32_t pid)
 int32_t Cooperate::UnregisterListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::UNREGISTER_LISTENER,
-        UnregisterListenerEvent {
-            .pid = pid
-        }));
+    auto ret = context_.Sender().Send(
+        CooperateEvent(CooperateEventType::UNREGISTER_LISTENER, UnregisterListenerEvent { .pid = pid }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }
@@ -104,11 +91,8 @@ int32_t Cooperate::UnregisterListener(int32_t pid)
 int32_t Cooperate::RegisterHotAreaListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::REGISTER_HOTAREA_LISTENER,
-        RegisterHotareaListenerEvent {
-            .pid = pid
-        }));
+    auto ret = context_.Sender().Send(
+        CooperateEvent(CooperateEventType::REGISTER_HOTAREA_LISTENER, RegisterHotareaListenerEvent { .pid = pid }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }
@@ -118,11 +102,8 @@ int32_t Cooperate::RegisterHotAreaListener(int32_t pid)
 int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::UNREGISTER_HOTAREA_LISTENER,
-        UnregisterHotareaListenerEvent {
-            .pid = pid
-        }));
+    auto ret = context_.Sender().Send(
+        CooperateEvent(CooperateEventType::UNREGISTER_HOTAREA_LISTENER, UnregisterHotareaListenerEvent { .pid = pid }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }
@@ -132,8 +113,7 @@ int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
 int32_t Cooperate::Enable(int32_t tokenId, int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::ENABLE,
+    auto ret = context_.Sender().Send(CooperateEvent(CooperateEventType::ENABLE,
         EnableCooperateEvent {
             .tokenId = tokenId,
             .pid = pid,
@@ -148,8 +128,7 @@ int32_t Cooperate::Enable(int32_t tokenId, int32_t pid, int32_t userData)
 int32_t Cooperate::Disable(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::DISABLE,
+    auto ret = context_.Sender().Send(CooperateEvent(CooperateEventType::DISABLE,
         DisableCooperateEvent {
             .pid = pid,
             .userData = userData,
@@ -187,8 +166,7 @@ int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remot
 int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::STOP,
+    auto ret = context_.Sender().Send(CooperateEvent(CooperateEventType::STOP,
         StopCooperateEvent {
             .pid = pid,
             .userData = userData,
@@ -203,8 +181,7 @@ int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
 int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::GET_COOPERATE_STATE,
+    auto ret = context_.Sender().Send(CooperateEvent(CooperateEventType::GET_COOPERATE_STATE,
         GetCooperateStateEvent {
             .pid = pid,
             .userData = userData,
@@ -219,8 +196,7 @@ int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::s
 int32_t Cooperate::RegisterEventListener(int32_t pid, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::REGISTER_EVENT_LISTENER,
+    auto ret = context_.Sender().Send(CooperateEvent(CooperateEventType::REGISTER_EVENT_LISTENER,
         RegisterEventListenerEvent {
             .pid = pid,
             .networkId = networkId,
@@ -234,8 +210,7 @@ int32_t Cooperate::RegisterEventListener(int32_t pid, const std::string &network
 int32_t Cooperate::UnregisterEventListener(int32_t pid, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::UNREGISTER_EVENT_LISTENER,
+    auto ret = context_.Sender().Send(CooperateEvent(CooperateEventType::UNREGISTER_EVENT_LISTENER,
         UnregisterEventListenerEvent {
             .pid = pid,
             .networkId = networkId,
@@ -255,8 +230,7 @@ int32_t Cooperate::GetCooperateState(const std::string &udId, bool &state)
 
 int32_t Cooperate::Update(uint32_t mask, uint32_t flag)
 {
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::UPDATE_COOPERATE_FLAG,
+    auto ret = context_.Sender().Send(CooperateEvent(CooperateEventType::UPDATE_COOPERATE_FLAG,
         UpdateCooperateFlagEvent {
             .mask = mask,
             .flag = flag,
@@ -270,11 +244,7 @@ int32_t Cooperate::Update(uint32_t mask, uint32_t flag)
 void Cooperate::Dump(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    auto ret = context_.Sender().Send(CooperateEvent(
-        CooperateEventType::DUMP,
-        DumpEvent {
-            .fd = fd
-        }));
+    auto ret = context_.Sender().Send(CooperateEvent(CooperateEventType::DUMP, DumpEvent { .fd = fd }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }
@@ -312,7 +282,9 @@ void Cooperate::StartWorker()
     std::lock_guard guard(lock_);
     if (!workerStarted_) {
         workerStarted_ = true;
-        worker_ = std::thread([this] { this->Loop(); });
+        worker_ = std::thread([this] {
+            this->Loop();
+        });
     }
 }
 
@@ -343,7 +315,7 @@ void Cooperate::LoadMotionDrag()
     motionDrag->Enable(context_.EventHandler());
 }
 
-extern "C" ICooperate* CreateInstance(IContext *env)
+extern "C" ICooperate *CreateInstance(IContext *env)
 {
     CHKPP(env);
     return new Cooperate(env);

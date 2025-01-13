@@ -28,7 +28,7 @@ namespace DeviceStatus {
 namespace Cooperate {
 constexpr size_t MAX_INPUT_DEV_PER_DEVICE { 10 };
 
-InputDeviceMgr::InputDeviceMgr(IContext *context) : env_(context) {}
+InputDeviceMgr::InputDeviceMgr(IContext *context) : env_(context) { }
 
 void InputDeviceMgr::Enable()
 {
@@ -222,8 +222,8 @@ void InputDeviceMgr::DispDeviceInfo(std::shared_ptr<IDevice> device)
     FI_HILOGI("  name:          \"%{public}s\"", device->GetName().c_str());
     FI_HILOGI("  location:      \"%{public}s\"", device->GetPhys().c_str());
     FI_HILOGI("  unique id:     \"%{public}s\"", device->GetUniq().c_str());
-    FI_HILOGI("  is pointer:    %{public}s, is keyboard:%{public}s",
-        device->IsPointerDevice() ? "True" : "False", device->IsKeyboard() ? "True" : "False");
+    FI_HILOGI("  is pointer:    %{public}s, is keyboard:%{public}s", device->IsPointerDevice() ? "True" : "False",
+        device->IsKeyboard() ? "True" : "False");
 }
 
 void InputDeviceMgr::DumpRemoteInputDevice(const std::string &networkId)
@@ -233,8 +233,8 @@ void InputDeviceMgr::DumpRemoteInputDevice(const std::string &networkId)
         FI_HILOGE("NetworkId:%{public}s have no device existed", Utility::Anonymize(networkId).c_str());
         return;
     }
-    FI_HILOGI("NetworkId%{public}s, device mount:%{public}zu", Utility::Anonymize(networkId).c_str(),
-        remoteDevices_.size());
+    FI_HILOGI(
+        "NetworkId%{public}s, device mount:%{public}zu", Utility::Anonymize(networkId).c_str(), remoteDevices_.size());
     for (const auto &elem : remoteDevices_[networkId]) {
         FI_HILOGI("DeviceId:%{public}d, deviceName:%{public}s", elem->GetId(), elem->GetName().c_str());
     }
@@ -243,10 +243,10 @@ void InputDeviceMgr::DumpRemoteInputDevice(const std::string &networkId)
 int32_t InputDeviceMgr::SerializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet)
 {
     CALL_INFO_TRACE;
-    packet << device->GetId() << device->GetDevPath() << device->GetSysPath() << device->GetBus() <<
-    device->GetVendor() << device->GetProduct() << device->GetVersion() << device->GetName() <<
-    device->GetPhys() << device->GetUniq() << device->IsPointerDevice() << device->IsKeyboard() <<
-    static_cast<int32_t> (device->GetKeyboardType());
+    packet << device->GetId() << device->GetDevPath() << device->GetSysPath() << device->GetBus() << device->GetVendor()
+           << device->GetProduct() << device->GetVersion() << device->GetName() << device->GetPhys()
+           << device->GetUniq() << device->IsPointerDevice() << device->IsKeyboard()
+           << static_cast<int32_t>(device->GetKeyboardType());
     if (packet.ChkRWError()) {
         FI_HILOGE("Write packet failed");
         return RET_ERR;
@@ -280,9 +280,9 @@ void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId, int32_t
 {
     CALL_INFO_TRACE;
     if (remote2VirtualIds_.find(remoteDeviceId) != remote2VirtualIds_.end()) {
-        FI_HILOGW("Remote device:%{public}d already added as virtual device:%{public}d",
-            remoteDeviceId, remote2VirtualIds_[remoteDeviceId]);
-            return;
+        FI_HILOGW("Remote device:%{public}d already added as virtual device:%{public}d", remoteDeviceId,
+            remote2VirtualIds_[remoteDeviceId]);
+        return;
     }
     auto device = GetRemoteDeviceById(networkId, remoteDeviceId);
     CHKPV(device);
@@ -301,8 +301,8 @@ void InputDeviceMgr::RemoveVirtualInputDevice(const std::string &networkId, int3
 {
     CALL_INFO_TRACE;
     if (remote2VirtualIds_.find(remoteDeviceId) == remote2VirtualIds_.end()) {
-        FI_HILOGE("No remote device from networkId%{public}s with id:%{public}d",
-            Utility::Anonymize(networkId).c_str(), remoteDeviceId);
+        FI_HILOGE("No remote device from networkId%{public}s with id:%{public}d", Utility::Anonymize(networkId).c_str(),
+            remoteDeviceId);
         return;
     }
     auto virtualDeviceId = remote2VirtualIds_[remoteDeviceId];

@@ -44,7 +44,9 @@
 #include "parameters.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "touch_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -128,8 +130,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             return checkReturn;
         }
     }
-    int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
-    keyEvent->SetKeyIntention(keyIntention);
+    keyEvent->SetKeyIntention(KeyItemsTransKeyIntention(keyEvent->GetKeyItems()));
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
@@ -154,17 +155,32 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
-    auto device = INPUT_DEV_MGR->GetKeyboardDevice();
-    CHKPR(device, ERROR_NULL_POINTER);
-    if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
-        MMI_HILOGE("Failed to set the keyboard led");
-        return RET_ERR;
-    }
-    int32_t state = libinput_get_funckey_state(device, funcKey);
-
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    int32_t ret = keyEvent->SetFunctionKey(funcKey, state);
+    bool checkState = keyEvent->GetFunctionKey(funcKey);
+    if (checkState == enable) {
+        MMI_HILOGE("Current device no need to set up");
+        return RET_OK;
+    }
+    std::vector<struct libinput_device*> input_device;
+    int32_t DeviceId = -1;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
+    if (input_device.size() == 0) {
+        MMI_HILOGW("No keyboard device is currently available");
+        return RET_ERR;
+    }
+    for (auto it = input_device.begin(); it != input_device.end(); ++it) {
+        auto device = (*it);
+        DeviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+        if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
+            MMI_HILOGE("Failed to set the keyboard led, device id %{public}d", DeviceId);
+        }
+        int32_t state = libinput_get_funckey_state(device, funcKey);
+        if (state != enable) {
+            MMI_HILOGE("Failed to enable the function key, device id %{public}d", DeviceId);
+        }
+    }
+    int32_t ret = keyEvent->SetFunctionKey(funcKey, enable);
     if (ret != funcKey) {
         MMI_HILOGE("Failed to enable the function key");
         return RET_ERR;
@@ -214,7 +230,9 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
                 !(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) &&
                 !IsNavigationWindowInjectEvent(pointerEvent)) {
+#ifndef OHOS_BUILD_ENABLE_WATCH
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_WATCH
             }
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
@@ -536,7 +554,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
-            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi;
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
+            >> info.offsetX >> info.offsetY;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -611,7 +630,7 @@ int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetP
     CALL_DEBUG_ENTER;
     int32_t pid = sess->GetPid();
     WIN_MGR->SetWindowStateNotifyPid(pid);
-    MMI_HILOGI("pid:%{public}d", pid);
+    MMI_HILOGI("The pid:%{public}d", pid);
     return RET_OK;
 }
 
@@ -647,7 +666,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
     HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_HILOGD("handlerType:%{public}d", handlerType);
+    MMI_HILOGD("The handlerType:%{public}d", handlerType);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
@@ -868,7 +887,9 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 void ServerMsgHandler::LaunchAbility()
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     AUTH_DIALOG.ConnectSystemUi();
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
@@ -877,7 +898,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
     if (isAuthorize) {
         auto state = AUTHORIZE_HELPER->GetAuthorizeState();
         int32_t authorPid = AUTHORIZE_HELPER->GetAuthorizePid();
-        MMI_HILOGE("OnAuthorize  not has authorizing s:%{public}d, authPid:%{public}d",
+        MMI_HILOGE("OnAuthorize not has authorizing s:%{public}d, authPid:%{public}d",
             state, authorPid);
         if (state == AuthorizeState::STATE_UNAUTHORIZE) {
             MMI_HILOGE("Current not has authorizing");
@@ -887,12 +908,10 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             MMI_HILOGE("The injection permission has been granted. authPid:%{public}d ", authorPid);
             return ERR_OK;
         }
-
         InjectNoticeInfo noticeInfo;
         noticeInfo.pid = authorPid;
         AddInjectNotice(noticeInfo);
-        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(authorPid,
-            [&] (int32_t pid) {
+        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, [&] (int32_t pid) {
                 CloseInjectNotice(pid);
         });
         if (result != RET_OK) {
@@ -915,7 +934,6 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
         }
     }
-
     return ERR_OK;
 }
 
@@ -938,7 +956,6 @@ int32_t ServerMsgHandler::OnCancelInjection(int32_t callPid)
             CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
         }
     }
-
     return ERR_OK;
 }
 

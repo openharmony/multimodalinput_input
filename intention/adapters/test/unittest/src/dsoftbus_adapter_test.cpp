@@ -21,15 +21,15 @@
 #include "accesstoken_kit.h"
 #include "device_manager.h"
 #include "dm_device_info.h"
-#include <gtest/gtest.h>
 #include "nativetoken_kit.h"
 #include "securec.h"
 #include "token_setproc.h"
+#include <gtest/gtest.h>
 
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
-#include "dsoftbus_adapter_impl.h"
 #include "dsoftbus_adapter.h"
+#include "dsoftbus_adapter_impl.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -44,7 +44,7 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 const std::string SYSTEM_CORE { "system_core" };
 uint64_t g_tokenID { 0 };
 #define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
-#define DSTB_HARDWARE DistributedHardware::DeviceManager::GetInstance()
+#define DSTB_HARDWARE       DistributedHardware::DeviceManager::GetInstance()
 const std::string PKG_NAME_PREFIX { "DBinderBus_Dms_" };
 const std::string CLIENT_SESSION_NAME { "ohos.msdp.device_status.intention.clientsession." };
 constexpr size_t DEVICE_NAME_SIZE_MAX { 256 };
@@ -52,7 +52,7 @@ constexpr size_t PKG_NAME_SIZE_MAX { 65 };
 constexpr int32_t SOCKET_SERVER { 0 };
 constexpr int32_t SOCKET_CLIENT { 1 };
 constexpr int32_t SOCKET { 1 };
-const char* g_cores[] = { "ohos.permission.INPUT_MONITORING" };
+const char *g_cores[] = { "ohos.permission.INPUT_MONITORING" };
 } // namespace
 
 class DsoftbusAdapterTest : public testing::Test {
@@ -60,12 +60,12 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
-    static void SetPermission(const std::string &level, const char** perms, size_t permAmount);
+    static void SetPermission(const std::string &level, const char **perms, size_t permAmount);
     static void RemovePermission();
     static std::string GetLocalNetworkId();
 };
 
-void DsoftbusAdapterTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
+void DsoftbusAdapterTest::SetPermission(const std::string &level, const char **perms, size_t permAmount)
 {
     CALL_DEBUG_ENTER;
     if (perms == nullptr || permAmount == 0) {
@@ -98,9 +98,9 @@ void DsoftbusAdapterTest::RemovePermission()
     }
 }
 
-void DsoftbusAdapterTest::SetUpTestCase() {}
+void DsoftbusAdapterTest::SetUpTestCase() { }
 
-void DsoftbusAdapterTest::SetUp() {}
+void DsoftbusAdapterTest::SetUp() { }
 
 void DsoftbusAdapterTest::TearDown()
 {
@@ -112,9 +112,9 @@ public:
     DSoftbusObserver() = default;
     ~DSoftbusObserver() = default;
 
-    void OnBind(const std::string &networkId) {}
-    void OnShutdown(const std::string &networkId) {}
-    void OnConnected(const std::string &networkId) {}
+    void OnBind(const std::string &networkId) { }
+    void OnShutdown(const std::string &networkId) { }
+    void OnConnected(const std::string &networkId) { }
     bool OnPacket(const std::string &networkId, NetPacket &packet)
     {
         return true;
@@ -317,13 +317,11 @@ HWTEST_F(DsoftbusAdapterTest, InitSocket, TestSize.Level1)
     char peerName[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char peerNetworkId[PKG_NAME_SIZE_MAX] {};
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
-    SocketInfo info {
-        .name = name,
+    SocketInfo info { .name = name,
         .peerName = peerName,
         .peerNetworkId = peerNetworkId,
         .pkgName = pkgName,
-        .dataType = DATA_TYPE_BYTES
-    };
+        .dataType = DATA_TYPE_BYTES };
     int32_t socket = 1;
     int32_t ret = DSoftbusAdapterImpl::GetInstance()->InitSocket(info, SOCKET_CLIENT, socket);
     ASSERT_EQ(ret, RET_ERR);
@@ -501,11 +499,7 @@ HWTEST_F(DsoftbusAdapterTest, DsoftbusAdapterTest04, TestSize.Level1)
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     char name[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
-    SocketInfo info {
-        .name = name,
-        .pkgName = pkgName,
-        .dataType = DATA_TYPE_BYTES
-    };
+    SocketInfo info { .name = name, .pkgName = pkgName, .dataType = DATA_TYPE_BYTES };
     int32_t socket = 1;
     int32_t ret = DSoftbusAdapterImpl::GetInstance()->InitSocket(info, SOCKET_CLIENT, socket);
     ASSERT_EQ(ret, RET_ERR);

@@ -22,7 +22,9 @@
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "touch_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -33,7 +35,9 @@ namespace OHOS {
 namespace MMI {
 void DelegateInterface::Init()
 {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     TOUCH_DRAWING_MGR->SetDelegateProxy(shared_from_this());
+#endif // OHOS_BUILD_ENABLE_WATCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     DISPLAY_MONITOR->SetDelegateProxy(shared_from_this());
 #endif // #ifdef OHOS_BUILD_ENABLE_KEYBOARD

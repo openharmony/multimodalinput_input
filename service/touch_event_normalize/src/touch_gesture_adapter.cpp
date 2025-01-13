@@ -16,6 +16,7 @@
 #include "touch_gesture_adapter.h"
 
 #include "input_event_handler.h"
+#include "i_input_windows_manager.h"
 #include "util.h"
 
 #undef MMI_LOG_DOMAIN
@@ -57,6 +58,16 @@ void TouchGestureAdapter::process(std::shared_ptr<PointerEvent> event)
     }
 }
 
+void TouchGestureAdapter::HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent)
+{
+    if (gestureDetector_ != nullptr) {
+        gestureDetector_->HandleGestureWindowEmerged(windowId, lastTouchEvent);
+    }
+    if (nextAdapter_ != nullptr) {
+        nextAdapter_->HandleGestureWindowEmerged(windowId, lastTouchEvent);
+    }
+}
+
 void TouchGestureAdapter::Init()
 {
     if (gestureDetector_ == nullptr) {
@@ -84,7 +95,6 @@ void TouchGestureAdapter::OnTouchEvent(std::shared_ptr<PointerEvent> event)
     if (event->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         return;
     }
-    UpdateTouchMovement(event);
     shouldDeliverToNext_ = true;
 
     if (!gestureStarted_ && (event->GetPointerAction() == PointerEvent::POINTER_ACTION_UP)) {
@@ -98,36 +108,6 @@ void TouchGestureAdapter::OnTouchEvent(std::shared_ptr<PointerEvent> event)
     }
     if (gestureStarted_ && (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE)) {
         shouldDeliverToNext_ = false;
-    }
-}
-
-void TouchGestureAdapter::OnGestureSuccessful(std::shared_ptr<PointerEvent> event)
-{
-    CHKPV(event);
-    auto items = event->GetAllPointerItems();
-    for (const auto &item : items) {
-        if (!item.IsPressed()) {
-            continue;
-        }
-        auto iter = touches_.find(item.GetPointerId());
-        if (iter == touches_.end()) {
-            MMI_HILOGW("No touch(%{public}d) record", item.GetPointerId());
-            continue;
-        }
-        if (iter->second.cancelled_) {
-            continue;
-        }
-        iter->second.cancelled_ = true;
-        MMI_HILOGI("Cancel touch(%{public}d)", item.GetPointerId());
-        auto pointerEvent = std::make_shared<PointerEvent>(*event);
-        pointerEvent->SetPointerId(item.GetPointerId());
-        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-        pointerEvent->SetActionTime(GetSysClockTime());
-        pointerEvent->UpdateId();
-        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        CHKPV(eventDispatchHandler);
-        eventDispatchHandler->HandlePointerEvent(pointerEvent);
     }
 }
 
@@ -192,27 +172,7 @@ bool TouchGestureAdapter::OnGestureEvent(std::shared_ptr<PointerEvent> event, Ge
 
 void TouchGestureAdapter::OnGestureTrend(std::shared_ptr<PointerEvent> event)
 {
-    OnGestureSuccessful(event);
-}
-
-void TouchGestureAdapter::UpdateTouchMovement(std::shared_ptr<PointerEvent> event)
-{
-    if (!TouchGestureDetector::IsPhysicalPointer(event)) {
-        return;
-    }
-    switch (event->GetPointerAction()) {
-        case PointerEvent::POINTER_ACTION_DOWN: {
-            touches_.insert_or_assign(event->GetPointerId(), TouchItem {});
-            break;
-        }
-        case PointerEvent::POINTER_ACTION_UP: {
-            touches_.erase(event->GetPointerId());
-            break;
-        }
-        default: {
-            break;
-        }
-    }
+    WIN_MGR->CancelAllTouches(event);
 }
 } // namespace MMI
 } // namespace OHOS

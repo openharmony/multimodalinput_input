@@ -44,7 +44,7 @@ public:
         }
     };
 
-    HotArea(IContext *env) : env_(env) {}
+    HotArea(IContext *env) : env_(env) { }
     ~HotArea() = default;
     DISALLOW_COPY_AND_MOVE(HotArea);
 

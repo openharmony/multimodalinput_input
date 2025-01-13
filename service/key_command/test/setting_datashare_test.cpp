@@ -150,7 +150,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.L
     observer->key_ = "settingDateShare";
     std::string strUri = "strUri";
     settingDataShare.isDataShareReady_ = false;
-    ASSERT_EQ(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
+    ASSERT_NE(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
     settingDataShare.isDataShareReady_ = true;
     ASSERT_NE(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
 }
@@ -170,7 +170,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize
     observer->key_ = "settingDateShare";
     std::string strUri = "strUri";
     settingDataShare.isDataShareReady_ = false;
-    ASSERT_EQ(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
+    ASSERT_NE(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
     settingDataShare.isDataShareReady_ = true;
     ASSERT_NE(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
 }

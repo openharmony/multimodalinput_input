@@ -518,6 +518,7 @@ void LongPressSubscriberHandler::NotifySubscriber(std::shared_ptr<Subscriber> su
         .displayY = fingerGesture_.touches[0].y,
         .result = result,
         .windowId = touchEvent_->GetTargetWindowId(),
+        .pointerId = touchEvent_->GetPointerId(),
         .bundleName = bundleName,
     };
 

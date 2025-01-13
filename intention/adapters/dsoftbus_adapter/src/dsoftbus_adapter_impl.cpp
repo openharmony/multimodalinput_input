@@ -41,7 +41,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 #define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
-#define D_DEV_MGR DistributedHardware::DeviceManager::GetInstance()
+#define D_DEV_MGR           DistributedHardware::DeviceManager::GetInstance()
 const std::string CLIENT_SESSION_NAME { "ohos.msdp.device_status.intention.clientsession." };
 constexpr size_t BIND_STRING_LENGTH { 15 };
 constexpr size_t DEVICE_NAME_SIZE_MAX { 256 };
@@ -50,7 +50,7 @@ constexpr int32_t MIN_BW { 80 * 1024 * 1024 };
 constexpr int32_t LATENCY { 3000 };
 constexpr int32_t SOCKET_SERVER { 0 };
 constexpr int32_t SOCKET_CLIENT { 1 };
-}
+} // namespace
 
 std::mutex DSoftbusAdapterImpl::mutex_;
 std::shared_ptr<DSoftbusAdapterImpl> DSoftbusAdapterImpl::instance_;
@@ -143,8 +143,8 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
     }
     int32_t ret = OpenSessionLocked(networkId);
 #ifdef ENABLE_PERFORMANCE_CHECK
-    auto openSessionDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - startStamp).count();
+    auto openSessionDuration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startStamp).count();
     FI_HILOGI("[PERF] OpenSessionLocked ret:%{public}d, elapsed:%{public}lld ms", ret, openSessionDuration);
 #endif // ENABLE_PERFORMANCE_CHECK
     if (ret != RET_OK) {
@@ -162,8 +162,8 @@ void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
     if (auto iter = sessions_.find(networkId); iter != sessions_.end()) {
         ::Shutdown(iter->second.socket_);
         sessions_.erase(iter);
-        FI_HILOGI("Shutdown session(%{public}d, %{public}s)", iter->second.socket_,
-            Utility::Anonymize(networkId).c_str());
+        FI_HILOGI(
+            "Shutdown session(%{public}d, %{public}s)", iter->second.socket_, Utility::Anonymize(networkId).c_str());
     }
 }
 
@@ -216,7 +216,7 @@ int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &pa
         FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId).c_str());
         return RET_ERR;
     }
-    int32_t ret = ::SendBytes(socket, reinterpret_cast<const void*>(parcel.GetData()), parcel.GetDataSize());
+    int32_t ret = ::SendBytes(socket, reinterpret_cast<const void *>(parcel.GetData()), parcel.GetDataSize());
     if (ret != SOFTBUS_OK) {
         FI_HILOGE("DSOFTBUS::SendBytes fail, error:%{public}d", ret);
         return RET_ERR;
@@ -279,8 +279,8 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
     FI_HILOGI("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
     if (auto iter = sessions_.find(networkId); iter != sessions_.cend()) {
         if (iter->second.socket_ == socket) {
-            FI_HILOGI("(%{public}d, %{public}s) has bound", iter->second.socket_,
-                Utility::Anonymize(networkId).c_str());
+            FI_HILOGI(
+                "(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId).c_str());
             return;
         }
         FI_HILOGI("(%{public}d, %{public}s) need erase", iter->second.socket_, Utility::Anonymize(networkId).c_str());
@@ -302,10 +302,9 @@ void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
 {
     CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
-    auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
-        [socket](const auto &item) {
-            return (item.second.socket_ == socket);
-        });
+    auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(), [socket](const auto &item) {
+        return (item.second.socket_ == socket);
+    });
     if (iter == sessions_.cend()) {
         FI_HILOGD("Session(%{public}d) is not bound", socket);
         return;
@@ -317,8 +316,8 @@ void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
         if (observer != nullptr) {
-            FI_HILOGD("Notify shutdown of session(%{public}d, %{public}s)",
-                socket, Utility::Anonymize(networkId).c_str());
+            FI_HILOGD(
+                "Notify shutdown of session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
             observer->OnShutdown(networkId);
         }
     }
@@ -328,20 +327,19 @@ void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dat
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
-    auto iter = std::find_if(sessions_.begin(), sessions_.end(),
-        [socket](const auto &item) {
-            return (item.second.socket_ == socket);
-        });
+    auto iter = std::find_if(sessions_.begin(), sessions_.end(), [socket](const auto &item) {
+        return (item.second.socket_ == socket);
+    });
     if (iter == sessions_.end()) {
         FI_HILOGE("Invalid socket:%{public}d", socket);
         return;
     }
     const std::string networkId = iter->first;
 
-    if (*reinterpret_cast<const uint32_t*>(data) < static_cast<uint32_t>(MessageId::MAX_MESSAGE_ID)) {
+    if (*reinterpret_cast<const uint32_t *>(data) < static_cast<uint32_t>(MessageId::MAX_MESSAGE_ID)) {
         CircleStreamBuffer &circleBuffer = iter->second.buffer_;
 
-        if (!circleBuffer.Write(reinterpret_cast<const char*>(data), dataLen)) {
+        if (!circleBuffer.Write(reinterpret_cast<const char *>(data), dataLen)) {
             FI_HILOGE("Failed to write buffer");
         }
         HandleSessionData(networkId, circleBuffer);
@@ -359,7 +357,7 @@ int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int
         return RET_ERR;
     }
     QosTV socketQos[] {
-        { .qos = QOS_TYPE_MIN_BW, .value = MIN_BW },
+        { .qos = QOS_TYPE_MIN_BW,      .value = MIN_BW },
         { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
         { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
     };
@@ -399,11 +397,7 @@ int32_t DSoftbusAdapterImpl::SetupServer()
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
     FI_HILOGI("Server session name: \'%{public}s\'", name);
     FI_HILOGI("Package name: \'%{public}s\'", pkgName);
-    SocketInfo info {
-        .name = name,
-        .pkgName = pkgName,
-        .dataType = DATA_TYPE_BYTES
-    };
+    SocketInfo info { .name = name, .pkgName = pkgName, .dataType = DATA_TYPE_BYTES };
     int32_t ret = InitSocket(info, SOCKET_SERVER, socketFd_);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to setup server");
@@ -446,13 +440,11 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
     FI_HILOGI("Peer name: \'%{public}s\'", peerName);
     FI_HILOGI("Peer network id: \'%{public}s\'", Utility::Anonymize(peerNetworkId).c_str());
     FI_HILOGI("Package name: \'%{public}s\'", pkgName);
-    SocketInfo info {
-        .name = name,
+    SocketInfo info { .name = name,
         .peerName = peerName,
         .peerNetworkId = peerNetworkId,
         .pkgName = pkgName,
-        .dataType = DATA_TYPE_BYTES
-    };
+        .dataType = DATA_TYPE_BYTES };
     int32_t socket { -1 };
 
     int32_t ret = InitSocket(info, SOCKET_CLIENT, socket);
@@ -564,8 +556,7 @@ void DSoftbusAdapterImpl::HandlePacket(const std::string &networkId, NetPacket &
     CALL_DEBUG_ENTER;
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
-        if ((observer != nullptr) &&
-            observer->OnPacket(networkId, packet)) {
+        if ((observer != nullptr) && observer->OnPacket(networkId, packet)) {
             return;
         }
     }
@@ -576,8 +567,7 @@ void DSoftbusAdapterImpl::HandleRawData(const std::string &networkId, const void
     CALL_DEBUG_ENTER;
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
-        if ((observer != nullptr) &&
-            observer->OnRawData(networkId, data, dataLen)) {
+        if ((observer != nullptr) && observer->OnRawData(networkId, data, dataLen)) {
             return;
         }
     }

@@ -29,7 +29,7 @@ namespace Cooperate {
 class DSoftbusHandler final {
     class DSoftbusObserver final : public IDSoftbusObserver {
     public:
-        DSoftbusObserver(DSoftbusHandler &parent) : parent_(parent) {}
+        DSoftbusObserver(DSoftbusHandler &parent) : parent_(parent) { }
         ~DSoftbusObserver() = default;
 
         void OnBind(const std::string &networkId) override
@@ -90,13 +90,13 @@ private:
     void OnComeBack(const std::string &networkId, NetPacket &packet);
     void OnRelayCooperate(const std::string &networkId, NetPacket &packet);
     void OnRelayCooperateFinish(const std::string &networkId, NetPacket &packet);
-    void OnSubscribeMouseLocation(const std::string& networKId, NetPacket &packet);
-    void OnUnSubscribeMouseLocation(const std::string& networKId, NetPacket &packet);
-    void OnReplySubscribeLocation(const std::string& networKId, NetPacket &packet);
-    void OnReplyUnSubscribeLocation(const std::string& networKId, NetPacket &packet);
-    void OnRemoteMouseLocation(const std::string& networKId, NetPacket &packet);
-    void OnRemoteInputDevice(const std::string& networKId, NetPacket &packet);
-    void OnRemoteHotPlug(const std::string& networKId, NetPacket &packet);
+    void OnSubscribeMouseLocation(const std::string &networKId, NetPacket &packet);
+    void OnUnSubscribeMouseLocation(const std::string &networKId, NetPacket &packet);
+    void OnReplySubscribeLocation(const std::string &networKId, NetPacket &packet);
+    void OnReplyUnSubscribeLocation(const std::string &networKId, NetPacket &packet);
+    void OnRemoteMouseLocation(const std::string &networKId, NetPacket &packet);
+    void OnRemoteInputDevice(const std::string &networKId, NetPacket &packet);
+    void OnRemoteHotPlug(const std::string &networKId, NetPacket &packet);
     int32_t DeserializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet);
 
     IContext *env_ { nullptr };

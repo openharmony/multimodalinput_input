@@ -1136,5 +1136,109 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+
+void* JsPointerManager::DeepCopyPixelMap(void* pixelMap, int32_t pixelMapSize)
+{
+    if (pixelMap == nullptr || pixelMapSize <= 0) {
+        MMI_HILOGE("pixelMap is nullptr.");
+        return nullptr;
+    }
+    void* newPixelMap = (void *)malloc(pixelMapSize);
+    if (memcpy_s(newPixelMap, pixelMapSize, pixelMap, pixelMapSize) != 0) {
+        MMI_HILOGE("Failed to invoke memcpy_s.");
+        free(newPixelMap);
+        newPixelMap = nullptr;
+        return nullptr;
+    }
+
+    return newPixelMap;
+}
+
+napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, CustomCursor cursor,
+    CursorOptions options, int32_t pixelMapSize)
+{
+    CALL_DEBUG_ENTER;
+    sptr<CustomCursorAsyncContext> asyncContext = new (std::nothrow) CustomCursorAsyncContext(env);
+    CHKPP(asyncContext);
+    asyncContext->windowId = windowId;
+    asyncContext->cursor.pixelMap = DeepCopyPixelMap(cursor.pixelMap, pixelMapSize);
+    CHKPP(asyncContext->cursor.pixelMap);
+    asyncContext->cursor.focusX = cursor.focusX;
+    asyncContext->cursor.focusY = cursor.focusY;
+    asyncContext->options = options;
+    napi_value promise = nullptr;
+    CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    ExecuteSetCustomCursorAsync(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::ExecuteSetCustomCursorAsync(sptr<CustomCursorAsyncContext> asyncContext)
+{
+    CALL_DEBUG_ENTER;
+    CHKPP(asyncContext);
+    napi_env env = asyncContext->env;
+
+    napi_value resource = nullptr;
+    CHKRP(napi_create_string_utf8(env, "ExecuteSetCustomCursor", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
+    asyncContext->IncStrongRef(nullptr);
+    if (!CreateAsyncWork(env, asyncContext, resource)) {
+        MMI_HILOGE("Create async work failed");
+        asyncContext->DecStrongRef(nullptr);
+        return nullptr;
+    }
+
+    napi_value result;
+    napi_get_undefined(env, &result);
+    return result;
+}
+
+bool JsPointerManager::CreateAsyncWork(napi_env env, sptr<CustomCursorAsyncContext> asyncContext, napi_value resource)
+{
+    napi_status status = napi_create_async_work(
+        env,
+        nullptr,
+        resource,
+        ExecuteSetCustomCursorWork,
+        HandleSetCustomCursorCompletion,
+        asyncContext.GetRefPtr(), &asyncContext->work);
+    if (status != napi_ok ||
+        napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
+        return false;
+    }
+    return true;
+}
+
+void JsPointerManager::ExecuteSetCustomCursorWork(napi_env env, void* data)
+{
+    CHKPV(data);
+    sptr<CustomCursorAsyncContext> asyncContext(static_cast<CustomCursorAsyncContext*>(data));
+    asyncContext->errorCode = InputManager::GetInstance()->SetCustomCursor(
+        asyncContext->windowId,
+        asyncContext->cursor,
+        asyncContext->options);
+    napi_create_int32(env, asyncContext->errorCode, &asyncContext->resultValue);
+}
+
+void JsPointerManager::HandleSetCustomCursorCompletion(napi_env env, napi_status status, void* data)
+{
+    CHKPV(data);
+    sptr<CustomCursorAsyncContext> asyncContext(static_cast<CustomCursorAsyncContext*>(data));
+    CHKPV(asyncContext);
+    napi_value results[2] = { 0 };
+    int32_t size = 2;
+    if (!GetResult(asyncContext, results, size)) {
+        asyncContext->DecStrongRef(nullptr);
+        return;
+    }
+    results[1] = asyncContext->resultValue;
+    if (asyncContext->deferred) {
+        if (asyncContext->errorCode == RET_OK) {
+            CHKRV(napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
+        } else {
+            CHKRV(napi_reject_deferred(env, asyncContext->deferred, results[0]), REJECT_DEFERRED);
+        }
+    }
+    asyncContext->DecStrongRef(nullptr);
+}
 } // namespace MMI
 } // namespace OHOS

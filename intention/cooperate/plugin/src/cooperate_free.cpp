@@ -30,8 +30,7 @@ namespace {
 const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
 }
 
-CooperateFree::CooperateFree(IStateMachine &parent, IContext *env)
-    : ICooperateState(parent), env_(env)
+CooperateFree::CooperateFree(IStateMachine &parent, IContext *env) : ICooperateState(parent), env_(env)
 {
     initial_ = std::make_shared<Initial>(*this);
     Initial::BuildChains(initial_, *this);
@@ -79,8 +78,8 @@ bool CooperateFree::HasLocalPointerDevice() const
 bool CooperateFree::HasLocalKeyboardDevice() const
 {
     return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
-        CHKPR(dev, false);
-        return (dev->IsKeyboard() && !dev->IsRemote());
+    CHKPR(dev, false);
+    return (dev->IsKeyboard() && !dev->IsRemote());
     }};
 }
 
@@ -94,8 +93,7 @@ void CooperateFree::UnchainConnections(Context &context, const StopCooperateEven
     }
 }
 
-CooperateFree::Initial::Initial(CooperateFree &parent)
-    : ICooperateStep(parent, nullptr), parent_(parent)
+CooperateFree::Initial::Initial(CooperateFree &parent) : ICooperateStep(parent, nullptr), parent_(parent)
 {
     AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
         this->OnStart(context, event);
@@ -111,17 +109,13 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     });
 }
 
-void CooperateFree::Initial::OnProgress(Context &context, const CooperateEvent &event)
-{}
+void CooperateFree::Initial::OnProgress(Context &context, const CooperateEvent &event) { }
 
-void CooperateFree::Initial::OnReset(Context &context, const CooperateEvent &event)
-{}
+void CooperateFree::Initial::OnReset(Context &context, const CooperateEvent &event) { }
 
-void CooperateFree::Initial::BuildChains(std::shared_ptr<Initial> initial, CooperateFree &parent)
-{}
+void CooperateFree::Initial::BuildChains(std::shared_ptr<Initial> initial, CooperateFree &parent) { }
 
-void CooperateFree::Initial::RemoveChains(std::shared_ptr<Initial> initial)
-{}
+void CooperateFree::Initial::RemoveChains(std::shared_ptr<Initial> initial) { }
 
 void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &event)
 {
@@ -133,13 +127,10 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
 
     int32_t ret = context.dsoftbus_.OpenSession(context.Peer());
     if (ret != RET_OK) {
-        FI_HILOGE("[start cooperation] Failed to connect to \'%{public}s\'",
-            Utility::Anonymize(context.Peer()).c_str());
+        FI_HILOGE(
+            "[start cooperation] Failed to connect to \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
         int32_t errNum = (ret == RET_ERR ? static_cast<int32_t>(CoordinationErrCode::OPEN_SESSION_FAILED) : ret);
-        DSoftbusStartCooperateFinished failNotice {
-            .success = false,
-            .errCode = errNum
-        };
+        DSoftbusStartCooperateFinished failNotice { .success = false, .errCode = errNum };
         context.eventMgr_.StartCooperateFinish(failNotice);
         return;
     }
@@ -152,8 +143,8 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
     context.dsoftbus_.StartCooperate(context.Peer(), startNotice);
     context.inputEventInterceptor_.Enable(context);
     context.eventMgr_.StartCooperateFinish(startNotice);
-    FI_HILOGI("[start cooperation] Cooperation with \'%{public}s\' established",
-        Utility::Anonymize(context.Peer()).c_str());
+    FI_HILOGI(
+        "[start cooperation] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_OUT);
     context.OnTransitionOut();
 #ifdef ENABLE_PERFORMANCE_CHECK

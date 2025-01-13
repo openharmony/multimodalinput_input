@@ -27,9 +27,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-EventManager::EventManager(IContext *env)
-    : env_(env)
-{}
+EventManager::EventManager(IContext *env) : env_(env) { }
 
 void EventManager::RegisterListener(const RegisterListenerEvent &event)
 {
@@ -40,10 +38,9 @@ void EventManager::RegisterListener(const RegisterListenerEvent &event)
     eventInfo->pid = event.pid;
 
     FI_HILOGI("Add cooperate listener (%{public}d)", eventInfo->pid);
-    auto iter = std::find_if(listeners_.begin(), listeners_.end(),
-        [eventInfo](const auto &item) {
-            return ((item != nullptr) && (item->pid == eventInfo->pid));
-        });
+    auto iter = std::find_if(listeners_.begin(), listeners_.end(), [eventInfo](const auto &item) {
+        return ((item != nullptr) && (item->pid == eventInfo->pid));
+    });
     if (iter != listeners_.end()) {
         *iter = eventInfo;
     } else {
@@ -63,24 +60,20 @@ void EventManager::UnregisterListener(const UnregisterListenerEvent &event)
 void EventManager::EnableCooperate(const EnableCooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    CooperateNotice notice {
-        .pid = event.pid,
+    CooperateNotice notice { .pid = event.pid,
         .msgId = MessageId::COORDINATION_MESSAGE,
         .userData = event.userData,
-        .msg = CoordinationMessage::PREPARE
-    };
+        .msg = CoordinationMessage::PREPARE };
     NotifyCooperateMessage(notice);
 }
 
 void EventManager::DisableCooperate(const DisableCooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    CooperateNotice notice {
-        .pid = event.pid,
+    CooperateNotice notice { .pid = event.pid,
         .msgId = MessageId::COORDINATION_MESSAGE,
         .userData = event.userData,
-        .msg = CoordinationMessage::UNPREPARE
-    };
+        .msg = CoordinationMessage::UNPREPARE };
     NotifyCooperateMessage(notice);
 }
 
@@ -95,16 +88,13 @@ void EventManager::StartCooperate(const StartCooperateEvent &event)
     calls_[EventType::START] = eventInfo;
 }
 
-void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &event)
-{
-        .msgId = eventInfo->msgId,
-        .userData = eventInfo->userData,
-        .networkId = eventInfo->networkId,
-        .msg = (event.success ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL),
-        .errCode = event.errCode
-    };
-    calls_[EventType::START] = nullptr;
-    NotifyCooperateMessage(notice);
+void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &event) { .msgId = eventInfo -> msgId,
+    .userData = eventInfo->userData,
+    .networkId = eventInfo->networkId,
+    .msg = (event.success ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL),
+    .errCode = event.errCode };
+calls_[EventType::START] = nullptr;
+NotifyCooperateMessage(notice);
 }
 
 void EventManager::RemoteStart(const DSoftbusStartCooperate &event)
@@ -116,9 +106,8 @@ void EventManager::RemoteStart(const DSoftbusStartCooperate &event)
 void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event)
 {
     CALL_INFO_TRACE;
-    CoordinationMessage msg { event.success ?
-                              CoordinationMessage::ACTIVATE_SUCCESS :
-                              CoordinationMessage::ACTIVATE_FAIL };
+    CoordinationMessage msg { event.success ? CoordinationMessage::ACTIVATE_SUCCESS :
+                                              CoordinationMessage::ACTIVATE_FAIL };
     OnCooperateMessage(msg, event.networkId);
     if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
         CooperateDFX::WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
@@ -143,16 +132,13 @@ void EventManager::StopCooperate(const StopCooperateEvent &event)
     calls_[EventType::STOP] = eventInfo;
 }
 
-void EventManager::StopCooperateFinish(const DSoftbusStopCooperateFinished &event)
-{
-        .msgId = eventInfo->msgId,
-        .userData = eventInfo->userData,
-        .networkId = eventInfo->networkId,
-        .msg = (event.normal ? CoordinationMessage::DEACTIVATE_SUCCESS : CoordinationMessage::DEACTIVATE_FAIL),
-        .errCode = event.errCode
-    };
-    NotifyCooperateMessage(notice);
-    calls_[EventType::STOP] = nullptr;
+void EventManager::StopCooperateFinish(const DSoftbusStopCooperateFinished &event) { .msgId = eventInfo -> msgId,
+    .userData = eventInfo->userData,
+    .networkId = eventInfo->networkId,
+    .msg = (event.normal ? CoordinationMessage::DEACTIVATE_SUCCESS : CoordinationMessage::DEACTIVATE_FAIL),
+    .errCode = event.errCode };
+NotifyCooperateMessage(notice);
+calls_[EventType::STOP] = nullptr;
 }
 
 void EventManager::RemoteStop(const DSoftbusStopCooperate &event)
@@ -168,8 +154,8 @@ void EventManager::RemoteStopFinish(const DSoftbusStopCooperateFinished &event)
 void EventManager::OnProfileChanged(const DDPCooperateSwitchChanged &event)
 {
     CALL_INFO_TRACE;
-    FI_HILOGI("Switch status of \'%{public}s\' has changed to %{public}d",
-        Utility::Anonymize(event.networkId).c_str(), event.normal);
+    FI_HILOGI("Switch status of \'%{public}s\' has changed to %{public}d", Utility::Anonymize(event.networkId).c_str(),
+        event.normal);
     CoordinationMessage msg = (event.normal ? CoordinationMessage::PREPARE : CoordinationMessage::UNPREPARE);
     OnCooperateMessage(msg, event.networkId);
 }
@@ -193,13 +179,11 @@ void EventManager::OnCooperateMessage(CoordinationMessage msg, const std::string
         std::shared_ptr<EventInfo> listener = *iter;
         CHKPC(listener);
         FI_HILOGD("Notify cooperate listener (%{public}d, %{public}d)", listener->pid, listener->msgId);
-        CooperateNotice notice {
-            .pid = listener->pid,
+        CooperateNotice notice { .pid = listener->pid,
             .msgId = listener->msgId,
             .userData = listener->userData,
             .networkId = networkId,
-            .msg = msg
-        };
+            .msg = msg };
         NotifyCooperateMessage(notice);
     }
 }

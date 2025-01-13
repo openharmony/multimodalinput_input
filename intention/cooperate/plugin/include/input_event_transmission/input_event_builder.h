@@ -34,12 +34,12 @@ class Context;
 class InputEventBuilder final {
     class DSoftbusObserver final : public IDSoftbusObserver {
     public:
-        DSoftbusObserver(InputEventBuilder &parent) : parent_(parent) {}
+        DSoftbusObserver(InputEventBuilder &parent) : parent_(parent) { }
         ~DSoftbusObserver() = default;
 
-        void OnBind(const std::string &networkId) override {}
-        void OnShutdown(const std::string &networkId) override {}
-        void OnConnected(const std::string &networkId) override {}
+        void OnBind(const std::string &networkId) override { }
+        void OnShutdown(const std::string &networkId) override { }
+        void OnConnected(const std::string &networkId) override { }
 
         bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet) override
         {

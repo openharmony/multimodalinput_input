@@ -45,7 +45,9 @@ public:
     int32_t SetPointerSize(int32_t size) override;
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override;
     int32_t GetPointerSize(int32_t &size) override;
+    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
@@ -98,7 +100,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
-    int32_t SetPointerLocation(int32_t x, int32_t y) override;
+    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
     int32_t GetWindowPid(int32_t windowId) override;
     int32_t AppendExtraData(const ExtraData& extraData) override;

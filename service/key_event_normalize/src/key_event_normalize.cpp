@@ -16,11 +16,13 @@
 #include "key_event_normalize.h"
 
 #include <linux/input.h>
+#include <config_policy_utils.h>
 #include <parameters.h>
 
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "key_map_manager.h"
+#include "key_command_handler_util.h"
 #include "key_unicode_transformation.h"
 
 #undef MMI_LOG_DOMAIN
@@ -32,6 +34,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr uint32_t KEYSTATUS { 0 };
+constexpr int32_t SWAP_VOLUME_KEYS_ON_FOLD { 0 };
 } // namespace
 
 KeyEventNormalize::KeyEventNormalize() {}
@@ -169,7 +172,7 @@ int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
     } else if (lastShieldMode_ != shieldMode) {
         MMI_HILOGI("Shield mode:%{public}d is already false", shieldMode);
     } else {
-        MMI_HILOGI("lastShieldMode_ unset");
+        MMI_HILOGI("The lastShieldMode_ unset");
         lastShieldMode_ = SHIELD_MODE::UNSET_MODE;
     }
     iter = shieldStatus_.find(shieldMode);
@@ -210,6 +213,66 @@ void KeyEventNormalize::SetCurrentShieldMode(int32_t shieldMode)
     lastShieldMode_ = shieldMode;
 }
 
+void KeyEventNormalize::ReadProductConfig(InputProductConfig &config) const
+{
+    config = InputProductConfig {};
+    char cfgName[] { "etc/input/input_product_config.json" };
+    char buf[MAX_PATH_LEN] {};
+    char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
+    if (cfgPath == nullptr) {
+        MMI_HILOGE("No '%{public}s' was found", cfgName);
+        return;
+    }
+    MMI_HILOGI("Input product config:%{public}s", cfgPath);
+    ReadProductConfig(std::string(cfgPath), config);
+}
+
+void KeyEventNormalize::ReadProductConfig(const std::string &cfgPath, InputProductConfig &config) const
+{
+    std::string cfg = ReadJsonFile(cfgPath);
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(cfg.c_str());
+    if (!cJSON_IsObject(parser.json_)) {
+        MMI_HILOGE("Not json format");
+        return;
+    }
+    cJSON *jsonKeyboard = cJSON_GetObjectItemCaseSensitive(parser.json_, "keyboard");
+    if (!cJSON_IsObject(jsonKeyboard)) {
+        MMI_HILOGE("jsonKeyboard is not object");
+        return;
+    }
+    cJSON *jsonVolumeSwap = cJSON_GetObjectItemCaseSensitive(jsonKeyboard, "volumeSwap");
+    if (!cJSON_IsObject(jsonVolumeSwap)) {
+        MMI_HILOGE("jsonVolumeSwap is not object");
+        return;
+    }
+    cJSON *jsonWhen = cJSON_GetObjectItemCaseSensitive(jsonVolumeSwap, "when");
+    if (!cJSON_IsNumber(jsonWhen)) {
+        MMI_HILOGE("jsonWhen is not number");
+        return;
+    }
+    if (static_cast<int32_t>(cJSON_GetNumberValue(jsonWhen)) == SWAP_VOLUME_KEYS_ON_FOLD) {
+        config.volumeSwap_ = VolumeSwapConfig::SWAP_ON_FOLD;
+    } else {
+        config.volumeSwap_ = VolumeSwapConfig::NO_VOLUME_SWAP;
+    }
+    MMI_HILOGI("keyboard.volumeSwap:%{public}d", static_cast<int32_t>(config.volumeSwap_));
+}
+
+void KeyEventNormalize::CheckProductParam(InputProductConfig &productConfig) const
+{
+    if (productConfig.volumeSwap_ != VolumeSwapConfig::NO_CONFIG) {
+        return;
+    }
+    const std::string theProduct { "UNKNOWN_PRODUCT" };
+    std::string product = OHOS::system::GetParameter("const.build.product", "");
+    if (product == theProduct) {
+        productConfig.volumeSwap_ = VolumeSwapConfig::SWAP_ON_FOLD;
+    } else {
+        productConfig.volumeSwap_ = VolumeSwapConfig::NO_VOLUME_SWAP;
+    }
+}
+
 int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32_t keyCode, int32_t keyAction) const
 {
     static std::once_flag flag;
@@ -217,13 +280,13 @@ int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32
         { KeyEvent::KEYCODE_VOLUME_DOWN, DisplayMode::UNKNOWN },
         { KeyEvent::KEYCODE_VOLUME_UP, DisplayMode::UNKNOWN },
     };
-    static std::string product;
-    const std::string theProduct { "UNKNOWN_PRODUCT" };
+    static InputProductConfig productConfig {};
 
-    std::call_once(flag, []() {
-        product = OHOS::system::GetParameter("const.build.product", "");
+    std::call_once(flag, [this]() {
+        ReadProductConfig(productConfig);
+        CheckProductParam(productConfig);
     });
-    if (product != theProduct) {
+    if (productConfig.volumeSwap_ != VolumeSwapConfig::SWAP_ON_FOLD) {
         return keyCode;
     }
     auto iter = displayModes.find(keyCode);

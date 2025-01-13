@@ -44,26 +44,38 @@ constexpr int32_t FAIL_SUCC_TIME_DIFF { 3 * 60 * 1000 };
 constexpr int32_t MIN_GESTURE_TIMESTAMPS_SIZE { 2 };
 constexpr int32_t DOWN_TO_PREV_UP_MAX_TIME_THRESHOLD { 1000 * 1000 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+constexpr int32_t CALC_KEY_EVENT_TIMES { 100 };
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string EMPTY_STRING { "" };
-const std::string LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
-const std::string ACC_PATH { "/sys/devices/platform/_sensor/acc_info" };
-const std::string ACC0_PATH { "/sys/class/sensors/acc_sensor/info" };
-const std::string TP_PATH { "/sys/touchscreen/touch_chip_info" };
-const std::string TP0_PATH { "/sys/touchscreen0/touch_chip_info" };
-const std::string TP1_PATH { "/sys/touchscreen1/touch_chip_info" };
+const char* LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
+const char* ACC_PATH { "/sys/devices/platform/_sensor/acc_info" };
+const char* ACC0_PATH { "/sys/class/sensors/acc_sensor/info" };
+const char* TP_PATH { "/sys/touchscreen/touch_chip_info" };
+const char* TP0_PATH { "/sys/touchscreen0/touch_chip_info" };
+const char* TP1_PATH { "/sys/touchscreen1/touch_chip_info" };
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
+const std::string WALLET_BUNDLE_NAME { "com.hmos.walletservice" };
+const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
+const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string CAMERA_BUNDLE_NAME { "com.hmos.camera" };
+const std::string HINOTE_BUNDLE_NAME { "com.hmos.hinote" };
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 } // namespace
 
-static std::string GetVendorInfo(const std::string &nodePath)
+static std::string GetVendorInfo(const char* nodePath)
 {
     char realPath[PATH_MAX] = {};
-    if (realpath(nodePath.c_str(), realPath) == nullptr) {
+    if (realpath(nodePath, realPath) == nullptr) {
         MMI_HILOGE("The realpath return nullptr");
         return "";
     }
     std::ifstream file(realPath);
     if (!file.is_open()) {
-        MMI_HILOGE("Unable to open file:%{public}s, error:%{public}d", nodePath.c_str(), errno);
+        MMI_HILOGE("Unable to open file:%{public}s, error:%{public}d", nodePath, errno);
         return "";
     }
     std::string vendorInfo;
@@ -1138,5 +1150,98 @@ void DfxHisysevent::ReportSetCurrentUser(int32_t userId)
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+void DfxHisysevent::ClearCallCount()
+{
+    calKeyEventTime_.clear();
+    callCount_ = 0;
+}
+
+void DfxHisysevent::ReportAbility(int32_t keyCode, int32_t action, std::string name)
+{
+    if (name == HINOTE_BUNDLE_NAME) {
+        ReportKeyEvent(keyCode, action, name, STYLUS_PEN);
+    } else if (name == AIBASE_BUNDLE_NAME) {
+        ReportKeyEvent(keyCode, action, name, AIBASE_VOICE);
+    } else if (name == WALLET_BUNDLE_NAME) {
+        ReportKeyEvent(keyCode, action, name, OPEN_WALLET);
+    } else if (name == SOS_BUNDLE_NAME) {
+        ReportKeyEvent(keyCode, action, name, OPEN_SOS);
+    } else if (name == CAMERA_BUNDLE_NAME) {
+        ReportKeyEvent(keyCode, action, name, OPEN_CAMERA);
+    } else if (name == SCREENSHOT_BUNDLE_NAME) {
+        ReportKeyEvent(keyCode, action, name, SCREEN_SHOT);
+    } else if (name == SCREENRECORDER_BUNDLE_NAME) {
+        ReportKeyEvent(keyCode, action, name, SCREEN_RECORDING);
+    } else {
+        ReportKeyEvent(keyCode, action, name, NO_TYPE);
+    }
+}
+
+void DfxHisysevent::ReportKeyEvent(int32_t keyCode, int32_t action, std::string name,
+    KEY_CONSUMPTION_TYPE type, int32_t subscribeId)
+{
+    if (callCount_ < CALC_KEY_EVENT_TIMES) {
+        callCount_++;
+        calKeyEventTime_[type]++;
+    }
+    if (callCount_ == CALC_KEY_EVENT_TIMES) {
+        int32_t ret = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "KEY_EVENT",
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "KEY_CODE", keyCode,
+            "KEY_ACTION", action,
+            "BUNDLE_NAME", name,
+            "SUBSCRIBE_ID", subscribeId,
+            "CONSUMER_TYPE", type,
+            "CONSUMER_TIMES", calKeyEventTime_[type]);
+        if (ret != 0) {
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+        }
+        ClearCallCount();
+    }
+}
+
+void DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t durationMS)
+{
+    apiDurationStatics_.RecordDuration(api, durationMS);
+    if (!apiDurationStatics_.IsLimitMatched()) {
+        return;
+    }
+    auto apiDurations = apiDurationStatics_.GetDurationBox();
+    for (const auto &apiDuration : apiDurations) {
+        auto api = apiDuration.first;
+        std::vector<int32_t> thresholds;
+        std::vector<int32_t> durationCounts;
+        for (const auto &durationBox : apiDuration.second) {
+            thresholds.push_back(durationBox.first);
+            durationCounts.push_back(durationBox.second);
+        }
+        HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "MMI_API_DURATION",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "API_NAME", apiDurationStatics_.ApiToString(api),
+            "DURATION_THRESHOLDS", threshold,
+            "DURATION_THRESHOLD_COUNTS", durationCounts,
+            "USER_ID", userId);
+    }
+    apiDurationStatics_.ResetApiStatistics();
+}
+
+void DfxHisysevent::ReportMMiServiceThreadLongTask(const std::string &taskName)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MMI_LONG_TASK",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "TASK_NAME", taskName);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 } // namespace MMI
 } // namespace OHOS

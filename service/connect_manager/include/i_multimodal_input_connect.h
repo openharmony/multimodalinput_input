@@ -16,8 +16,8 @@
 #ifndef I_MULTIMODAL_INPUT_CONNECT_H
 #define I_MULTIMODAL_INPUT_CONNECT_H
 
-#include "iremote_broker.h"
-#include "system_ability_definition.h"
+#include <iremote_broker.h>
+#include <system_ability_definition.h>
 
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -59,10 +59,12 @@ public:
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
     virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) = 0;
+    virtual int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) = 0;
     virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap) = 0;
     virtual int32_t SetPointerSize(int32_t size) = 0;
     virtual int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) = 0;
     virtual int32_t GetPointerSize(int32_t &size) = 0;
+    virtual int32_t GetCursorSurfaceId(uint64_t &surfaceId) = 0;
     virtual int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
@@ -114,7 +116,7 @@ public:
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
-    virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId) = 0;
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) = 0;

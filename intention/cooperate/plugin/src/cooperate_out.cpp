@@ -26,8 +26,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-CooperateOut::CooperateOut(IStateMachine &parent, IContext *env)
-    : ICooperateState(parent), env_(env)
+CooperateOut::CooperateOut(IStateMachine &parent, IContext *env) : ICooperateState(parent), env_(env)
 {
     initial_ = std::make_shared<Initial>(*this);
     Initial::BuildChains(initial_, *this);
@@ -62,8 +61,8 @@ void CooperateOut::SetPointerVisible(Context &context)
     CHKPV(env_);
     bool hasLocalPointerDevice = env_->GetDeviceManager().HasLocalPointerDevice();
     bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
-    FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s",
-        visible ? "true" : "false", hasLocalPointerDevice ? "true" : "false");
+    FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s", visible ? "true" : "false",
+        hasLocalPointerDevice ? "true" : "false");
     env_->GetInput().SetPointerVisibility(visible, PRIORITY);
 }
 
@@ -73,14 +72,11 @@ void CooperateOut::OnSetCooperatePriv(uint32_t priv)
     env_->GetDragManager().SetCooperatePriv(priv);
 }
 
-void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent)
-{}
+void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent) { }
 
-void CooperateOut::Initial::RemoveChains(std::shared_ptr<Initial> self)
-{}
+void CooperateOut::Initial::RemoveChains(std::shared_ptr<Initial> self) { }
 
-CooperateOut::Initial::Initial(CooperateOut &parent)
-    : ICooperateStep(parent, nullptr), parent_(parent)
+CooperateOut::Initial::Initial(CooperateOut &parent) : ICooperateStep(parent, nullptr), parent_(parent)
 {
     AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
         this->OnDisable(context, event);
@@ -103,29 +99,23 @@ CooperateOut::Initial::Initial(CooperateOut &parent)
     AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, [this](Context &context, const CooperateEvent &event) {
         this->OnBoardOffline(context, event);
     });
-    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnSwitchChanged(context, event);
+    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, [this](Context &context, const CooperateEvent &event) {
+        this->OnSwitchChanged(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusSessionClosed(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, [this](Context &context, const CooperateEvent &event) {
+        this->OnSoftbusSessionClosed(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_COME_BACK,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnComeBack(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_COME_BACK, [this](Context &context, const CooperateEvent &event) {
+        this->OnComeBack(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteStart(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, [this](Context &context, const CooperateEvent &event) {
+        this->OnRemoteStart(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteStop(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, [this](Context &context, const CooperateEvent &event) {
+        this->OnRemoteStop(context, event);
     });
-    AddHandler(CooperateEventType::DSOFTBUS_RELAY_COOPERATE,
-        [this](Context &context, const CooperateEvent &event) {
-            this->OnRelay(context, event);
+    AddHandler(CooperateEventType::DSOFTBUS_RELAY_COOPERATE, [this](Context &context, const CooperateEvent &event) {
+        this->OnRelay(context, event);
     });
 }
 
@@ -142,10 +132,8 @@ void CooperateOut::Initial::OnStart(Context &context, const CooperateEvent &even
     context.eventMgr_.StartCooperate(param);
     FI_HILOGI("[start] Start cooperation with \'%{public}s\', report success when out",
         Utility::Anonymize(context.Peer()).c_str());
-    DSoftbusStartCooperateFinished failNotice {
-        .success = false,
-        .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL)
-    };
+    DSoftbusStartCooperateFinished failNotice { .success = false,
+        .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL) };
     context.eventMgr_.StartCooperateFinish(failNotice);
 }
 
@@ -283,8 +271,7 @@ void CooperateOut::Initial::OnPointerEvent(Context &context, const CooperateEven
 {
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
 
-    if ((notice.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
-        (notice.deviceId == context.StartDeviceId())) {
+    if ((notice.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) || (notice.deviceId == context.StartDeviceId())) {
         return;
     }
     FI_HILOGI("Stop cooperation on operation of undedicated pointer");
@@ -320,16 +307,14 @@ void CooperateOut::Initial::OnSoftbusSessionClosed(Context &context, const Coope
     if (!context.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[dsoftbus session closed] Disconnected with \'%{public}s\'",
-        Utility::Anonymize(notice.networkId).c_str());
+    FI_HILOGI(
+        "[dsoftbus session closed] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
 }
 
-void CooperateOut::Initial::OnProgress(Context &context, const CooperateEvent &event)
-{}
+void CooperateOut::Initial::OnProgress(Context &context, const CooperateEvent &event) { }
 
-void CooperateOut::Initial::OnReset(Context &context, const CooperateEvent &event)
-{}
+void CooperateOut::Initial::OnReset(Context &context, const CooperateEvent &event) { }
 
 void CooperateOut::StopCooperate(Context &context, const CooperateEvent &event)
 {

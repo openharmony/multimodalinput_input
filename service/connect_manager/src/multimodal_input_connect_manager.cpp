@@ -189,6 +189,13 @@ int32_t MultimodalInputConnectManager::GetPointerSize(int32_t &size)
     return multimodalInputConnectService_->GetPointerSize(size);
 }
 
+int32_t MultimodalInputConnectManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetCursorSurfaceId(surfaceId);
+}
+
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -498,11 +505,11 @@ int32_t MultimodalInputConnectManager::SetFunctionKeyState(int32_t funcKey, bool
     return multimodalInputConnectService_->SetFunctionKeyState(funcKey, enable);
 }
 
-int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
+int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetPointerLocation(x, y);
+    return multimodalInputConnectService_->SetPointerLocation(x, y, displayId);
 }
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService() __attribute__((no_sanitize("cfi")))
@@ -969,6 +976,13 @@ int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(int32_t sourceWindow
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+}
+
+int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetCustomCursor(windowId, cursor, options);
 }
 } // namespace MMI
 } // namespace OHOS

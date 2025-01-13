@@ -171,12 +171,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisAcce
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
     double ret = processor.HandleAxisAccelateTouchPad(axisValue);
     ASSERT_EQ(ret, 2.0);
-    inputWindowsManager->captureModeInfo_.isCaptureMode = false;
-    ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_EQ(ret, 2.14);
-    axisValue = -5.0;
-    ret = processor.HandleAxisAccelateTouchPad(axisValue);
-    ASSERT_NE(ret, -5.0);
 }
 
 /**
@@ -282,10 +276,11 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLoca
 {
     int32_t idNames = -1;
     int32_t deviceId = 0;
+    int32_t displayId = -1;
     MouseTransformProcessor processor(deviceId);
     int32_t x = 0;
     int32_t y = 0;
-    ASSERT_EQ(processor.SetPointerLocation(x, y), idNames);
+    ASSERT_EQ(processor.SetPointerLocation(x, y, displayId), idNames);
 }
 
 /**

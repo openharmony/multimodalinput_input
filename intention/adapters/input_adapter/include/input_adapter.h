@@ -36,7 +36,7 @@ public:
     int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb) override;
     int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb) override;
     int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
-                           std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb) override;
+        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb) override;
     void RemoveInterceptor(int32_t interceptorId) override;
 
     int32_t AddFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> callback) override;

@@ -16,6 +16,7 @@
 #include "multimodal_input_preferences_manager.h"
 
 #include "mmi_log.h"
+#include "param_wrapper.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -29,7 +30,7 @@ constexpr int32_t KEYBOARD_REPEATRATE { 50 };
 constexpr int32_t KEYBOARD_REPEATDELAY { 500 };
 constexpr int32_t MOUSE_SCROLL_ROWS { 3 };
 constexpr int32_t PRIMARY_BUTTON { 0 };
-constexpr int32_t POINTER_SPEED { 7 };
+constexpr int32_t POINTER_SPEED { 10 };
 constexpr int32_t TOUCHPAD_POINTER_SPEED { 6 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t RIGHT_CLICK_TYPE { 1 };
@@ -41,12 +42,12 @@ constexpr int32_t MAGIC_POINTER_SIZE { 1 };
 constexpr int32_t POINTER_STYLE { 0 };
 constexpr int32_t ERROR_DELAY_VALUE { -1000 };
 constexpr bool BOOL_DEFAULT { true };
-constexpr bool BOOL_DEFAULT_FALSE { false };
 const std::string PATH { "/data/service/el1/public/multimodalinput/" };
 const std::string SHORT_KEY_FILE_NAME { "Settings.xml" };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string KEYBOARD_FILE_NAME { "keyboard_settings.xml" };
 const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
+const std::string DEFAULT_MOUSE_SPEED_NAME { "const.multimodalinput.default_mouse_speed" };
 } // namespace
 
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
@@ -92,7 +93,8 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
         NativePreferences::PreferencesHelper::GetPreferences(PATH + TOUCHPAD_FILE_NAME, errCode);
     CHKPR(touchpadPref, errno);
     pointerSize_ = mousePref->GetInt(strPointerSize_, POINTER_SIZE);
-    pointerSpeed_ = mousePref->GetInt(strPointerSpeed_, POINTER_SPEED);
+    pointerSpeed_ = mousePref->GetInt(strPointerSpeed_,
+        OHOS::system::GetIntParameter(DEFAULT_MOUSE_SPEED_NAME, POINTER_SPEED));
     pointerColor_ = mousePref->GetInt(strPointerColor_, POINTER_COLOR);
     pointerStyle_ = mousePref->GetInt(strPointerStyle_, POINTER_STYLE);
     mouseScrollRows_ = mousePref->GetInt(strMouseScrollRows_, MOUSE_SCROLL_ROWS);
@@ -109,7 +111,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     touchpadScrollDirection_ = touchpadPref->GetBool(strTouchpadScrollDirection_, BOOL_DEFAULT);
     touchpadThreeFingerTapSwitch_ = touchpadPref->GetBool(strTouchpadThreeFingerTapSwitch_, BOOL_DEFAULT);
     touchpadScrollRows_ = touchpadPref->GetInt(strTouchpadScrollRows_, TOUCHPAD_SCROLL_ROWS);
-    touchpadDoubleTapAndDrag_ = touchpadPref->GetBool(strTouchpadDoubleTapAndDrag_, BOOL_DEFAULT_FALSE);
+    touchpadDoubleTapAndDrag_ = touchpadPref->GetBool(strTouchpadDoubleTapAndDrag_, BOOL_DEFAULT);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     magicPointerSize_ = mousePref->GetInt(strMagicPointerSize_, MAGIC_POINTER_SIZE);
     magicPointerColor_ = mousePref->GetInt(strMagicPointerColor_, POINTER_COLOR);

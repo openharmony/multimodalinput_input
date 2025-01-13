@@ -65,19 +65,16 @@ config("libmmi_server_config") {
     "libinput_adapter/include",
     "message_handle/include",
     "module_loader/include",
-    "hardware_cursor_pointer_manager/include",
     "window_manager/include",
     "touch_event_normalize/include",
     "key_command/include",
     "subscriber/include",
     "timer_manager/include",
     "permission_helper/include",
-    "infrared_emitter/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/device_state_manager/include",
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
-    "${mmi_service_path}/hardware_cursor_pointer_manager/include",
     "${mmi_service_path}/nap_process/include",
     "${mmi_service_path}/event_resample/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -91,6 +88,14 @@ config("libmmi_server_config") {
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/util/napi/include",
   ]
+
+  if (input_feature_product != "watch") {
+    include_dirs += [
+      "hardware_cursor_pointer_manager/include",
+      "infrared_emitter/include",
+      "${mmi_service_path}/hardware_cursor_pointer_manager/include",
+    ]
+  }
 
   if (input_feature_fingerprint) {
     include_dirs += [ "fingerprint_event_processor/include" ]
@@ -156,15 +161,7 @@ ohos_shared_library("libmmi-server") {
   version_script = "libmmi-server-map"
   include_dirs = [ "${mmi_path}/frameworks/proxy/events/include" ]
 
-  sources += [
-    "account_manager/src/account_manager.cpp",
-    "window_manager/src/knuckle_divergent_point.cpp",
-    "window_manager/src/knuckle_drawing_manager.cpp",
-    "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
-    "window_manager/src/knuckle_glow_point.cpp",
-    "window_manager/src/knuckle_glow_trace_system.cpp",
-    "window_manager/src/touch_drawing_manager.cpp",
-  ]
+  sources += [ "account_manager/src/account_manager.cpp" ]
 
   if (input_feature_keyboard) {
     sources += [
@@ -196,8 +193,6 @@ ohos_shared_library("libmmi-server") {
     sources += [ "subscriber/src/switch_subscriber_handler.cpp" ]
   }
 
-  sources += [ "infrared_emitter/src/infrared_emitter_controller.cpp" ]
-
   if (input_feature_mouse || input_feature_touchscreen) {
     sources += [ "touch_event_normalize/src/touch_event_normalize.cpp" ]
     if (input_feature_mouse) {
@@ -206,11 +201,14 @@ ohos_shared_library("libmmi-server") {
         "mouse_event_normalize/src/mouse_device_state.cpp",
         "mouse_event_normalize/src/mouse_event_normalize.cpp",
         "mouse_event_normalize/src/mouse_transform_processor.cpp",
-        "touch_event_normalize/src/gesture_transform_processor.cpp",
         "touch_event_normalize/src/touchpad_transform_processor.cpp",
       ]
       if (input_feature_pointer_drawing) {
-        sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
+        sources += [
+          "window_manager/src/pointer_drawing_manager.cpp",
+          "window_manager/src/pointer_renderer.cpp",
+          "window_manager/src/screen_pointer.cpp",
+        ]
       } else {
         sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
       }
@@ -218,7 +216,7 @@ ohos_shared_library("libmmi-server") {
     if (input_feature_touchscreen) {
       sources += [
         "event_resample/src/event_resample.cpp",
-        "touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
+        "touch_event_normalize/src/remote_control_transform_processor.cpp",
         "touch_event_normalize/src/touch_gesture_adapter.cpp",
         "touch_event_normalize/src/touch_gesture_detector.cpp",
         "touch_event_normalize/src/touch_gesture_manager.cpp",
@@ -254,11 +252,14 @@ ohos_shared_library("libmmi-server") {
   deps = [
     ":mmi_device_config.ini",
     ":mmi_rust",
-    "${mmi_path}/etc/mouse_icon:input_mouse_icon",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
     "${mmi_path}/util:libmmi-util",
   ]
+
+  if (input_feature_product != "watch") {
+    deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
+  }
 
   if (input_ext_feature_anco) {
     deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
@@ -269,7 +270,6 @@ ohos_shared_library("libmmi-server") {
     "cJSON:cjson",
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "graphic_2d:librender_service_base",
     "graphic_surface:surface",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -308,44 +308,73 @@ ohos_shared_library("libmmi-server") {
   }
 
   external_deps += [
-    "ability_base:want",
-    "ability_base:zuri",
-    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
-    "ability_runtime:dataobs_manager",
-    "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
-    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "faultloggerd:libbacktrace_local",
     "faultloggerd:libdfx_dumpcatcher",
     "faultloggerd:libjson_stack_formatter",
     "ffrt:libffrt",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:libcomposer",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
     "hdf_core:libhdi",
     "hicollie:libhicollie",
-    "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "image_framework:image_native",
-    "init:libbeget_proxy",
-    "init:libbegetutil",
-    "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "safwk:system_ability_fwk",
-    "window_manager:libdm",
-    "window_manager:libdms",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (input_feature_product != "watch") {
+    sources += [
+      "infrared_emitter/src/infrared_emitter_controller.cpp",
+      "window_manager/src/knuckle_divergent_point.cpp",
+      "window_manager/src/knuckle_drawing_manager.cpp",
+      "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
+      "window_manager/src/knuckle_glow_point.cpp",
+      "window_manager/src/knuckle_glow_trace_system.cpp",
+      "window_manager/src/touch_drawing_manager.cpp",
+    ]
+
+    deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
+
+    if (input_feature_mouse || input_feature_touchscreen) {
+      if (input_feature_mouse) {
+        sources +=
+            [ "touch_event_normalize/src/gesture_transform_processor.cpp" ]
+      }
+      if (input_feature_touchscreen) {
+        sources +=
+            [ "touch_event_normalize/src/tablet_tool_tranform_processor.cpp" ]
+      }
+    }
+
+    external_deps += [
+      "ability_base:want",
+      "ability_base:zuri",
+      "ability_runtime:ability_connect_callback_stub",
+      "ability_runtime:dataobs_manager",
+      "access_token:libaccesstoken_sdk",
+      "common_event_service:cesfwk_innerkits",
+      "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
+      "graphic_2d:2d_graphics",
+      "graphic_2d:libcomposer",
+      "graphic_2d:librender_service_base",
+      "graphic_2d:librender_service_client",
+      "graphic_2d:window_animation",
+      "hilog:libhilog",
+      "image_framework:image_native",
+      "init:libbeget_proxy",
+      "init:libbegetutil",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+      "window_manager:libdm",
+      "window_manager:libdms",
+    ]
+  }
 
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
@@ -1239,6 +1268,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
