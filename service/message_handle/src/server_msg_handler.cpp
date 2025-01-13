@@ -760,9 +760,7 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 void ServerMsgHandler::LaunchAbility()
 {
     CALL_DEBUG_ENTER;
-#ifndef OHOS_BUILD_ENABLE_WATCH
     AUTH_DIALOG.ConnectSystemUi();
-#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
