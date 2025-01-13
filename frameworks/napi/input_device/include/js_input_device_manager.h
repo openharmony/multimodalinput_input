@@ -50,8 +50,8 @@ public:
     napi_value GetKeyboardRepeatRate(napi_env env, napi_value handle = nullptr);
     napi_value GetIntervalSinceLastInput(napi_env env);
     napi_value SetInputDeviceEnabled(napi_env env, int32_t deviceId, bool enable, napi_value handle = nullptr);
-    napi_value SetFunctionKeyState(napi_env env, int32_t funcKey, bool state, napi_value handle = nullptr);
-    napi_value GetFunctionKeyState(napi_env env, int32_t funcKey, napi_value handle = nullptr);
+    napi_value SetFunctionKeyEnabled(napi_env env, int32_t funcKey, bool state, napi_value handle = nullptr);
+    napi_value IsFunctionKeyEnabled(napi_env env, int32_t funcKey, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS
