@@ -421,7 +421,7 @@ void MMIService::OnStart()
         keyHandler->PreHandleEvent();
     }
     t_ = std::thread([this] {this->OnThread();});
-    pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
+    pthread_setname_np(t_.native_handle(), THREAD_NAME);
     eventMonitorThread_ = std::thread(&EventStatistic::WriteEventFile);
     pthread_setname_np(eventMonitorThread_.native_handle(), "event-monitor");
 #ifdef OHOS_RSS_CLIENT
