@@ -2573,7 +2573,10 @@ ohos_unittest("DfxHisysEventTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "dfx/test/dfx_hisysevent_test.cpp" ]
+  sources = [
+    "dfx/test/dfx_hisysevent_device_test.cpp",
+    "dfx/test/dfx_hisysevent_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",

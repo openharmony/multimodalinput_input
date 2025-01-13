@@ -34,6 +34,7 @@
 #endif // OHOS_BUILD_ENABLE_WATCH
 #include "proto.h"
 #include "util_ex.h"
+#include "dfx_hisysevent_device.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -405,7 +406,11 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
             return std::stoi(mr[EXPECTED_SUBMATCH].str());
         }
     }
-    MMI_HILOGE("Parsing strName failed: \'%{public}s\'", strName.c_str());
+    std::string errStr = "Parsing strName failed: \'" + strName + "\'";
+    MMI_HILOGE("%{public}s", errStr.c_str());
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER, errStr);
+#endif
     return RET_ERR;
 }
 
@@ -417,7 +422,11 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin == inputDevice) {
             MMI_HILOGI("The device is already existent");
-            DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisyseventDeivce::ReportDeviceFault(item.first,
+                DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
+                "The device is already existent");
+#endif
             return;
         }
         if ((!item.second.isRemote && item.second.isPointerDevice) ||
@@ -458,7 +467,9 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-    DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "Device added successfully");
+#endif
 }
 
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo &info)
@@ -484,7 +495,9 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         if (it->second.inputDeviceOrigin == inputDevice) {
             deviceId = it->first;
             enable = it->second.enable;
-            DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "Device removed successfully");
+#endif
             inputDevice_.erase(it);
             break;
         }
@@ -511,7 +524,10 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
     ScanPointerDevice();
     if (deviceId == INVALID_DEVICE_ID) {
-        DfxHisysevent::OnDeviceDisconnect(INVALID_DEVICE_ID, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
+                                               "Device reomved failed becaused of not found");
+#endif
     }
 }
 
@@ -768,7 +784,9 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
         return RET_ERR;
     }
     NotifyDevCallback(deviceId, deviceInfo);
-    DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
+#endif
     return RET_OK;
 }
 
@@ -792,7 +810,9 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
         CHKPC(item);
         NotifyMessage(item, deviceId, "remove");
     }
-    DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
+#endif
     return RET_OK;
 }
 
