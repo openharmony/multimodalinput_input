@@ -1305,7 +1305,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible, int32_t priority)
     return ret;
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
-    return ERROR_UNSUPPORT;
+    return COMMON_CAPABILITY_NOT_SUPPORTED;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
