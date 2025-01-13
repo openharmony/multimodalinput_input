@@ -69,6 +69,20 @@ public:
         TOUCHPAD_DOUBLE_TAP_DRAG_SETTING,
     };
 
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    enum KEY_CONSUMPTION_TYPE {
+        NO_TYPE = 0,
+        FINGERPRINT,
+        STYLUS_PEN,
+        AIBASE_VOICE,
+        SCREEN_SHOT,
+        SCREEN_RECORDING,
+        OPEN_WALLET,
+        OPEN_CAMERA,
+        OPEN_SOS,
+    };
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+
     static void OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type);
@@ -148,12 +162,21 @@ public:
     static void ReportMMiServiceThreadLongTask(const std::string &taskName);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    static void ClearCallCount();
+    static void ReportAbility(int32_t keyCode, int32_t action, std::string name);
+    static void ReportKeyEvent(int32_t keyCode, int32_t action, std::string name,
+        KEY_CONSUMPTION_TYPE type, int32_t subscribeId = -1);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+
 private:
     static inline int64_t dispatchStartTime_ { 0 };
     static inline int64_t comboStartTime_ { 0 };
     static inline DispCastTime dispCastTime_ { 0 };
     static inline ComboStartCastTime comboStartCastTime_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    static inline std::map<KEY_CONSUMPTION_TYPE, int32_t> calKeyEventTime_;
+    static inline int32_t callCount_ { 0 };
     static inline ApiDurationStatistics apiDurationStatics_;
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 };
