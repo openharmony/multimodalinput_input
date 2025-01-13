@@ -243,6 +243,8 @@ typedef enum Input_Result {
     INPUT_NOT_SYSTEM_APPLICATION = 202,
     /** Parameter check failed */
     INPUT_PARAMETER_ERROR = 401,
+    /** Capability not supported */
+    COMMON_CAPABILITY_NOT_SUPPORTED = 801,
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
     /** Interceptor repeatedly created for an application */
@@ -250,9 +252,7 @@ typedef enum Input_Result {
     /** @error Already occupied by the system */
     INPUT_OCCUPIED_BY_SYSTEM = 4200002,
     /** @error Already occupied by the other */
-    INPUT_OCCUPIED_BY_OTHER = 4200003,
-    /** Capability not supported */
-    COMMON_CAPABILITY_NOT_SUPPORTED = 801
+    INPUT_OCCUPIED_BY_OTHER = 4200003
 } Input_Result;
 
 /**
