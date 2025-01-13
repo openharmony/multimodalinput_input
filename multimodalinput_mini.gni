@@ -112,6 +112,7 @@ declare_args() {
     "delegate_task/src/delegate_tasks.cpp",
     "device_manager/src/input_device_manager.cpp",
     "device_state_manager/src/device_event_monitor.cpp",
+    "dfx/src/api_duration_statistics.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
     "event_dump/src/event_dump.cpp",

@@ -24,6 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
     const std::string UNKNOWN_API { "UNKNOWN_API" };
+    using ApiDurationsType = std::unordered_map<ApiDurationStatistics::Api, ApiDurationStatistics::DurationBox>;
 }
 
 int32_t ApiDurationStatistics::COUNT_LIMIT_TO_DFX_RADAR { 1000 };
@@ -52,7 +53,7 @@ bool ApiDurationStatistics::IsLimitMatched()
     return apiCallingCount_ >= COUNT_LIMIT_TO_DFX_RADAR;
 }
 
-std::unordered_map<Api, DurationBox> ApiDurationStatistics::GetDurationBox()
+ApiDurationsType ApiDurationStatistics::GetDurationBox()
 {
     std::lock_guard<std::mutex> guard(mtx_);
     return apiDurations_;
