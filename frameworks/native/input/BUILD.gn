@@ -61,7 +61,10 @@ ohos_shared_library("oh_input_manager") {
     "${mmi_path}/service/permission_helper/src/permission_helper.cpp",
   ]
 
-  cflags = [ "-Werror" ]
+  cflags = [
+    "-Werror",
+    "-Oz",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
