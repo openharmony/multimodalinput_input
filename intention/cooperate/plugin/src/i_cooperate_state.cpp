@@ -25,7 +25,8 @@ namespace Cooperate {
 
 ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::shared_ptr<ICooperateStep> prev)
     : parent_(parent), prev_(prev)
-{}
+{
+}
 
 void ICooperateState::TransiteTo(Context &context, CooperateState state)
 {

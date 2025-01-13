@@ -232,36 +232,22 @@ struct UpdateCooperateFlagEvent {
 };
 
 struct CooperateEvent {
-    CooperateEvent() : type(CooperateEventType::QUIT) {}
+    CooperateEvent() : type(CooperateEventType::QUIT) { }
 
-    explicit CooperateEvent(CooperateEventType ty) : type(ty) {}
+    explicit CooperateEvent(CooperateEventType ty) : type(ty) { }
 
-    template<typename Event>
-    CooperateEvent(CooperateEventType ty, Event ev) : type(ty), event(ev) {}
+    template <typename Event>
+    CooperateEvent(CooperateEventType ty, Event ev) : type(ty), event(ev)
+    {
+    }
 
     CooperateEventType type;
-    std::variant<
-        AddObserverEvent,
-        RegisterListenerEvent,
-        StartCooperateEvent,
-        StopCooperateEvent,
-        EnableCooperateEvent,
-        GetCooperateStateEvent,
-        RegisterEventListenerEvent,
-        DSoftbusSubscribeMouseLocation,
-        DSoftbusReplySubscribeMouseLocation,
-        DSoftbusSyncMouseLocation,
-        DumpEvent,
-        DDMBoardOnlineEvent,
-        InputHotplugEvent,
-        InputPointerEvent,
-        DSoftbusStartCooperate,
-        DSoftbusRelayCooperate,
-        ClientDiedEvent,
-        UpdateCooperateFlagEvent,
-        DSoftbusSyncInputDevice,
-        DSoftbusHotPlugEvent
-    > event;
+    std::variant<AddObserverEvent, RegisterListenerEvent, StartCooperateEvent, StopCooperateEvent, EnableCooperateEvent,
+        GetCooperateStateEvent, RegisterEventListenerEvent, DSoftbusSubscribeMouseLocation,
+        DSoftbusReplySubscribeMouseLocation, DSoftbusSyncMouseLocation, DumpEvent, DDMBoardOnlineEvent,
+        InputHotplugEvent, InputPointerEvent, DSoftbusStartCooperate, DSoftbusRelayCooperate, ClientDiedEvent,
+        UpdateCooperateFlagEvent, DSoftbusSyncInputDevice, DSoftbusHotPlugEvent>
+        event;
 };
 
 inline constexpr int32_t DEFAULT_TIMEOUT { 3000 };

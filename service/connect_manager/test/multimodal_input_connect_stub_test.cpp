@@ -2655,5 +2655,24 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_111, TestSize.Level1
     int32_t ret = stub->StubSetCurrentUser(data, reply);
     EXPECT_EQ(ret, returnCode);
 }
+
+/**
+ * @tc.name: StubSetInputDeviceInputEnable_001
+ * @tc.desc: Test the function StubSetInputDeviceInputEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceInputEnable_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t returnCode = 65142800;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUT_DEVICE_ENABLE);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(ret, returnCode);
+}
 } // namespace MMI
 } // namespace OHOS

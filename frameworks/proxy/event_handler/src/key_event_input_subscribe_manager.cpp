@@ -135,7 +135,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         subscribeInfos_.erase(tIter);
         return ret;
     }
-    MMI_HILOGI("subscribeId:%{public}d, preKeys:[%{private}s], finalKey:%{private}d,"
+    MMI_HILOGI("The subscribeId:%{public}d, preKeys:[%{private}s], finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
         tIter->GetSubscribeId(), DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
         keyOption->IsFinalKeyDown() ? "true" : "false", keyOption->GetFinalKeyDownDuration());
@@ -150,11 +150,11 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGE("The subscribe Infos is empty");
         return RET_ERR;
@@ -206,7 +206,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeHotkey(std::shared_ptr<KeyOption
         return ret;
     }
 
-    MMI_HILOGI("subscribeId:%{public}d, preKeys:%{private}s, finalKey:%{private}d,"
+    MMI_HILOGI("The subscribeId:%{public}d, preKeys:%{private}s, finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
         tIter->GetSubscribeId(), DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
         keyOption->IsFinalKeyDown() ? "true" : "false", keyOption->GetFinalKeyDownDuration());
@@ -221,11 +221,12 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeHotkey(int32_t subscribeId)
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
+
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGE("Subscribe Infos is empty");
         return RET_ERR;

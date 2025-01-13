@@ -108,6 +108,7 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_SWITCH_TOGGLE)
 };
 constexpr int32_t MAX_N_PRESSED_KEYS { 10 };
+constexpr int32_t POINTER_MOVEFLAG = { 7 };
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -123,6 +124,27 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
     DfxHisysevent::GetDispStartTime();
     auto type = libinput_event_get_type(event);
+
+    auto device = libinput_event_get_device(event);
+    CHKPV(device);
+
+    if (LIBINPUT_EVENT_DEVICE_ADDED != type && LIBINPUT_EVENT_DEVICE_REMOVED != type) {
+        auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+        auto enable = INPUT_DEV_MGR->IsInputDeviceEnable(deviceId);
+        if (!enable) {
+            MMI_HILOGE("The current device has been disabled");
+            return;
+        }
+    }
+    std::string name = libinput_device_get_name(device);
+    size_t pos = name.find("hand_status_dev");
+    if ((pos != std::string::npos) && (type == LIBINPUT_EVENT_MSDP)) {
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+        FingerprintEventHdr->HandleFingerprintEvent(event);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+        return;
+    }
+    
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
@@ -172,6 +194,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+#ifndef OHOS_BUILD_ENABLE_WATCH
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
@@ -189,17 +212,18 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+        case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
+        case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
+        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
+            HandleTableToolEvent(event);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_WATCH
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             HandleTouchEvent(event, frameTime);
             DfxHisysevent::CalcPointerDispTimes();
-            break;
-        }
-        case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
-        case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
-        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
-            HandleTableToolEvent(event);
             break;
         }
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -249,6 +273,11 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
     INPUT_DEV_MGR->OnInputDeviceAdded(device);
+#if OHOS_BUILD_ENABLE_POINTER
+    bool switchFlag = false;
+    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
+    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
+#endif
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -345,6 +374,10 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     FingerprintEventHdr->SetPowerAndVolumeKeyState(event);
     if (FingerprintEventHdr->IsFingerprintEvent(event)) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        auto key = KeyEventHdr->GetKeyEvent();
+        DfxHisysevent::ReportAbility(key->GetKeyCode(), key->GetKeyAction(), "");
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -380,10 +413,10 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
-    KeyRepeat->SelectAutoRepeat(keyEvent);
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
 #endif // SHORTCUT_KEY_RULES_ENABLED
+    KeyRepeat->SelectAutoRepeat(keyEvent);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
@@ -482,7 +515,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
     }
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
     if (toolType == MT_TOOL_PALM) {
-        MMI_HILOGI("toolType is MT_TOOL_PALM");
+        MMI_HILOGI("The toolType is MT_TOOL_PALM");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     }
 }
@@ -490,6 +523,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(nextHandler_);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
@@ -499,9 +533,11 @@ bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<Pointer
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return false;
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
@@ -577,10 +613,12 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
+    CHKPR(event, ERROR_NULL_POINTER);
 #ifdef OHOS_RSS_CLIENT
     if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCH_DOWN) {
         std::unordered_map<std::string, std::string> mapPayload;
@@ -598,11 +636,22 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     BytraceAdapter::StartPackageEvent("package touchEvent");
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     LogTracer lt;
-    if (event != nullptr) {
+    auto touch = libinput_event_get_touch_event(event);
+    CHKPR(touch, ERROR_NULL_POINTER);
+    int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
+    if (moveFlag == POINTER_MOVEFLAG) {
+        pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::REMOTE_CONTROL);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    } else {
         pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
-        lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
+    if (moveFlag == POINTER_MOVEFLAG && pointerEvent->GetPointerAction() != POINTER_ACTION_MOVE) {
+        MMI_HILOGD("Tv Touch event is not Motion");
+        return RET_OK;
+    }
+    lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     if (HandleTouchEventWithFlag(pointerEvent)) {
         MMI_HILOGD("Touch event is filtered with flag");
@@ -629,7 +678,11 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         MMI_HILOGE("Failed to set origin pointerId");
         return RET_ERR;
     }
-    nextHandler_->HandleTouchEvent(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    } else {
+        nextHandler_->HandleTouchEvent(pointerEvent);
+    }
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
     }
@@ -675,6 +728,7 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
     }
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
@@ -696,6 +750,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
 int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
@@ -749,7 +804,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
     enum libinput_switch sw = libinput_event_switch_get_switch(swev);
-    MMI_HILOGI("libinput_event_switch type:%{public}d, state:%{public}d", sw, state);
+    MMI_HILOGI("The libinput_event_switch type:%{public}d, state:%{public}d", sw, state);
     if (sw == LIBINPUT_SWITCH_PRIVACY && state == LIBINPUT_SWITCH_STATE_OFF) {
         MMI_HILOGD("Privacy switch event ignored");
         return RET_OK;

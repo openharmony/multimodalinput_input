@@ -670,5 +670,35 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_Authorize_001, TestSize.Leve
     isAuthorize = false;
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.Authorize(isAuthorize));
 }
+
+/**
+ * @tc.name: InputManagerImplTest_SubscribeLongPressEvent
+ * @tc.desc: Test SubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeLongPressEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LongPressRequest longPR = {
+        .fingerCount = 3,
+        .duration = 2,
+    };
+    int32_t ret = InputMgrImpl.SubscribeLongPressEvent(longPR, nullptr);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UnsubscribeLongPressEvent
+ * @tc.desc: Test UnsubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnsubscribeLongPressEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscriberId = 0;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UnsubscribeLongPressEvent(subscriberId));
+}
 } // namespace MMI
 } // namespace OHOS

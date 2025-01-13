@@ -36,6 +36,7 @@ void OnConnected(const IfMMIClient& client)
 {
     CALL_DEBUG_ENTER;
     InputMgrImpl.OnConnected();
+    INPUT_DEVICE_IMPL.OnConnected();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -54,6 +55,7 @@ void OnDisconnected(const IfMMIClient &client)
 {
     CALL_DEBUG_ENTER;
     InputMgrImpl.OnDisconnected();
+    INPUT_DEVICE_IMPL.OnDisconnected();
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnDisconnected();
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -150,6 +152,7 @@ int32_t MultimodalEventHandler::UnsubscribeLongPressEvent(int32_t subscribeId)
 bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (client_ != nullptr) {
         if (eventHandler != nullptr) {
             client_->MarkIsEventHandlerChanged(eventHandler);
@@ -176,6 +179,7 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 
 MMIClientPtr MultimodalEventHandler::GetMMIClient()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     CHKPP(client_);
     return client_->GetSharedPtr();
 }

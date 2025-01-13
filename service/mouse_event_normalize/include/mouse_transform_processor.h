@@ -84,7 +84,7 @@ public:
         uint64_t filterPrePointTime{ 0 };
         uint64_t filterDeltaTime{ 0 };
         bool filterFlag{ false };
-        static constexpr int32_t FILTER_THRESHOLD_US = 909; // <=1ms
+        static constexpr int32_t FILTER_THRESHOLD_US = 800; // <=1ms
     };
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 
@@ -114,17 +114,19 @@ private:
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
-    void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
     double HandleAxisAccelateTouchPad(double axisValue);
+#endif // OHOS_BUILD_ENABLE_WATCH
+    void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
+    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t& button, int32_t type);
     DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();
@@ -142,7 +144,7 @@ public:
     static int32_t GetMouseScrollRows();
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
-    static int32_t SetPointerLocation(int32_t x, int32_t y);
+    static int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId);
     static int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag);
     static void GetTouchpadScrollSwitch(bool &switchFlag);
     static int32_t SetTouchpadScrollDirection(bool state);

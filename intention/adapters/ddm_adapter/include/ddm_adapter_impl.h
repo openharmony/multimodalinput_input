@@ -46,8 +46,7 @@ private:
 private:
     class Observer final {
     public:
-        explicit Observer(std::shared_ptr<IBoardObserver> observer)
-            : observer_(observer) {}
+        explicit Observer(std::shared_ptr<IBoardObserver> observer) : observer_(observer) { }
 
         Observer() = default;
         ~Observer() = default;
@@ -73,12 +72,12 @@ private:
         ~DmInitCb() = default;
         DISALLOW_COPY_AND_MOVE(DmInitCb);
 
-        void OnRemoteDied() override {}
+        void OnRemoteDied() override { }
     };
 
     class DmBoardStateCb final : public DistributedHardware::DeviceStateCallback {
     public:
-        DmBoardStateCb(std::shared_ptr<DDMAdapterImpl> dm) : dm_(dm) {}
+        DmBoardStateCb(std::shared_ptr<DDMAdapterImpl> dm) : dm_(dm) { }
         ~DmBoardStateCb() = default;
         DISALLOW_COPY_AND_MOVE(DmBoardStateCb);
 
@@ -98,8 +97,8 @@ private:
             }
         }
 
-        void OnDeviceChanged(const DistributedHardware::DmDeviceInfo &deviceInfo) override {}
-        void OnDeviceReady(const DistributedHardware::DmDeviceInfo &deviceInfo) override {}
+        void OnDeviceChanged(const DistributedHardware::DmDeviceInfo &deviceInfo) override { }
+        void OnDeviceReady(const DistributedHardware::DmDeviceInfo &deviceInfo) override { }
 
     private:
         std::weak_ptr<DDMAdapterImpl> dm_;

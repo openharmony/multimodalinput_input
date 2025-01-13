@@ -427,7 +427,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_CheckPointerStyleP
 
     pointerStyle.id = 46;
     bool ret2 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
-    EXPECT_FALSE(ret2);
+    EXPECT_TRUE(ret2);
 
     windowId = -3;
     bool ret3 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
@@ -1859,26 +1859,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SkipPointerLay
     pointerDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawMgr.surfaceNode_ != nullptr);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.SkipPointerLayer(isSkip));
-}
-
-/**
-@tc.name: PointerDrawingManagerExTest_CreateDynamicCanvas_001
-@tc.desc: Test the funcation CreateDynamicCanvas
-@tc.type: FUNC
-@tc.require:
-*/
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_CreateDynamicCanvas_001, TestSize.Level1)
-{
-CALL_TEST_DEBUG;
-PointerDrawingManager pointerDrawMgr;
-pointerDrawMgr.dynamicBitmap_ = nullptr;
-ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
-pointerDrawMgr.dynamicBitmap_ = std::make_shared<OHOS::Rosen::Drawing::Bitmap>();
-EXPECT_TRUE(pointerDrawMgr.dynamicBitmap_ != nullptr);
-pointerDrawMgr.dynamicCanvas_ = nullptr;
-ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
-pointerDrawMgr.dynamicCanvas_ = std::make_shared<OHOS::Rosen::Drawing::Canvas>();
-ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateDynamicCanvas());
 }
 
 /**

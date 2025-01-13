@@ -74,9 +74,9 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDeviceIds_003, T
     info3.enable = true;
     manager.inputDevice_[3] = info3;
     auto ids = manager.GetInputDeviceIds();
-    ASSERT_EQ(ids.size(), 2);
+    ASSERT_EQ(ids.size(), 3);
     EXPECT_EQ(ids[0], 1);
-    EXPECT_EQ(ids[1], 3);
+    EXPECT_EQ(ids[1], 2);
 }
 
 /**
@@ -1591,6 +1591,28 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceSupportKey_Test
     EXPECT_NE(ret, RET_OK);
     int32_t ret2 = inputDevice.GetDeviceSupportKey(deviceId, keyboardType);
     EXPECT_EQ(ret2, returnCode1);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsInputDeviceEnable_Test_01
+ * @tc.desc: Test the function IsInputDeviceEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsInputDeviceEnable_Test_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    int32_t deviceId = 1000;
+    bool ret = inputDevice.IsInputDeviceEnable(deviceId);
+    ASSERT_EQ(ret, false);
+    deviceId = 5;
+    inDevice.enable = true;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    deviceId = 5;
+    ret = inputDevice.IsInputDeviceEnable(deviceId);
+    ASSERT_EQ(ret, true);
 }
 } // namespace MMI
 } // namespace OHOS

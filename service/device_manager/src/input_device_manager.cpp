@@ -29,7 +29,9 @@
 #include "key_event_value_transformation.h"
 #include "key_map_manager.h"
 #include "net_packet.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "proto.h"
 #include "util_ex.h"
 
@@ -467,7 +469,9 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isPointerDevice = IsPointerDevice(inputDevice);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
     info.sysUid = GetInputIdentification(inputDevice);
+#ifndef OHOS_BUILD_ENABLE_WATCH
     info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
@@ -572,7 +576,7 @@ void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 
 void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug)
 {
-    MMI_HILOGI("observers_ size:%{public}zu", observers_.size());
+    MMI_HILOGI("The observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
         (*observer)->UpdatePointerDevice(hasPointerDevice, isVisible, isHotPlug);
     }
@@ -607,6 +611,21 @@ struct libinput_device *InputDeviceManager::GetKeyboardDevice() const
     }
     MMI_HILOGW("No keyboard device is currently available");
     return nullptr;
+}
+
+void InputDeviceManager::GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> keyCodes;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
+    for (const auto &item : inputDevice_) {
+        const auto &device = item.second.inputDeviceOrigin;
+        if (IsMatchKeys(device, keyCodes)) {
+            MMI_HILOGI("Find keyboard device success id %{public}d", item.first);
+            inputDevice.push_back(device);
+        }
+    }
 }
 
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -669,7 +688,7 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
     if (pos != std::string::npos) {
         isRemote = true;
     }
-    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    MMI_HILOGD("The isRemote:%{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
 
@@ -680,7 +699,7 @@ bool InputDeviceManager::IsRemote(int32_t id) const
     if (device != inputDevice_.end()) {
         isRemote = device->second.isRemote;
     }
-    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    MMI_HILOGD("The isRemote:%{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
 
@@ -933,7 +952,7 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
+    MMI_HILOGI("The deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
         NotifyInputdeviceMessage(session, index, ERROR_DEVICE_NOT_EXIST);
@@ -953,6 +972,8 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
 void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(session);
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto item = recoverList_.begin(); item != recoverList_.end();) {
         if (session->GetPid() == item->second) {
             auto device = inputDevice_.find(item->first);
@@ -960,9 +981,24 @@ void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
                 MMI_HILOGI("Recover input device : %{public}d", item->first);
                 device->second.enable = true;
             }
-            recoverList_.erase(item++);
+            item = recoverList_.erase(item);
+        } else {
+            item++;
         }
     }
+}
+
+bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId)
+{
+    bool enable = false;
+    CALL_DEBUG_ENTER;
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGD("Get inputDevice enabled failed, Invalid deviceId.");
+        return enable;
+    }
+    enable = item->second.enable;
+    return enable;
 }
 } // namespace MMI
 } // namespace OHOS

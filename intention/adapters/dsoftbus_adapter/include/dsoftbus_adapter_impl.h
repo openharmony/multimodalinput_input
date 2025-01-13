@@ -32,8 +32,7 @@ namespace DeviceStatus {
 class DSoftbusAdapterImpl final : public IDSoftbusAdapter {
     class Observer final {
     public:
-        explicit Observer(std::shared_ptr<IDSoftbusObserver> observer)
-            : observer_(observer) {}
+        explicit Observer(std::shared_ptr<IDSoftbusObserver> observer) : observer_(observer) { }
 
         Observer() = default;
         ~Observer() = default;
@@ -54,11 +53,11 @@ class DSoftbusAdapterImpl final : public IDSoftbusAdapter {
     };
 
     struct Session {
-        Session(int32_t socket) : socket_(socket) {}
-        Session(const Session &other) : socket_(other.socket_) {}
+        Session(int32_t socket) : socket_(socket) { }
+        Session(const Session &other) : socket_(other.socket_) { }
         DISALLOW_MOVE(Session);
 
-        Session& operator=(const Session &other) = delete;
+        Session &operator=(const Session &other) = delete;
 
         int32_t socket_;
         CircleStreamBuffer buffer_;

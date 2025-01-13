@@ -52,7 +52,9 @@
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 #include "gesturesense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "infrared_emitter_controller.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "input_device_manager.h"
 #include "ipc_skeleton.h"
 #include "i_input_windows_manager.h"
@@ -106,7 +108,7 @@ namespace {
 std::mutex g_instanceMutex;
 MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
-const std::string THREAD_NAME { "mmi_service" };
+const char* THREAD_NAME { "mmi_service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 [[ maybe_unused ]] constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
@@ -123,6 +125,7 @@ constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 const std::set<int32_t> g_keyCodeValueSet = {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
     KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
     KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_TAB, KeyEvent::KEYCODE_ENTER,
@@ -134,6 +137,7 @@ const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_F3, KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_F5, KeyEvent::KEYCODE_F6, KeyEvent::KEYCODE_F7,
     KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
     KeyEvent::KEYCODE_NUM_LOCK
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t DEFAULT_USER_ID { 100 };
@@ -249,7 +253,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     auto eventData = std::make_shared<mmi_epoll_event>();
     eventData->fd = fd;
     eventData->event_type = type;
-    MMI_HILOGI("userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
+    MMI_HILOGI("The userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -375,12 +379,12 @@ int32_t MMIService::Init()
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
     MMI_HILOGI("PointerDrawingManager Init");
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Create epoll failed");
@@ -429,12 +433,13 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif // OHOS_RSS_CLIENT
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    MMI_HILOGI("Add SA listener COMMON_EVENT_SERVICE_ID start");
+    AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
+    MMI_HILOGI("Add SA listener COMMON_EVENT_SERVICE_ID success");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
     FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
-    MMI_HILOGI("Add system ability listener start");
-    AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
-    MMI_HILOGI("Add system ability listener success");
-    AddSystemAbilityListener(RENDER_SERVICE);
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
@@ -443,6 +448,7 @@ void MMIService::OnStart()
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
     MMI_HILOGI("Add app manager service listener end");
+    AddSystemAbilityListener(RENDER_SERVICE);
     AddAppDebugListener();
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -591,7 +597,7 @@ int32_t MMIService::RemoveInputEventFilter(int32_t filterId)
 void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
-    MMI_HILOGI("fd:%{public}d", s->GetFd());
+    MMI_HILOGI("Get fd:%{public}d", s->GetFd());
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (s->GetProgramName() != SHELL_ASSISTANT) {
         return;
@@ -798,6 +804,22 @@ int32_t MMIService::GetPointerSize(int32_t &size)
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
+int32_t MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    auto ret = delegateTasks_.PostSyncTask(
+        [&surfaceId] {
+            return IPointerDrawingManager::GetInstance()->GetCursorSurfaceId(surfaceId);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetCursorSurfaceId fail, error:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
@@ -1672,7 +1694,7 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGI("systemAbilityId is %{public}d", systemAbilityId);
+    MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);
 #if defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         OnAddResSchedSystemAbility(systemAbilityId, deviceId);
@@ -1695,6 +1717,12 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
+    }
+    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
+        IPointerDrawingManager::GetInstance()->InitScreenInfo();
+    }
+    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
+        IPointerDrawingManager::GetInstance()->SubscribeScreenModeChange();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
@@ -2016,13 +2044,13 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
+int32_t MMIService::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
-        [x, y] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetPointerLocation(x, y);
+        [x, y, displayId] {
+            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetPointerLocation(x, y, displayId);
         }
         );
     if (ret != RET_OK) {
@@ -2113,7 +2141,7 @@ void MMIService::SetMmiServicePriority()
     if (schRet != 0) {
         MMI_HILOGE("mmi_service Couldn't set SCHED_FIFO, schRet:%{public}d", schRet);
     } else {
-        MMI_HILOGI("mmi_service set SCHED_FIFO succeed, schRet:%{public}d", schRet);
+        MMI_HILOGI("The mmi_service set SCHED_FIFO succeed, schRet:%{public}d", schRet);
     }
 }
 #endif // OHOS_BUILD_PC_PRIORITY
@@ -2840,6 +2868,7 @@ int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
 int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies)
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGI("Start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
     if (!InfraredEmitterController::GetInstance()->GetFrequencies(infos)) {
@@ -2859,12 +2888,14 @@ int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
         ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
     MMI_HILOGD("Data from hdf context:%{public}s", context.c_str());
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
 int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     std::string context = "infraredFrequency:" + std::to_string(number) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
@@ -2875,6 +2906,7 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
         MMI_HILOGE("Failed to transmit");
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -3369,6 +3401,7 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
 void MMIService::SetupTouchGestureHandler()
 {
     touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
+    WIN_MGR->AttachTouchGestureMgr(touchGestureMgr_);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -3415,6 +3448,24 @@ int32_t MMIService::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetW
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
+
+int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+{
+    CALL_INFO_TRACE;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+        [pid, windowId, cursor, options] {
+            return IPointerDrawingManager::GetInstance()->SetCustomCursor(pid, windowId, cursor, options);
+        }
+        ));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 } // namespace MMI

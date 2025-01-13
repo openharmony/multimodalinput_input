@@ -61,7 +61,7 @@ std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullp
 const std::string CALL_BEHAVIOR_KEY { "incall_power_button_behavior" };
 const std::string SETTINGS_DATA_SYSTEM_URI {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true" };
-const std::string SETTINGS_DATA_EXT_URI {
+const char* SETTINGS_DATA_EXT_URI {
     "datashare:///com.ohos.USER_SETTINGSDATA_100.DataAbility" };
 } // namespace
 
@@ -135,7 +135,11 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
         sess->GetProgramName(), sess->GetPid());
-
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportKeyEvent(keyOption->GetFinalKey(),
+        keyOption->IsFinalKeyDown() ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP,
+        sess->GetProgramName(), DfxHisysevent::KEY_CONSUMPTION_TYPE::NO_TYPE, subscribeId);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         auto ret = AddKeyGestureSubscriber(subscriber, keyOption);
@@ -718,7 +722,7 @@ bool KeySubscriberHandler::IsMatchForegroundPid(std::list<std::shared_ptr<Subscr
             isForegroundExits_ = true;
         }
     }
-    MMI_HILOGD("isForegroundExits_:%{public}d, foregroundPids:%{public}zu",
+    MMI_HILOGD("The isForegroundExits_:%{public}d, foregroundPids:%{public}zu",
         isForegroundExits_, foregroundPids_.size());
     return isForegroundExits_;
 }

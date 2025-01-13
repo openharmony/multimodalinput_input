@@ -150,7 +150,8 @@ int32_t InputEventDataTransformation::NetPacketToSwitchEvent(NetPacket &pkt, std
 int32_t InputEventDataTransformation::LongPressEventToNetPacket(const LongPressEvent &longPressEvent, NetPacket &pkt)
 {
     pkt << longPressEvent.fingerCount << longPressEvent.duration << longPressEvent.pid << longPressEvent.displayId
-        << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result << longPressEvent.windowId;
+        << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result << longPressEvent.windowId
+        << longPressEvent.pointerId;
     if (!pkt.Write(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet write long press event failed");
         return RET_ERR;
@@ -181,6 +182,8 @@ int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, 
     longPressEvent.result = data;
     pkt >> data;
     longPressEvent.windowId = data;
+    pkt >> data;
+    longPressEvent.pointerId = data;
     if (!pkt.Read(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet read long press event failed");
         return RET_ERR;
@@ -306,6 +309,7 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
     }
     pkt << event->GetVelocity();
     pkt << event->GetAxisEventType();
+    pkt << event->GetHandOption();
 }
 
 void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
@@ -338,6 +342,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     pkt >> type;
     event->SetHandlerEventType(type);
     SetAxisInfo(pkt, event);
+    pkt >> tField;
+    event->SetHandOption(tField);
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;

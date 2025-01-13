@@ -45,7 +45,9 @@
 #include "mmi_log.h"
 #include "nap_process.h"
 #include "net_packet.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "proto.h"
 #include "setting_datashare.h"
 #include "stylus_key_handler.h"
@@ -76,20 +78,20 @@ constexpr int64_t SOS_DELAY_TIMES { 1000000 };
 constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 15000 };
-const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
-const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
-const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const char* AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
+const char* WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
+const char* SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const char* SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const char* SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 const std::string WALLET_BUNDLE_NAME { "com.hmos.wallet" };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int64_t POWER_ACTION_INTERVAL { 600 };
 constexpr int64_t SOS_WAIT_TIME { 3000 };
-const std::string PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const std::string PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const std::string PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const std::string PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
+const char* PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const char* PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const char* PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const char* PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
 const std::string KEY_ENABLE { "enable" };
 const std::string KEY_STATUS { "status" };
 } // namespace
@@ -367,7 +369,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 
     lastPointerDownTime_[id] = currentDownTime;
     auto items = touchEvent->GetAllPointerItems();
-    MMI_HILOGI("itemsSize:%{public}zu", items.size());
+    MMI_HILOGI("The itemsSize:%{public}zu", items.size());
     for (const auto &item : items) {
         if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
             MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
@@ -894,7 +896,7 @@ void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
         ability.abilityName = WAKEUP_ABILITY_NAME;
         ability.bundleName = AIBASE_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
-        MMI_HILOGI("isStartBase_:%{public}d, sessionKey_:%{public}s", isStartBase_, sessionKey_.c_str());
+        MMI_HILOGI("The isStartBase_:%{public}d, sessionKey_:%{public}s", isStartBase_, sessionKey_.c_str());
         if (!isStartBase_) {
             ability.params.emplace(std::make_pair("fingerPath", ""));
             ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture_pre"));
@@ -1162,12 +1164,12 @@ void KeyCommandHandler::Print()
     MMI_HILOGI("ShortcutKey count:%{public}zu", shortcutKeys_.size());
     int32_t row = 0;
     for (const auto &item : shortcutKeys_) {
-        MMI_HILOGI("row:%{public}d", row++);
+        MMI_HILOGI("The row:%{public}d", row++);
         auto &shortcutKey = item.second;
         for (const auto &prekey : shortcutKey.preKeys) {
-            MMI_HILOGI("preKey:%d", prekey);
+            MMI_HILOGI("The preKey:%d", prekey);
         }
-        MMI_HILOGI("finalKey:%d, keyDownDuration:%{public}d, triggerType:%{public}d,"
+        MMI_HILOGI("The finalKey:%d, keyDownDuration:%{public}d, triggerType:%{public}d,"
                    " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
                    shortcutKey.keyDownDuration, shortcutKey.triggerType,
                    shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
@@ -1188,12 +1190,12 @@ void KeyCommandHandler::PrintSeq()
     MMI_HILOGI("Sequences count:%{public}zu", sequences_.size());
     int32_t row = 0;
     for (const auto &item : sequences_) {
-        MMI_HILOGI("row:%{public}d", row++);
+        MMI_HILOGI("The row:%{public}d", row++);
         for (const auto& sequenceKey : item.sequenceKeys) {
-            MMI_HILOGI("keyCode:%d, keyAction:%{public}d, delay:%{public}" PRId64,
+            MMI_HILOGI("The keyCode:%d, keyAction:%{public}d, delay:%{public}" PRId64,
                        sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
         }
-        MMI_HILOGI("bundleName:%{public}s, abilityName:%{public}s",
+        MMI_HILOGI("Ability bundleName:%{public}s, abilityName:%{public}s",
                    item.ability.bundleName.c_str(), item.ability.abilityName.c_str());
     }
 }
@@ -1395,6 +1397,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     if (STYLUS_HANDLER->HandleStylusKey(key)) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportAbility(key->GetKeyCode(), key->GetKeyAction(), "com.hmos.hinote");
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return true;
     }
 
@@ -1618,7 +1623,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     }
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
         (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
-        MMI_HILOGI("isDownStart:%{public}d", isDownStart_);
+        MMI_HILOGI("The isDownStart:%{public}d", isDownStart_);
         if (isDownStart_) {
             HandleSpecialKeys(keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         }
@@ -1709,11 +1714,11 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
     BytraceAdapter::StopLaunchAbility();
     repeatKeyCountMap_.clear();
     isLaunched = true;
-    if (InputHandler->GetSubscriberHandler() != nullptr) {
-        auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
-        keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
-        InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
-    }
+    auto subscriberHandler = InputHandler->GetSubscriberHandler();
+    CHKPV(subscriberHandler);
+    auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
+    keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    subscriberHandler->HandleKeyEvent(keyEventCancel);
 }
 
 int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
@@ -2023,7 +2028,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
     MarkActiveSequence(false);
     if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        MMI_HILOGI("screen locked, remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
+        MMI_HILOGI("Screen locked, remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
         matchedSequence_.timerId = -1;
     }
@@ -2155,7 +2160,7 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
 {
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    MMI_HILOGI("screenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("The screenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     std::string bundleName = sequence.ability.bundleName;
     std::string matchName = ".screenshot";
     if (bundleName.find(matchName) != std::string::npos) {
@@ -2259,6 +2264,9 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 #endif // SHORTCUT_KEY_RULES_ENABLED
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportAbility(shortcutKey.finalKey, shortcutKey.keyDownDuration, shortcutKey.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         BytraceAdapter::StopLaunchAbility();
         return true;
     }
@@ -2271,6 +2279,9 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         shortcutKey.timerId = -1;
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportAbility(shortcutKey.finalKey, shortcutKey.keyDownDuration, shortcutKey.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         BytraceAdapter::StopLaunchAbility();
     });
     if (shortcutKey.timerId < 0) {
@@ -2282,7 +2293,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     auto handler = InputHandler->GetSubscriberHandler();
     CHKPF(handler);
     if (handler->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
-        MMI_HILOGI("current shortcutKey %d is subSubcribed", shortcutKey.finalKey);
+        MMI_HILOGI("Current shortcutKey %d is subSubcribed", shortcutKey.finalKey);
         return false;
     }
     return true;
@@ -2312,7 +2323,7 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     }
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
-    MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
+    MMI_HILOGI("The upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
 
     if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * FREQUENCY) {
@@ -2331,7 +2342,7 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_HILOGI("timerId:%{public}d", timerId);
+    MMI_HILOGI("The timerId:%{public}d", timerId);
     return false;
 }
 
@@ -2438,6 +2449,11 @@ void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 {
     CALL_INFO_TRACE;
+    auto sequenceKeys = sequence.sequenceKeys;
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportAbility(sequenceKeys[0].keyCode,
+        sequenceKeys[0].keyAction, sequence.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     LaunchAbility(sequence.ability, sequence.abilityStartDelay);
 }
 

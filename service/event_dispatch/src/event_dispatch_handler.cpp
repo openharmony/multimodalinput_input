@@ -19,7 +19,9 @@
 
 #include <linux/input-event-codes.h>
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
 #include "transaction/rs_interfaces.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 #include "anr_manager.h"
 #include "app_debug_listener.h"
@@ -220,7 +222,9 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
     uint32_t pid, int32_t pointCnt)
 {
+#ifndef OHOS_BUILD_ENABLE_WATCH
     OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+#endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)

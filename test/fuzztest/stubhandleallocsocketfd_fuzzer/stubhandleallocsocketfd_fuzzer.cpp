@@ -40,6 +40,7 @@ int32_t deviceId = 1;
 uint32_t frameCount = 1;
 uint32_t vsyncCount = 1;
 int64_t infraredFrequency = 1;
+int32_t displayId = -1;
 std::vector<int32_t> vecInt = { 1, 2, 3 };
 std::vector<bool> vecBool = { 1 };
 std::vector<std::u16string> argString = { u"hello", u"worid" };
@@ -101,7 +102,7 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->SubscribeSwitchEvent(tmpfd, tmpfd);
     MMIService::GetInstance()->SetDisplayBind(tmpfd, tmpfd, message);
     MMIService::GetInstance()->SetFunctionKeyState(tmpfd, g_enableFlag);
-    MMIService::GetInstance()->SetPointerLocation(tmpfd, tmpfd);
+    MMIService::GetInstance()->SetPointerLocation(tmpfd, tmpfd, displayId);
     MMIService::GetInstance()->AddReloadDeviceTimer();
     MMIService::GetInstance()->Dump(tmpfd, argString);
     MMIService::GetInstance()->OnGetWindowPid(tmpfd, tmpfd);

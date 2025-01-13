@@ -172,7 +172,7 @@ bool FingerprintEventProcessor::CheckMisTouchState()
 bool FingerprintEventProcessor::CheckScreenMisTouchState()
 {
     int32_t flag = screenMissTouchFlag_ ? 1 : 0;
-    MMI_HILOGI("screenMissTouchFlag_ is %{public}d", flag);
+    MMI_HILOGI("The screenMissTouchFlag_ is %{public}d", flag);
     return screenMissTouchFlag_;
 }
  
@@ -234,11 +234,15 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
     auto device = libinput_event_get_device(event);
     CHKPR(device, PARAM_INPUT_INVALID);
     std::string name = libinput_device_get_name(device);
+    size_t pos = name.find("hand_status_dev");
     if (name == FINGERPRINT_SOURCE_KEY) {
         return AnalyseKeyEvent(event);
     } else if (name == FINGERPRINT_SOURCE_POINT) {
         ProcessSlideEvent();
         return AnalysePointEvent(event);
+    } else if (pos != std::string::npos) { // 设备名称包含hand_status_dev的即为合法设备
+        ProcessSlideEvent();
+        return AnalyseMsdpPointEvent(event);
     } else {
         MMI_HILOGI("Unknown input device name:%{public}s", name.c_str());
         return PARAM_INPUT_INVALID;
@@ -273,7 +277,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
         case FINGERPRINT_CODE_CANCEL: {
             cancelState_ = true;
             ChangeScreenMissTouchFlag(screenState_, cancelState_);
-            MMI_HILOGI("change cancel state and dont send point event");
+            MMI_HILOGI("Change cancel state and dont send point event");
             return RET_OK;
         }
         case FINGERPRINT_CODE_UP: {
@@ -307,7 +311,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGI("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
     if (CheckMisTouchState()) {
-        MMI_HILOGD("in mistouch state, dont report event");
+        MMI_HILOGD("In mistouch state, dont report event");
         return ERR_OK;
     }
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -338,9 +342,28 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGI("Fingerprint key:%{public}d, ux:%f, uy:%f", pointerEvent->GetPointerAction(), ux, uy);
     if (CheckMisTouchState()) {
-        MMI_HILOGD("in mistouch state, dont report event");
+        MMI_HILOGD("In mistouch state, dont report event");
         return ERR_OK;
     }
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
+    if (eventMonitorHandler_ != nullptr) {
+        eventMonitorHandler_->OnHandleEvent(pointerEvent);
+    }
+#endif // (OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH) && OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+int32_t FingerprintEventProcessor::AnalyseMsdpPointEvent(libinput_event * event)
+{
+    CALL_DEBUG_ENTER;
+    int32_t value = libinput_event_get_hand_feature(event);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    pointerEvent->SetHandOption(value);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MSDP_HAND_OPTINON);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
+    
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
     if (eventMonitorHandler_ != nullptr) {

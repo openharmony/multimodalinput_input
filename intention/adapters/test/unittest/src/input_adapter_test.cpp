@@ -20,10 +20,10 @@
 #include <unistd.h>
 
 #include "accesstoken_kit.h"
-#include <gtest/gtest.h>
 #include "input_device.h"
 #include "pointer_event.h"
 #include "securec.h"
+#include <gtest/gtest.h>
 
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
@@ -42,8 +42,8 @@ namespace {
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 const std::string SYSTEM_CORE { "system_core" };
 uint64_t g_tokenID { 0 };
-const char* g_cores[] = { "ohos.permission.INPUT_MONITORING" };
-const char* g_coresInject[] = { "ohos.permission.INJECT_INPUT_EVENT" };
+const char *g_cores[] = { "ohos.permission.INPUT_MONITORING" };
+const char *g_coresInject[] = { "ohos.permission.INJECT_INPUT_EVENT" };
 } // namespace
 
 class InputAdapterTest : public testing::Test {
@@ -51,11 +51,11 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
-    static void SetPermission(const std::string &level, const char** perms, size_t permAmount);
+    static void SetPermission(const std::string &level, const char **perms, size_t permAmount);
     static void RemovePermission();
 };
 
-void InputAdapterTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
+void InputAdapterTest::SetPermission(const std::string &level, const char **perms, size_t permAmount)
 {
     CALL_DEBUG_ENTER;
     if (perms == nullptr || permAmount == 0) {
@@ -88,9 +88,9 @@ void InputAdapterTest::RemovePermission()
     }
 }
 
-void InputAdapterTest::SetUpTestCase() {}
+void InputAdapterTest::SetUpTestCase() { }
 
-void InputAdapterTest::SetUp() {}
+void InputAdapterTest::SetUp() { }
 
 void InputAdapterTest::TearDown()
 {
@@ -108,7 +108,7 @@ HWTEST_F(InputAdapterTest, TestPointerAddMonitor, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    auto callback = [] (std::shared_ptr<OHOS::MMI::PointerEvent>) {
+    auto callback = [](std::shared_ptr<OHOS::MMI::PointerEvent>) {
         FI_HILOGI("OnEvent");
     };
     int32_t monitorId = inputAdapter->AddMonitor(callback);
@@ -128,7 +128,7 @@ HWTEST_F(InputAdapterTest, TestKeyAddMonitor, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    auto callback = [] (std::shared_ptr<OHOS::MMI::KeyEvent>) {
+    auto callback = [](std::shared_ptr<OHOS::MMI::KeyEvent>) {
         FI_HILOGI("OnEvent");
     };
     int32_t monitorId = inputAdapter->AddMonitor(callback);
@@ -148,7 +148,7 @@ HWTEST_F(InputAdapterTest, AddKeyEventInterceptor, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    auto callback = [] (std::shared_ptr<OHOS::MMI::KeyEvent>) {
+    auto callback = [](std::shared_ptr<OHOS::MMI::KeyEvent>) {
         FI_HILOGI("OnEvent");
     };
     int32_t interceptorId = inputAdapter->AddInterceptor(callback);
@@ -168,7 +168,7 @@ HWTEST_F(InputAdapterTest, AddPointerEventInterceptor, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    auto callback = [] (std::shared_ptr<OHOS::MMI::PointerEvent>) {
+    auto callback = [](std::shared_ptr<OHOS::MMI::PointerEvent>) {
         FI_HILOGI("OnEvent");
     };
     int32_t interceptorId = inputAdapter->AddInterceptor(callback);
@@ -188,10 +188,10 @@ HWTEST_F(InputAdapterTest, AddBothEventInterceptor, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    auto pointerCallback = [] (std::shared_ptr<OHOS::MMI::PointerEvent>) {
+    auto pointerCallback = [](std::shared_ptr<OHOS::MMI::PointerEvent>) {
         FI_HILOGI("OnEvent");
     };
-    auto keyCallback = [] (std::shared_ptr<OHOS::MMI::KeyEvent>) {
+    auto keyCallback = [](std::shared_ptr<OHOS::MMI::KeyEvent>) {
         FI_HILOGI("OnEvent");
     };
     int32_t interceptorId = inputAdapter->AddInterceptor(pointerCallback, keyCallback);
@@ -211,7 +211,7 @@ HWTEST_F(InputAdapterTest, AddFilter, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    auto filterCallback = [] (std::shared_ptr<OHOS::MMI::PointerEvent>) -> bool {
+    auto filterCallback = [](std::shared_ptr<OHOS::MMI::PointerEvent>) -> bool {
         FI_HILOGI("OnEvent");
         return true;
     };

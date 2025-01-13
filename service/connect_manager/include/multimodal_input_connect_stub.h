@@ -61,6 +61,7 @@ protected:
     int32_t StubGetMouseScrollRows(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSize(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSize(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetCursorSurfaceId(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCustomCursor(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMouseIcon(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMouseHotSpot(MessageParcel& data, MessageParcel& reply);
@@ -175,6 +176,7 @@ protected:
     int32_t ParseAddInputHandlerData(MessageParcel& data, ParseData& parseData);
     int32_t StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply);
     int32_t StubShiftAppPointerEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetCustomMouseCursor(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

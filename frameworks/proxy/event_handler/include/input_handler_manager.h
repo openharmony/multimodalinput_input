@@ -125,6 +125,7 @@ private:
     void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,
         std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    void RegisterGestureMonitors() const;
 
 private:
     std::list<Handler> interHandlers_;

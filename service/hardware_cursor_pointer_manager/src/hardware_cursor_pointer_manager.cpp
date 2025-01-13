@@ -75,13 +75,14 @@ bool HardwareCursorPointerManager::IsSupported()
     return isEnableState_;
 }
 
-int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y, BufferHandle* buffer)
+int32_t HardwareCursorPointerManager::SetPosition(uint32_t devId, int32_t x, int32_t y, BufferHandle* buffer)
 {
+    CHKPR(buffer, RET_ERR);
+
     auto powerInterface = GetPowerInterface();
     CHKPR(powerInterface, RET_ERR);
-    CHKPR(buffer, RET_ERR);
-    if (powerInterface->UpdateHardwareCursor(devId_, x, y, buffer) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
-        MMI_HILOGE("Set hardware cursor position failed, attempting to reinitialize interface.");
+    if (powerInterface->UpdateHardwareCursor(devId, x, y, buffer) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("UpdateHardwareCursor failed, attempting to reinitialize interface.");
         {
             auto DisplayComposer = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
             std::lock_guard<std::mutex> guard(mtx_);
@@ -89,13 +90,13 @@ int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y, BufferHa
         }
         powerInterface = GetPowerInterface();
         CHKPR(powerInterface, RET_ERR);
-        if (powerInterface->UpdateHardwareCursor(devId_, x, y, buffer) !=
+        if (powerInterface->UpdateHardwareCursor(devId, x, y, buffer) !=
             HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
-            MMI_HILOGE("Set hardware cursor position is error");
+            MMI_HILOGE("UpdateHardwareCursor is error");
             return RET_ERR;
         }
     }
-    MMI_HILOGD("SetPosition, x:%{private}d, y:%{private}d", x, y);
+    MMI_HILOGD("SetPosition, devId:%{public}u, x:%{private}d, y:%{private}d", devId, x, y);
     return RET_OK;
 }
 

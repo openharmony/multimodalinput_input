@@ -2764,6 +2764,41 @@ public:
      */
     static const int32_t KEYCODE_BRL_DOT10;
 
+   /**
+     * PEN_AIR_MOUSE
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_KEY_PEN_AIR_MOUSE;
+
+    /**
+     * PEN_LIGHT_PINCH
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_KEY_PEN_LIGHT_PINCH;
+
+    /**
+     * KEYCODE_PEN_AI
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_KEY_PEN_AI;
+
+    /**
+     * KEYCODE_PEN_AI
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_KEY_PEN_END_CLICK;
+
+    /**
+     * KEYCODE_PEN_AI
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_KEY_PEN_END_DOUBLE_CLICK;
+
     /**
      * Left Knob roll-up
      * <p>In contrast to {@link #static const int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN},
@@ -3083,6 +3118,27 @@ public:
      * @since 11
      */
     static const int32_t KEYCODE_CALL_CONTROL_CENTER;
+
+         /**
+     * Dagger Press
+     *
+     * @since 12
+     */
+    static const int32_t KEYCODE_DAGGER_PRESS;
+
+     /**
+     * Dagger Click
+     *
+     * @since 13
+     */
+    static const int32_t KEYCODE_DAGGER_CLICK;
+
+     /**
+     * Dagger Long Press
+     *
+     * @since 14
+     */
+    static const int32_t KEYCODE_DAGGER_LONG_PRESS;
 public:
     class KeyItem {
     public:

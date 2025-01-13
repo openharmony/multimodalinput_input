@@ -101,7 +101,7 @@ struct Input_DeviceInfo {
 typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
 static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
-static constexpr size_t PRE_KEYS_SIZE { 2 };
+static constexpr size_t PRE_KEYS_SIZE { 4 };
 static constexpr size_t KEYS_SIZE { 3 };
 static std::mutex g_hotkeyCountsMutex;
 static std::unordered_map<Input_Hotkey**, int32_t> g_hotkeyCounts;
@@ -1722,8 +1722,22 @@ Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
         return nullptr;
     }
     auto hotkeys = new (std::nothrow)Input_Hotkey *[count];
+    if (hotkeys == nullptr) {
+        MMI_HILOGE("Memory allocation failed");
+        return nullptr;
+    }
     for (int32_t i = 0; i < count; ++i) {
         hotkeys[i] = new (std::nothrow)Input_Hotkey();
+        if (hotkeys[i] == nullptr) {
+            MMI_HILOGE("Memory allocation failed");
+            for (int32_t j = 0; j < i; ++j) {
+                delete hotkeys[j];
+                hotkeys[j] = nullptr;
+            }
+            delete[] hotkeys;
+            hotkeys = nullptr;
+            return nullptr;
+        }
     }
     std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
     g_hotkeyCounts.insert(std::make_pair(hotkeys, count));

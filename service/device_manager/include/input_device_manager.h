@@ -74,6 +74,7 @@ public:
     bool IsPointerDevice(struct libinput_device* device) const;
     bool IsTouchDevice(struct libinput_device* device) const;
     struct libinput_device* GetKeyboardDevice() const;
+    void GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
     bool HasVirtualPointerDevice();
@@ -88,6 +89,7 @@ public:
     struct libinput_device *GetTouchPadDeviceOrigin();
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session);
     static std::shared_ptr<InputDeviceManager> GetInstance();
+    bool IsInputDeviceEnable(int32_t deviceId);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
@@ -118,7 +120,9 @@ private:
     std::list<SessionPtr> devListeners_;
     inputDeviceCallback devCallbacks_ { nullptr };
     std::map<int32_t, std::string> displayInputBindInfos_;
+#ifndef OHOS_BUILD_ENABLE_WATCH
     DeviceConfigManagement configManagement_;
+#endif // OHOS_BUILD_ENABLE_WATCH
     bool sessionLostCallbackInitialized_ { false };
 
     static std::shared_ptr<InputDeviceManager> instance_;

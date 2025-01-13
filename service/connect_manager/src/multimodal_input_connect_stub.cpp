@@ -458,6 +458,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_SYSTEM_HOT_KEY):
             ret = StubGetAllSystemHotkeys(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_CURSOR_SURFACE_ID):
+            ret = StubGetCursorSurfaceId(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_LONG_PRESS):
             ret = StubSubscribeLongPressEvent(data, reply);
             break;
@@ -466,6 +469,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUT_DEVICE_ENABLE):
             ret = StubSetInputDeviceInputEnable(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_MOUSE_CURSOR):
+            ret = StubSetCustomMouseCursor(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
@@ -769,6 +775,26 @@ int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, Mess
     }
     WRITEINT32(reply, size, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Pointer size:%{public}d, ret:%{public}d", size, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetCursorSurfaceId(MessageParcel& data, MessageParcel& reply)
+{
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    uint64_t surfaceId {};
+    auto ret = GetCursorSurfaceId(surfaceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetCursorSurfaceId fail, ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEUINT64(reply, surfaceId, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
 }
 
@@ -1802,9 +1828,11 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
 
     int32_t x = 0;
     int32_t y = 0;
+    int32_t displayId = 0;
     READINT32(data, x, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, y, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetPointerLocation(x, y);
+    READINT32(data, displayId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerLocation(x, y, displayId);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
     }
@@ -1876,6 +1904,7 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
     READINT32(data, extraData.pointerId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.pullId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.eventId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, extraData.drawCursor, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = AppendExtraData(extraData);
     if (ret != RET_OK) {
         MMI_HILOGE("Fail to call AppendExtraData, ret:%{public}d", ret);
@@ -3004,6 +3033,32 @@ int32_t MultimodalInputConnectStub::StubShiftAppPointerEvent(MessageParcel& data
         MMI_HILOGE("shift AppPointerEvent failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetCustomMouseCursor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t windowId = 0;
+    CustomCursor cursor;
+    CursorOptions options;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    OHOS::Media::PixelMap* pixelMapPtr = Media::PixelMap::Unmarshalling(data);
+    CHKPR(pixelMapPtr, RET_ERR);
+    cursor.pixelMap = (void*)pixelMapPtr;
+    READINT32(data, cursor.focusX, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, cursor.focusY, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, options.followSystem, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SetCustomCursor(windowId, cursor, options);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

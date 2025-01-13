@@ -55,14 +55,14 @@ int32_t LongPressEventSubscribeManager::SubscribeLongPressEvent(
         MMI_HILOGE("FingerCount or duration is invalid");
         return RET_ERR;
     }
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return EVENT_REG_FAIL;
+    }
     std::lock_guard<std::mutex> guard(mtx_);
     if (LongPressEventSubscribeManager::subscribeManagerId_ >= INT_MAX) {
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
         return INVALID_SUBSCRIBE_ID;
-    }
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Client init failed");
-        return EVENT_REG_FAIL;
     }
     int32_t subscribeId = LongPressEventSubscribeManager::subscribeManagerId_;
     ++LongPressEventSubscribeManager::subscribeManagerId_;
@@ -72,7 +72,7 @@ int32_t LongPressEventSubscribeManager::SubscribeLongPressEvent(
         subscribeInfos_.erase(subscribeId);
         return INVALID_SUBSCRIBE_ID;
     }
-    MMI_HILOGI("subscribeId:%{public}d, fingerCount:%{public}d, duration:%{public}d", subscribeId,
+    MMI_HILOGI("The subscribeId:%{public}d, fingerCount:%{public}d, duration:%{public}d", subscribeId,
         longPressRequest.fingerCount, longPressRequest.duration);
     return subscribeId;
 }
@@ -122,17 +122,19 @@ int32_t LongPressEventSubscribeManager::OnSubscribeLongPressEventCallback(const 
     CHKPR(callback, ERROR_NULL_POINTER);
     callback(longPressEvent);
     MMI_HILOGD("LongPressEvent fingerCount:%{public}d, duration:%{public}d, pid:%{public}d, displayId:%{public}d, "
-        "displayX:%{public}d, displayY:%{public}d, result:%{public}d, windowId:%{public}d, bundleName:%{public}s, "
-        "subscribeId:%{public}d",
+        "displayX:%{public}d, displayY:%{public}d, result:%{public}d, windowId:%{public}d, pointerId:%{public}d, "
+        "bundleName:%{public}s, subscribeId:%{public}d",
         longPressEvent.fingerCount, longPressEvent.duration, longPressEvent.pid,
         longPressEvent.displayId, longPressEvent.displayX, longPressEvent.displayY,
-        longPressEvent.result, longPressEvent.windowId, longPressEvent.bundleName.c_str(), subscribeId);
+        longPressEvent.result, longPressEvent.windowId, longPressEvent.pointerId, longPressEvent.bundleName.c_str(),
+        subscribeId);
     return RET_OK;
 }
 
 void LongPressEventSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGD("Leave, subscribeInfos_ is empty");
         return;

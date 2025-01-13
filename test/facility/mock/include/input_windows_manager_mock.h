@@ -134,6 +134,13 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(int32_t, ShiftAppPointerEvent, (int32_t, int32_t, bool));
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    MOCK_METHOD(bool, IsSupported, ());
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    MOCK_METHOD(void, AttachTouchGestureMgr, (std::shared_ptr<TouchGestureManager>));
+    MOCK_METHOD(void, CancelAllTouches, (std::shared_ptr<PointerEvent>));
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
 
