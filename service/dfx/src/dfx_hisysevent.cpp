@@ -1221,7 +1221,7 @@ void DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t d
         }
         HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "MMI_API_DURATION",
+            "API_CALLING_STATISTIC",
             OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
             "API_NAME", apiDurationStatics_.ApiToString(api),
             "DURATION_THRESHOLDS", thresholds,

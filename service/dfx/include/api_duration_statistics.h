@@ -31,8 +31,28 @@ namespace MMI {
 class ApiDurationStatistics {
 public:
     enum Api : int32_t {
-        FIRST_API = 0,
-        SECOND_API
+        IS_SCREEN_CAPTURE_WORKING = 0, // IScreenCaptureWorking
+        GET_DEFAULT_DISPLAY, // GetDefaultDisplay
+        GET_SYSTEM_ABILITY_MANAGER, // GetSystemAbilityManager
+        IS_FOLDABLE, // IsFoldable
+        IS_SCREEN_LOCKED, // IsScreenLocked
+        RS_NOTIFY_TOUCH_EVENT, // RSInterfaces::NotifyTouchEvent
+        RESOURCE_SCHEDULE_REPORT_DATA, // ResourceSchedule::ReportData
+        GET_CURRENT_RENDERER_CHANGE_INFOS, // GetCurrentRendererChangeInfos
+        GET_PROCESS_RUNNING_INFOS_BY_USER_ID, // GetProcessRunningInfosByUserId
+        TELEPHONY_CALL_MGR_CLIENT_INIT, // Telephony::CallManagerClient::Init
+        TELEPHONY_CALL_MGR_CLIENT_MUTE_RINGER, // Telephony::CallManagerCLient::MuteRinger
+        TELEPHONY_CALL_MGR_HANG_UP_CALL, // Telephony::CallManagerCLient::HangUpCall
+        TELEPHONY_CALL_MGR_REJECT_CALL, // Telephony::CallManagerClient::RejectCall
+        REGISTER_SCREEN_MODE_CHANGE_LISTENER, // RegisterScreenModeChangeListener
+        SET_ON_REMOTE_DIED_CALLBACK, // SetOnRemoteDiedCallback
+        REGISTER_SCREEN_CAPTURE_MONITOR_LISTENER, // RegisterScreenCaptureMonitorListener
+        ABILITY_MGR_CLIENT_START_EXTENSION_ABILITY, // StartExtensionAbility
+        ABILITY_MGR_CLIENT_START_ABILITY, // AbilityManagerClient::StartAbility
+        ABILITY_MGR_CLIENT_CONNECT_ABILITY, // AbilityManagerClient::ConnectAbility
+        GET_RUNNING_PROCESS_INFO_BY_PID, // GetRunningProcessInfoByPid
+        REGISTER_APP_DEBUG_LISTENER, // RegisterAppDebugListener
+        UNREGISTER_APP_DEBUG_LISTENER, // UnregisterAppDebugListener
     };
 
     enum class Threshold : int32_t {
@@ -63,7 +83,7 @@ private:
 private:
     std::unordered_map<Api, DurationBox> apiDurations_;
     std::atomic_int32_t apiCallingCount_ { 0 };
-    std::unordered_map<Api, std::string> apiNames_;
+    static std::unordered_map<Api, std::string> apiNames_;
     std::mutex mtx_;
     static int32_t COUNT_LIMIT_TO_DFX_RADAR;
 };

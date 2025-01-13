@@ -364,3 +364,10 @@ TRANSMIT_INFRARED:
 SET_CURRENT_USER:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report set current user event}
   USER_ID: {type: INT32, desc: userId}
+
+API_CALLING_STATISTIC:
+  __BASE: {type: STATISTIC, level: CRITICAL, desc: report set current user event}
+  API_NAME: {type:STRING, desc: api name}
+  DURATION_THRESHOLDS: {type: ,desc: duration thresholds}
+  DURATION_THRESHOLD_COUNTS: {type: ,desc duration thresholds counts}
+# 数组类型如何打点呢

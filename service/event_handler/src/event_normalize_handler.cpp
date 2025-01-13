@@ -622,10 +622,14 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
 #ifdef OHOS_RSS_CLIENT
     if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCH_DOWN) {
         std::unordered_map<std::string, std::string> mapPayload;
+        auto begin = std::chrono::high_resolution_clock::now();
         OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
             OHOS::ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
             OHOS::ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN_MMI,
             mapPayload);
+        auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - begin).count();
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
         mapPayload.clear();
     }
 #endif

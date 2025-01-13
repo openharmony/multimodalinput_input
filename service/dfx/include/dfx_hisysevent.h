@@ -16,6 +16,7 @@
 #ifndef DFX_HISYSEVENT_H
 #define DFX_HISYSEVENT_H
 
+#include <chrono>
 #include <string>
 
 #include "hisysevent.h"
@@ -160,9 +161,6 @@ public:
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     static void ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t durationMS);
     static void ReportMMiServiceThreadLongTask(const std::string &taskName);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
-
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     static void ClearCallCount();
     static void ReportAbility(int32_t keyCode, int32_t action, std::string name);
     static void ReportKeyEvent(int32_t keyCode, int32_t action, std::string name,
