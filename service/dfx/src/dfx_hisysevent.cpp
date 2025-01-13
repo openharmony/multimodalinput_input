@@ -1216,7 +1216,7 @@ void DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t d
         std::vector<int32_t> thresholds;
         std::vector<int32_t> durationCounts;
         for (const auto &durationBox : apiDuration.second) {
-            thresholds.push_back(durationBox.first);
+            thresholds.push_back(static_cast<int32_t>(durationBox.first));
             durationCounts.push_back(durationBox.second);
         }
         HiSysEventWrite(
@@ -1224,9 +1224,8 @@ void DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t d
             "MMI_API_DURATION",
             OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
             "API_NAME", apiDurationStatics_.ApiToString(api),
-            "DURATION_THRESHOLDS", threshold,
-            "DURATION_THRESHOLD_COUNTS", durationCounts,
-            "USER_ID", userId);
+            "DURATION_THRESHOLDS", thresholds,
+            "DURATION_THRESHOLD_COUNTS", durationCounts);
     }
     apiDurationStatics_.ResetApiStatistics();
 }
