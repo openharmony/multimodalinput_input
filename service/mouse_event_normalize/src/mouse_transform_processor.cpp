@@ -77,7 +77,10 @@ const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
 constexpr int32_t ANGLE_90 { 90 };
-constexpr int32_t ANGLE_360 { 360 };
+constexpr int32_t FINE_CALCULATE { 20 };
+constexpr int32_t STEP_CALCULATE { 40 };
+constexpr int32_t STOP_CALCULATE { 5000 };
+constexpr int32_t CALCULATE_STEP { 5 };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -164,7 +167,8 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
     MMI_HILOGD("mouseName: %{public}s, devType: %{public}d", mouseName.c_str(), devType);
     if (devType == BUS_USB || devType == BUS_BLUETOOTH)
     {
-        std::string connectType = devType == BUS_USB ? 'USB' : 'BLUETOOTH';
+        std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
+        MMI_HILOGD("connectType: %{public}s", connectType.c_str());
         auto curMouseTimeMap = mouseMap.fins(mouseName);
         if (curMouseTimeMap == mouseMap.end())
         {
@@ -178,48 +182,49 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
             long long gap = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
             mouseMap[mouseName] = curTime;
             MMI_HILOGD("current time difference: %{public}lld", gap);
-            if (gap < 20)
+            std::map<long long, int32_t> &curMap = mouseResponseMap.find(mouseName)->second;
+            if (gap < FINE_CALCULATE)
             {
-                auto curMapIt = mouseResponseMap.find(mouseName)->second.find(gap);
-                if (curMapIt == mouseResponseMap.find(mouseName)->second.end())
+                auto curMapIt = curMap.find(gap);
+                if (curMapIt == curMap.end())
                 {
-                    mouseResponseMap.find(mouseName)->second[gap] = 1;
+                    curMap[gap] = 1;
                 }
                 else
                 {
-                    mouseResponseMap.find(mouseName)->second[gap] = curMapIt->second + 1;
+                    curMap[gap] = curMapIt->second + 1;
                 }
             }
-            else if (gap >= 20 && gap < 40)
+            else if (gap >= FINE_CALCULATE && gap < STEP_CALCULATE)
             {
-                long long tempNum = gap - gap % 5;
-                auto curMapIt = mouseResponseMap.find(mouseName)->second.find(tempNum);
-                if (curMapIt == mouseResponseMap.find(mouseName)->second.end())
+                long long tempNum = gap - gap % CALCULATE_STEP;
+                auto curMapIt = curMap.find(tempNum);
+                if (curMapIt == curMap.end())
                 {
-                    mouseResponseMap.find(mouseName)->second[tempNum] = 1;
+                    curMap[tempNum] = 1;
                 }
                 else
                 {
-                    mouseResponseMap.find(mouseName)->second[tempNum] = curMapIt->second + 1;
+                    curMap[tempNum] = curMapIt->second + 1;
                 }
             }
-            else if (gap >= 40 && gap < 5000)
+            else if (gap >= STEP_CALCULATE && gap < STOP_CALCULATE)
             {
-                auto curMapIt = mouseResponseMap.find(mouseName)->second.find(40);
-                if (curMapIt == mouseResponseMap.find(mouseName)->second.end())
+                auto curMapIt = curMap.find(STEP_CALCULATE);
+                if (curMapIt == curMap.end())
                 {
-                    mouseResponseMap.find(mouseName)->second[40] = 1;
+                    curMap[STEP_CALCULATE] = 1;
                 }
                 else
                 {
-                    mouseResponseMap.find(mouseName)->second[40] = curMapIt->second + 1;
+                    curMap[STEP_CALCULATE] = curMapIt->second + 1;
                 }
             }
-            else if (gap > 5000)
+            else if (gap > STOP_CALCULATE)
             {
                 MMI_HILOGD("start to report");
                 long total = 0;
-                for (const auto &[key, value] : mouseResponseMap.find(mouseName)->second)
+                for (const auto &[key, value] : curMap)
                 {
                     total += value;
                 }
@@ -232,30 +237,30 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
                     connectType,
                     "MOVING_TOTAL",
                     total,
-                    "1ms", mouseResponseMap.find(mouseName)->second.find(1)->second / total,
-                    "2ms", mouseResponseMap.find(mouseName)->second.find(2)->second / total,
-                    "3ms", mouseResponseMap.find(mouseName)->second.find(3)->second / total,
-                    "4ms", mouseResponseMap.find(mouseName)->second.find(4)->second / total,
-                    "5ms", mouseResponseMap.find(mouseName)->second.find(5)->second / total,
-                    "6ms", mouseResponseMap.find(mouseName)->second.find(6)->second / total,
-                    "7ms", mouseResponseMap.find(mouseName)->second.find(7)->second / total,
-                    "8ms", mouseResponseMap.find(mouseName)->second.find(8)->second / total,
-                    "9ms", mouseResponseMap.find(mouseName)->second.find(9)->second / total,
-                    "10ms", mouseResponseMap.find(mouseName)->second.find(10)->second / total,
-                    "11ms", mouseResponseMap.find(mouseName)->second.find(11)->second / total,
-                    "12ms", mouseResponseMap.find(mouseName)->second.find(12)->second / total,
-                    "13ms", mouseResponseMap.find(mouseName)->second.find(13)->second / total,
-                    "14ms", mouseResponseMap.find(mouseName)->second.find(14)->second / total,
-                    "15ms", mouseResponseMap.find(mouseName)->second.find(15)->second / total,
-                    "16ms", mouseResponseMap.find(mouseName)->second.find(16)->second / total,
-                    "17ms", mouseResponseMap.find(mouseName)->second.find(17)->second / total,
-                    "18ms", mouseResponseMap.find(mouseName)->second.find(18)->second / total,
-                    "19ms", mouseResponseMap.find(mouseName)->second.find(19)->second / total,
-                    "20ms", mouseResponseMap.find(mouseName)->second.find(20)->second / total,
-                    "25ms", mouseResponseMap.find(mouseName)->second.find(25)->second / total,
-                    "30ms", mouseResponseMap.find(mouseName)->second.find(30)->second / total,
-                    "35ms", mouseResponseMap.find(mouseName)->second.find(35)->second / total,
-                    "40ms", mouseResponseMap.find(mouseName)->second.find(40)->second / total,
+                    "1ms", curMap.find(1)->second / total,
+                    "2ms", curMap.find(2)->second / total,
+                    "3ms", curMap.find(3)->second / total,
+                    "4ms", curMap.find(4)->second / total,
+                    "5ms", curMap.find(5)->second / total,
+                    "6ms", curMap.find(6)->second / total,
+                    "7ms", curMap.find(7)->second / total,
+                    "8ms", curMap.find(8)->second / total,
+                    "9ms", curMap.find(9)->second / total,
+                    "10ms", curMap.find(10)->second / total,
+                    "11ms", curMap.find(11)->second / total,
+                    "12ms", curMap.find(12)->second / total,
+                    "13ms", curMap.find(13)->second / total,
+                    "14ms", curMap.find(14)->second / total,
+                    "15ms", curMap.find(15)->second / total,
+                    "16ms", curMap.find(16)->second / total,
+                    "17ms", curMap.find(17)->second / total,
+                    "18ms", curMap.find(18)->second / total,
+                    "19ms", curMap.find(19)->second / total,
+                    "20ms", curMap.find(FINE_CALCULATE)->second / total,
+                    "25ms", curMap.find(25)->second / total,
+                    "30ms", curMap.find(30)->second / total,
+                    "35ms", curMap.find(35)->second / total,
+                    "40ms", curMap.find(STEP_CALCULATE)->second / total,
                     "MSG", "collectiong mouse response time probability");
                 if (ret != RET_OK)
                 {
