@@ -31,7 +31,7 @@ using namespace testing::ext;
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
 } // namespace
 
-class Remote_ControlTransformProcessorTest : public testing::Test {
+class RemoteControlTransformProcessorTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -45,22 +45,22 @@ private:
     static LibinputWrapper libinput_;
 };
 
-GeneralUwbRemoteControl Remote_ControlTransformProcessorTest::vUwbRemoteControl_;
-LibinputWrapper Remote_ControlTransformProcessorTest::libinput_;
+GeneralUwbRemoteControl RemoteControlTransformProcessorTest::vUwbRemoteControl_;
+LibinputWrapper RemoteControlTransformProcessorTest::libinput_;
 
-void Remote_ControlTransformProcessorTest::SetUpTestCase(void)
+void RemoteControlTransformProcessorTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupUwbRemoteControl();
 }
 
-void Remote_ControlTransformProcessorTest::TearDownTestCase(void)
+void RemoteControlTransformProcessorTest::TearDownTestCase(void)
 {
     CloseUwbRemoteControl();
 }
 
 
-void Remote_ControlTransformProcessorTest::SetupUwbRemoteControl()
+void RemoteControlTransformProcessorTest::SetupUwbRemoteControl()
 {
     ASSERT_TRUE(vUwbRemoteControl_.SetUp());
     std::cout << "device node name: " << vUwbRemoteControl_.GetDevPath() << std::endl;
@@ -73,17 +73,17 @@ void Remote_ControlTransformProcessorTest::SetupUwbRemoteControl()
 }
 
 
-void Remote_ControlTransformProcessorTest::CloseUwbRemoteControl()
+void RemoteControlTransformProcessorTest::CloseUwbRemoteControl()
 {
     libinput_.RemovePath(vUwbRemoteControl_.GetDevPath());
     vUwbRemoteControl_.Close();
 }
 
-void Remote_ControlTransformProcessorTest::SetUp()
+void RemoteControlTransformProcessorTest::SetUp()
 {
 }
 
-void Remote_ControlTransformProcessorTest::TearDown()
+void RemoteControlTransformProcessorTest::TearDown()
 {
 }
 
@@ -93,7 +93,7 @@ void Remote_ControlTransformProcessorTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(Remote_ControlTransformProcessorTest, InitToolTypes_001, TestSize.Level1)
+HWTEST_F(RemoteControlTransformProcessorTest, InitToolTypes_001, TestSize.Level1)
 {
     int32_t deviceId = 7;
     Remote_ControlTransformProcessor processor(deviceId);
@@ -123,7 +123,7 @@ HWTEST_F(Remote_ControlTransformProcessorTest, InitToolTypes_001, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(Remote_ControlTransformProcessorTest, Remote_ControlTransformProcessorTest_OnEvent_001,
+HWTEST_F(RemoteControlTransformProcessorTest, Remote_ControlTransformProcessorTest_OnEvent_001,
         TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -131,7 +131,7 @@ HWTEST_F(Remote_ControlTransformProcessorTest, Remote_ControlTransformProcessorT
     int32_t deviceId = 7;
     Remote_ControlTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
-    ASSERT_TRUE(processor.pointerEvent_ != nullptr);  
+    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
     int32_t varMoveFlag = POINTER_MOVEFLAG;
     std::cout << "varMoveFlag: " << POINTER_MOVEFLAG << std::endl;
     for(int32_t index = 1; index < POINTER_MOVEFLAG; ++index){
@@ -166,9 +166,7 @@ HWTEST_F(Remote_ControlTransformProcessorTest, Remote_ControlTransformProcessorT
         std::cout << "touch device: " << libinput_device_get_name(dev) << std::endl;
         EXPECT_NO_FATAL_FAILURE(processor.OnEvent(event));
         event = libinput_.Dispatch();
-    }
-
-    
+    } 
 }
 
 /**
@@ -177,7 +175,7 @@ HWTEST_F(Remote_ControlTransformProcessorTest, Remote_ControlTransformProcessorT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(Remote_ControlTransformProcessorTest, Remote_ControlTransformProcessorTest_OnEventTouchMotion_001,
+HWTEST_F(RemoteControlTransformProcessorTest, Remote_ControlTransformProcessorTest_OnEventTouchMotion_001,
         TestSize.Level1)
 {
     int32_t deviceId = 7;
@@ -193,7 +191,7 @@ HWTEST_F(Remote_ControlTransformProcessorTest, Remote_ControlTransformProcessorT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(Remote_ControlTransformProcessorTest, Remote_ControlTransformProcessorTest_OnEventTouchMotion_002,
+HWTEST_F(RemoteControlTransformProcessorTest, Remote_ControlTransformProcessorTest_OnEventTouchMotion_002,
         TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -204,7 +202,7 @@ HWTEST_F(Remote_ControlTransformProcessorTest, Remote_ControlTransformProcessorT
     ASSERT_TRUE(processor.pointerEvent_ != nullptr);
     int32_t varMoveFlag = POINTER_MOVEFLAG;
     std::cout << "moveflag: " << varMoveFlag << std::endl;
-    for(int32_t index = 1; index < POINTER_MOVEFLAG; ++index){
+    for (int32_t index = 1; index < POINTER_MOVEFLAG; ++index){
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 0);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 5190);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 8306);

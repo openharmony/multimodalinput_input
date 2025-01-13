@@ -845,7 +845,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_0
     int64_t frameTime = 10000;
     int32_t varMoveFlag = POINTER_MOVEFLAG;
     std::cout << "varMoveFlag: " << POINTER_MOVEFLAG << std::endl;
-    for(int32_t index = 1; index < POINTER_MOVEFLAG; ++index){
+    for (int32_t index = 1; index < POINTER_MOVEFLAG; ++index) {
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 0);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 5190 + index*30);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 8306);
