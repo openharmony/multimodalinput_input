@@ -36,7 +36,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string THREAD_NAME { "OS_mmi_EventHdr" };
-static const bool USE_ISOLATE_DISPATCH_THREAD = system::GetBoolParameter("const.sys.mmi.use_isolate_dispatch_thread", false);
+static const bool USE_ISOLATE_DISPATCH_THREAD = system::GetBoolParameter("const.multimodalinput.use_isolate_dispatch_thread", false);
 } // namespace
 
 using namespace AppExecFwk;
