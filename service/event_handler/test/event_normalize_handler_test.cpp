@@ -117,7 +117,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
     libinput_event* event = new (std::nothrow) libinput_event;
-    ASSERT_EQ(event, nullptr);
+    ASSERT_NE(event, nullptr);
     event->type = LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN;
     handler.HandleEvent(event, frameTime);
     ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(event));
