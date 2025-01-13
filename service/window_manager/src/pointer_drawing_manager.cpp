@@ -2211,6 +2211,9 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #else
     CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (lastMouseStyle_.id == MOUSE_ICON::CURSOR_CIRCLE) {
+        MMI_HILOGE("Cursor circle does not need to draw size");
+    }
     if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
