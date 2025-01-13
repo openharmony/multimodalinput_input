@@ -2092,7 +2092,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
         MMI_HILOGD("HotkeyId:%{private}s", hotkeyInfo->hotkeyId.c_str());
         int32_t subscribeId = -1;
         subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeHotkey(keyOption, HandleKeyEvent);
-        if (subscribeId == ERROR_UNSUPPORT) {
+        if (subscribeId == OHOS::MMI::ERROR_UNSUPPORT) {
             delete hotkeyInfo;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return COMMON_CAPABILITY_NOT_SUPPORTED;
