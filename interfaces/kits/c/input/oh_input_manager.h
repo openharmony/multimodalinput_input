@@ -250,7 +250,7 @@ typedef enum Input_Result {
     /** @error Already occupied by the system */
     INPUT_OCCUPIED_BY_SYSTEM = 4200002,
     /** @error Already occupied by the other */
-    INPUT_OCCUPIED_BY_OTHER = 4200003
+    INPUT_OCCUPIED_BY_OTHER = 4200003,
     /** Capability not supported */
     COMMON_CAPABILITY_NOT_SUPPORTED = 801
 } Input_Result;
