@@ -17,6 +17,9 @@
 
 #include "ability_manager_client.h"
 #include "define_multimodal.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "setting_datashare.h"
@@ -124,7 +127,12 @@ void StylusKeyHandler::LaunchAbility(const Ability &ability)
         want.SetParam(item.first, item.second);
     }
 
+    auto begin = std::chrono::high_resolution_clock::now();
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY,
+        durationMS);
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }

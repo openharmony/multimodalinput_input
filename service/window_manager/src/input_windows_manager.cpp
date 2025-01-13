@@ -3567,14 +3567,22 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 std::unordered_map<std::string, std::string> mapPayload;
                 mapPayload["msg"] = "";
                 constexpr int32_t touchDownBoost = 1006;
+                auto begin = std::chrono::high_resolution_clock::now();
                 OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
                     OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchDownBoost, mapPayload);
+                auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::high_resolution_clock::now() - begin).count();
+                DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
             } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
                 constexpr int32_t touchUpBoost = 1007;
                 std::unordered_map<std::string, std::string> mapPayload;
                 mapPayload["msg"] = "";
+                auto begin = std::chrono::high_resolution_clock::now();
                 OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
                     OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchUpBoost, mapPayload);
+                auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::high_resolution_clock::now() - begin).count();
+                DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
             }
         }
         if (displayGroupInfo_.focusWindowId == touchWindow->id) {
@@ -4974,7 +4982,11 @@ int32_t InputWindowsManager::GetCurrentUserId()
 void InputWindowsManager::SetFoldState()
 {
     BytraceAdapter::StartFoldState(Rosen::DisplayManager::GetInstance().IsFoldable());
+    auto begin = std::chrono::high_resolution_clock::now();
     IsFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::IS_FOLDABLE, durationMS);
     BytraceAdapter::StopFoldState();
 }
 

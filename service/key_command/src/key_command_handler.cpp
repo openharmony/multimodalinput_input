@@ -1579,7 +1579,11 @@ bool KeyCommandHandler::IsMusicActivate()
 {
     CALL_INFO_TRACE;
     std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
+    auto begin = std::chrono::high_resolution_clock::now();
     auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_CURRENT_RENDERER_CHANGE_INFOS, durationMS);
     if (ret != ERR_OK) {
         MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
         return false;
@@ -2367,7 +2371,12 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     DfxHisysevent::CalcComboStartTimes(delay);
     DfxHisysevent::ReportComboStartTimes();
     MMI_HILOGW("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    auto begin = std::chrono::high_resolution_clock::now();
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY,
+        durationMS);
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         return;
@@ -2405,12 +2414,22 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
 
     MMI_HILOGW("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
     if (ability.abilityType == EXTENSION_ABILITY) {
+        auto begin = std::chrono::high_resolution_clock::now();
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, nullptr);
+        auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_EXTENSION_ABILITY,
+            durationMS);
         if (err != ERR_OK) {
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         }
     } else {
+        auto begin = std::chrono::high_resolution_clock::now();
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+        auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY,
+            durationMS);
         if (err != ERR_OK) {
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         }

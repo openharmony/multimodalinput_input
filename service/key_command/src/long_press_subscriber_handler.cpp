@@ -476,7 +476,11 @@ int32_t LongPressSubscriberHandler::GetBundleName(std::string &bundleName, int32
         userid = DEFAULT_USER_ID;
     }
     std::vector<AppExecFwk::RunningProcessInfo> info;
+    auto begin = std::chrono::high_resolution_clock::now();
     appMgrClient->GetProcessRunningInfosByUserId(info, userid);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_PROCESS_RUNNING_INFOS_BY_USER_ID, durationMS);
     for (const auto &item : info) {
         if (item.bundleNames.empty()) {
             continue;
