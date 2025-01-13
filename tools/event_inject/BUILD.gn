@@ -73,6 +73,7 @@ ohos_unittest("ut-event-injection-out") {
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Oz",
   ]
 
   include_dirs = [
