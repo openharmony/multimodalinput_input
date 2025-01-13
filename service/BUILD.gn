@@ -2484,7 +2484,10 @@ ohos_unittest("ConnectManagerEXTest") {
     "module_loader/src/input_screen_capture_agent.cpp",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [
     "ability_runtime:app_manager",

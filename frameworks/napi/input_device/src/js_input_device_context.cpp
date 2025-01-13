@@ -691,7 +691,7 @@ napi_value JsInputDeviceContext::SetInputDeviceEnabled(napi_env env, napi_callba
     return jsInputDeviceMgr->SetInputDeviceEnabled(env, deviceId, enable);
 }
 
-napi_value JsInputDeviceContext::SetFunctionKeyState(napi_env env, napi_callback_info info)
+napi_value JsInputDeviceContext::SetFunctionKeyEnabled(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
@@ -721,10 +721,10 @@ napi_value JsInputDeviceContext::SetFunctionKeyState(napi_env env, napi_callback
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
     CHKPP(jsInputDeviceMgr);
-    return jsInputDeviceMgr->SetFunctionKeyState(env, funcKey, state);
+    return jsInputDeviceMgr->SetFunctionKeyEnabled(env, funcKey, state);
 }
 
-napi_value JsInputDeviceContext::GetFunctionKeyState(napi_env env, napi_callback_info info)
+napi_value JsInputDeviceContext::IsFunctionKeyEnabled(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
@@ -746,7 +746,7 @@ napi_value JsInputDeviceContext::GetFunctionKeyState(napi_env env, napi_callback
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
     CHKPP(jsInputDeviceMgr);
-    return jsInputDeviceMgr->GetFunctionKeyState(env, funcKey);
+    return jsInputDeviceMgr->IsFunctionKeyEnabled(env, funcKey);
 }
 
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
@@ -790,6 +790,21 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
     return exports;
 }
 
+napi_value JsInputDeviceContext::CreateEnumFunctionKey(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_value capsLock = nullptr;
+    CHKRP(napi_create_int32(env, FunctionKey::FUNCTION_KEY_CAPSLOCK, &capsLock), CREATE_INT32);
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("CAPS_LOCK", capsLock),
+    };
+    napi_value result = nullptr;
+    CHKRP(napi_define_class(env, "FunctionKey", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "FunctionKey", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -812,11 +827,12 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatRate", GetKeyboardRepeatRate),
         DECLARE_NAPI_STATIC_FUNCTION("getIntervalSinceLastInput", GetIntervalSinceLastInput),
         DECLARE_NAPI_STATIC_FUNCTION("setInputDeviceEnabled", SetInputDeviceEnabled),
-        DECLARE_NAPI_STATIC_FUNCTION("setFunctionKeyState", SetFunctionKeyState),
-        DECLARE_NAPI_STATIC_FUNCTION("getFunctionKeyState", GetFunctionKeyState),
+        DECLARE_NAPI_STATIC_FUNCTION("setFunctionKeyEnabled", SetFunctionKeyEnabled),
+        DECLARE_NAPI_STATIC_FUNCTION("isFunctionKeyEnabled", IsFunctionKeyEnabled),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     CHKPP(CreateEnumKeyboardType(env, exports));
+    CHKPP(CreateEnumFunctionKey(env, exports));
     return exports;
 }
 } // namespace MMI

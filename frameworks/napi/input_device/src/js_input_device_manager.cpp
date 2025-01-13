@@ -292,7 +292,7 @@ napi_value JsInputDeviceManager::SetInputDeviceEnabled(napi_env env, int32_t dev
     return ret;
 }
 
-napi_value JsInputDeviceManager::SetFunctionKeyState(napi_env env, int32_t funcKey, bool state, napi_value handle)
+napi_value JsInputDeviceManager::SetFunctionKeyEnabled(napi_env env, int32_t funcKey, bool state, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
@@ -302,7 +302,7 @@ napi_value JsInputDeviceManager::SetFunctionKeyState(napi_env env, int32_t funcK
     return ret;
 }
 
-napi_value JsInputDeviceManager::GetFunctionKeyState(napi_env env, int32_t funcKey, napi_value handle)
+napi_value JsInputDeviceManager::IsFunctionKeyEnabled(napi_env env, int32_t funcKey, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();

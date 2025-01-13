@@ -597,7 +597,7 @@ public:
      * @return Returns <b>true</b> if the function key is enabled;
      * returns <b>false</b> otherwise.
      */
-    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
 
     /**
      * @brief Sets the enablement status of the specified function key on the keyboard.

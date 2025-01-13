@@ -1457,6 +1457,7 @@ void JsEventTarget::EmitJsSetFunctionKeyState(sptr<JsUtil::CallbackInfo> cb, int
     int32_t keyState = state ? 1 : 0;
     cb->uData.keys.push_back(funcKey);
     cb->uData.keys.push_back(keyState);
+    cb->setFuncKeyType = true;
     cb->errCode = -1;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -1485,6 +1486,7 @@ void JsEventTarget::EmitJsGetFunctionKeyState(sptr<JsUtil::CallbackInfo> cb, int
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     cb->uData.keys.push_back(funcKey);
+    cb->getFuncKeyType = true;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -1509,7 +1511,6 @@ void JsEventTarget::EmitJsGetFunctionKeyState(sptr<JsUtil::CallbackInfo> cb, int
 void JsEventTarget::CallFunctionKeyStateTask(uv_work_t *work)
 {
     CHKPV(work);
-    int32_t size = 2;
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t *>(work);
         MMI_HILOGE("Check data is nullptr");
@@ -1517,23 +1518,19 @@ void JsEventTarget::CallFunctionKeyStateTask(uv_work_t *work)
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     CHKPV(cb->env);
-    if (cb->uData.keys.size() == size - 1) {
+    if (cb->getFuncKeyType) {
+        bool resultState = false;
         auto funcKey = cb->uData.keys.front();
-        int32_t napiCode = InputManager::GetInstance()->GetFunctionKeyState(funcKey);
-        cb->errCode = RET_OK;
-        cb->uData.keys.push_back(napiCode);
-    } else if (cb->uData.keys.size() == size) {
-        int32_t backState = -1;
+        int32_t napiCode = InputManager::GetInstance()->GetFunctionKeyState(funcKey, resultState);
+        int32_t keyState = resultState ? 1 : 0;
+        cb->errCode = napiCode;
+        cb->uData.keys.push_back(keyState);
+    }
+    if (cb->setFuncKeyType) {
         auto funcKey = cb->uData.keys.front();
         auto state = cb->uData.keys.back();
         int32_t napiCode = InputManager::GetInstance()->SetFunctionKeyState(funcKey, state);
         cb->errCode = napiCode;
-        if (cb->errCode == RET_OK) {
-            backState = 1;
-        } else {
-            backState = 0;
-        }
-        cb->uData.keys.push_back(backState);
     }
 }
 
@@ -1578,24 +1575,20 @@ void JsEventTarget::CallFunctionKeyState(uv_work_t *work, int32_t status)
     napi_open_handle_scope(cb->env, &scope);
     CHKPV(scope);
     napi_value callResult = nullptr;
-    if (cb->deferred) {
-        if (cb->errCode != RET_OK) {
-            if (!GetFunctionKeyStateErrCode(cb, scope, callResult)) {
-                MMI_HILOGE("promise get function key state error");
-                return;
-            }
-            CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
-        } else {
-            int32_t argc = 2;
-            auto keysSize = cb->uData.keys.size();
-            if (keysSize == argc) {
-                auto state = cb->uData.keys.back();
-                CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, state, &callResult), CREATE_INT32, scope);
-            } else {
-                CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult), GET_UNDEFINED, scope);
-            }
-            CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
+    if (cb->errCode != RET_OK) {
+        if (!GetFunctionKeyStateErrCode(cb, scope, callResult)) {
+            MMI_HILOGE("promise get function key state error");
+            return;
         }
+        CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
+    } else {
+        if (cb->getFuncKeyType) {
+            auto state = cb->uData.keys.back();
+            CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, state, &callResult), CREATE_INT32, scope);
+        } else {
+            CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult), GET_UNDEFINED, scope);
+        }
+        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
     }
     napi_close_handle_scope(cb->env, scope);
 }
