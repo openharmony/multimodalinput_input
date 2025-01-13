@@ -44,6 +44,10 @@
 #include "crown_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_CROWN
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_RSS_CLIENT
+#include "res_sched_client.h"
+#include "res_type.h"
+#endif // OHOS_RSS_CLIENT
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -564,9 +568,25 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     return RET_OK;
 }
 
+#ifdef OHOS_RSS_CLIENT
+    inline void ReportTouchDownToRSS(libinput_event* event)
+{
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCH_DOWN) {
+        std::unordered_map<std::string, std::string> mapPayload;
+        OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+            OHOS::ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
+            OHOS::ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN_MMI,
+            mapPayload);
+    }
+}
+#endif
+
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
+#ifdef OHOS_RSS_CLIENT
+    ReportTouchDownToRSS(event);
+#endif
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     FingerprintEventHdr->SetScreenState(event);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
