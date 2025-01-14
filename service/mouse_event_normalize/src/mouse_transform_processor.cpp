@@ -196,17 +196,8 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
                 mouseResponseMap.erase(mouseName);
                 mouseMap.erase(mouseName);
             }
-                else
-                {
-                    curMap[tempNum] = curMapIt->second + 1;
         }
     }
-            else if (gap >= STEP_CALCULATE && gap < STOP_CALCULATE)
-            {
-                auto curMapIt = curMap.find(STEP_CALCULATE);
-                if (curMapIt == curMap.end())
-                {
-                    curMap[STEP_CALCULATE] = 1;
 }
 void MouseTransformProcessor::HandleReportMouseResponseTime(std::string &connectType, std::map<long long, int32_t> &curMap)
 {
@@ -251,11 +242,6 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(std::string &connect
         MMI_HILOGE("mouse write failed , ret:%{public}d", ret);
     }
     MMI_HILOGD("mouse write end , ret:%{public}d", ret);
-                mouseResponseMap.erase(mouseName);
-                mouseMap.erase(mouseName);
-            }
-        }
-    }
 }
 
 void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
