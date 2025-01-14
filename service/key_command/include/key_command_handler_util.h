@@ -47,6 +47,9 @@ namespace MMI {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
+constexpr int64_t MAX_REPEATKEY_DELAY_TIME = 1000;
+constexpr int64_t MAX_KEYDOWNDURATION_TIME = 10000;
+constexpr int64_t MAX_ABILITYSTARTDELAY_TIME = 3000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
@@ -120,6 +123,7 @@ bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey, std::
 bool GetKeyCode(const cJSON* jsonData, int32_t &keyCodeInt);
 bool GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt);
 bool GetDelay(const cJSON* jsonData, int64_t &delayInt);
+bool GetRepeatKeyDelay(const cJSON* jsonData, int64_t &delayInt);
 bool GetRepeatTimes(const cJSON* jsonData, int32_t &repeatTimesInt);
 bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt);
 bool PackageSequenceKey(const cJSON* sequenceKeysJson, SequenceKey &sequenceKey);

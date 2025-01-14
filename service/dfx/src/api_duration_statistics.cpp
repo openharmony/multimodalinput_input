@@ -28,8 +28,7 @@ namespace {
 }
 
 int32_t ApiDurationStatistics::COUNT_LIMIT_TO_DFX_RADAR { 1000 };
-std::unordered_map<ApiDurationStatistics::Api, std::string> ApiDurationStatistics::apiNames_
-{
+std::unordered_map<ApiDurationStatistics::Api, std::string> ApiDurationStatistics::apiNames_ {
     { ApiDurationStatistics::Api::IS_SCREEN_CAPTURE_WORKING, "IS_SCREEN_CAPTURE_WORKING" },
     { ApiDurationStatistics::Api::GET_DEFAULT_DISPLAY, "GET_DEFAULT_DISPLAY" },
     { ApiDurationStatistics::Api::GET_SYSTEM_ABILITY_MANAGER, "GET_SYSTEM_ABILITY_MANAGER" },
