@@ -58,6 +58,7 @@ public:
                 return;
             }
             auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+            CHKPV(eventKeyCommandHandler);
             int32_t ret = eventKeyCommandHandler->SetIsFreezePowerKey(pageName);
             if (ret != RET_OK) {
                 MMI_HILOGE("SetIsFreezePowerKey is failed in key command:%{public}d", ret);
