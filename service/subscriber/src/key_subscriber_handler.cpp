@@ -135,11 +135,12 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
         sess->GetProgramName(), sess->GetPid());
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisysevent::ReportKeyEvent(keyOption->GetFinalKey(),
-        keyOption->IsFinalKeyDown() ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP,
-        sess->GetProgramName(), DfxHisysevent::KEY_CONSUMPTION_TYPE::NO_TYPE, subscribeId);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+
+// HGC 26
+// #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportSubscribeKey("Subscribe", sess->GetProgramName(),
+        keyOption->GetFinalKey(), keyOption->GetFinalKeyDownDuration(), subscribeId);
+// #endif // OHOS_BUILD_ENABLE_DFX_RADAR
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         auto ret = AddKeyGestureSubscriber(subscriber, keyOption);
@@ -192,6 +193,11 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 subscribers.erase(it);
                 DfxHisysevent::ReportUnSubscribeKeyEvent(subscribeId, option->GetFinalKey(),
                     sess->GetProgramName(), sess->GetPid());
+                // HGC 27
+// #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+                DfxHisysevent::ReportSubscribeKey("Unsubscribe", sess->GetProgramName(),
+                    option->GetFinalKey(), option->GetFinalKeyDownDuration(), subscribeId);
+// #endif // OHOS_BUILD_ENABLE_DFX_RADAR
                 return RET_OK;
             }
         }
