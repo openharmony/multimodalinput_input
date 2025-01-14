@@ -201,7 +201,7 @@ public:
      * the monitor fails to be added.
      * @since 9
      */
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
 
     /**
      * @brief Removes a monitor.
@@ -926,7 +926,6 @@ public:
      * @since 13
      */
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
-
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

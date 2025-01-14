@@ -85,6 +85,7 @@ private:
     };
     std::atomic_bool screenState_ { false };
     std::atomic_bool cancelState_ { false };
+    std::atomic_bool fingerprintFlag_ {false};
     std::atomic_bool screenMissTouchFlag_ { false };
     std::atomic_bool isStartedSmartKeyBySlide_ { false };
     std::atomic_bool isStartedSmartKey_ { false };

@@ -903,5 +903,236 @@ std::string DfxHisysevent::GetLcdInfo()
 {
     return GetVendorInfo(LCD_PATH);
 }
+
+void DfxHisysevent::ReportSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey,
+    std::string name, int32_t pid)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SUBSCRIBE_KEY_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "SUBSCRIBE_ID", subscribeId,
+        "FINAL_KEY", finalKey,
+        "NAME", name,
+        "PID", pid);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportUnSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey,
+    std::string name, int32_t pid)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "UNSUBSCRIBE_KEY_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "SUBSCRIBE_ID", subscribeId,
+        "FINAL_KEY", finalKey,
+        "NAME", name,
+        "PID", pid);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKeyboardEvent(int32_t eventType, int32_t keyCode, int32_t keyAction)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "KAYBOARD_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "KEY_EVENT_TYPE", eventType,
+        "KEY_CODE", keyCode,
+        "KEY_ACTION", keyAction);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportLaunchAbility(std::string bundleName)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "LAUNCH_ABILITY",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "BUNDLE_NAME", bundleName);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportCommonAction(std::string action)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "COMMON_ACTION",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "ACTION", action);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportTouchEvent(int32_t pointAction, int32_t pointId, int32_t windowId)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "TOUCH_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "POINT_ACTION", pointAction,
+        "POINT_ID", pointId,
+        "WINDOW_ID", windowId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetCustomCursor(int32_t windowPid, int32_t windowId)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_CUSTOM_CURSOR",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "WINDOW_PID", windowPid,
+        "WINDOW_ID", windowId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetMouseIcon(int32_t windowId)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_MOUSE_ICON",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "WINDOW_ID", windowId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetPointerStyle(int32_t windowId, int32_t pointerStyleId, bool isUiExtension)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_POINTER_STYLE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "WINDOW_ID", windowId,
+        "POINTER_STYLE_ID", pointerStyleId,
+        "IS_UIEXTENSION", isUiExtension);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetPointerVisible(bool visible, int32_t priority)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_POINTER_VISIBLE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "VISIBLE", visible,
+        "PRIORITY", priority);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetPointerSpeed(int32_t speed)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_POINTER_SPEED",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "SPEED", speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportAddInputHandler(int32_t handlerType)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "ADD_INPUT_HANDLER",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "INPUT_HANDLER_TYPE", handlerType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportRemoveInputHandler(int32_t handlerType)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "REMOVE_INPUT_HANDLER",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "INPUT_HANDLER_TYPE", handlerType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportInjectPointerEvent(bool isNativeInject)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "INJECT_POINTER_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "IS_NATIVE_INJECT", isNativeInject);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportEnableCombineKey(bool enable)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "ENABLE_COMBINE_KEY",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "ENABLE", enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportAppendExtraData()
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "APPEND_EXTRA_DATA",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportTransmitInfrared(int64_t number)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "APPEND_EXTRA_DATA",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "ENABLE", number);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSetCurrentUser(int32_t userId)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "SET_CURRENT_USER",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "USER_ID", userId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
 } // namespace MMI
 } // namespace OHOS

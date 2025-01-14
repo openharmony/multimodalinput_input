@@ -44,6 +44,7 @@ private:
     void NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem, int32_t &toolType);
     void UpdatePointerItemProperties(PointerEvent::PointerItem &item, EventTouch &touchInfo);
     void InitToolTypes();
+    bool DumpInner();
 private:
     const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };

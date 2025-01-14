@@ -3428,6 +3428,10 @@ protected:
      */
     explicit KeyEvent(int32_t eventType);
 
+public:
+    void SetFourceMonitorFlag(bool fourceMonitorFlag);
+    bool GetFourceMonitorFlag();
+
 private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     bool ReadEnhanceDataFromParcel(Parcel &in);
@@ -3446,6 +3450,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    bool fourceMonitorFlag_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

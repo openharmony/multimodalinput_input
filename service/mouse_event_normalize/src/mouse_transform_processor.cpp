@@ -407,6 +407,9 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
         deviceType = DeviceType::DEVICE_SOFT_PC_PRO;
     }
+    if (PRODUCT_TYPE == DEVICE_TYPE_TABLET || PRODUCT_TYPE == DEVICE_TYPE_PCE) {
+        deviceType = DeviceType::DEVICE_TABLET;
+    }
     int32_t ret =
         HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
     if (ret != RET_OK) {
@@ -719,10 +722,17 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
 
 void MouseTransformProcessor::DumpInner()
 {
+    static int32_t lastDeviceId = -1;
+    static std::string lastDeviceName("default");
+    auto nowId = pointerEvent_->GetDeviceId();
+    if (lastDeviceId != nowId) {
+        auto device = INPUT_DEV_MGR->GetInputDevice(nowId);
+        CHKPV(device);
+        lastDeviceId = nowId;
+        lastDeviceName = device->GetName();
+    }
     EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_FREEZE);
-    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
-    CHKPV(device);
-    aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
+    aggregator_.Record(MMI_LOG_FREEZE, lastDeviceName + ", TW: " +
         std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
 }
 

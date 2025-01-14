@@ -446,6 +446,8 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent)
     }
     g_mouseEvent->SetActionTime(time);
     OHOS::MMI::PointerEvent::PointerItem item;
+    int32_t pointerId = 10000;
+    g_mouseEvent->GetPointerItem(pointerId, item);
     item.SetDownTime(time);
     int32_t result = HandleMouseAction(mouseEvent, item);
     if (result != 0) {
@@ -1639,22 +1641,6 @@ Input_Result OH_Input_RemoveInputEventInterceptor(void)
     return retCode;
 }
 
-int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(intervalSinceLastInput, INPUT_PARAMETER_ERROR);
-    int64_t interval = -1;
-    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(interval);
-    *intervalSinceLastInput = interval;
-    Input_Result retCode = INPUT_SUCCESS;
-    retCode = NormalizeResult(ret);
-    if (retCode != INPUT_SUCCESS) {
-        MMI_HILOGE("Get Interval Since Last Input failed");
-        return retCode;
-    }
-    return INPUT_SUCCESS;
-}
-
 Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
 {
     return nullptr;
@@ -1968,5 +1954,21 @@ Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *ven
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(vendor, INPUT_PARAMETER_ERROR);
     *vendor = deviceInfo->vendor;
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(intervalSinceLastInput, INPUT_PARAMETER_ERROR);
+    int64_t interval = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(interval);
+    *intervalSinceLastInput = interval;
+    Input_Result retCode = INPUT_SUCCESS;
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Get Interval Since Last Input failed");
+        return retCode;
+    }
     return INPUT_SUCCESS;
 }

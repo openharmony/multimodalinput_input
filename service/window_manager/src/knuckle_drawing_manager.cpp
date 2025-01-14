@@ -515,7 +515,8 @@ void KnuckleDrawingManager::CreateCanvasNode()
 int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touchEvent)
 {
     CHKPR(touchEvent, RET_ERR);
-    if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+    if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
         isActionUp_ = true;
         return RET_OK;
     }

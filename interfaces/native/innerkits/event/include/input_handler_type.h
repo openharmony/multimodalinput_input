@@ -34,11 +34,25 @@ enum InputHandlerType : int32_t {
 };
 
 using HandleEventType = uint32_t;
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_NONE { 0x0 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_KEY { 0x1 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_POINTER { 0x2 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_FINGERPRINT { 0x3 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_ALL { HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_NONE {0x0};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_KEY {1u};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_POINTER {1u << 1};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_TOUCH { 1u << 3 };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_MOUSE { 1u << 4 };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_PINCH { 1u << 5 };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_THREEFINGERSSWIP { 1u << 6 };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_FOURFINGERSSWIP {1u << 7 };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_ROTATE { 1u << 8 };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_THREEFINGERSTAP { 1u << 9 };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_SWIPEINWARD { 1u << 10 };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_ALL {
+    HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER |
+    HANDLE_EVENT_TYPE_TOUCH | HANDLE_EVENT_TYPE_MOUSE | HANDLE_EVENT_TYPE_PINCH |
+    HANDLE_EVENT_TYPE_THREEFINGERSSWIP | HANDLE_EVENT_TYPE_FOURFINGERSSWIP |
+    HANDLE_EVENT_TYPE_ROTATE | HANDLE_EVENT_TYPE_THREEFINGERSTAP | HANDLE_EVENT_TYPE_SWIPEINWARD
+};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_KP {HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_FINGERPRINT {HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER};
 
 inline bool IsValidHandlerType(InputHandlerType handlerType)
 {

@@ -17,6 +17,8 @@
 
 #include <sstream>
 
+#include "common_event_support.h"
+
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
 #include "call_manager_client.h"
@@ -25,6 +27,7 @@
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
+#include "display_event_monitor.h"
 #include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
@@ -55,6 +58,15 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
 {
     CHKPV(keyEvent);
     if (OnSubscribeKeyEvent(keyEvent)) {
+        if (DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+            auto monitorHandler = InputHandler->GetMonitorHandler();
+            CHKPV(monitorHandler);
+            keyEvent->SetFourceMonitorFlag(true);
+#ifndef OHOS_BUILD_EMULATOR
+            monitorHandler->OnHandleEvent(keyEvent);
+#endif // OHOS_BUILD_EMULATOR
+            keyEvent->SetFourceMonitorFlag(false);
+        }
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%d", keyEvent->GetKeyCode());
         } else {
@@ -109,6 +121,9 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         "isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
+    DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
+        sess->GetProgramName(), sess->GetPid());
+
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         AddKeyGestureSubscriber(subscriber, keyOption);
@@ -144,6 +159,8 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
                 subscribers.erase(it);
+                DfxHisysevent::ReportUnSubscribeKeyEvent(subscribeId, option->GetFinalKey(),
+                    sess->GetProgramName(), sess->GetPid());
                 return RET_OK;
             }
         }
@@ -687,6 +704,7 @@ bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscribe
         MMI_HILOGD("Timer callback");
         auto subscriber = weakSubscriber.lock();
         CHKPV(subscriber);
+        subscriber->timerId_ = -1;
         OnTimer(subscriber);
     });
 

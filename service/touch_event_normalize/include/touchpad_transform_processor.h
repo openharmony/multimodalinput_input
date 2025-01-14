@@ -96,19 +96,22 @@ private:
     int32_t OnEventTouchPadSwipeBegin(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeEnd(struct libinput_event *event);
-    int32_t OnEventTouchPadPinchBegin(struct libinput_event *event);
-    int32_t OnEventTouchPadPinchUpdate(struct libinput_event *event);
-    int32_t OnEventTouchPadPinchEnd(struct libinput_event *event);
+
+    int32_t OnEventTouchPadPinchGesture(struct libinput_event *event);
+    int32_t GetPinchGestureType(int32_t type, double angle);
+
     int32_t SetTouchPadPinchData(struct libinput_event *event, int32_t action);
     void SetTouchPadMultiTapData();
     void SetPinchPointerItem(int64_t time);
-    void ProcessTouchPadPinchDataEvent(int32_t fingerCount, int32_t action, double scale);
+    void ProcessTouchPadPinchDataEvent(int32_t fingerCount, int32_t action, double scale, double angle);
 
     int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchPadToolType(struct libinput_device *device);
     void InitToolType();
 private:
     const int32_t deviceId_ { -1 };
+    bool isRotateGesture_ { false };
+    double rotateAngle_ { 0.0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     Aggregator aggregator_ {

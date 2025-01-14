@@ -987,7 +987,7 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> point
 #ifndef OHOS_BUILD_ENABLE_TOUCH
         MMI_HILOGW("Touchscreen device does not support");
         return INPUT_OCCUPIED_BY_OTHER;
-#endif
+#endif // OHOS_BUILD_ENABLE_TOUCH
     }
 #ifndef OHOS_BUILD_ENABLE_JOYSTICK
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
@@ -2364,6 +2364,15 @@ int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
     return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
 }
 
+void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
+{
+    if (windowStatecallback_ != nullptr) {
+        windowStatecallback_(pid, windowId);
+    } else {
+        MMI_HILOGE("windowStatecallback_ is nullptr");
+    }
+}
+
 int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     CALL_DEBUG_ENTER;
@@ -2377,15 +2386,6 @@ int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
         return RET_ERR;
     }
     return RET_OK;
-}
-
-void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
-{
-    if (windowStatecallback_ != nullptr) {
-        windowStatecallback_(pid, windowId);
-    } else {
-        MMI_HILOGE("windowStatecallback_ is nullptr");
-    }
 }
 
 int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
