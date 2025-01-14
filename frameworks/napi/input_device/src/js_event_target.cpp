@@ -1592,5 +1592,327 @@ void JsEventTarget::CallFunctionKeyState(uv_work_t *work, int32_t status)
     }
     napi_close_handle_scope(cb->env, scope);
 }
+
+void JsEventTarget::CallKeyboardRepeatDelayTask(uv_work_t *work, const string& operateType)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+
+    if (operateType == "get") {
+        int32_t _delay = -1;
+        auto callback = [&_delay] (int32_t delay) { _delay = delay; };
+        int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatDelay(callback);
+        cb->errCode = napiCode;
+        cb->data.keyboardRepeatDelay = _delay;
+    } else {
+        int32_t napiCode = InputManager::GetInstance()->setKeyboardRepeatDelay(cb->data.keyboardRepeatDelay);
+        cb->errCode = napiCode;
+    }
+}
+
+void JsEventTarget::CallKeyboardRepeatRateTask(uv_work_t *work, const string& operateType)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+
+    if (operateType == "get") {
+        int32_t _rate = -1;
+        auto callback = [&_rate] (int32_t rate) { _rate = rate; };
+        int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatRate(callback);
+        cb->errCode = napiCode;
+        cb->data.keyboardRepeatDelay = _rate;
+    } else {
+        int32_t napiCode = InputManager::GetInstance()->setKeyboardRepeatRate(cb->data.keyboardRepeatRate);
+        cb->errCode = napiCode;
+    }
+}
+
+void JsEventTarget::CallGetKeyboardTypeTask(uv_work_t *work)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+
+    int32_t _keyboardtype = -1;
+    auto callback = [&_keyboardtype] (int32_t keyboardtype) { _keyboardtype = keyboardtype;};
+    int32_t napiCode = InputManager::GetInstance()->GetKeyboardType(cb->data.deviceId, callback);
+    cb->errCode = napiCode;
+    cb->data.keyboardType = _keyboardtype;
+}
+
+void JsEventTarget::CallJsIdsTask(uv_work_t *work)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+    std::vector<int32_t> _ids;
+    auto callback = [&_ids] (std::vector<int32_t>& ids) { _ids = ids;};    
+    int32_t napiCode = InputManager::GetInstance()->GetDeviceIds(callback);
+    cb->errCode = napiCode;
+    cb->data.ids = _ids;
+}
+
+void JsEventTarget::EmitJsKeyboardRepeatDelayAsync(sptr<JsUtil::CallbackInfo> cb, int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardRepeatDelay = delay;
+    cb->errCode = RET_OK;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatDelayTask(work, "get");
+            },
+            CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatDelayTask(work, "get");
+            },
+            CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
+void JsEventTarget::EmitJsKeyboardRepeatRateAsync(sptr<JsUtil::CallbackInfo> cb, int32_t rate)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardRepeatRate = rate;
+    cb->errCode = RET_OK;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatRateTask(work, "get");
+            },
+            CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatRateTask(work, "get");
+            },
+            CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
+void JsEventTarget::EmitJsSetKeyboardRepeatDelayAsync(sptr<JsUtil::CallbackInfo> cb, int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardRepeatDelay = delay;
+    cb->errCode = RET_OK;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatDelayTask(work, "set");
+            },
+            CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatDelayTask(work, "set");
+            },
+            CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
+void JsEventTarget::EmitJsSetKeyboardRepeatRateAsync(sptr<JsUtil::CallbackInfo> cb, int32_t rate)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardRepeatRate = rate;
+    cb->errCode = RET_OK;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatRateTask(work, "set");
+            },
+            CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatRateTask(work, "set");
+            },
+            CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
+void JsEventTarget::EmitJsKeyboardTypeAsync(sptr<JsUtil::CallbackInfo> cb, int32_t deviceid)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.deviceId = deviceid;
+    cb->errCode = RET_OK;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallGetKeyboardTypeTask(work);
+            },
+            CallKeyboardTypePromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+                CallGetKeyboardTypeTask(work);
+            },
+            CallKeyboardTypeAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+void JsEventTarget::EmitJsIdsAsync(sptr<JsUtil::CallbackInfo> cb)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->errCode = RET_OK;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    if (cb->isApi9) {
+        if (cb->ref == nullptr) {
+            ret = uv_queue_work_with_qos(
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsIdsTask(work);
+                }, CallDevListPromiseWork, uv_qos_user_initiated);
+        } else {
+            ret = uv_queue_work_with_qos(
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsIdsTask(work);
+                }, CallDevListAsyncWork, uv_qos_user_initiated);
+        }
+    } else {
+        if (cb->ref == nullptr) {
+            ret = uv_queue_work_with_qos(
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsIdsTask(work);
+                }, CallIdsPromiseWork, uv_qos_user_initiated);
+        } else {
+            ret = uv_queue_work_with_qos(
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsIdsTask(work);
+                }, CallIdsAsyncWork, uv_qos_user_initiated);
+        }
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
 } // namespace MMI
 } // namespace OHOS

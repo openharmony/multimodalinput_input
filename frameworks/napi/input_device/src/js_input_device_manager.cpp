@@ -311,5 +311,64 @@ napi_value JsInputDeviceManager::IsFunctionKeyEnabled(napi_env env, int32_t func
     EmitJsGetFunctionKeyState(cb, funcKey);
     return ret;
 }
+
+napi_value JsInputDeviceManager::SetKeyboardRepeatDelayAsync(napi_env env, int32_t delay, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    EmitJsSetKeyboardRepeatDelayAsync(cb, delay);
+    return ret;
+}
+
+napi_value JsInputDeviceManager::SetKeyboardRepeatRateAsync(napi_env env, int32_t rate, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    EmitJsSetKeyboardRepeatRateAsync(cb, rate);
+    return ret;
+}
+
+napi_value JsInputDeviceManager::GetKeyboardRepeatDelayAsync(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    EmitJsKeyboardRepeatDelayAsync(cb, cb->data.keyboardRepeatDelay);
+    return ret;
+}
+
+napi_value JsInputDeviceManager::GetKeyboardRepeatRateAsync(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    EmitJsKeyboardRepeatRateAsync(cb, cb->data.keyboardRepeatRate);
+    return ret;
+}
+
+napi_value JsInputDeviceManager::GetKeyboardTypeAsync(napi_env env, int32_t id, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    EmitJsKeyboardTypeAsync(cb, id);
+    return ret;
+}
+napi_value JsInputDeviceManager::GetDeviceIdsAsync(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    EmitJsIdsAsync(cb);
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
