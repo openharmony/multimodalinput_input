@@ -32,6 +32,7 @@ ohos_unittest("TouchEventNormalizeTest") {
   cflags_cc = [ "-Wno-string-conversion" ]
 
   sources = [
+    "src/remote_control_transform_processor_test.cpp",
     "src/touch_event_normalize_test.cpp",
     "src/touch_gesture_detector_test.cpp",
     "src/touch_transform_processor_test.cpp",
