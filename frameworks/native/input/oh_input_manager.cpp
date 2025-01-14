@@ -1286,7 +1286,7 @@ static Input_Result AddPointerEventMonitor()
             PointerEventMonitorCallback);
         retCode = NormalizeResult(ret);
         if (retCode != INPUT_SUCCESS) {
-            MMI_HILOGE("Add pointer event monitor failed.");
+            MMI_HILOGE("Add pointer event monitor failed");
             return retCode;
         }
         g_pointerMonitorId = ret;
