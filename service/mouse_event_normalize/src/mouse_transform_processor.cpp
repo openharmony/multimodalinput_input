@@ -163,8 +163,8 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libinput_event *event)
 {
     struct libinput_device *dev = libinput_event_get_device(event);
-    const std::string mouseName = libinput_device_get_name(event);
-    const int32_t devType = libinput_device_get_id_bustype(event);
+    const std::string mouseName = libinput_device_get_name(dev);
+    const int32_t devType = libinput_device_get_id_bustype(dev);
     MMI_HILOGD("mouseName: %{public}s, devType: %{public}d", mouseName.c_str(), devType);
     if (devType == BUS_USB || devType == BUS_BLUETOOTH) {
         std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
