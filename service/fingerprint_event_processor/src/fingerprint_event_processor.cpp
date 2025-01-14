@@ -16,7 +16,9 @@
 #include "fingerprint_event_processor.h"
 
 #include "ability_manager_client.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "event_log_helper.h"
 #include "ffrt.h"
 #include "input_event_handler.h"
