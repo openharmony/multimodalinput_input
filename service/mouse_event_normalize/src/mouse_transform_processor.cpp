@@ -166,108 +166,91 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
     const std::string mouseName = libinput_event_get_name(event);
     const int32_t devType = libinput_event_get_type(event);
     MMI_HILOGD("mouseName: %{public}s, devType: %{public}d", mouseName.c_str(), devType);
-    if (devType == BUS_USB || devType == BUS_BLUETOOTH)
-    {
+    if (devType == BUS_USB || devType == BUS_BLUETOOTH) {
         std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
         MMI_HILOGD("connectType: %{public}s", connectType.c_str());
         auto curMouseTimeMap = mouseMap.fins(mouseName);
-        if (curMouseTimeMap == mouseMap.end())
-        {
+        if (curMouseTimeMap == mouseMap.end()) {
             MMI_HILOGD("start to collect");
             mouseMap[mouseName] = std::chrono::steady_clock::now();
             mouseResponseMap[mouseName] = {};
-        }
-        else
-        {
+        } else {
             std::chrono::time_point<std::chrono::steady_clock> curTime = std::chrono::steady_clock::now();
-            long long gap = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
+            long long gap =
+                std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
             mouseMap[mouseName] = curTime;
             MMI_HILOGD("current time difference: %{public}lld", gap);
             std::map<long long, int32_t> &curMap = mouseResponseMap.find(mouseName)->second;
-            if (gap < FINE_CALCULATE)
-            {
+            if (gap < FINE_CALCULATE) {
                 auto curMapIt = curMap.find(gap);
-                if (curMapIt == curMap.end())
-                {
-                    curMap[gap] = 1;
-                }
-                else
-                {
-                    curMap[gap] = curMapIt->second + 1;
-                }
-            }
-            else if (gap >= FINE_CALCULATE && gap < STEP_CALCULATE)
-            {
+                curMap[gap] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
+            } else if (gap >= FINE_CALCULATE && gap < STEP_CALCULATE) {
                 long long tempNum = gap - gap % CALCULATE_STEP;
                 auto curMapIt = curMap.find(tempNum);
-                if (curMapIt == curMap.end())
-                {
-                    curMap[tempNum] = 1;
-                }
+                curMap[tempNum] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
+            } else if (gap >= STEP_CALCULATE && gap < STOP_CALCULATE) {
+                auto curMapIt = curMap.find(STEP_CALCULATE);
+                curMap[STEP_CALCULATE] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
+            } else if (gap > STOP_CALCULATE) {
+                HandleReportMouseResponseTime(connectType, curMap);
+                mouseResponseMap.erase(mouseName);
+                mouseMap.erase(mouseName);
+            }
                 else
                 {
                     curMap[tempNum] = curMapIt->second + 1;
-                }
-            }
+        }
+    }
             else if (gap >= STEP_CALCULATE && gap < STOP_CALCULATE)
             {
                 auto curMapIt = curMap.find(STEP_CALCULATE);
                 if (curMapIt == curMap.end())
                 {
                     curMap[STEP_CALCULATE] = 1;
-                }
-                else
-                {
-                    curMap[STEP_CALCULATE] = curMapIt->second + 1;
-                }
-            }
-            else if (gap > STOP_CALCULATE)
-            {
-                MMI_HILOGD("start to report");
-                long total = 0;
-                for (const auto &[key, value] : curMap)
-                {
-                    total += value;
-                }
-                MMI_HILOGD("total mouse movements: %{public}ld", total);
-                int32_t ret = HiSysEventWrite(
-                    OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-                    "COLLECT_MOUSE_RESPONSE_TIME",
-                    OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
-                    "MOUSE_CONNECT_TYPE",
-                    connectType,
-                    "MOVING_TOTAL",
-                    total,
-                    "1ms", curMap.find(1)->second / total,
-                    "2ms", curMap.find(2)->second / total,
-                    "3ms", curMap.find(3)->second / total,
-                    "4ms", curMap.find(4)->second / total,
-                    "5ms", curMap.find(5)->second / total,
-                    "6ms", curMap.find(6)->second / total,
-                    "7ms", curMap.find(7)->second / total,
-                    "8ms", curMap.find(8)->second / total,
-                    "9ms", curMap.find(9)->second / total,
-                    "10ms", curMap.find(10)->second / total,
-                    "11ms", curMap.find(11)->second / total,
-                    "12ms", curMap.find(12)->second / total,
-                    "13ms", curMap.find(13)->second / total,
-                    "14ms", curMap.find(14)->second / total,
-                    "15ms", curMap.find(15)->second / total,
-                    "16ms", curMap.find(16)->second / total,
-                    "17ms", curMap.find(17)->second / total,
-                    "18ms", curMap.find(18)->second / total,
-                    "19ms", curMap.find(19)->second / total,
-                    "20ms", curMap.find(FINE_CALCULATE)->second / total,
-                    "25ms", curMap.find(25)->second / total,
-                    "30ms", curMap.find(30)->second / total,
-                    "35ms", curMap.find(35)->second / total,
-                    "40ms", curMap.find(STEP_CALCULATE)->second / total,
-                    "MSG", "collectiong mouse response time probability");
-                if (ret != RET_OK)
-                {
-                    MMI_HILOGE("mouse write failed , ret:%{public}d", ret);
-                }
-                MMI_HILOGD("mouse write end , ret:%{public}d", ret);
+}
+void MouseTransformProcessor::HandleReportMouseResponseTime(std::string &connectType, std::map<long long, int32_t> &curMap)
+{
+    MMI_HILOGD("start to report");
+    long total = 0;
+    for (const auto &[key, value] : curMap) {
+        total += value;
+    }
+    MMI_HILOGD("total mouse movements: %{public}ld", total);
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "COLLECT_MOUSE_RESPONSE_TIME",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "MOUSE_CONNECT_TYPE", connectType,
+        "MOVING_TOTAL", total,
+        "1ms", curMap.find(1)->second / total,
+        "2ms", curMap.find(2)->second / total,
+        "3ms", curMap.find(3)->second / total,
+        "4ms", curMap.find(4)->second / total,
+        "5ms", curMap.find(5)->second / total,
+        "6ms", curMap.find(6)->second / total,
+        "7ms", curMap.find(7)->second / total,
+        "8ms", curMap.find(8)->second / total,
+        "9ms", curMap.find(9)->second / total,
+        "10ms", curMap.find(10)->second / total,
+        "11ms", curMap.find(11)->second / total,
+        "12ms", curMap.find(12)->second / total,
+        "13ms", curMap.find(13)->second / total,
+        "14ms", curMap.find(14)->second / total,
+        "15ms", curMap.find(15)->second / total,
+        "16ms", curMap.find(16)->second / total,
+        "17ms", curMap.find(17)->second / total,
+        "18ms", curMap.find(18)->second / total,
+        "19ms", curMap.find(19)->second / total,
+        "20ms", curMap.find(FINE_CALCULATE)->second / total,
+        "25ms", curMap.find(25)->second / total,
+        "30ms", curMap.find(30)->second / total,
+        "35ms", curMap.find(35)->second / total,
+        "40ms", curMap.find(STEP_CALCULATE)->second / total,
+        "MSG", "collectiong mouse response time probability");
+    if (ret != RET_OK) {
+        MMI_HILOGE("mouse write failed , ret:%{public}d", ret);
+    }
+    MMI_HILOGD("mouse write end , ret:%{public}d", ret);
                 mouseResponseMap.erase(mouseName);
                 mouseMap.erase(mouseName);
             }
