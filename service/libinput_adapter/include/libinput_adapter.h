@@ -143,7 +143,7 @@ private:
     int32_t ConvertToTouchEventType(libinput_event_type eventType);
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
-    void HandleHWKeyEventForVKeyboard(libinput_event_type eventType);
+    void HandleHWKeyEventForVKeyboard(libinput_event* event);
     void HideMouseCursorTemporary();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
