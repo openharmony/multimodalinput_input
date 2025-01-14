@@ -54,6 +54,7 @@ declare_args() {
   input_shortcut_key_rules_enabled = true
   input_new_knuckle_dynamic_enabled = true
   input_feature_virtual_keyboard = false
+  input_feature_dfx_radar_enable = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -111,6 +112,7 @@ declare_args() {
     "delegate_task/src/delegate_tasks.cpp",
     "device_manager/src/input_device_manager.cpp",
     "device_state_manager/src/device_event_monitor.cpp",
+    "dfx/src/api_duration_statistics.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
     "event_dump/src/event_dump.cpp",
@@ -443,4 +445,8 @@ if (defined(global_parts_info) &&
 
 if (input_feature_virtual_keyboard) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_VKEYBOARD" ]
+}
+
+if (input_feature_dfx_radar_enable) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_DFX_RADAR" ]
 }

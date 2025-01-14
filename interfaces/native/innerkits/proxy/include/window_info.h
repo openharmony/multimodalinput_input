@@ -450,6 +450,7 @@ struct DisplayInfo {
     int32_t screenRealWidth = 0;
     int32_t screenRealHeight = 0;
     float screenRealPPI = 0.0f;
+    float screenRealDPI = 0.0f;
     ScreenCombination screenCombination = ScreenCombination::SCREEN_MAIN;
 };
 

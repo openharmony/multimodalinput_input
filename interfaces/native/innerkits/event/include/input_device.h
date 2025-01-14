@@ -36,6 +36,10 @@ enum InputDeviceCapability {
     INPUT_DEV_CAP_MAX
 };
 
+enum FunctionKey {
+    FUNCTION_KEY_CAPSLOCK = 1,
+};
+
 inline constexpr uint32_t CapabilityToTags(InputDeviceCapability capability)
 {
     return static_cast<uint32_t>((1 << capability) - (capability / INPUT_DEV_CAP_MAX));

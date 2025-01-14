@@ -135,7 +135,10 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
         sess->GetProgramName(), sess->GetPid());
-
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportSubscribeKey("Subscribe", sess->GetProgramName(),
+        keyOption->GetFinalKey(), keyOption->GetFinalKeyDownDuration(), subscribeId);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         auto ret = AddKeyGestureSubscriber(subscriber, keyOption);
@@ -188,6 +191,10 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 subscribers.erase(it);
                 DfxHisysevent::ReportUnSubscribeKeyEvent(subscribeId, option->GetFinalKey(),
                     sess->GetProgramName(), sess->GetPid());
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+                DfxHisysevent::ReportSubscribeKey("Unsubscribe", sess->GetProgramName(),
+                    option->GetFinalKey(), option->GetFinalKeyDownDuration(), subscribeId);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
                 return RET_OK;
             }
         }
@@ -485,6 +492,10 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         }
         return true;
     }
+    if (!InterceptByVm(keyEvent)) {
+        return true;
+    }
+
     return enableCombineKey_;
 }
 
@@ -497,6 +508,29 @@ bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEven
             keyCode != KeyEvent::KEYCODE_DPAD_LEFT) {
             return enableCombineKey_;
         }
+    }
+    return true;
+}
+
+bool KeySubscriberHandler::InterceptByVm(const std::shared_ptr<KeyEvent> keyEvt)
+{
+    // logo + leftShift + E is used by sceneboard, do not intercept by vm
+    const std::vector<int32_t> LOGO_LEFTSHIFT_E = {
+        KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_E};
+    int waitMatchCnt{LOGO_LEFTSHIFT_E.size()};
+    if (keyEvt->GetKeyItems().size() != waitMatchCnt) {
+        return true;
+    }
+    for (auto &&keyItem : keyEvt->GetKeyItems()) {
+        for (auto &&k : LOGO_LEFTSHIFT_E) {
+            if (keyItem.GetKeyCode() == k) {
+                --waitMatchCnt;
+                break;
+            };
+        }
+    }
+    if (waitMatchCnt == 0) {
+        return false;
     }
     return true;
 }

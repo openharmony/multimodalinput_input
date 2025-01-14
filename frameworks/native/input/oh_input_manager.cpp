@@ -1722,8 +1722,22 @@ Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
         return nullptr;
     }
     auto hotkeys = new (std::nothrow)Input_Hotkey *[count];
+    if (hotkeys == nullptr) {
+        MMI_HILOGE("Memory allocation failed");
+        return nullptr;
+    }
     for (int32_t i = 0; i < count; ++i) {
         hotkeys[i] = new (std::nothrow)Input_Hotkey();
+        if (hotkeys[i] == nullptr) {
+            MMI_HILOGE("Memory allocation failed");
+            for (int32_t j = 0; j < i; ++j) {
+                delete hotkeys[j];
+                hotkeys[j] = nullptr;
+            }
+            delete[] hotkeys;
+            hotkeys = nullptr;
+            return nullptr;
+        }
     }
     std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
     g_hotkeyCounts.insert(std::make_pair(hotkeys, count));
@@ -2078,6 +2092,11 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
         MMI_HILOGD("HotkeyId:%{private}s", hotkeyInfo->hotkeyId.c_str());
         int32_t subscribeId = -1;
         subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeHotkey(keyOption, HandleKeyEvent);
+        if (subscribeId == OHOS::MMI::ERROR_UNSUPPORT) {
+            delete hotkeyInfo;
+            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            return COMMON_CAPABILITY_NOT_SUPPORTED;
+        }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             delete hotkeyInfo;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
@@ -2434,5 +2453,23 @@ Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *ven
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(vendor, INPUT_PARAMETER_ERROR);
     *vendor = deviceInfo->vendor;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state)
+{
+    CALL_DEBUG_ENTER;
+    if (keyCode < 0 || keyCode != OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK) {
+        MMI_HILOGE("Invalid keycode:%{public}d", keyCode);
+        return INPUT_PARAMETER_ERROR;
+    }
+    CHKPR(state, INPUT_PARAMETER_ERROR);
+    bool resultState = false;
+    int32_t napiCode = OHOS::MMI::InputManager::GetInstance()->GetFunctionKeyState(keyCode, resultState);
+    *state = resultState ? 1 : 0;
+    if (napiCode == INPUT_DEVICE_NOT_EXIST) {
+        MMI_HILOGE("GetFunctionKeyState fail, no keyboard device connected");
+        return INPUT_DEVICE_NOT_EXIST;
+    }
     return INPUT_SUCCESS;
 }

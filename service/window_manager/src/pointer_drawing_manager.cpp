@@ -131,7 +131,7 @@ namespace OHOS {
 namespace MMI {
 static bool IsSingleDisplayFoldDevice()
 {
-    return (!FOLD_SCREEN_FLAG.empty() && FOLD_SCREEN_FLAG[0] == '1');
+    return (!FOLD_SCREEN_FLAG.empty() && (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4'));
 }
 
 void RsRemoteDiedCallback()
@@ -159,9 +159,12 @@ void PointerDrawingManager::InitPointerCallback()
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
-    if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
-        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+    if (!initEventhandlerFlag_.load()) {
+        std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
+        if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
+            renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+        }
+        initEventhandlerFlag_.store(true);
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }

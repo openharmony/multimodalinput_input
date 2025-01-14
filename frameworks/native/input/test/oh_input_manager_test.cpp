@@ -1329,5 +1329,24 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_001, T
     EXPECT_EQ(result, Input_Result::INPUT_SUCCESS);
     OH_Input_DestroyHotkey(&hotkey);
 }
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState
+ * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001, TestSize.Level1)
+{
+    int32_t keyCode = 1;
+    int32_t state = -1;
+    Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    bool resultState = static_cast<bool>(state);
+    if (resultState) {
+        EXPECT_EQ(retResult, INPUT_SUCCESS);
+    } else {
+        EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    }
+}
 } // namespace MMI
 } // namespace OHOS
