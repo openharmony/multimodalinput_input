@@ -102,6 +102,8 @@ public:
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest);
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
+    int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,
+        bool isNativeInject);
     int32_t SetAnrObserver();
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
@@ -119,6 +121,7 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag);
     int32_t SetTouchpadPointerSpeed(int32_t speed);
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG);
     int32_t SetTouchpadPinchSwitch(bool switchFlag);
     int32_t GetTouchpadPinchSwitch(bool &switchFlag);
     int32_t SetTouchpadSwipeSwitch(bool switchFlag);

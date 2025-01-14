@@ -1647,6 +1647,18 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
+int32_t MMIService::CheckTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t pid, const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell)
+{
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    return sMsgHandler_.OnInjectTouchPadEvent(pointerEvent, pid, touchpadCDG, isNativeInject, isShell);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
+
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
@@ -1665,6 +1677,27 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
+
+int32_t MMIService::InjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG, bool isNativeInject)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t ret;
+    int32_t pid = GetCallingPid();
+    bool isShell = PER_HELPER->RequestFromShell();
+    ret = delegateTasks_.PostSyncTask(
+        [this, pointerEvent, pid, touchpadCDG, isNativeInject, isShell] {
+            return sMsgHandler_.OnInjectTouchPadEvent(pointerEvent, pid, touchpadCDG, isNativeInject, isShell);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Inject touchpad event failed, ret:%{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -2417,6 +2450,12 @@ int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
+int32_t MMIService::ReadTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    MouseEventHdr->GetTouchpadCDG(touchpadCDG);
+    return RET_OK;
+}
+
 int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
 {
     TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(switchFlag);
@@ -2584,6 +2623,23 @@ int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &touchpadCDG] {
+            return this->ReadTouchpadCDG(touchpadCDG);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get touchpad option failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
 

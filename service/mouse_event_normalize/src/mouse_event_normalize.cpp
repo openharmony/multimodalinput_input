@@ -254,6 +254,11 @@ void MouseEventNormalize::GetTouchpadPointerSpeed(int32_t &speed) const
     MouseTransformProcessor::GetTouchpadPointerSpeed(speed);
 }
 
+void MouseEventNormalize::GetTouchpadCDG(TouchpadCDG &touchpadCDG) const
+{
+    MouseTransformProcessor::GetTouchpadCDG(touchpadCDG);
+}
+
 int32_t MouseEventNormalize::SetTouchpadRightClickType(int32_t type) const
 {
     return MouseTransformProcessor::SetTouchpadRightClickType(type);

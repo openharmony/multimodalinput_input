@@ -219,9 +219,59 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     return OnInjectPointerEventExt(pointerEvent, isShell);
 }
 
+int32_t ServerMsgHandler::OnInjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+    const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    if (isNativeInject) {
+        int32_t checkReturn = NativeInjectCheck(pid);
+        if (checkReturn != RET_OK) {
+            return checkReturn;
+        }
+    }
+    return OnInjectTouchPadEventExt(pointerEvent, touchpadCDG, isShell);
+}
+
 bool ServerMsgHandler::IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     return pointerEvent->GetZOrder() > 0;
+}
+
+int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG, bool isShell)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    EndLogTraceId(pointerEvent->GetId());
+    pointerEvent->UpdateId();
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+        int32_t ret = AccelerateMotionTouchpad(pointerEvent, touchpadCDG);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to accelerate motion, error:%{public}d", ret);
+            return ret;
+        }
+        UpdatePointerEvent(pointerEvent);
+        inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+            (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
+            !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
+            IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0, false);
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    } else {
+            MMI_HILOGW("Source types are not Touchpad, source:%{public}d", pointerEvent->GetSourceType());
+    }
+    return SaveTargetWindowId(pointerEvent, isShell);
 }
 
 int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
@@ -323,13 +373,28 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
             MouseTransformProcessor::GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
     } else {
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+        MMI_HILOGE("Hidumper before HandleMotionDynamicAccelerateMouse");
+        std::system("hidumper -p `getpid()`");
+        struct rusage usageBefore;
+        struct rusage usageAfter;
+        getrusage(RUSAGE_SELF, &usageBefore);
+        long memoryBefore = usageBefore.ru_maxrss;
+
         static uint64_t preTime = -1;
         uint64_t currentTime = static_cast<uint64_t>(pointerEvent->GetActionTime());
         preTime = fmin(preTime, currentTime);
         uint64_t deltaTime = (currentTime - preTime);
+        MMI_HILOGE("Memory usage and DeltaTime before HandleMotionDynamicAccelerateMouse:
+            %{public}ld KB %{public}PRId64 ms", memoryBefore, deltaTime);
+
         ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed(),
             deltaTime, static_cast<double>(displayInfo->ppi));
+
+        MMI_HILOGE("DeltaTime after HandleMotionDynamicAccelerateMouse: %{public}PRId64 ms", deltaTime);
+        getrusage(RUSAGE_SELF, &usageAfter);
+        long memoryAfter = usageAfter.ru_maxrss;
+        std::system("hidumper -p `getpid()`");
         preTime = currentTime;
 #else
         ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
@@ -337,6 +402,76 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
             MouseTransformProcessor::GetPointerSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     }
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);
+        return ret;
+    }
+    WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    } else {
+        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::AccelerateMotionTouchpad(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG)
+{
+    PointerEvent::PointerItem pointerItem {};
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Pointer event is corrupted");
+        return RET_ERR;
+    }
+    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    if (cursorPos.displayId < 0) {
+        MMI_HILOGE("No display");
+        return RET_ERR;
+    }
+    Offset offset {
+        .dx = pointerItem.GetRawDx(),
+        .dy = pointerItem.GetRawDy(),
+    };
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_EMULATOR
+    Direction displayDirection = static_cast<Direction>((
+        ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    CalculateOffset(displayDirection, offset);
+#endif // OHOS_BUILD_EMULATOR
+    int32_t ret = RET_OK;
+
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    MMI_HILOGE("Hidumper before HandleMotionDynamicAccelerateTouchpad");
+    static uint64_t preTime = -1;
+    uint64_t currentTime = static_cast<uint64_t>(pointerEvent->GetActionTime());
+    preTime = fmin(preTime, currentTime);
+    uint64_t deltaTime = (currentTime - preTime);
+    MMI_HILOGE("DeltaTime before HandleMotionDynamicAccelerateTouchpad: %{public}PRId64 ms", deltaTime);
+
+    double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
+    double touchpadSize = touchpadCDG.size;
+    double touchpadPPi = touchpadCDG.ppi;
+    int32_t touchpadSpeed = touchpadCDG.speed;
+    if (touchpadSize <= 0 || touchpadPPi <= 0 || touchpadSpeed <= 0) {
+        MMI_HILOGE("touchpadSize, touchpadPPi or touchpadSpeed are invalid,
+            touchpadSize:%{public}lf, touchpadPPi:%{public}lf, touchpadSpeed:%{public}d",
+            touchpadSize, touchpadPPi, touchpadSpeed);
+        return RET_ERR;
+    }
+    ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
+        &cursorPos.cursorPos.y, touchpadSpeed, displaySize, touchpadSize, touchpadPPi);
+
+    MMI_HILOGE("DeltaTime after HandleMotionDynamicAccelerateTouchpad: %{public}PRId64 ms", deltaTime);
+    MMI_HILOGE("Hidumper after HandleMotionDynamicAccelerateTouchpad");
+    preTime = currentTime;
+#else
+    ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+        &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
+        MouseTransformProcessor::GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);
         return ret;
