@@ -5069,8 +5069,8 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(std::optional<WindowInfo>
 
 int32_t InputWindowsManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
 {
-    MMI_HILOGI("start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
-               "autoGenDown: %{public}d", sourceWindowId, targetWindowId, static_cast<int32_t>(autoGenDown));
+    MMI_HILOGI("Start shift pointer event, sourceWindowId:%{public}d, targetWindowId:%{public}d,"
+               "autoGenDown:%{public}d", sourceWindowId, targetWindowId, static_cast<int32_t>(autoGenDown));
     std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(sourceWindowId);
     std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(targetWindowId);
     if (!sourceWindowInfo || !targetWindowInfo) {
