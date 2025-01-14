@@ -77,6 +77,7 @@ const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
 constexpr int32_t ANGLE_90 { 90 };
+constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t FINE_CALCULATE { 20 };
 constexpr int32_t STEP_CALCULATE { 40 };
 constexpr int32_t STOP_CALCULATE { 5000 };
