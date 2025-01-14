@@ -199,7 +199,8 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
         }
     }
 }
-void MouseTransformProcessor::HandleReportMouseResponseTime(std::string &connectType, std::map<long long, int32_t> &curMap)
+void MouseTransformProcessor::HandleReportMouseResponseTime(
+    std::string &connectType, std::map<long long, int32_t> &curMap)
 {
     MMI_HILOGD("start to report");
     long total = 0;
