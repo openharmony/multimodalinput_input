@@ -991,25 +991,38 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
     });
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-        if (!windowInfo.isDisplayCoord) {
-            auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
-            CHKPR(displayInfo, action);
-            windowInfo.area.x += displayInfo->x;
-            windowInfo.area.y += displayInfo->y;
-            for (auto &area : windowInfo.defaultHotAreas) {
-                area.x += displayInfo->x;
-                area.y += displayInfo->y;
-            }
-            for (auto &area : windowInfo.pointerHotAreas) {
-                area.x += displayInfo->x;
-                area.y += displayInfo->y;
-            }
-            windowInfo.isDisplayCoord = true;
+        if (windowInfo.isDisplayCoord) {
+            continue;
         }
+        auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
+        CHKPR(displayInfo, action);
+        ChangeWindowArea(displayInfo->x, displayInfo->y, windowInfo);
+        if (!windowInfo.uiExtentionWindowInfo.empty()) {
+            for (auto &item : windowInfo.uiExtentionWindowInfo) {
+                ChangeWindowArea(displayInfo->x, displayInfo->y, item);
+            }
+        }
+        windowInfo.isDisplayCoord = true;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return action;
 }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo)
+{
+    windowInfo.area.x += x;
+    windowInfo.area.y += y;
+    for (auto &area : windowInfo.defaultHotAreas) {
+        area.x += x;
+        area.y += y;
+    }
+    for (auto &area : windowInfo.pointerHotAreas) {
+        area.x += x;
+        area.y += y;
+    }
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 void InputWindowsManager::HandleWindowPositionChange()
 {
