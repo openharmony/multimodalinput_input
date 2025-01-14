@@ -2390,11 +2390,10 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGI("Start launch ability immediately");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
-//  23
-// #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
         DfxHisysevent::ReportLaunchAbility(keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
             shortcutKey.ability.bundleName);
-// #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         LaunchAbility(shortcutKey);
         BytraceAdapter::StopLaunchAbility();
         return true;
