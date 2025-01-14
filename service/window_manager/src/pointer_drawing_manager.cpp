@@ -3035,7 +3035,7 @@ bool PointerDrawingManager::IsSupported()
 
 void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
 {
-    MMI_HILOGI("OnScreenModeChange enter, screen size: %{public}lu", screens.size());
+    MMI_HILOGI("OnScreenModeChange enter, screen size:%{public}lu", screens.size());
     HideHardwareCursors();
     std::set<uint32_t> sids;
     uint32_t mainWidth = 0;
