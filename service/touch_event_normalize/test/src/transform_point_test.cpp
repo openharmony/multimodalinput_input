@@ -132,15 +132,15 @@ bool TransformPointTest::SendEvents(const Context& ctx, struct input_event* even
 {
     CALL_INFO_TRACE;
     if (!ctx.IsReady()) {
-        MMI_HILOGE("Device is not ready.");
+        MMI_HILOGE("Device is not ready");
         return false;
     }
-    MMI_HILOGD("%{public}zu input events to send.", nevents);
+    MMI_HILOGD("%{public}zu input events to send", nevents);
     struct input_event* sp = events;
     struct input_event* tp = sp + nevents;
     for (; sp < tp; ++sp) {
         if (!SendEvent(ctx, sp)) {
-            MMI_HILOGE("Failed to send event.");
+            MMI_HILOGE("Failed to send event");
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_EVENTS));

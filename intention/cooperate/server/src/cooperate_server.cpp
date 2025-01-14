@@ -36,7 +36,7 @@ namespace {
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t DEFAULT_UNLOAD_COOLING_TIME_MS { 60000 };
 constexpr int32_t SYNC_TASK_TIMEOUT_DURATION { 2500 };
-}
+} // namespace
 
 CooperateServer::CooperateServer(IContext *context)
     : context_(context)

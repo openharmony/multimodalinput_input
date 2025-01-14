@@ -2215,6 +2215,9 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #else
     CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (lastMouseStyle_.id == MOUSE_ICON::CURSOR_CIRCLE) {
+        MMI_HILOGE("Cursor circle does not need to draw size");
+    }
     if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
@@ -3043,7 +3046,7 @@ bool PointerDrawingManager::IsSupported()
 
 void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
 {
-    MMI_HILOGI("OnScreenModeChange enter, screen size: %{public}lu", screens.size());
+    MMI_HILOGI("OnScreenModeChange enter, screen size:%{public}lu", screens.size());
     HideHardwareCursors();
     std::set<uint32_t> sids;
     uint32_t mainWidth = 0;

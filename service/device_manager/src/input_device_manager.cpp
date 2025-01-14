@@ -956,12 +956,12 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
         NotifyInputdeviceMessage(session, index, ERROR_DEVICE_NOT_EXIST);
-        MMI_HILOGD("Set inputDevice enabled failed, Invalid deviceId.");
+        MMI_HILOGD("Set inputDevice enabled failed, Invalid deviceId");
         return RET_ERR;
     }
     item->second.enable = enable;
     if (!enable) {
-        MMI_HILOGD("Disable inputdevice, save calling pid: %{public}d to recoverlist.", pid);
+        MMI_HILOGD("Disable inputdevice, save calling pid: %{public}d to recoverlist", pid);
         recoverList_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
         InitSessionLostCallback();
     }
