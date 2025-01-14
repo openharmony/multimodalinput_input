@@ -253,6 +253,7 @@ void EventDispatchHandler::SendWindowStateError(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
     auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
     auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid());
     if (sess != nullptr) {
         NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);

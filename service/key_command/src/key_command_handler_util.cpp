@@ -114,7 +114,7 @@ bool GetKeyDownDuration(const cJSON* jsonData, int32_t &keyDownDurationInt)
         MMI_HILOGE("keyDownDuration is not number");
         return false;
     }
-    if (keyDownDuration->valueint < 0) {
+    if (keyDownDuration->valueint < 0 || keyDownDuration->valueint > MAX_KEYDOWNDURATION_TIME) {
         MMI_HILOGE("keyDownDuration must be number and bigger and equal zero");
         return false;
     }
@@ -355,6 +355,29 @@ bool GetDelay(const cJSON* jsonData, int64_t &delayInt)
     return true;
 }
 
+bool GetRepeatKeyDelay(const cJSON* jsonData, int64_t &delayInt)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *delay = cJSON_GetObjectItemCaseSensitive(jsonData, "delay");
+    if (delay == nullptr) {
+        MMI_HILOGE("delay init failed");
+        return false;
+    }
+    if (!cJSON_IsNumber(delay)) {
+        MMI_HILOGE("delay is not number");
+        return false;
+    }
+    if ((delay->valueint < 0) || (delay->valueint > MAX_REPEATKEY_DELAY_TIME)) {
+        MMI_HILOGE("delay must be number and bigger and equal zero and less than max delay");
+        return false;
+    }
+    delayInt = delay->valueint * SECONDS_SYSTEM;
+    return true;
+}
+
 bool GetRepeatTimes(const cJSON* jsonData, int32_t &repeatTimesInt)
 {
     if (!cJSON_IsObject(jsonData)) {
@@ -393,7 +416,7 @@ bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
         MMI_HILOGE("abilityStartDelay is not number");
         return false;
     }
-    if ((abilityStartDelay->valueint < 0) || (abilityStartDelay->valueint > MAX_DELAY_TIME)) {
+    if ((abilityStartDelay->valueint < 0) || (abilityStartDelay->valueint > MAX_ABILITYSTARTDELAY_TIME)) {
         MMI_HILOGE("abilityStartDelay must be number and bigger and equal zero and less than max delay time");
         return false;
     }
@@ -562,7 +585,7 @@ bool ConvertToKeyRepeat(const cJSON* jsonData, RepeatKey &repeatKey)
         return false;
     }
 
-    if (!GetDelay(jsonData, repeatKey.delay)) {
+    if (!GetRepeatKeyDelay(jsonData, repeatKey.delay)) {
         MMI_HILOGE("Get delay failed");
         return false;
     }

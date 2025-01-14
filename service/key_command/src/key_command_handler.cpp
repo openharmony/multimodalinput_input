@@ -1093,6 +1093,10 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     }
     MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportHandleKey("CheckSpecialRepeatKey", keyEvent->GetKeyCode(),
+            DfxHisysevent::KEY_ERROR_CODE::FAILED_VERIFICATION);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return false;
     }
     return true;
@@ -1222,6 +1226,10 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 
     if (!isParseExcludeConfig_) {
         if (!ParseExcludeConfig()) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportFailLaunchAbility("IsEnableCombineKey",
+                DfxHisysevent::KEY_ERROR_CODE::FAILED_PARSE_CONFIG);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
             MMI_HILOGE("Parse Exclude configFile failed");
             return false;
         }
@@ -1345,12 +1353,20 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportHandleKey("PreHandleEvent", key->GetKeyCode(),
+                DfxHisysevent::KEY_ERROR_CODE::FAILED_PARSE_CONFIG);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
             return false;
         }
         isParseConfig_ = true;
     }
     if (!isParseLongPressConfig_) {
         if (!ParseLongPressConfig()) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportHandleKey("PreHandleEvent", key->GetKeyCode(),
+                DfxHisysevent::KEY_ERROR_CODE::FAILED_PARSE_CONFIG);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
             MMI_HILOGE("Parse long press configFile failed");
         }
         isParseLongPressConfig_ = true;
@@ -1398,7 +1414,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
 
     if (STYLUS_HANDLER->HandleStylusKey(key)) {
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisysevent::ReportAbility(key->GetKeyCode(), key->GetKeyAction(), "com.hmos.hinote");
+        DfxHisysevent::ReportLaunchAbility(key->GetKeyCode(), key->GetKeyAction(), "Enable Fingerprint");
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return true;
     }
@@ -1491,6 +1507,10 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
             handler->HandleKeyEvent(tmpKey);
         });
         if (timerId < 0) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportHandleKey("OnHandleEvent", key->GetKeyCode(),
+                DfxHisysevent::KEY_ERROR_CODE::FAILED_TIMER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
             MMI_HILOGE("Add timer failed");
             return false;
         }
@@ -1542,6 +1562,10 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (repeatKeys_.empty()) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportHandleKey("HandleRepeatKeys", keyEvent->GetKeyCode(),
+        DfxHisysevent::KEY_ERROR_CODE::FAILED_PARSE_CONFIG);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         MMI_HILOGD("No sequences configuration data");
         return false;
     }
@@ -1652,6 +1676,10 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
                 .GetBoolValue(item.statusConfig, statusValue);
             if (ret != RET_OK) {
                 MMI_HILOGE("Get value from setting data fail");
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+                DfxHisysevent::ReportHandleKey("HandleRepeatKey", keyEvent->GetKeyCode(),
+                    DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
                 return false;
             }
             if (!statusValue) {
@@ -1692,6 +1720,10 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
             }
         });
         if (timerId < 0) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportHandleKey("HandleRepeatKeyAbility", keyEvent->GetKeyCode(),
+                DfxHisysevent::KEY_ERROR_CODE::FAILED_TIMER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
             return false;
         }
         if (repeatTimerId_ >= 0) {
@@ -1714,6 +1746,10 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
     const std::shared_ptr<KeyEvent> keyEvent)
 {
     BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportLaunchAbility(keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+        item.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     LaunchAbility(item.ability);
     BytraceAdapter::StopLaunchAbility();
     repeatKeyCountMap_.clear();
@@ -1872,6 +1908,10 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (shortcutKeys_.empty()) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportHandleKey("HandleShortKeys", keyEvent->GetKeyCode(),
+            DfxHisysevent::KEY_ERROR_CODE::FAILED_PARSE_CONFIG);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         MMI_HILOGD("No shortkeys configuration data");
         return false;
     }
@@ -1926,6 +1966,10 @@ bool KeyCommandHandler::MatchShortcutKeys(const std::shared_ptr<KeyEvent> keyEve
 #endif // SHORTCUT_KEY_RULES_ENABLED
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, tmpShorteKey.ability.bundleName);
         LaunchAbility(tmpShorteKey);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportLaunchAbility(keyEvent->GetKeyCode(),
+        keyEvent->GetKeyAction(), tmpShorteKey.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         BytraceAdapter::StopLaunchAbility();
     }
     if (result) {
@@ -2108,6 +2152,10 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
         }
     }
     if (size > MAX_SEQUENCEKEYS_NUM) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportHandleKey("AddSequenceKey", keyEvent->GetKeyCode(),
+            DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         MMI_HILOGD("The save key size more than the max size");
         return false;
     }
@@ -2120,6 +2168,10 @@ bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbi
     sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, &sequence] () {
         MMI_HILOGI("Timer callback");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportLaunchAbility(sequence.sequenceKeys[0].keyCode, sequence.sequenceKeys[0].keyAction,
+            sequence.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         LaunchAbility(sequence);
         sequence.timerId = -1;
         BytraceAdapter::StopLaunchAbility();
@@ -2139,6 +2191,10 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
     if (sequence.abilityStartDelay == 0) {
         MMI_HILOGI("Start launch ability immediately");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportLaunchAbility(sequence.sequenceKeys[0].keyCode, sequence.sequenceKeys[0].keyAction,
+            sequence.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         LaunchAbility(sequence);
         BytraceAdapter::StopLaunchAbility();
         isLaunchAbility = true;
@@ -2147,12 +2203,20 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
     sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, &sequence] () {
         MMI_HILOGI("Timer callback");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportLaunchAbility(sequence.sequenceKeys[0].keyCode, sequence.sequenceKeys[0].keyAction,
+            sequence.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         LaunchAbility(sequence);
         sequence.timerId = -1;
         BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportFailLaunchAbility(sequence.ability.bundleName,
+        DfxHisysevent::KEY_ERROR_CODE::FAILED_TIMER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return false;
     }
     MMI_HILOGI("Add timer success");
@@ -2178,6 +2242,10 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
     } else {
         if (bundleName == matchName && isScreenLocked) {
             MMI_HILOGI("Screen locked, screenshot delay 2000 milisecond");
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportHandleKey("HandleMatchedSequence", sequence.sequenceKeys[0].keyCode,
+                DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
             return HandleScreenLocked(sequence, isLaunchAbility);
         }
     }
@@ -2234,6 +2302,10 @@ bool KeyCommandHandler::IsKeyMatch(const ShortcutKey &shortcutKey, const std::sh
     CALL_DEBUG_ENTER;
     CHKPF(key);
     if ((key->GetKeyCode() != shortcutKey.finalKey) || (shortcutKey.triggerType != key->GetKeyAction())) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportHandleKey("IsKeyMatch", key->GetKeyCode(),
+            DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return false;
     }
     if ((shortcutKey.preKeys.size() + 1) != key->GetKeyItems().size()) {
@@ -2269,7 +2341,8 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisysevent::ReportAbility(shortcutKey.finalKey, shortcutKey.keyDownDuration, shortcutKey.ability.bundleName);
+        DfxHisysevent::ReportLaunchAbility(shortcutKey.finalKey,
+            shortcutKey.keyDownDuration, shortcutKey.ability.bundleName);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
         BytraceAdapter::StopLaunchAbility();
         return true;
@@ -2284,12 +2357,17 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisysevent::ReportAbility(shortcutKey.finalKey, shortcutKey.keyDownDuration, shortcutKey.ability.bundleName);
+        DfxHisysevent::ReportLaunchAbility(shortcutKey.finalKey, shortcutKey.keyDownDuration,
+            shortcutKey.ability.bundleName);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
         BytraceAdapter::StopLaunchAbility();
     });
     if (shortcutKey.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportFailLaunchAbility(shortcutKey.ability.bundleName,
+            DfxHisysevent::KEY_ERROR_CODE::FAILED_TIMER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return false;
     }
     MMI_HILOGI("Add timer success");
@@ -2316,6 +2394,10 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGI("Start launch ability immediately");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportLaunchAbility(keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+            shortcutKey.ability.bundleName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         LaunchAbility(shortcutKey);
         BytraceAdapter::StopLaunchAbility();
         return true;
@@ -2341,6 +2423,10 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
 {
     CALL_DEBUG_ENTER;
     if (shortcutKey.timerId < 0) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportHandleKey("HandleKeyCancel", shortcutKey.finalKey,
+            DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         MMI_HILOGE("Skip, timerid less than 0");
     }
     auto timerId = shortcutKey.timerId;
@@ -2468,10 +2554,10 @@ void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 {
     CALL_INFO_TRACE;
-    auto sequenceKeys = sequence.sequenceKeys;
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisysevent::ReportAbility(sequenceKeys[0].keyCode,
-        sequenceKeys[0].keyAction, sequence.ability.bundleName);
+    auto sequenceKeys = sequence.sequenceKeys;
+    DfxHisysevent::ReportLaunchAbility(sequenceKeys[0].keyCode, sequenceKeys[0].keyAction,
+        sequence.ability.bundleName);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
     LaunchAbility(sequence.ability, sequence.abilityStartDelay);
 }

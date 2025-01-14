@@ -991,25 +991,38 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
     });
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-        if (!windowInfo.isDisplayCoord) {
-            auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
-            CHKPR(displayInfo, action);
-            windowInfo.area.x += displayInfo->x;
-            windowInfo.area.y += displayInfo->y;
-            for (auto &area : windowInfo.defaultHotAreas) {
-                area.x += displayInfo->x;
-                area.y += displayInfo->y;
-            }
-            for (auto &area : windowInfo.pointerHotAreas) {
-                area.x += displayInfo->x;
-                area.y += displayInfo->y;
-            }
-            windowInfo.isDisplayCoord = true;
+        if (windowInfo.isDisplayCoord) {
+            continue;
         }
+        auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
+        CHKPR(displayInfo, action);
+        ChangeWindowArea(displayInfo->x, displayInfo->y, windowInfo);
+        if (!windowInfo.uiExtentionWindowInfo.empty()) {
+            for (auto &item : windowInfo.uiExtentionWindowInfo) {
+                ChangeWindowArea(displayInfo->x, displayInfo->y, item);
+            }
+        }
+        windowInfo.isDisplayCoord = true;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return action;
 }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo)
+{
+    windowInfo.area.x += x;
+    windowInfo.area.y += y;
+    for (auto &area : windowInfo.defaultHotAreas) {
+        area.x += x;
+        area.y += y;
+    }
+    for (auto &area : windowInfo.pointerHotAreas) {
+        area.x += x;
+        area.y += y;
+    }
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 void InputWindowsManager::HandleWindowPositionChange()
 {
@@ -3572,7 +3585,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchDownBoost, mapPayload);
                 auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::high_resolution_clock::now() - begin).count();
-                DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
+                DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA,
+                    durationMS);
             } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
                 constexpr int32_t touchUpBoost = 1007;
                 std::unordered_map<std::string, std::string> mapPayload;
@@ -3582,7 +3596,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchUpBoost, mapPayload);
                 auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::high_resolution_clock::now() - begin).count();
-                DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
+                DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA,
+                    durationMS);
             }
         }
         if (displayGroupInfo_.focusWindowId == touchWindow->id) {
