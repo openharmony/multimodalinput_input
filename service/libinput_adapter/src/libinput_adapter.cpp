@@ -1050,7 +1050,7 @@ void LibinputAdapter::OnEventHandler()
             double y = 0.0;
             int32_t touchId = libinput_event_touch_get_slot(touch);
             int32_t touchEventType = ConvertToTouchEventType(eventType);
-			double touchPressure = libinput_event_touch_get_pressure(touch);
+            double touchPressure = libinput_event_touch_get_pressure(touch);
 
             // touch up event has no coordinates information, skip coordinate calculation.
             if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
