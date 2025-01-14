@@ -68,7 +68,7 @@ public:
 
     using DurationBox = std::unordered_map<Threshold, int32_t>;
 
-    ApiDurationStatistics();
+    ApiDurationStatistics() = default;
     ~ApiDurationStatistics() = default;
 
     void RecordDuration(Api api, int32_t durationMS);

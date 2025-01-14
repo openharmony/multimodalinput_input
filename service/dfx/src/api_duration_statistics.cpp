@@ -55,8 +55,6 @@ std::unordered_map<ApiDurationStatistics::Api, std::string> ApiDurationStatistic
     { ApiDurationStatistics::Api::UNREGISTER_APP_DEBUG_LISTENER, "UNREGISTER_APP_DEBUG_LISTENER" },
 };
 
-ApiDurationStatistics::ApiDurationStatistics() { }
-
 void ApiDurationStatistics::RecordDuration(Api api, int32_t durationMS)
 {
     auto threshold = GetCurrentThreshold(durationMS);
