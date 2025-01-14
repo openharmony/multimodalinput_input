@@ -969,7 +969,7 @@ int32_t ServerMsgHandler::OnCancelInjection(int32_t callPid)
         state, curAuthPid);
     if (state != AuthorizeState::STATE_UNAUTHORIZE) {
         if (callPid != curAuthPid) {
-            MMI_HILOGW("Authorized pid not callPid.");
+            MMI_HILOGW("Authorized pid not callPid");
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         AUTHORIZE_HELPER->CancelAuthorize(curAuthPid);
