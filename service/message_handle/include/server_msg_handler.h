@@ -18,20 +18,22 @@
 
 #include "nocopyable.h"
 
+#include "client_death_handler.h"
 #include "event_dispatch_handler.h"
 #include "i_event_filter.h"
+#include "inject_notice_manager.h"
 #include "input_handler_type.h"
 #include "key_option.h"
 #include "long_press_event.h"
 #include "mouse_event_normalize.h"
 #include "msg_handler.h"
 #include "pixel_map.h"
+#include "touchpad_control_display_gain.h"
+#include "window_info.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "window_info.h"
-#include "inject_notice_manager.h"
-#include "client_death_handler.h"
+
 
 namespace OHOS {
 namespace MMI {
@@ -96,7 +98,11 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell);
+    int32_t OnInjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+        const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell);
     int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
+    int32_t OnInjectTouchPadEventExt(const std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG &touchpadCDG, bool isShell);
     int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
@@ -134,9 +140,10 @@ private:
     bool UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, int32_t targetWindowId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER
+    int32_t AccelerateMotionTouchpad(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

@@ -94,6 +94,8 @@ public:
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
+    int32_t InjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,
+        bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas) override;
@@ -115,6 +117,7 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
     int32_t SetTouchpadPointerSpeed(int32_t speed) override;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG) override;
     int32_t SetTouchpadPinchSwitch(bool switchFlag) override;
     int32_t GetTouchpadPinchSwitch(bool &switchFlag) override;
     int32_t SetTouchpadSwipeSwitch(bool switchFlag) override;
@@ -169,6 +172,7 @@ private:
     int32_t GetTouchpadBoolData(bool &date, int32_t type);
     int32_t SetTouchpadInt32Data(int32_t date, int32_t type);
     int32_t GetTouchpadInt32Data(int32_t &date, int32_t type);
+    int32_t GetTouchpadCDGData(double &ppi, double &size, int32_t &speed, int32_t type);
     int32_t HandleGestureMonitor(uint32_t code, InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
 };
