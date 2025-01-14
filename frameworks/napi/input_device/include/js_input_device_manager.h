@@ -52,6 +52,12 @@ public:
     napi_value SetInputDeviceEnabled(napi_env env, int32_t deviceId, bool enable, napi_value handle = nullptr);
     napi_value SetFunctionKeyEnabled(napi_env env, int32_t funcKey, bool state, napi_value handle = nullptr);
     napi_value IsFunctionKeyEnabled(napi_env env, int32_t funcKey, napi_value handle = nullptr);
+    napi_value SetKeyboardRepeatDelayAsync(napi_env env, int32_t delay, napi_value handle = nullptr);
+    napi_value SetKeyboardRepeatRateAsync(napi_env env, int32_t rate, napi_value handle = nullptr);
+    napi_value GetKeyboardRepeatDelayAsync(napi_env env, napi_value handle = nullptr);
+    napi_value GetKeyboardRepeatRateAsync(napi_env env, napi_value handle = nullptr);
+    napi_value GetKeyboardTypeAsync(napi_env env, int32_t id, napi_value handle = nullptr);
+    napi_value GetDeviceIdsAsync(napi_env env, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS

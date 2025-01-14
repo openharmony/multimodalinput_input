@@ -46,7 +46,12 @@ public:
     static napi_value SetInputDeviceEnabled(napi_env env, napi_callback_info info);
     static napi_value SetFunctionKeyEnabled(napi_env env, napi_callback_info info);
     static napi_value IsFunctionKeyEnabled(napi_env env, napi_callback_info info);
-
+    static napi_value SetKeyboardRepeatDelayAsync(napi_env env, napi_callback_info info);
+    static napi_value SetKeyboardRepeatRateAsync(napi_env env, napi_callback_info info);
+    static napi_value GetKeyboardRepeatDelayAsync(napi_env env, napi_callback_info info);
+    static napi_value GetKeyboardRepeatRateAsync(napi_env env, napi_callback_info info);
+    static napi_value GetKeyboardTypeAsync(napi_env env, napi_callback_info info);
+    static napi_value GetDeviceIdsAsync(napi_env env, napi_callback_info info);
 private:
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
