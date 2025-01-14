@@ -1140,12 +1140,12 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
 void* JsPointerManager::DeepCopyPixelMap(void* pixelMap, int32_t pixelMapSize)
 {
     if (pixelMap == nullptr || pixelMapSize <= 0) {
-        MMI_HILOGE("pixelMap is nullptr.");
+        MMI_HILOGE("pixelMap is nullptr");
         return nullptr;
     }
     void* newPixelMap = (void *)malloc(pixelMapSize);
     if (memcpy_s(newPixelMap, pixelMapSize, pixelMap, pixelMapSize) != 0) {
-        MMI_HILOGE("Failed to invoke memcpy_s.");
+        MMI_HILOGE("Failed to invoke memcpy_s");
         free(newPixelMap);
         newPixelMap = nullptr;
         return nullptr;
