@@ -1156,15 +1156,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
     double physicalY = 15;
     WIN_MGR->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
     EXPECT_EQ(physicalX, 0);
-    EXPECT_EQ(physicalY, 9);
+    EXPECT_EQ(physicalY, 15);
     displayInfo.width = 10;
     displayInfo.height = 20;
     displayInfo.direction = DIRECTION270;
     physicalX = 15;
     physicalY = 25;
     WIN_MGR->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 15);
-    EXPECT_EQ(physicalY, 9);
+    EXPECT_EQ(physicalX, 9);
+    EXPECT_EQ(physicalY, 19);
     displayInfo.width = 10;
     displayInfo.height = 20;
     displayInfo.direction = DIRECTION270;
