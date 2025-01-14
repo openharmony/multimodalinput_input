@@ -492,44 +492,6 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
 }
 
 /**
- * @tc.name: HandlePointerEventFilter_004
- * @tc.desc: Add filter but not remove filter, depend on process dead auto kill
- * @tc.type: FUNC
- * @tc.require:
- */
-/**
- * HWTEST_F(InputManagerFilterManualTest, DISABLED_HandleKeyEventFilter_004, TestSize.Level1)
- * {
- *     CALL_DEBUG_ENTER;
- *     MMI_HILOGI("enter DISABLED_HandleKeyEventFilter_004");
- *     struct KeyFilter : public IInputEventFilter {
- *         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
- *         {
- *             MMI_HILOGI("KeyFilter::OnInputEvent enter, pid:%{public}d", getpid());
- *             return false;
- *         }
- *         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
- *         {
- *             return false;
- *         }
- *     };
- *     AccessToken accessToken;
- *     auto addFilter = []() -> int32_t {
- *         auto filter = std::make_shared<KeyFilter>();
- *         uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
- *         const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
- *         return filterId;
- *     };
- *     const size_t singleClientSuportMaxNum = 4;
- *     for (size_t i = 0; i < singleClientSuportMaxNum; ++i) {
- *         const int32_t filterId = addFilter();
- *         ASSERT_NE(filterId, RET_ERR);
- *     }
- *     ASSERT_EQ(GetSelfHidumperFilterNum(), singleClientSuportMaxNum);
- * }
- */
-
-/**
  * @tc.name: HandlePointerEventFilter_005
  * @tc.desc: Delete all filter of this process
  * @tc.type: FUNC
@@ -599,58 +561,6 @@ void PrintFilter(const std::string title, const std::set<std::pair<std::string, 
         MMI_HILOGI("The priority:%{public}s, filterId:%{pulbic}s", priority.c_str(), filterId.c_str());
     }
 };
-
-/**
- * HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_006, TestSize.Level1)
- * {
- *     CALL_DEBUG_ENTER;
- *     MMI_HILOGI("enter HandleKeyEventFilter_006");
- *     AccessToken accessToken;
- *     const size_t singleClientSuportMaxNum = 4;
- *     for (size_t i = 0; i < singleClientSuportMaxNum; ++i) {
- *         const int32_t filterId = AddFilter();
- *         ASSERT_NE(filterId, RET_ERR);
- *     }
- *     pid_t serverPid1 = GetMmiServerPid();
- *     ASSERT_NE(serverPid1, -1);
- *     MMI_HILOGI("Origin serverPid1:%{public}d", serverPid1);
- *     std::set<std::pair<std::string, std::string>> filterInfo1;
- *     auto ret = GetSelfHidumperFilter(filterInfo1);
- *     ASSERT_EQ(ret, RET_OK);
- *     ret = StopExecutable(serverPid1);
- *     ASSERT_EQ(ret, RET_OK);
- *     pid_t serverPid2 = -1;
- *     int32_t cnt = 20;
- *     do {
- *         MMI_HILOGI("Sleep 1s, wait mmi server started, cnt:%{public}d", cnt--);
- *         sleep(1);
- *         serverPid2 = GetMmiServerPid();
- *         MMI_HILOGI("ServerPid2:%{public}d", serverPid2);
- *     } while (serverPid2 == -1);
- *     ASSERT_NE(serverPid2, -1);
- *     sleep(1);
- *     cnt = 20;
- *     bool retInitClient = false;
- *     do {
- *         MMI_HILOGI("Sleep 1s, wait init client success cnt:%{public}d", cnt--);
- *         sleep(1);
- *         --cnt;
- *         retInitClient = MMIEventHdl.InitClient();
- *     } while (cnt > 0 && !retInitClient);
- *     ASSERT_EQ(retInitClient, true);
- *     std::set<std::pair<std::string, std::string>> filterInfo2;
- *     cnt = 20;
- *     do {
- *         MMI_HILOGI("Sleep 1s, wait add filter finished, cnt:%{public}d", cnt--);
- *         sleep(1);
- *         filterInfo2.clear();
- *         GetSelfHidumperFilter(filterInfo2);
- *     } while (cnt > 0 && filterInfo1.size() != filterInfo2.size());
- *     PrintFilter("filterInfo1", filterInfo1);
- *     PrintFilter("filterInfo2", filterInfo2);
- *     ASSERT_TRUE(filterInfo1 == filterInfo2);
- * }
- */
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS
