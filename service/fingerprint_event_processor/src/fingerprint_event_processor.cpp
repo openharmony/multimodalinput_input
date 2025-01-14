@@ -16,6 +16,7 @@
 #include "fingerprint_event_processor.h"
 
 #include "ability_manager_client.h"
+#include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "ffrt.h"
 #include "input_event_handler.h"
@@ -245,6 +246,9 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
         return AnalyseMsdpPointEvent(event);
     } else {
         MMI_HILOGI("Unknown input device name:%{public}s", name.c_str());
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportFailLaunchAbility("Disable Fingerprint", DfxHisysevent::KEY_ERROR_CODE::NO_INPUT_DEVICE);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return PARAM_INPUT_INVALID;
     }
 }

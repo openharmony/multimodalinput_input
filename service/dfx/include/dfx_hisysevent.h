@@ -70,16 +70,13 @@ public:
     };
 
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    enum KEY_CONSUMPTION_TYPE {
-        NO_TYPE = 0,
-        FINGERPRINT,
-        STYLUS_PEN,
-        AIBASE_VOICE,
-        SCREEN_SHOT,
-        SCREEN_RECORDING,
-        OPEN_WALLET,
-        OPEN_CAMERA,
-        OPEN_SOS,
+    enum KEY_ERROR_CODE {
+        ERROR_RETURN_VALUE = 4001,
+        FAILED_TIMER,
+        NO_INPUT_DEVICE,
+        INVALID_PARAMETER,
+        FAILED_VERIFICATION,
+        FAILED_PARSE_CONFIG,
     };
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
@@ -164,9 +161,10 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     static void ClearCallCount();
-    static void ReportAbility(int32_t keyCode, int32_t action, std::string name);
-    static void ReportKeyEvent(int32_t keyCode, int32_t action, std::string name,
-        KEY_CONSUMPTION_TYPE type, int32_t subscribeId = -1);
+    static void ReportLaunchAbility(int32_t keyCode, int32_t action, std::string bundleName);
+    static void ReportFailLaunchAbility(std::string bundleName, int32_t errorCode);
+    static void ReportSubscribeKey(std::string flag, std::string name, int32_t keyCode, int32_t action, int32_t id);
+    static void ReportHandleKey(std::string name, int32_t keyCode, int32_t errorCode);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
 private:
@@ -175,9 +173,8 @@ private:
     static inline DispCastTime dispCastTime_ { 0 };
     static inline ComboStartCastTime comboStartCastTime_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    static inline std::map<KEY_CONSUMPTION_TYPE, int32_t> calKeyEventTime_;
-    static inline int32_t callCount_ { 0 };
     static inline ApiDurationStatistics apiDurationStatics_;
+    static inline int32_t callCount_ { 0 };
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 };
 } // namespace MMI
