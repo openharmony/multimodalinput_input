@@ -153,6 +153,11 @@ std::vector<InputDevice::AxisInfo> InputDevice::GetAxisInfo()
     return axis_;
 }
 
+void InputDevice::SetAxisInfo(std::vector<AxisInfo> axis)
+{
+    axis_ = axis;
+}
+
 InputDevice::AxisInfo::AxisInfo(int32_t type, int32_t min, int32_t max, int32_t fuzz, int32_t flat, int32_t resolution)
     : axisType_(type), minimum_(min), maximum_(max), fuzz_(fuzz), flat_(flat), resolution_(resolution) {}
 

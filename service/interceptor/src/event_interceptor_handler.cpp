@@ -124,12 +124,6 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent)) {
-        MMI_HILOGI("Knuckle in ancowindow need to be intercepted");
-        return true;
-    }
-#endif // OHOS_BUILD_ENABLE_ANCO
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         MMI_HILOGW("This event has been tagged as not to be intercepted");
         return false;

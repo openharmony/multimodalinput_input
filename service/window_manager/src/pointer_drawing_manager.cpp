@@ -1726,7 +1726,9 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int3
     if (pidInfos_.size() > VISIBLE_LIST_MAX_SIZE) {
         pidInfos_.pop_front();
     }
-    UpdatePointerVisible();
+    if (!WIN_MGR->HasMouseHideFlag() || INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice()) {
+        UpdatePointerVisible();
+    }
     return RET_OK;
 }
 

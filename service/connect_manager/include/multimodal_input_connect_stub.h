@@ -132,6 +132,7 @@ protected:
     int32_t StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -141,7 +142,6 @@ protected:
 #endif // OHOS_BUILD_ENABLE_ANCO
     int32_t StubTransferBinderClientService(MessageParcel& data, MessageParcel& reply);
     int32_t StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

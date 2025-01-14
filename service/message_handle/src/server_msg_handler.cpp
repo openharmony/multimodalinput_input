@@ -57,12 +57,14 @@ namespace {
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
-constexpr int32_t DEFAULT_POINTER_ID { 10000 };
+[[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_ID { 10000 };
+[[ maybe_unused ]] constexpr int32_t CAST_POINTER_ID { 5000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_PC = "2in1";
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
+constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -265,6 +267,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
+                !(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) &&
                 !IsNavigationWindowInjectEvent(pointerEvent)) {
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
             }
@@ -288,7 +291,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
                 break;
             } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0, false);
+                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
             } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
@@ -414,6 +417,8 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         if (isShell) {
             shellTargetWindowIds_[pointerId] = targetWindowId;
+        } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+            castTargetWindowIds_[pointerId] = targetWindowId;
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             accessTargetWindowIds_[pointerId] = targetWindowId;
         } else {
@@ -426,6 +431,8 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t pointerId = pointerEvent->GetPointerId();
         if (isShell) {
             shellTargetWindowIds_.erase(pointerId);
+        } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+            castTargetWindowIds_.erase(pointerId);
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             accessTargetWindowIds_.erase(pointerId);
         } else {
@@ -452,6 +459,16 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         if (iter != shellTargetWindowIds_.end()) {
             targetWindowId = iter->second;
         }
+    } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+        pointerEvent->RemovePointerItem(pointerId);
+        pointerId += CAST_POINTER_ID;
+        pointerItem.SetPointerId(pointerId);
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+        pointerEvent->SetPointerId(pointerId);
+        auto iter = castTargetWindowIds_.find(pointerEvent->GetPointerId());
+        if (iter != castTargetWindowIds_.end()) {
+            targetWindowId = iter->second;
+        }
     } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         auto iter = accessTargetWindowIds_.find(pointerEvent->GetPointerId());
         if (iter != accessTargetWindowIds_.end()) {
@@ -469,6 +486,18 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         }
     }
     MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
+    return UpdateTouchEvent(pointerEvent, action, targetWindowId);
+}
+
+bool ServerMsgHandler::UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t action, int32_t targetWindowId)
+{
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return false;
+    }
     if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
         action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
         MMI_HILOGD("Down event or targetWindowId less 0 is not need fix window id");
