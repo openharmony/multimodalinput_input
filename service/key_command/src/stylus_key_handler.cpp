@@ -17,6 +17,9 @@
 
 #include "ability_manager_client.h"
 #include "define_multimodal.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "setting_datashare.h"
@@ -50,6 +53,10 @@ bool StylusKeyHandler::HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent)
     }
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_STYLUS_SCREEN) {
         stylusKey_.lastEventIsStylus = false;
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportFailLaunchAbility("com.hmos.hinote",
+            DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return false;
     }
     if (stylusKey_.isLaunchAbility) {

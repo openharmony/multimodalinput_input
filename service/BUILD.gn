@@ -216,6 +216,7 @@ ohos_shared_library("libmmi-server") {
     if (input_feature_touchscreen) {
       sources += [
         "event_resample/src/event_resample.cpp",
+        "touch_event_normalize/src/remote_control_transform_processor.cpp",
         "touch_event_normalize/src/touch_gesture_adapter.cpp",
         "touch_event_normalize/src/touch_gesture_detector.cpp",
         "touch_event_normalize/src/touch_gesture_manager.cpp",
@@ -2483,7 +2484,10 @@ ohos_unittest("ConnectManagerEXTest") {
     "module_loader/src/input_screen_capture_agent.cpp",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [
     "ability_runtime:app_manager",

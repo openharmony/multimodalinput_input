@@ -1058,7 +1058,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    bool state = false;
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, state);
+    ASSERT_TRUE(state);
 }
 
 /**
@@ -1071,8 +1073,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_002, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, false);
-    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY);
-    ASSERT_FALSE(result);
+    bool state = true;
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -1085,7 +1088,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    bool state = false;
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, state);
+    ASSERT_TRUE(state);
 }
 
 /**
@@ -1098,8 +1103,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_004, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, false);
-    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
-    ASSERT_FALSE(result);
+    bool state = true;
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -1112,7 +1118,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    bool state = false;
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, state);
+    ASSERT_TRUE(state);
 }
 
 /**
@@ -1125,8 +1133,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_006, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, false);
-    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
-    ASSERT_FALSE(result);
+    bool state = true;
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -1139,12 +1148,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_007, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY, true);
-    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY);
-    ASSERT_FALSE(result);
+    bool state = true;
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY, state);
+    ASSERT_FALSE(state);
 
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY, false);
-    result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY);
-    ASSERT_FALSE(result);
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY, state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -4710,7 +4720,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_001, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d disable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("Set input device result: %{public}d ", result);
+            MMI_HILOGI("set input device result: %{public}d ", result);
+            ASSERT_EQ(result, RET_OK);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, false, cb);
     }
@@ -4731,7 +4742,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_002, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d enable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("Set input device result: %{public}d ", result);
+            MMI_HILOGI("set input device result: %{public}d ", result);
+            ASSERT_EQ(result, RET_OK);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, true, cb);
     }
@@ -4747,7 +4759,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_003, TestSize.L
 {
     CALL_TEST_DEBUG;
     auto cb = [](int32_t result) {
-        MMI_HILOGD("set input device result: %{public}d ", result);
+        MMI_HILOGI("set input device result: %{public}d ", result);
+        ASSERT_EQ(result, ERROR_DEVICE_NOT_EXIST);
     };
     InputManager::GetInstance()->SetInputDeviceEnabled(10000, true, cb);
 }

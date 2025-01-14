@@ -20,6 +20,10 @@
 
 #include "hisysevent.h"
 
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "api_duration_statistics.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+
 #include "input_device_manager.h"
 #include "key_event.h"
 #include "mmi_log.h"
@@ -64,6 +68,17 @@ public:
         TOUCHPAD_ROTATE_SETTING,
         TOUCHPAD_DOUBLE_TAP_DRAG_SETTING,
     };
+
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    enum KEY_ERROR_CODE {
+        ERROR_RETURN_VALUE = 4001,
+        FAILED_TIMER,
+        NO_INPUT_DEVICE,
+        INVALID_PARAMETER,
+        FAILED_VERIFICATION,
+        FAILED_PARSE_CONFIG,
+    };
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
     static void OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
@@ -139,12 +154,28 @@ public:
     static void ReportAppendExtraData();
     static void ReportTransmitInfrared(int64_t number);
     static void ReportSetCurrentUser(int32_t userId);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    static void ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t durationMS);
+    static void ReportMMiServiceThreadLongTask(const std::string &taskName);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    static void ClearCallCount();
+    static void ReportLaunchAbility(int32_t keyCode, int32_t action, std::string bundleName);
+    static void ReportFailLaunchAbility(std::string bundleName, int32_t errorCode);
+    static void ReportSubscribeKey(std::string flag, std::string name, int32_t keyCode, int32_t action, int32_t id);
+    static void ReportHandleKey(std::string name, int32_t keyCode, int32_t errorCode);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
     static inline int64_t comboStartTime_ { 0 };
     static inline DispCastTime dispCastTime_ { 0 };
     static inline ComboStartCastTime comboStartCastTime_ { 0 };
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    static inline ApiDurationStatistics apiDurationStatics_;
+    static inline int32_t callCount_ { 0 };
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 };
 } // namespace MMI
 } // namespace OHOS

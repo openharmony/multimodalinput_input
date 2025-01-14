@@ -343,6 +343,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
     bool OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo);
+    void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

@@ -20,6 +20,7 @@
 
 #include "ability_manager_client.h"
 #include "anr_manager.h"
+#include "app_mgr_client.h"
 #include "authorization_dialog.h"
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
@@ -42,6 +43,7 @@
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "parameters.h"
+#include "running_process_info.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
@@ -69,6 +71,8 @@ constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
+constexpr int32_t ERR_DEVICE_NOT_EXIST { 3900002 };
+constexpr int32_t ERR_NON_INPUT_APPLICATION { 3900003 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -155,19 +159,28 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
-    auto keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    bool checkState = keyEvent->GetFunctionKey(funcKey);
-    if (checkState == enable) {
-        MMI_HILOGE("Current device no need to set up");
-        return RET_OK;
+    int32_t callerPid = IPCSkeleton::GetCallingPid();
+    AppExecFwk::RunningProcessInfo processInfo;
+    auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+    CHKPR(appMgrClient, ERROR_NULL_POINTER);
+    appMgrClient->GetRunningProcessInfoByPid(callerPid, processInfo);
+    if (processInfo.extensionType_ != AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
+        MMI_HILOGW("It is prohibited for non-input applications");
+        return ERR_NON_INPUT_APPLICATION;
     }
     std::vector<struct libinput_device*> input_device;
     int32_t DeviceId = -1;
     INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
     if (input_device.size() == 0) {
         MMI_HILOGW("No keyboard device is currently available");
-        return RET_ERR;
+        return ERR_DEVICE_NOT_EXIST;
+    }
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    bool checkState = keyEvent->GetFunctionKey(funcKey);
+    if (checkState == enable) {
+        MMI_HILOGE("Current device no need to set up");
+        return RET_OK;
     }
     for (auto it = input_device.begin(); it != input_device.end(); ++it) {
         auto device = (*it);
@@ -797,6 +810,7 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 int32_t ServerMsgHandler::OnSubscribeHotkey(IUdsServer *server, int32_t pid,
     int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
     auto sess = server->GetSessionByPid(pid);
@@ -804,10 +818,15 @@ int32_t ServerMsgHandler::OnSubscribeHotkey(IUdsServer *server, int32_t pid,
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->SubscribeHotkey(sess, subscribeId, option);
+#else
+    MMI_HILOGI("OnSubscribeHotkey function does not support");
+    return ERROR_UNSUPPORT;
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 }
 
 int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, int32_t subscribeId)
 {
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
     auto sess = server->GetSessionByPid(pid);
@@ -815,6 +834,10 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->UnsubscribeHotkey(sess, subscribeId);
+#else
+    MMI_HILOGI("OnUnsubscribeHotkey function does not support");
+    return ERROR_UNSUPPORT;
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -918,7 +941,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         InjectNoticeInfo noticeInfo;
         noticeInfo.pid = authorPid;
         AddInjectNotice(noticeInfo);
-        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, [&] (int32_t pid) {
+        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(authorPid, [&] (int32_t pid) {
                 CloseInjectNotice(pid);
         });
         if (result != RET_OK) {

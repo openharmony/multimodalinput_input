@@ -44,6 +44,9 @@ constexpr int32_t FAIL_SUCC_TIME_DIFF { 3 * 60 * 1000 };
 constexpr int32_t MIN_GESTURE_TIMESTAMPS_SIZE { 2 };
 constexpr int32_t DOWN_TO_PREV_UP_MAX_TIME_THRESHOLD { 1000 * 1000 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+constexpr int32_t CALC_KEY_EVENT_TIMES { 100 };
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string EMPTY_STRING { "" };
 const char* LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
@@ -1138,5 +1141,115 @@ void DfxHisysevent::ReportSetCurrentUser(int32_t userId)
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+void DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t durationMS)
+{
+    apiDurationStatics_.RecordDuration(api, durationMS);
+    if (!apiDurationStatics_.IsLimitMatched()) {
+        return;
+    }
+    auto apiDurations = apiDurationStatics_.GetDurationBox();
+    for (const auto &apiDuration : apiDurations) {
+        auto api = apiDuration.first;
+        std::vector<int32_t> thresholds;
+        std::vector<int32_t> durationCounts;
+        for (const auto &durationBox : apiDuration.second) {
+            thresholds.push_back(static_cast<int32_t>(durationBox.first));
+            durationCounts.push_back(durationBox.second);
+        }
+        HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "MMI_API_DURATION",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "API_NAME", apiDurationStatics_.ApiToString(api),
+            "DURATION_THRESHOLDS", thresholds,
+            "DURATION_THRESHOLD_COUNTS", durationCounts);
+    }
+    apiDurationStatics_.ResetApiStatistics();
+}
+
+void DfxHisysevent::ReportMMiServiceThreadLongTask(const std::string &taskName)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MMI_LONG_TASK",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "TASK_NAME", taskName);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ClearCallCount()
+{
+    callCount_ = 0;
+}
+
+void DfxHisysevent::ReportLaunchAbility(int32_t keyCode, int32_t action, std::string bundleName)
+{
+    if (callCount_ < CALC_KEY_EVENT_TIMES) {
+        callCount_++;
+        return;
+    }
+    if (callCount_ == CALC_KEY_EVENT_TIMES) {
+        int32_t ret = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "KEY_EVENT_DATA",
+            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+            "KEY_CODE", keyCode,
+            "KEY_ACTION", action,
+            "BUNDLE_NAME", bundleName);
+        if (ret != 0) {
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+        }
+        ClearCallCount();
+    }
+}
+
+void DfxHisysevent::ReportFailLaunchAbility(std::string bundleName, int32_t errorCode)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "KEY_EVENT_DATA",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "BUNDLE_NAME", bundleName,
+        "ERROR_CODE", errorCode);
+    if (ret != 0) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportSubscribeKey(std::string flag,
+    std::string name, int32_t keyCode, int32_t action, int32_t id)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "KEY_EVENT_DATA",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "FLAG", flag,
+        "SUBSCRIBE_NAME", name,
+        "KEY_CODE", keyCode,
+        "KEY_ACTION", action,
+        "SUBSCRIBE_ID", id);
+    if (ret != 0) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportHandleKey(std::string name, int32_t keyCode, int32_t errorCode)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "KEY_EVENT_DATA",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "FUNCTION_NAME", name,
+        "KEY_CODE", keyCode,
+        "ERROR_CODE", errorCode);
+    if (ret != 0) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 } // namespace MMI
 } // namespace OHOS

@@ -49,6 +49,7 @@ public:
     bool CheckInputEventFilter();
     bool CheckAuthorize();
     bool CheckInputDeviceController();
+    bool CheckFunctionKeyEnabled();
 
 private:
     PermissionHelper() {}

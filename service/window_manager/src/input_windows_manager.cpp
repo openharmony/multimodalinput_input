@@ -97,6 +97,7 @@ constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
+constexpr int32_t POINTER_MOVEFLAG = { 7 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -990,25 +991,38 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
     });
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-        if (!windowInfo.isDisplayCoord) {
-            auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
-            CHKPR(displayInfo, action);
-            windowInfo.area.x += displayInfo->x;
-            windowInfo.area.y += displayInfo->y;
-            for (auto &area : windowInfo.defaultHotAreas) {
-                area.x += displayInfo->x;
-                area.y += displayInfo->y;
-            }
-            for (auto &area : windowInfo.pointerHotAreas) {
-                area.x += displayInfo->x;
-                area.y += displayInfo->y;
-            }
-            windowInfo.isDisplayCoord = true;
+        if (windowInfo.isDisplayCoord) {
+            continue;
         }
+        auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
+        CHKPR(displayInfo, action);
+        ChangeWindowArea(displayInfo->x, displayInfo->y, windowInfo);
+        if (!windowInfo.uiExtentionWindowInfo.empty()) {
+            for (auto &item : windowInfo.uiExtentionWindowInfo) {
+                ChangeWindowArea(displayInfo->x, displayInfo->y, item);
+            }
+        }
+        windowInfo.isDisplayCoord = true;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return action;
 }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo)
+{
+    windowInfo.area.x += x;
+    windowInfo.area.y += y;
+    for (auto &area : windowInfo.defaultHotAreas) {
+        area.x += x;
+        area.y += y;
+    }
+    for (auto &area : windowInfo.pointerHotAreas) {
+        area.x += x;
+        area.y += y;
+    }
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 void InputWindowsManager::HandleWindowPositionChange()
 {
@@ -2905,7 +2919,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             timerId_ = DEFAULT_VALUE;
         }
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+            pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
@@ -2963,7 +2978,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsMouseDrawing(pointerEvent->GetPointerAction())) {
-        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER) ||
+            pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         } else {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
@@ -4333,7 +4349,7 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.eventId = extraData.eventId;
     extraData_.drawCursor = extraData.drawCursor;
     if ((extraData.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (mouseDownEventId_ < 0 || extraData.eventId <= mouseDownEventId_)) {
+        (mouseDownEventId_ < 0 || extraData.eventId < mouseDownEventId_)) {
         MMI_HILOGE("Mouse drag failed, PI:%{public}d, EI:%{public}d, DEI:%{public}d",
             extraData.pointerId, extraData.eventId, mouseDownEventId_);
         ClearExtraData();
