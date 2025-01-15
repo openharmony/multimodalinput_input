@@ -199,11 +199,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void InitKeyObserver();
     bool PreHandleEvent();
-#ifdef UNIT_TEST
-public:
-#else
+
 private:
-#endif // UNIT_TEST
     void Print();
     void PrintSeq();
     void PrintExcludeKeys();
