@@ -65,6 +65,10 @@ constexpr uint32_t VKEY_TP_AXES_ONE { 1 };
 constexpr uint32_t VKEY_TP_AXES_TWO { 2 };
 constexpr double VTP_SCALE_AND_ANGLE_FACTOR { 1000.0 };
 constexpr uint32_t KEY_CAPSLOCK { 58 };
+constexpr uint32_t LIBINPUT_KEY_VOLUME_DOWN { 114 };
+constexpr uint32_t LIBINPUT_KEY_VOLUME_UP { 115 };
+constexpr uint32_t LIBINPUT_KEY_POWER { 116 };
+constexpr uint32_t LIBINPUT_KEY_FN { 240 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
@@ -1003,13 +1007,38 @@ void LibinputAdapter::PrintVKeyTPGestureLog(event_gesture &gEvent)
         static_cast<double>(gEvent.scale), static_cast<double>(gEvent.angle));
 }
 
-void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event_type eventType)
+void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event* event)
 {
     MMI_HILOGD("Hardware keyboard key event detected");
     if (hardwareKeyEventDetected_ == nullptr) {
         return;
     }
+    if (event == nullptr) {
+        MMI_HILOGD("libinput event is nullptr");
+        return;
+    }
+    libinput_event_type eventType = libinput_event_get_type(event);
     if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
+        libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
+        if (keyboardEvent == nullptr) {
+            MMI_HILOGD("keyboardEvent is nullptr");
+            return;
+        }
+        libinput_device* device = libinput_event_get_device(event);
+        if (device == nullptr) {
+            MMI_HILOGD("keyboard device is nullptr");
+            return;
+        }
+        uint32_t keyCode = libinput_event_keyboard_get_key(keyboardEvent);
+        int32_t hasFnKey = libinput_device_has_key(device, LIBINPUT_KEY_FN);
+        const char* outPutName = libinput_device_get_name(device);
+        MMI_HILOGD("The current keyCode: %{private}u, hasFnKey %{private}d, outPutName: %{private}s",
+            keyCode, hasFnKey, outPutName);
+        if ((keyCode == LIBINPUT_KEY_VOLUME_DOWN || keyCode == LIBINPUT_KEY_VOLUME_UP ||
+            keyCode == LIBINPUT_KEY_POWER) && !hasFnKey) {
+            MMI_HILOGD("Skip device local button keyCode: %{private}u", keyCode);
+            return;
+        }
         hardwareKeyEventDetected_();
     }
 }
@@ -1147,7 +1176,7 @@ type:%{private}d",
                 libinput_device* device = libinput_event_get_device(event);
                 int libinputCaps = libinput_get_funckey_state(device, MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
 
-                HandleHWKeyEventForVKeyboard(eventType);
+                HandleHWKeyEventForVKeyboard(event);
                 funInputEvent_(event, frameTime);
                 libinput_event_destroy(event);
 				
@@ -1155,12 +1184,11 @@ type:%{private}d",
                 keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
                 libinput_toggle_caps_key();
             } else {
-                HandleHWKeyEventForVKeyboard(eventType);
+                HandleHWKeyEventForVKeyboard(event);
                 funInputEvent_(event, frameTime);
                 libinput_event_destroy(event);
             }
         } else {
-            HandleHWKeyEventForVKeyboard(eventType);
             funInputEvent_(event, frameTime);
             libinput_event_destroy(event);
         }
