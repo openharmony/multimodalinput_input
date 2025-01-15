@@ -34,6 +34,8 @@ struct Input_KeyEvent {
     int32_t action;
     int32_t keyCode;
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_MouseEvent {
@@ -44,6 +46,8 @@ struct Input_MouseEvent {
     int32_t axisType { -1 };
     float axisValue { 0.0f };
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_TouchEvent {
@@ -52,6 +56,8 @@ struct Input_TouchEvent {
     int32_t displayX;
     int32_t displayY;
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_AxisEvent {
@@ -62,6 +68,8 @@ struct Input_AxisEvent {
     int64_t actionTime { -1 };
     int32_t sourceType;
     int32_t axisEventType { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 namespace OHOS {
