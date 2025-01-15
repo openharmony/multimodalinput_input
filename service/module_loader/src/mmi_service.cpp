@@ -368,6 +368,10 @@ void MMIService::OnStart()
     AddReloadDeviceTimer();
     t_ = std::thread([this] {this->OnThread();});
     pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
+    auto keyHandler = InputHandler->GetKeyCommandHandler();
+    if (keyHandler != nullptr) {
+        keyHandler->PreHandleEvent();
+    }
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -1115,14 +1119,26 @@ int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
     return RET_OK;
 }
 
-int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
+int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
     CALL_DEBUG_ENTER;
     if (INPUT_DEV_MGR->GetInputDevice(deviceId) == nullptr) {
         MMI_HILOGE("Input device not found");
         return COMMON_PARAMETER_ERROR;
     }
-    inputDevice = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    auto tmpDevice = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    inputDevice->SetId(tmpDevice->GetId());
+    inputDevice->SetType(tmpDevice->GetType());
+    inputDevice->SetName(tmpDevice->GetName());
+    inputDevice->SetBus(tmpDevice->GetBus());
+    inputDevice->SetVersion(tmpDevice->GetVersion());
+    inputDevice->SetProduct(tmpDevice->GetProduct());
+    inputDevice->SetVendor(tmpDevice->GetVendor());
+    inputDevice->SetPhys(tmpDevice->GetPhys());
+    inputDevice->SetUniq(tmpDevice->GetUniq());
+    inputDevice->SetCapabilities(tmpDevice->GetCapabilities());
+    inputDevice->SetAxisInfo(tmpDevice->GetAxisInfo());
+
     return RET_OK;
 }
 
@@ -1130,7 +1146,7 @@ int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &in
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, deviceId, &inputDevice] {
+        [this, deviceId, inputDevice] {
             return this->OnGetDevice(deviceId, inputDevice);
         }
         );
@@ -1563,10 +1579,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
             IPointerDrawingManager::GetInstance()->InitPointerObserver();
-            auto keyHandler = InputHandler->GetKeyCommandHandler();
-            if (keyHandler != nullptr) {
-                keyHandler->InitKeyObserver();
-            }
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING

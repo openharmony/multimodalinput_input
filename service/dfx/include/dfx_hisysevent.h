@@ -121,6 +121,24 @@ public:
     static std::string GetTpVendorName();
     static std::string GetAccVendorName();
     static std::string GetLcdInfo();
+    static void ReportSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey, std::string name, int32_t pid);
+    static void ReportUnSubscribeKeyEvent(int32_t subscribeId, int32_t finalKey, std::string name, int32_t pid);
+    static void ReportKeyboardEvent(int32_t eventType, int32_t keyCode, int32_t keyAction);
+    static void ReportLaunchAbility(std::string bundleName);
+    static void ReportCommonAction(std::string action);
+    static void ReportTouchEvent(int32_t pointAction, int32_t pointId, int32_t windowId);
+    static void ReportSetCustomCursor(int32_t windowPid, int32_t windowId);
+    static void ReportSetMouseIcon(int32_t windowId);
+    static void ReportSetPointerStyle(int32_t windowId, int32_t pointerStyleId, bool isUiExtension);
+    static void ReportSetPointerVisible(bool visible, int32_t priority);
+    static void ReportSetPointerSpeed(int32_t speed);
+    static void ReportAddInputHandler(int32_t handlerType);
+    static void ReportRemoveInputHandler(int32_t handlerType);
+    static void ReportInjectPointerEvent(bool isNativeInject);
+    static void ReportEnableCombineKey(bool enable);
+    static void ReportAppendExtraData();
+    static void ReportTransmitInfrared(int64_t number);
+    static void ReportSetCurrentUser(int32_t userId);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };

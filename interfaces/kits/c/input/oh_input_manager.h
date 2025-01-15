@@ -243,15 +243,19 @@ typedef enum Input_Result {
     INPUT_NOT_SYSTEM_APPLICATION = 202,
     /** Parameter check failed */
     INPUT_PARAMETER_ERROR = 401,
-    /** @error Device not support */
+    /**
+     * @error Device not support
+     * @since 14
+     */
     INPUT_DEVICE_NOT_SUPPORTED = 801,
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
     /** Interceptor repeatedly created for an application */
     INPUT_REPEAT_INTERCEPTOR = 4200001,
-    /** @error Already occupied by the system */
-    INPUT_OCCUPIED_BY_SYSTEM = 4200002,
-    /** @error Already occupied by the other */
+    /**
+	 * @error Already occupied by the other
+	 * @since 13
+	 */
     INPUT_OCCUPIED_BY_OTHER = 4200003
 } Input_Result;
 
@@ -290,10 +294,6 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
  */
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
-/**
- * @brief Callback used to return shortcut key events.
- * @since 14
- */
 typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
 
 /**
@@ -1266,46 +1266,6 @@ Input_Result OH_Input_RemoveKeyEventInterceptor(void);
 Input_Result OH_Input_RemoveInputEventInterceptor(void);
 
 /**
- * @brief Creates an array of {@Link Input_Hotkey} instances.
- *
- * @param count Number of {@Link Input_Hotkey} instances to be created. The count must be the same as the number of
- * system shortcut keys.
- * @return If the operation is successful, the pointer to an array of {@Link Input_Hotkey} instances is returned.
- * If the operation fails, a null pointer is returned. The possible cause is memory allocation failure or count is
- * not equal to the number of system hotkeys.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 14
- */
-Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count);
-
-/**
- * @brief Destroys an array of {@link Input_Hotkey} instances and reclaims memory.
- *
- * @param hotkeys Pointer to an array of {@Link Input_Hotkey } instances created by the
- * {@Link OH_Input_CreateAllSystemHotkeys} method.
- * @param count Count of the array to be destroyed, which must be the same as the number of system shortcut keys.
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 14
- */
-void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
-
-/**
- * @brief Obtains all hot keys supported by the system.
- *
- * @param hotkey Array of {@Link Input_Hotkey} instances.
- * When calling this API for the first time, you can pass NULL to obtain the array length.
- * @param count Number of hot keys supported by the system.
- * @return OH_Input_GetAllSystemHotkeys status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} The hotkey or count is NULL, or the value of count does not match the number
- *         of system shortcut keys supported by the system;\n
- *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 14
- */
-Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
-
-/**
  * @brief Creates a hot key object.
  *
  * @return Returns an {@Link Input_Hotkey} pointer object if the operation is successful. Otherwise, a null pointer is
@@ -1376,6 +1336,46 @@ void OH_Input_SetFinalKey(Input_Hotkey *hotkey, int32_t finalKey);
 Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyCode);
 
 /**
+ * @brief Creates an array of {@Link Input_Hotkey} instances.
+ *
+ * @param count Number of {@Link Input_Hotkey} instances to be created. The count must be the same as the number of
+ * system shortcut keys.
+ * @return If the operation is successful, the pointer to an array of {@Link Input_Hotkey} instances is returned.
+ * If the operation fails, a null pointer is returned. The possible cause is memory allocation failure or count is
+ * not equal to the number of system hotkeys.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count);
+
+/**
+ * @brief Destroys an array of {@link Input_Hotkey} instances and reclaims memory.
+ *
+ * @param hotkeys Pointer to an array of {@Link Input_Hotkey } instances created by the
+ * {@Link OH_Input_CreateAllSystemHotkeys} method.
+ * @param count Count of the array to be destroyed, which must be the same as the number of system shortcut keys.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
+
+/**
+ * @brief Obtains all hot keys supported by the system.
+ *
+ * @param hotkey Array of {@Link Input_Hotkey} instances.
+ * When calling this API for the first time, you can pass NULL to obtain the array length.
+ * @param count Number of hot keys supported by the system.
+ * @return OH_Input_GetAllSystemHotkeys status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} The hotkey or count is NULL, or the value of count does not match the number
+ *         of system shortcut keys supported by the system;\n
+ *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 14
+ */
+Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
+
+/**
  * @brief Specifies whether to report repeated key events.
  *
  * @param hotkey Shortcut key object.
@@ -1391,7 +1391,7 @@ void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
  *
  * @param hotkey Shortcut key object.
  * @param isRepeat Whether a key event is repeated.
- * @return OH_Input_GetIsRepeat status code, specifically,
+ * @return OH_Input_GetRepeat status code, specifically,
  *         {@link INPUT_SUCCESS} if the operation is successful;\n
  *         {@link INPUT_PARAMETER_ERROR} otherwise;\n
  *         {@Link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n

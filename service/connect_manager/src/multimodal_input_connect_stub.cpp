@@ -103,7 +103,8 @@ const int32_t TUPLE_PID { 0 };
 const int32_t TUPLE_UID { 1 };
 const int32_t TUPLE_NAME { 2 };
 const int32_t DEFAULT_POINTER_COLOR { 0x000000 };
-constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
+constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 1024 };
+
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
 {
@@ -1384,7 +1385,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
     LogTracer lt(event->GetId(), event->GetEventType(), event->GetKeyAction());
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->CheckInjectPermission()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1414,7 +1415,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
     }
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->CheckInjectPermission()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }

@@ -316,6 +316,42 @@
         "name": "OH_Input_RemoveInputEventInterceptor"
     },
     {
+        "first_introduced": "14",
+        "name": "OH_Input_CreateAllSystemHotkeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_DestroyAllSystemHotkeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_GetAllSystemHotkeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_CreateHotkey"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_DestroyHotkey"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_SetPreKeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_GetPreKeys"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_SetFinalKey"
+    },
+    {
+        "first_introduced": "14",
+        "name": "OH_Input_GetFinalKey"
+    },
+    {
         "first_introduced": "13",
         "name": "OH_Input_GetDeviceIds"
     },
@@ -381,39 +417,11 @@
     },
     {
         "first_introduced": "14",
-        "name": "OH_Input_CreateAllSystemHotkeys"
+        "name": "OH_Input_AddHotkeyMonitor"
     },
     {
         "first_introduced": "14",
-        "name": "OH_Input_DestroyAllSystemHotkeys"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_GetAllSystemHotkeys"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_CreateHotkey"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_DestroyHotkey"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_SetPreKeys"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_GetPreKeys"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_SetFinalKey"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_GetFinalKey"
+        "name": "OH_Input_RemoveHotkeyMonitor"
     },
     {
         "first_introduced": "14",
@@ -422,13 +430,5 @@
     {
         "first_introduced": "14",
         "name": "OH_Input_GetRepeat"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_AddHotkeyMonitor"
-    },
-    {
-        "first_introduced": "14",
-        "name": "OH_Input_RemoveHotkeyMonitor"
     }
 ]

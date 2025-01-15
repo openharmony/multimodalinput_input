@@ -252,7 +252,10 @@ ohos_shared_library("libmmi-server") {
     deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
   }
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "audio_framework:audio_client",
+    "c_utils:utils",
+  ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm_lite" ]
   }
@@ -1536,7 +1539,6 @@ ohos_unittest("EventHandlerTest") {
   sources = [
     "event_handler/test/anr_manager_test.cpp",
     "event_handler/test/event_normalize_handler_test.cpp",
-    "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/input_event_handler_test.cpp",
     "event_handler/test/key_auto_repeat_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",

@@ -77,6 +77,7 @@ AccountManager::AccountSetting::AccountSetting(int32_t accountId)
 AccountManager::AccountSetting::~AccountSetting()
 {
     if (timerId_ >= 0) {
+        timerId_ = -1;
         TimerMgr->RemoveTimer(timerId_);
     }
     auto &setting = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
@@ -183,6 +184,7 @@ void AccountManager::AccountSetting::InitializeSetting()
     if ((switchObserver_ == nullptr) || (onScreenLockedSwitchObserver_ == nullptr) || (configObserver_ == nullptr)) {
         timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
             InitializeSetting();
+            timerId_ = -1;
         });
         if (timerId_ < 0) {
             MMI_HILOGE("AddTimer fail, setting will not work");
@@ -274,28 +276,28 @@ AccountManager::AccountManager()
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
-            [this](const EventFwk::CommonEventData &data) {
+            [](const EventFwk::CommonEventData &data) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF,
-            [this](const EventFwk::CommonEventData &data) {
+            [](const EventFwk::CommonEventData &data) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED,
-            [this](const EventFwk::CommonEventData &data) {
+            [](const EventFwk::CommonEventData &data) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenLocked(true);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
-            [this](const EventFwk::CommonEventData &data) {
+            [](const EventFwk::CommonEventData &data) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenLocked(false);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -310,6 +312,7 @@ AccountManager::~AccountManager()
     UnsubscribeCommonEvent();
     if (timerId_ >= 0) {
         TimerMgr->RemoveTimer(timerId_);
+        timerId_ = -1;
     }
     accounts_.clear();
 }
@@ -368,6 +371,7 @@ void AccountManager::SubscribeCommonEvent()
     MMI_HILOGI("SubscribeCommonEvent fail, retry later");
     timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
         SubscribeCommonEvent();
+        timerId_ = -1;
     });
     if (timerId_ < 0) {
         MMI_HILOGE("AddTimer fail, SubscribeCommonEvent fail");
