@@ -311,6 +311,9 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     if (clearKeyMessage_ != nullptr) {
         clearKeyMessage_();
     }
+    if (!keyMsgList.empty()) {
+        ShowMouseCursor();
+    }
     OnVKeyTrackPadMessage(touch, keyMsgList);
     // Handle all track pad touch messages
     std::vector<std::vector<int32_t>> touchMsgList;
@@ -319,6 +322,9 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     }
     if (clearTouchMessage_ != nullptr) {
         clearTouchMessage_();
+    }
+    if (!touchMsgList.empty()) {
+        ShowMouseCursor();
     }
     OnVKeyTrackPadMessage(touch, touchMsgList);
 }
@@ -1040,6 +1046,17 @@ void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event* event)
             return;
         }
         hardwareKeyEventDetected_();
+    }
+}
+
+void LibinputAdapter::ShowMouseCursor()
+{
+    MMI_HILOGD("Check cursor state function valid = %{public}d",
+        IPointerDrawingManager::GetInstance() != nullptr);
+    if (IPointerDrawingManager::GetInstance() != nullptr &&
+        !IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        MMI_HILOGI("Found hidden mouse cursor during trackpad operation, show it.");
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     }
 }
 
