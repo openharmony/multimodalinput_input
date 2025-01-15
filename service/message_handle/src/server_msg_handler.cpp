@@ -641,6 +641,13 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
 int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t tokenType = sess->GetTokenType();
+    if (tokenType != TokenType::TOKEN_NATIVE && tokenType != TokenType::TOKEN_SHELL &&
+        tokenType !=TokenType::TOKEN_SYSTEM_HAP) {
+        MMI_HILOGW("Not native or systemapp skip, pid:%{public}d tokenType:%{public}d", sess->GetPid(), tokenType);
+        return RET_ERR;
+    }
     int32_t pid = sess->GetPid();
     WIN_MGR->SetWindowStateNotifyPid(pid);
     MMI_HILOGI("The pid:%{public}d", pid);

@@ -225,7 +225,7 @@ int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
 void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
     CALL_INFO_TRACE;
-    if (cfg == nullptr || cfgLen == 0) {
+    if (cfg == nullptr || cfgLen <= 0) {
         MMI_HILOGE("SecCompEnhance cfg info is empty");
         return;
     }
