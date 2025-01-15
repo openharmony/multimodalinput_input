@@ -998,18 +998,11 @@ bool KeyCommandHandler::IsMatchedAbility(std::vector<float> gesturePoints,
 
 bool KeyCommandHandler::ParseConfig()
 {
-#ifndef UNIT_TEST
-    const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
-#else
-    const char *testPathSuffix = "/data/test/test.json";
-#endif // UNIT_TEST
-    char buf[MAX_PATH_LEN] = { 0 };
-    char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
-#ifndef UNIT_TEST
-    std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
-#else
-    std::string defaultConfig = "/data/test/test.json";
-#endif // UNIT_TEST
+    const std::string defaultConfig { "/system/etc/multimodalinput/ability_launch_config.json" };
+    const char configName[] { "/etc/multimodalinput/ability_launch_config.json" };
+    char buf[MAX_PATH_LEN] {};
+
+    char *filePath = ::GetOneCfgFile(configName, buf, sizeof(buf));
     if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
         MMI_HILOGD("Can not get customization config file");
         return ParseJson(defaultConfig);
@@ -1021,18 +1014,11 @@ bool KeyCommandHandler::ParseConfig()
 
 bool KeyCommandHandler::ParseExcludeConfig()
 {
-#ifndef UNIT_TEST
-    const char *testPathSuffix = "/etc/multimodalinput/exclude_keys_config.json";
-#else
-    const char *testPathSuffix = "/data/test/exclude_keys_config.json";
-#endif // UNIT_TEST
-    char buf[MAX_PATH_LEN] = { 0 };
-    char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
-#ifndef UNIT_TEST
-    std::string defaultConfig = "/system/etc/multimodalinput/exclude_keys_config.json";
-#else
-    std::string defaultConfig = "/data/test/exclude_keys_config.json";
-#endif // UNIT_TEST
+    const std::string defaultConfig { "/system/etc/multimodalinput/exclude_keys_config.json" };
+    const char configName[] { "/etc/multimodalinput/exclude_keys_config.json" };
+    char buf[MAX_PATH_LEN] {};
+
+    char *filePath = ::GetOneCfgFile(configName, buf, sizeof(buf));
     if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
         MMI_HILOGD("Can not get customization exclude_keys_config.json file");
         return ParseExcludeJson(defaultConfig);
@@ -2067,7 +2053,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
         }
     }
     if (IsActiveSequenceRepeating(keyEvent)) {
-        MMI_HILOGD("Skip repeating key(%{public}d) in active sequence", keyEvent->GetKeyCode());
+        MMI_HILOGD("Skip repeating key(%{private}d) in active sequence", keyEvent->GetKeyCode());
         return true;
     }
     MarkActiveSequence(false);
