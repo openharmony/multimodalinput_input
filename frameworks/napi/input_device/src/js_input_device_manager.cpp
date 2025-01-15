@@ -195,7 +195,7 @@ napi_value JsInputDeviceManager::SetKeyboardRepeatDelay(napi_env env, int32_t de
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    EmitJsSetKeyboardRepeatRateAsync(cb, rate);
+    EmitJsSetKeyboardRepeatDelayAsync(cb, delay);
     return ret;
 }
 
