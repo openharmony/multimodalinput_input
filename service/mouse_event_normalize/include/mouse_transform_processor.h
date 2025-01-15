@@ -122,6 +122,10 @@ private:
     double HandleAxisAccelateTouchPad(double axisValue);
 #endif // OHOS_BUILD_ENABLE_WATCH
     void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
+    void HandleReportMouseResponseTime(std::string &connectType, std::map<long long, int32_t> &curMap);
+    void CalculateMouseResponseTimeProbability(struct libinput_event *event);
+    std::map<std::string, std::map<long long, int32_t>> mouseResponseMap = {};
+    std::map<std::string, std::chrono::time_point<std::chrono::steady_clock>> mouseMap = {};
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
