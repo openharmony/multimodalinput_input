@@ -1611,7 +1611,7 @@ void JsEventTarget::CallKeyboardRepeatDelayTask(uv_work_t *work, const string& o
         cb->errCode = napiCode;
         cb->data.keyboardRepeatDelay = _delay;
     } else {
-        int32_t napiCode = InputManager::GetInstance()->setKeyboardRepeatDelay(cb->data.keyboardRepeatDelay);
+        int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatDelay(cb->data.keyboardRepeatDelay);
         cb->errCode = napiCode;
     }
 }
@@ -1634,7 +1634,7 @@ void JsEventTarget::CallKeyboardRepeatRateTask(uv_work_t *work, const string& op
         cb->errCode = napiCode;
         cb->data.keyboardRepeatDelay = _rate;
     } else {
-        int32_t napiCode = InputManager::GetInstance()->setKeyboardRepeatRate(cb->data.keyboardRepeatRate);
+        int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatRate(cb->data.keyboardRepeatRate);
         cb->errCode = napiCode;
     }
 }
