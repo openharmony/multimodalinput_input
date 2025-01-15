@@ -380,6 +380,21 @@ int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handl
     return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
 }
 
+int32_t MultimodalInputConnectManager::AddPreInputHandler(int32_t handlerId, HandleEventType eventType,
+    std::vector<int32_t> keys)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddPreInputHandler(handlerId, eventType, keys);
+}
+
+int32_t MultimodalInputConnectManager::RemovePreInputHandler(int32_t handlerId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemovePreInputHandler(handlerId);
+}
+
 int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 {
     std::lock_guard<std::mutex> guard(lock_);

@@ -92,6 +92,8 @@ public:
         int32_t priority, uint32_t deviceTags) = 0;
     virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) = 0;
+    virtual int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) = 0;
+    virtual int32_t RemovePreInputHandler(int32_t handlerId) = 0;
     virtual int32_t MarkEventConsumed(int32_t eventId) = 0;
     virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) = 0;
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) = 0;
