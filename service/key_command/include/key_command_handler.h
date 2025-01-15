@@ -195,6 +195,7 @@ public:
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void InitKeyObserver();
+    bool PreHandleEvent();
 private:
     void Print();
     void PrintSeq();
@@ -245,6 +246,7 @@ private:
     int32_t GetKeyDownDurationFromXml(const std::string &businessId);
     void SendKeyEvent();
     bool CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent);
+    bool IsMusicActivate();
     template <class T>
     void CreateStatusConfigObserver(T& item);
     void ResetLastMatchedKey()
@@ -312,6 +314,7 @@ private:
     bool IsMatchedAbility(std::vector<float> gesturePoints_, float gestureLastX, float gestureLastY);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent);
+    void SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEvent);
 
 private:
     Sequence matchedSequence_;
@@ -389,6 +392,8 @@ private:
     std::map<int32_t, int64_t> lastPointerDownTime_;
     std::mutex mutex_;
     int64_t walletLaunchDelayTimes_ { 0 };
+    int64_t sosLaunchTime_ { -1 };
+    int64_t powerUpTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

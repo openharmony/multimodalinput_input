@@ -34,6 +34,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t DEVICE_TAGS { 1 };
+constexpr int32_t THREE_FINGERS { 3 };
+constexpr int32_t FOUR_FINGERS { 4 };
 } // namespace
 InputHandlerManager::InputHandlerManager()
 {
@@ -335,13 +337,131 @@ void InputHandlerManager::AddMouseEventId(std::shared_ptr<PointerEvent> pointerE
     }
 }
 
+
+bool InputHandlerManager::IsPinchType(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE &&
+        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        return false;
+    }
+    if ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_END)) {
+        return false;
+    }
+    return true;
+}
+ 
+bool InputHandlerManager::IsRotateType(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_END)) {
+        return false;
+    }
+    return true;
+}
+ 
+ 
+bool InputHandlerManager::IsThreeFingersSwipeType(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetFingerCount() != THREE_FINGERS ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        return false;
+    }
+    return true;
+}
+ 
+bool InputHandlerManager::IsFourFingersSwipeType(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetFingerCount() != FOUR_FINGERS ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        return false;
+    }
+    return true;
+}
+ 
+bool InputHandlerManager::IsThreeFingersTapType(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetFingerCount() != THREE_FINGERS ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_TRIPTAP)) {
+        return false;
+    }
+    return true;
+}
+ 
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+bool InputHandlerManager::IsFingerprintType(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
+        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
+            return true;
+    }
+    MMI_HILOGD("not fingerprint event");
+    return false;
+}
+#endif
+ 
+bool InputHandlerManager::CheckIfNeedAddToConsumerInfos(const Handler &monitor,
+    std::shared_ptr<PointerEvent> pointerEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT &&
+        IsFingerprintType(pointerEvent)) {
+        return true;
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_SWIPEINWARD) == HANDLE_EVENT_TYPE_SWIPEINWARD) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH) == HANDLE_EVENT_TYPE_TOUCH &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_MOUSE) == HANDLE_EVENT_TYPE_MOUSE &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_PINCH) == HANDLE_EVENT_TYPE_PINCH &&
+        IsPinchType(pointerEvent)) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_THREEFINGERSSWIP) == HANDLE_EVENT_TYPE_THREEFINGERSSWIP &&
+        IsThreeFingersSwipeType(pointerEvent)) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FOURFINGERSSWIP) == HANDLE_EVENT_TYPE_FOURFINGERSSWIP &&
+        IsFourFingersSwipeType(pointerEvent)) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_ROTATE) == HANDLE_EVENT_TYPE_ROTATE &&
+        IsRotateType(pointerEvent)) {
+        return true;
+    } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_THREEFINGERSTAP) == HANDLE_EVENT_TYPE_THREEFINGERSTAP &&
+        IsThreeFingersTapType(pointerEvent)) {
+        return true;
+    }
+    return false;
+}
+
 int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
 {
     int32_t consumerCount = 0;
     MMI_HILOG_DISPATCHD("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     for (const auto &item : monitorHandlers_) {
-        if ((item.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+        if (!CheckIfNeedAddToConsumerInfos(item.second, pointerEvent)) {
             continue;
         }
         int32_t handlerId = item.first;

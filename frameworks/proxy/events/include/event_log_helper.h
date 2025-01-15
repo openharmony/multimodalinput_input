@@ -18,9 +18,7 @@
 
 #include <memory>
 
-#if !defined(ANDROID_PLATFORM) && !defined(IOS_PLATFORM)
 #include "parameters.h"
-#endif // !defined(ANDROID_PLATFORM) && !defined(IOS_PLATFORM)
 
 #include "define_multimodal.h"
 #include "input_event.h"
@@ -91,9 +89,7 @@ public:
 
     static void SetBetaUserType()
     {
-#if !defined(ANDROID_PLATFORM) && !defined(IOS_PLATFORM)
         userType_ = OHOS::system::GetParameter("const.logsystem.versiontype", "default");
-#endif // !defined(ANDROID_PLATFORM) && !defined(IOS_PLATFORM)
     }
 
 private:

@@ -115,11 +115,13 @@ int32_t DeviceEventMonitor::GetCallState()
 
 void DeviceEventMonitor::SetHasHandleRingMute(bool hasHandleRingMute)
 {
+    CALL_INFO_TRACE;
     hasHandleRingMute_ = hasHandleRingMute;
 }
 
 bool DeviceEventMonitor::GetHasHandleRingMute()
 {
+    CALL_INFO_TRACE;
     return hasHandleRingMute_;
 }
 } // namespace MMI

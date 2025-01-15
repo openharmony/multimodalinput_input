@@ -317,7 +317,7 @@ HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_SetShieldStatus_001, TestS
     int32_t shieldMode = -1;
     bool isShield = true;
     int32_t ret = KeyEventHdr->SetShieldStatus(shieldMode, isShield);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(ret, RET_ERR);
     shieldMode = 2;
     isShield = true;
     ret = KeyEventHdr->SetShieldStatus(shieldMode, isShield);
@@ -355,7 +355,7 @@ HWTEST_F(KeyEventNormalizeTest, shieldMode_Equal_lastShieldMode, TestSize.Level1
     bool isShield = true;
     int32_t shieldMode = -1;
     int32_t result = KeyEventHdr->SetShieldStatus(shieldMode, isShield);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**

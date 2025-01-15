@@ -106,12 +106,32 @@ void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
 }
 } // namespace
 
-int32_t InputMonitor::Start()
+std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
+    { "none", HANDLE_EVENT_TYPE_NONE },
+    { "key", HANDLE_EVENT_TYPE_KEY },
+    { "pointer", HANDLE_EVENT_TYPE_POINTER },
+    { "touch", HANDLE_EVENT_TYPE_TOUCH },
+    { "mouse", HANDLE_EVENT_TYPE_MOUSE },
+    { "pinch", HANDLE_EVENT_TYPE_PINCH },
+    { "threeFingersSwipe", HANDLE_EVENT_TYPE_THREEFINGERSSWIP },
+    { "fourFingersSwipe", HANDLE_EVENT_TYPE_FOURFINGERSSWIP },
+    { "swipeInward", HANDLE_EVENT_TYPE_SWIPEINWARD },
+    { "rotate", HANDLE_EVENT_TYPE_ROTATE },
+    { "threeFingersTap", HANDLE_EVENT_TYPE_THREEFINGERSTAP },
+    { "fingerprint", HANDLE_EVENT_TYPE_FINGERPRINT },
+};
+
+int32_t InputMonitor::Start(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
-        monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
+        int32_t eventType = 0;
+        auto it = TO_HANDLE_EVENT_TYPE.find(typeName.c_str());
+        if (it != TO_HANDLE_EVENT_TYPE.end()) {
+            eventType = it->second;
+        }
+        monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this(), eventType);
     }
     return monitorId_;
 }
@@ -665,7 +685,8 @@ int32_t JsInputMonitor::TransformSwipeInwardEvent(std::shared_ptr<PointerEvent> 
             actionValue = GESTURE_UPDATE;
             break;
         }
-        case PointerEvent::POINTER_ACTION_UP: {
+        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_CANCEL: {
             actionValue = GESTURE_END;
             break;
         }
@@ -1050,7 +1071,7 @@ int32_t JsInputMonitor::TransformFingerprintEvent(const std::shared_ptr<PointerE
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
-int32_t JsInputMonitor::Start()
+int32_t JsInputMonitor::Start(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
     CHKPF(monitor_);
@@ -1058,7 +1079,7 @@ int32_t JsInputMonitor::Start()
         MMI_HILOGW("Js is monitoring");
         return RET_OK;
     }
-    int32_t ret = monitor_->Start();
+    int32_t ret = monitor_->Start(typeName);
     if (ret >= 0) {
         isMonitoring_ = true;
     }
@@ -1213,6 +1234,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             evQueue_.pop();
             pointerQueue_.push(pointerEvent);
+            napi_close_handle_scope(jsEnv_, scope);
         }
     }
 
@@ -1462,7 +1484,8 @@ bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
         return false;
     } else if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
         MMI_HILOGE("failed to do swipe inward, wrong action");
         return false;
     }

@@ -5114,7 +5114,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_003, TestSize.Leve
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, CheckInfraredEmmit()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadInt64(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt64(_)).WillRepeatedly(DoAll(SetArgReferee<0>(-1), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(501), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);

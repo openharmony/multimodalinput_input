@@ -36,6 +36,7 @@ public:
     }
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>, int32_t));
+    MOCK_METHOD(bool, AdjustFingerFlag, (std::shared_ptr<PointerEvent>));
     void UpdateDisplayInfo(DisplayGroupInfo&) override {}
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo&, bool) override {}
     void UpdateWindowInfo(const WindowGroupInfo&) override {}
@@ -100,6 +101,7 @@ public:
     MOCK_METHOD(const DisplayInfo*, GetDefaultDisplayInfo, (), (const));
     MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
     MOCK_METHOD(void, SendCancelEventWhenLock, ());
+    MOCK_METHOD(void, FoldScreenRotation, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

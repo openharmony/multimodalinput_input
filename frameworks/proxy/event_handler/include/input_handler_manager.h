@@ -55,7 +55,7 @@ public:
 
 protected:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
-        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
+        HandleEventType eventType = HANDLE_EVENT_TYPE_KP, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     int32_t RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
 
@@ -63,7 +63,7 @@ private:
     struct Handler {
         int32_t handlerId_ { 0 };
         InputHandlerType handlerType_ { NONE };
-        HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
+        HandleEventType eventType_ { HANDLE_EVENT_TYPE_KP };
         int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
         uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
@@ -85,6 +85,16 @@ private:
     void AddMouseEventId(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetMonitorConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
         std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
+    bool CheckIfNeedAddToConsumerInfos(const Handler &monitor, std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsPinchType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsRotateType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsThreeFingersSwipeType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsFourFingersSwipeType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsBeginAndEndType(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsThreeFingersTapType(std::shared_ptr<PointerEvent> pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    bool IsFingerprintType(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool CheckInputDeviceSource(const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const;
     void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,

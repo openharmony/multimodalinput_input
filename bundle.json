@@ -90,7 +90,8 @@
         "libinput",
         "bounds_checking_function",
         "screenlock_mgr",
-        "player_framework"
+        "player_framework",
+        "audio_framework"
       ],
       "third_party": [
         "cJSON",

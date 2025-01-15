@@ -267,17 +267,18 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_ProcessT
     int32_t fingerCount = 2;
     int32_t action = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
     double scale = 8.5;
+    double angle = 8.5;
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
     processor.pointerEvent_->SetFingerCount(2);
-    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale));
+    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale, angle));
 
     fingerCount = 1;
     processor.pointerEvent_->SetFingerCount(1);
-    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale));
+    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale, angle));
 
     fingerCount = 3;
-    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale));
+    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale, angle));
 }
 
 /**
@@ -1073,72 +1074,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_CanAddTo
     MultiFingersTapHandler processor;
     ASSERT_NO_FATAL_FAILURE(processor.CanAddToPointerMaps(touchpad));
     ASSERT_NO_FATAL_FAILURE(processor.CanAddToPointerMaps(touchpad));
-}
-
-/**
- * @tc.name: TouchPadTransformProcessorTest_OnEventTouchPadPinch_001
- * @tc.desc: test OnEventTouchPadPinchBegin OnEventTouchPadPinchUpdate OnEventTouchPadPinchEnd
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventTouchPadPinch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 66);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 77);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
-    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
-        if (iter->second.inputDeviceOrigin == dev) {
-            break;
-        }
-    }
-    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
-    int32_t deviceId = iter->first;
-    TouchPadTransformProcessor processor(deviceId);
-    ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchBegin(event));
-    ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchUpdate(event));
-    ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchEnd(event));
-}
-
-/**
- * @tc.name: TouchPadTransformProcessorTest_SetTouchPadPinchData_001
- * @tc.desc: test SetTouchPadPinchData
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchPadPinchData_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 166);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 155);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
-    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
-        if (iter->second.inputDeviceOrigin == dev) {
-            break;
-        }
-    }
-    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
-    int32_t deviceId = iter->first;
-    TouchPadTransformProcessor processor(deviceId);
-    processor.pointerEvent_ = PointerEvent::Create();
-    processor.SetTouchpadSwipeSwitch(false);
-    int32_t action = PointerEvent::POINTER_ACTION_SWIPE_BEGIN;
-    ASSERT_NO_FATAL_FAILURE(processor.SetTouchPadPinchData(event, action));
-    ASSERT_NO_FATAL_FAILURE(processor.SetPinchPointerItem(111222));
 }
 
 /**

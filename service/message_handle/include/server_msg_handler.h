@@ -121,6 +121,7 @@ protected:
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, bool isShell);
+    bool UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, int32_t targetWindowId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -140,6 +141,7 @@ private:
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
     std::map<int32_t, int32_t> shellTargetWindowIds_;
     std::map<int32_t, int32_t> accessTargetWindowIds_;
+    std::map<int32_t, int32_t> castTargetWindowIds_;
     std::map<int32_t, AuthorizationStatus> authorizationCollection_;
     int32_t CurrentPID_ { -1 };
     InjectionType InjectionType_ { InjectionType::UNKNOWN };

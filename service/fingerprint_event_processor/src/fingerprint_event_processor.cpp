@@ -142,6 +142,9 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
     if (screenMissTouchFlag_ == false) {
         if (screen == true) {
             screenMissTouchFlag_ = true;
+            if (!fingerprintFlag_) {
+                return;
+            }
             SendFingerprintCancelEvent();
             return;
         }
@@ -254,6 +257,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     isStartedSmartKeyBySlide_ = false;
     switch (key) {
         case FINGERPRINT_CODE_DOWN: {
+            fingerprintFlag_ = true;
             cancelState_ = false;
             ChangeScreenMissTouchFlag(screenState_, true);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN);
@@ -268,18 +272,21 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
             return RET_OK;
         }
         case FINGERPRINT_CODE_UP: {
+            fingerprintFlag_ = false;
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_UP);
             ReportResSched(ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
                 ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_UP);
             break;
         }
         case FINGERPRINT_CODE_RETOUCH: {
+            fingerprintFlag_ = false;
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH);
             ReportResSched(ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
                 ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN);
             break;
         }
         case FINGERPRINT_CODE_CLICK: {
+            fingerprintFlag_ = false;
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK);
             ProcessClickEvent();
             break;
