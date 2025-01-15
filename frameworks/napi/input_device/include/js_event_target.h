@@ -34,13 +34,13 @@ public:
     virtual ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
     static void EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t> &ids);
-    static void EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<InputDevice> device);
-    static void EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<bool> &keystrokeAbility);
-    static void EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t keyboardType);
+    static void EmitJsDev(sptr<JsUtil::CallbackInfo> cb, int32_t deviceid);
+    static void EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t> &keycode, int32_t id);
+    static void EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t deviceid);
     static void EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay);
     static void EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
-    static void EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
-    static void EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
+    static void EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay);
+    static void EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
     static void EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb, int64_t timeInterval);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
@@ -55,13 +55,6 @@ public:
     static void CallFunctionKeyState(uv_work_t *work, int32_t status);
     static bool GetFunctionKeyStateErrCode(sptr<JsUtil::CallbackInfo> cb,
         napi_handle_scope scope, napi_value &callResult);
-    
-    static void EmitJsKeyboardRepeatDelayAsync(sptr<JsUtil::CallbackInfo> cb, int32_t delay);
-    static void EmitJsKeyboardRepeatRateAsync(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
-    static void EmitJsSetKeyboardRepeatDelayAsync(sptr<JsUtil::CallbackInfo> cb, int32_t delay);
-    static void EmitJsSetKeyboardRepeatRateAsync(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
-    static void EmitJsKeyboardTypeAsync(sptr<JsUtil::CallbackInfo> cb, int32_t keyboardType);
-    static void EmitJsIdsAsync(sptr<JsUtil::CallbackInfo> cb);
 private:
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
     static void CallIdsAsyncWork(uv_work_t *work, int32_t status);
@@ -84,10 +77,12 @@ private:
     static void EmitRemoveDeviceEvent(sptr<JsUtil::ReportData> reportData);
     static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
     static void CallSetInputDeviceEnabledPromise(uv_work_t *work, int32_t status);
-    static void CallKeyboardRepeatDelayTask(uv_work_t *work, const string& operateType);
-    static void CallKeyboardRepeatRateTask(uv_work_t *work, const string& operateType);
+    static void CallKeyboardRepeatDelayTask(uv_work_t *work, const std::string& operateType);
+    static void CallKeyboardRepeatRateTask(uv_work_t *work, const std::string& operateType);
     static void CallGetKeyboardTypeTask(uv_work_t *work);
     static void CallJsIdsTask(uv_work_t *work);
+    static void CallJsDevTask(uv_work_t *work);
+    static void CallSupportKeysTask(uv_work_t *work);
 private:
     inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devListener_ {};
     bool isListeningProcess_ { false };
