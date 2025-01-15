@@ -245,7 +245,7 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     uint32_t dx = GetOffsetX(align);
     uint32_t dy = GetOffsetY(align);
     int32_t px = x - dx;
-    int32_t py = x - dy;
+    int32_t py = y - dy;
     if (IsMirror()) {
         px = paddingLeft_ + x * scale_ - dx;
         py = paddingTop_ + y * scale_ - dy;
@@ -270,7 +270,7 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     uint32_t dx = GetOffsetX(align);
     uint32_t dy = GetOffsetY(align);
     int32_t px = x - dx;
-    int32_t py = x - dy;
+    int32_t py = y - dy;
     if (IsMirror()) {
         px = paddingLeft_ + x * scale_ - dx;
         py = paddingTop_ + y * scale_ - dy;

@@ -123,6 +123,7 @@ constexpr int32_t MAX_CUSTOM_CURSOR_SIZE { 256 };
 constexpr float MAX_CUSTOM_CURSOR_DIMENSION { 256.0f };
 const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 constexpr int32_t CURSOR_STRIDE { 4 };
+std::atomic<bool> g_isRsRestart { false };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -140,6 +141,7 @@ void RsRemoteDiedCallback()
     g_isRsRemoteDied = true;
     g_isHdiRemoteDied = true;
     g_isReStartVsync = true;
+    g_isRsRestart = false;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -150,6 +152,7 @@ void PointerDrawingManager::InitPointerCallback()
 {
     MMI_HILOGI("Init RS Callback start");
     g_isRsRemoteDied = false;
+    g_isRsRestart = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -384,7 +387,11 @@ void PointerDrawingManager::SetSurfaceNodeVisible(bool visible)
         if (visible) {
             auto style = MOUSE_ICON(currentMouseStyle_.id);
             InitLayer(style);
-            HardwareCursorMove(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(style));
+            auto align = MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id));
+            int32_t px = lastPhysicalX_;
+            int32_t py = lastPhysicalY_;
+            AdjustMouseFocus(currentDirection_, align, px, py);
+            HardwareCursorMove(px, py, align);
         } else {
             HideHardwareCursors();
         }
@@ -1560,7 +1567,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
     BytraceAdapter::StartRsSurfaceNode(displayId);
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::lock_guard<std::mutex> guard(mutex_);
    
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     auto sp = GetScreenPointer(displayId);
@@ -1977,11 +1984,6 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
         MMI_HILOGE("read file failed");
         return nullptr;
     }
-    const bool isPartColor = (type == CURSOR_COPY) || (type == CURSOR_FORBID) || (type == HELP);
-    if (isPartColor) {
-        ChangeSvgCursorColor(svgContent, color);
-    }
-
     OHOS::Media::SourceOptions opts;
     uint32_t ret = 0;
     std::unique_ptr<std::istream>  isp(std::make_unique<std::istringstream>(svgContent));
@@ -1995,8 +1997,9 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
         .width = imageWidth_,
         .height = imageHeight_
     };
-    if (!isPartColor) {
-        decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = color};
+    int32_t pointerColor = GetPointerColor();
+    if (tempPointerColor_ != DEFAULT_VALUE) {
+        decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
         if (color == MAX_POINTER_COLOR) {
             decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
         } else {
@@ -2130,7 +2133,19 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
         std::lock_guard<std::mutex> lock(mtx_);
         if (screenPointers_.count(displayInfo.id)) {
             sp = screenPointers_[displayInfo.id];
+            if(!g_isRsRestart) {
+                if (!sp->Init()) {
+                    MMI_HILOGE("ScreenPointer %{public}d init failed", displayInfo.id);
+                    return;
+                }
+                if (displayId_ == displayInfo.id) {
+                    surfaceNode_ = sp->GetSurfaceNode();
+                }
+                Rosen::RSTransaction::FlushImplicitTransaction();
+                g_isRsRestart = true;
+            }
         } else {
+            g_isRsRestart = true;
             sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo);
             screenPointers_[displayInfo.id] = sp;
             if (!sp->Init()) {
@@ -2385,7 +2400,10 @@ void PointerDrawingManager::UpdatePointerVisible()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         InitLayer(MOUSE_ICON(currentMouseStyle_.id));
         auto align = MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id));
-        HardwareCursorMove(lastPhysicalX_, lastPhysicalY_, align);
+        int32_t px = lastPhysicalX_;
+        int32_t py = lastPhysicalY_;
+        AdjustMouseFocus(currentDirection_, align, px, py);
+        HardwareCursorMove(px, py, align);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s",
             mouseDisplayState_ ? "true" : "false");
@@ -3021,11 +3039,11 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
 
     // 新屏幕上软硬光标位置更新
     auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
-    HardwareCursorMove(lastPhysicalX_, lastPhysicalY_, align);
-    auto sp = GetScreenPointer(displayId);
-    if (sp) {
-        sp->MoveSoft(lastPhysicalX_, lastPhysicalY_, align);
-    }
+    int32_t px = lastPhysicalX_;
+    int32_t py = lastPhysicalY_;
+    AdjustMouseFocus(currentDirection_, align, px, py);
+    HardwareCursorMove(px, py, align);
+    SoftwareCursorMoveAsync(lastPhysicalX_, lastPhysicalY_, align);
     Rosen::RSTransaction::FlushImplicitTransaction();
 
     lastDisplayId_ = displayId;
