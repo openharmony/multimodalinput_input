@@ -1408,6 +1408,45 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
     return RET_OK;
 }
 
+int32_t MMIService::AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, handlerId, eventType, keys] () -> int32_t {
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        auto preMonitorHandler = InputHandler->GetEventPreMonitorHandler();
+        return preMonitorHandler->AddInputHandler(sess, handlerId, eventType, keys);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("The AddPreInputHandler key event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+int32_t MMIService::RemovePreInputHandler(int32_t handlerId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, handlerId] () -> int32_t {
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        auto preMonitorHandler = InputHandler->GetEventPreMonitorHandler();
+        preMonitorHandler->RemoveInputHandler(sess, handlerId);
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Remove pre input handler failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)

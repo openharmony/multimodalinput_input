@@ -21,6 +21,7 @@
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "hitrace_meter.h"
+#include "pre_monitor_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManager"
@@ -173,6 +174,17 @@ int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, H
 int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, std::vector<int32_t> actionsType)
 {
     return InputMgrImpl.AddMonitor(monitor, actionsType);
+}
+
+int32_t InputManager::AddPreMonitor(
+    std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType, std::vector<int32_t> keys)
+{
+    return PRE_MONITOR_MGR.AddHandler(monitor, eventType, keys);
+}
+
+void InputManager::RemovePreMonitor(int32_t monitorId)
+{
+    PRE_MONITOR_MGR.RemoveHandler(monitorId);
 }
 
 void InputManager::RemoveMonitor(int32_t monitorId)

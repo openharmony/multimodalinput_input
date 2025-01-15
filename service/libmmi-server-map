@@ -38,7 +38,9 @@
             "VTT for OHOS::MMI::AppDebugListener";
             "vtable for OHOS::MMI::AppDebugListener";
             "vtable for OHOS::MMI::KeySubscriberHandler";
-            "vtable for OHOS::MMI::SwitchSubscriberHandler"
+            "vtable for OHOS::MMI::SwitchSubscriberHandler";
+            "vtable for OHOS::MMI::EventPreMonitorHandler";
+            "vtable for OHOS::MMI::EventPreMonitorHandler::MonitorCollection"
         };
     local:
         *;

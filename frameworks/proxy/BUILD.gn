@@ -360,8 +360,10 @@ ohos_unittest("InputManagerImplTest") {
     "event_handler/src/key_event_input_subscribe_manager.cpp",
     "event_handler/src/long_press_event_subscribe_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
+    "event_handler/src/pre_monitor_manager.cpp",
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
     "event_handler/test/input_manager_impl_test.cpp",
+    "event_handler/test/pre_monitor_manager_test.cpp",
   ]
 
   configs = [
