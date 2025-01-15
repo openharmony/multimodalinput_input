@@ -44,6 +44,7 @@ enum NapiErrorCode : int32_t {
     INPUT_OCCUPIED_BY_SYSTEM = 4200002,
     INPUT_OCCUPIED_BY_OTHER = 4200003,
     COMMON_DEVICE_NOT_EXIST = 3900001,
+    PRE_KEY_NOT_SUPPORTED = 4100001,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {

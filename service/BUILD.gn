@@ -237,6 +237,7 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_monitor) {
     sources += [
       "monitor/src/event_monitor_handler.cpp",
+      "monitor/src/event_pre_monitor_handler.cpp",
       "monitor/src/gesture_monitor_handler.cpp",
     ]
   }
@@ -1478,6 +1479,7 @@ ohos_unittest("MonitorTest") {
 
   sources = [
     "monitor/test/event_monitor_handler_test.cpp",
+    "monitor/test/event_pre_monitor_handler_test.cpp",
     "monitor/test/gesture_monitor_handler_test.cpp",
   ]
 

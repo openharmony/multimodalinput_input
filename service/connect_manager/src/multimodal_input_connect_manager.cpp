@@ -382,6 +382,21 @@ int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handl
         actionsType);
 }
 
+int32_t MultimodalInputConnectManager::AddPreInputHandler(int32_t handlerId, HandleEventType eventType,
+    std::vector<int32_t> keys)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddPreInputHandler(handlerId, eventType, keys);
+}
+
+int32_t MultimodalInputConnectManager::RemovePreInputHandler(int32_t handlerId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemovePreInputHandler(handlerId);
+}
+
 int32_t MultimodalInputConnectManager::AddGestureMonitor(InputHandlerType handlerType,
     HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
 {

@@ -160,6 +160,14 @@ public:
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType) override { return priority; }
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType) override { return priority; }
+    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) override
+    {
+        return RET_OK;
+    }
+    int32_t RemovePreInputHandler(int32_t handlerId) override
+    {
+        return RET_OK;
+    }
     int32_t AddGestureMonitor(InputHandlerType handlerType, HandleEventType eventType,
         TouchGestureType gestureType, int32_t fingers) override { return RET_OK; }
     int32_t RemoveGestureMonitor(InputHandlerType handlerType, HandleEventType eventType,

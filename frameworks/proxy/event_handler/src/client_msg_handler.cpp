@@ -38,6 +38,7 @@
 #include "proto.h"
 #include "time_cost_chk.h"
 #include "util.h"
+#include "pre_monitor_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ClientMsgHandler"
@@ -55,6 +56,8 @@ void ClientMsgHandler::Init()
             return this->OnKeyEvent(client, pkt); }},
         { MmiMessageId::ON_SUBSCRIBE_KEY, [this] (const UDSClient &client, NetPacket &pkt) {
             return this->OnSubscribeKeyEventCallback(client, pkt); }},
+        { MmiMessageId::ON_PRE_KEY_EVENT, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnPreKeyEvent(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
         { MmiMessageId::ON_SUBSCRIBE_SWITCH, [this] (const UDSClient &client, NetPacket &pkt) {
@@ -154,6 +157,29 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
     key->MarkProcessed();
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnPreKeyEvent(const UDSClient& client, NetPacket& pkt)
+{
+    auto keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
+    if (ret != RET_OK) {
+        MMI_HILOG_DISPATCHE("Read netPacket failed");
+        return RET_ERR;
+    }
+    int32_t fd = -1;
+    int32_t handlerId = -1;
+    pkt >> fd >> handlerId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOG_ANRDETECTE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
+    MMI_HILOG_DISPATCHD("PRE key event dispathcer of clent, Fd:%{public}d", fd);
+    MMI_HILOG_DISPATCHI("Received");
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
+    PRE_MONITOR_MGR.OnPreKeyEvent(keyEvent, handlerId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
