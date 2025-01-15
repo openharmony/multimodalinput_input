@@ -1651,7 +1651,7 @@ void JsEventTarget::CallGetKeyboardTypeTask(uv_work_t *work)
     CHKPV(cb->env);
 
     int32_t _keyboardtype = -1;
-    auto callback = [&_keyboardtype] (int32_t keyboardtype) { _keyboardtype = keyboardtype;};
+    auto callback = [&_keyboardtype] (int32_t keyboardtype) { _keyboardtype = keyboardtype; };
     int32_t napiCode = InputManager::GetInstance()->GetKeyboardType(cb->data.deviceId, callback);
     cb->errCode = napiCode;
     cb->data.keyboardType = _keyboardtype;
@@ -1668,7 +1668,7 @@ void JsEventTarget::CallJsIdsTask(uv_work_t *work)
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
     CHKPV(cb->env);
     std::vector<int32_t> _ids;
-    auto callback = [&_ids] (std::vector<int32_t>& ids) { _ids = ids;};    
+    auto callback = [&_ids] (std::vector<int32_t>& ids) { _ids = ids; };    
     int32_t napiCode = InputManager::GetInstance()->GetDeviceIds(callback);
     cb->errCode = napiCode;
     cb->data.ids = _ids;
