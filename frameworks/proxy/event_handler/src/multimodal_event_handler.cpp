@@ -24,6 +24,7 @@
 #include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "switch_event_input_subscribe_manager.h"
+#include "pre_monitor_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -44,6 +45,7 @@ void OnConnected(const IfMMIClient& client)
 #endif // OHOS_BUILD_ENABLE_SWITCH
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnConnected();
+    PRE_MONITOR_MGR.OnConnected();
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     InputInterMgr->OnConnected();
