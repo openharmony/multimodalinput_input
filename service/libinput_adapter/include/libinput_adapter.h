@@ -144,6 +144,7 @@ private:
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
     void HandleHWKeyEventForVKeyboard(libinput_event* event);
+    void ShowMouseCursor();
     void HideMouseCursorTemporary();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
