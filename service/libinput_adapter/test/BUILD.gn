@@ -25,13 +25,13 @@ ohos_unittest("mmi-libadapter-hotplug-test") {
   module_out_path = output_path
   include_dirs = [
     "${mmi_path}/util/common/include",
+    "${mmi_path}/service/dfx/include",
     "${mmi_path}/service/libinput_adapter/include",
   ]
 
-  sources = [
-    "${mmi_path}/service/libinput_adapter/src/hotplug_detector.cpp",
-    "hotplug_detector_test.cpp",
-  ]
+  sources = [ "hotplug_detector_test.cpp" ]
+
+  deps = [ "${mmi_path}/service:libmmi-server" ]
 
   defines = [ "MMI_DISABLE_LOG_TRACE" ]
 
