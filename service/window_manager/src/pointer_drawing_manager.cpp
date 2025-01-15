@@ -1567,7 +1567,6 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
     BytraceAdapter::StartRsSurfaceNode(displayId);
-    std::lock_guard<std::mutex> guard(mutex_);
    
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     auto sp = GetScreenPointer(displayId);
@@ -2133,7 +2132,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
         std::lock_guard<std::mutex> lock(mtx_);
         if (screenPointers_.count(displayInfo.id)) {
             sp = screenPointers_[displayInfo.id];
-            if(!g_isRsRestart) {
+            if (!g_isRsRestart) {
                 if (!sp->Init()) {
                     MMI_HILOGE("ScreenPointer %{public}d init failed", displayInfo.id);
                     return;
