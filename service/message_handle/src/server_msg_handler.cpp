@@ -769,7 +769,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
     if (isAuthorize) {
         auto state = AUTHORIZE_HELPER->GetAuthorizeState();
         int32_t authorPid = AUTHORIZE_HELPER->GetAuthorizePid();
-        MMI_HILOGE("OnAuthorize not has authorizing s:%{public}d, authPid:%{public}d",
+        MMI_HILOGE("OnAuthorize  not has authorizing s:%{public}d, authPid:%{public}d",
             state, authorPid);
         if (state == AuthorizeState::STATE_UNAUTHORIZE) {
             MMI_HILOGE("Current not has authorizing");
@@ -779,10 +779,12 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             MMI_HILOGE("The injection permission has been granted. authPid:%{public}d ", authorPid);
             return ERR_OK;
         }
+
         InjectNoticeInfo noticeInfo;
         noticeInfo.pid = authorPid;
         AddInjectNotice(noticeInfo);
-        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(authorPid, [&] (int32_t pid) {
+        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(authorPid,
+            [&] (int32_t pid) {
                 CloseInjectNotice(pid);
         });
         if (result != RET_OK) {
@@ -805,6 +807,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
         }
     }
+  
     return ERR_OK;
 }
 
@@ -827,6 +830,7 @@ int32_t ServerMsgHandler::OnCancelInjection(int32_t callPid)
             CloseInjectNotice(AUTHORIZE_HELPER->GetAuthorizePid());
         }
     }
+   
     return ERR_OK;
 }
 
