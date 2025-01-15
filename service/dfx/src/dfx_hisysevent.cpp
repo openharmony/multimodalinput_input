@@ -28,7 +28,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_DEVICE_ID { -1 };
 constexpr uint32_t REPORT_DISPATCH_TIMES { 100 };
 constexpr uint32_t REPORT_COMBO_START_TIMES { 100 };
 constexpr uint32_t POINTER_CLEAR_TIMES { 10 };
@@ -73,73 +72,6 @@ static std::string GetVendorInfo(const char* nodePath)
     file >> vendorInfo;
     file.close();
     return vendorInfo;
-}
-
-void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    std::shared_ptr<InputDevice> dev = INPUT_DEV_MGR->GetInputDevice(id);
-    CHKPV(dev);
-    std::string message;
-    std::string name;
-    if (type == OHOS::HiviewDFX::HiSysEvent::EventType::FAULT) {
-        message = "The input_device connection failed for already existing";
-        name = "INPUT_DEV_CONNECTION_FAILURE";
-    } else {
-        message = "The input_device connection succeed";
-        name = "INPUT_DEV_CONNECTION_SUCCESS";
-    }
-    if (id == INT32_MAX) {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            name,
-            type,
-            "MSG", "The input_device connection failed because the nextId_ exceeded the upper limit");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    } else {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            name,
-            type,
-            "DEVICE_ID", id,
-            "DEVICE_PHYS", dev->GetPhys(),
-            "DEVICE_NAME", dev->GetName(),
-            "DEVICE_TYPE", dev->GetType(),
-            "MSG", message);
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    }
-}
-
-void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    if (id == INVALID_DEVICE_ID) {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "INPUT_DEV_DISCONNECTION_FAILURE",
-            type,
-            "MSG", "The input device failed to disconnect to server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    } else {
-        std::shared_ptr dev = INPUT_DEV_MGR->GetInputDevice(id);
-        CHKPV(dev);
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "INPUT_DEV_DISCONNECTION_SUCCESS",
-            type,
-            "DEVICE_Id", id,
-            "DEVICE_PHYS", dev->GetPhys(),
-            "DEVICE_NAME", dev->GetName(),
-            "DEVICE_TYPE", dev->GetType(),
-            "MSG", "The input device successfully disconnect to server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    }
 }
 
 void DfxHisysevent::OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type)
