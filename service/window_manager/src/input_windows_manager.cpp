@@ -3076,6 +3076,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGD("Clear extra data");
         ClearExtraData();
     }
+    if (pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    }
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
