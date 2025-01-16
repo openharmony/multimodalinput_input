@@ -1181,7 +1181,8 @@ type:%{private}d",
                 static_cast<int32_t>(y),
                 static_cast<int32_t>(eventType));
 
-            if (handleTouchPoint_ != nullptr && handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
+            if (handleTouchPoint_ != nullptr &&
+                handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
                 MMI_HILOGD("Inside vkeyboard area");
 
                 while (true) {
