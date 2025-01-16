@@ -1283,7 +1283,8 @@ bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event
     filterInsertionPoint_.filterY += dy;
 
     filterInsertionPoint_.filterPrePointTime = currentTime;
-    if (filterInsertionPoint_.filterDeltaTime < FilterInsertionPoint::FILTER_THRESHOLD_US) {
+    if (filterInsertionPoint_.filterDeltaTime < FilterInsertionPoint::FILTER_THRESHOLD_US &&
+        libinput_device_get_id_bustype(device) == BUS_USB) {
         MMI_HILOGD("Mouse motion event delta time is too short");
         return true;
     }
