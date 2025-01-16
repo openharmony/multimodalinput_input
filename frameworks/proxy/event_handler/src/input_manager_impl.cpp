@@ -981,7 +981,7 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> point
 #ifndef OHOS_BUILD_ENABLE_POINTER
         MMI_HILOGW("Pointer device does not support");
         return INPUT_OCCUPIED_BY_OTHER;
-#endif
+#endif OHOS_BUILD_ENABLE_POINTER
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
 #ifndef OHOS_BUILD_ENABLE_TOUCH
@@ -2373,6 +2373,16 @@ void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
     }
 }
 
+int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    auto iter = g_keyActionMap.find(keyAction);
+    if (iter == g_keyActionMap.end()) {
+        MMI_HILOGE("Convert keyAction:%{public}d to capi failed", keyAction);
+        return INVALID_KEY_ACTION;
+    }
+    return iter->second;
+}
+
 int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     CALL_DEBUG_ENTER;
@@ -2386,16 +2396,6 @@ int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
         return RET_ERR;
     }
     return RET_OK;
-}
-
-int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
-{
-    auto iter = g_keyActionMap.find(keyAction);
-    if (iter == g_keyActionMap.end()) {
-        MMI_HILOGE("Convert keyAction:%{public}d to capi failed", keyAction);
-        return INVALID_KEY_ACTION;
-    }
-    return iter->second;
 }
 } // namespace MMI
 } // namespace OHOS
