@@ -20,13 +20,14 @@
 
 #include "ability_connect_callback_stub.h"
 #include "ffrt_inner.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class AuthorizationDialog {
+class AuthorizationDialog final {
+    DECLARE_SINGLETON(AuthorizationDialog);
 public:
-    AuthorizationDialog();
-    ~AuthorizationDialog();
+    DISALLOW_MOVE(AuthorizationDialog);
     bool ConnectSystemUi();
     static std::string GetBundleName()
     {
@@ -42,22 +43,31 @@ public:
     {
         return uiExtensionType_;
     }
+    void CloseDialog();
 private:
     class DialogAbilityConnection : public OHOS::AAFwk::AbilityConnectionStub {
     public:
         void OnAbilityConnectDone(
             const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode) override;
         void OnAbilityDisconnectDone(const AppExecFwk::ElementName& element, int resultCode) override;
+        void CloseDialog();
+        bool DialogIsOpen();
+        void OpenDialog();
+        bool IsConnected();
 
     private:
         std::mutex mutex_;
+        std::atomic_bool isDialogShow_ { false };
+        sptr<IRemoteObject> remoteObject_ { nullptr };
     };
 
-    sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_ {nullptr};
+    sptr<DialogAbilityConnection> dialogConnectionCallback_ { nullptr };
     static std::string bundleName_;
     static std::string abilityName_;
     static std::string uiExtensionType_;
 };
+
+#define AUTH_DIALOG ::OHOS::Singleton<AuthorizationDialog>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 

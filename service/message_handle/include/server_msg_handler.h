@@ -99,7 +99,7 @@ public:
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnAuthorize(bool isAuthorize);
-    int32_t OnCancelInjection();
+    int32_t OnCancelInjection(int32_t callPidId = 0);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     bool InitInjectNoticeSource();
     bool AddInjectNotice(const InjectNoticeInfo& noticeInfo);
@@ -136,6 +136,7 @@ private:
     int32_t OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info);
     bool CloseInjectNotice(int32_t pid);
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t NativeInjectCheck(int32_t pid);
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
