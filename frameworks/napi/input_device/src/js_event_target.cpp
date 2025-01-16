@@ -264,6 +264,11 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
     CHKPV(cb->env);
     cb->data.ids = ids;
     cb->errCode = RET_OK;
+    EmitJsIdsInternal(cb);
+}
+
+void JsEventTarget::EmitJsIdsInternal(sptr<JsUtil::CallbackInfo> cb)
+{
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -371,6 +376,11 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, int32_t deviceid)
     CHKPV(cb->env);
     cb->data.deviceId = deviceid;
     cb->errCode = RET_OK;
+    EmitJsDevInternal(cb);
+}
+
+void JsEventTarget::EmitJsDevInternal(sptr<JsUtil::CallbackInfo> cb)
+{
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -569,7 +579,7 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t de
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.deviceId = deviceid;;
+    cb->data.deviceId = deviceid;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -1688,7 +1698,7 @@ void JsEventTarget::CallJsIdsTask(uv_work_t *work)
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
     CHKPV(cb->env);
     std::vector<int32_t> _ids;
-    auto callback = [&_ids] (std::vector<int32_t>& ids) { _ids = ids; };    
+    auto callback = [&_ids](std::vector<int32_t>& ids) { _ids = ids; };    
     int32_t napiCode = InputManager::GetInstance()->GetDeviceIds(callback);
     cb->errCode = napiCode;
     cb->data.ids = _ids;
@@ -1705,7 +1715,7 @@ void JsEventTarget::CallJsDevTask(uv_work_t *work)
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
     CHKPV(cb->env);
     std::shared_ptr<InputDevice> _device = std::make_shared<InputDevice>();
-    auto callback = [&_device] (std::shared_ptr<InputDevice> device) { _device = device; };    
+    auto callback = [&_device](std::shared_ptr<InputDevice> device) { _device = device; };    
     int32_t napiCode = InputManager::GetInstance()->GetDevice(cb->data.deviceId, callback);
     CHKPV(_device);
     cb->errCode = napiCode;
@@ -1722,11 +1732,11 @@ void JsEventTarget::CallSupportKeysTask(uv_work_t *work)
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
     CHKPV(cb->env);
-    std::vector<bool> _keystrokeAbility;
-    auto callback = [&_keystrokeAbility] (std::vector<bool>& keystrokeAbility) { _keystrokeAbility = keystrokeAbility; };    
+    auto callback = [&](std::vector<bool>& keystrokeAbility) { 
+        cb->data.keystrokeAbility = keystrokeAbility;
+    };    
     int32_t napiCode = InputManager::GetInstance()->SupportKeys(cb->data.deviceId, cb->data.ids, callback);
     cb->errCode = napiCode;
-    cb->data.keystrokeAbility = _keystrokeAbility;
 }
 } // namespace MMI
 } // namespace OHOS

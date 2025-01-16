@@ -55,6 +55,8 @@ public:
     static void CallFunctionKeyState(uv_work_t *work, int32_t status);
     static bool GetFunctionKeyStateErrCode(sptr<JsUtil::CallbackInfo> cb,
         napi_handle_scope scope, napi_value &callResult);
+    static void EmitJsDevInternal(sptr<JsUtil::CallbackInfo> cb);
+    static void EmitJsIdsInternal(sptr<JsUtil::CallbackInfo> cb);
 private:
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
     static void CallIdsAsyncWork(uv_work_t *work, int32_t status);
