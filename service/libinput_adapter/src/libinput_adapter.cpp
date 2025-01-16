@@ -1068,6 +1068,50 @@ void LibinputAdapter::HideMouseCursorTemporary()
         IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
     }
 }
+
+double LibinputAdapter::GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure)
+{
+    auto pos = touchPointPressureCache_.find(touchId);
+    double accumulatedPressure = 0.0;
+    if (pos != touchPointPressureCache_.end()) {
+        accumulatedPressure = pos->second;
+    }
+
+    accumulatedPressure += touchPressure;
+    touchPointPressureCache_[touchId] = accumulatedPressure;
+
+    if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
+        pos = touchPointPressureCache_.find(touchId);
+        if (pos != touchPointPressureCache_.end()) {
+            touchPointPressureCache_.erase(pos);
+        }
+    }
+
+    return accumulatedPressure;
+}
+
+bool LibinputAdapter::SkipTouchMove(int touchId, int32_t eventType)
+{
+    if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
+        skipTouchMoveCache_[touchId] = true;
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
+        auto pos = skipTouchMoveCache_.find(touchId);
+        if (pos != skipTouchMoveCache_.end()) {
+            skipTouchMoveCache_.erase(pos);
+        }
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
+        auto pos = skipTouchMoveCache_.find(touchId);
+        if (pos != skipTouchMoveCache_.end()) {
+            return pos->second;
+        }
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
+        auto pos = skipTouchMoveCache_.find(touchId);
+        if (pos != skipTouchMoveCache_.end()) {
+            skipTouchMoveCache_[touchId] = !pos->second;
+        }
+    }
+    return false;
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void LibinputAdapter::OnEventHandler()
@@ -1079,11 +1123,24 @@ void LibinputAdapter::OnEventHandler()
     while ((event = libinput_get_event(input_))) {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         libinput_event_type eventType = libinput_event_get_type(event);
+        int32_t touchId = 0;
+        libinput_event_touch* touch = nullptr;
+        bool skipTouchMove = false;
+
         if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
+            || eventType == LIBINPUT_EVENT_TOUCH_FRAME
             ) {
-            libinput_event_touch* touch = libinput_event_get_touch_event(event);
+            touch = libinput_event_get_touch_event(event);
+            touchId = libinput_event_touch_get_slot(touch);
+            skipTouchMove = SkipTouchMove(touchId, eventType);
+        }
+
+        if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
+            || eventType == LIBINPUT_EVENT_TOUCH_UP
+            || (eventType == LIBINPUT_EVENT_TOUCH_MOTION && !skipTouchMove)
+            ) {
             if (deviceId == -1) {
                 // initialize touch device ID.
                 libinput_device* device = libinput_event_get_device(event);
@@ -1094,10 +1151,9 @@ void LibinputAdapter::OnEventHandler()
             int32_t logicalDisplayId = -1;
             double x = 0.0;
             double y = 0.0;
-            int32_t touchId = libinput_event_touch_get_slot(touch);
             int32_t touchEventType = ConvertToTouchEventType(eventType);
             double touchPressure = libinput_event_touch_get_pressure(touch);
-
+            double accumulatedPressure = GetAccumulatedPressure(touchId, eventType, touchPressure);
             // touch up event has no coordinates information, skip coordinate calculation.
             if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
                 if (!WIN_MGR->TouchPointToDisplayPoint(deviceId, touch, touchInfo, logicalDisplayId)) {
@@ -1125,7 +1181,7 @@ type:%{private}d",
                 static_cast<int32_t>(y),
                 static_cast<int32_t>(eventType));
 
-            if (handleTouchPoint_ != nullptr && handleTouchPoint_(x, y, touchId, touchEventType, touchPressure) == 0) {
+            if (handleTouchPoint_ != nullptr && handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
                 MMI_HILOGD("Inside vkeyboard area");
 
                 while (true) {
