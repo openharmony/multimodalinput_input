@@ -981,7 +981,7 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> point
 #ifndef OHOS_BUILD_ENABLE_POINTER
         MMI_HILOGW("Pointer device does not support");
         return INPUT_OCCUPIED_BY_OTHER;
-#endif OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
 #ifndef OHOS_BUILD_ENABLE_TOUCH
