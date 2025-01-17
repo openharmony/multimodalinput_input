@@ -303,10 +303,12 @@ public:
      * This event will be distributed and processed in the same way as the event reported by the input device.
      * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
      * or mouse device input event to simulate.
+     * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
+     * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
      * @return void
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen = true);
 
     /**
      * @brief Simulates a touchpad input event, touchscreen input event, or mouse device input event.
@@ -314,10 +316,12 @@ public:
      * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
      * or mouse device input event to simulate.
      * @param zOrder Indicates the point event will inject to the window whose index value is less than the zOrder
+     * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
+     * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
      * @return void
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder, bool isAutoToVirtualScreen);
 
     /**
      * @brief Simulates a touchpad input event.
