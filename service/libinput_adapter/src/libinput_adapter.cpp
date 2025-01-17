@@ -1139,7 +1139,7 @@ void LibinputAdapter::OnEventHandler()
 
         if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
             || eventType == LIBINPUT_EVENT_TOUCH_UP
-            || (eventType == LIBINPUT_EVENT_TOUCH_MOTION && !skipTouchMove)
+            || eventType == LIBINPUT_EVENT_TOUCH_MOTION
             ) {
             if (deviceId == -1) {
                 // initialize touch device ID.
