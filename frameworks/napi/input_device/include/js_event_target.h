@@ -41,7 +41,7 @@ public:
     static void EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
     static void EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay);
     static void EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
-    static void EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb, int64_t timeInterval);
+    static void EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> cb);
@@ -85,6 +85,7 @@ private:
     static void CallJsIdsTask(uv_work_t *work);
     static void CallJsDevTask(uv_work_t *work);
     static void CallSupportKeysTask(uv_work_t *work);
+    static void CallIntervalSinceLastInputTask(uv_work_t *work);
 private:
     inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devListener_ {};
     bool isListeningProcess_ { false };

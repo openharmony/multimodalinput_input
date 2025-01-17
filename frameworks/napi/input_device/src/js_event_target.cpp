@@ -1348,12 +1348,11 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sp
     return promise;
 }
 
-void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb, int64_t timeInterval)
+void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb)
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.IntervalSinceLastInput = timeInterval;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -1365,6 +1364,7 @@ void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> c
         loop, work,
         [](uv_work_t *work) {
             MMI_HILOGD("uv_queue_work callback function is called");
+            CallIntervalSinceLastInputTask(work);
         },
         CallIntervalSinceLastInputPromise, uv_qos_user_initiated);
     if (ret != 0) {
@@ -1636,7 +1636,7 @@ void JsEventTarget::CallKeyboardRepeatDelayTask(uv_work_t *work, const std::stri
 
     if (operateType == "get") {
         int32_t _delay = -1;
-        auto callback = [&_delay] (int32_t delay) { _delay = delay; };
+        auto callback = [&_delay] (int32_t delay) { _delay = delay; }
         int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatDelay(callback);
         cb->errCode = napiCode;
         cb->data.keyboardRepeatDelay = _delay;
@@ -1659,7 +1659,7 @@ void JsEventTarget::CallKeyboardRepeatRateTask(uv_work_t *work, const std::strin
 
     if (operateType == "get") {
         int32_t _rate = -1;
-        auto callback = [&_rate] (int32_t rate) { _rate = rate; };
+        auto callback = [&_rate] (int32_t rate) { _rate = rate; }
         int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatRate(callback);
         cb->errCode = napiCode;
         cb->data.keyboardRepeatDelay = _rate;
@@ -1681,7 +1681,7 @@ void JsEventTarget::CallGetKeyboardTypeTask(uv_work_t *work)
     CHKPV(cb->env);
 
     int32_t _keyboardtype = -1;
-    auto callback = [&_keyboardtype] (int32_t keyboardtype) { _keyboardtype = keyboardtype; };
+    auto callback = [&_keyboardtype] (int32_t keyboardtype) { _keyboardtype = keyboardtype; }
     int32_t napiCode = InputManager::GetInstance()->GetKeyboardType(cb->data.deviceId, callback);
     cb->errCode = napiCode;
     cb->data.keyboardType = _keyboardtype;
@@ -1698,7 +1698,7 @@ void JsEventTarget::CallJsIdsTask(uv_work_t *work)
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
     CHKPV(cb->env);
     std::vector<int32_t> _ids;
-    auto callback = [&_ids](std::vector<int32_t>& ids) { _ids = ids; };    
+    auto callback = [&_ids](std::vector<int32_t>& ids) { _ids = ids; }
     int32_t napiCode = InputManager::GetInstance()->GetDeviceIds(callback);
     cb->errCode = napiCode;
     cb->data.ids = _ids;
@@ -1715,7 +1715,7 @@ void JsEventTarget::CallJsDevTask(uv_work_t *work)
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
     CHKPV(cb->env);
     std::shared_ptr<InputDevice> _device = std::make_shared<InputDevice>();
-    auto callback = [&_device](std::shared_ptr<InputDevice> device) { _device = device; };    
+    auto callback = [&_device](std::shared_ptr<InputDevice> device) { _device = device; }
     int32_t napiCode = InputManager::GetInstance()->GetDevice(cb->data.deviceId, callback);
     CHKPV(_device);
     cb->errCode = napiCode;
@@ -1734,8 +1734,20 @@ void JsEventTarget::CallSupportKeysTask(uv_work_t *work)
     CHKPV(cb->env);
     auto callback = [&](std::vector<bool>& keystrokeAbility) { 
         cb->data.keystrokeAbility = keystrokeAbility;
-    };    
+    }
     int32_t napiCode = InputManager::GetInstance()->SupportKeys(cb->data.deviceId, cb->data.ids, callback);
+    cb->errCode = napiCode;
+}
+void JsEventTarget::CallIntervalSinceLastInputTask(uv_work_t *work)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));  
+    int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(cb->data.IntervalSinceLastInput);
     cb->errCode = napiCode;
 }
 } // namespace MMI
