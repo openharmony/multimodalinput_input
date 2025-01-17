@@ -2404,8 +2404,8 @@ void PointerDrawingManager::UpdatePointerVisible()
         AdjustMouseFocus(currentDirection_, align, px, py);
         HardwareCursorMove(px, py, align);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s",
-            mouseDisplayState_ ? "true" : "false");
+        MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s, displayId_:%{public}d",
+            mouseDisplayState_ ? "true" : "false", displayId_);
     } else {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON);
@@ -2560,7 +2560,7 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int3
     return RET_OK;
 }
 
-void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
+void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     FixCursorPosition(x, y);
@@ -2568,6 +2568,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
     lastPhysicalY_ = y;
     MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
     CHKPV(surfaceNode_);
+    displayId_ = displayId;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPV(hardwareCursorPointerManager_);
     if (g_isHdiRemoteDied) {

@@ -1165,7 +1165,7 @@ void InputWindowsManager::AdjustDisplayRotation()
         UpdateAndAdjustMouseLocation(cursorPos_.displayId, coord.x, coord.y);
         IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*displayInfo);
         IPointerDrawingManager::GetInstance()->SetPointerLocation(
-            static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y));
+            static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y), cursorPos_.displayId);
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING

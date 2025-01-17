@@ -267,7 +267,7 @@ bool PointerDrawingManager::IsPointerVisible()
 {
     return false;
 }
-void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y) {}
+void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId) {}
 void PointerDrawingManager::SetMouseDisplayState(bool state) {}
 bool PointerDrawingManager::GetMouseDisplayState() const
 {

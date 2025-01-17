@@ -723,7 +723,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerLocation_0
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y));
+    int32_t displayId = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
 }
 
 /**
@@ -1419,7 +1420,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerLocation_0
     PointerDrawingManager pointerDrawingManager;
     int32_t x = 100;
     int32_t y = 100;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y));
+    int32_t displayId = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
 }
 
 /**
@@ -1918,7 +1920,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImag
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     MOUSE_ICON mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawImage(canvas, mouseStyle));
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(200, 200));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(200, 200, 0));
 }
 
 /**

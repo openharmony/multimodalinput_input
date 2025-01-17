@@ -79,7 +79,7 @@ public:
     {
         return false;
     }
-    virtual void SetPointerLocation(int32_t x, int32_t y) {}
+    virtual void SetPointerLocation(int32_t x, int32_t y, int32_t displayId) {}
     virtual void SetMouseDisplayState(bool state) {}
     virtual bool GetMouseDisplayState() const
     {
