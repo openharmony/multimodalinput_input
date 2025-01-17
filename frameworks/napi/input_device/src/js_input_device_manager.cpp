@@ -225,12 +225,7 @@ napi_value JsInputDeviceManager::GetIntervalSinceLastInput(napi_env env)
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, nullptr, cb);
-    int64_t timeInterval = -1;
-    int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
-    EmitJsGetIntervalSinceLastInput(cb, timeInterval);
-    if (napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid get interval since last input");
-    }
+    EmitJsGetIntervalSinceLastInput(cb);
     return ret;
 }
 
