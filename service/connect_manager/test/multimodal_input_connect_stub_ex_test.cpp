@@ -344,7 +344,7 @@ public:
         return retCreateVKeyboardDevice_;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override
     {
         return static_cast<int32_t>(autoGenDown);
     }
@@ -8467,6 +8467,42 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceInputEnable_003, Test
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetInputDeviceInputEnable(data, reply));
+}
+
+/**
+ * @tc.name: StubShiftAppPointerEvent_001
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_001, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubShiftAppPointerEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubShiftAppPointerEvent_002
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_002, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubShiftAppPointerEvent(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS

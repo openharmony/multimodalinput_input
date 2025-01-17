@@ -2604,16 +2604,16 @@ int32_t InputManagerImpl::SetInputDeviceEnabled(int32_t deviceId, bool enable, s
     return INPUT_DEVICE_IMPL.RegisterInputdevice(deviceId, enable, callback);
 }
 
-int32_t InputManagerImpl::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+int32_t InputManagerImpl::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::lock_guard<std::mutex> guard(mtx_);
-    if (sourceWindowId == targetWindowId) {
+    if (param.sourceWindowId == param.targetWindowId) {
         MMI_HILOGE("Failed shift pointer Event, sourceWindowId can't be equal to targetWindowId");
         return ARGV_VALID;
     }
-    return MULTIMODAL_INPUT_CONNECT_MGR->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    return MULTIMODAL_INPUT_CONNECT_MGR->ShiftAppPointerEvent(param, autoGenDown);
 #else
     MMI_HILOGW("Pointer device does not support");
     return ERROR_UNSUPPORT;

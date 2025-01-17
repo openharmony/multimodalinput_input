@@ -41,6 +41,7 @@
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -1080,8 +1081,7 @@ public:
 
     /**
      * @brief shift AppPointerEvent from source window to target window
-     * @param sourceWindowId - source window id.
-     * @param targetWindowId - target window id.
+     * @param param - param for shift pointer event.
      * @param autoGenDown - send down event if true.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 13

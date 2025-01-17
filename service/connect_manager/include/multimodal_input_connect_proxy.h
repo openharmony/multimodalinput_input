@@ -161,7 +161,7 @@ public:
     int32_t SkipPointerLayer(bool isSkip) override;
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override;
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
