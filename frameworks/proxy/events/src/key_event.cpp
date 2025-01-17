@@ -913,16 +913,6 @@ uint32_t KeyEvent::KeyItem::GetUnicode() const
     return unicode_;
 }
 
-void KeyEvent::SetFourceMonitorFlag(bool fourceMonitorFlag)
-{
-    fourceMonitorFlag_ = fourceMonitorFlag;
-}
-
-bool KeyEvent::GetFourceMonitorFlag()
-{
-    return fourceMonitorFlag_;
-}
-
 bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
 {
     WRITEBOOL(out, pressed_);
@@ -1183,6 +1173,16 @@ bool KeyEvent::IsValid() const
         return false;
     }
     return true;
+}
+
+void KeyEvent::SetFourceMonitorFlag(bool fourceMonitorFlag)
+{
+    fourceMonitorFlag_ = fourceMonitorFlag;
+}
+
+bool KeyEvent::GetFourceMonitorFlag()
+{
+    return fourceMonitorFlag_;
 }
 
 bool KeyEvent::WriteToParcel(Parcel &out) const
