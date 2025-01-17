@@ -969,13 +969,12 @@ int32_t MultimodalInputConnectManager::SetInputDeviceEnabled(int32_t deviceId, b
     return multimodalInputConnectService_->SetInputDeviceEnabled(deviceId, enable, index);
 }
 
-int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(int32_t sourceWindowId,
-                                                            int32_t targetWindowId, bool autoGenDown)
+int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    return multimodalInputConnectService_->ShiftAppPointerEvent(param, autoGenDown);
 }
 
 int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)

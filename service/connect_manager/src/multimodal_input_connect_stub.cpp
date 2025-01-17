@@ -3137,19 +3137,14 @@ int32_t MultimodalInputConnectStub::StubShiftAppPointerEvent(MessageParcel& data
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t sourceWindowId = -1;
-    READINT32(data, sourceWindowId, ERR_INVALID_VALUE);
-    int32_t targetWindowId = -1;
-    READINT32(data, targetWindowId, ERR_INVALID_VALUE);
-    if (sourceWindowId <= 0 || targetWindowId <= 0) {
-        MMI_HILOGE("Invalid sourceWindowId or targetWindowId,sourceWindowId:%{public}d, targetWindowId:%{public}d",
-            sourceWindowId, targetWindowId);
-        return RET_ERR;
-    }
-    
+    ShiftWindowParam param;
+    READINT32(data, param.sourceWindowId, ERR_INVALID_VALUE);
+    READINT32(data, param.targetWindowId, ERR_INVALID_VALUE);
+    READINT32(data, param.x, ERR_INVALID_VALUE);
+    READINT32(data, param.y, ERR_INVALID_VALUE);
     bool autoGenDown = true;
     READBOOL(data, autoGenDown, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = ShiftAppPointerEvent(param, autoGenDown);
     if (ret != RET_OK) {
         MMI_HILOGE("shift AppPointerEvent failed, ret:%{public}d", ret);
     }
