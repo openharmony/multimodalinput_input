@@ -162,14 +162,13 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
+int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
-    int32_t callerPid = IPCSkeleton::GetCallingPid();
     AppExecFwk::RunningProcessInfo processInfo;
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     CHKPR(appMgrClient, ERROR_NULL_POINTER);
-    appMgrClient->GetRunningProcessInfoByPid(callerPid, processInfo);
+    appMgrClient->GetRunningProcessInfoByPid(pid, processInfo);
     if (processInfo.extensionType_ != AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
         MMI_HILOGW("It is prohibited for non-input applications");
         return ERR_NON_INPUT_APPLICATION;
