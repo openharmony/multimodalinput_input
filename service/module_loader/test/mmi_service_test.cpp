@@ -297,12 +297,11 @@ HWTEST_F(MMIServerTest, OnConnected_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SetCustomCursor_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t pid = 1;
     int32_t windowId = 1;
     int32_t focusX = 200;
     int32_t focusY = 500;
     void* pixelMap = nullptr;
-    int32_t ret = mmiService.SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
+    int32_t ret = mmiService.SetCustomCursor(windowId, focusX, focusY, pixelMap);
     EXPECT_EQ(ret, RET_ERR);
 }
 

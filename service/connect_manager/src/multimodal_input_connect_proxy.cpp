@@ -218,7 +218,7 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
+int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY,
     void* pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
@@ -233,7 +233,6 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, pid, ERR_INVALID_VALUE);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
     WRITEINT32(data, focusX, ERR_INVALID_VALUE);
     WRITEINT32(data, focusY, ERR_INVALID_VALUE);

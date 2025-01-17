@@ -606,10 +606,8 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t windowId = 0;
-    int32_t windowPid = INVALID_PID;
     int32_t focusX = 0;
     int32_t focusY = 0;
-    READINT32(data, windowPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusX, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusY, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -623,7 +621,7 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
     focusY = focusY < 0 ? 0 : focusY;
     focusX = focusX > pixelMap->GetWidth() ? pixelMap->GetWidth() : focusX;
     focusY = focusY > pixelMap->GetHeight() ? pixelMap->GetHeight() : focusY;
-    int32_t ret = SetCustomCursor(windowPid, windowId, focusX, focusY, (void*)pixelMap);
+    int32_t ret = SetCustomCursor(windowId, focusX, focusY, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
         return ret;
