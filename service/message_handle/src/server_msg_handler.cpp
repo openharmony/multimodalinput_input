@@ -533,6 +533,31 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
     return RET_OK;
 }
 
+int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo)
+{
+    uint32_t num = 0;
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
+            >> info.offsetX >> info.offsetY;
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        pkt >> info.oneHandX >> info.oneHandY;
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        displayGroupInfo.displaysInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
@@ -568,20 +593,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             return RET_ERR;
         }
     }
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
-            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
-            >> info.offsetX >> info.offsetY;
-        displayGroupInfo.displaysInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read display info failed");
-            return RET_ERR;
-        }
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
+    if (ReadDisplayInfo(pkt, displayGroupInfo) != RET_OK) {
         return RET_ERR;
     }
     WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);

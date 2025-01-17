@@ -325,6 +325,25 @@ public:
         AXIS_TYPE_MAX
     };
 
+    enum FixedMode {
+        /**
+         * Indicates unknown.
+         */
+        SCREEN_MODE_UNKNOWN,
+        /**
+         * Indicates normal mode.
+         */
+        NORMAL,
+        /**
+         * Indicates one-hand mode.
+         */
+        ONE_HAND,
+        /**
+         * Indicates invalid max.
+         */
+        SCREEN_MODE_MAX
+    };
+
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
      *
@@ -1246,11 +1265,40 @@ public:
          * @since 12
          */
         void SetBlobId(int32_t blobId);
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        /**
+         * @brief Obtains the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         */
+        int32_t GetFixedDisplayX() const;
+
+        /**
+         * @brief Sets the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         * @param fixedDisplayX Indicates the x coordinate to set.
+         * @return void
+         */
+        void SetFixedDisplayX(int32_t fixedDisplayX);
+
+        /**
+         * @brief Obtains the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         */
+        int32_t GetFixedDisplayY() const;
+
+        /**
+         * @brief Sets the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         * @param fixedDisplayY Indicates the y coordinate to set.
+         * @return void
+         */
+        void SetFixedDisplayY(int32_t fixedDisplayY);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
         int32_t displayX_ {};
         int32_t displayY_ {};
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        int32_t fixedDisplayX_ {};
+        int32_t fixedDisplayY_ {};
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
         int32_t windowX_ {};
         int32_t windowY_ {};
         double displayXPos_ {};
@@ -1772,6 +1820,14 @@ public:
 
     void SetScrollRows(int32_t scrollRows);
     int32_t GetScrollRows() const;
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    void SetAutoToVirtualScreen(bool autoToVirtualScreen);
+    bool GetAutoToVirtualScreen() const;
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
+    void SetFixedMode(PointerEvent::FixedMode fixedMode);
+    PointerEvent::FixedMode GetFixedMode() const;
+    std::string GetFixedModeStr();
 
 protected:
     /**
@@ -1791,6 +1847,7 @@ private:
     bool ReadEnhanceDataFromParcel(Parcel &in);
     bool ReadBufferFromParcel(Parcel &in);
     bool ReadAxisFromParcel(Parcel &in);
+    bool ReadFixedModeFromParcel(Parcel &in);
 
 private:
     struct Settings {
@@ -1825,8 +1882,12 @@ private:
 #endif // OHOS_BUILD_ENABLE_ANCO
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
     Settings settings_ {};
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    bool autoToVirtualScreen_ { true };
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     //Left and right hand steady-state reporting status
     int32_t handOption_ { -1 };
+    FixedMode fixedMode_ { FixedMode::NORMAL };
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
