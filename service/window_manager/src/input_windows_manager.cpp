@@ -3222,6 +3222,80 @@ bool InputWindowsManager::IsNavigationWindowInjectEvent(std::shared_ptr<PointerE
     return (pointerEvent->GetZOrder() > 0 && pointerEvent->GetTargetWindowId() == -1);
 }
 
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+void InputWindowsManager::UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY,
+    const DisplayInfo &displayInfo, float oneHandScale)
+{
+    double virtualY = physicalY - displayInfo.oneHandY;
+    double virtualX = physicalX - displayInfo.oneHandX;
+    physicalX = virtualX / oneHandScale;
+    physicalY = virtualY / oneHandScale;
+}
+
+void InputWindowsManager::UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    UpdatePointerItemInOneHandMode(displayInfo, pointerEvent);
+    if (displayInfo.oneHandY > 0) {
+        pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    }
+#else
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    pointerItem.SetFixedDisplayX(pointerItem.GetDisplayX());
+    pointerItem.SetFixedDisplayY(pointerItem.GetDisplayY());
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+}
+
+void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo,
+    std::shared_ptr<PointerEvent> &pointerEvent)
+{
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    double physicalX = pointerItem.GetDisplayXPos();
+    double physicalY = pointerItem.GetDisplayYPos();
+    if (displayInfo.height == 0 || displayInfo.height == displayInfo.oneHandY) {
+        MMI_HILOG_DISPATCHE("displayInfo.height=%{public}d, displayInfo.oneHandY=%{public}d is invalid",
+            displayInfo.height, displayInfo.oneHandY);
+        pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
+        pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+        return;
+    }
+    bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
+    float epsilon {1e-7};
+    float oneHandScale = (displayInfo.height - displayInfo.oneHandY) * 1.0 / displayInfo.height;
+    bool isOneHandMode = oneHandScale + epsilon < 1;
+
+    if (isOneHandMode) {
+        double fixedDisplayX = physicalX;
+        double fixedDisplayY = physicalY;
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+            if (autoToVirtualScreen) {
+                UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
+            }
+        } else {
+            UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
+        }
+        pointerItem.SetFixedDisplayX(static_cast<int32_t>(fixedDisplayX));
+        pointerItem.SetFixedDisplayY(static_cast<int32_t>(fixedDisplayY));
+    } else {
+        pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
+        pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
+    }
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
 void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
     const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
 {
@@ -3229,6 +3303,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     bool isNavigationWindow = false;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
+    
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
@@ -3263,11 +3338,13 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     if (isNavigationWindow && pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION);
     }
+
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
     pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
     pointerItem.SetDisplayXPos(physicalX);
     pointerItem.SetDisplayYPos(physicalY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    UpdateFixedXY(displayInfo, pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 

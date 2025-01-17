@@ -147,6 +147,7 @@ private:
     bool CloseInjectNotice(int32_t pid);
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t NativeInjectCheck(int32_t pid);
+    int32_t ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
