@@ -68,8 +68,8 @@ private:
     static void CallKeyboardRepeatRatePromise(uv_work_t *work, int32_t status);
     static void EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData);
     static void EmitRemoveDeviceEvent(sptr<JsUtil::ReportData> reportData);
-    static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
     static void CallIntervalSinceLastInputPromise(uv_work_t *work, int32_t status);
+    static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
 private:
     inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devListener_ {};
     bool isListeningProcess_ { false };
