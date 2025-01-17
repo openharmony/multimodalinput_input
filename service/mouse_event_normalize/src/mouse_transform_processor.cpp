@@ -1257,8 +1257,6 @@ void MouseTransformProcessor::HandleFilterMouseEvent(Offset* offset)
 bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event)
 {
     CHKPF(event);
-    struct libinput_device *device = libinput_event_get_device(event);
-    CHKPF(device);
 
     if (libinput_device_get_id_bustype(device) != BUS_USB) {
         return false;
@@ -1283,6 +1281,8 @@ bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event
     filterInsertionPoint_.filterY += dy;
 
     filterInsertionPoint_.filterPrePointTime = currentTime;
+    struct libinput_device *device = libinput_event_get_device(event);
+    CHKPF(device);
     if (filterInsertionPoint_.filterDeltaTime < FilterInsertionPoint::FILTER_THRESHOLD_US &&
         libinput_device_get_id_bustype(device) == BUS_USB) {
         MMI_HILOGD("Mouse motion event delta time is too short");
