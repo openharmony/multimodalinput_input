@@ -3477,8 +3477,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventZorder_001, TestSi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
-
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false));
 }
 
 /**

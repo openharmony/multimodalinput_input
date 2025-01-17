@@ -440,6 +440,15 @@ struct DisplayInfo {
     int32_t offsetX = 0;
     int32_t offsetY = 0;
     float ppi;
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    /**
+     * Coordinate of the upper left corner of the virtual screen in one-hand mode.
+     * If oneHandX is 0, the virtual screen is in the lower left corner.
+     * If oneHandY is greater rthan 0, the virtual screen is in the lower right corner.
+     */
+    int32_t oneHandX = 0;
+    int32_t oneHandY = 0;
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
     /**
      * Use for off screen policy

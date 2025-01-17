@@ -229,19 +229,26 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     InputMgrImpl.SimulateInputEvent(keyEvent);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen)
 {
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder)
+void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
+    bool isAutoToVirtualScreen)
 {
     CHKPV(pointerEvent);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->SetZOrder(zOrder);
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
