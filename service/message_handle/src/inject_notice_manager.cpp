@@ -90,7 +90,7 @@ bool InjectNoticeManager::ConnectNoticeSrv()
     ErrCode result = abilityMgr->ConnectAbility(want, connectionCallback_, INVALID_USERID);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_CONNECT_ABILITY,
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CONNECT_ABILITY,
         durationMS);
 
     if (result != ERR_OK) {

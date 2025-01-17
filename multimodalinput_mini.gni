@@ -114,6 +114,7 @@ declare_args() {
     "device_state_manager/src/device_event_monitor.cpp",
     "dfx/src/api_duration_statistics.cpp",
     "dfx/src/dfx_hisysevent.cpp",
+    "dfx/src/dfx_hisysevent_device.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
     "event_dump/src/event_dump.cpp",
     "event_dump/src/event_statistic.cpp",

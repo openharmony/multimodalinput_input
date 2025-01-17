@@ -144,40 +144,6 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnUpdateTargetKeyTest_001, TestSiz
 }
 
 /**
- * @tc.name: DfxHisysEventTest_OnDeviceConnectTest_001
- * @tc.desc: OnDeviceConnect
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnDeviceConnectTest_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t id = 1;
-    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::FAULT;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceConnect(id, type));
-    type = OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceConnect(id, type));
-    id = INT32_MAX;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceConnect(id, type));
-}
-
-/**
- * @tc.name: DfxHisysEventTest_OnDeviceDisconnectTest_001
- * @tc.desc: OnDeviceDisconnect
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnDeviceDisconnectTest_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::FAULT;
-    int32_t id = -1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceDisconnect(id, type));
-    id = 1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceDisconnect(id, type));
-}
-
-/**
  * @tc.name: DfxHisysEventTest_OnLidSwitchChangedTest_001
  * @tc.desc: OnLidSwitchChanged
  * @tc.type: FUNC

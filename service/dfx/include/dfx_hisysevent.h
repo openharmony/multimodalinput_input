@@ -81,8 +81,6 @@ public:
     };
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
-    static void OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static void OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnClientDisconnect(const SessionPtr& secPtr, int32_t fd,
         OHOS::HiviewDFX::HiSysEvent::EventType type);

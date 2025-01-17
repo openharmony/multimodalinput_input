@@ -225,7 +225,7 @@ int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
 void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
     CALL_INFO_TRACE;
-    if (cfg == nullptr || cfgLen == 0) {
+    if (cfg == nullptr || cfgLen <= 0) {
         MMI_HILOGE("SecCompEnhance cfg info is empty");
         return;
     }
@@ -1793,7 +1793,7 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetFunctionKeyState(funcKey, enable);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 #else
