@@ -2679,8 +2679,7 @@ int32_t MultimodalInputConnectProxy::SetInputDeviceEnabled(int32_t deviceId, boo
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(int32_t sourceWindowId,
-    int32_t targetWindowId, bool autoGenDown)
+int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -2688,8 +2687,10 @@ int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(int32_t sourceWindowId
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, sourceWindowId, ERR_INVALID_VALUE);
-    WRITEINT32(data, targetWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.sourceWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.targetWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.y, ERR_INVALID_VALUE);
     WRITEBOOL(data, autoGenDown, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;

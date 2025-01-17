@@ -51,13 +51,11 @@ bool ShiftAppPointerEvent(const uint8_t* data, const size_t size, size_t& startP
 		
 bool ShiftAppPointerEventNoHapTokenVerify(const uint8_t* data, const size_t size, size_t& startPos)
 {
-    int32_t sourceWindowId;
-    int32_t targetWindowId;
+    ShiftWindowParam param;
     bool autoGenDown;
-    startPos += GetObject<int32_t>(sourceWindowId, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(targetWindowId, data + startPos, size - startPos);
+    startPos += GetObject<ShiftWindowParam>(param, data + startPos, size - startPos);
     startPos += GetObject<bool>(autoGenDown, data + startPos, size - startPos);
-    WIN_MGR->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    WIN_MGR->ShiftAppPointerEvent(param, autoGenDown);
     return true;
 }
 		
