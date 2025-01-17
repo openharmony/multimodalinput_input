@@ -1258,9 +1258,6 @@ bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event
 {
     CHKPF(event);
 
-    if (libinput_device_get_id_bustype(device) != BUS_USB) {
-        return false;
-    }
     if (libinput_event_get_type(event) != LIBINPUT_EVENT_POINTER_MOTION) {
         return false;
     }
