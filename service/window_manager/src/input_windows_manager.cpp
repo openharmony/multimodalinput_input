@@ -64,6 +64,7 @@ namespace {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
+constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t OUTWINDOW_HOT_AREA { 20 };
 constexpr int32_t SCALE_X { 0 };
@@ -2146,7 +2147,7 @@ void InputWindowsManager::SetGlobalDefaultPointerStyle()
         for (auto &item : iter.second) {
             if (item.second.id == DEFAULT_POINTER_STYLE) {
                 item.second.id = globalStyle_.id;
-            } else if (item.second.id == CURSOR_CIRCLE_STYLE) {
+            } else if (item.second.id == CURSOR_CIRCLE_STYLE || item.second.id == AECH_DEVELOPER_DEFINED_STYLE) {
                 item.second.id = globalStyle_.id;
             }
             item.second.options = globalStyle_.options;
@@ -3724,7 +3725,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
             MMI_HILOG_DISPATCHD("PointerAction is to leave the window");
-            if (timerId_ == DEFAULT_VALUE) {
+            if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH) && timerId_ == DEFAULT_VALUE) {
                 timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
                     DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
                     HandleGestureInjection(gestureInject);

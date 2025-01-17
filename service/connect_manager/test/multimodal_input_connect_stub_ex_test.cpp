@@ -71,9 +71,9 @@ public:
         return rows_;
     }
     int32_t GetMouseScrollRows(int32_t &rows) override { return rows_; }
-    int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override
+    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override
     {
-        return pid;
+        return windowId;
     }
     int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override
     {
