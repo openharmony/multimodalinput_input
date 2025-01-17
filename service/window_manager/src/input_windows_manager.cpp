@@ -3297,7 +3297,7 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
-    std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
+    const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
 {
     CHKPV(pointerEvent);
     bool isNavigationWindow = false;
