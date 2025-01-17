@@ -298,7 +298,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 
     void UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-void UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> pointerEvent);
+void UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
 void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const DisplayInfo &displayInfo,
     float oneHandScale);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
