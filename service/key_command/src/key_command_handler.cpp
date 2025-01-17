@@ -1607,7 +1607,7 @@ bool KeyCommandHandler::IsMusicActivate()
     auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_CURRENT_RENDERER_CHANGE_INFOS, durationMS);
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_CUR_RENDERER_CHANGE_INFOS, durationMS);
     if (ret != ERR_OK) {
         MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
         return false;
@@ -2504,7 +2504,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, nullptr);
         auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_EXTENSION_ABILITY,
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_START_EXT_ABILITY,
             durationMS);
         if (err != ERR_OK) {
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);

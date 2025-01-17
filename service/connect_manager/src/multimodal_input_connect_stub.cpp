@@ -634,6 +634,10 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1455,6 +1459,10 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 
     int32_t subscribeId = 0;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -1919,6 +1927,10 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
     }
 
     int32_t windowId = 0;
@@ -2802,6 +2814,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(Message
 int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool enable = false;
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = EnableHardwareCursorStats(enable);
@@ -2815,6 +2831,10 @@ int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel&
 int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     uint32_t frameCount = 0;
     uint32_t vsyncCount = 0;
     int32_t ret = GetHardwareCursorStats(frameCount, vsyncCount);
@@ -3004,6 +3024,10 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
 int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool isSkip = true;
     READBOOL(data, isSkip, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SkipPointerLayer(isSkip);

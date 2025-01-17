@@ -364,3 +364,31 @@ TRANSMIT_INFRARED:
 SET_CURRENT_USER:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report set current user event}
   USER_ID: {type: INT32, desc: userId}
+
+EXTERNAL_CALL_STATISTIC:
+  __BASE: {type: STATISTIC, level: MINOR, desc: api calling duration statistic}
+  API_DURATION_BOX: {type: STRING, arrsize: 4, desc: api duration box}
+  IS_SCREEN_CAPTURE_WORKING: {type: INT32, arrsize: 4, desc: is screen capture working}
+  GET_DEFAULT_DISPLAY: {type: INT32, arrsize: 4, desc: get default display}
+  GET_SYSTEM_ABILITY_MANAGER: {type: INT32, arrsize: 4, desc: get system ability manager}
+  IS_FOLDABLE: {type: INT32, arrsize: 4, desc: is foldable}
+  IS_SCREEN_LOCKED: {type: INT32, arrsize: 4, desc: is screen locked}
+  RS_NOTIFY_TOUCH_EVENT: {type: INT32, arrsize: 4, desc: rs report touch event}
+  RESOURCE_SCHEDULE_REPORT_DATA: {type: INT32, arrsize: 4, desc: resource schedule report data}
+  GET_CUR_RENDERER_CHANGE_INFOS: {type: INT32, arrsize: 4, desc: get current renderer change infos}
+  GET_PROC_RUNNING_INFOS_BY_UID: {type: INT32, arrsize: 4, desc: get running process infos by user id}
+  TELEPHONY_CALL_MGR_INIT: {type: INT32, arrsize: 4, desc: telephony cal manager init}
+  TELEPHONY_CALL_MGR_MUTE_RINGER: {type: INT32, arrsize: 4, desc: telephony call manager mute ringer}
+  TELEPHONY_CALL_MGR_HANG_UP_CALL: {type: INT32, arrsize: 4, desc: telephony call manager hang up}
+  TELEPHONY_CALL_MGR_REJECT_CALL: {type: INT32, arrsize: 4, desc: telephony call manager reject}
+  RE_SCREEN_MODE_CHANGE_LISTENER: {type: INT32, arrsize: 4, desc: register screen mode change listener}
+  SET_ON_REMOTE_DIED_CALLBACK: {type: INT32, arrsize: 4, desc: set on remote died callback}
+  REG_SCREEN_CAPTURE_LISTENER: {type: INT32, arrsize: 4, desc: register screen capture listener}
+  ABILITY_MGR_START_EXT_ABILITY: {type: INT32, arrsize: 4, desc: ability manager start external ability}
+  ABILITY_MGR_CLIENT_START_ABILITY: {type: INT32, arrsize: 4, desc: ability manager start ability}
+  ABILITY_MGR_CONNECT_ABILITY: {type: INT32, arrsize: 4, desc: ability manager connect ability}
+  GET_RUNNING_PROCESS_INFO_BY_PID: {type: INT32, arrsize: 4, desc: get running process info by pid}
+  REGISTER_APP_DEBUG_LISTENER: {type: INT32, arrsize: 4, desc: register app debug listener}
+  UNREGISTER_APP_DEBUG_LISTENER: {type: INT32, arrsize: 4, desc: unregister app debug listener}
+  PUBLISH_COMMON_EVENT: {type: INT32, arrsize: 4, desc: publish common event}
+  GET_VISIBILITY_WINDOW_INFO: {type: INT32, arrsize: 4, desc: get visibility window info}

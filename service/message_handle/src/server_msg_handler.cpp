@@ -152,6 +152,12 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
+    std::vector<struct libinput_device*> input_device;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
+    if (input_device.size() == 0) {
+        MMI_HILOGW("No keyboard device is currently available");
+        return ERR_DEVICE_NOT_EXIST;
+    }
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     state = keyEvent->GetFunctionKey(funcKey);
@@ -159,15 +165,14 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
+int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
-    int32_t callerPid = IPCSkeleton::GetCallingPid();
     AppExecFwk::RunningProcessInfo processInfo;
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     CHKPR(appMgrClient, ERROR_NULL_POINTER);
     auto begin = std::chrono::high_resolution_clock::now();
-    appMgrClient->GetRunningProcessInfoByPid(callerPid, processInfo);
+    appMgrClient->GetRunningProcessInfoByPid(pid, processInfo);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_RUNNING_PROCESS_INFO_BY_PID,
@@ -649,6 +654,13 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
 int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t tokenType = sess->GetTokenType();
+    if (tokenType != TokenType::TOKEN_NATIVE && tokenType != TokenType::TOKEN_SHELL &&
+        tokenType !=TokenType::TOKEN_SYSTEM_HAP) {
+        MMI_HILOGW("Not native or systemapp skip, pid:%{public}d tokenType:%{public}d", sess->GetPid(), tokenType);
+        return RET_ERR;
+    }
     int32_t pid = sess->GetPid();
     WIN_MGR->SetWindowStateNotifyPid(pid);
     MMI_HILOGI("The pid:%{public}d", pid);

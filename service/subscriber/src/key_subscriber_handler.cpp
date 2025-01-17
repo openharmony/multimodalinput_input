@@ -571,14 +571,14 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
             callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
             auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now() - begin).count();
-            DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_CLIENT_INIT, durationMS);
+            DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_INIT, durationMS);
         }
         if (!DEVICE_MONITOR->GetHasHandleRingMute()) {
             auto begin = std::chrono::high_resolution_clock::now();
             ret = callManagerClientPtr->MuteRinger();
             auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now() - begin).count();
-            DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_CLIENT_MUTE_RINGER,
+            DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_MUTE_RINGER,
                 durationMS);
             if (ret != ERR_OK) {
                 MMI_HILOGE("Set mute fail, ret:%{public}d", ret);

@@ -33,6 +33,7 @@ constexpr int32_t DEVCIE_INDEPENDENT_PIXELS{40};
 constexpr float INCREASE_RATIO{1.22f};
 constexpr int32_t MIN_POINTER_COLOR{0x000000};
 constexpr int32_t MAX_POINTER_COLOR{0xFFFFFF};
+constexpr int32_t OTHER_POINTER_COLOR{0x171717};
 constexpr float CALCULATE_IMAGE_MIDDLE{2.0f};
 constexpr uint32_t FOCUS_POINT{256};
 constexpr float CALCULATE_MOUSE_ICON_BIAS{5.0f};
@@ -115,6 +116,27 @@ static void ChangeSvgCursorColor(std::string& str, int32_t color)
     }
 }
 
+void SetCursorColorBaseOnStyle(const RenderConfig &cfg, OHOS::Media::DecodeOptions &decodeOpts)
+{
+    const bool isHandColor =
+        (cfg.style == HAND_GRABBING) ||(cfg.style == HAND_OPEN) || (cfg.style == HAND_POINTING);
+    if (isHandColor) {
+        if (cfg.color == MAX_POINTER_COLOR ||
+            cfg.color == MIN_POINTER_COLOR ||
+            cfg.color == OTHER_POINTER_COLOR) {
+            decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
+            decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
+        } else {
+            decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = cfg.color};
+            if (cfg.color == MAX_POINTER_COLOR) {
+                decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
+            } else {
+                decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
+            }
+        }
+    }
+}
+
 pixelmap_ptr_t PointerRenderer::LoadCursorSvgWithColor(const RenderConfig &cfg)
 {
     std::string svgContent;
@@ -146,6 +168,7 @@ pixelmap_ptr_t PointerRenderer::LoadCursorSvgWithColor(const RenderConfig &cfg)
         } else {
             decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
         }
+        SetCursorColorBaseOnStyle(cfg, decodeOpts);
     }
 
     pixelmap_ptr_t pmap = imageSource->CreatePixelMap(decodeOpts, ret);

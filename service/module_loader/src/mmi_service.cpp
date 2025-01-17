@@ -298,10 +298,7 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-    if (!(libinputAdapter_.Init([] (void *event, int64_t frameTime) {
-        ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()->OnEvent(event, frameTime);
-        }
-        ))) {
+    if (!(libinputAdapter_.Init([](void *event, int64_t frameTime) { InputHandler->OnEvent(event, frameTime); }))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }
@@ -624,7 +621,7 @@ void MMIService::OnConnected(SessionPtr s)
     appMgrClient->GetProcessRunningInfosByUserId(info, userid);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_PROCESS_RUNNING_INFOS_BY_USER_ID, durationMS);
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_PROC_RUNNING_INFOS_BY_UID, durationMS);
     for (auto &item : info) {
         if (item.bundleNames.empty()) {
             continue;
@@ -2048,9 +2045,10 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, funcKey, enable] {
-            return sMsgHandler_.OnSetFunctionKeyState(funcKey, enable);
+        [this, clientPid, funcKey, enable] {
+            return sMsgHandler_.OnSetFunctionKeyState(clientPid, funcKey, enable);
         }
         );
     if (ret != RET_OK) {

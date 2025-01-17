@@ -446,7 +446,7 @@ void FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
         auto ret = abmc->StartExtensionAbility(want, nullptr, -1, AppExecFwk::ExtensionAbilityType::SERVICE);
         auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_EXTENSION_ABILITY,
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_START_EXT_ABILITY,
             durationMS);
         if (ret != RET_OK) {
             MMI_HILOGE("StartExtensionAbility failed, ret:%{public}d", ret);

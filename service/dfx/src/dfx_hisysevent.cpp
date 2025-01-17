@@ -28,7 +28,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_DEVICE_ID { -1 };
 constexpr uint32_t REPORT_DISPATCH_TIMES { 100 };
 constexpr uint32_t REPORT_COMBO_START_TIMES { 100 };
 constexpr uint32_t POINTER_CLEAR_TIMES { 10 };
@@ -73,73 +72,6 @@ static std::string GetVendorInfo(const char* nodePath)
     file >> vendorInfo;
     file.close();
     return vendorInfo;
-}
-
-void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    std::shared_ptr<InputDevice> dev = INPUT_DEV_MGR->GetInputDevice(id);
-    CHKPV(dev);
-    std::string message;
-    std::string name;
-    if (type == OHOS::HiviewDFX::HiSysEvent::EventType::FAULT) {
-        message = "The input_device connection failed for already existing";
-        name = "INPUT_DEV_CONNECTION_FAILURE";
-    } else {
-        message = "The input_device connection succeed";
-        name = "INPUT_DEV_CONNECTION_SUCCESS";
-    }
-    if (id == INT32_MAX) {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            name,
-            type,
-            "MSG", "The input_device connection failed because the nextId_ exceeded the upper limit");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    } else {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            name,
-            type,
-            "DEVICE_ID", id,
-            "DEVICE_PHYS", dev->GetPhys(),
-            "DEVICE_NAME", dev->GetName(),
-            "DEVICE_TYPE", dev->GetType(),
-            "MSG", message);
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    }
-}
-
-void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    if (id == INVALID_DEVICE_ID) {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "INPUT_DEV_DISCONNECTION_FAILURE",
-            type,
-            "MSG", "The input device failed to disconnect to server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    } else {
-        std::shared_ptr dev = INPUT_DEV_MGR->GetInputDevice(id);
-        CHKPV(dev);
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "INPUT_DEV_DISCONNECTION_SUCCESS",
-            type,
-            "DEVICE_Id", id,
-            "DEVICE_PHYS", dev->GetPhys(),
-            "DEVICE_NAME", dev->GetName(),
-            "DEVICE_TYPE", dev->GetType(),
-            "MSG", "The input device successfully disconnect to server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    }
 }
 
 void DfxHisysevent::OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type)
@@ -1149,23 +1081,61 @@ void DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t d
     if (!apiDurationStatics_.IsLimitMatched()) {
         return;
     }
-    auto apiDurations = apiDurationStatics_.GetDurationBox();
-    for (const auto &apiDuration : apiDurations) {
-        auto api = apiDuration.first;
-        std::vector<int32_t> thresholds;
-        std::vector<int32_t> durationCounts;
-        for (const auto &durationBox : apiDuration.second) {
-            thresholds.push_back(static_cast<int32_t>(durationBox.first));
-            durationCounts.push_back(durationBox.second);
-        }
-        HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "API_CALLING_STATISTIC",
-            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
-            "API_NAME", apiDurationStatics_.ApiToString(api),
-            "DURATION_THRESHOLDS", thresholds,
-            "DURATION_THRESHOLD_COUNTS", durationCounts);
-    }
+    static std::vector<std::string> apiDurationBox { "<=3MS", "<=5MS", "<=10MS", ">10MS" };
+    HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "EXTERNAL_CALL_STATISTIC",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "API_DURATION_BOX", apiDurationBox,
+        "IS_SCREEN_CAPTURE_WORKING",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::IS_SCREEN_CAPTURE_WORKING),
+        "GET_DEFAULT_DISPLAY",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_DEFAULT_DISPLAY),
+        "GET_SYSTEM_ABILITY_MANAGER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_SYSTEM_ABILITY_MANAGER),
+        "IS_FOLDABLE",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::IS_FOLDABLE),
+        "IS_SCREEN_LOCKED",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::IS_SCREEN_LOCKED),
+        "RS_NOTIFY_TOUCH_EVENT",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT),
+        "RESOURCE_SCHEDULE_REPORT_DATA",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA),
+        "GET_CUR_RENDERER_CHANGE_INFOS",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_CUR_RENDERER_CHANGE_INFOS),
+        "GET_PROC_RUNNING_INFOS_BY_UID",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_PROC_RUNNING_INFOS_BY_UID),
+        "TELEPHONY_CALL_MGR_INIT",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_INIT),
+        "TELEPHONY_CALL_MGR_MUTE_RINGER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_MUTE_RINGER),
+        "TELEPHONY_CALL_MGR_HANG_UP_CALL",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_HANG_UP_CALL),
+        "TELEPHONY_CALL_MGR_REJECT_CALL",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_REJECT_CALL),
+        "RE_SCREEN_MODE_CHANGE_LISTENER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::RE_SCREEN_MODE_CHANGE_LISTENER),
+        "SET_ON_REMOTE_DIED_CALLBACK",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::SET_ON_REMOTE_DIED_CALLBACK),
+        "REG_SCREEN_CAPTURE_LISTENER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::REG_SCREEN_CAPTURE_LISTENER),
+        "ABILITY_MGR_START_EXT_ABILITY",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::ABILITY_MGR_START_EXT_ABILITY),
+        "ABILITY_MGR_CLIENT_START_ABILITY",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY),
+        "ABILITY_MGR_CONNECT_ABILITY",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::ABILITY_MGR_CONNECT_ABILITY),
+        "GET_RUNNING_PROCESS_INFO_BY_PID",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_RUNNING_PROCESS_INFO_BY_PID),
+        "REGISTER_APP_DEBUG_LISTENER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::REGISTER_APP_DEBUG_LISTENER),
+        "UNREGISTER_APP_DEBUG_LISTENER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::UNREGISTER_APP_DEBUG_LISTENER),
+        "PUBLISH_COMMON_EVENT",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::PUBLISH_COMMON_EVENT),
+        "GET_VISIBILITY_WINDOW_INFO",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_VISIBILITY_WINDOW_INFO)
+        );
     apiDurationStatics_.ResetApiStatistics();
 }
 
