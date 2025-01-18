@@ -353,7 +353,9 @@ void AccountManager::InitializeScreenLockStatus()
     DISPLAY_MONITOR->SetScreenLocked(screenLockPtr->IsScreenLocked());
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::IS_SCREEN_LOCKED, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 #endif // SCREENLOCK_MANAGER_ENABLED

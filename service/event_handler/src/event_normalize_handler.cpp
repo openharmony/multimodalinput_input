@@ -631,7 +631,9 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             mapPayload);
         auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
         DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         mapPayload.clear();
     }
 #endif

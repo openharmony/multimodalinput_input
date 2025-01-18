@@ -480,7 +480,9 @@ int32_t LongPressSubscriberHandler::GetBundleName(std::string &bundleName, int32
     appMgrClient->GetProcessRunningInfosByUserId(info, userid);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_PROC_RUNNING_INFOS_BY_UID, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     for (const auto &item : info) {
         if (item.bundleNames.empty()) {
             continue;

@@ -571,15 +571,18 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
             callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
             auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
             DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_INIT, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         }
         if (!DEVICE_MONITOR->GetHasHandleRingMute()) {
             auto begin = std::chrono::high_resolution_clock::now();
             ret = callManagerClientPtr->MuteRinger();
             auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now() - begin).count();
-            DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_MUTE_RINGER,
-                durationMS);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_MUTE_RINGER, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
             if (ret != ERR_OK) {
                 MMI_HILOGE("Set mute fail, ret:%{public}d", ret);
                 return false;
@@ -1391,7 +1394,9 @@ void KeySubscriberHandler::HangUpCallProcess()
     ret = callManagerClientPtr->HangUpCall(0);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_HANG_UP_CALL, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (ret != ERR_OK) {
         MMI_HILOGE("HangUpCall fail, ret:%{public}d", ret);
         return;
@@ -1414,7 +1419,9 @@ void KeySubscriberHandler::RejectCallProcess()
     ret = callManagerClientPtr->RejectCall(0, false, u"");
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_REJECT_CALL, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (ret != ERR_OK) {
         MMI_HILOGE("RejectCall fail, ret:%{public}d", ret);
         return;
