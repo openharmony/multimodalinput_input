@@ -811,15 +811,6 @@ public:
      * @since 9
      */
     int32_t GetTouchpadRightClickType(int32_t &type);
-     /**
-     * @brief SetWindowPointerStyle.
-     * @param area Indicates area.
-     * @param pid Indicates pid.
-     * @param windowId Indicates windowId.
-     * @return void.
-     * @since 9
-     */
-    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 
      /**
      * @brief Turn on or off hard cursor statistics.
