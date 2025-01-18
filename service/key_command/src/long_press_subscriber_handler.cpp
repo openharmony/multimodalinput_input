@@ -509,6 +509,9 @@ void LongPressSubscriberHandler::NotifySubscriber(std::shared_ptr<Subscriber> su
     if (GetBundleName(bundleName, windowPid) == RET_ERR) {
         MMI_HILOGE("Failed to get bundle name, pid %{public}d", windowPid);
     }
+    int32_t id = touchEvent_->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent_->GetPointerItem(id, item);
     LongPressEvent longPressEvent = {
         .fingerCount = subscriber->fingerCount_,
         .duration = subscriber->duration_,
@@ -519,6 +522,7 @@ void LongPressSubscriberHandler::NotifySubscriber(std::shared_ptr<Subscriber> su
         .result = result,
         .windowId = touchEvent_->GetTargetWindowId(),
         .pointerId = touchEvent_->GetPointerId(),
+        .downTime = item.GetDownTime(),
         .bundleName = bundleName,
     };
 
