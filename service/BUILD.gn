@@ -38,10 +38,14 @@ config("libmmi_server_config") {
         "-Wno-error=backend-plugin",
         "-Wno-profile-instr-out-of-date",
         "-Wno-profile-instr-unprofiled",
+        "-Oz",
       ]
     }
     if (input_feature_product == "pc" && target_cpu == "arm64") {
-      cflags += [ "-moutline-atomics" ]
+      cflags += [
+        "-moutline-atomics",
+        "-Oz",
+      ]
     }
   }
   include_dirs = [
