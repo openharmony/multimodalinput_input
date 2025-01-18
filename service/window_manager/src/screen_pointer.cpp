@@ -191,6 +191,12 @@ void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
     MMI_HILOGD("Update with DisplayInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+    if (isCurrentOffScreenRendering_) {
+        screenRealDPI_ = di.screenRealDPI;
+        offRenderScale_ = float(di.screenRealWidth) / di.width;
+        MMI_HILOGI("Update with DisplayInfo, screenRealDPI=%{public}u, offRenderScale_=(%{public}f ",
+            screenRealDPI_, offRenderScale_);
+    }
 }
 
 bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
@@ -249,6 +255,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     if (IsMirror()) {
         px = paddingLeft_ + x * scale_ - dx;
         py = paddingTop_ + y * scale_ - dy;
+    } else if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+        px = (px + FOCUS_POINT) * offRenderScale_ - FOCUS_POINT;
+        py = (px + FOCUS_POINT) * offRenderScale_ - FOCUS_POINT;
     }
 
     auto buffer = GetCurrentBuffer();
@@ -311,10 +320,19 @@ int32_t ScreenPointer::GetPointerSize() const
     return size;
 }
 
+float ScreenPointer::GetRenderDPI() const
+{
+    if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+        return float(GetScreenRealDPI()) / BASELINE_DENSITY;
+    } else {
+        return dpi_ * scale_;
+    }
+}
+
 uint32_t ScreenPointer::GetImageSize() const
 {
     int32_t size = GetPointerSize();
-    return pow(INCREASE_RATIO, size - 1) * dpi_ * DEVICE_INDEPENDENT_PIXELS * scale_;
+    return pow(INCREASE_RATIO, size - 1) * dpi_ * DEVICE_INDEPENDENT_PIXELS;
 }
 
 uint32_t ScreenPointer::GetOffsetX(ICON_TYPE align) const

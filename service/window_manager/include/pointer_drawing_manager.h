@@ -130,6 +130,7 @@ public:
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
+    std::vector<std::vector<std::string>> GetDisplayInfo(DisplayInfo &di);
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
