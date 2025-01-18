@@ -1133,14 +1133,15 @@ void LibinputAdapter::OnEventHandler()
             || eventType == LIBINPUT_EVENT_TOUCH_FRAME
             ) {
             touch = libinput_event_get_touch_event(event);
-            touchId = libinput_event_touch_get_slot(touch);
+            double touchPressure = 0.0;
+            double accumulatedPressure = 0.0;
+            if (eventType != LIBINPUT_EVENT_TOUCH_FRAME) {
+                touchId = libinput_event_touch_get_slot(touch);
+                touchPressure = libinput_event_touch_get_pressure(touch);
+                accumulatedPressure = GetAccumulatedPressure(touchId, eventType, touchPressure);
+            }
             skipTouchMove = SkipTouchMove(touchId, eventType);
-        }
 
-        if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
-            || eventType == LIBINPUT_EVENT_TOUCH_UP
-            || eventType == LIBINPUT_EVENT_TOUCH_MOTION
-            ) {
             if (deviceId == -1) {
                 // initialize touch device ID.
                 libinput_device* device = libinput_event_get_device(event);
@@ -1152,10 +1153,8 @@ void LibinputAdapter::OnEventHandler()
             double x = 0.0;
             double y = 0.0;
             int32_t touchEventType = ConvertToTouchEventType(eventType);
-            double touchPressure = libinput_event_touch_get_pressure(touch);
-            double accumulatedPressure = GetAccumulatedPressure(touchId, eventType, touchPressure);
             // touch up event has no coordinates information, skip coordinate calculation.
-            if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
+            if (eventType == LIBINPUT_EVENT_TOUCH_DOWN || eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
                 if (!WIN_MGR->TouchPointToDisplayPoint(deviceId, touch, touchInfo, logicalDisplayId)) {
                     MMI_HILOGE("Map touch point to display point failed");
                 } else {
@@ -1164,7 +1163,7 @@ void LibinputAdapter::OnEventHandler()
 
                     touchPoints_[touchId] = std::pair<double, double>(x, y);
                 }
-            } else {
+            } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
                 auto pos = touchPoints_.find(touchId);
                 if (pos != touchPoints_.end()) {
                     x = (pos->second).first;
@@ -1174,12 +1173,13 @@ void LibinputAdapter::OnEventHandler()
             }
 
             MMI_HILOGD("touch event. deviceId:%{private}d, touchId:%{private}d, x:%{private}d, y:%{private}d, \
-type:%{private}d",
+type:%{private}d, accPressure:%{private}f",
                 deviceId,
                 touchId,
                 static_cast<int32_t>(x),
                 static_cast<int32_t>(y),
-                static_cast<int32_t>(eventType));
+                static_cast<int32_t>(eventType),
+                accumulatedPressure);
 
             if (handleTouchPoint_ != nullptr &&
                 handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
@@ -1234,6 +1234,11 @@ type:%{private}d",
                     }
                 }
                 HandleVKeyTouchpadMessages(touch);
+
+                if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
+                    // still let frame info go through.
+                    funInputEvent_(event, frameTime);
+                }
                 libinput_event_destroy(event);
             } else {
                 funInputEvent_(event, frameTime);
