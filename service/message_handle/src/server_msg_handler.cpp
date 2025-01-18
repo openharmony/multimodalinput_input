@@ -175,8 +175,9 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
     appMgrClient->GetRunningProcessInfoByPid(pid, processInfo);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_RUNNING_PROCESS_INFO_BY_PID,
-        durationMS);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_RUNNING_PROCESS_INFO_BY_PID, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (processInfo.extensionType_ != AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
         MMI_HILOGW("It is prohibited for non-input applications");
         return ERR_NON_INPUT_APPLICATION;

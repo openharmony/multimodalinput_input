@@ -1607,7 +1607,9 @@ bool KeyCommandHandler::IsMusicActivate()
     auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_CUR_RENDERER_CHANGE_INFOS, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (ret != ERR_OK) {
         MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
         return false;
@@ -2461,8 +2463,9 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY,
-        durationMS);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         return;
@@ -2504,8 +2507,9 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, nullptr);
         auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_START_EXT_ABILITY,
-            durationMS);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_START_EXT_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         if (err != ERR_OK) {
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         }
@@ -2514,8 +2518,9 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
         auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY,
-            durationMS);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         if (err != ERR_OK) {
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         }

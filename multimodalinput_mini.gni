@@ -54,7 +54,7 @@ declare_args() {
   input_shortcut_key_rules_enabled = true
   input_new_knuckle_dynamic_enabled = true
   input_feature_virtual_keyboard = false
-  input_feature_dfx_radar_enable = true
+  input_feature_dfx_radar_enable = false
   input_one_hand_mode_enable = true
 
   if (defined(global_parts_info) &&
