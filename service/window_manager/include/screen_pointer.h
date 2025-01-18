@@ -99,7 +99,29 @@ public:
         return mode_ == mode_t::SCREEN_MIRROR;
     }
 
+    bool IsExtend() const
+    {
+        return mode_ == mode_t::SCREEN_EXTEND;
+    }
+
     int32_t GetPointerSize() const;
+
+    bool GetIsCurrentOffScreenRendering() const
+    {
+        return isCurrentOffScreenRendering_;
+    }
+
+    float GetOffRenderScale() const
+    {
+        return offRenderScale_;
+    }
+
+    float GetScreenRealDPI() const
+    {
+        return screenRealDPI_;
+    }
+
+    float GetRenderDPI() const;
 
 private:
     bool InitSurfaceNode();
@@ -133,6 +155,11 @@ private:
 
     std::vector<buffer_ptr_t> buffers_;
     uint32_t bufferId_ {0};
+
+    // isCurrentOffScreenRendering
+    bool isCurrentOffScreenRendering_ = false;
+    float offRenderScale_{1.0f};
+    int32_t screenRealDPI_{1.0f};
 };
 
 } // namespace OHOS::MMI

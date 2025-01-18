@@ -2957,13 +2957,18 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
     oss << std::endl;
 
     std::vector<std::string> displayTitles = {"ID", "X", "Y", "Width", "Height", "DPI", "Name", "Uniq",
-                                              "Direction", "Display Direction", "Display Mode"};
+                                              "Direction", "Display Direction", "Display Mode",
+                                              "Is Current Off Screen Rendering", "Screen Real Width",
+                                              "Screen Real Height", "Screen Real PPI", "Screen Real DPI",
+                                              "Screen Combination"};
     DisplayInfo &di = displayInfo_;
     std::vector<std::vector<std::string>> displayInfo = {
         {std::to_string(di.id), std::to_string(di.x), std::to_string(di.y), std::to_string(di.width),
          std::to_string(di.height), std::to_string(di.dpi), di.name, di.uniq,
          std::to_string(static_cast<int32_t>(di.direction)), std::to_string(static_cast<int32_t>(di.displayDirection)),
-         std::to_string(static_cast<int32_t>(di.displayMode))}};
+         std::to_string(static_cast<int32_t>(di.displayMode)), std::to_string(di.isCurrentOffScreenRendering),
+         std::to_string(di.screenRealWidth), std::to_string(di.screenRealHeight), std::to_string(di.screenRealPPI),
+         std::to_string(di.screenRealDPI), std::to_string(static_cast<int32_t>(di.screenCombination))}};
 
     DumpFullTable(oss, "Display Info", displayTitles, displayInfo);
     oss << std::endl;
@@ -3138,10 +3143,9 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         .isHard = true,
     };
     for (auto it : screenPointers) {
-        cfg.dpi = it.second->GetDPI();
+        cfg.dpi = it.second->GetRenderDPI();
         MMI_HILOGD("HardwareCursorRender, screen=%{public}u, dpi=%{public}f", it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
-            cfg.dpi *= it.second->GetScale();
             DrawCursor(it.second, cfg);
         } else {
             it.second->SetInvisible();
