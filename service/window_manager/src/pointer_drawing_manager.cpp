@@ -2950,7 +2950,7 @@ int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
     return RET_OK;
 }
 
-std::vector<std::vector<std::string>> PointerDrawingManager::GetDisplayInfo(DisplayInfo &di) 
+std::vector<std::vector<std::string>> PointerDrawingManager::GetDisplayInfo(DisplayInfo &di)
 {
     std::vector<std::vector<std::string>> displayInfo = {
         {std::to_string(di.id), std::to_string(di.x), std::to_string(di.y), std::to_string(di.width),
