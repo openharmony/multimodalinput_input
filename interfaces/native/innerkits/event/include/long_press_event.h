@@ -33,6 +33,7 @@ struct LongPressEvent {
     int32_t result; // If the value is 0, it indicates correct reporting; non-zero indicates cancellation
     int32_t windowId;
     int32_t pointerId;
+    int64_t downTime;
     std::string bundleName;
 };
 } // namespace MMI
