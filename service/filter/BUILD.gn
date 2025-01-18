@@ -21,6 +21,7 @@ config("mmi_event_filter_config") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/dfx/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/util/common/include",
@@ -77,6 +78,7 @@ ohos_source_set("mmi_event_filter_proxy") {
     "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
   ]

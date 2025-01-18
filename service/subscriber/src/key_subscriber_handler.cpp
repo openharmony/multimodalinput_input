@@ -85,6 +85,7 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
             MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
         }
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
+        DfxHisysevent::ReportKeyEvent("subcriber");
         return;
     }
     CHKPV(nextHandler_);
@@ -135,21 +136,21 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
         sess->GetProgramName(), sess->GetPid());
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisysevent::ReportSubscribeKey("Subscribe", sess->GetProgramName(),
-        keyOption->GetFinalKey(), keyOption->GetFinalKeyDownDuration(), subscribeId);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         auto ret = AddKeyGestureSubscriber(subscriber, keyOption);
         if (ret != RET_OK) {
             MMI_HILOGE("AddKeyGestureSubscriber fail, error:%{public}d", ret);
+            DfxHisysevent::ReportFailSubscribeKey("SubscribeKeyEvent", sess->GetProgramName(),
+                keyOption->GetFinalKey(), DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
             return ret;
         }
     } else {
         auto ret = AddSubscriber(subscriber, keyOption, true);
         if (ret != RET_OK) {
             MMI_HILOGE("AddSubscriber fail, error:%{public}d", ret);
+            DfxHisysevent::ReportFailSubscribeKey("SubscribeKeyEvent", sess->GetProgramName(),
+                keyOption->GetFinalKey(), DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
             return ret;
         }
     }
@@ -164,6 +165,10 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
     int32_t ret = RemoveSubscriber(sess, subscribeId, true);
     if (ret != RET_OK) {
         ret = RemoveKeyGestureSubscriber(sess, subscribeId);
+    }
+    if (ret == RET_ERR) {
+        DfxHisysevent::ReportFailSubscribeKey("UnsubscribeKeyEvent", sess->GetProgramName(),
+            subscribeId, DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
     }
     return ret;
 }
@@ -191,10 +196,6 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 subscribers.erase(it);
                 DfxHisysevent::ReportUnSubscribeKeyEvent(subscribeId, option->GetFinalKey(),
                     sess->GetProgramName(), sess->GetPid());
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-                DfxHisysevent::ReportSubscribeKey("Unsubscribe", sess->GetProgramName(),
-                    option->GetFinalKey(), option->GetFinalKeyDownDuration(), subscribeId);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
                 return RET_OK;
             }
         }
@@ -332,6 +333,8 @@ int32_t KeySubscriberHandler::SubscribeHotkey(
     auto ret = AddSubscriber(subscriber, keyOption, false);
     if (ret != RET_OK) {
         MMI_HILOGE("AddSubscriber fail, error:%{public}d", ret);
+        DfxHisysevent::ReportFailSubscribeKey("SubscribeHotkey", sess->GetProgramName(),
+            keyOption->GetFinalKey(), DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
         return ret;
     }
     InitSessionDeleteCallback();
@@ -345,6 +348,8 @@ int32_t KeySubscriberHandler::UnsubscribeHotkey(SessionPtr sess, int32_t subscri
     int32_t ret = RemoveSubscriber(sess, subscribeId, false);
     if (ret != RET_OK) {
         MMI_HILOGW("No hot key subscription(%{public}d, No.%{public}d)", sess->GetPid(), subscribeId);
+        DfxHisysevent::ReportFailSubscribeKey("UnsubscribeHotkey", sess->GetProgramName(),
+            subscribeId, DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
     }
     return ret;
 }
@@ -657,6 +662,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         handled = HandleKeyUp(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
         hasEventExecuting_ = false;
+        DfxHisysevent::ReportKeyEvent("cancel");
         handled = HandleKeyCancel(keyEvent);
     } else {
         MMI_HILOGW("keyAction exception");
