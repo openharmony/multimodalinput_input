@@ -77,7 +77,6 @@ public:
     std::string ApiToString(Api api);
     std::vector<int32_t> GetDurationDistribution(Api api);
 
-
 private:
     Threshold GetCurrentThreshold(int32_t duration);
 private:

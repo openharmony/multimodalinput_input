@@ -3449,13 +3449,13 @@ int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t
     return RET_OK;
 }
 
-int32_t MMIService::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+int32_t MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
-        [sourceWindowId, targetWindowId, autoGenDown]() {
-            return WIN_MGR->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+        [&param, autoGenDown]() {
+            return WIN_MGR->ShiftAppPointerEvent(param, autoGenDown);
         }
         );
     if (ret != RET_OK) {

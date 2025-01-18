@@ -568,6 +568,10 @@ int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, 
     CHKRR(SetNameProperty(jsEnv_, value, "rawX", item.GetRawDx()), "Set rawX", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "rawY", item.GetRawDy()), "Set rawY", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "toolType", item.GetToolType()), "Set toolType", RET_ERR);
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    CHKRR(SetNameProperty(jsEnv_, value, "fixedDisplayX", item.GetFixedDisplayX()), "Set fixedDisplayX", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "fixedDisplayY", item.GetFixedDisplayY()), "Set fixedDisplayY", RET_ERR);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     return RET_OK;
 }
 
@@ -609,6 +613,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         ++index;
     }
     CHKRR(SetNameProperty(jsEnv_, result, "touches", pointers), "Set touches", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, result, "fixedMode", pointerEvent->GetFixedModeStr()), "Set fixedMode", RET_ERR);
     return RET_OK;
 }
 

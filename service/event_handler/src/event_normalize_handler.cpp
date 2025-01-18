@@ -546,7 +546,9 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION && TouchPadKnuckleDoubleClickHandle(event)) {
+    if ((type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_MOTION ||
+            type == LIBINPUT_EVENT_TOUCHPAD_UP) &&
+        TouchPadKnuckleDoubleClickHandle(event)) {
         return RET_OK;
     }
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);

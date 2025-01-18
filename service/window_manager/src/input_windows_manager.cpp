@@ -3222,6 +3222,80 @@ bool InputWindowsManager::IsNavigationWindowInjectEvent(std::shared_ptr<PointerE
     return (pointerEvent->GetZOrder() > 0 && pointerEvent->GetTargetWindowId() == -1);
 }
 
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+void InputWindowsManager::UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY,
+    const DisplayInfo &displayInfo, float oneHandScale)
+{
+    double virtualY = physicalY - displayInfo.oneHandY;
+    double virtualX = physicalX - displayInfo.oneHandX;
+    physicalX = virtualX / oneHandScale;
+    physicalY = virtualY / oneHandScale;
+}
+
+void InputWindowsManager::UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    UpdatePointerItemInOneHandMode(displayInfo, pointerEvent);
+    if (displayInfo.oneHandY > 0) {
+        pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    }
+#else
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    pointerItem.SetFixedDisplayX(pointerItem.GetDisplayX());
+    pointerItem.SetFixedDisplayY(pointerItem.GetDisplayY());
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+}
+
+void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo,
+    std::shared_ptr<PointerEvent> &pointerEvent)
+{
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    double physicalX = pointerItem.GetDisplayXPos();
+    double physicalY = pointerItem.GetDisplayYPos();
+    if (displayInfo.height == 0 || displayInfo.height == displayInfo.oneHandY) {
+        MMI_HILOG_DISPATCHE("displayInfo.height=%{public}d, displayInfo.oneHandY=%{public}d is invalid",
+            displayInfo.height, displayInfo.oneHandY);
+        pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
+        pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+        return;
+    }
+    bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
+    float epsilon {1e-7};
+    float oneHandScale = (displayInfo.height - displayInfo.oneHandY) * 1.0 / displayInfo.height;
+    bool isOneHandMode = oneHandScale + epsilon < 1;
+
+    if (isOneHandMode) {
+        double fixedDisplayX = physicalX;
+        double fixedDisplayY = physicalY;
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+            if (autoToVirtualScreen) {
+                UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
+            }
+        } else {
+            UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
+        }
+        pointerItem.SetFixedDisplayX(static_cast<int32_t>(fixedDisplayX));
+        pointerItem.SetFixedDisplayY(static_cast<int32_t>(fixedDisplayY));
+    } else {
+        pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
+        pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
+    }
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
 void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
     const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
 {
@@ -3229,6 +3303,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     bool isNavigationWindow = false;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
+    
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
@@ -3263,11 +3338,13 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     if (isNavigationWindow && pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION);
     }
+
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
     pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
     pointerItem.SetDisplayXPos(physicalX);
     pointerItem.SetDisplayYPos(physicalY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    UpdateFixedXY(displayInfo, pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -5040,13 +5117,17 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
     return std::nullopt;
 }
 
-int32_t InputWindowsManager::ShiftAppMousePointerEvent(std::optional<WindowInfo> &sourceWindowInfo,
-    std::optional<WindowInfo> &targetWindowInfo, bool autoGenDown)
+int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown)
 {
-    if (!lastPointerEvent_ || !lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
-        MMI_HILOGE("Failed shift pointerEvent, left mouse button is not pressed");
+    if (!lastPointerEvent_) {
+        MMI_HILOGE("Failed shift pointerEvent, lastPointerEvent_ is null");
         return RET_ERR;
     }
+    if (!lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
+        MMI_HILOGD("shift pointerEvent, current mouse left mouse button is not pressed");
+    }
+    const std::optional<WindowInfo> &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
+    const std::optional<WindowInfo> &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
     std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     pointerEvent->ClearButtonPressed();
 
@@ -5066,8 +5147,12 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(std::optional<WindowInfo>
     pointerEvent->UpdatePointerItem(pointerId, item);
     InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
     if (autoGenDown) {
-        item.SetWindowX(lastLogicX_ - targetWindowInfo->area.x);
-        item.SetWindowY(lastLogicY_ - targetWindowInfo->area.y);
+        item.SetWindowX(shiftWindowInfo.x);
+        item.SetWindowY(shiftWindowInfo.y);
+        if (shiftWindowInfo.x == -1 && shiftWindowInfo.y == -1) {
+            item.SetWindowX(lastLogicX_ - sourceWindowInfo->area.x);
+            item.SetWindowY(lastLogicY_ - sourceWindowInfo->area.y);
+        }
         item.SetPressed(true);
         pointerEvent->ClearButtonPressed();
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -5084,18 +5169,24 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(std::optional<WindowInfo>
     return RET_OK;
 }
 
-int32_t InputWindowsManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
-    MMI_HILOGI("Start shift pointer event, sourceWindowId:%{public}d, targetWindowId:%{public}d,"
-               "autoGenDown:%{public}d", sourceWindowId, targetWindowId, static_cast<int32_t>(autoGenDown));
-    std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(sourceWindowId);
-    std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(targetWindowId);
+    MMI_HILOGI("Start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
+               "x: %{public}d, y: %{public}d, autoGenDown: %{public}d",
+        param.sourceWindowId, param.targetWindowId, param.x, param.y, static_cast<int32_t>(autoGenDown));
+    std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(param.sourceWindowId);
+    std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(param.targetWindowId);
     if (!sourceWindowInfo || !targetWindowInfo) {
         MMI_HILOGE("Failed shift pointerEvent, get null sourceWindowInfo, source:%{public}d, target:%{public}d",
         static_cast<int32_t>(!!sourceWindowInfo), static_cast<int32_t>(!!targetWindowInfo));
         return RET_ERR;
     }
-    return ShiftAppMousePointerEvent(sourceWindowInfo, targetWindowInfo, autoGenDown);
+    ShiftWindowInfo shiftWindowInfo;
+    shiftWindowInfo.sourceWindowInfo = sourceWindowInfo;
+    shiftWindowInfo.targetWindowInfo = targetWindowInfo;
+    shiftWindowInfo.x = param.x;
+    shiftWindowInfo.y = param.y;
+    return ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
