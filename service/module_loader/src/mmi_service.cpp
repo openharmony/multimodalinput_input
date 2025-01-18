@@ -503,8 +503,13 @@ void MMIService::AddAppDebugListener()
 {
     CALL_DEBUG_ENTER;
     appDebugListener_ = AppDebugListener::GetInstance();
+    auto begin = std::chrono::high_resolution_clock::now();
     auto errCode =
         AAFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(appDebugListener_);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::REGISTER_APP_DEBUG_LISTENER,
+        durationMS);
     if (errCode != RET_OK) {
         MMI_HILOGE("Call RegisterAppDebugListener failed, errCode:%{public}d", errCode);
     }
@@ -514,8 +519,12 @@ void MMIService::RemoveAppDebugListener()
 {
     CALL_DEBUG_ENTER;
     CHKPV(appDebugListener_);
-    auto errCode =
-        AAFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(appDebugListener_);
+    auto begin = std::chrono::high_resolution_clock::now();
+    auto errCode = AAFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(appDebugListener_);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::REGISTER_APP_DEBUG_LISTENER,
+        durationMS);
     if (errCode != RET_OK) {
         MMI_HILOGE("Call UnregisterAppDebugListener failed, errCode:%{public}d", errCode);
     }
@@ -608,7 +617,11 @@ void MMIService::OnConnected(SessionPtr s)
         userid = DEFAULT_USER_ID;
     }
     std::vector<AppExecFwk::RunningProcessInfo> info;
+    auto begin = std::chrono::high_resolution_clock::now();
     appMgrClient->GetProcessRunningInfosByUserId(info, userid);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_PROC_RUNNING_INFOS_BY_UID, durationMS);
     for (auto &item : info) {
         if (item.bundleNames.empty()) {
             continue;
@@ -1683,8 +1696,12 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
     payload["isSa"] = "1";
     payload["cgroupPrio"] = "1";
     payload["threadName"] = "mmi_service";
+    auto begin = std::chrono::high_resolution_clock::now();
     ResourceSchedule::ResSchedClient::GetInstance().ReportData(
         ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - begin).count();
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
 }
 #endif // defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
 

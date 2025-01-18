@@ -29,6 +29,10 @@
 #include "setting_datashare.h"
 #include "timer_manager.h"
 
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
@@ -345,7 +349,11 @@ void AccountManager::InitializeScreenLockStatus()
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     auto screenLockPtr = ScreenLock::ScreenLockManager::GetInstance();
     CHKPV(screenLockPtr);
+    auto begin = std::chrono::high_resolution_clock::now();
     DISPLAY_MONITOR->SetScreenLocked(screenLockPtr->IsScreenLocked());
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::IS_SCREEN_LOCKED, durationMS);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 #endif // SCREENLOCK_MANAGER_ENABLED
