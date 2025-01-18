@@ -63,8 +63,9 @@ bool InjectNoticeManager::StartNoticeAbility()
     int32_t result = client->StartAbility(want);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY,
-        durationMS);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (result != 0) {
         MMI_HILOGW("Start injectNoticeAbility failed, result:%{public}d", result);
         return false;
@@ -90,9 +91,9 @@ bool InjectNoticeManager::ConnectNoticeSrv()
     ErrCode result = abilityMgr->ConnectAbility(want, connectionCallback_, INVALID_USERID);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CONNECT_ABILITY,
-        durationMS);
-
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CONNECT_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (result != ERR_OK) {
         MMI_HILOGW("Connect InjectNoticeAbility failed, result:%{public}d", result);
         return false;

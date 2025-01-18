@@ -158,7 +158,9 @@ void PointerDrawingManager::InitPointerCallback()
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::SET_ON_REMOTE_DIED_CALLBACK, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor() && surfaceNode_ != nullptr) {
         surfaceNode_ = nullptr;
@@ -2876,7 +2878,9 @@ void PointerDrawingManager::SubscribeScreenModeChange()
         screenModeChangeListener_);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RE_SCREEN_MODE_CHANGE_LISTENER, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (ret != OHOS::Rosen::DMError::DM_OK) {
         MMI_HILOGE("RegisterScreenModeChangeListener failed, ret=%{public}d", ret);
         return;
