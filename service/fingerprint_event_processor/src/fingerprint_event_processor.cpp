@@ -442,8 +442,12 @@ void FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
         if (isShowDialog) {
             want.SetParam("isShowDialog", IS_SHOW_DIALOG);
         }
-
+        auto begin = std::chrono::high_resolution_clock::now();
         auto ret = abmc->StartExtensionAbility(want, nullptr, -1, AppExecFwk::ExtensionAbilityType::SERVICE);
+        auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_START_EXT_ABILITY,
+            durationMS);
         if (ret != RET_OK) {
             MMI_HILOGE("StartExtensionAbility failed, ret:%{public}d", ret);
             return false;
@@ -475,7 +479,11 @@ void FingerprintEventProcessor::ProcessClickEvent()
 void FingerprintEventProcessor::ReportResSched(uint32_t resType, int64_t value)
 {
     std::unordered_map<std::string, std::string> payload { {"msg", ""} };
+    auto begin = std::chrono::high_resolution_clock::now();
     ResourceSchedule::ResSchedClient::GetInstance().ReportData(resType, value, payload);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 } // namespace MMI
