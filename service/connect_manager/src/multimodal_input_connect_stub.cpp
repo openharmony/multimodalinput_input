@@ -1103,10 +1103,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
-    if (windowId < 0) {
-        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
-        return RET_ERR;
-    }
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
     PointerStyle pointerStyle;

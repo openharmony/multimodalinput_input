@@ -40,9 +40,6 @@ public:
     void UpdateDisplayInfo(DisplayGroupInfo&) override {}
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo&, bool) override {}
     void UpdateWindowInfo(const WindowGroupInfo&) override {}
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    void SetWindowPointerStyle(WindowArea area, int32_t, int32_t) override {}
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     MOCK_METHOD(int32_t, ClearWindowPointerStyle, (int32_t, int32_t));
     void Dump(int32_t, const std::vector<std::string>&) override {}
     MOCK_METHOD(int32_t, GetWindowPid, (int32_t), (const));

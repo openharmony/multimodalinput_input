@@ -549,30 +549,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt_001,
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnWindowAreaInfo_001
- * @tc.desc: Test the function OnWindowAreaInfo
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnWindowAreaInfo_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    SessionPtr sess = nullptr;
-    MmiMessageId idMsg = MmiMessageId::INVALID;
-    NetPacket pkt(idMsg);
-    int32_t ret = handler.OnWindowAreaInfo(sess, pkt);
-    EXPECT_EQ(ret, ERROR_NULL_POINTER);
-    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
-    ret = handler.OnWindowAreaInfo(sess, pkt);
-    EXPECT_EQ(ret, RET_ERR);
-    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
-    ret = handler.OnWindowAreaInfo(sess, pkt);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_OnEnhanceConfig_001
  * @tc.desc: Test the function OnEnhanceConfig
  * @tc.type: FUNC

@@ -81,10 +81,6 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
     MsgCallback funs[] = {
         {MmiMessageId::DISPLAY_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnDisplayInfo(sess, pkt); }},
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-        {MmiMessageId::WINDOW_AREA_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
-            return this->OnWindowAreaInfo(sess, pkt); }},
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::WINDOW_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnWindowGroupInfo(sess, pkt); }},
         {MmiMessageId::WINDOW_STATE_ERROR_CALLBACK, [this] (SessionPtr sess, NetPacket &pkt) {
@@ -599,25 +595,6 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
     return RET_OK;
 }
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t temp = 0;
-    int32_t pid = 0;
-    int32_t windowId = 0;
-    pkt >> temp >> pid >> windowId;
-    WindowArea area = static_cast<WindowArea>(temp);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    WIN_MGR->SetWindowPointerStyle(area, pid, windowId);
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
 {

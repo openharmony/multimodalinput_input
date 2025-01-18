@@ -2277,36 +2277,6 @@ void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, const std::str
     eventObserver_->SyncBundleName(pid, uid, bundleName, syncStatus);
 }
 
-void InputManagerImpl::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
-{
-    CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Get mmi client is nullptr");
-        return;
-    }
-    SendWindowAreaInfo(area, pid, windowId);
-#else
-    MMI_HILOGW("Pointer device or pointer drawing module does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-}
-
-void InputManagerImpl::SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId)
-{
-    CALL_INFO_TRACE;
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::WINDOW_AREA_INFO);
-    pkt << area << pid << windowId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write logical data failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-    }
-}
-
 void InputManagerImpl::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_INFO_TRACE;
