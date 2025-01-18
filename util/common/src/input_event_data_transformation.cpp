@@ -151,7 +151,7 @@ int32_t InputEventDataTransformation::LongPressEventToNetPacket(const LongPressE
 {
     pkt << longPressEvent.fingerCount << longPressEvent.duration << longPressEvent.pid << longPressEvent.displayId
         << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result << longPressEvent.windowId
-        << longPressEvent.pointerId;
+        << longPressEvent.pointerId << longPressEvent.downTime;
     if (!pkt.Write(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet write long press event failed");
         return RET_ERR;
@@ -184,6 +184,9 @@ int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, 
     longPressEvent.windowId = data;
     pkt >> data;
     longPressEvent.pointerId = data;
+    int64_t downTime;
+    pkt >> downTime;
+    longPressEvent.downTime = downTime;
     if (!pkt.Read(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet read long press event failed");
         return RET_ERR;
