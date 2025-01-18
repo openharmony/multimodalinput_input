@@ -415,6 +415,16 @@ void PointerEvent::PointerItem::SetBlobId(int32_t blobId)
     blobId_ = blobId;
 }
 
+bool PointerEvent::PointerItem::IsCanceled() const
+{
+    return canceled_;
+}
+
+void PointerEvent::PointerItem::SetCanceled(bool canceled)
+{
+    canceled_ = canceled;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
