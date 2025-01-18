@@ -48,7 +48,7 @@ private:
     int32_t keyboardRepeatDelay_ { 500 };
     int32_t mouseScrollRows_ { 3 };
     int32_t mousePrimaryButton_ { 0 };
-    int32_t pointerSpeed_ { 7 };
+    int32_t pointerSpeed_ { 10 };
     int32_t touchpadRightClickType_ { 1 };
     int32_t touchpadPointerSpeed_ { 9 };
     bool touchpadTapSwitch_ { true };
