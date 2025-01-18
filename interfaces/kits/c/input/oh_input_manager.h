@@ -537,7 +537,7 @@ int64_t OH_Input_GetKeyEventActionTime(const struct Input_KeyEvent* keyEvent);
  * @param keyEvent Key event object.
  * @param windowId The windowId for a key event.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 void OH_Input_SetKeyEventWindowId(struct Input_KeyEvent* keyEvent, int32_t windowId);
 
@@ -547,7 +547,7 @@ void OH_Input_SetKeyEventWindowId(struct Input_KeyEvent* keyEvent, int32_t windo
  * @param keyEvent Key event object.
  * @return windowId.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 int32_t OH_Input_GetKeyEventWindowId(const struct Input_KeyEvent* keyEvent);
 
@@ -557,7 +557,7 @@ int32_t OH_Input_GetKeyEventWindowId(const struct Input_KeyEvent* keyEvent);
  * @param keyEvent Key event object.
  * @param displayId The displayId for a key event.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 void OH_Input_SetKeyEventDisplayId(struct Input_KeyEvent* keyEvent, int32_t displayId);
 
@@ -567,7 +567,7 @@ void OH_Input_SetKeyEventDisplayId(struct Input_KeyEvent* keyEvent, int32_t disp
  * @param keyEvent Key event object.
  * @return displayId.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 int32_t OH_Input_GetKeyEventDisplayId(const struct Input_KeyEvent* keyEvent);
 
@@ -749,7 +749,7 @@ int64_t OH_Input_GetMouseEventActionTime(const struct Input_MouseEvent* mouseEve
  * @param mouseEvent Mouse event object.
  * @param windowId The windowId for a mouse event.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 void OH_Input_SetMouseEventWindowId(struct Input_MouseEvent* mouseEvent, int32_t windowId);
 
@@ -759,7 +759,7 @@ void OH_Input_SetMouseEventWindowId(struct Input_MouseEvent* mouseEvent, int32_t
  * @param mouseEvent Mouse event object.
  * @return windowId.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 int32_t OH_Input_GetMouseEventWindowId(const struct Input_MouseEvent* mouseEvent);
 
@@ -769,7 +769,7 @@ int32_t OH_Input_GetMouseEventWindowId(const struct Input_MouseEvent* mouseEvent
  * @param mouseEvent Mouse event object.
  * @param displayId The displayId for a mouse event.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 void OH_Input_SetMouseEventDisplayId(struct Input_MouseEvent* mouseEvent, int32_t displayId);
 
@@ -779,7 +779,7 @@ void OH_Input_SetMouseEventDisplayId(struct Input_MouseEvent* mouseEvent, int32_
  * @param mouseEvent Mouse event object.
  * @return displayId.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 int32_t OH_Input_GetMouseEventDisplayId(const struct Input_MouseEvent* mouseEvent);
 
@@ -920,7 +920,7 @@ int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEve
  * @param touchEvent Touch event object.
  * @param windowId The windowId for a touch event.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 void OH_Input_SetTouchEventWindowId(struct Input_TouchEvent* touchEvent, int32_t windowId);
 
@@ -930,7 +930,7 @@ void OH_Input_SetTouchEventWindowId(struct Input_TouchEvent* touchEvent, int32_t
  * @param touchEvent Touch event object.
  * @return windowId.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
 */
 int32_t OH_Input_GetTouchEventWindowId(const struct Input_TouchEvent* touchEvent);
 
@@ -940,7 +940,7 @@ int32_t OH_Input_GetTouchEventWindowId(const struct Input_TouchEvent* touchEvent
  * @param touchEvent Touch event object.
  * @param displayId The displayId for a touch event.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 void OH_Input_SetTouchEventDisplayId(struct Input_TouchEvent* touchEvent, int32_t displayId);
 
@@ -950,7 +950,7 @@ void OH_Input_SetTouchEventDisplayId(struct Input_TouchEvent* touchEvent, int32_
  * @param touchEvent Touch event object.
  * @return displayId.
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
 */
 int32_t OH_Input_GetTouchEventDisplayId(const struct Input_TouchEvent* touchEvent);
 
@@ -1180,7 +1180,7 @@ Input_Result OH_Input_GetAxisEventSourceType(const Input_AxisEvent* axisEvent, I
  *         {@link INPUT_SUCCESS} Sets the Y coordinate of the axis event success.\n
  *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 Input_Result OH_Input_SetAxisEventWindowId(Input_AxisEvent* axisEvent, int32_t windowId);
 
@@ -1193,7 +1193,7 @@ Input_Result OH_Input_SetAxisEventWindowId(Input_AxisEvent* axisEvent, int32_t w
  *         {@link INPUT_SUCCESS} Obtains the Y coordinate of the axis event success.\n
  *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the displayY is NULL.\n
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 Input_Result OH_Input_GetAxisEventWindowId(const Input_AxisEvent* axisEvent, int32_t* windowId);
 
@@ -1206,7 +1206,7 @@ Input_Result OH_Input_GetAxisEventWindowId(const Input_AxisEvent* axisEvent, int
  *         {@link INPUT_SUCCESS} Sets the Y coordinate of the axis event success.\n
  *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 Input_Result OH_Input_SetAxisEventDisplayId(Input_AxisEvent* axisEvent, int32_t displayId);
 
@@ -1219,7 +1219,7 @@ Input_Result OH_Input_SetAxisEventDisplayId(Input_AxisEvent* axisEvent, int32_t 
  *         {@link INPUT_SUCCESS} Obtains the Y coordinate of the axis event success.\n
  *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the displayY is NULL.\n
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 16
+ * @since 15
  */
 Input_Result OH_Input_GetAxisEventDisplayId(const Input_AxisEvent* axisEvent, int32_t* displayId);
 
