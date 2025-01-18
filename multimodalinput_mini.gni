@@ -55,6 +55,7 @@ declare_args() {
   input_new_knuckle_dynamic_enabled = true
   input_feature_virtual_keyboard = false
   input_feature_dfx_radar_enable = true
+  input_one_hand_mode_enable = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -290,6 +291,7 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
+print("input_one_hand_mode_enable = ${input_one_hand_mode_enable}")
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 
 input_default_defines = []
@@ -336,6 +338,10 @@ if (input_feature_fingerprint) {
 
 if (input_feature_crown) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_CROWN" ]
+}
+
+if (input_one_hand_mode_enable) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_ONE_HAND_MODE" ]
 }
 
 if (!defined(global_parts_info) ||
