@@ -5226,6 +5226,11 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
         MMI_HILOGI("Cancel touch(%{public}d)", item.GetPointerId());
         auto now = GetSysClockTime();
         pointerEvent->SetActionTime(now);
+        pointerEvent->SetTargetWindowId(item.GetTargetWindowId());
+        auto winOpt = GetWindowAndDisplayInfo(item.GetTargetWindowId(), pointerEvent->GetTargetDisplayId());
+        if (winOpt) {
+            pointerEvent->SetAgentWindowId(winOpt->agentWindowId);
+        }
         pointerEvent->UpdateId();
 
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
