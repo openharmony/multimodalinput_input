@@ -729,7 +729,8 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.dpi << item.name << item.uniq << item.direction
             << item.displayDirection << item.displayMode << item.transform << item.ppi << item.offsetX
-            << item.offsetY;
+            << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
+            << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination;
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
         pkt << item.oneHandX << item.oneHandY;
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
