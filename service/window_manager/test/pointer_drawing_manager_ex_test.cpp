@@ -306,7 +306,8 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation
     int32_t x = 100;
     int32_t y = 100;
     pointerDrawingManager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y));
+    int32_t displayId = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
 }
 
 /**
@@ -326,7 +327,8 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y));
+    int32_t displayId = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
 }
 
 /**

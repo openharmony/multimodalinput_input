@@ -989,7 +989,8 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y, int32_
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y, false);
     cursorPos = WIN_MGR->GetCursorPos();
-    IPointerDrawingManager::GetInstance()->SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    IPointerDrawingManager::GetInstance()->SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y,
+        cursorPos.displayId);
     MMI_HILOGI("CursorPosX:%f, cursorPosY:%f", cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     return RET_OK;
 }
