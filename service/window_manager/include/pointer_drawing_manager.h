@@ -242,6 +242,7 @@ private:
     void SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_TYPE align);
     void HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void HideHardwareCursors();
+    int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo, DisplayInfo &mainScreenDisplayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
