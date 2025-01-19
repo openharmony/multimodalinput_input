@@ -188,6 +188,7 @@ void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
         return;
     }
 
+    isCurrentOffScreenRendering_ = di.isCurrentOffScreenRendering;
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
     MMI_HILOGD("Update with DisplayInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
@@ -257,7 +258,7 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
         py = paddingTop_ + y * scale_ - dy;
     } else if (GetIsCurrentOffScreenRendering() && IsExtend()) {
         px = (px + FOCUS_POINT) * offRenderScale_ - FOCUS_POINT;
-        py = (px + FOCUS_POINT) * offRenderScale_ - FOCUS_POINT;
+        py = (py + FOCUS_POINT) * offRenderScale_ - FOCUS_POINT;
     }
 
     auto buffer = GetCurrentBuffer();
