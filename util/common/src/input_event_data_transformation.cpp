@@ -313,6 +313,13 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
     pkt << event->GetVelocity();
     pkt << event->GetAxisEventType();
     pkt << event->GetHandOption();
+    PointerEvent::FixedMode fixedMode = event->GetFixedMode();
+    if (fixedMode > PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN &&
+        fixedMode < PointerEvent::FixedMode::SCREEN_MODE_MAX) {
+        pkt << static_cast<int32_t>(fixedMode);
+    } else {
+        pkt << static_cast<int32_t>(PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN);
+    }
 }
 
 void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
@@ -347,6 +354,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     SetAxisInfo(pkt, event);
     pkt >> tField;
     event->SetHandOption(tField);
+    pkt >> tField;
+    event->SetFixedMode(static_cast<PointerEvent::FixedMode>(tField));
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;

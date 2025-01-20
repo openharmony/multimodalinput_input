@@ -519,7 +519,11 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       ancoDeal_(other.ancoDeal_),
 #endif // OHOS_BUILD_ENABLE_ANCO
       handleEventType_(other.handleEventType_),
-      settings_(other.settings_), handOption_(other.handOption_) {}
+      settings_(other.settings_),
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+      autoToVirtualScreen_(other.autoToVirtualScreen_),
+#endif
+      handOption_(other.handOption_), fixedMode_(other.fixedMode_) {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -1434,7 +1438,7 @@ PointerEvent::FixedMode PointerEvent::GetFixedMode() const
     return fixedMode_;
 }
 
-std::string PointerEvent::GetFixedModeStr()
+std::string PointerEvent::GetFixedModeStr() const
 {
     switch (fixedMode_) {
         case PointerEvent::FixedMode::NORMAL:
