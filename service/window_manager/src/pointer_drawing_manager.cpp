@@ -1137,7 +1137,7 @@ void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rose
     uint32_t addrSize = buffer->GetWidth() * buffer->GetHeight() * CURSOR_STRIDE;
     auto ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), addrSize);
     if (ret != EOK) {
-        MMI_HILOGE("memcpy_s failed, ret: %{public}d", ret);
+        MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
         return;
     }
     for (auto &sp : GetMirrorScreenPointers()) {
@@ -1147,7 +1147,7 @@ void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rose
         CHKPC(addr);
         ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), addrSize);
         if (ret != EOK) {
-            MMI_HILOGE("memcpy_s failed, ret: %{public}d", ret);
+            MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
             return;
         }
     }
