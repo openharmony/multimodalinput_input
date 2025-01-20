@@ -295,10 +295,10 @@ int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32
     }
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         iter->second = WIN_MGR->GetDisplayMode();
-        if (iter->second != DisplayMode::SUB) {
+        if (iter->second != DisplayMode::SUB && iter->second != DisplayMode::MAIN) {
             return keyCode;
         }
-    } else if (iter->second != DisplayMode::SUB) {
+    } else if (iter->second != DisplayMode::SUB && iter->second != DisplayMode::MAIN) {
         return keyCode;
     }
     const char *name = libinput_device_get_name(dev);
