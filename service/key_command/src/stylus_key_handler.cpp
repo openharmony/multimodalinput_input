@@ -131,7 +131,13 @@ void StylusKeyHandler::LaunchAbility(const Ability &ability)
         want.SetParam(item.first, item.second);
     }
 
+    auto begin = std::chrono::high_resolution_clock::now();
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }

@@ -1672,9 +1672,10 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState_002, T
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
     int32_t funcKey = 1;
+    int32_t pid = 15;
     bool enable = true;
     INPUT_DEV_MGR->IsKeyboardDevice(nullptr);
-    EXPECT_EQ(handler.OnSetFunctionKeyState(funcKey, enable), ERR_DEVICE_NOT_EXIST);
+    EXPECT_EQ(handler.OnSetFunctionKeyState(pid, funcKey, enable), ERR_DEVICE_NOT_EXIST);
 }
 
 /**

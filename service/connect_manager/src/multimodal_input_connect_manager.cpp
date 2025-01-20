@@ -138,12 +138,12 @@ int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
     return multimodalInputConnectService_->SetMouseScrollRows(rows);
 }
 
-int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
+int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY,
     void* pixelMap)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
+    return multimodalInputConnectService_->SetCustomCursor(windowId, focusX, focusY, pixelMap);
 }
 
 int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t windowId, void* pixelMap)
@@ -984,13 +984,12 @@ int32_t MultimodalInputConnectManager::SetInputDeviceEnabled(int32_t deviceId, b
     return multimodalInputConnectService_->SetInputDeviceEnabled(deviceId, enable, index);
 }
 
-int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(int32_t sourceWindowId,
-                                                            int32_t targetWindowId, bool autoGenDown)
+int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    return multimodalInputConnectService_->ShiftAppPointerEvent(param, autoGenDown);
 }
 
 int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)

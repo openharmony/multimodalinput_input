@@ -37,6 +37,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -58,7 +59,7 @@ public:
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
-    virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) = 0;
+    virtual int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) = 0;
     virtual int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) = 0;
     virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap) = 0;
     virtual int32_t SetPointerSize(int32_t size) = 0;
@@ -178,7 +179,7 @@ public:
     virtual int32_t SkipPointerLayer(bool isSkip) = 0;
     virtual int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) = 0;
     virtual int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) = 0;
-    virtual int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) = 0;
+    virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

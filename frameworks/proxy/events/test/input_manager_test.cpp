@@ -3477,8 +3477,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventZorder_001, TestSi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
-
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false));
 }
 
 /**
@@ -4720,7 +4719,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_001, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d disable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("set input device result: %{public}d ", result);
+            MMI_HILOGI("Set input device result: %{public}d ", result);
             ASSERT_EQ(result, RET_OK);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, false, cb);
@@ -4742,7 +4741,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_002, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d enable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("set input device result: %{public}d ", result);
+            MMI_HILOGI("Set input device result: %{public}d ", result);
             ASSERT_EQ(result, RET_OK);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, true, cb);
@@ -4759,7 +4758,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_003, TestSize.L
 {
     CALL_TEST_DEBUG;
     auto cb = [](int32_t result) {
-        MMI_HILOGI("set input device result: %{public}d ", result);
+        MMI_HILOGI("Set input device result: %{public}d ", result);
         ASSERT_EQ(result, ERROR_DEVICE_NOT_EXIST);
     };
     InputManager::GetInstance()->SetInputDeviceEnabled(10000, true, cb);

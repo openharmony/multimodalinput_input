@@ -31,7 +31,7 @@ int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const DeviceItem&
     CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("Manage KeyBoard array failed, inputData is empty.");
+        MMI_HILOGE("Manage KeyBoard array failed, inputData is empty");
         return RET_ERR;
     }
     std::vector<KeyBoardEvent> keyBoardEventArray;

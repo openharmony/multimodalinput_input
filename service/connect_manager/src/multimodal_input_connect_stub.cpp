@@ -612,10 +612,8 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t windowId = 0;
-    int32_t windowPid = INVALID_PID;
     int32_t focusX = 0;
     int32_t focusY = 0;
-    READINT32(data, windowPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusX, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusY, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -629,7 +627,7 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
     focusY = focusY < 0 ? 0 : focusY;
     focusX = focusX > pixelMap->GetWidth() ? pixelMap->GetWidth() : focusX;
     focusY = focusY > pixelMap->GetHeight() ? pixelMap->GetHeight() : focusY;
-    int32_t ret = SetCustomCursor(windowPid, windowId, focusX, focusY, (void*)pixelMap);
+    int32_t ret = SetCustomCursor(windowId, focusX, focusY, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
         return ret;
@@ -640,6 +638,10 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1527,6 +1529,10 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 
     int32_t subscribeId = 0;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -1991,6 +1997,10 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
     }
 
     int32_t windowId = 0;
@@ -2874,6 +2884,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(Message
 int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool enable = false;
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = EnableHardwareCursorStats(enable);
@@ -2887,6 +2901,10 @@ int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel&
 int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     uint32_t frameCount = 0;
     uint32_t vsyncCount = 0;
     int32_t ret = GetHardwareCursorStats(frameCount, vsyncCount);
@@ -3076,6 +3094,10 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
 int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     bool isSkip = true;
     READBOOL(data, isSkip, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SkipPointerLayer(isSkip);
@@ -3185,19 +3207,14 @@ int32_t MultimodalInputConnectStub::StubShiftAppPointerEvent(MessageParcel& data
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t sourceWindowId = -1;
-    READINT32(data, sourceWindowId, ERR_INVALID_VALUE);
-    int32_t targetWindowId = -1;
-    READINT32(data, targetWindowId, ERR_INVALID_VALUE);
-    if (sourceWindowId <= 0 || targetWindowId <= 0) {
-        MMI_HILOGE("Invalid sourceWindowId or targetWindowId,sourceWindowId:%{public}d, targetWindowId:%{public}d",
-            sourceWindowId, targetWindowId);
-        return RET_ERR;
-    }
-    
+    ShiftWindowParam param;
+    READINT32(data, param.sourceWindowId, ERR_INVALID_VALUE);
+    READINT32(data, param.targetWindowId, ERR_INVALID_VALUE);
+    READINT32(data, param.x, ERR_INVALID_VALUE);
+    READINT32(data, param.y, ERR_INVALID_VALUE);
     bool autoGenDown = true;
     READBOOL(data, autoGenDown, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = ShiftAppPointerEvent(param, autoGenDown);
     if (ret != RET_OK) {
         MMI_HILOGE("shift AppPointerEvent failed, ret:%{public}d", ret);
     }

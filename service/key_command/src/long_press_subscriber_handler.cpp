@@ -476,7 +476,13 @@ int32_t LongPressSubscriberHandler::GetBundleName(std::string &bundleName, int32
         userid = DEFAULT_USER_ID;
     }
     std::vector<AppExecFwk::RunningProcessInfo> info;
+    auto begin = std::chrono::high_resolution_clock::now();
     appMgrClient->GetProcessRunningInfosByUserId(info, userid);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_PROC_RUNNING_INFOS_BY_UID, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     for (const auto &item : info) {
         if (item.bundleNames.empty()) {
             continue;
@@ -509,6 +515,9 @@ void LongPressSubscriberHandler::NotifySubscriber(std::shared_ptr<Subscriber> su
     if (GetBundleName(bundleName, windowPid) == RET_ERR) {
         MMI_HILOGE("Failed to get bundle name, pid %{public}d", windowPid);
     }
+    int32_t id = touchEvent_->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent_->GetPointerItem(id, item);
     LongPressEvent longPressEvent = {
         .fingerCount = subscriber->fingerCount_,
         .duration = subscriber->duration_,
@@ -519,6 +528,7 @@ void LongPressSubscriberHandler::NotifySubscriber(std::shared_ptr<Subscriber> su
         .result = result,
         .windowId = touchEvent_->GetTargetWindowId(),
         .pointerId = touchEvent_->GetPointerId(),
+        .downTime = item.GetDownTime(),
         .bundleName = bundleName,
     };
 

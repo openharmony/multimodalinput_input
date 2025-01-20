@@ -132,7 +132,7 @@ public:
     MOCK_METHOD(bool, IsKnuckleOnAncoWindow, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    MOCK_METHOD(int32_t, ShiftAppPointerEvent, (int32_t, int32_t, bool));
+    MOCK_METHOD(int32_t, ShiftAppPointerEvent, (const ShiftWindowParam&, bool));
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MOCK_METHOD(bool, IsSupported, ());

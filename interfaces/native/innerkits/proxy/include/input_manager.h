@@ -41,6 +41,7 @@
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -326,10 +327,12 @@ public:
      * This event will be distributed and processed in the same way as the event reported by the input device.
      * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
      * or mouse device input event to simulate.
+     * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
+     * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
      * @return void
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen = true);
 
     /**
      * @brief Simulates a touchpad input event, touchscreen input event, or mouse device input event.
@@ -337,10 +340,12 @@ public:
      * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
      * or mouse device input event to simulate.
      * @param zOrder Indicates the point event will inject to the window whose index value is less than the zOrder
+     * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
+     * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
      * @return void
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder, bool isAutoToVirtualScreen);
 
     /**
      * @brief Simulates a touchpad input event.
@@ -1099,8 +1104,7 @@ public:
 
     /**
      * @brief shift AppPointerEvent from source window to target window
-     * @param sourceWindowId - source window id.
-     * @param targetWindowId - target window id.
+     * @param param - param for shift pointer event.
      * @param autoGenDown - send down event if true.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 13

@@ -29,7 +29,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const DeviceIt
     }
     std::vector<DeviceEvent> inputData = touchScreenEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("Manage touchScreen array failed, inputData is empty.");
+        MMI_HILOGE("Manage touchScreen array failed, inputData is empty");
         return RET_ERR;
     }
     TouchScreenInputEvents touchScreenInputEvents = {};

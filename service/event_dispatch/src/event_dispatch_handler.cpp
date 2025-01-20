@@ -223,7 +223,13 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
     uint32_t pid, int32_t pointCnt)
 {
 #ifndef OHOS_BUILD_ENABLE_WATCH
+    auto begin = std::chrono::high_resolution_clock::now();
     OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #endif // OHOS_BUILD_ENABLE_WATCH
 }
 

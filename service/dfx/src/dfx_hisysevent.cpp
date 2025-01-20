@@ -28,7 +28,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_DEVICE_ID { -1 };
 constexpr uint32_t REPORT_DISPATCH_TIMES { 100 };
 constexpr uint32_t REPORT_COMBO_START_TIMES { 100 };
 constexpr uint32_t POINTER_CLEAR_TIMES { 10 };
@@ -44,9 +43,7 @@ constexpr int32_t FAIL_SUCC_TIME_DIFF { 3 * 60 * 1000 };
 constexpr int32_t MIN_GESTURE_TIMESTAMPS_SIZE { 2 };
 constexpr int32_t DOWN_TO_PREV_UP_MAX_TIME_THRESHOLD { 1000 * 1000 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-constexpr int32_t CALC_KEY_EVENT_TIMES { 100 };
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+constexpr int32_t REPORT_MAX_KEY_EVENT_TIMES { 1000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string EMPTY_STRING { "" };
 const char* LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
@@ -55,6 +52,19 @@ const char* ACC0_PATH { "/sys/class/sensors/acc_sensor/info" };
 const char* TP_PATH { "/sys/touchscreen/touch_chip_info" };
 const char* TP0_PATH { "/sys/touchscreen0/touch_chip_info" };
 const char* TP1_PATH { "/sys/touchscreen1/touch_chip_info" };
+const std::string NAME_DISPATCH { "dispatch" };
+const std::string NAME_FILTER { "filter" };
+const std::string NAME_INTERCEPT { "intercept" };
+const std::string NAME_SUBCRIBER { "subcriber" };
+const std::string NAME_FINGERPRINT { "fingerprint" };
+const std::string NAME_STYLUS { "stylus" };
+const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
+const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string WALLET_BUNDLE_NAME { "com.hmos.walletservice" };
+const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
+const std::string NAME_CANCEL { "cancel" };
+const std::string TOUCH_SCREEN_ON { "screen on" };
 } // namespace
 
 static std::string GetVendorInfo(const char* nodePath)
@@ -73,73 +83,6 @@ static std::string GetVendorInfo(const char* nodePath)
     file >> vendorInfo;
     file.close();
     return vendorInfo;
-}
-
-void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    std::shared_ptr<InputDevice> dev = INPUT_DEV_MGR->GetInputDevice(id);
-    CHKPV(dev);
-    std::string message;
-    std::string name;
-    if (type == OHOS::HiviewDFX::HiSysEvent::EventType::FAULT) {
-        message = "The input_device connection failed for already existing";
-        name = "INPUT_DEV_CONNECTION_FAILURE";
-    } else {
-        message = "The input_device connection succeed";
-        name = "INPUT_DEV_CONNECTION_SUCCESS";
-    }
-    if (id == INT32_MAX) {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            name,
-            type,
-            "MSG", "The input_device connection failed because the nextId_ exceeded the upper limit");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    } else {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            name,
-            type,
-            "DEVICE_ID", id,
-            "DEVICE_PHYS", dev->GetPhys(),
-            "DEVICE_NAME", dev->GetName(),
-            "DEVICE_TYPE", dev->GetType(),
-            "MSG", message);
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    }
-}
-
-void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    if (id == INVALID_DEVICE_ID) {
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "INPUT_DEV_DISCONNECTION_FAILURE",
-            type,
-            "MSG", "The input device failed to disconnect to server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    } else {
-        std::shared_ptr dev = INPUT_DEV_MGR->GetInputDevice(id);
-        CHKPV(dev);
-        int32_t ret = HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "INPUT_DEV_DISCONNECTION_SUCCESS",
-            type,
-            "DEVICE_Id", id,
-            "DEVICE_PHYS", dev->GetPhys(),
-            "DEVICE_NAME", dev->GetName(),
-            "DEVICE_TYPE", dev->GetType(),
-            "MSG", "The input device successfully disconnect to server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    }
 }
 
 void DfxHisysevent::OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type)
@@ -1149,23 +1092,61 @@ void DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t d
     if (!apiDurationStatics_.IsLimitMatched()) {
         return;
     }
-    auto apiDurations = apiDurationStatics_.GetDurationBox();
-    for (const auto &apiDuration : apiDurations) {
-        auto api = apiDuration.first;
-        std::vector<int32_t> thresholds;
-        std::vector<int32_t> durationCounts;
-        for (const auto &durationBox : apiDuration.second) {
-            thresholds.push_back(static_cast<int32_t>(durationBox.first));
-            durationCounts.push_back(durationBox.second);
-        }
-        HiSysEventWrite(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "MMI_API_DURATION",
-            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
-            "API_NAME", apiDurationStatics_.ApiToString(api),
-            "DURATION_THRESHOLDS", thresholds,
-            "DURATION_THRESHOLD_COUNTS", durationCounts);
-    }
+    static std::vector<std::string> apiDurationBox { "<=3MS", "<=5MS", "<=10MS", ">10MS" };
+    HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "EXTERNAL_CALL_STATISTIC",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "API_DURATION_BOX", apiDurationBox,
+        "IS_SCREEN_CAPTURE_WORKING",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::IS_SCREEN_CAPTURE_WORKING),
+        "GET_DEFAULT_DISPLAY",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_DEFAULT_DISPLAY),
+        "GET_SYSTEM_ABILITY_MANAGER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_SYSTEM_ABILITY_MANAGER),
+        "IS_FOLDABLE",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::IS_FOLDABLE),
+        "IS_SCREEN_LOCKED",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::IS_SCREEN_LOCKED),
+        "RS_NOTIFY_TOUCH_EVENT",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT),
+        "RESOURCE_SCHEDULE_REPORT_DATA",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA),
+        "GET_CUR_RENDERER_CHANGE_INFOS",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_CUR_RENDERER_CHANGE_INFOS),
+        "GET_PROC_RUNNING_INFOS_BY_UID",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_PROC_RUNNING_INFOS_BY_UID),
+        "TELEPHONY_CALL_MGR_INIT",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_INIT),
+        "TELEPHONY_CALL_MGR_MUTE_RINGER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_MUTE_RINGER),
+        "TELEPHONY_CALL_MGR_HANG_UP_CALL",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_HANG_UP_CALL),
+        "TELEPHONY_CALL_MGR_REJECT_CALL",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_REJECT_CALL),
+        "RE_SCREEN_MODE_CHANGE_LISTENER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::RE_SCREEN_MODE_CHANGE_LISTENER),
+        "SET_ON_REMOTE_DIED_CALLBACK",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::SET_ON_REMOTE_DIED_CALLBACK),
+        "REG_SCREEN_CAPTURE_LISTENER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::REG_SCREEN_CAPTURE_LISTENER),
+        "ABILITY_MGR_START_EXT_ABILITY",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::ABILITY_MGR_START_EXT_ABILITY),
+        "ABILITY_MGR_CLIENT_START_ABILITY",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY),
+        "ABILITY_MGR_CONNECT_ABILITY",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::ABILITY_MGR_CONNECT_ABILITY),
+        "GET_RUNNING_PROCESS_INFO_BY_PID",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_RUNNING_PROCESS_INFO_BY_PID),
+        "REGISTER_APP_DEBUG_LISTENER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::REGISTER_APP_DEBUG_LISTENER),
+        "UNREGISTER_APP_DEBUG_LISTENER",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::UNREGISTER_APP_DEBUG_LISTENER),
+        "PUBLISH_COMMON_EVENT",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::PUBLISH_COMMON_EVENT),
+        "GET_VISIBILITY_WINDOW_INFO",
+            apiDurationStatics_.GetDurationDistribution(ApiDurationStatistics::Api::GET_VISIBILITY_WINDOW_INFO)
+        );
     apiDurationStatics_.ResetApiStatistics();
 }
 
@@ -1180,30 +1161,72 @@ void DfxHisysevent::ReportMMiServiceThreadLongTask(const std::string &taskName)
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
-void DfxHisysevent::ClearCallCount()
+void DfxHisysevent::ClearKeyEventCount()
 {
-    callCount_ = 0;
+    calKeyEventTime_.clear();
+    keyEventCount_ = 0;
 }
 
-void DfxHisysevent::ReportLaunchAbility(int32_t keyCode, int32_t action, std::string bundleName)
+void DfxHisysevent::ReportKeyEvent(std::string name)
 {
-    if (callCount_ < CALC_KEY_EVENT_TIMES) {
-        callCount_++;
-        return;
+    if (name == NAME_FILTER) {
+        ReportKeyEventTimes(KEY_FILTER);
+    } else if (name == NAME_INTERCEPT) {
+        ReportKeyEventTimes(KEY_INTERCEPT);
+    } else if (name == NAME_SUBCRIBER) {
+        ReportKeyEventTimes(KEY_SUBCRIBER);
+    } else if (name == NAME_FINGERPRINT) {
+        ReportKeyEventTimes(FINGERPRINT);
+    } else if (name == NAME_STYLUS) {
+        ReportKeyEventTimes(STYLUS_PEN);
+    } else if (name == AIBASE_BUNDLE_NAME) {
+        ReportKeyEventTimes(AIBASE_VOICE);
+    } else if (name == SCREENSHOT_BUNDLE_NAME) {
+        ReportKeyEventTimes(SCREEN_SHOT);
+    } else if (name == SCREENRECORDER_BUNDLE_NAME) {
+        ReportKeyEventTimes(SCREEN_RECORDING);
+    } else if (name == WALLET_BUNDLE_NAME) {
+        ReportKeyEventTimes(OPEN_WALLET);
+    } else if (name == SOS_BUNDLE_NAME) {
+        ReportKeyEventTimes(OPEN_SOS);
+    } else if (name == NAME_CANCEL) {
+        ReportKeyEventTimes(KEY_EVENT_CANCEL);
+    } else if (name == TOUCH_SCREEN_ON) {
+        ReportKeyEventTimes(KEY_SCREEN_ON);
+    } else {
+        ReportKeyEventTimes(DISPATCH_KEY);
     }
-    if (callCount_ == CALC_KEY_EVENT_TIMES) {
+}
+
+void DfxHisysevent::ReportKeyEventTimes(KEY_CONSUMPTION_TYPE type)
+{
+    if (keyEventCount_ < REPORT_MAX_KEY_EVENT_TIMES) {
+        keyEventCount_++;
+        calKeyEventTime_[type]++;
+    } else {
         int32_t ret = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "KEY_EVENT_DATA",
-            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-            "KEY_CODE", keyCode,
-            "KEY_ACTION", action,
-            "BUNDLE_NAME", bundleName);
+            "KEY_EVENT_STATISTIC",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "DISPATCH_KEY", calKeyEventTime_[DISPATCH_KEY],
+            "KEY_FILTER", calKeyEventTime_[KEY_FILTER],
+            "KEY_INTERCEPT", calKeyEventTime_[KEY_INTERCEPT],
+            "KEY_SUBCRIBER", calKeyEventTime_[KEY_SUBCRIBER],
+            "FINGERPRINT", calKeyEventTime_[FINGERPRINT],
+            "STYLUS_PEN", calKeyEventTime_[STYLUS_PEN],
+            "AIBASE_VOICE", calKeyEventTime_[AIBASE_VOICE],
+            "SCREEN_SHOT", calKeyEventTime_[SCREEN_SHOT],
+            "SCREEN_RECORDING", calKeyEventTime_[SCREEN_RECORDING],
+            "OPEN_WALLET", calKeyEventTime_[OPEN_WALLET],
+            "OPEN_SOS", calKeyEventTime_[OPEN_SOS],
+            "KEY_CANCEL", calKeyEventTime_[KEY_EVENT_CANCEL],
+            "KEY_SCREEN_ON", calKeyEventTime_[KEY_SCREEN_ON]);
         if (ret != 0) {
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
-        ClearCallCount();
+        ClearKeyEventCount();
     }
 }
 
@@ -1211,8 +1234,8 @@ void DfxHisysevent::ReportFailLaunchAbility(std::string bundleName, int32_t erro
 {
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "KEY_EVENT_DATA",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "KEY_EVENT_FAULT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
         "BUNDLE_NAME", bundleName,
         "ERROR_CODE", errorCode);
     if (ret != 0) {
@@ -1220,29 +1243,28 @@ void DfxHisysevent::ReportFailLaunchAbility(std::string bundleName, int32_t erro
     }
 }
 
-void DfxHisysevent::ReportSubscribeKey(std::string flag,
-    std::string name, int32_t keyCode, int32_t action, int32_t id)
+void DfxHisysevent::ReportFailSubscribeKey(std::string functionName, std::string subscribeName,
+    int32_t keyCode, int32_t errorCode)
 {
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "KEY_EVENT_DATA",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-        "FLAG", flag,
-        "SUBSCRIBE_NAME", name,
+        "KEY_EVENT_FAULT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "FUNCTION_NAME", functionName,
+        "SUBSCRIBE_NAME", subscribeName,
         "KEY_CODE", keyCode,
-        "KEY_ACTION", action,
-        "SUBSCRIBE_ID", id);
+        "ERROR_CODE", errorCode);
     if (ret != 0) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
 
-void DfxHisysevent::ReportHandleKey(std::string name, int32_t keyCode, int32_t errorCode)
+void DfxHisysevent::ReportFailHandleKey(std::string name, int32_t keyCode, int32_t errorCode)
 {
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "KEY_EVENT_DATA",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "KEY_EVENT_FAULT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
         "FUNCTION_NAME", name,
         "KEY_CODE", keyCode,
         "ERROR_CODE", errorCode);
@@ -1250,6 +1272,5 @@ void DfxHisysevent::ReportHandleKey(std::string name, int32_t keyCode, int32_t e
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 } // namespace MMI
 } // namespace OHOS

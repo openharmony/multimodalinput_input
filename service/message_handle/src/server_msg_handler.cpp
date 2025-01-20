@@ -25,6 +25,9 @@
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
 #include "client_death_handler.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "display_event_monitor.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
@@ -149,6 +152,12 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
+    std::vector<struct libinput_device*> input_device;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
+    if (input_device.size() == 0) {
+        MMI_HILOGW("No keyboard device is currently available");
+        return ERR_DEVICE_NOT_EXIST;
+    }
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     state = keyEvent->GetFunctionKey(funcKey);
@@ -156,14 +165,19 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
+int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
-    int32_t callerPid = IPCSkeleton::GetCallingPid();
     AppExecFwk::RunningProcessInfo processInfo;
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     CHKPR(appMgrClient, ERROR_NULL_POINTER);
-    appMgrClient->GetRunningProcessInfoByPid(callerPid, processInfo);
+    auto begin = std::chrono::high_resolution_clock::now();
+    appMgrClient->GetRunningProcessInfoByPid(pid, processInfo);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_RUNNING_PROCESS_INFO_BY_PID, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (processInfo.extensionType_ != AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
         MMI_HILOGW("It is prohibited for non-input applications");
         return ERR_NON_INPUT_APPLICATION;
@@ -322,20 +336,23 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
             MouseTransformProcessor::GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
     } else {
+        uint64_t deltaTime = 0;
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
         static uint64_t preTime = -1;
         uint64_t currentTime = static_cast<uint64_t>(pointerEvent->GetActionTime());
         preTime = fmin(preTime, currentTime);
-        uint64_t deltaTime = (currentTime - preTime);
-        ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+        deltaTime = (currentTime - preTime);
+        preTime = currentTime;
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+        if (displayInfo->ppi != 0) {
+            ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed(),
             deltaTime, static_cast<double>(displayInfo->ppi));
-        preTime = currentTime;
-#else
-        ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+        } else {
+            ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
             MouseTransformProcessor::GetPointerSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
-#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+        }
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);
@@ -528,6 +545,32 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
     return RET_OK;
 }
 
+int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo)
+{
+    uint32_t num = 0;
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
+            >> info.offsetX >> info.offsetY >> info.isCurrentOffScreenRendering >> info.screenRealWidth
+            >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination;
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        pkt >> info.oneHandX >> info.oneHandY;
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        displayGroupInfo.displaysInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
@@ -563,20 +606,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             return RET_ERR;
         }
     }
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
-            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
-            >> info.offsetX >> info.offsetY;
-        displayGroupInfo.displaysInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read display info failed");
-            return RET_ERR;
-        }
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
+    if (ReadDisplayInfo(pkt, displayGroupInfo) != RET_OK) {
         return RET_ERR;
     }
     WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
@@ -641,6 +671,13 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
 int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t tokenType = sess->GetTokenType();
+    if (tokenType != TokenType::TOKEN_NATIVE && tokenType != TokenType::TOKEN_SHELL &&
+        tokenType !=TokenType::TOKEN_SYSTEM_HAP) {
+        MMI_HILOGW("Not native or systemapp skip, pid:%{public}d tokenType:%{public}d", sess->GetPid(), tokenType);
+        return RET_ERR;
+    }
     int32_t pid = sess->GetPid();
     WIN_MGR->SetWindowStateNotifyPid(pid);
     MMI_HILOGI("The pid:%{public}d", pid);
@@ -969,7 +1006,7 @@ int32_t ServerMsgHandler::OnCancelInjection(int32_t callPid)
         state, curAuthPid);
     if (state != AuthorizeState::STATE_UNAUTHORIZE) {
         if (callPid != curAuthPid) {
-            MMI_HILOGW("Authorized pid not callPid.");
+            MMI_HILOGW("Authorized pid not callPid");
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         AUTHORIZE_HELPER->CancelAuthorize(curAuthPid);
