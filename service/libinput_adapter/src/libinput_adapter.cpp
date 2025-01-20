@@ -1038,11 +1038,11 @@ void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event* event)
         uint32_t keyCode = libinput_event_keyboard_get_key(keyboardEvent);
         int32_t hasFnKey = libinput_device_has_key(device, LIBINPUT_KEY_FN);
         const char* outPutName = libinput_device_get_name(device);
-        MMI_HILOGD("The current keyCode: %{private}u, hasFnKey %{private}d, outPutName: %{private}s",
+        MMI_HILOGD("The current keyCode:%{private}u, hasFnKey %{private}d, outPutName:%{private}s",
             keyCode, hasFnKey, outPutName);
         if ((keyCode == LIBINPUT_KEY_VOLUME_DOWN || keyCode == LIBINPUT_KEY_VOLUME_UP ||
             keyCode == LIBINPUT_KEY_POWER) && !hasFnKey) {
-            MMI_HILOGD("Skip device local button keyCode: %{private}u", keyCode);
+            MMI_HILOGD("Skip device local button keyCode:%{private}u", keyCode);
             return;
         }
         hardwareKeyEventDetected_();
