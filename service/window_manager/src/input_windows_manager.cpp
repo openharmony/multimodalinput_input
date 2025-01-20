@@ -5156,8 +5156,8 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
         item.SetWindowX(shiftWindowInfo.x);
         item.SetWindowY(shiftWindowInfo.y);
         if (shiftWindowInfo.x == -1 && shiftWindowInfo.y == -1) {
-            item.SetWindowX(lastLogicX_ - sourceWindowInfo->area.x);
-            item.SetWindowY(lastLogicY_ - sourceWindowInfo->area.y);
+            item.SetWindowX(lastLogicX_ - targetWindowInfo->area.x);
+            item.SetWindowY(lastLogicY_ - targetWindowInfo->area.y);
         }
         item.SetPressed(true);
         pointerEvent->ClearButtonPressed();
@@ -5178,7 +5178,7 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
 int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     MMI_HILOGI("Start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
-               "x: %{public}d, y: %{public}d, autoGenDown: %{public}d",
+               "x: %{private}d, y: %{private}d, autoGenDown: %{public}d",
         param.sourceWindowId, param.targetWindowId, param.x, param.y, static_cast<int32_t>(autoGenDown));
     std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(param.sourceWindowId);
     std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(param.targetWindowId);
