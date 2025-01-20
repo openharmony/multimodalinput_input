@@ -1265,6 +1265,24 @@ public:
          * @since 12
          */
         void SetBlobId(int32_t blobId);
+
+        /**
+         * @brief Checks whether the pointer is canceled.
+         * @return Returns <b>true</b> if the pointer is canceled; returns <b>false</b> otherwise.
+         * @since 9
+         */
+        bool IsCanceled() const;
+
+        /**
+         * @brief Sets whether to enable the canceled state for the pointer.
+         * @param canceled Specifies whether to set the canceled state for the pointer.
+         * The value <b>true</b> means to set the canceled state for the pointer, and the
+         * value <b>false</b> means the opposite.
+         * @return void
+         * @since 9
+         */
+        void SetCanceled(bool canceled);
+
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
         /**
          * @brief Obtains the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
@@ -1329,6 +1347,7 @@ public:
         int32_t rawDisplayX_ {};
         int32_t rawDisplayY_ {};
         int32_t blobId_ {};
+        bool canceled_ { false };
     };
 
 public:
