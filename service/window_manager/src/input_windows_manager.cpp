@@ -5177,7 +5177,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
         int32_t displayId = iter->first;
         const std::vector<WindowInfo> &windowsInfo = iter->second.windowsInfo;
         if (displayId < 0) {
-            MMI_HILOGE("windowsPerDisplay_ contain invalid displayId: %{public}d", displayId);
+            MMI_HILOGE("windowsPerDisplay_ contain invalid displayId:%{public}d", displayId);
             continue;
         }
         for (const auto& item : windowsInfo) {
