@@ -99,6 +99,30 @@ std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
     return pointerEvent_;
 }
 
+#ifdef OHOS_BUILD_EMULATOR
+static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const DisplayInfo &displayInfo)
+{
+    auto direction = displayInfo.displayDirection;
+    auto width = displayInfo.width;
+    auto height = displayInfo.height;
+    constexpr int evenNum = 2;
+    if ((displayInfo.displayDirection - displayInfo.direction) % evenNum != 0) {
+        std::swap(width, height);
+    }
+    if (direction == DIRECTION90) {
+        std::swap(offset.dx, offset.dy);
+        offset.dx = width - offset.dx;
+    } else if (direction == DIRECTION180) {
+        offset.dx = width - offset.dx;
+        offset.dy = height - offset.dy;
+    } else if (direction == DIRECTION270) {
+        std::swap(offset.dx, offset.dy);
+        offset.dy = height - offset.dy;
+    }
+    return {offset.dx, offset.dy};
+}
+#endif
+
 int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
@@ -155,8 +179,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         return ret;
     }
 #ifdef OHOS_BUILD_EMULATOR
-    cursorPos.cursorPos.x = offset.dx;
-    cursorPos.cursorPos.y = offset.dy;
+    cursorPos.cursorPos = CalculateCursorPosFromOffset(offset, *displayInfo);
 #endif // OHOS_BUILD_EMULATOR
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     pointerEvent_->SetTargetDisplayId(cursorPos.displayId);
