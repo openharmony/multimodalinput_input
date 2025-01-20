@@ -2300,7 +2300,7 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
         MMI_HILOGE("Get window pid failed");
         return RET_ERR;
     }
-    MMI_HILOGD("windowpid is %{public}d", windowPid);
+    MMI_HILOGD("The windowpid is:%{public}d", windowPid);
     return RET_OK;
 }
 
@@ -2317,7 +2317,7 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
         MMI_HILOGE("OnGetWindowPid failed, ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("windowpid is %{public}d", windowPid);
+    MMI_HILOGD("The windowpid is:%{public}d", windowPid);
     return windowPid;
 }
 
