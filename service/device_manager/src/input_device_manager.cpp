@@ -972,7 +972,7 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("The deviceId: %{public}d, enable: %{public}d, pid: %{public}d", deviceId, enable, pid);
+    MMI_HILOGI("The deviceId:%{public}d, enable:%{public}d, pid:%{public}d", deviceId, enable, pid);
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
         NotifyInputdeviceMessage(session, index, ERROR_DEVICE_NOT_EXIST);
@@ -981,7 +981,7 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     }
     item->second.enable = enable;
     if (!enable) {
-        MMI_HILOGD("Disable inputdevice, save calling pid: %{public}d to recoverlist", pid);
+        MMI_HILOGD("Disable inputdevice, save calling pid:%{public}d to recoverlist", pid);
         recoverList_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
         InitSessionLostCallback();
     }
