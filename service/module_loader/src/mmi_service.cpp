@@ -3460,7 +3460,7 @@ int32_t MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool aut
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
-        [&param, autoGenDown]() {
+        [param, autoGenDown]() {
             return WIN_MGR->ShiftAppPointerEvent(param, autoGenDown);
         }
         );
