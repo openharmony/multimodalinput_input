@@ -96,9 +96,9 @@ private:
     void OnDeviceRemoved(std::string path);
     void InitRightButtonAreaConfig();
     void InjectKeyEvent(libinput_event_touch* touch, int32_t keyCode, libinput_key_state state, int64_t frameTime);
-    void InjectCombinationKeyEvent(libinput_event_touch* touch, std::vector<int32_t>& toggleKeyCodes,
-                                   int32_t triggerKeyCode, int64_t frameTime);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void HandleVFullKeyboardMessages(
+        libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch);
     void HandleVKeyTouchpadMessages(libinput_event_touch* touch);
     void OnVKeyTrackPadMessage(libinput_event_touch* touch,
         const std::vector<std::vector<int32_t>>& msgList);
