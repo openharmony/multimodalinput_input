@@ -1974,9 +1974,9 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
         MMI_HILOGE("Invalid extraData.sourceType:%{public}d", extraData.sourceType);
         return RET_ERR;
     }
-    if (extraData.pointerId < 0 || extraData.pullId < 0 || extraData.eventId < 0) {
-        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, sourceType:%{public}d,"
-            "pullId:%{public}d, eventId:%{public}d", extraData.sourceType, extraData.pullId, extraData.eventId);
+    if (extraData.pointerId < 0 || extraData.pullId < 0) {
+        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, pointerId:%{public}d,"
+            "pullId:%{public}d, eventId:%{public}d", extraData.pointerId, extraData.pullId, extraData.eventId);
         return RET_ERR;
     }
     
