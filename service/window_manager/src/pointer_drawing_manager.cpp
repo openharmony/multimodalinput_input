@@ -1867,6 +1867,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
     int32_t focusY)
 {
     CALL_DEBUG_ENTER;
+    followSystem_ = false;
     CHKPR(pixelMap, RET_ERR);
     if (pid == -1) {
         MMI_HILOGE("The pid is invalid");
@@ -3371,6 +3372,43 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
 std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
 {
     std::lock_guard<std::mutex> guard(mtx_);
+    if (userIcon_ == nullptr) {
+        MMI_HILOGI("userIcon_ is nullptr");
+        return nullptr; 
+    }
+    if (followSystem_) {
+        Parcel data;
+        userIcon_->Marshalling(data);
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr(OHOS::Media::PixelMap::Unmarshalling(data));
+        if (pixelMapPtr == nullptr) {
+            MMI_HILOGE("pixelMapPtr is nullptr");
+            return nullptr; 
+        }
+        Media::ImageInfo imageInfo;
+        pixelMapPtr->GetImageInfo(imageInfo);
+        int32_t cursorSize = GetPointerSize();
+        float axis = 1.0f;
+        cursorWidth_ = pow(INCREASE_RATIO, cursorSize - 1) * imageInfo.size.width;
+        cursorHeight_ = pow(INCREASE_RATIO, cursorSize - 1) * imageInfo.size.height;
+        int32_t maxValue = imageInfo.size.width > imageInfo.size.height ? cursorWidth_ : cursorHeight_;
+        if (maxValue > MAX_CUSTOM_CURSOR_DIMENSION) {
+            axis = (float)MAX_CUSTOM_CURSOR_DIMENSION / (float)std::max(imageInfo.size.width, imageInfo.size.height);
+        } else {
+            axis = (float)std::max(cursorWidth_, cursorHeight_) /
+                (float)std::max(imageInfo.size.width, imageInfo.size.height);
+        }
+        pixelMapPtr->scale(axis, axis, Media::AntiAliasingOption::LOW);
+        cursorWidth_ = static_cast<int32_t>((float)imageInfo.size.width * axis);
+        cursorHeight_ = static_cast<int32_t>((float)imageInfo.size.height * axis);
+        userIconHotSpotX_ = static_cast<int32_t>((float)focusX_ * axis);
+        userIconHotSpotY_ = static_cast<int32_t>((float)focusY_ * axis);
+        MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d,"
+            "imageHeight:%{public}d, focusX:%{public}d, focusY:%{public}d, axis:%{public}f,"
+            "userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
+            cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
+            focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
+        return pixelMapPtr;
+    }
     return userIcon_;
 }
 
@@ -3382,10 +3420,8 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
         MMI_HILOGE("The windowId not in right pid");
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
-    if (options.followSystem) {
-        return SetCustomCursor(cursor.pixelMap, pid, windowId, cursor.focusX, cursor.focusY);
-    }
-    int32_t ret = UpdateCursorProperty(cursor);
+    followSystem_ = options.followSystem;
+    int32_t ret = UpdateCursorProperty(cursor, options);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
         return ret;
@@ -3410,10 +3446,6 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     CHKPR(newPixelMap, RET_ERR);
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
-    if (imageInfo.size.width < cursor.focusX || imageInfo.size.width < cursor.focusY) {
-        MMI_HILOGE("focus is invalid");
-        return RET_ERR;
-    }
     if (imageInfo.size.width > MAX_CUSTOM_CURSOR_SIZE || imageInfo.size.height > MAX_CUSTOM_CURSOR_SIZE) {
         MMI_HILOGE("PixelMap is invalid");
         return RET_ERR;
@@ -3424,13 +3456,13 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
         std::lock_guard<std::mutex> guard(mtx_);
         userIcon_.reset(newPixelMap);
     }
+    focusX_ = cursor.focusX;
+    focusY_ = cursor.focusY;
     userIconHotSpotX_ = cursor.focusX;
     userIconHotSpotY_ = cursor.focusY;
-    MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
-        "focusX:%{public}d, focusY:%{public}d, userIconHotSpotX_:%{public}d,"
-        "userIconHotSpotY_:%{public}d", cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
-        cursor.focusX, cursor.focusY, userIconHotSpotX_, userIconHotSpotY_);
-    return RET_OK;
+    MMI_HILOGI("imageWidth:%{public}d, imageHeight:%{public}d, focusX:%{public}d, focusY:%{public}d",
+        imageInfo.size.width, imageInfo.size.height, cursor.focusX, cursor.focusY);
+     return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
