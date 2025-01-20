@@ -1188,7 +1188,7 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
 
     // Currently, a process is authorized.state is AuthorizeState::STATE_AUTHORIZE
     if (pid != AUTHORIZE_HELPER->GetAuthorizePid()) {
-        MMI_HILOGI("Other processes have been authorized.");
+        MMI_HILOGI("Other processes have been authorized");
         return COMMON_PERMISSION_CHECK_ERROR;
     }
     return RET_OK;
