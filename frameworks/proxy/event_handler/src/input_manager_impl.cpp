@@ -573,10 +573,12 @@ void InputManagerImpl::UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent
 {
     CHKPV(pointerEvent);
     if (pointerEvent->GetFixedMode() != PointerEvent::FixedMode::ONE_HAND) {
-        MMI_HILOG_DISPATCHD("Pointer event screen mode=%{public}d",
-            static_cast<int32_t>(pointerEvent->GetFixedMode()));
+        MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
+            static_cast<int32_t>(pointerEvent->GetFixedMode()), pointerEvent->GetFixedModeStr().c_str());
         return;
     }
+    MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
+        static_cast<int32_t>(pointerEvent->GetFixedMode()), pointerEvent->GetFixedModeStr().c_str());
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
