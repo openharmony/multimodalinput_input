@@ -362,7 +362,14 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
     CHKPV(pointerEvent);
     WIN_MGR->UpdateTargetPointer(pointerEvent);
     BytraceAdapter::StartTouchEvent(pointerEvent->GetId());
-    nextHandler_->HandleTouchEvent(pointerEvent);
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        return;
+    }
+    if (!item.IsCanceled()) {
+        nextHandler_->HandleTouchEvent(pointerEvent);
+    }
     BytraceAdapter::StopTouchEvent();
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
@@ -683,10 +690,17 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         MMI_HILOGE("Failed to set origin pointerId");
         return RET_ERR;
     }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        nextHandler_->HandlePointerEvent(pointerEvent);
-    } else {
-        nextHandler_->HandleTouchEvent(pointerEvent);
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        return RET_ERR;
+    }
+    if (!item.IsCanceled()) {
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+            nextHandler_->HandlePointerEvent(pointerEvent);
+        } else {
+            nextHandler_->HandleTouchEvent(pointerEvent);
+        }
     }
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);

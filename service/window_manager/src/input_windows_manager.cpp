@@ -355,7 +355,7 @@ bool InputWindowsManager::AdjustFingerFlag(std::shared_ptr<PointerEvent> pointer
         return false;
     }
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    return (iter != touchItemDownInfos_.end() && !(iter->second.flag));
+    return ((iter == touchItemDownInfos_.end()) || !(iter->second.flag));
 }
 
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
@@ -3657,6 +3657,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (it == touchItemDownInfos_.end() ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+                int32_t originPointerAction = pointerEvent->GetPointerAction();
+                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+                pointerEvent->SetOriginPointerAction(originPointerAction);
+                pointerItem.SetCanceled(true);
+                pointerEvent->UpdatePointerItem(pointerId, pointerItem);
                 MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{private}f,"
                     "logicalY:%{private}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
                 return RET_ERR;
