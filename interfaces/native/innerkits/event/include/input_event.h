@@ -124,7 +124,8 @@ public:
     static constexpr uint32_t EVENT_FLAG_SIMULATE_NAVIGATION = 0x00000200;
 
     static constexpr uint32_t EVENT_FLAG_GENERATE_FROM_REAL = 0x00000400;
-
+    
+    static constexpr uint32_t EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH = 0x00000600;
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
      *

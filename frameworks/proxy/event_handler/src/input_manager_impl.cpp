@@ -1147,12 +1147,7 @@ int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, int32_t focusX, int3
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t winPid = GetWindowPid(windowId);
-    if (winPid == -1) {
-        MMI_HILOGE("The winPid is invalid");
-        return RET_ERR;
-    }
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(winPid, windowId, focusX, focusY, pixelMap);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(windowId, focusX, focusY, pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Set custom cursor failed, ret:%{public}d", ret);
     }

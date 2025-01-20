@@ -675,16 +675,26 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
-int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
+int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = CheckPidPermission(pid);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Check pid permission failed");
-        return ret;
+    int32_t pid = GetCallingPid();
+    auto type = PER_HELPER->GetTokenType();
+    if (windowId < 0 && (type == OHOS::Security::AccessToken::TOKEN_HAP ||
+        type == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
+        // The windowID of the application must be greater than 0
+        MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", RET_ERR);
+        return RET_ERR;
     }
-    ret = delegateTasks_.PostSyncTask(std::bind(
+    if (windowId >= 0) {
+        int32_t ret = CheckPidPermission(pid);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Check pid permission failed");
+            return ret;
+        }
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
         [pixelMap, pid, windowId, focusX, focusY] {
             return IPointerDrawingManager::GetInstance()->SetCustomCursor(pixelMap, pid, windowId, focusX, focusY);
         }

@@ -64,6 +64,7 @@ const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscre
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 const std::string CursorIconPath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
+const std::string CustomCursorIconPath = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
 const std::string LoadingIconPath = IMAGE_POINTER_DEFAULT_PATH + "Loading.svg";
 const std::string LoadingRightIconPath = IMAGE_POINTER_DEFAULT_PATH + "Loading_Right.svg";
 const std::string POINTER_COLOR { "pointerColor" };
@@ -84,6 +85,7 @@ constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t ANIMATION_DURATION { 500 };
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
+constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
 constexpr int32_t MOUSE_ICON_BAIS { 5 };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
 [[ maybe_unused ]] constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 6000 };
@@ -516,6 +518,11 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     if (pointerStyle.id == MOUSE_ICON::DEFAULT && mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath == CursorIconPath) {
         AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
             physicalX, physicalY);
+    } else if (pointerStyle.id == MOUSE_ICON::DEFAULT &&
+        mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath == CustomCursorIconPath) {
+            AdjustMouseFocus(direction,
+                ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
+                    physicalX, physicalY);
     } else {
         AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay),
             physicalX, physicalY);
@@ -554,7 +561,7 @@ void PointerDrawingManager::UpdateMouseStyle()
     CALL_DEBUG_ENTER;
     PointerStyle curPointerStyle;
     GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
-    if (curPointerStyle.id == CURSOR_CIRCLE_STYLE) {
+    if (curPointerStyle.id == CURSOR_CIRCLE_STYLE || curPointerStyle.id == AECH_DEVELOPER_DEFINED_STYLE) {
         lastMouseStyle_.id = curPointerStyle.id;
         int ret = SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
         if (ret != RET_OK) {
@@ -1737,7 +1744,8 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
         CHKPV(pixelmap);
         image = ExtractDrawingImage(pixelmap);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        if ((mouseStyle == MOUSE_ICON::DEFAULT) || (mouseStyle == MOUSE_ICON::CURSOR_CIRCLE)) {
+        if ((mouseStyle == MOUSE_ICON::DEFAULT) || (mouseStyle == MOUSE_ICON::CURSOR_CIRCLE) ||
+             (mouseStyle == MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)) {
             SetPixelMap(pixelmap);
         }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1849,8 +1857,22 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
         return RET_ERR;
     }
     if (windowId < 0) {
-        MMI_HILOGE("The windowId is invalid, windowId:%{public}d", windowId);
-        return RET_ERR;
+        int32_t ret = UpdateCursorProperty(pixelMap, focusX, focusY);
+        if (ret != RET_OK) {
+            MMI_HILOGE("UpdateCursorProperty is failed");
+            return ret;
+        }
+        // Constructing a PointerStyle indicates that the SA is being passed in
+        MMI_HILOGE("This indicates that the message transmitted is SA, windowId:%{public}d", windowId);
+        mouseIconUpdate_ = true;
+        PointerStyle style;
+        style.id = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
+        lastMouseStyle_ = style;
+        ret = SetPointerStyle(pid, windowId, style);
+        if (ret != RET_OK) {
+            MMI_HILOGE("SetPointerStyle is failed");
+        }
+        return ret;
     }
     if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
         MMI_HILOGE("The windowId not in right pid");
@@ -1874,6 +1896,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
         style.id, userIconHotSpotX_, userIconHotSpotY_);
     return ret;
 }
+
 
 int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY)
 {
@@ -2003,7 +2026,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
         .height = imageHeight_
     };
     int32_t pointerColor = GetPointerColor();
-    if (tempPointerColor_ != DEFAULT_VALUE) {
+    if (tempPointerColor_ != DEFAULT_VALUE && type != AECH_DEVELOPER_DEFINED_STYLE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
         if (color == MAX_POINTER_COLOR) {
             decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
@@ -2694,7 +2717,7 @@ bool PointerDrawingManager::CheckPointerStyleParam(int32_t windowId, PointerStyl
         return false;
     }
     if ((pointerStyle.id < MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) ||
-        pointerStyle.id > MOUSE_ICON::RUNNING_RIGHT) {
+        pointerStyle.id > MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON) {
         return false;
     }
     return true;
@@ -2772,7 +2795,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
         name = "pointerStyle";
         int32_t style = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_STYLE);
         MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
-        if (style == CURSOR_CIRCLE_STYLE) {
+        if (style == CURSOR_CIRCLE_STYLE || style == AECH_DEVELOPER_DEFINED_STYLE) {
             pointerStyle.id = style;
             return RET_OK;
         }
@@ -2941,6 +2964,7 @@ void PointerDrawingManager::InitStyle()
         {RUNNING, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg"}},
         {RUNNING_LEFT, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg"}},
         {RUNNING_RIGHT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Loading_Right.svg"}},
+        {AECH_DEVELOPER_DEFINED_ICON, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg"}},
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
     };
     CheckMouseIconPath();
