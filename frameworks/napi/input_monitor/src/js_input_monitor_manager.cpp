@@ -447,7 +447,7 @@ bool JsInputMonitorManager::GetKeysArray(napi_env env, napi_value keysNapiValue,
         CHKRR(napi_get_element(env, keysNapiValue, i, &napiElement), GET_ELEMENT, false);
         int32_t keycode;
         CHKRR(napi_get_value_int32(env, napiElement, &keycode), GET_VALUE_INT32, false);
-        auto it = std::find(supportedKeyCodes.begin(), supportedKeyCodes.end(), item);
+        auto it = std::find(supportedKeyCodes.begin(), supportedKeyCodes.end(), keycode);
         if (it == supportedKeyCodes.end()) {
             MMI_HILOGE("PreKeys is not expect");
             return false;
