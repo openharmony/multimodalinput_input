@@ -1929,6 +1929,6 @@ napi_value JsPointerContext::SetCustomCursorEx(napi_env env, std::shared_ptr<JsP
         return nullptr;
     }
     return jsPointerMgr->SetCustomCursor(env, windowId, cursor, options);
- }
+}
 } // namespace MMI
 } // namespace OHOS

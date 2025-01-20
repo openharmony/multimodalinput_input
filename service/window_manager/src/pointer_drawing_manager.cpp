@@ -3382,7 +3382,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
         std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr(OHOS::Media::PixelMap::Unmarshalling(data));
         if (pixelMapPtr == nullptr) {
             MMI_HILOGE("pixelMapPtr is nullptr");
-            return nullptr; 
+            return nullptr;
         }
         Media::ImageInfo imageInfo;
         pixelMapPtr->GetImageInfo(imageInfo);
@@ -3421,7 +3421,7 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
     followSystem_ = options.followSystem;
-    int32_t ret = UpdateCursorProperty(cursor, options);
+    int32_t ret = UpdateCursorProperty(cursor);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
         return ret;
@@ -3462,7 +3462,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     userIconHotSpotY_ = cursor.focusY;
     MMI_HILOGI("imageWidth:%{public}d, imageHeight:%{public}d, focusX:%{public}d, focusY:%{public}d",
         imageInfo.size.width, imageInfo.size.height, cursor.focusX, cursor.focusY);
-     return RET_OK;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

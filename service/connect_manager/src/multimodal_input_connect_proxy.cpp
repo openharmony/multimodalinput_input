@@ -2740,6 +2740,7 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, CustomCur
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     } else {
         READINT32(reply, ret);
+    }
     return ret;
 }
 } // namespace MMI
