@@ -2975,6 +2975,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_EMULATOR
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN &&
+        !IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+    }
+#endif
     GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
     if (isUiExtension_) {
         MMI_HILOGD("updatemouse target in uiextension");
@@ -3072,6 +3078,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(udsServer_, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
+#elif defined(OHOS_BUILD_EMULATOR)
+    if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
+    }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
@@ -3841,7 +3851,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) && MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
         gestureInject = true;
     }
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+#if defined(OHOS_BUILD_ENABLE_POINTER) && (defined(OHOS_BUILD_ENABLE_POINTER_DRAWING) || defined(OHOS_BUILD_EMULATOR))
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
