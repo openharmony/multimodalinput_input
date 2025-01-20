@@ -42,8 +42,7 @@ napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (std::vector<int32_t> &ids) { return EmitJsIds(cb, ids); };
-    InputManager::GetInstance()->GetDeviceIds(callback);
+    EmitJsIds(cb, cb->data.ids);
     return ret;
 }
 
@@ -53,8 +52,7 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (std::shared_ptr<InputDevice> device) { return EmitJsDev(cb, device); };
-    InputManager::GetInstance()->GetDevice(id, callback);
+    EmitJsDev(cb, id);
     return ret;
 }
 
@@ -65,11 +63,7 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (std::vector<bool> &keystrokeAbility) { return EmitSupportKeys(cb, keystrokeAbility); };
-    int32_t napiCode = InputManager::GetInstance()->SupportKeys(id, keyCodes, callback);
-    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
-    }
+    EmitSupportKeys(cb, keyCodes, id);
     return ret;
 }
 
@@ -104,11 +98,7 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (int32_t keyboardType) { return EmitJsKeyboardType(cb, keyboardType); };
-    int32_t napiCode = InputManager::GetInstance()->GetKeyboardType(id, callback);
-    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
-    }
+    EmitJsKeyboardType(cb, id);
     return ret;
 }
 
@@ -141,8 +131,7 @@ napi_value JsInputDeviceManager::GetDeviceList(napi_env env, napi_value handle)
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (std::vector<int32_t> &ids) { return EmitJsIds(cb, ids); };
-    InputManager::GetInstance()->GetDeviceIds(callback);
+    EmitJsIds(cb, cb->data.ids);
     return ret;
 }
 
@@ -152,11 +141,7 @@ napi_value JsInputDeviceManager::GetDeviceInfo(napi_env env, int32_t id, napi_va
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (std::shared_ptr<InputDevice> inputDevice) { return EmitJsDev(cb, inputDevice); };
-    int32_t napiCode = InputManager::GetInstance()->GetDevice(id, callback);
-    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
-    }
+    EmitJsDev(cb, id);
     return ret;
 }
 
@@ -200,11 +185,7 @@ napi_value JsInputDeviceManager::SetKeyboardRepeatDelay(napi_env env, int32_t de
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatDelay(delay);
-    EmitJsSetKeyboardRepeatDelay(cb, napiCode);
-    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
-    }
+    EmitJsSetKeyboardRepeatDelay(cb, delay);
     return ret;
 }
 
@@ -214,11 +195,7 @@ napi_value JsInputDeviceManager::SetKeyboardRepeatRate(napi_env env, int32_t rat
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatRate(rate);
-    EmitJsSetKeyboardRepeatRate(cb, napiCode);
-    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
-    }
+    EmitJsSetKeyboardRepeatRate(cb, rate);
     return ret;
 }
 
@@ -228,11 +205,7 @@ napi_value JsInputDeviceManager::GetKeyboardRepeatDelay(napi_env env, napi_value
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (int32_t delay) { return EmitJsKeyboardRepeatDelay(cb, delay); };
-    int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatDelay(callback);
-    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
-    }
+    EmitJsKeyboardRepeatDelay(cb, cb->data.keyboardRepeatDelay);
     return ret;
 }
 
@@ -242,11 +215,7 @@ napi_value JsInputDeviceManager::GetKeyboardRepeatRate(napi_env env, napi_value 
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (int32_t rate) { return EmitJsKeyboardRepeatRate(cb, rate); };
-    int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatRate(callback);
-    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
-    }
+    EmitJsKeyboardRepeatRate(cb, cb->data.keyboardRepeatRate);
     return ret;
 }
 
@@ -256,12 +225,7 @@ napi_value JsInputDeviceManager::GetIntervalSinceLastInput(napi_env env)
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, nullptr, cb);
-    int64_t timeInterval = -1;
-    int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
-    EmitJsGetIntervalSinceLastInput(cb, timeInterval);
-    if (napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid get interval since last input");
-    }
+    EmitJsGetIntervalSinceLastInput(cb);
     return ret;
 }
 
