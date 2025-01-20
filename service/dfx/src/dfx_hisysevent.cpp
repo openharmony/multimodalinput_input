@@ -43,9 +43,7 @@ constexpr int32_t FAIL_SUCC_TIME_DIFF { 3 * 60 * 1000 };
 constexpr int32_t MIN_GESTURE_TIMESTAMPS_SIZE { 2 };
 constexpr int32_t DOWN_TO_PREV_UP_MAX_TIME_THRESHOLD { 1000 * 1000 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-constexpr int32_t CALC_KEY_EVENT_TIMES { 100 };
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+constexpr int32_t REPORT_MAX_KEY_EVENT_TIMES { 1000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string EMPTY_STRING { "" };
 const char* LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
@@ -54,6 +52,19 @@ const char* ACC0_PATH { "/sys/class/sensors/acc_sensor/info" };
 const char* TP_PATH { "/sys/touchscreen/touch_chip_info" };
 const char* TP0_PATH { "/sys/touchscreen0/touch_chip_info" };
 const char* TP1_PATH { "/sys/touchscreen1/touch_chip_info" };
+const std::string NAME_DISPATCH { "dispatch" };
+const std::string NAME_FILTER { "filter" };
+const std::string NAME_INTERCEPT { "intercept" };
+const std::string NAME_SUBCRIBER { "subcriber" };
+const std::string NAME_FINGERPRINT { "fingerprint" };
+const std::string NAME_STYLUS { "stylus" };
+const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
+const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string WALLET_BUNDLE_NAME { "com.hmos.walletservice" };
+const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
+const std::string NAME_CANCEL { "cancel" };
+const std::string TOUCH_SCREEN_ON { "screen on" };
 } // namespace
 
 static std::string GetVendorInfo(const char* nodePath)
@@ -1150,30 +1161,72 @@ void DfxHisysevent::ReportMMiServiceThreadLongTask(const std::string &taskName)
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
-void DfxHisysevent::ClearCallCount()
+void DfxHisysevent::ClearKeyEventCount()
 {
-    callCount_ = 0;
+    calKeyEventTime_.clear();
+    keyEventCount_ = 0;
 }
 
-void DfxHisysevent::ReportLaunchAbility(int32_t keyCode, int32_t action, std::string bundleName)
+void DfxHisysevent::ReportKeyEvent(std::string name)
 {
-    if (callCount_ < CALC_KEY_EVENT_TIMES) {
-        callCount_++;
-        return;
+    if (name == NAME_FILTER) {
+        ReportKeyEventTimes(KEY_FILTER);
+    } else if (name == NAME_INTERCEPT) {
+        ReportKeyEventTimes(KEY_INTERCEPT);
+    } else if (name == NAME_SUBCRIBER) {
+        ReportKeyEventTimes(KEY_SUBCRIBER);
+    } else if (name == NAME_FINGERPRINT) {
+        ReportKeyEventTimes(FINGERPRINT);
+    } else if (name == NAME_STYLUS) {
+        ReportKeyEventTimes(STYLUS_PEN);
+    } else if (name == AIBASE_BUNDLE_NAME) {
+        ReportKeyEventTimes(AIBASE_VOICE);
+    } else if (name == SCREENSHOT_BUNDLE_NAME) {
+        ReportKeyEventTimes(SCREEN_SHOT);
+    } else if (name == SCREENRECORDER_BUNDLE_NAME) {
+        ReportKeyEventTimes(SCREEN_RECORDING);
+    } else if (name == WALLET_BUNDLE_NAME) {
+        ReportKeyEventTimes(OPEN_WALLET);
+    } else if (name == SOS_BUNDLE_NAME) {
+        ReportKeyEventTimes(OPEN_SOS);
+    } else if (name == NAME_CANCEL) {
+        ReportKeyEventTimes(KEY_EVENT_CANCEL);
+    } else if (name == TOUCH_SCREEN_ON) {
+        ReportKeyEventTimes(KEY_SCREEN_ON);
+    } else {
+        ReportKeyEventTimes(DISPATCH_KEY);
     }
-    if (callCount_ == CALC_KEY_EVENT_TIMES) {
+}
+
+void DfxHisysevent::ReportKeyEventTimes(KEY_CONSUMPTION_TYPE type)
+{
+    if (keyEventCount_ < REPORT_MAX_KEY_EVENT_TIMES) {
+        keyEventCount_++;
+        calKeyEventTime_[type]++;
+    } else {
         int32_t ret = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "KEY_EVENT_DATA",
-            OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-            "KEY_CODE", keyCode,
-            "KEY_ACTION", action,
-            "BUNDLE_NAME", bundleName);
+            "KEY_EVENT_STATISTIC",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "DISPATCH_KEY", calKeyEventTime_[DISPATCH_KEY],
+            "KEY_FILTER", calKeyEventTime_[KEY_FILTER],
+            "KEY_INTERCEPT", calKeyEventTime_[KEY_INTERCEPT],
+            "KEY_SUBCRIBER", calKeyEventTime_[KEY_SUBCRIBER],
+            "FINGERPRINT", calKeyEventTime_[FINGERPRINT],
+            "STYLUS_PEN", calKeyEventTime_[STYLUS_PEN],
+            "AIBASE_VOICE", calKeyEventTime_[AIBASE_VOICE],
+            "SCREEN_SHOT", calKeyEventTime_[SCREEN_SHOT],
+            "SCREEN_RECORDING", calKeyEventTime_[SCREEN_RECORDING],
+            "OPEN_WALLET", calKeyEventTime_[OPEN_WALLET],
+            "OPEN_SOS", calKeyEventTime_[OPEN_SOS],
+            "KEY_CANCEL", calKeyEventTime_[KEY_EVENT_CANCEL],
+            "KEY_SCREEN_ON", calKeyEventTime_[KEY_SCREEN_ON]);
         if (ret != 0) {
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
-        ClearCallCount();
+        ClearKeyEventCount();
     }
 }
 
@@ -1181,8 +1234,8 @@ void DfxHisysevent::ReportFailLaunchAbility(std::string bundleName, int32_t erro
 {
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "KEY_EVENT_DATA",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "KEY_EVENT_FAULT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
         "BUNDLE_NAME", bundleName,
         "ERROR_CODE", errorCode);
     if (ret != 0) {
@@ -1190,29 +1243,28 @@ void DfxHisysevent::ReportFailLaunchAbility(std::string bundleName, int32_t erro
     }
 }
 
-void DfxHisysevent::ReportSubscribeKey(std::string flag,
-    std::string name, int32_t keyCode, int32_t action, int32_t id)
+void DfxHisysevent::ReportFailSubscribeKey(std::string functionName, std::string subscribeName,
+    int32_t keyCode, int32_t errorCode)
 {
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "KEY_EVENT_DATA",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-        "FLAG", flag,
-        "SUBSCRIBE_NAME", name,
+        "KEY_EVENT_FAULT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "FUNCTION_NAME", functionName,
+        "SUBSCRIBE_NAME", subscribeName,
         "KEY_CODE", keyCode,
-        "KEY_ACTION", action,
-        "SUBSCRIBE_ID", id);
+        "ERROR_CODE", errorCode);
     if (ret != 0) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
 
-void DfxHisysevent::ReportHandleKey(std::string name, int32_t keyCode, int32_t errorCode)
+void DfxHisysevent::ReportFailHandleKey(std::string name, int32_t keyCode, int32_t errorCode)
 {
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "KEY_EVENT_DATA",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "KEY_EVENT_FAULT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
         "FUNCTION_NAME", name,
         "KEY_CODE", keyCode,
         "ERROR_CODE", errorCode);
@@ -1220,6 +1272,5 @@ void DfxHisysevent::ReportHandleKey(std::string name, int32_t keyCode, int32_t e
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 } // namespace MMI
 } // namespace OHOS

@@ -15,6 +15,7 @@
 
 #include "event_filter_handler.h"
 
+#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "mmi_log.h"
@@ -35,6 +36,7 @@ void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
         return;
     }
     if (HandleKeyEventFilter(keyEvent)) {
+        DfxHisysevent::ReportKeyEvent("filter");
         MMI_HILOGD("Key event is filtered");
         return;
     }
@@ -166,6 +168,8 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
     std::vector<KeyEvent::KeyItem> keyItems = event->GetKeyItems();
     if (keyItems.empty()) {
         MMI_HILOGE("keyItems is empty");
+        DfxHisysevent::ReportFailHandleKey("HandleKeyEventFilter", event->GetKeyCode(),
+            DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
         return false;
     }
     std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(keyItems.front().GetDeviceId());
