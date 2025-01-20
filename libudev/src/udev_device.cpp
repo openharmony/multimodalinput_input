@@ -403,7 +403,7 @@ private:
     {
         if (flag) {
             SetInputProperty(prop);
-            MMI_HILOGD("device has prop with %{public}s", prop.c_str());
+            MMI_HILOGD("The device has prop with %{public}s", prop.c_str());
         }
     }
 
