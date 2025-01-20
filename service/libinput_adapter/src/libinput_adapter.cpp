@@ -287,20 +287,55 @@ void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCod
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
-void LibinputAdapter::InjectCombinationKeyEvent(libinput_event_touch* touch, std::vector<int32_t>& toggleKeyCodes,
-                                                int32_t triggerKeyCode, int64_t frameTime)
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+void LibinputAdapter::HandleVFullKeyboardMessages(
+    libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch)
 {
-    for (auto& toggleCode: toggleKeyCodes) {
-        InjectKeyEvent(touch, toggleCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
+    // handle keyboard and trackpad messages.
+    while (true) {
+        int32_t toggleCodeFirst(-1);
+        int32_t toggleCodeSecond(-1);
+        int32_t keyCode(-1);
+        VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(toggleCodeFirst, toggleCodeSecond, keyCode);
+        MMI_HILOGD("Get message type:%{private}d", static_cast<int32_t>(type));
+        if (type == VNoMessage) {
+            break;
+        }
+
+        switch (type) {
+            case VKeyboardMessageType::VKeyPressed: {
+                MMI_HILOGD("press key:%{private}d", keyCode);
+                InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
+                InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
+                break;
+            }
+            case VKeyboardMessageType::VStartLongPressControl: {
+                MMI_HILOGD("long press start:%{private}d", keyCode);
+                InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
+                break;
+            }
+            case VKeyboardMessageType::VStopLongPressControl: {
+                MMI_HILOGD("long press stop:%{private}d", keyCode);
+                InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
+                break;
+            }
+            case VKeyboardMessageType::VSwitchLayout: {
+                HideMouseCursorTemporary();
+                break;
+            }
+            default:
+                break;
+        }
     }
-    InjectKeyEvent(touch, triggerKeyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
-    InjectKeyEvent(touch, triggerKeyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
-    for (auto& toggleCode: toggleKeyCodes) {
-        InjectKeyEvent(touch, toggleCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
+    HandleVKeyTouchpadMessages(touch);
+
+    if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
+        // still let frame info go through.
+        funInputEvent_(event, frameTime);
     }
+    libinput_event_destroy(event);
 }
 
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
 {
     // Handle all track pad key messages
@@ -1125,7 +1160,6 @@ void LibinputAdapter::OnEventHandler()
         libinput_event_type eventType = libinput_event_get_type(event);
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
-        bool skipTouchMove = false;
 
         if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
             || eventType == LIBINPUT_EVENT_TOUCH_UP
@@ -1140,7 +1174,6 @@ void LibinputAdapter::OnEventHandler()
                 touchPressure = libinput_event_touch_get_pressure(touch);
                 accumulatedPressure = GetAccumulatedPressure(touchId, eventType, touchPressure);
             }
-            skipTouchMove = SkipTouchMove(touchId, eventType);
 
             if (deviceId == -1) {
                 // initialize touch device ID.
@@ -1184,62 +1217,7 @@ type:%{private}d, accPressure:%{private}f",
             if (handleTouchPoint_ != nullptr &&
                 handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
                 MMI_HILOGD("Inside vkeyboard area");
-
-                while (true) {
-                    int32_t toggleCodeFirst(-1);
-                    int32_t toggleCodeSecond(-1);
-                    int32_t keyCode(-1);
-                    VKeyboardMessageType type = (VKeyboardMessageType)getMessage_(toggleCodeFirst, toggleCodeSecond,
-                        keyCode);
-                    MMI_HILOGD("Get message type:%{private}d", static_cast<int32_t>(type));
-                    if (type == VNoMessage) {
-                        break;
-                    }
-
-                    switch (type) {
-                        case VKeyboardMessageType::VKeyPressed: {
-                            MMI_HILOGD("press key:%{private}d", keyCode);
-                            InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
-                            InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
-                            break;
-                        }
-                        case VKeyboardMessageType::VCombinationKeyPressed: {
-                            MMI_HILOGD("combination key. triger:%{private}d, toggle:%{private}d + %{private}d",
-                                keyCode, toggleCodeFirst, toggleCodeSecond);
-                            std::vector<int32_t> toggleKeyCodes;
-                            if (toggleCodeFirst >= 0) {
-                                toggleKeyCodes.push_back(toggleCodeFirst);
-                            }
-                            if (toggleCodeSecond >= 0) {
-                                toggleKeyCodes.push_back(toggleCodeSecond);
-                            }
-                            InjectCombinationKeyEvent(touch, toggleKeyCodes, keyCode, frameTime);
-                            break;
-                        }
-                        case VKeyboardMessageType::VStartLongPressControl: {
-                            MMI_HILOGD("long press start:%{private}d", keyCode);
-                            InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_PRESSED, frameTime);
-                            break;
-                        }
-                        case VKeyboardMessageType::VStopLongPressControl: {
-                            MMI_HILOGD("long press stop:%{private}d", keyCode);
-                            InjectKeyEvent(touch, keyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED, frameTime);
-                            break;
-                        }
-                        case VKeyboardMessageType::VSwitchLayout: {
-                            HideMouseCursorTemporary();
-                            break;
-                        }
-                        default: break;
-                    }
-                }
-                HandleVKeyTouchpadMessages(touch);
-
-                if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
-                    // still let frame info go through.
-                    funInputEvent_(event, frameTime);
-                }
-                libinput_event_destroy(event);
+                HandleVFullKeyboardMessages(event, frameTime, eventType, touch);
             } else {
                 funInputEvent_(event, frameTime);
                 libinput_event_destroy(event);
