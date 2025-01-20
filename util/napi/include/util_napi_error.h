@@ -45,6 +45,8 @@ enum NapiErrorCode : int32_t {
     INPUT_OCCUPIED_BY_OTHER = 4200003,
     COMMON_DEVICE_NOT_EXIST = 3900001,
     PRE_KEY_NOT_SUPPORTED = 4100001,
+    COMMON_DEVICE_NOT_EXIST = 3900002,
+    COMMON_NON_INPUT_APPLICATION = 3900003,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
@@ -52,6 +54,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         { COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s." } },
     { COMMON_PARAMETER_ERROR, { COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s." } },
     { COMMON_DEVICE_NOT_EXIST, { COMMON_DEVICE_NOT_EXIST, "The specified device does not exist." } },
+    { COMMON_NON_INPUT_APPLICATION, { COMMON_NON_INPUT_APPLICATION, "it is prohibited for non-input applications." } },
     { COMMON_CAPABILITY_NOT_SUPPORTED, { COMMON_CAPABILITY_NOT_SUPPORTED, "Capability not supported.\n" } },
 };
 

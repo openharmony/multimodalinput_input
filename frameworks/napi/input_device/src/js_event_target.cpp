@@ -264,6 +264,11 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
     CHKPV(cb->env);
     cb->data.ids = ids;
     cb->errCode = RET_OK;
+    EmitJsIdsInternal(cb);
+}
+
+void JsEventTarget::EmitJsIdsInternal(sptr<JsUtil::CallbackInfo> cb)
+{
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -277,12 +282,14 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsIdsTask(work);
                 }, CallDevListPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsIdsTask(work);
                 }, CallDevListAsyncWork, uv_qos_user_initiated);
         }
     } else {
@@ -291,12 +298,14 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsIdsTask(work);
                 }, CallIdsPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsIdsTask(work);
                 }, CallIdsAsyncWork, uv_qos_user_initiated);
         }
     }
@@ -360,14 +369,18 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<InputDevice> device)
+void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, int32_t deviceid)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(device);
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.device = device;
+    cb->data.deviceId = deviceid;
     cb->errCode = RET_OK;
+    EmitJsDevInternal(cb);
+}
+
+void JsEventTarget::EmitJsDevInternal(sptr<JsUtil::CallbackInfo> cb)
+{
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -381,12 +394,14 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsDevTask(work);
                 }, CallDevInfoPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsDevTask(work);
                 }, CallDevInfoAsyncWork, uv_qos_user_initiated);
         }
     } else {
@@ -395,12 +410,14 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsDevTask(work);
                 }, CallDevPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
+                    CallJsDevTask(work);
                 }, CallDevAsyncWork, uv_qos_user_initiated);
         }
     }
@@ -519,12 +536,13 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<bool> &keystrokeAbility)
+void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t> &keycode, int32_t id)
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.keystrokeAbility = keystrokeAbility;
+    cb->data.ids = keycode;
+    cb->data.deviceId = id;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -538,6 +556,7 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallSupportKeysTask(work);
             },
             CallKeystrokeAbilityPromise, uv_qos_user_initiated);
     } else {
@@ -545,6 +564,7 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallSupportKeysTask(work);
             },
             CallKeystrokeAbilityAsync, uv_qos_user_initiated);
     }
@@ -554,12 +574,12 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
     }
 }
 
-void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t keyboardType)
+void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t deviceid)
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.keyboardType = keyboardType;
+    cb->data.deviceId = deviceid;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -574,6 +594,7 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallGetKeyboardTypeTask(work);
             },
             CallKeyboardTypePromise, uv_qos_user_initiated);
     } else {
@@ -581,6 +602,7 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallGetKeyboardTypeTask(work);
             },
             CallKeyboardTypeAsync, uv_qos_user_initiated);
     }
@@ -885,13 +907,13 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t errCode)
+void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay)
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.keyboardRepeatDelay = 0;
-    cb->errCode = errCode;
+    cb->data.keyboardRepeatDelay = delay;
+    cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
 
@@ -905,6 +927,7 @@ void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, 
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatDelayTask(work, "set");
             },
             CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
     } else {
@@ -912,6 +935,7 @@ void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, 
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatDelayTask(work, "set");
             },
             CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
     }
@@ -941,6 +965,7 @@ void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatDelayTask(work, "get");
             },
             CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
     } else {
@@ -948,6 +973,7 @@ void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatDelayTask(work, "get");
             },
             CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
     }
@@ -1056,13 +1082,13 @@ void JsEventTarget::CallKeyboardRepeatDelayPromise(uv_work_t *work, int32_t stat
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t errCode)
+void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate)
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.keyboardRepeatRate = 0;
-    cb->errCode = errCode;
+    cb->data.keyboardRepeatRate = rate;
+    cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
 
@@ -1076,6 +1102,7 @@ void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, i
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatRateTask(work, "set");
             },
             CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
     } else {
@@ -1083,6 +1110,7 @@ void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, i
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatRateTask(work, "set");
             },
             CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
     }
@@ -1112,6 +1140,7 @@ void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int3
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatRateTask(work, "get");
             },
             CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
     } else {
@@ -1119,6 +1148,7 @@ void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int3
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
+                CallKeyboardRepeatRateTask(work, "get");
             },
             CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
     }
@@ -1318,12 +1348,11 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sp
     return promise;
 }
 
-void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb, int64_t timeInterval)
+void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb)
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.IntervalSinceLastInput = timeInterval;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -1335,6 +1364,7 @@ void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> c
         loop, work,
         [](uv_work_t *work) {
             MMI_HILOGD("uv_queue_work callback function is called");
+            CallIntervalSinceLastInputTask(work);
         },
         CallIntervalSinceLastInputPromise, uv_qos_user_initiated);
     if (ret != 0) {
@@ -1591,6 +1621,134 @@ void JsEventTarget::CallFunctionKeyState(uv_work_t *work, int32_t status)
         CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
     }
     napi_close_handle_scope(cb->env, scope);
+}
+
+void JsEventTarget::CallKeyboardRepeatDelayTask(uv_work_t *work, const std::string& operateType)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+
+    if (operateType == "get") {
+        int32_t _delay = -1;
+        auto callback = [&_delay] (int32_t delay) { _delay = delay; };
+        int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatDelay(callback);
+        cb->errCode = napiCode;
+        cb->data.keyboardRepeatDelay = _delay;
+    } else {
+        int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatDelay(cb->data.keyboardRepeatDelay);
+        cb->errCode = napiCode;
+    }
+}
+
+void JsEventTarget::CallKeyboardRepeatRateTask(uv_work_t *work, const std::string& operateType)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+
+    if (operateType == "get") {
+        int32_t _rate = -1;
+        auto callback = [&_rate] (int32_t rate) { _rate = rate; };
+        int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatRate(callback);
+        cb->errCode = napiCode;
+        cb->data.keyboardRepeatDelay = _rate;
+    } else {
+        int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatRate(cb->data.keyboardRepeatRate);
+        cb->errCode = napiCode;
+    }
+}
+
+void JsEventTarget::CallGetKeyboardTypeTask(uv_work_t *work)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+
+    int32_t _keyboardtype = -1;
+    auto callback = [&_keyboardtype] (int32_t keyboardtype) { _keyboardtype = keyboardtype; };
+    int32_t napiCode = InputManager::GetInstance()->GetKeyboardType(cb->data.deviceId, callback);
+    cb->errCode = napiCode;
+    cb->data.keyboardType = _keyboardtype;
+}
+
+void JsEventTarget::CallJsIdsTask(uv_work_t *work)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+    std::vector<int32_t> _ids;
+    auto callback = [&_ids] (std::vector<int32_t>& ids) { _ids = ids; };
+    int32_t napiCode = InputManager::GetInstance()->GetDeviceIds(callback);
+    cb->errCode = napiCode;
+    cb->data.ids = _ids;
+}
+
+void JsEventTarget::CallJsDevTask(uv_work_t *work)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+    std::shared_ptr<InputDevice> _device = std::make_shared<InputDevice>();
+    auto callback = [&_device] (std::shared_ptr<InputDevice> device) { _device = device; };
+    int32_t napiCode = InputManager::GetInstance()->GetDevice(cb->data.deviceId, callback);
+    CHKPV(_device);
+    cb->errCode = napiCode;
+    cb->data.device = _device;
+}
+
+void JsEventTarget::CallSupportKeysTask(uv_work_t *work)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
+    auto callback = [&] (std::vector<bool>& keystrokeAbility) {
+        cb->data.keystrokeAbility = keystrokeAbility;
+    };
+    int32_t napiCode = InputManager::GetInstance()->SupportKeys(cb->data.deviceId, cb->data.ids, callback);
+    cb->errCode = napiCode;
+}
+void JsEventTarget::CallIntervalSinceLastInputTask(uv_work_t *work)
+{
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(cb->data.IntervalSinceLastInput);
+    cb->errCode = napiCode;
 }
 } // namespace MMI
 } // namespace OHOS

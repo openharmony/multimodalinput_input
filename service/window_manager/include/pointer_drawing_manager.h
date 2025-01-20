@@ -115,7 +115,7 @@ public:
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
-    void SetPointerLocation(int32_t x, int32_t y) override;
+    void SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
@@ -130,6 +130,7 @@ public:
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
+    std::vector<std::vector<std::string>> GetDisplayInfo(DisplayInfo &di);
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
@@ -242,6 +243,7 @@ private:
     void SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_TYPE align);
     void HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void HideHardwareCursors();
+    int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo, DisplayInfo &mainScreenDisplayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:

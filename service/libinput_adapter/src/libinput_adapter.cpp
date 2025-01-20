@@ -65,6 +65,10 @@ constexpr uint32_t VKEY_TP_AXES_ONE { 1 };
 constexpr uint32_t VKEY_TP_AXES_TWO { 2 };
 constexpr double VTP_SCALE_AND_ANGLE_FACTOR { 1000.0 };
 constexpr uint32_t KEY_CAPSLOCK { 58 };
+constexpr uint32_t LIBINPUT_KEY_VOLUME_DOWN { 114 };
+constexpr uint32_t LIBINPUT_KEY_VOLUME_UP { 115 };
+constexpr uint32_t LIBINPUT_KEY_POWER { 116 };
+constexpr uint32_t LIBINPUT_KEY_FN { 240 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
@@ -307,6 +311,9 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     if (clearKeyMessage_ != nullptr) {
         clearKeyMessage_();
     }
+    if (!keyMsgList.empty()) {
+        ShowMouseCursor();
+    }
     OnVKeyTrackPadMessage(touch, keyMsgList);
     // Handle all track pad touch messages
     std::vector<std::vector<int32_t>> touchMsgList;
@@ -315,6 +322,9 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     }
     if (clearTouchMessage_ != nullptr) {
         clearTouchMessage_();
+    }
+    if (!touchMsgList.empty()) {
+        ShowMouseCursor();
     }
     OnVKeyTrackPadMessage(touch, touchMsgList);
 }
@@ -1003,14 +1013,50 @@ void LibinputAdapter::PrintVKeyTPGestureLog(event_gesture &gEvent)
         static_cast<double>(gEvent.scale), static_cast<double>(gEvent.angle));
 }
 
-void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event_type eventType)
+void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event* event)
 {
     MMI_HILOGD("Hardware keyboard key event detected");
     if (hardwareKeyEventDetected_ == nullptr) {
         return;
     }
+    if (event == nullptr) {
+        MMI_HILOGD("libinput event is nullptr");
+        return;
+    }
+    libinput_event_type eventType = libinput_event_get_type(event);
     if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
+        libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
+        if (keyboardEvent == nullptr) {
+            MMI_HILOGD("keyboardEvent is nullptr");
+            return;
+        }
+        libinput_device* device = libinput_event_get_device(event);
+        if (device == nullptr) {
+            MMI_HILOGD("keyboard device is nullptr");
+            return;
+        }
+        uint32_t keyCode = libinput_event_keyboard_get_key(keyboardEvent);
+        int32_t hasFnKey = libinput_device_has_key(device, LIBINPUT_KEY_FN);
+        const char* outPutName = libinput_device_get_name(device);
+        MMI_HILOGD("The current keyCode: %{private}u, hasFnKey %{private}d, outPutName: %{private}s",
+            keyCode, hasFnKey, outPutName);
+        if ((keyCode == LIBINPUT_KEY_VOLUME_DOWN || keyCode == LIBINPUT_KEY_VOLUME_UP ||
+            keyCode == LIBINPUT_KEY_POWER) && !hasFnKey) {
+            MMI_HILOGD("Skip device local button keyCode: %{private}u", keyCode);
+            return;
+        }
         hardwareKeyEventDetected_();
+    }
+}
+
+void LibinputAdapter::ShowMouseCursor()
+{
+    MMI_HILOGD("Check cursor state function valid = %{public}d",
+        IPointerDrawingManager::GetInstance() != nullptr);
+    if (IPointerDrawingManager::GetInstance() != nullptr &&
+        !IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        MMI_HILOGI("Found hidden mouse cursor during trackpad operation, show it.");
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     }
 }
 
@@ -1021,6 +1067,50 @@ void LibinputAdapter::HideMouseCursorTemporary()
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
         IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
     }
+}
+
+double LibinputAdapter::GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure)
+{
+    auto pos = touchPointPressureCache_.find(touchId);
+    double accumulatedPressure = 0.0;
+    if (pos != touchPointPressureCache_.end()) {
+        accumulatedPressure = pos->second;
+    }
+
+    accumulatedPressure += touchPressure;
+    touchPointPressureCache_[touchId] = accumulatedPressure;
+
+    if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
+        pos = touchPointPressureCache_.find(touchId);
+        if (pos != touchPointPressureCache_.end()) {
+            touchPointPressureCache_.erase(pos);
+        }
+    }
+
+    return accumulatedPressure;
+}
+
+bool LibinputAdapter::SkipTouchMove(int touchId, int32_t eventType)
+{
+    if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
+        skipTouchMoveCache_[touchId] = true;
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
+        auto pos = skipTouchMoveCache_.find(touchId);
+        if (pos != skipTouchMoveCache_.end()) {
+            skipTouchMoveCache_.erase(pos);
+        }
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
+        auto pos = skipTouchMoveCache_.find(touchId);
+        if (pos != skipTouchMoveCache_.end()) {
+            return pos->second;
+        }
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
+        auto pos = skipTouchMoveCache_.find(touchId);
+        if (pos != skipTouchMoveCache_.end()) {
+            skipTouchMoveCache_[touchId] = !pos->second;
+        }
+    }
+    return false;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
@@ -1033,11 +1123,24 @@ void LibinputAdapter::OnEventHandler()
     while ((event = libinput_get_event(input_))) {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         libinput_event_type eventType = libinput_event_get_type(event);
+        int32_t touchId = 0;
+        libinput_event_touch* touch = nullptr;
+        bool skipTouchMove = false;
+
+        if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
+            || eventType == LIBINPUT_EVENT_TOUCH_UP
+            || eventType == LIBINPUT_EVENT_TOUCH_MOTION
+            || eventType == LIBINPUT_EVENT_TOUCH_FRAME
+            ) {
+            touch = libinput_event_get_touch_event(event);
+            touchId = libinput_event_touch_get_slot(touch);
+            skipTouchMove = SkipTouchMove(touchId, eventType);
+        }
+
         if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
             ) {
-            libinput_event_touch* touch = libinput_event_get_touch_event(event);
             if (deviceId == -1) {
                 // initialize touch device ID.
                 libinput_device* device = libinput_event_get_device(event);
@@ -1048,10 +1151,9 @@ void LibinputAdapter::OnEventHandler()
             int32_t logicalDisplayId = -1;
             double x = 0.0;
             double y = 0.0;
-            int32_t touchId = libinput_event_touch_get_slot(touch);
             int32_t touchEventType = ConvertToTouchEventType(eventType);
             double touchPressure = libinput_event_touch_get_pressure(touch);
-
+            double accumulatedPressure = GetAccumulatedPressure(touchId, eventType, touchPressure);
             // touch up event has no coordinates information, skip coordinate calculation.
             if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
                 if (!WIN_MGR->TouchPointToDisplayPoint(deviceId, touch, touchInfo, logicalDisplayId)) {
@@ -1079,7 +1181,8 @@ type:%{private}d",
                 static_cast<int32_t>(y),
                 static_cast<int32_t>(eventType));
 
-            if (handleTouchPoint_ != nullptr && handleTouchPoint_(x, y, touchId, touchEventType, touchPressure) == 0) {
+            if (handleTouchPoint_ != nullptr &&
+                handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
                 MMI_HILOGD("Inside vkeyboard area");
 
                 while (true) {
@@ -1147,7 +1250,7 @@ type:%{private}d",
                 libinput_device* device = libinput_event_get_device(event);
                 int libinputCaps = libinput_get_funckey_state(device, MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
 
-                HandleHWKeyEventForVKeyboard(eventType);
+                HandleHWKeyEventForVKeyboard(event);
                 funInputEvent_(event, frameTime);
                 libinput_event_destroy(event);
 				
@@ -1155,12 +1258,11 @@ type:%{private}d",
                 keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
                 libinput_toggle_caps_key();
             } else {
-                HandleHWKeyEventForVKeyboard(eventType);
+                HandleHWKeyEventForVKeyboard(event);
                 funInputEvent_(event, frameTime);
                 libinput_event_destroy(event);
             }
         } else {
-            HandleHWKeyEventForVKeyboard(eventType);
             funInputEvent_(event, frameTime);
             libinput_event_destroy(event);
         }

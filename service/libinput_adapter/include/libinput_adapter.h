@@ -143,8 +143,11 @@ private:
     int32_t ConvertToTouchEventType(libinput_event_type eventType);
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
-    void HandleHWKeyEventForVKeyboard(libinput_event_type eventType);
+    void HandleHWKeyEventForVKeyboard(libinput_event* event);
+    void ShowMouseCursor();
     void HideMouseCursorTemporary();
+    double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
+    bool SkipTouchMove(int touchId, int32_t eventType); // compress touch move events in consecutive two frame
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
@@ -160,6 +163,8 @@ private:
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
+    std::unordered_map<int32_t, double> touchPointPressureCache_;
+    std::unordered_map<int32_t, bool> skipTouchMoveCache_;
 
     HotplugDetector hotplugDetector_;
     std::unordered_map<std::string, libinput_device*> devices_;

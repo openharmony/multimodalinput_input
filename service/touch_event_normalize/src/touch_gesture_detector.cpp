@@ -230,12 +230,12 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
         gestureTimer_ = -1;
     }
     if (isRecognized_) {
-        if (lastTouchEvent_ != nullptr) {
-            PointerEvent::PointerItem pointerItem {};
+        PointerEvent::PointerItem pointerItem {};
 
-            if (event->GetPointerItem(event->GetPointerId(), pointerItem)) {
-                lastTouchEvent_->UpdatePointerItem(event->GetPointerId(), pointerItem);
-            }
+        if ((lastTouchEvent_ != nullptr) &&
+            lastTouchEvent_->GetPointerItem(event->GetPointerId(), pointerItem) &&
+            event->GetPointerItem(event->GetPointerId(), pointerItem)) {
+            lastTouchEvent_->UpdatePointerItem(event->GetPointerId(), pointerItem);
         }
         if (!haveGestureWinEmerged_) {
             MMI_HILOGI("Touch-up while touch gesture is pending");

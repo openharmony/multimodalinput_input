@@ -27,6 +27,7 @@
 #include "qos.h"
 #include "proto.h"
 #include "util.h"
+#include "parameters.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIClient"
@@ -35,6 +36,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string THREAD_NAME { "OS_mmi_EventHdr" };
+static const bool USE_ISOLATE_DISPATCH_THREAD = false;
 } // namespace
 
 using namespace AppExecFwk;
@@ -49,6 +51,7 @@ void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
 {
     CHKPV(eventHandler);
     // use the new thread untill eventhandler use poll thread
+    eventHandler_ = eventHandler;
 }
 
 void MMIClient::MarkIsEventHandlerChanged(EventHandlerPtr eventHandler)
@@ -112,24 +115,28 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    eventHandler_->PostTask([this] { this->SetScheduler(); });
-    MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
-
-    if (isConnected_ && fd_ >= 0) {
-        if (isListening_) {
-            MMI_HILOGI("File fd is in listening");
-            return true;
-        }
-        if (!AddFdListener(fd_)) {
-            MMI_HILOGE("Add fd listener failed");
-            return false;
-        }
-    } else {
+    if (USE_ISOLATE_DISPATCH_THREAD || eventHandler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+        eventHandler_->PostTask([this] { this->SetScheduler(); });
+        MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
         if (!eventHandler_->PostTask([this] { return this->OnReconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
             MMI_HILOGE("Send reconnect event failed");
             return false;
+        }
+    } else {
+        if (isConnected_ && fd_ >= 0 && isListening_) {
+            MMI_HILOGI("File fd is in listening");
+            return true;
+        } else {
+            if (!AddFdListener(fd_)) {
+                MMI_HILOGE("Add fd listener failed");
+                return false;
+            } else {
+                auto runner = eventHandler_->GetEventRunner();
+                MMI_HILOGI("reuse current event handler, thread name:%{public}s",
+                    runner->GetRunnerThreadName().c_str());
+            }
         }
     }
     return true;
@@ -144,6 +151,10 @@ bool MMIClient::AddFdListener(int32_t fd)
     }
     CHKPF(eventHandler_);
     auto fdListener = std::make_shared<MMIFdListener>(GetSharedPtr());
+    if (!USE_ISOLATE_DISPATCH_THREAD) {
+        fdListener->SetDeamonWaiter();
+    }
+    
     auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener, "MMITask",
         AppExecFwk::EventQueue::Priority::VIP);
     if (errCode != ERR_OK) {
@@ -166,9 +177,8 @@ bool MMIClient::DelFdListener(int32_t fd)
     } else {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }
-    auto runner = eventHandler_->GetEventRunner();
-    CHKPF(runner);
-    if (runner->GetRunnerThreadName() == THREAD_NAME) {
+
+    if (USE_ISOLATE_DISPATCH_THREAD) {
         eventHandler_->RemoveAllEvents();
         MMI_HILOGI("Remove all events success");
     }
