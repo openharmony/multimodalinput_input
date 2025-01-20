@@ -257,8 +257,12 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
         px = paddingLeft_ + x * scale_ - dx;
         py = paddingTop_ + y * scale_ - dy;
     } else if (GetIsCurrentOffScreenRendering() && IsExtend()) {
-        px = (px + FOCUS_POINT) * offRenderScale_ - FOCUS_POINT;
-        py = (py + FOCUS_POINT) * offRenderScale_ - FOCUS_POINT;
+        int32_t adjustX = static_cast<int32_t>(float(FOCUS_POINT - dx) *
+            (dpi_ * scale_) / GetRenderDPI());
+        int32_t adjustY = static_cast<int32_t>(float(FOCUS_POINT - dy) *
+            (dpi_ * scale_) / GetRenderDPI());
+        px = x * offRenderScale_ + adjustX * offRenderScale_ - FOCUS_POINT;
+        py = y * offRenderScale_ + adjustY * offRenderScale_ - FOCUS_POINT;
     }
 
     auto buffer = GetCurrentBuffer();
@@ -333,7 +337,7 @@ float ScreenPointer::GetRenderDPI() const
 uint32_t ScreenPointer::GetImageSize() const
 {
     int32_t size = GetPointerSize();
-    return pow(INCREASE_RATIO, size - 1) * dpi_ * DEVICE_INDEPENDENT_PIXELS;
+    return pow(INCREASE_RATIO, size - 1) * GetRenderDPI() * DEVICE_INDEPENDENT_PIXELS;
 }
 
 uint32_t ScreenPointer::GetOffsetX(ICON_TYPE align) const
