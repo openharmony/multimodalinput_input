@@ -797,6 +797,22 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::RetryGetSurfaceBuffer(sptr<OHOS
     return buffer;
 }
 
+int32_t PointerDrawingManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
+    DisplayInfo &mainScreenDisplayInfo)
+{
+    if (displayGroupInfo.displaysInfo.empty()) {
+        MMI_HILOGE("displayGroupInfo doesn't contain displayInfo");
+        return RET_ERR;
+    }
+    for (const DisplayInfo& display : displayGroupInfo.displaysInfo) {
+        if (display.screenCombination == OHOS::MMI::ScreenCombination::SCREEN_MAIN) {
+            mainScreenDisplayInfo = display;
+            return RET_OK;
+        }
+    }
+    mainScreenDisplayInfo = displayGroupInfo.displaysInfo[0];
+    return RET_OK;
+}
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
@@ -2293,9 +2309,13 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
             return;
         }
     }
-    UpdateDisplayInfo(displayGroupInfo.displaysInfo[0]);
-    lastPhysicalX_ = displayGroupInfo.displaysInfo[0].width / CALCULATE_MIDDLE;
-    lastPhysicalY_ = displayGroupInfo.displaysInfo[0].height / CALCULATE_MIDDLE;
+    DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    UpdateDisplayInfo(displayInfo);
+    lastPhysicalX_ = displayInfo.width / CALCULATE_MIDDLE;
+    lastPhysicalY_ = displayInfo.height / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.id);
     if (surfaceNode_ != nullptr) {
 #ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
