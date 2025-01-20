@@ -22,10 +22,32 @@
 
 namespace OHOS {
 namespace MMI {
+#ifdef OHOS_BUILD_EMULATOR
+class EmulatorPointerDrawingManager final : public IPointerDrawingManager {
+public:
+    void SetMouseDisplayState(bool state) override
+    {
+        mouseDisplayState_ = state;
+    }
+
+    bool GetMouseDisplayState() const override
+    {
+        return mouseDisplayState_;
+    }
+
+private:
+    bool mouseDisplayState_ {false};
+};
+#endif
+
 std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 {
     if (iPointDrawMgr_ == nullptr) {
+#ifndef OHOS_BUILD_EMULATOR
         iPointDrawMgr_ = std::make_shared<IPointerDrawingManager>();
+#else
+        iPointDrawMgr_ = std::make_shared<EmulatorPointerDrawingManager>();
+#endif
     }
     return iPointDrawMgr_;
 }
