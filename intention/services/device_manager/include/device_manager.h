@@ -25,9 +25,9 @@
 #include "nocopyable.h"
 
 #include "enumerator.h"
+#include "epoll_manager.h"
 #include "i_context.h"
 #include "i_device_mgr.h"
-#include "epoll_manager.h"
 #include "monitor.h"
 
 namespace OHOS {
