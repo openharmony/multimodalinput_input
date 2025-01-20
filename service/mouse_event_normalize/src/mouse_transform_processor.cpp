@@ -171,10 +171,10 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
     struct libinput_device *dev = libinput_event_get_device(event);
     const std::string mouseName = libinput_device_get_name(dev);
     const int32_t devType = libinput_device_get_id_bustype(dev);
-    MMI_HILOGD("mouseName: %{public}s, devType: %{public}d", mouseName.c_str(), devType);
+    MMI_HILOGD("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
     if (devType == BUS_USB || devType == BUS_BLUETOOTH) {
         std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
-        MMI_HILOGD("connectType: %{public}s", connectType.c_str());
+        MMI_HILOGD("connectType:%{public}s", connectType.c_str());
         auto curMouseTimeMap = mouseMap.find(mouseName);
         if (curMouseTimeMap == mouseMap.end()) {
             MMI_HILOGD("start to collect");
@@ -185,7 +185,7 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
             long long gap =
                 std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
             mouseMap[mouseName] = curTime;
-            MMI_HILOGD("current time difference: %{public}lld", gap);
+            MMI_HILOGD("current time difference:%{public}lld", gap);
             std::map<long long, int32_t> &curMap = mouseResponseMap.find(mouseName)->second;
             if (gap < FINE_CALCULATE) {
                 auto curMapIt = curMap.find(gap);
