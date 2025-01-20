@@ -329,7 +329,7 @@ public:
         /**
          * Indicates unknown.
          */
-        SCREEN_MODE_UNKNOWN,
+        SCREEN_MODE_UNKNOWN = 0,
         /**
          * Indicates normal mode.
          */
@@ -1827,7 +1827,7 @@ public:
 
     void SetFixedMode(PointerEvent::FixedMode fixedMode);
     PointerEvent::FixedMode GetFixedMode() const;
-    std::string GetFixedModeStr();
+    std::string GetFixedModeStr() const;
 
 protected:
     /**

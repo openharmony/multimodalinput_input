@@ -322,7 +322,8 @@ public:
      * @return void
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder, bool isAutoToVirtualScreen);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
+        bool isAutoToVirtualScreen = true);
 
     /**
      * @brief Simulates a touchpad input event.
