@@ -1023,6 +1023,52 @@ void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &win
         area.y += y;
     }
 }
+
+int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo, DisplayInfo &mainScreenDisplayInfo)
+{
+    if (displayGroupInfo.displaysInfo.empty()) {
+        MMI_HILOGE("displayGroupInfo doesn't contain displayInfo");
+        return RET_ERR;
+    }
+    for (const DisplayInfo& display : displayGroupInfo.displaysInfo) {
+        if (display.screenCombination == OHOS::MMI::ScreenCombination::SCREEN_MAIN) {
+            mainScreenDisplayInfo = display;
+            return RET_OK;
+        }
+    }
+    mainScreenDisplayInfo = displayGroupInfo.displaysInfo[0];
+    return RET_OK;
+}
+
+void InputWindowsManager::ResetPointerPosition(const DisplayGroupInfo &displayGroupInfo)
+{
+    if (displayGroupInfo.displaysInfo.empty()) {
+        return;
+    }
+    CursorPosition oldPtrPos = GetCursorPos();
+    int32_t oldDisplayId = oldPtrPos.displayId;
+    for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
+        if ((currentDisplay.screenCombination == OHOS::MMI::ScreenCombination::SCREEN_MAIN)) {
+            MMI_HILOGD("CurDisplayId = %{public}d oldDisplayId = %{public}d", currentDisplay.id, oldDisplayId);
+            if (oldDisplayId != currentDisplay.id || !IsPointerOnCenter(oldPtrPos, currentDisplay)) {
+                CursorPosition cursorPos = ResetCursorPos();
+                UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+            }
+            break;
+        }
+    }
+}
+
+bool InputWindowsManager::IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay)
+{
+    auto displayCenterX = currentDisplay.width * HALF_RATIO;
+    auto displayCenterY = currentDisplay.height * HALF_RATIO;
+    if ((currentPos.cursorPos.x == displayCenterX) &&
+        (currentPos.cursorPos.y == displayCenterY)) {
+        return true;
+    }
+    return false;
+}
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 void InputWindowsManager::HandleWindowPositionChange()
@@ -1099,12 +1145,17 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    bool isDisplayRemoved = OnDisplayRemoved(displayGroupInfo);
+    bool isDisplayChanged = OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     displayGroupInfoTmp_ = displayGroupInfo;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
         if ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfoTmp_.currentUserId)) {
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+            if (isDisplayChanged) {
+                ResetPointerPosition(displayGroupInfoTmp_);
+        }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             PrintChangedWindowBySync(displayGroupInfoTmp_);
             CleanInvalidPiexMap();
             displayGroupInfo_ = displayGroupInfoTmp_;
@@ -1112,12 +1163,6 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
             HandleWindowPositionChange();
         }
     }
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (isDisplayRemoved) {
-        CursorPosition cursorPos = ResetCursorPos();
-        UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     PrintDisplayInfo();
     if (!displayGroupInfo_.displaysInfo.empty()) {
         UpdateDisplayIdAndName();
@@ -1138,7 +1183,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     if (!displayGroupInfo.displaysInfo.empty() && pointerDrawFlag_) {
         AdjustDisplayRotation();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayRemoved);
+        PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
 #else
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -4397,7 +4442,10 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
     if ((mouseLocation_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
-        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        DisplayInfo displayInfo = displayGroupInfo_.displaysInfo[0];
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        (void)GetMainScreenDisplayInfo(displayGroupInfo_, displayInfo);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         mouseLocation_.displayId = displayInfo.id;
         mouseLocation_.physicalX = displayInfo.width / TWOFOLD;
         mouseLocation_.physicalY = displayInfo.height / TWOFOLD;
@@ -4408,7 +4456,10 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 CursorPosition InputWindowsManager::GetCursorPos()
 {
     if ((cursorPos_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
-        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        DisplayInfo displayInfo = displayGroupInfo_.displaysInfo[0];
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        (void)GetMainScreenDisplayInfo(displayGroupInfo_, displayInfo);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         cursorPos_.displayId = displayInfo.id;
         cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
         cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
@@ -4419,7 +4470,10 @@ CursorPosition InputWindowsManager::GetCursorPos()
 CursorPosition InputWindowsManager::ResetCursorPos()
 {
     if (!displayGroupInfo_.displaysInfo.empty()) {
-        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        DisplayInfo displayInfo = displayGroupInfo_.displaysInfo[0];
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        (void)GetMainScreenDisplayInfo(displayGroupInfo_, displayInfo);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         cursorPos_.displayId = displayInfo.id;
         cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
         cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
@@ -5060,9 +5114,22 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
     }
 }
 
-bool InputWindowsManager::OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo)
+bool InputWindowsManager::OnDisplayRemovedOrCombiantionChanged(const DisplayGroupInfo &displayGroupInfo)
 {
+    if (displayGroupInfo.displaysInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
+        return false;
+    }
     if (displayGroupInfo.displaysInfo.size() < displayGroupInfo_.displaysInfo.size()) {
+        MMI_HILOGD("display has been removed");
+        return true;
+    }
+    DisplayInfo newMainDisplayInfo;
+    DisplayInfo oldMainDisplayInfo;
+    (void)GetMainScreenDisplayInfo(displayGroupInfo, newMainDisplayInfo);
+    (void)GetMainScreenDisplayInfo(displayGroupInfo_, oldMainDisplayInfo);
+    if (displayGroupInfo.displaysInfo.size() == displayGroupInfo_.displaysInfo.size() &&
+        newMainDisplayInfo.id != oldMainDisplayInfo.id) {
+        MMI_HILOGD("current mainScreenDisplayId changed");
         return true;
     }
     return false;
