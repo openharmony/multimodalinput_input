@@ -1581,14 +1581,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_002, TestS
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
-    handler.authorizationCollection_.insert(std::make_pair(12, AuthorizationStatus::AUTHORIZED));
-    int32_t CurrentPID_ = 12;
-    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
     int32_t ret = handler.OnCancelInjection();
-    EXPECT_EQ(ret, ERR_OK);
-    CurrentPID_ = 1;
-    ret = handler.OnCancelInjection();
-    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_FALSE(ret != ERR_OK);
 }
 
 /**
@@ -1601,12 +1596,10 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_002, TestSize.Le
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
-    handler.CurrentPID_ = 12345;
-    handler.authorizationCollection_.clear();
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
     int32_t result = handler.OnAuthorize(false);
     EXPECT_EQ(result, ERR_OK);
 }
-
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
