@@ -176,7 +176,7 @@ private:
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     void UpdateMouseStyle();
     int32_t UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY);
-    int32_t UpdateCursorProperty(CustomCursor cursor);
+    int32_t UpdateCursorProperty(CustomCursor cursor, CursorOptions options);
     void RotateDegree(Direction direction);
     int32_t DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle, Direction direction);
@@ -323,6 +323,9 @@ private:
     std::map<MOUSE_ICON, loadingAndLoadingPixelMapInfo> mousePixelMap_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
     int releaseFence_ { -1 };
+    bool followSystem_ { false };
+    int32_t focusX_ { 0 };
+    int32_t focusY_ { 0 };
     std::atomic<bool> initEventhandlerFlag_ { false };
 };
 } // namespace MMI

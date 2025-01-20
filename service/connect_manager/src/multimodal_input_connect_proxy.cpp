@@ -2710,7 +2710,9 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, CustomCur
 {
     CALL_DEBUG_ENTER;
     CHKPR(cursor.pixelMap, RET_ERR);
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(cursor.pixelMap);
+    Parcel *pData = static_cast<Parcel*>(cursor.pixelMap);
+    CHKPR(pData, RET_ERR);
+    OHOS::Media::PixelMap* pixelMapPtr =  Media::PixelMap::Unmarshalling(*pData);
     CHKPR(pixelMapPtr, RET_ERR);
     if (pixelMapPtr->GetCapacity() == 0) {
         MMI_HILOGE("pixelMap is empty");
@@ -2736,7 +2738,8 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, CustomCur
             data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-    }
+    } else {
+        READINT32(reply, ret);
     return ret;
 }
 } // namespace MMI

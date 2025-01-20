@@ -56,13 +56,7 @@ struct CustomCursorAsyncContext : AsyncContext {
     CursorOptions options;
     napi_value resultValue;
     CustomCursorAsyncContext(napi_env env) : AsyncContext(env) {}
-    ~CustomCursorAsyncContext() override
-    {
-        if (cursor.pixelMap != nullptr) {
-            free(cursor.pixelMap);
-            cursor.pixelMap = nullptr;
-        }
-    }
+    ~CustomCursorAsyncContext() override;
 };
 
 class JsPointerManager final {
@@ -128,14 +122,12 @@ public:
     napi_value GetHardwareCursorStats(napi_env env);
     napi_value SetTouchpadScrollRows(napi_env env, int32_t rows, napi_value handle = nullptr);
     napi_value GetTouchpadScrollRows(napi_env env, napi_value handle = nullptr);
-    napi_value SetCustomCursor(napi_env env, int32_t windowId, CustomCursor cursor, CursorOptions options,
-        int32_t pixelMapSize);
+    napi_value SetCustomCursor(napi_env env, int32_t windowId, CustomCursor cursor, CursorOptions options);
 
 private:
     napi_value SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode);
     napi_value GetTouchpadBoolData(napi_env env, napi_value handle, bool data, int32_t errorCode);
     napi_value GetTouchpadInt32Data(napi_env env, napi_value handle, int32_t data, int32_t errorCode);
-    void* DeepCopyPixelMap(void* pixelMap, int32_t pixelMapSize);
     napi_value ExecuteSetCustomCursorAsync(sptr<CustomCursorAsyncContext> asyncContext);
     bool CreateAsyncWork(napi_env env, sptr<CustomCursorAsyncContext> asyncContext, napi_value resource);
     static void ExecuteSetCustomCursorWork(napi_env env, void* data);
