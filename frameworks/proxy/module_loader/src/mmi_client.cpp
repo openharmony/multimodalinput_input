@@ -134,7 +134,7 @@ bool MMIClient::StartEventRunner()
                 return false;
             } else {
                 auto runner = eventHandler_->GetEventRunner();
-                MMI_HILOGI("reuse current event handler, thread name:%{public}s",
+                MMI_HILOGI("Reuse current event handler, thread name:%{public}s",
                     runner->GetRunnerThreadName().c_str());
             }
         }
