@@ -56,7 +56,8 @@ struct CustomCursorAsyncContext : AsyncContext {
     CursorOptions options;
     napi_value resultValue;
     CustomCursorAsyncContext(napi_env env) : AsyncContext(env) {}
-    ~CustomCursorAsyncContext() override {
+    ~CustomCursorAsyncContext() override
+    {
         if (cursor.pixelMap != nullptr) {
             delete[] static_cast<uint8_t*>(cursor.pixelMap);
             cursor.pixelMap = nullptr;
