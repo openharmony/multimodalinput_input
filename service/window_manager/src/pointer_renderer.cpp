@@ -347,9 +347,9 @@ float PointerRenderer::GetOffsetY(const RenderConfig &cfg)
  
 int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg)
 {
-    if(cfg.style == MOUSE_ICON::LOADING) {
+    if (cfg.style == MOUSE_ICON::LOADING) {
         auto loadingImg = FindImg(cfg);
-        if(loadingImg == nullptr) {
+        if (loadingImg == nullptr) {
             loadingImg = LoadPointerImage(cfg);
             CHKPR(loadingImg, RET_ERR);
             PushImg(cfg, loadingImg);

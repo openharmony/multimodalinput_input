@@ -66,10 +66,10 @@ private:
     image_ptr_t ExtractDrawingImage(pixelmap_ptr_t pixelMap);
     float GetOffsetX(const RenderConfig &cfg);
     float GetOffsetY(const RenderConfig &cfg);
-    int32_t DrawImage(OHOS::Rosen::Drawing::Cavas &canvas, const RenderConfig &cfg);
+    int32_t DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg);
     image_ptr_t FindImg(const RenderConfig &cfg)
     {
-        for(auto data : imgMaps_) {
+        for (auto& data : imgMaps_) {
             if (std::get<0>(data) == cfg) {
                 return std::get<1>(data);
             }
@@ -78,14 +78,12 @@ private:
     }
     void PushImg(const RenderConfig &cfg, image_ptr_t img)
     {
-        if(imgMaps_.size() >= DEFAULT_IMG_SIZE) {
+        if (imgMaps_.size() >= DEFAULT_IMG_SIZE) {
             imgMaps_.erase(imgMaps_.begin());
         }
         imgMaps_.push_back({cfg, img});
     }
-
 };
-
 } // namespace OHOS::MMI
 
 #endif // POINTER_RENDERER_H
