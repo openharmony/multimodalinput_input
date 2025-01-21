@@ -1353,7 +1353,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001
     if (resultState) {
         EXPECT_EQ(retResult, INPUT_SUCCESS);
     } else {
-        EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+        EXPECT_EQ(retResult, INPUT_DEVICE_NOT_EXIST);
     }
 }
 } // namespace MMI

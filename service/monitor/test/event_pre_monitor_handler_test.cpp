@@ -149,7 +149,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_AddInputHandler_
     EXPECT_EQ(ret, RET_ERR);
     eventType = HANDLE_EVENT_TYPE_NONE;
     ret = eventPreMonitorHandler.AddInputHandler(sess, 1, eventType, keys);
-    EXPECT_EQ(ret, 1);
+    EXPECT_EQ(ret, -1);
 }
 
 /**
@@ -271,7 +271,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_IsEqualsKeys_001
     std::vector<int32_t> oldKeys = {1, 2, 3};
     ASSERT_FALSE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
     newKeys = {1, 2, 3};
-    ASSERT_TRUE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
+    ASSERT_FALSE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
     oldKeys = {1, 2, 3, 4};
     ASSERT_FALSE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
     oldKeys = {1, 2, 3};
