@@ -1924,10 +1924,6 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
 
     int32_t windowId = 0;
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
