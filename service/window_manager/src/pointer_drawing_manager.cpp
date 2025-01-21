@@ -1146,9 +1146,9 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     CHKPR(sp, RET_ERR);
     auto buffer = sp->RequestBuffer();
     CHKPR(buffer, RET_ERR);
-    auto addr = static_cast<uint8_t*>(buf->GetVirAddr());
+    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPC(addr);
-    pointerRender_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
     MMI_HILOGD("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u",
         sp->GetScreenId());
     return RET_OK;
@@ -1167,9 +1167,9 @@ voidPointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         .path = mouseIcons_[mouseStyle].iconPath,
         .color = GetPointerColor(),
         .size = GetPointerSize(),
-        .direction = displayInfo_.direction
+        .direction = displayInfo_.direction,
         .isHard = true,
-        .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE;
+        .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
     };
     for (auto it : screenPointers) {
         cfg.dpi = it.second->GetRenderDPI();
@@ -1177,11 +1177,11 @@ voidPointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
             it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
             if (mouseStyle == MOUSE_ICON::LOADING) {
-                cfg.rotationFocusX = GetFocusCoordinats();
-                cfg.rotationFocusY = GetFocusCoordinats();
+                cfg.rotationFocusX = GetFocusCoordinates();
+                cfg.rotationFocusY = GetFocusCoordinates();
             } else {
-                cfg.rotationFocusX = GetFocusCoordinats() + cfg.GetImageSize() * RUNNING_X_RATIO;
-                cfg.rotationFocusY = GetFocusCoordinats() + cfg.GetImageSize() * RUNNING_Y_RATIO;;
+                cfg.rotationFocusX = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_X_RATIO;
+                cfg.rotationFocusY = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_Y_RATIO;
             }
             DrawDynamicHardwareCursor(it.second, cfg);
         } else {
@@ -1215,11 +1215,11 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
         layer->CancelBuffer(buffer);
         return RET_ERR;
     }
-    MMI_HILOGD("DrawCursor on SurfaceNode success");
+    MMI_HILOGD("DrawDynamicSoftCursor on sn success");
     return RET_OK;
 }
 
-void PointerDrawingManager::SoftWareCursorDynamicRender(MOUSE_ICON mouseStyle)
+void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
 {
     std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
     {
@@ -1232,29 +1232,28 @@ void PointerDrawingManager::SoftWareCursorDynamicRender(MOUSE_ICON mouseStyle)
         .path = mouseIcons_[mouseStyle].iconPath,
         .color = GetPointerColor(),
         .size = GetPointerSize(),
-        .direction = displayInfo_.direction
+        .direction = displayInfo_.direction,
         .isHard = true,
-        .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE;
+        .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
     };
     for (auto it : screenPointers) {
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetRenderDPI();
-        MMI_HILOGD("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f",
+        MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}u, dpi = %{public}f",
             it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
             if (mouseStyle == MOUSE_ICON::LOADING) {
-                cfg.rotationFocusX = GetFocusCoordinats();
-                cfg.rotationFocusY = GetFocusCoordinats();
+                cfg.rotationFocusX = GetFocusCoordinates();
+                cfg.rotationFocusY = GetFocusCoordinates();
             } else {
-                cfg.rotationFocusX = GetFocusCoordinats() + cfg.GetImageSize() * RUNNING_X_RATIO;
-                cfg.rotationFocusY = GetFocusCoordinats() + cfg.GetImageSize() * RUNNING_Y_RATIO;;
+                cfg.rotationFocusX = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_X_RATIO;
+                cfg.rotationFocusY = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_Y_RATIO;
             }
             DrawDynamicSoftCursor(sn, cfg);
         } else {
             it.second->SetInvisible();
         }
     }
-    MMI_HILOGD("HardwareCursorDynamicRender success");
 }
 
 void PointerDrawingManager::OnVsync(uint64_t timestamp)
@@ -3312,7 +3311,7 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         .isHard = true,
     };
 
-    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINE_ICON) {
+    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
         cfg.userIconPixelMap = GetUserIconCopy();
         cfg.userIconHotSpotX = userIconHotSpotX_;
@@ -3348,7 +3347,7 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         .isHard = true,
     };
 
-    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINE_ICON) {
+    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
         cfg.userIconPixelMap = GetUserIconCopy();
         cfg.userIconHotSpotX = userIconHotSpotX_;
@@ -3360,8 +3359,8 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         MMI_HILOGD("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f,
             direction = %{public}d", it.first, cfg.dpi, cfg.direction);
         if (it.second->IsMirror() || it.first == screenId_) {
-            cfi.dpi * = it.second->GetScale();
-            DrawCursor(it.second->GetSurfaceNode, cfg);
+            cfg.dpi * = it.second->GetScale();
+            DrawCursor(it.second->GetSurfaceNode(), cfg);
         } else {
             it.second->SetInvisible();
         }
