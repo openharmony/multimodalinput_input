@@ -1873,6 +1873,10 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
         return false;
     }
+    if (pixelMap->GetWidth() > MAX_PIXELMAP_SIZE || pixelMap->GetHeight() > MAX_PIXELMAP_SIZE) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The width or height of the pixelMap exceed 256");
+        return false;
+    }
     Parcel* pixelMapData = new Parcel();
     CHKPF(pixelMapData);
     pixelMap->Marshalling(*pixelMapData);
@@ -1900,10 +1904,6 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusY is invalid");
             return false;
         }
-    }
-    if (pixelMap->GetWidth() > MAX_PIXELMAP_SIZE || pixelMap->GetHeight() > MAX_PIXELMAP_SIZE) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The width or height of the pixelMap exceed 256");
-        return false;
     }
     return true;
 }
