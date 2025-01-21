@@ -29,17 +29,17 @@ struct RenderConfig {
     MOUSE_ICON style;
     ICON_TYPE align;
     std::string path;
-    uint32_t color;
-    uint32_t size;
-    uint32_t direction;
-    float dpi;
-    bool isHard;
-    int32_t rotationAngle;
-    uint32_t rotationFocusX;
-    uint32_t rotationFocusY;
-    pixelmap_ptr_t userIconPixelMap;
-    int32_t userIconHotSpotX;
-    int32_t userIconHotSpotY;
+    uint32_t color { 0 };
+    uint32_t size { 0 };
+    uint32_t direction { 0 };
+    float dpi { 0 };
+    bool isHard { false };
+    int32_t rotationAngle { 0 };
+    uint32_t rotationFocusX { 0 };
+    uint32_t rotationFocusY { 0 };
+    pixelmap_ptr_t userIconPixelMap { nullptr };
+    int32_t userIconHotSpotX { 0 };
+    int32_t userIconHotSpotY { 0 };
 
     int32_t GetImageSize() const;
     std::string ToString() const;
