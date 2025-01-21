@@ -80,7 +80,7 @@ enum TypeName : int32_t {
     PRE_KEY = 11
 };
 
-enum Input_KeyEventAction {
+enum InputKeyEventAction {
     /** Cancellation of a key action. */
     KEY_ACTION_CANCEL = 0,
     /** Pressing of a key. */
@@ -2083,11 +2083,11 @@ int32_t JsInputMonitor::TransformKeyEvent(const std::shared_ptr<KeyEvent> keyEve
 int32_t JsInputMonitor::GetKeyEventAction(int32_t action) const
 {
     if (KeyEvent::KEY_ACTION_CANCEL == action) {
-        return Input_KeyEventAction::KEY_ACTION_CANCEL;
+        return InputKeyEventAction::KEY_ACTION_CANCEL;
     } else if (KeyEvent::KEY_ACTION_DOWN == action) {
-        return Input_KeyEventAction::KEY_ACTION_DOWN;
+        return InputKeyEventAction::KEY_ACTION_DOWN;
     } else if (KeyEvent::KEY_ACTION_UP == action) {
-        return Input_KeyEventAction::KEY_ACTION_UP;
+        return InputKeyEventAction::KEY_ACTION_UP;
     } else {
         return RET_ERR;
     }
