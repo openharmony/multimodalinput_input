@@ -3374,7 +3374,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
     std::lock_guard<std::mutex> guard(mtx_);
     if (userIcon_ == nullptr) {
         MMI_HILOGI("userIcon_ is nullptr");
-        return nullptr; 
+        return nullptr;
     }
     if (followSystem_) {
         Parcel data;
