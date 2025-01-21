@@ -29,6 +29,7 @@
 #include "mouse_event_normalize.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
+#include "event_statistic.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventDumpTest"
@@ -288,6 +289,22 @@ HWTEST_F(EventDumpTest, EventDumpTest014, TestSize.Level1)
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     ASSERT_NO_FATAL_FAILURE(MouseEventHdr->Dump(fd_, args));
+}
+
+/**
+ * @tc.name: EventDumpTest_015
+ * @tc.desc: Event dump event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-e"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
+    MMIEventDump->ParseCommand(fd_, args);
+    ASSERT_NO_FATAL_FAILURE(EventStatistic::Dump(fd_, args));
 }
 } // namespace MMI
 } // namespace OHOS
