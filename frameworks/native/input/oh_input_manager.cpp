@@ -1596,12 +1596,12 @@ Input_Result OH_Input_RemoveAxisEventMonitor(InputEvent_AxisEventType axisEventT
     CHKPR(callback, INPUT_PARAMETER_ERROR);
     std::lock_guard guard(g_mutex);
     if (g_axisMonitorCallbacks.find(axisEventType) == g_axisMonitorCallbacks.end()) {
-        MMI_HILOGE("The axis event type has not been added.");
+        MMI_HILOGE("The axis event type has not been added");
         return INPUT_PARAMETER_ERROR;
     }
     auto it = g_axisMonitorCallbacks[axisEventType].find(callback);
     if (it == g_axisMonitorCallbacks[axisEventType].end()) {
-        MMI_HILOGE("The callback has not been added.");
+        MMI_HILOGE("The callback has not been added");
         return INPUT_PARAMETER_ERROR;
     }
     g_axisMonitorCallbacks[axisEventType].erase(it);
