@@ -23,19 +23,34 @@
 namespace OHOS::MMI {
 using image_ptr_t = std::shared_ptr<Rosen::Drawing::Image>;
 using pixelmap_ptr_t = std::shared_ptr<OHOS::Media::PixelMap>;
+constexpr int32_t DEFAULT_IMG_SIZE{ 10 };
 
 struct RenderConfig {
-    MOUSE_ICON style;   // 光标样式
-    ICON_TYPE align;    // 光标对齐方式
-    std::string path;   // 光标路径
-    uint32_t color;     // 光标颜色
-    uint32_t size;      // 光标大小
-    uint32_t rotation;  // 光标朝向
-    float dpi;          // 屏幕 DPI
-    bool isHard;        // 是否是硬光标
+    MOUSE_ICON style;
+    ICON_TYPE align;
+    std::string path;
+    uint32_t color;
+    uint32_t size;
+    uint32_t direction;
+    float dpi;
+    bool isHard;
+    int32_t rotationAngle;
+    uint32_t rotationFocusX;
+    uint32_t rotationFocusY;
+    pixelmap_ptr_t userIconPixelMap;
+    int32_t userIconHotSpotX;
+    int32_t userIconHotSpotY;
 
     int32_t GetImageSize() const;
     std::string ToString() const;
+    bool operator == (const RenderConfig& rhs) const
+    {
+        return style == rhs.style && GetImageSize() == rhs.GetImageSize() && color == rhs.color;
+    }
+    bool operator != (const RenderConfig& rhs) const
+    {
+        return style != rhs.style && GetImageSize() != rhs.GetImageSize() && color != rhs.color;
+    }
 };
 
 class PointerRenderer {
@@ -44,13 +59,31 @@ public:
     ~PointerRenderer() = default;
 
     int32_t Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg);
-
+    int32_t DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg);
 private:
     image_ptr_t LoadPointerImage(const RenderConfig &cfg);
     pixelmap_ptr_t LoadCursorSvgWithColor(const RenderConfig &cfg);
     image_ptr_t ExtractDrawingImage(pixelmap_ptr_t pixelMap);
     float GetOffsetX(const RenderConfig &cfg);
     float GetOffsetY(const RenderConfig &cfg);
+    int32_t DrawImage(OHOS::Rosen::Drawing::Cavas &canvas, const RenderConfig &cfg);
+    std::vector<std::tuple<RenderConfig, image_ptr_t>> imgMaps_;
+    {
+        for(auto data : imgMaps) {
+            if (std::get<0>(data) == cfg) {
+                return std::get<1>(data);
+            }
+        }
+        return nullptr;
+    }
+    void PushImg(const RenderConfig &cfg, image_ptr_t img)
+    {
+        if(imgMaps_.size() >= DEAULT_IMG_SIZE) {
+            imgMaps_.erase(imgMaps_.begin());
+        }
+        imgMaps_.push_back({cfg, img});
+    }
+
 };
 
 } // namespace OHOS::MMI

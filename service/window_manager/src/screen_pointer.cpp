@@ -257,6 +257,10 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
         px = paddingLeft_ + x * scale_ - dx;
         py = paddingTop_ + y * scale_ - dy;
     } else if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+        if (renderDPI == 0) {
+            MMI_HILOGE("SetPosition failed, RenderDPI = %{public}f", renderDPI);
+            return false;
+        }
         int32_t adjustX = static_cast<int32_t>(float(FOCUS_POINT - dx) *
             (dpi_ * scale_) / GetRenderDPI());
         int32_t adjustY = static_cast<int32_t>(float(FOCUS_POINT - dy) *

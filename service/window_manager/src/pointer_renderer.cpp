@@ -20,6 +20,7 @@
 
 #include "define_multimodal.h"
 #include "image_source.h"
+#include "window_info.h"
 #include "mmi_log.h"
 #include "util.h"
 
@@ -37,6 +38,8 @@ constexpr int32_t OTHER_POINTER_COLOR{0x171717};
 constexpr float CALCULATE_IMAGE_MIDDLE{2.0f};
 constexpr uint32_t FOCUS_POINT{256};
 constexpr float CALCULATE_MOUSE_ICON_BIAS{5.0f};
+constexpr float ROTATION_ANGLE90 {90.0f};
+constexpr std::string IMAGE_POINER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 
 namespace OHOS::MMI {
 
@@ -49,7 +52,9 @@ std::string RenderConfig::ToString() const
 {
     std::ostringstream oss;
     oss << "{style=" << style << ", align=" << align << ", path" << path << ", color=" << color
-        << ", size=" << size << ", rotation=" << rotation << ", dpi=" << dpi
+        << ", size=" << size << ", rotationAngle=" << rotationAngle
+        << ", [" << rotationFocusX << " " <<rotationFocusY << "]"
+        <<",dpi=" <<dpi
         << ", isHard=" << isHard << ", ImageSize=" << GetImageSize() << "}";
     return oss.str();
 }
@@ -79,17 +84,22 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
 
     // load cursor image
-    auto image = LoadPointerImage(cfg);
-    CHKPR(image, RET_ERR);
-
-    // draw image on canvas
-    int32_t dx = 0;
-    int32_t dy = 0;
-    if (cfg.isHard) {
-        dx = GetOffsetX(cfg);
-        dy = GetOffsetY(cfg);
+    image_ptr_t image = nullptr;
+    if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        image = LoadPointerImage(cfg);
+    } else {
+        image = ExtractDrawingImage(cfg.userIconPixelMap);
     }
-    canvas.DrawImage(*image, dx, dy, Rosen::Drawing::SamplingOptions());
+    //load cursor image
+    image_ptr_t image = nullptr;
+    if(cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        image = LoadPointerImage(cfg);
+    } else {
+        image = ExtractDrawingImage(cfg.userIconPixelMap);
+    }
+    CHKPR(image, RET_ERR);
+    //Draw image on canvas
+    canvas.DrawImage(*image, GetOffsetX(cfg), GetOffsetY(cfg), Rosen::Drawing::SamplingOptions());
 
     // copy bitmap pixels to addr
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
@@ -277,6 +287,9 @@ image_ptr_t PointerRenderer::ExtractDrawingImage(pixelmap_ptr_t pixelMap)
 
 float PointerRenderer::GetOffsetX(const RenderConfig &cfg)
 {
+    if (!cfg.isHard) {
+        return 0.0f;
+    }
     int32_t width = cfg.GetImageSize();
     switch (cfg.align) {
         case ANGLE_E:
@@ -294,7 +307,7 @@ float PointerRenderer::GetOffsetX(const RenderConfig &cfg)
         case ANGLE_SW:
             return FOCUS_POINT;
         case ANGLE_NW:
-            return FOCUS_POINT;
+            return FOCUS_POINT - cfg.userIconHotSpotX;
         case ANGLE_CENTER:
             return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
         case ANGLE_NW_RIGHT:
@@ -307,6 +320,10 @@ float PointerRenderer::GetOffsetX(const RenderConfig &cfg)
 
 float PointerRenderer::GetOffsetY(const RenderConfig &cfg)
 {
+    if (!cfg.isHard) {
+        return 0.0f;
+    }
+
     int32_t height = cfg.GetImageSize();
     switch (cfg.align) {
         case ANGLE_E:
@@ -324,7 +341,7 @@ float PointerRenderer::GetOffsetY(const RenderConfig &cfg)
         case ANGLE_SW:
             return FOCUS_POINT - height;
         case ANGLE_NW:
-            return FOCUS_POINT;
+            return FOCUS_POINT - cfg.userIconHotSpotY;
         case ANGLE_CENTER:
             return FOCUS_POINT - height / CALCULATE_IMAGE_MIDDLE;
         case ANGLE_NW_RIGHT:
@@ -334,5 +351,83 @@ float PointerRenderer::GetOffsetY(const RenderConfig &cfg)
             return FOCUS_POINT;
     }
 }
+ 
+int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg)
+{
+    if(cfg.style == MOUSE_ICON::LOADING) {
+        auto loadingImg = FindImg(cfg);
+        if(loadingImg == nullptr) {
+            loadingImg = LoadPointerImage(cfg)
+            CHKPR(loadingImg, RET_ERR);
+            PushImg(cfg, loadingImg);
+        }
+        canvas.Rotate(cfg.rotationAngle, cfg.rotationFocusX, cfg.rotationFocusY);
+        canvas.DrawImage(*image, GetOffsetX(cfg), GetOffsetY(cfg), Rosen::Drawing::SamplingOptions());
+    } else {
+        RenderConfig runingLCfg = cfg;
+        runingLCfg.style == MOUSE_ICON::RUNNING_LEFT;
+        auto runningImgLeft = FindImg(runingLCfg);
+        if (runingLCfg == nullptr) {
+            runningImgLeft == LoadPointerImage(runingLCfg);
+            CHKPR(runningImgLeft, RET_ERR);
+            PushImage(runingLCfg, runningImgLeft);
+        }
+        CHKPR(runningImgLeft, RET_ERR);
+        canvas.DrawImage(*runningImgLeft, GetOffsetX(runingLCfg), GetOffsetY(runingLCfg),
+            Rosen::Drawing::SamplingOptions());
+        //绘制running 右上角光标
+        RenderConfig runingRCfg = cfg;
+        runingRCfg.style == MOUSE_ICON::RUNNING_RIGHT;
+        runingRCfg.align = ANGLE_NW;
+        runingRCfg.path = IMAGE_POINER_DEFAULT_PATH + "Loading_Right.svg";
+        auto runningImgRight = FindImg(runingRCfg);
+        if (runingRCfg == nullptr) {
+            runningImgRight == LoadPointerImage(runingRCfg);
+            CHKPR(runningImgRight, RET_ERR);
+            PushImage(runingRCfg, runningImgRight);
+        }
+        canvas.Rotate(runingRCfg.rotationAngle, runingRCfg.rotationFocusX, runingRCfg.rotationFocusY);
+        CHKPR(runningImgRight, RET_ERR);
+        canvas.DrawImage(*runningImgRight, GetOffsetX(runingRCfg), GetOffsetY(runingRCfg),
+            Rosen::Drawing::SamplingOptions());
+    }
+    return RET_OK;
+}
+int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg)
+{
+    CHKPR(addr, RET_ERR);
+    const uint32_t addrSize = width * height * CURSOR_STRIDE;
+    if (cfg.style == MOUSE_ICON::TRANSPARENT_ICON) {
+        memset_s(addr, addrSize, 0, addrSize);
+        return RET_OK;
+    }
 
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
+    bitmap.Build(width, height, format);
+    
+    OHOS::Rosen::Drawing::Canvas canvas;
+    canvas.Bind(bitmap);
+    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+
+    OHOS::Rosen::Drawing::Pen pen;
+    pen.SetAntiAlias(true);
+    pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
+    OHOS::Rosen::Drawing::scalar penWidth = 1;
+    pen.SetWidth(penWidth);
+    canvas.AttachPen(pen);
+    
+    OHOS::Rosen::Drawing::Brush brush;
+    brush.SetColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    canvas.DrawBackground(brush);
+    if (DrawImage(canvas, cfg) != RET_OK) {
+        return RET_ERR;
+    }
+    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
+    if (ret != EOK) {
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace OHOS::MMI
