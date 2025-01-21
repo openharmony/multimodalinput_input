@@ -67,6 +67,7 @@ private:
     float GetOffsetX(const RenderConfig &cfg);
     float GetOffsetY(const RenderConfig &cfg);
     int32_t DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg);
+    std::vector<std::tuple<RenderConfig, image_ptr_t>> imgMaps_;
     image_ptr_t FindImg(const RenderConfig &cfg)
     {
         for (auto& data : imgMaps_) {
