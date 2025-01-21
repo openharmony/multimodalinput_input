@@ -3446,7 +3446,12 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     CHKPR(newPixelMap, RET_ERR);
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
-    if (imageInfo.size.width > MAX_CUSTOM_CURSOR_SIZE || imageInfo.size.height > MAX_CUSTOM_CURSOR_SIZE) {
+    if (imageInfo.size.width < cursor.focusX || imageInfo.size.width < cursor.focusY) {
+        MMI_HILOGE("focus is invalid");
+        return RET_ERR;
+    }
+    if (imageInfo.size.width > MAX_CUSTOM_CURSOR_SIZE || imageInfo.size.height > MAX_CUSTOM_CURSOR_SIZE ||
+        imageInfo.size.width <= 0 || imageInfo.size.height <= 0) {
         MMI_HILOGE("PixelMap is invalid");
         return RET_ERR;
     }
