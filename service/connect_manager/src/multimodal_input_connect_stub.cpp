@@ -48,7 +48,7 @@ constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 constexpr int32_t MAX_SPEED { 20 };
 constexpr int32_t MIN_SPEED { 1 };
-
+constexpr int32_t KEY_MAX_LIST_SIZE { 5 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -243,6 +243,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER):
             ret = StubRemoveInputHandler(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_PRE_INPUT_HANDLER):
+            ret = StubAddPreInputHandler(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_PRE_INPUT_HANDLER):
+            ret = StubRemovePreInputHandler(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_GESTURE_MONITOR):
             ret = StubAddGestureMonitor(data, reply);
@@ -1308,6 +1314,72 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         parseData.deviceTags, parseData.actionsType);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubAddPreInputHandler(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t handlerId = -1;
+    READINT32(data, handlerId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t eventType = 0;
+    READINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::vector<int32_t> keys;
+    int32_t keysLen = 0;
+    int32_t key = 0;
+    READINT32(data, keysLen, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (keysLen <= 0 || keysLen > KEY_MAX_LIST_SIZE) {
+        MMI_HILOGE("Invalid keysLen:%{public}d", keysLen);
+        return RET_ERR;
+    }
+    for (int32_t i = 0; i < keysLen; ++i) {
+        READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
+        keys.push_back(key);
+    }
+
+    int32_t ret = AddPreInputHandler(handlerId, eventType, keys);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call AddPreInputHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemovePreInputHandler(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t handlerId = -1;
+    READINT32(data, handlerId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemovePreInputHandler(handlerId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RemovePreInputHandler failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
