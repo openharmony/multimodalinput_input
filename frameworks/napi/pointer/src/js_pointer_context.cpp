@@ -1884,7 +1884,7 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
             return false;
         }
         CHKRF(napi_get_value_int32(env, focusXValue, &cursor.focusX), GET_VALUE_INT32);
-        if (cursor.focusX <= 0 || cursor.focusX > pixelMap->GetWidth() || cursor.focusX > MAX_PIXELMAP_SIZE) {
+        if (cursor.focusX < 0 || cursor.focusX > pixelMap->GetWidth() || pixelMap->GetWidth() > MAX_PIXELMAP_SIZE) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusX is invalid");
             return false;
         }
@@ -1896,7 +1896,7 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
             return false;
         }
         CHKRF(napi_get_value_int32(env, focusYValue, &cursor.focusY), GET_VALUE_INT32);
-        if (cursor.focusY <= 0 || cursor.focusY > pixelMap->GetHeight() || cursor.focusY > MAX_PIXELMAP_SIZE) {
+        if (cursor.focusY < 0 || cursor.focusY > pixelMap->GetHeight() || pixelMap->GetHeight() > MAX_PIXELMAP_SIZE) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusY is invalid");
             return false;
         }
