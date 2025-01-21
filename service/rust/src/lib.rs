@@ -110,8 +110,8 @@ impl FoldPcTouchpadAccelerateCurves {
     }
 }
 impl FoldPcVirtTouchpadAccelerateCurves {
-    fn fold_pc_virt_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        &self.data[speed- 1]
+    fn fold_pc_virt_touchpad_get_curve_by_speed(&self) -> &CurveItem {
+        &self.data[5]
     }
 }
 impl AxisAccelerateCurvesTouchpad {
@@ -937,7 +937,7 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         3 => HardPcProTouchpadAccelerateCurves::get_instance().hard_pc_pro_touchpad_get_curve_by_speed(speed as usize),  
         4 => TabletTouchpadAccelerateCurves::get_instance().tablet_touchpad_get_curve_by_speed(speed as usize),
         5 => FoldPcTouchpadAccelerateCurves::get_instance().fold_pc_touchpad_get_curve_by_speed(speed as usize),
-        7 => FoldPcVirtTouchpadAccelerateCurves::get_instance().fold_pc_virt_touchpad_get_curve_by_speed(speed as usize),
+        7 => FoldPcVirtTouchpadAccelerateCurves::get_instance().fold_pc_virt_touchpad_get_curve_by_speed(),
         _ => PCTouchpadAccelerateCurves::get_instance().pc_touchpad_get_curve_by_speed(speed as usize),
     };
     unsafe {
