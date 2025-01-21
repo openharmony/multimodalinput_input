@@ -1147,14 +1147,14 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     auto buffer = sp->RequestBuffer();
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
-    CHKPC(addr);
+    CHKPR(addr, RET_ERR);
     pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
     MMI_HILOGD("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u",
         sp->GetScreenId());
     return RET_OK;
 }
 
-voidPointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
+void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
 {
     std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
     {
@@ -3356,10 +3356,10 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
 
     for (auto it : screenPointers) {
         cfg.dpi = it.second->GetDPI();
-        MMI_HILOGD("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f,
-            direction = %{public}d", it.first, cfg.dpi, cfg.direction);
+        MMI_HILOGD("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f,direction = %{public}d",
+            it.first, cfg.dpi, cfg.direction);
         if (it.second->IsMirror() || it.first == screenId_) {
-            cfg.dpi * = it.second->GetScale();
+            cfg.dpi *= it.second->GetScale();
             DrawCursor(it.second->GetSurfaceNode(), cfg);
         } else {
             it.second->SetInvisible();
