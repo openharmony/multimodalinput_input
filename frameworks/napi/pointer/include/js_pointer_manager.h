@@ -56,7 +56,7 @@ struct CustomCursorAsyncContext : AsyncContext {
     CursorOptions options;
     napi_value resultValue;
     CustomCursorAsyncContext(napi_env env) : AsyncContext(env) {}
-    ~CustomCursorAsyncContext() override;
+    ~CustomCursorAsyncContext() override {};
 };
 
 class JsPointerManager final {
