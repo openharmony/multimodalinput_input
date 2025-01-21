@@ -51,7 +51,8 @@ constexpr int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
-constexpr int32_t ERR_DEVICE_NOT_EXIST = 3900002;
+constexpr int32_t ERR_DEVICE_NOT_EXIST { 3900002 };
+constexpr int32_t ERR_NON_INPUT_APPLICATION { 3900003 };
 
 class RemoteObjectTest : public IRemoteObject {
 public:
