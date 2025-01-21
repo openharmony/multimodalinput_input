@@ -244,6 +244,10 @@ private:
     void HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void HideHardwareCursors();
     int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo, DisplayInfo &mainScreenDisplayInfo);
+    int32_t DrawDynamicHardwareCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
+    int32_t DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
+    void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle);
+    void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
