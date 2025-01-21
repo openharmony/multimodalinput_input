@@ -49,7 +49,7 @@ struct RenderConfig {
     }
     bool operator != (const RenderConfig& rhs) const
     {
-        return style != rhs.style && GetImageSize() != rhs.GetImageSize() && color != rhs.color;
+        return style != rhs.style || GetImageSize() != rhs.GetImageSize() || color != rhs.color;
     }
 };
 
@@ -67,9 +67,9 @@ private:
     float GetOffsetX(const RenderConfig &cfg);
     float GetOffsetY(const RenderConfig &cfg);
     int32_t DrawImage(OHOS::Rosen::Drawing::Cavas &canvas, const RenderConfig &cfg);
-    std::vector<std::tuple<RenderConfig, image_ptr_t>> imgMaps_;
+    image_ptr_t FindImg(const RenderConfig &cfg)
     {
-        for(auto data : imgMaps) {
+        for(auto data : imgMaps_) {
             if (std::get<0>(data) == cfg) {
                 return std::get<1>(data);
             }
@@ -78,7 +78,7 @@ private:
     }
     void PushImg(const RenderConfig &cfg, image_ptr_t img)
     {
-        if(imgMaps_.size() >= DEAULT_IMG_SIZE) {
+        if(imgMaps_.size() >= DEFAULT_IMG_SIZE) {
             imgMaps_.erase(imgMaps_.begin());
         }
         imgMaps_.push_back({cfg, img});

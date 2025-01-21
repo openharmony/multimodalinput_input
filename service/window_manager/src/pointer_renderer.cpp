@@ -39,7 +39,7 @@ constexpr float CALCULATE_IMAGE_MIDDLE{2.0f};
 constexpr uint32_t FOCUS_POINT{256};
 constexpr float CALCULATE_MOUSE_ICON_BIAS{5.0f};
 constexpr float ROTATION_ANGLE90 {90.0f};
-constexpr std::string IMAGE_POINER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 
 namespace OHOS::MMI {
 
@@ -54,7 +54,7 @@ std::string RenderConfig::ToString() const
     oss << "{style=" << style << ", align=" << align << ", path" << path << ", color=" << color
         << ", size=" << size << ", rotationAngle=" << rotationAngle
         << ", [" << rotationFocusX << " " <<rotationFocusY << "]"
-        <<",dpi=" <<dpi
+        <<", dpi=" << dpi
         << ", isHard=" << isHard << ", ImageSize=" << GetImageSize() << "}";
     return oss.str();
 }
@@ -86,13 +86,6 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     // load cursor image
     image_ptr_t image = nullptr;
     if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-        image = LoadPointerImage(cfg);
-    } else {
-        image = ExtractDrawingImage(cfg.userIconPixelMap);
-    }
-    //load cursor image
-    image_ptr_t image = nullptr;
-    if(cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         image = LoadPointerImage(cfg);
     } else {
         image = ExtractDrawingImage(cfg.userIconPixelMap);
@@ -357,34 +350,34 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
     if(cfg.style == MOUSE_ICON::LOADING) {
         auto loadingImg = FindImg(cfg);
         if(loadingImg == nullptr) {
-            loadingImg = LoadPointerImage(cfg)
+            loadingImg = LoadPointerImage(cfg);
             CHKPR(loadingImg, RET_ERR);
             PushImg(cfg, loadingImg);
         }
         canvas.Rotate(cfg.rotationAngle, cfg.rotationFocusX, cfg.rotationFocusY);
-        canvas.DrawImage(*image, GetOffsetX(cfg), GetOffsetY(cfg), Rosen::Drawing::SamplingOptions());
+        canvas.DrawImage(*loadingImg, GetOffsetX(cfg), GetOffsetY(cfg), Rosen::Drawing::SamplingOptions());
     } else {
         RenderConfig runingLCfg = cfg;
-        runingLCfg.style == MOUSE_ICON::RUNNING_LEFT;
+        runingLCfg.style = MOUSE_ICON::RUNNING_LEFT;
         auto runningImgLeft = FindImg(runingLCfg);
-        if (runingLCfg == nullptr) {
-            runningImgLeft == LoadPointerImage(runingLCfg);
+        if (runningImgLeft == nullptr) {
+            runningImgLeft = LoadPointerImage(runingLCfg);
             CHKPR(runningImgLeft, RET_ERR);
-            PushImage(runingLCfg, runningImgLeft);
+            PushImg(runingLCfg, runningImgLeft);
         }
         CHKPR(runningImgLeft, RET_ERR);
         canvas.DrawImage(*runningImgLeft, GetOffsetX(runingLCfg), GetOffsetY(runingLCfg),
             Rosen::Drawing::SamplingOptions());
-        //绘制running 右上角光标
+        
         RenderConfig runingRCfg = cfg;
-        runingRCfg.style == MOUSE_ICON::RUNNING_RIGHT;
+        runingRCfg.style = MOUSE_ICON::RUNNING_RIGHT;
         runingRCfg.align = ANGLE_NW;
-        runingRCfg.path = IMAGE_POINER_DEFAULT_PATH + "Loading_Right.svg";
+        runingRCfg.path = IMAGE_POINTER_DEFAULT_PATH + "Loading_Right.svg";
         auto runningImgRight = FindImg(runingRCfg);
-        if (runingRCfg == nullptr) {
-            runningImgRight == LoadPointerImage(runingRCfg);
+        if (runningImgRight == nullptr) {
+            runningImgRight = LoadPointerImage(runingRCfg);
             CHKPR(runningImgRight, RET_ERR);
-            PushImage(runingRCfg, runningImgRight);
+            PushImg(runingRCfg, runningImgRight);
         }
         canvas.Rotate(runingRCfg.rotationAngle, runingRCfg.rotationFocusX, runingRCfg.rotationFocusY);
         CHKPR(runningImgRight, RET_ERR);
@@ -396,7 +389,7 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
 int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg)
 {
     CHKPR(addr, RET_ERR);
-    const uint32_t addrSize = width * height * CURSOR_STRIDE;
+    uint32_t addrSize = width * height * RENDER_STRIDE;
     if (cfg.style == MOUSE_ICON::TRANSPARENT_ICON) {
         memset_s(addr, addrSize, 0, addrSize);
         return RET_OK;
