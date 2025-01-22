@@ -2708,9 +2708,6 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int3
         pidInfos_.pop_front();
     }
     if (!WIN_MGR->HasMouseHideFlag() || INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice()) {
-        if (visible) {
-            SetMouseDisplayState(true);
-        }
         UpdatePointerVisible();
     }
     return RET_OK;
@@ -2736,10 +2733,6 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t dis
             return;
         }
     }
-#else
-    surfaceNode_->SetBounds(lastPhysicalX_, lastPhysicalY_,
-        surfaceNode_->GetStagingProperties().GetBounds().z_, surfaceNode_->GetStagingProperties().GetBounds().w_);
-    Rosen::RSTransaction::FlushImplicitTransaction();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGD("Pointer window move success");
 }
