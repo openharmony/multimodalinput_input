@@ -1067,9 +1067,14 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
         return;
     }
 
-    // touchpad two finger button 272 -> 0
+    // touchpad two finger button 272 -> 273
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
+        uint32_t buttonArea = libinput_event_pointer_get_button_area(data);
+        if (buttonArea == BTN_RIGHT_MENUE_CODE && fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+            button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
+        }
         return;
     }
 }
