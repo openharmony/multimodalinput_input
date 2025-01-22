@@ -5221,23 +5221,23 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
     if (!lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
         MMI_HILOGD("shift pointerEvent, current mouse left mouse button is not pressed");
     }
-    const std::optional<WindowInfo> &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
-    const std::optional<WindowInfo> &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
+    const WindowInfo &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
+    const WindowInfo &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
     std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     pointerEvent->ClearButtonPressed();
 
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerId, item);
-    item.SetWindowX(lastLogicX_ - sourceWindowInfo->area.x);
-    item.SetWindowY(lastLogicY_ - sourceWindowInfo->area.y);
+    item.SetWindowX(lastLogicX_ - sourceWindowInfo.area.x);
+    item.SetWindowY(lastLogicY_ - sourceWindowInfo.area.y);
     item.SetPressed(false);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetTargetDisplayId(sourceWindowInfo->displayId);
-    pointerEvent->SetTargetWindowId(sourceWindowInfo->id);
-    pointerEvent->SetAgentWindowId(sourceWindowInfo->agentWindowId);
+    pointerEvent->SetTargetDisplayId(sourceWindowInfo.displayId);
+    pointerEvent->SetTargetWindowId(sourceWindowInfo.id);
+    pointerEvent->SetAgentWindowId(sourceWindowInfo.agentWindowId);
     ClearTargetWindowId(pointerId);
     pointerEvent->UpdatePointerItem(pointerId, item);
     InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
@@ -5245,21 +5245,21 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
         item.SetWindowX(shiftWindowInfo.x);
         item.SetWindowY(shiftWindowInfo.y);
         if (shiftWindowInfo.x == -1 && shiftWindowInfo.y == -1) {
-            item.SetWindowX(lastLogicX_ - targetWindowInfo->area.x);
-            item.SetWindowY(lastLogicY_ - targetWindowInfo->area.y);
+            item.SetWindowX(lastLogicX_ - targetWindowInfo.area.x);
+            item.SetWindowY(lastLogicY_ - targetWindowInfo.area.y);
         }
         item.SetPressed(true);
         pointerEvent->ClearButtonPressed();
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
         pointerEvent->UpdatePointerItem(pointerId, item);
-        pointerEvent->SetTargetDisplayId(targetWindowInfo->displayId);
-        pointerEvent->SetTargetWindowId(targetWindowInfo->id);
-        pointerEvent->SetAgentWindowId(targetWindowInfo->agentWindowId);
+        pointerEvent->SetTargetDisplayId(targetWindowInfo.displayId);
+        pointerEvent->SetTargetWindowId(targetWindowInfo.id);
+        pointerEvent->SetAgentWindowId(targetWindowInfo.agentWindowId);
         HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event dispatch down event");
         InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
     }
-    firstBtnDownWindowInfo_.first = targetWindowInfo->id;
+    firstBtnDownWindowInfo_.first = targetWindowInfo.id;
     MMI_HILOGI("Shift pointer event success for mouse");
     return RET_OK;
 }
@@ -5277,8 +5277,8 @@ int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param,
         return RET_ERR;
     }
     ShiftWindowInfo shiftWindowInfo;
-    shiftWindowInfo.sourceWindowInfo = sourceWindowInfo;
-    shiftWindowInfo.targetWindowInfo = targetWindowInfo;
+    shiftWindowInfo.sourceWindowInfo = *sourceWindowInfo;
+    shiftWindowInfo.targetWindowInfo = *targetWindowInfo;
     shiftWindowInfo.x = param.x;
     shiftWindowInfo.y = param.y;
     return ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown);
