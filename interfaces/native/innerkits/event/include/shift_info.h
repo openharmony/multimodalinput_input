@@ -16,8 +16,6 @@
 #ifndef SHIFT_INFO_H
 #define SHIFT_INFO_H
 
-#include <optional>
-
 #include "nocopyable.h"
 #include "window_info.h"
 
@@ -31,8 +29,8 @@ struct ShiftWindowParam {
 };
 
 struct ShiftWindowInfo {
-    std::optional<WindowInfo> sourceWindowInfo;
-    std::optional<WindowInfo> targetWindowInfo;
+    WindowInfo sourceWindowInfo;
+    WindowInfo targetWindowInfo;
     int32_t x { -1 };
     int32_t y { -1 };
 };
