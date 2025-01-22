@@ -785,7 +785,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::RetryGetSurfaceBuffer(sptr<OHOS
 }
 
 int32_t PointerDrawingManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
-    DisplayInfo &mainScreenDisplayInfo)
+    DisplayInfo &mainScreenDisplayInfo) const
 {
     if (displayGroupInfo.displaysInfo.empty()) {
         MMI_HILOGE("displayGroupInfo doesn't contain displayInfo");

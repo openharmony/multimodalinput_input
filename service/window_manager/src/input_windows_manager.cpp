@@ -1024,7 +1024,8 @@ void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &win
     }
 }
 
-int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo, DisplayInfo &mainScreenDisplayInfo)
+int32_t InputWindowsManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
+    DisplayInfo &mainScreenDisplayInfo) const
 {
     if (displayGroupInfo.displaysInfo.empty()) {
         MMI_HILOGE("displayGroupInfo doesn't contain displayInfo");

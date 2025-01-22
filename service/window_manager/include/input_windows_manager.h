@@ -353,7 +353,8 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     bool OnDisplayRemovedOrCombiantionChanged(const DisplayGroupInfo &displayGroupInfo);
     void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
     void ResetPointerPosition(const DisplayGroupInfo &displayGroupInfo);
-    int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo, DisplayInfo &mainScreenDisplayInfo);
+    int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
+        DisplayInfo &mainScreenDisplayInfo) const;
     bool IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
