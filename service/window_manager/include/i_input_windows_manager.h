@@ -76,9 +76,6 @@ public:
     virtual void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo) = 0;
     virtual void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    virtual void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId) = 0;
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) const = 0;

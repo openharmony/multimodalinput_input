@@ -64,7 +64,6 @@ public:
     int32_t GetWindowPid(int32_t windowId);
     int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
-    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
