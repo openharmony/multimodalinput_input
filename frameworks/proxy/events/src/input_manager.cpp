@@ -682,11 +682,6 @@ int32_t InputManager::GetTouchpadScrollRows(int32_t &rows)
     return InputMgrImpl.GetTouchpadScrollRows(rows);
 }
 
-void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
-{
-    InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
-}
-
 void InputManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     InputMgrImpl.ClearWindowPointerStyle(pid, windowId);

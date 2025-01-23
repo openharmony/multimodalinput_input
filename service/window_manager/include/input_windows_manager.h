@@ -66,10 +66,6 @@ public:
     void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
     void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
-    void UpdateWindowPointerVisible(int32_t pid);
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void DumpDisplayInfo(int32_t fd);
@@ -252,7 +248,6 @@ private:
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);

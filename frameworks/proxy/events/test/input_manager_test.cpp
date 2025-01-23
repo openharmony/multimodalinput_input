@@ -3673,27 +3673,6 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputKeyEvent_001, TestSize.Leve
 }
 
 /**
- * @tc.name: InputManagerTest_SetWindowPointerStyle_001
- * @tc.desc: Verify valid parameter.
- * @tc.type: FUNC
- * @tc.require:SR000GGQL4 AR000GJNGN
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetWindowPointerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto window = WindowUtilsTest::GetInstance()->GetWindow();
-    CHKPV(window);
-    uint32_t windowId = window->GetWindowId();
-    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::ENTER, getpid(), windowId);
-    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_TOP, getpid(), windowId);
-    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_RIGHT, getpid(), windowId);
-    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_BOTTOM_LEFT, getpid(), windowId);
-    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::TOP_LIMIT, getpid(), windowId);
-    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::BOTTOM_RIGHT_LIMIT, getpid(), windowId);
-    ASSERT_NO_FATAL_FAILURE(window->GetWindowId());
-}
-
-/**
  * @tc.name: InputManagerTest_RemoveInputEventFilter_001
  * @tc.desc: When eventFilterService is empty
  * @tc.type: FUNC
