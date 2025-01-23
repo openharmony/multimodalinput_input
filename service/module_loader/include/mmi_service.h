@@ -32,6 +32,7 @@
 #include "multimodal_input_connect_stub.h"
 #include "nap_process.h"
 #include "server_msg_handler.h"
+#include "touchpad_control_display_gain.h"
 #include "uds_server.h"
 
 namespace OHOS {
@@ -113,6 +114,8 @@ public:
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
+    int32_t InjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG &touchpadCDG, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>,
@@ -134,6 +137,7 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
     int32_t SetTouchpadPointerSpeed(int32_t speed) override;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG) override;
     int32_t SetTouchpadPinchSwitch(bool switchFlag) override;
     int32_t GetTouchpadPinchSwitch(bool &switchFlag) override;
     int32_t SetTouchpadSwipeSwitch(bool switchFlag) override;
@@ -219,6 +223,7 @@ protected:
     int32_t ReadTouchpadScrollDirection(bool &state);
     int32_t ReadTouchpadTapSwitch(bool &switchFlag);
     int32_t ReadTouchpadPointerSpeed(int32_t &speed);
+    int32_t ReadTouchpadCDG(TouchpadCDG &touchpadCDG);
     int32_t ReadTouchpadPinchSwitch(bool &switchFlag);
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
     int32_t ReadTouchpadRightMenuType(int32_t &type);
@@ -247,6 +252,8 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, bool isNativeInject, bool isShell);
+    int32_t CheckTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+        int32_t pid, const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell);
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();

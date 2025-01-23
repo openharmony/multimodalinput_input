@@ -357,6 +357,17 @@ public:
         return static_cast<int32_t>(autoGenDown);
     }
 
+    int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG &touchpadCDG, bool isNativeInject) override
+    {
+        return static_cast<int32_t>(isNativeInject);
+    }
+
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG) override
+    {
+        return touchpadCDG.ppi;
+    }
+
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;
