@@ -1144,7 +1144,7 @@ napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, Cus
     sptr<CustomCursorAsyncContext> asyncContext = new (std::nothrow) CustomCursorAsyncContext(env);
     CHKPP(asyncContext);
     asyncContext->windowId = windowId;
-    CHKPP(asyncContext->cursor.pixelMap);
+    CHKPP(cursor.pixelMap);
     asyncContext->cursor.pixelMap = cursor.pixelMap;
     asyncContext->cursor.focusX = cursor.focusX;
     asyncContext->cursor.focusY = cursor.focusY;
