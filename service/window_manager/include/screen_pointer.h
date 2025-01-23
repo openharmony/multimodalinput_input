@@ -130,6 +130,8 @@ private:
     uint32_t GetImageSize() const;
     uint32_t GetOffsetX(ICON_TYPE align) const;
     uint32_t GetOffsetY(ICON_TYPE align) const;
+    uint32_t GetOffsetXRotated(ICON_TYPE align) const;
+    uint32_t GetOffsetYRotated(ICON_TYPE align) const;
 
 private:
     std::mutex mtx_;
