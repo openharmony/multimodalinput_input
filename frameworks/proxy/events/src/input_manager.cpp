@@ -824,12 +824,9 @@ int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::
     return InputMgrImpl.SetInputDeviceEnabled(deviceId, enable, callback);
 }
 
-int32_t InputManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+int32_t InputManager::ShiftAppPointerEvent(const ShiftWindowParam param, bool autoGenDown)
 {
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event entry");
-    ShiftWindowParam param;
-    param.sourceWindowId = sourceWindowId;
-    param.targetWindowId = targetWindowId;
     return InputMgrImpl.ShiftAppPointerEvent(param, autoGenDown);
 }
 
