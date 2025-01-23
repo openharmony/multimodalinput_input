@@ -82,13 +82,14 @@ private:
     bool NotifyGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode);
     bool WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent> event);
 
-    Point CalcClusterCenter(std::map<int32_t, Point> &points) const;
+    Point CalcClusterCenter(const std::map<int32_t, Point> &points) const;
     Point CalcGravityCenter(std::map<int32_t, Point> &map);
     double CalcTwoPointsDistance(const Point &p1, const Point &p2) const;
-    void CalcAndStoreDistance(std::map<int32_t, Point> &map);
+    void CalcAndStoreDistance();
     int32_t CalcMultiFingerMovement(std::map<int32_t, Point> &map);
     void HandlePinchMoveEvent(std::shared_ptr<PointerEvent> event);
     bool InOppositeDirections(const std::unordered_set<SlideState> &directions) const;
+    bool InDiverseDirections(const std::unordered_set<SlideState> &directions) const;
     GestureMode JudgeOperationMode(std::map<int32_t, Point> &movePoint);
     bool AntiJitter(std::shared_ptr<PointerEvent> event, GestureMode mode);
     std::vector<std::pair<int32_t, Point>> SortPoints(std::map<int32_t, Point> &points);
@@ -112,7 +113,6 @@ private:
     bool isRecognized_ { false };
     bool gestureEnable_ { false };
     bool isFingerReady_ { false };
-    bool haveLastDistance_ { false };
     bool haveGestureWinEmerged_ { false };
     int32_t gestureDisplayId_ { INT32_MAX };
     int32_t continuousCloseCount_ { 0 };
