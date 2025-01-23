@@ -401,7 +401,9 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
     }
     return RET_OK;
 }
-int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg, bool isHard)
+
+int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg,
+       bool isHard)
 {
     CHKPR(addr, RET_ERR);
     uint32_t addrSize = width * height * RENDER_STRIDE;

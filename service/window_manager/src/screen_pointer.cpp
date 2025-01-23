@@ -326,7 +326,7 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     int32_t tmpX = px;
     int32_t tmpY = py;
     if (rotation_ == rotation_t(DIRECTION90)) {
-        px = tmpY; 
+        px = tmpY;
         py = width_ - tmpX;
         px = height_  - px - DEFAULT_CURSOR_SIZE;
         py =  width_ - py + DEFAULT_CURSOR_SIZE;
@@ -334,7 +334,7 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
         px = width_ - px;
         py = height_ - py;
     } else if (rotation_ == rotation_t(DIRECTION270)) {
-        px = height_ - tmpY; 
+        px = height_ - tmpY;
         py = tmpX;
         px =  height_ - px + DEFAULT_CURSOR_SIZE;
         py =  width_ - py - DEFAULT_CURSOR_SIZE;
