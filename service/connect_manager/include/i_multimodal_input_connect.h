@@ -36,6 +36,7 @@
 #include "nap_process.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
+#include "touchpad_control_display_gain.h"
 #include "window_info.h"
 #include "shift_info.h"
 
@@ -113,6 +114,8 @@ public:
     virtual int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) = 0;
     virtual int32_t UnsubscribeLongPressEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) = 0;
+    virtual int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG &touchpadCDG, bool isNativeInject) = 0;
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas) = 0;
@@ -134,6 +137,7 @@ public:
     virtual int32_t GetTouchpadTapSwitch(bool &switchFlag) = 0;
     virtual int32_t SetTouchpadPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetTouchpadPointerSpeed(int32_t &speed) = 0;
+    virtual int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG) = 0;
     virtual int32_t SetTouchpadPinchSwitch(bool switchFlag) = 0;
     virtual int32_t GetTouchpadPinchSwitch(bool &switchFlag) = 0;
     virtual int32_t SetTouchpadSwipeSwitch(bool switchFlag) = 0;

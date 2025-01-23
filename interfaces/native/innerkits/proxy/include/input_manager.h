@@ -40,6 +40,7 @@
 #include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
+#include "touchpad_control_display_gain.h"
 #include "window_info.h"
 #include "shift_info.h"
 
@@ -347,6 +348,7 @@ public:
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
         bool isAutoToVirtualScreen = true);
+    void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG);
 
     /**
      * @brief Simulates a touchpad input event.
@@ -787,6 +789,7 @@ public:
      * @since 9
      */
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG);
 
     /**
      * @brief Set the switch of touchpad pinch.

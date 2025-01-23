@@ -264,6 +264,16 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
+void InputManager::SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG)
+{
+    CHKPV(pointerEvent);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    pointerEvent->SetZOrder(touchpadCDG.zOrder);
+    InputMgrImpl.SimulateTouchPadInputEvent(pointerEvent, touchpadCDG);
+}
+
 void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
@@ -605,6 +615,11 @@ int32_t InputManager::SetTouchpadPointerSpeed(int32_t speed)
 int32_t InputManager::GetTouchpadPointerSpeed(int32_t &speed)
 {
     return InputMgrImpl.GetTouchpadPointerSpeed(speed);
+}
+
+int32_t InputManager::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    return InputMgrImpl.GetTouchpadCDG(touchpadCDG);
 }
 
 int32_t InputManager::SetTouchpadPinchSwitch(bool switchFlag)

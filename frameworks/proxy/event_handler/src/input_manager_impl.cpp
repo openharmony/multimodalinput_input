@@ -1130,6 +1130,19 @@ void InputManagerImpl::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+void InputManagerImpl::SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG)
+{
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        if (MMIEventHdl.InjectTouchPadEvent(pointerEvent, touchpadCDG, false) != RET_OK) {
+            MMI_HILOGE("Failed to inject pointer event to touchPad");
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
+
 int32_t InputManagerImpl::SetMouseScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;
@@ -2023,6 +2036,22 @@ int32_t InputManagerImpl::GetTouchpadPointerSpeed(int32_t &speed)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Get the touchpad pointer speed failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadCDG(touchpadCDG);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the touchpad option failed");
     }
     return ret;
 #else

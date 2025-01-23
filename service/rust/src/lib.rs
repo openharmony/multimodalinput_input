@@ -31,6 +31,8 @@ static mut COMPENSATE_VALUEX: f64 = 0.0;
 static mut COMPENSATE_VALUEY: f64 = 0.0;
 static MOUSE_DPI: f64 = 800.0;
 static MS_2_US: f64 = 1000.0;
+static TOUCHPAD_STANDARD_SIZE: f64 = 140.0;
+static DISPLAY_STANDARD_SIZE: f64 = 337.8;
 static MOUSE_GAIN_TYPE: i32 = 1;
 
 struct CurveItem {
@@ -852,6 +854,52 @@ fn get_speed_dynamic_gain_mouse(vin: f64, gain: *mut f64, speed: i32, delta_time
     true
 }
 
+fn get_speed_dynamic_gain_touchpad(
+    vin: f64,
+    gain: *mut f64,
+    speed: i32,
+    display_size: f64,
+    touchpad_size: f64,
+    touchpad_ppi: f64
+) -> bool {
+debug!(LOG_LABEL, "get_speed_gain_touchpad enter vin is set to {}, speed {}", @public(vin), @public(speed));
+if speed < 1 {
+    error!(LOG_LABEL, "{} The speed value can't be less than 1", @public(speed));
+    return false;
+}
+let speeds_radio = [0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 1.9, 2.3, 2.7];
+let standard_slopes = [0.9728, 1.7024, 3.6480, 7.0528];
+let standard_vins = [0.0803, 0.8026, 1.2039, 5.1368];
+unsafe {
+    let speed_radio = speeds_radio[speed as usize - 1];
+    let mut slopes = Vec::new();
+    let mut diff_nums = Vec::new();
+    let mut vins = Vec::new();
+    for i in 0..4 {
+        vins.push(standard_vins[i] * touchpad_ppi);
+        slopes.push(standard_slopes[i] * (display_size / touchpad_size) *
+            (TOUCHPAD_STANDARD_SIZE / DISPLAY_STANDARD_SIZE));
+        if i < 1 {
+            diff_nums.push(0.0);
+            continue;
+        }
+        diff_nums.push((slopes[i - 1] - slopes[i]) * vins[i - 1] + diff_nums[i - 1]);
+    }
+    let num: f64 = fabs(vin);
+    for i in 0..4 {
+        if num <= vins[i] {
+            *gain = (slopes[i] * vin + diff_nums[i]) * speed_radio / vin;
+            debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+            return true;
+        }
+    }
+    *gain = (slopes[3] * vin + diff_nums[3]) * speed_radio / vin;
+    debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+}
+debug!(LOG_LABEL, "get_speed_gain_touchpad leave");
+true
+}
+
 fn get_speed_dynamic_gain_mouse_new(vin: f64, gain: *mut f64, speed: i32, display_ppi: f64) -> bool {
     if display_ppi < 1.0 {
         error!(LOG_LABEL, "{} The display_ppi can't be less than 1", @public(display_ppi));
@@ -1088,6 +1136,61 @@ pub unsafe extern "C" fn HandleMotionAccelerateMouse (
         debug!(
             LOG_LABEL,
             "abs_x {} and abs_y {}", @private(*abs_x), @private(*abs_y)
+        );
+    }
+    RET_OK
+}
+
+/// # Safety
+/// HandleMotionDynamicAccelerateTouchpad is the origin C++ function name
+/// C++ will call for rust realization using this name
+#[no_mangle]
+pub unsafe extern "C" fn HandleMotionDynamicAccelerateTouchpad (
+    offset: *const Offset,
+    mode: bool,
+    abs_x: *mut f64,
+    abs_y: *mut f64,
+    speed: i32,
+    display_size: f64,
+    touchpad_size: f64,
+    touchpad_ppi: f64
+) -> i32 {
+    let mut gain = 0.0;
+    let vin: f64;
+    let dx: f64;
+    let dy: f64;
+    let deltax: f64;
+    let deltay: f64;
+    unsafe {
+        dx = (*offset).dx;
+        dy = (*offset).dy;
+        vin = (fmax(fabs(dx), fabs(dy))) + (fmin(fabs(dx), fabs(dy))) / 2.0;
+        debug!(
+            LOG_LABEL,
+            "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
+            @private(*abs_x),
+            @private(*abs_y),
+            @public(mode),
+            @private(dx),
+            @private(dy),
+            @public(gain)
+        );
+        if !get_speed_dynamic_gain_touchpad(vin, &mut gain as *mut f64, speed, display_size,
+            touchpad_size, touchpad_ppi) {
+            error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
+            return RET_ERR;
+        }
+        if !mode {
+            deltax = (dx * gain + COMPENSATE_VALUEX).trunc();
+            deltay = (dy * gain + COMPENSATE_VALUEY).trunc();
+            COMPENSATE_VALUEX = (dx * gain + COMPENSATE_VALUEX).fract();
+            COMPENSATE_VALUEY = (dy * gain + COMPENSATE_VALUEY).fract();
+            *abs_x += deltax;
+            *abs_y += deltay;
+        }
+        debug!(
+            LOG_LABEL,
+            "output the abs_x {} and abs_y {}", @private(*abs_x), @private(*abs_y)
         );
     }
     RET_OK
