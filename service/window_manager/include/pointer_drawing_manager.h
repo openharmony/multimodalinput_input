@@ -115,7 +115,7 @@ public:
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
-    void SetPointerLocation(int32_t x, int32_t y) override;
+    void SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
@@ -130,6 +130,7 @@ public:
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
+    std::vector<std::vector<std::string>> GetDisplayInfo(DisplayInfo &di);
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
@@ -242,6 +243,12 @@ private:
     void SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_TYPE align);
     void HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void HideHardwareCursors();
+    int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
+        DisplayInfo &mainScreenDisplayInfo) const;
+    int32_t DrawDynamicHardwareCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
+    int32_t DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
+    void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle);
+    void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
@@ -321,6 +328,9 @@ private:
     std::map<MOUSE_ICON, loadingAndLoadingPixelMapInfo> mousePixelMap_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
     int releaseFence_ { -1 };
+    bool followSystem_ { false };
+    int32_t focusX_ { 0 };
+    int32_t focusY_ { 0 };
     std::atomic<bool> initEventhandlerFlag_ { false };
 };
 } // namespace MMI

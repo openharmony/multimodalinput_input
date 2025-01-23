@@ -710,6 +710,11 @@ napi_value JsInputDeviceContext::SetFunctionKeyEnabled(napi_env env, napi_callba
     }
     int32_t funcKey = -1;
     CHKRP(napi_get_value_int32(env, argv[0], &funcKey), GET_VALUE_INT32);
+    if (funcKey != FunctionKey::FUNCTION_KEY_CAPSLOCK) {
+        MMI_HILOGE("First parameter value error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funckey", "FunctionKey");
+        return nullptr;
+    }
     if (!JsUtil::TypeOf(env, argv[1], napi_boolean)) {
         MMI_HILOGE("Second parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "state", "boolean");
@@ -742,6 +747,11 @@ napi_value JsInputDeviceContext::IsFunctionKeyEnabled(napi_env env, napi_callbac
     }
     int32_t funcKey = -1;
     CHKRP(napi_get_value_int32(env, argv[0], &funcKey), GET_VALUE_INT32);
+    if (funcKey != FunctionKey::FUNCTION_KEY_CAPSLOCK) {
+        MMI_HILOGE("First parameter value error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funckey", "FunctionKey");
+        return nullptr;
+    }
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();

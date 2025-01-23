@@ -218,7 +218,7 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
+int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY,
     void* pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
@@ -233,7 +233,6 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, pid, ERR_INVALID_VALUE);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
     WRITEINT32(data, focusX, ERR_INVALID_VALUE);
     WRITEINT32(data, focusY, ERR_INVALID_VALUE);
@@ -1083,6 +1082,54 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handler
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER),
         data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::AddPreInputHandler(
+    int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
+    WRITEINT32(data, eventType, ERR_INVALID_VALUE);
+    WRITEINT32(data, static_cast<int32_t>(keys.size()), ERR_INVALID_VALUE);
+    for (const auto &item :keys) {
+        WRITEINT32(data, item);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_PRE_INPUT_HANDLER), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::RemovePreInputHandler(int32_t handlerId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_PRE_INPUT_HANDLER), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -2737,8 +2784,7 @@ int32_t MultimodalInputConnectProxy::SetInputDeviceEnabled(int32_t deviceId, boo
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(int32_t sourceWindowId,
-    int32_t targetWindowId, bool autoGenDown)
+int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -2746,8 +2792,10 @@ int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(int32_t sourceWindowId
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, sourceWindowId, ERR_INVALID_VALUE);
-    WRITEINT32(data, targetWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.sourceWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.targetWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.y, ERR_INVALID_VALUE);
     WRITEBOOL(data, autoGenDown, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
@@ -2768,7 +2816,9 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, CustomCur
 {
     CALL_DEBUG_ENTER;
     CHKPR(cursor.pixelMap, RET_ERR);
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(cursor.pixelMap);
+    Parcel *pData = static_cast<Parcel*>(cursor.pixelMap);
+    CHKPR(pData, RET_ERR);
+    OHOS::Media::PixelMap* pixelMapPtr =  Media::PixelMap::Unmarshalling(*pData);
     CHKPR(pixelMapPtr, RET_ERR);
     if (pixelMapPtr->GetCapacity() == 0) {
         MMI_HILOGE("pixelMap is empty");
@@ -2794,6 +2844,8 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, CustomCur
             data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    } else {
+        READINT32(reply, ret);
     }
     return ret;
 }

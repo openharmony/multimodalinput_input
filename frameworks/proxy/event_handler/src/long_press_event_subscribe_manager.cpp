@@ -123,11 +123,11 @@ int32_t LongPressEventSubscribeManager::OnSubscribeLongPressEventCallback(const 
     callback(longPressEvent);
     MMI_HILOGD("LongPressEvent fingerCount:%{public}d, duration:%{public}d, pid:%{public}d, displayId:%{public}d, "
         "displayX:%{public}d, displayY:%{public}d, result:%{public}d, windowId:%{public}d, pointerId:%{public}d, "
-        "bundleName:%{public}s, subscribeId:%{public}d",
+        "bundleName:%{public}s, subscribeId:%{public}d, downTime:%{public} " PRId64 "",
         longPressEvent.fingerCount, longPressEvent.duration, longPressEvent.pid,
         longPressEvent.displayId, longPressEvent.displayX, longPressEvent.displayY,
         longPressEvent.result, longPressEvent.windowId, longPressEvent.pointerId, longPressEvent.bundleName.c_str(),
-        subscribeId);
+        subscribeId, longPressEvent.downTime);
     return RET_OK;
 }
 

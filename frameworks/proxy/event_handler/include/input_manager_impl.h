@@ -49,6 +49,7 @@
 #include "switch_event.h"
 #include "touchpad_control_display_gain.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -242,7 +243,7 @@ public:
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown);
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -277,6 +278,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_ANCO
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    void UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;

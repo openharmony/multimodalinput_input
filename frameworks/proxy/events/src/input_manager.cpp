@@ -21,6 +21,7 @@
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "hitrace_meter.h"
+#include "pre_monitor_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManager"
@@ -175,6 +176,17 @@ int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, s
     return InputMgrImpl.AddMonitor(monitor, actionsType);
 }
 
+int32_t InputManager::AddPreMonitor(
+    std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType, std::vector<int32_t> keys)
+{
+    return PRE_MONITOR_MGR.AddHandler(monitor, eventType, keys);
+}
+
+void InputManager::RemovePreMonitor(int32_t monitorId)
+{
+    PRE_MONITOR_MGR.RemoveHandler(monitorId);
+}
+
 void InputManager::RemoveMonitor(int32_t monitorId)
 {
     InputMgrImpl.RemoveMonitor(monitorId);
@@ -229,19 +241,26 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     InputMgrImpl.SimulateInputEvent(keyEvent);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen)
 {
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder)
+void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
+    bool isAutoToVirtualScreen)
 {
     CHKPV(pointerEvent);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->SetZOrder(zOrder);
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
@@ -823,7 +842,10 @@ int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::
 int32_t InputManager::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
 {
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event entry");
-    return InputMgrImpl.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
+    return InputMgrImpl.ShiftAppPointerEvent(param, autoGenDown);
 }
 
 int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)

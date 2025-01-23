@@ -16,6 +16,7 @@
 #include "fingerprint_event_processor.h"
 
 #include "ability_manager_client.h"
+#include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "ffrt.h"
 #include "input_event_handler.h"
@@ -436,8 +437,13 @@ void FingerprintEventProcessor::StartSmartKey(bool isShowDialog)
         if (isShowDialog) {
             want.SetParam("isShowDialog", IS_SHOW_DIALOG);
         }
-
+        auto begin = std::chrono::high_resolution_clock::now();
         auto ret = abmc->StartExtensionAbility(want, nullptr, -1, AppExecFwk::ExtensionAbilityType::SERVICE);
+        auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_START_EXT_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         if (ret != RET_OK) {
             MMI_HILOGE("StartExtensionAbility failed, ret:%{public}d", ret);
             return false;
@@ -469,7 +475,13 @@ void FingerprintEventProcessor::ProcessClickEvent()
 void FingerprintEventProcessor::ReportResSched(uint32_t resType, int64_t value)
 {
     std::unordered_map<std::string, std::string> payload { {"msg", ""} };
+    auto begin = std::chrono::high_resolution_clock::now();
     ResourceSchedule::ResSchedClient::GetInstance().ReportData(resType, value, payload);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 } // namespace MMI

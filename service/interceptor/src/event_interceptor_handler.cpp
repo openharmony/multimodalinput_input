@@ -17,6 +17,7 @@
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "dfx_hisysevent.h"
 #include "event_dispatch_handler.h"
 #include "input_device_manager.h"
 #include "input_event_data_transformation.h"
@@ -47,6 +48,7 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
         MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{private}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
+        DfxHisysevent::ReportKeyEvent("intercept");
         return;
     }
     CHKPV(nextHandler_);
@@ -226,6 +228,8 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
     if (keyItems.empty()) {
         MMI_HILOGE("keyItems is empty");
+        DfxHisysevent::ReportFailHandleKey("InterceptorCollection::HandleEvent", keyEvent->GetKeyCode(),
+            DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
         return false;
     }
     std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(keyItems.front().GetDeviceId());

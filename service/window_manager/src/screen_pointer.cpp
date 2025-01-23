@@ -109,7 +109,7 @@ bool ScreenPointer::Init()
         .usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA | BUFFER_USAGE_HW_COMPOSER,
         .timeout = BUFFER_TIMEOUT,
     };
-    for (int32_t i = 0; i < DEFAULT_BUFFER_SIZE; i++) {
+    for (int32_t i = 0; i < DEFAULT_BUFFER_SIZE && buffers_.size() < DEFAULT_BUFFER_SIZE; i++) {
         sptr<OHOS::SurfaceBuffer> buffer = OHOS::SurfaceBuffer::Create();
         if (buffer == nullptr) {
             MMI_HILOGE("SurfaceBuffer Create failed");
@@ -188,9 +188,17 @@ void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
         return;
     }
 
+    isCurrentOffScreenRendering_ = di.isCurrentOffScreenRendering;
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
+    rotation_ = static_cast<rotation_t>(di.direction);
     MMI_HILOGD("Update with DisplayInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+    if (isCurrentOffScreenRendering_) {
+        screenRealDPI_ = di.screenRealDPI;
+        offRenderScale_ = float(di.screenRealWidth) / di.width;
+        MMI_HILOGI("Update with DisplayInfo, screenRealDPI=%{public}u, offRenderScale_=(%{public}f ",
+            screenRealDPI_, offRenderScale_);
+    }
 }
 
 bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
@@ -245,10 +253,22 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     uint32_t dx = GetOffsetX(align);
     uint32_t dy = GetOffsetY(align);
     int32_t px = x - dx;
-    int32_t py = x - dy;
+    int32_t py = y - dy;
     if (IsMirror()) {
         px = paddingLeft_ + x * scale_ - dx;
         py = paddingTop_ + y * scale_ - dy;
+    } else if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+        float renderDPI = GetRenderDPI();
+        if (renderDPI == 0) {
+            MMI_HILOGE("SetPosition failed, RenderDPI = %{public}f", renderDPI);
+            return false;
+        }
+        int32_t adjustX = static_cast<int32_t>(float(FOCUS_POINT - dx) *
+            (dpi_ * scale_) / renderDPI);
+        int32_t adjustY = static_cast<int32_t>(float(FOCUS_POINT - dy) *
+            (dpi_ * scale_) / renderDPI);
+        px = x * offRenderScale_ + adjustX * offRenderScale_ - FOCUS_POINT;
+        py = y * offRenderScale_ + adjustY * offRenderScale_ - FOCUS_POINT;
     }
 
     auto buffer = GetCurrentBuffer();
@@ -270,7 +290,7 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     uint32_t dx = GetOffsetX(align);
     uint32_t dy = GetOffsetY(align);
     int32_t px = x - dx;
-    int32_t py = x - dy;
+    int32_t py = y - dy;
     if (IsMirror()) {
         px = paddingLeft_ + x * scale_ - dx;
         py = paddingTop_ + y * scale_ - dy;
@@ -311,10 +331,19 @@ int32_t ScreenPointer::GetPointerSize() const
     return size;
 }
 
+float ScreenPointer::GetRenderDPI() const
+{
+    if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+        return float(GetScreenRealDPI()) / BASELINE_DENSITY;
+    } else {
+        return dpi_ * scale_;
+    }
+}
+
 uint32_t ScreenPointer::GetImageSize() const
 {
     int32_t size = GetPointerSize();
-    return pow(INCREASE_RATIO, size - 1) * dpi_ * DEVICE_INDEPENDENT_PIXELS * scale_;
+    return pow(INCREASE_RATIO, size - 1) * GetRenderDPI() * DEVICE_INDEPENDENT_PIXELS;
 }
 
 uint32_t ScreenPointer::GetOffsetX(ICON_TYPE align) const

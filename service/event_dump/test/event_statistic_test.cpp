@@ -137,5 +137,23 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_Dump, TestSize.Level1)
     }
     ASSERT_NO_FATAL_FAILURE(eventStatistic.Dump(fd, dumpStr));
 }
+
+/**
+ * @tc.name: EventDumpTest_PopEvent
+ * @tc.desc: Event dump PopEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PopEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    auto inputEvent = std::make_shared<InputEvent>(3);
+    eventStatistic.writeFileEnabled_ = true;
+    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEvent(inputEvent));
+    std::string str = "";
+    str = eventStatistic.PopEvent();
+    ASSERT_TRUE(!str.empty());
+}
 } // OHOS
 } // MMI

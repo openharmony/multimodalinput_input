@@ -34,6 +34,8 @@ struct Input_KeyEvent {
     int32_t action;
     int32_t keyCode;
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_MouseEvent {
@@ -44,6 +46,8 @@ struct Input_MouseEvent {
     int32_t axisType { -1 };
     float axisValue { 0.0f };
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_TouchEvent {
@@ -52,6 +56,8 @@ struct Input_TouchEvent {
     int32_t displayX;
     int32_t displayY;
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_AxisEvent {
@@ -62,6 +68,8 @@ struct Input_AxisEvent {
     int64_t actionTime { -1 };
     int32_t sourceType;
     int32_t axisEventType { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 namespace OHOS {
@@ -1341,12 +1349,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001
     int32_t keyCode = 1;
     int32_t state = -1;
     Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
-    bool resultState = static_cast<bool>(state);
-    if (resultState) {
-        EXPECT_EQ(retResult, INPUT_SUCCESS);
-    } else {
-        EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
-    }
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
 } // namespace MMI
 } // namespace OHOS

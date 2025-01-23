@@ -502,45 +502,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_08, TestSize.Level
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_DAGGER_PRESS);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(0);
-    int32_t subscribeId = INVAID_VALUE;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("Subscribe key event KEYCODE_DAGGER_PRESS down trigger callback");
-    });
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_TRUE(subscribeId >= 0);
-#else
-    EXPECT_TRUE(subscribeId < 0);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_DAGGER_PRESS);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_PRESS);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-}
-
-/**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_06
- * @tc.desc: Verify subscribe key event.
- * @tc.type: FUNC
- * @tc.require:
- * @tc.author:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_06, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(KeyEvent::KEYCODE_DAGGER_CLICK);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
@@ -562,6 +523,45 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_06, TestSize.Level
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_06
+ * @tc.desc: Verify subscribe key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event KEYCODE_DAGGER_DOUBLE_CLICK down trigger callback");
+    });
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    EXPECT_TRUE(subscribeId >= 0);
+#else
+    EXPECT_TRUE(subscribeId < 0);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
@@ -897,6 +897,73 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_12, TestSize.Level
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_14
+ * @tc.desc: Verify subscribe key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_14, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t tvPower = 4000;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(tvPower);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event %{public}d down trigger callback", keyEvent->GetKeyCode());
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(tvPower);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(tvPower);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_15
+ * @tc.desc: Verify subscribe key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_15, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t tvPower = 4000;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(tvPower);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event %{public}d down trigger callback", keyEvent->GetKeyCode());
+    });
+    EXPECT_TRUE(subscribeId >= 0);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
 }
@@ -3104,9 +3171,9 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_013, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_PRESS);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
 
-    itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_PRESS);
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
     itemFirst.SetPressed(true);
     itemFirst.SetDownTime(500);
     keyEvent->AddKeyItem(itemFirst);
@@ -3136,9 +3203,9 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_014, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK);
 
-    itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK);
     itemFirst.SetPressed(true);
     itemFirst.SetDownTime(500);
     keyEvent->AddKeyItem(itemFirst);
@@ -3200,9 +3267,9 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_016, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_PRESS);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
 
-    itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_PRESS);
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
     itemFirst.SetPressed(false);
     itemFirst.SetDownTime(500);
     keyEvent->AddKeyItem(itemFirst);
@@ -3232,9 +3299,9 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_017, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK);
 
-    itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_CLICK);
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK);
     itemFirst.SetPressed(false);
     itemFirst.SetDownTime(500);
     keyEvent->AddKeyItem(itemFirst);
@@ -3477,8 +3544,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventZorder_001, TestSi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
-
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false));
 }
 
 /**
@@ -4720,7 +4786,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_001, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d disable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("set input device result: %{public}d ", result);
+            MMI_HILOGI("Set input device result:%{public}d ", result);
             ASSERT_EQ(result, RET_OK);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, false, cb);
@@ -4742,7 +4808,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_002, TestSize.L
     for (const auto &iter : aucids) {
         MMI_HILOGI("Set inputdevice %{public}d enable", iter);
         auto cb = [](int32_t result) {
-            MMI_HILOGI("set input device result: %{public}d ", result);
+            MMI_HILOGI("Set input device result:%{public}d ", result);
             ASSERT_EQ(result, RET_OK);
         };
         InputManager::GetInstance()->SetInputDeviceEnabled(iter, true, cb);
@@ -4759,7 +4825,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_003, TestSize.L
 {
     CALL_TEST_DEBUG;
     auto cb = [](int32_t result) {
-        MMI_HILOGI("set input device result: %{public}d ", result);
+        MMI_HILOGI("Set input device result:%{public}d ", result);
         ASSERT_EQ(result, ERROR_DEVICE_NOT_EXIST);
     };
     InputManager::GetInstance()->SetInputDeviceEnabled(10000, true, cb);

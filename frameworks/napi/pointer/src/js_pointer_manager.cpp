@@ -1137,32 +1137,15 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     return promise;
 }
 
-void* JsPointerManager::DeepCopyPixelMap(void* pixelMap, int32_t pixelMapSize)
-{
-    if (pixelMap == nullptr || pixelMapSize <= 0) {
-        MMI_HILOGE("pixelMap is nullptr.");
-        return nullptr;
-    }
-    void* newPixelMap = (void *)malloc(pixelMapSize);
-    if (memcpy_s(newPixelMap, pixelMapSize, pixelMap, pixelMapSize) != 0) {
-        MMI_HILOGE("Failed to invoke memcpy_s.");
-        free(newPixelMap);
-        newPixelMap = nullptr;
-        return nullptr;
-    }
-
-    return newPixelMap;
-}
-
 napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, CustomCursor cursor,
-    CursorOptions options, int32_t pixelMapSize)
+    CursorOptions options)
 {
     CALL_DEBUG_ENTER;
     sptr<CustomCursorAsyncContext> asyncContext = new (std::nothrow) CustomCursorAsyncContext(env);
     CHKPP(asyncContext);
     asyncContext->windowId = windowId;
-    asyncContext->cursor.pixelMap = DeepCopyPixelMap(cursor.pixelMap, pixelMapSize);
     CHKPP(asyncContext->cursor.pixelMap);
+    asyncContext->cursor.pixelMap = cursor.pixelMap;
     asyncContext->cursor.focusX = cursor.focusX;
     asyncContext->cursor.focusY = cursor.focusY;
     asyncContext->options = options;
@@ -1177,7 +1160,6 @@ napi_value JsPointerManager::ExecuteSetCustomCursorAsync(sptr<CustomCursorAsyncC
     CALL_DEBUG_ENTER;
     CHKPP(asyncContext);
     napi_env env = asyncContext->env;
-
     napi_value resource = nullptr;
     CHKRP(napi_create_string_utf8(env, "ExecuteSetCustomCursor", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     asyncContext->IncStrongRef(nullptr);

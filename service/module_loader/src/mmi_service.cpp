@@ -149,7 +149,7 @@ const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product
 const std::string VKEYBOARD_PATH { "libvkeyboard_device.z.so" };
 void* g_VKeyboardHandle = nullptr;
 typedef int32_t (*HANDLE_TOUCHPOINT_TYPE)(
-    double screenX, double screenY, int touchId, int32_t eventType);
+    double screenX, double screenY, int touchId, int32_t eventType, double touchPressure);
 HANDLE_TOUCHPOINT_TYPE handleTouchPoint_ = nullptr;
 typedef int32_t (*STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)(
     int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode);
@@ -298,10 +298,7 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-    if (!(libinputAdapter_.Init([] (void *event, int64_t frameTime) {
-        ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()->OnEvent(event, frameTime);
-        }
-        ))) {
+    if (!(libinputAdapter_.Init([](void *event, int64_t frameTime) { InputHandler->OnEvent(event, frameTime); }))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }
@@ -506,8 +503,14 @@ void MMIService::AddAppDebugListener()
 {
     CALL_DEBUG_ENTER;
     appDebugListener_ = AppDebugListener::GetInstance();
+    auto begin = std::chrono::high_resolution_clock::now();
     auto errCode =
         AAFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(appDebugListener_);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::REGISTER_APP_DEBUG_LISTENER, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (errCode != RET_OK) {
         MMI_HILOGE("Call RegisterAppDebugListener failed, errCode:%{public}d", errCode);
     }
@@ -517,8 +520,13 @@ void MMIService::RemoveAppDebugListener()
 {
     CALL_DEBUG_ENTER;
     CHKPV(appDebugListener_);
-    auto errCode =
-        AAFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(appDebugListener_);
+    auto begin = std::chrono::high_resolution_clock::now();
+    auto errCode = AAFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(appDebugListener_);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::REGISTER_APP_DEBUG_LISTENER, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (errCode != RET_OK) {
         MMI_HILOGE("Call UnregisterAppDebugListener failed, errCode:%{public}d", errCode);
     }
@@ -611,7 +619,13 @@ void MMIService::OnConnected(SessionPtr s)
         userid = DEFAULT_USER_ID;
     }
     std::vector<AppExecFwk::RunningProcessInfo> info;
+    auto begin = std::chrono::high_resolution_clock::now();
     appMgrClient->GetProcessRunningInfosByUserId(info, userid);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_PROC_RUNNING_INFOS_BY_UID, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     for (auto &item : info) {
         if (item.bundleNames.empty()) {
             continue;
@@ -661,16 +675,26 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
-int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
+int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = CheckPidPermission(pid);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Check pid permission failed");
-        return ret;
+    int32_t pid = GetCallingPid();
+    auto type = PER_HELPER->GetTokenType();
+    if (windowId < 0 && (type == OHOS::Security::AccessToken::TOKEN_HAP ||
+        type == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
+        // The windowID of the application must be greater than 0
+        MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", RET_ERR);
+        return RET_ERR;
     }
-    ret = delegateTasks_.PostSyncTask(std::bind(
+    if (windowId >= 0) {
+        int32_t ret = CheckPidPermission(pid);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Check pid permission failed");
+            return ret;
+        }
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
         [pixelMap, pid, windowId, focusX, focusY] {
             return IPointerDrawingManager::GetInstance()->SetCustomCursor(pixelMap, pid, windowId, focusX, focusY);
         }
@@ -1408,6 +1432,45 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
     return RET_OK;
 }
 
+int32_t MMIService::AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, handlerId, eventType, keys] () -> int32_t {
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        auto preMonitorHandler = InputHandler->GetEventPreMonitorHandler();
+        return preMonitorHandler->AddInputHandler(sess, handlerId, eventType, keys);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("The AddPreInputHandler key event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+int32_t MMIService::RemovePreInputHandler(int32_t handlerId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, handlerId] () -> int32_t {
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        auto preMonitorHandler = InputHandler->GetEventPreMonitorHandler();
+        preMonitorHandler->RemoveInputHandler(sess, handlerId);
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Remove pre input handler failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
@@ -1719,8 +1782,14 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
     payload["isSa"] = "1";
     payload["cgroupPrio"] = "1";
     payload["threadName"] = "mmi_service";
+    auto begin = std::chrono::high_resolution_clock::now();
     ResourceSchedule::ResSchedClient::GetInstance().ReportData(
         ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 }
 #endif // defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
 
@@ -2064,9 +2133,10 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, funcKey, enable] {
-            return sMsgHandler_.OnSetFunctionKeyState(funcKey, enable);
+        [this, clientPid, funcKey, enable] {
+            return sMsgHandler_.OnSetFunctionKeyState(clientPid, funcKey, enable);
         }
         );
     if (ret != RET_OK) {
@@ -2302,7 +2372,7 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
         MMI_HILOGE("Get window pid failed");
         return RET_ERR;
     }
-    MMI_HILOGD("windowpid is %{public}d", windowPid);
+    MMI_HILOGD("The windowpid is:%{public}d", windowPid);
     return RET_OK;
 }
 
@@ -2319,7 +2389,7 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
         MMI_HILOGE("OnGetWindowPid failed, ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("windowpid is %{public}d", windowPid);
+    MMI_HILOGD("The windowpid is:%{public}d", windowPid);
     return windowPid;
 }
 
@@ -3490,13 +3560,13 @@ int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t
     return RET_OK;
 }
 
-int32_t MMIService::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+int32_t MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
-        [sourceWindowId, targetWindowId, autoGenDown]() {
-            return WIN_MGR->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+        [param, autoGenDown]() {
+            return WIN_MGR->ShiftAppPointerEvent(param, autoGenDown);
         }
         );
     if (ret != RET_OK) {

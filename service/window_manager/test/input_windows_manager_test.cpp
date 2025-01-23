@@ -6489,24 +6489,24 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateKeyEventDisplayI
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_OnDisplayRemoved_001
- * @tc.desc: Test the funcation OnDisplayRemoved
+ * @tc.name: InputWindowsManagerTest_OnDisplayRemovedOrCombiantionChanged_001
+ * @tc.desc: Test the funcation OnDisplayRemovedOrCombiantionChanged
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemoved_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemovedOrCombiantionChanged_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     DisplayGroupInfo displayGroupInfo {};
-    bool ret = inputWindowsManager.OnDisplayRemoved(displayGroupInfo);
+    bool ret = inputWindowsManager.OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
     EXPECT_FALSE(ret);
 
     DisplayInfo info1 = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200};
     DisplayInfo info2 = {.id = 1, .x = 100, .y = 0, .width = 100, .height = 200};
     inputWindowsManager.displayGroupInfo_.displaysInfo = {info1, info2};
     displayGroupInfo.displaysInfo = {info2};
-    ret = inputWindowsManager.OnDisplayRemoved(displayGroupInfo);
+    ret = inputWindowsManager.OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
     EXPECT_TRUE(ret);
 }
 
@@ -6541,6 +6541,55 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_001, 
     WINDOW_UPDATE_ACTION ret = WIN_MGR->UpdateWindowInfo(displayGroupInfo);
     ASSERT_EQ(ret, WINDOW_UPDATE_ACTION::ADD);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_PointerBackCenter_001
+ * @tc.desc: Test moved screen , pointer back screen center
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_PointerBackCenter_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+
+    DisplayInfo displayInfo1;
+    displayInfo1.id = 1;
+    displayInfo1.x =1;
+    displayInfo1.y = 1;
+    displayInfo1.width = 2;
+    displayInfo1.height = 2;
+    displayInfo1.dpi = 240;
+    displayInfo1.name = "pp";
+    displayInfo1.uniq = "pp";
+    displayInfo1.direction = DIRECTION0;
+    displayInfo1.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_MAIN;
+
+    DisplayInfo displayInfo2;
+    displayInfo2.id = 2;
+    displayInfo2.x =1;
+    displayInfo2.y = 1;
+    displayInfo2.width = 2;
+    displayInfo2.height = 2;
+    displayInfo2.dpi = 240;
+    displayInfo2.name = "pp";
+    displayInfo2.uniq = "pp";
+    displayInfo2.direction = DIRECTION0;
+    displayInfo2.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_EXPAND;
+    displayGroupInfo.displaysInfo.push_back(displayInfo2);
+    displayGroupInfo.displaysInfo.push_back(displayInfo1);
+
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+   
+    displayGroupInfo.displaysInfo.erase(displayGroupInfo.displaysInfo.begin());
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+    CursorPosition  pointerPos = WIN_MGR->GetCursorPos();
+    EXPECT_EQ(pointerPos.displayId, displayInfo1.id);
+}
+
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 /**
@@ -7402,6 +7451,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
@@ -7410,7 +7463,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     item.SetPointerId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7427,6 +7480,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7442,7 +7499,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.displayId = displayId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7459,6 +7516,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = -1;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7474,7 +7535,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.displayId = displayId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7491,6 +7552,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7508,7 +7573,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     windowInfo.flags &= WindowInfo::FLAG_BIT_UNTOUCHABLE;
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7525,6 +7590,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7540,10 +7609,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.id = sourceWindowId;
     windowInfo.displayId = displayId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    windowInfo.flags &= WindowInfo::FLAG_BIT_UNTOUCHABLE;
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
     inputWindowsManager.transparentWins_[sourceWindowId];
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7560,6 +7628,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = 0;
     WindowGroupInfo windowGroupInfo;
@@ -7570,41 +7642,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.id = targetWindowId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
-    EXPECT_NE(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_ShiftAppPointerEvent_007
- * @tc.desc: Test ShiftAppPointerEvent failed for not pressed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_007, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    inputWindowsManager.lastPointerEvent_ = nullptr;
-    int32_t sourceWindowId = 50;
-    int32_t targetWindowId = 51;
-    bool autoGenDown = true;
-    int32_t displayId = 0;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-    inputWindowsManager.lastPointerEvent_ = pointerEvent;
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    WindowGroupInfo windowGroupInfo;
-    WindowInfo windowInfo;
-    windowInfo.id = sourceWindowId;
-    windowInfo.displayId = displayId;
-    windowGroupInfo.windowsInfo.push_back(windowInfo);
-    windowInfo.id = targetWindowId;
-    windowGroupInfo.windowsInfo.push_back(windowInfo);
-    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

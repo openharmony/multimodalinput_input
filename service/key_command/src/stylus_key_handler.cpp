@@ -17,6 +17,9 @@
 
 #include "ability_manager_client.h"
 #include "define_multimodal.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "setting_datashare.h"
@@ -50,6 +53,10 @@ bool StylusKeyHandler::HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent)
     }
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_STYLUS_SCREEN) {
         stylusKey_.lastEventIsStylus = false;
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportFailLaunchAbility("com.hmos.hinote",
+            DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         return false;
     }
     if (stylusKey_.isLaunchAbility) {
@@ -124,7 +131,13 @@ void StylusKeyHandler::LaunchAbility(const Ability &ability)
         want.SetParam(item.first, item.second);
     }
 
+    auto begin = std::chrono::high_resolution_clock::now();
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }

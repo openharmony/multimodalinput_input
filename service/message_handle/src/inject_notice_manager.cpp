@@ -21,6 +21,9 @@
 #include "message_parcel.h"
 
 #include "ability_manager_client.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -56,7 +59,13 @@ bool InjectNoticeManager::StartNoticeAbility()
     }
     AAFwk::Want want;
     want.SetElementName("com.ohos.powerdialog", "InjectNoticeAbility");
+    auto begin = std::chrono::high_resolution_clock::now();
     int32_t result = client->StartAbility(want);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (result != 0) {
         MMI_HILOGW("Start injectNoticeAbility failed, result:%{public}d", result);
         return false;
@@ -78,7 +87,13 @@ bool InjectNoticeManager::ConnectNoticeSrv()
     CHKPF(abilityMgr);
     AAFwk::Want want;
     want.SetElementName("com.ohos.powerdialog", "InjectNoticeAbility");
+    auto begin = std::chrono::high_resolution_clock::now();
     ErrCode result = abilityMgr->ConnectAbility(want, connectionCallback_, INVALID_USERID);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CONNECT_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (result != ERR_OK) {
         MMI_HILOGW("Connect InjectNoticeAbility failed, result:%{public}d", result);
         return false;

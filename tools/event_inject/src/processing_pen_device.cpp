@@ -158,7 +158,7 @@ int32_t ProcessingPenDevice::AnalysisPenPadEvent(const std::vector<DeviceEvent>&
 int32_t ProcessingPenDevice::AnalysisPenApproachPadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray)
 {
     if ((event.eventType != "RUBBER_TOUCH") && (event.eventType != "PEN_TOUCH")) {
-        MMI_HILOGE("Enter the correct event type in the configuration file.");
+        MMI_HILOGE("Enter the correct event type in the configuration file");
         return RET_ERR;
     }
 
@@ -200,7 +200,7 @@ int32_t ProcessingPenDevice::AnalysisPenSlidePadEvent(const DeviceEvent& event, 
 int32_t ProcessingPenDevice::AnalysisPenLeavePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray)
 {
     if ((event.eventType != "RUBBER_TOUCH") && (event.eventType != "PEN_TOUCH")) {
-        MMI_HILOGE("Enter the correct event type in the configuration file.");
+        MMI_HILOGE("Enter the correct event type in the configuration file");
         return RET_ERR;
     }
 

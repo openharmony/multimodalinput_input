@@ -3124,14 +3124,14 @@ public:
      *
      * @since 12
      */
-    static const int32_t KEYCODE_DAGGER_PRESS;
+    static const int32_t KEYCODE_DAGGER_CLICK;
 
      /**
      * Dagger Click
      *
      * @since 13
      */
-    static const int32_t KEYCODE_DAGGER_CLICK;
+    static const int32_t KEYCODE_DAGGER_DOUBLE_CLICK;
 
      /**
      * Dagger Long Press
