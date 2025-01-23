@@ -24,6 +24,7 @@
 #include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "switch_event_input_subscribe_manager.h"
+#include "pre_monitor_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -36,6 +37,7 @@ void OnConnected(const IfMMIClient& client)
 {
     CALL_DEBUG_ENTER;
     InputMgrImpl.OnConnected();
+    PRE_MONITOR_MGR.OnConnected();
     INPUT_DEVICE_IMPL.OnConnected();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();

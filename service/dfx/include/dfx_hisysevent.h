@@ -16,6 +16,7 @@
 #ifndef DFX_HISYSEVENT_H
 #define DFX_HISYSEVENT_H
 
+#include <chrono>
 #include <string>
 
 #include "hisysevent.h"
@@ -69,22 +70,34 @@ public:
         TOUCHPAD_DOUBLE_TAP_DRAG_SETTING,
     };
 
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    enum KEY_ERROR_CODE {
+        ERROR_RETURN_VALUE = 65470470,
+        FAILED_TIMER = 65470471,
+        NO_INPUT_DEVICE = 65470472,
+        INVALID_PARAMETER = 65470473,
+        FAILED_VERIFICATION = 65470474,
+        FAILED_PARSE_CONFIG = 65470475,
+        DISPLAY_NOT_FOUND = 65470476,
+        WINDOW_NOT_FOUND = 65470477,
+        SESSION_NOT_FOUND = 65470478,
+    };
+
     enum KEY_CONSUMPTION_TYPE {
-        NO_TYPE = 0,
+        DISPATCH_KEY = 0,
+        KEY_FILTER,
+        KEY_INTERCEPT,
+        KEY_SUBCRIBER,
         FINGERPRINT,
         STYLUS_PEN,
         AIBASE_VOICE,
         SCREEN_SHOT,
         SCREEN_RECORDING,
         OPEN_WALLET,
-        OPEN_CAMERA,
         OPEN_SOS,
+        KEY_EVENT_CANCEL,
+        KEY_SCREEN_ON,
     };
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
-    static void OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static void OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnClientDisconnect(const SessionPtr& secPtr, int32_t fd,
         OHOS::HiviewDFX::HiSysEvent::EventType type);
@@ -161,13 +174,13 @@ public:
     static void ReportApiCallTimes(ApiDurationStatistics::Api api, int32_t durationMS);
     static void ReportMMiServiceThreadLongTask(const std::string &taskName);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
-
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    static void ClearCallCount();
-    static void ReportAbility(int32_t keyCode, int32_t action, std::string name);
-    static void ReportKeyEvent(int32_t keyCode, int32_t action, std::string name,
-        KEY_CONSUMPTION_TYPE type, int32_t subscribeId = -1);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+    static void ReportKeyEvent(std::string name);
+    static void ReportKeyEventTimes(KEY_CONSUMPTION_TYPE type);
+    static void ClearKeyEventCount();
+    static void ReportFailLaunchAbility(std::string bundleName, int32_t errorCode);
+    static void ReportFailSubscribeKey(std::string functionName, std::string subscribeName,
+        int32_t keyCode, int32_t errorCode);
+    static void ReportFailHandleKey(std::string name, int32_t keyCode, int32_t errorCode);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
@@ -175,10 +188,10 @@ private:
     static inline DispCastTime dispCastTime_ { 0 };
     static inline ComboStartCastTime comboStartCastTime_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    static inline std::map<KEY_CONSUMPTION_TYPE, int32_t> calKeyEventTime_;
-    static inline int32_t callCount_ { 0 };
     static inline ApiDurationStatistics apiDurationStatics_;
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+    static inline int32_t keyEventCount_ { 0 };
+    static inline std::map<KEY_CONSUMPTION_TYPE, int32_t> calKeyEventTime_;
 };
 } // namespace MMI
 } // namespace OHOS

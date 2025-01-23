@@ -528,8 +528,9 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    napi_value result = SetCustomCursorEx(env, jsPointerMgr, windowId, argc, argv);
-    if (isCustomCursorEx_) {
+    bool isEx = CheckIsSetCustomCursorEx(env, argc, argv);
+    if (isEx) {
+        napi_value result = SetCustomCursorEx(env, jsPointerMgr, windowId, argc, argv);
         return result;
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_object)) {
@@ -1855,7 +1856,7 @@ bool JsPointerContext::GetCursorOptions(napi_env env, napi_value obj, CursorOpti
     return true;
 }
 
-bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomCursor& cursor, int32_t& pixelMapSize)
+bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomCursor& cursor)
 {
     if (!JsCommon::TypeOf(env, obj, napi_object)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "CustomCursor", "object");
@@ -1872,8 +1873,14 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
         return false;
     }
-    pixelMapSize = pixelMap->GetWidth() * pixelMap->GetHeight() * pixelMap->GetPixelBytes();
-    cursor.pixelMap = (void*)pixelMap.get();
+    if (pixelMap->GetWidth() > MAX_PIXELMAP_SIZE || pixelMap->GetHeight() > MAX_PIXELMAP_SIZE) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The width or height of the pixelMap exceed 256");
+        return false;
+    }
+    Parcel* pixelMapData = new Parcel();
+    CHKPF(pixelMapData);
+    pixelMap->Marshalling(*pixelMapData);
+    cursor.pixelMap = pixelMapData;
     napi_value focusXValue;
     if (napi_get_named_property(env, obj, "focusX", &focusXValue) == napi_ok) {
         if (!JsCommon::TypeOf(env, focusXValue, napi_number)) {
@@ -1897,37 +1904,35 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusY is invalid");
             return false;
         }
-        if (pixelMap->GetWidth() > MAX_PIXELMAP_SIZE || pixelMap->GetHeight() > MAX_PIXELMAP_SIZE) {
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The width or height of the pixelMap exceed 256");
-            return false;
-        }
     }
     return true;
+}
+
+bool JsPointerContext::CheckIsSetCustomCursorEx(napi_env env, size_t argc, napi_value* argv)
+{
+    bool followSystemValue = false;
+    if (argc > INPUT_PARAMETER && JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_object) &&
+        napi_has_named_property(env, argv[INPUT_PARAMETER], "followSystem", &followSystemValue) == napi_ok &&
+        followSystemValue)  {
+        return true;
+    }
+    return false;
 }
 
 napi_value JsPointerContext::SetCustomCursorEx(napi_env env, std::shared_ptr<JsPointerManager> jsPointerMgr,
     int32_t windowId, size_t argc, napi_value* argv)
 {
-    bool followSystemValue = false;
-    if (argc > INPUT_PARAMETER && JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_object) &&
-        napi_has_named_property(env, argv[INPUT_PARAMETER], "followSystem", &followSystemValue) == napi_ok &&
-        followSystemValue) {
-        isCustomCursorEx_ = true;
-        CustomCursor cursor;
-        CursorOptions options;
-        int32_t pixelMapSize = 0;
-        if (!GetCustomCursorInfo(env, argv[1], cursor, pixelMapSize)) {
-            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "cursor", "CustomCursor");
-            return nullptr;
-        }
-        if (!GetCursorOptions(env, argv[INPUT_PARAMETER], options)) {
-            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "options", "CursorOptions");
-            return nullptr;
-        }
-        return jsPointerMgr->SetCustomCursor(env, windowId, cursor, options, pixelMapSize);
+    CustomCursor cursor;
+    CursorOptions options;
+    if (!GetCustomCursorInfo(env, argv[1], cursor)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "cursor", "CustomCursor");
+        return nullptr;
     }
-    isCustomCursorEx_ = false;
-    return nullptr;
+    if (!GetCursorOptions(env, argv[INPUT_PARAMETER], options)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "options", "CursorOptions");
+        return nullptr;
+    }
+    return jsPointerMgr->SetCustomCursor(env, windowId, cursor, options);
 }
 } // namespace MMI
 } // namespace OHOS

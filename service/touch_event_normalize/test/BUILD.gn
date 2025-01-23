@@ -32,6 +32,7 @@ ohos_unittest("TouchEventNormalizeTest") {
   cflags_cc = [ "-Wno-string-conversion" ]
 
   sources = [
+    "src/remote_control_transform_processor_test.cpp",
     "src/touch_event_normalize_test.cpp",
     "src/touch_gesture_detector_test.cpp",
     "src/touch_transform_processor_test.cpp",
@@ -131,6 +132,7 @@ ohos_unittest("GestureTransformTest") {
     "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
     "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/monitor/src/event_pre_monitor_handler.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
     "${mmi_path}/service/nap_process/src/nap_process.cpp",
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
@@ -289,6 +291,7 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
     "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/monitor/src/event_pre_monitor_handler.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
     "${mmi_path}/service/nap_process/src/nap_process.cpp",
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
@@ -461,6 +464,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
     "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/monitor/src/event_pre_monitor_handler.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
     "${mmi_path}/service/nap_process/src/nap_process.cpp",
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
@@ -603,6 +607,7 @@ ohos_unittest("TouchpadGestureTest") {
     "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
     "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/monitor/src/event_pre_monitor_handler.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
     "${mmi_path}/service/nap_process/src/nap_process.cpp",
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
@@ -747,6 +752,7 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
     "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/monitor/src/event_pre_monitor_handler.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_event_normalize.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",

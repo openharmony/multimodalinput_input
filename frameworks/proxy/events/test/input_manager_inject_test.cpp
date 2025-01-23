@@ -1524,7 +1524,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_002, 
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
     
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -1557,7 +1557,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_003, 
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(-1000.0);
     
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, -1000.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, -1000.0, false);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -1590,7 +1590,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_004, 
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
     
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -1622,7 +1622,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_005, 
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
     
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -1654,7 +1654,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_006, 
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
     
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -1686,7 +1686,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_007, 
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
     
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -1717,7 +1717,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_008, 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(20.0);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 } // namespace MMI

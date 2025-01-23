@@ -362,7 +362,14 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
     CHKPV(pointerEvent);
     WIN_MGR->UpdateTargetPointer(pointerEvent);
     BytraceAdapter::StartTouchEvent(pointerEvent->GetId());
-    nextHandler_->HandleTouchEvent(pointerEvent);
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        return;
+    }
+    if (!item.IsCanceled()) {
+        nextHandler_->HandleTouchEvent(pointerEvent);
+    }
     BytraceAdapter::StopTouchEvent();
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
@@ -374,10 +381,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     FingerprintEventHdr->SetPowerAndVolumeKeyState(event);
     if (FingerprintEventHdr->IsFingerprintEvent(event)) {
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        auto key = KeyEventHdr->GetKeyEvent();
-        DfxHisysevent::ReportAbility(key->GetKeyCode(), key->GetKeyAction(), "");
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportKeyEvent("fingerprint");
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -546,7 +550,9 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION && TouchPadKnuckleDoubleClickHandle(event)) {
+    if ((type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_MOTION ||
+            type == LIBINPUT_EVENT_TOUCHPAD_UP) &&
+        TouchPadKnuckleDoubleClickHandle(event)) {
         return RET_OK;
     }
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
@@ -622,10 +628,16 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
 #ifdef OHOS_RSS_CLIENT
     if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCH_DOWN) {
         std::unordered_map<std::string, std::string> mapPayload;
+        auto begin = std::chrono::high_resolution_clock::now();
         OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
             OHOS::ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
             OHOS::ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN_MMI,
             mapPayload);
+        auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         mapPayload.clear();
     }
 #endif
@@ -678,10 +690,17 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         MMI_HILOGE("Failed to set origin pointerId");
         return RET_ERR;
     }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        nextHandler_->HandlePointerEvent(pointerEvent);
-    } else {
-        nextHandler_->HandleTouchEvent(pointerEvent);
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        return RET_ERR;
+    }
+    if (!item.IsCanceled()) {
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+            nextHandler_->HandlePointerEvent(pointerEvent);
+        } else {
+            nextHandler_->HandleTouchEvent(pointerEvent);
+        }
     }
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);

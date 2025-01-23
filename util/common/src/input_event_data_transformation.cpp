@@ -151,7 +151,7 @@ int32_t InputEventDataTransformation::LongPressEventToNetPacket(const LongPressE
 {
     pkt << longPressEvent.fingerCount << longPressEvent.duration << longPressEvent.pid << longPressEvent.displayId
         << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result << longPressEvent.windowId
-        << longPressEvent.pointerId;
+        << longPressEvent.pointerId << longPressEvent.downTime;
     if (!pkt.Write(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet write long press event failed");
         return RET_ERR;
@@ -184,6 +184,9 @@ int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, 
     longPressEvent.windowId = data;
     pkt >> data;
     longPressEvent.pointerId = data;
+    int64_t downTime;
+    pkt >> downTime;
+    longPressEvent.downTime = downTime;
     if (!pkt.Read(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet read long press event failed");
         return RET_ERR;
@@ -310,6 +313,13 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
     pkt << event->GetVelocity();
     pkt << event->GetAxisEventType();
     pkt << event->GetHandOption();
+    PointerEvent::FixedMode fixedMode = event->GetFixedMode();
+    if (fixedMode > PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN &&
+        fixedMode < PointerEvent::FixedMode::SCREEN_MODE_MAX) {
+        pkt << static_cast<int32_t>(fixedMode);
+    } else {
+        pkt << static_cast<int32_t>(PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN);
+    }
 }
 
 void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
@@ -344,6 +354,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     SetAxisInfo(pkt, event);
     pkt >> tField;
     event->SetHandOption(tField);
+    pkt >> tField;
+    event->SetFixedMode(static_cast<PointerEvent::FixedMode>(tField));
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;

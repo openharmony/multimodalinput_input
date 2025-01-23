@@ -40,6 +40,7 @@ enum class MmiMessageId : int32_t {
     WINDOW_STATE_ERROR_NOTIFY,
     ON_SUBSCRIBE_LONG_PRESS,
     SET_INPUT_DEVICE_ENABLED,
+    ON_PRE_KEY_EVENT,
 };
 
 enum TokenType : int32_t {

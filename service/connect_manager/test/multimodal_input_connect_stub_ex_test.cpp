@@ -71,9 +71,9 @@ public:
         return rows_;
     }
     int32_t GetMouseScrollRows(int32_t &rows) override { return rows_; }
-    int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override
+    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override
     {
-        return pid;
+        return windowId;
     }
     int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override
     {
@@ -160,6 +160,14 @@ public:
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType) override { return priority; }
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType) override { return priority; }
+    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) override
+    {
+        return RET_OK;
+    }
+    int32_t RemovePreInputHandler(int32_t handlerId) override
+    {
+        return RET_OK;
+    }
     int32_t AddGestureMonitor(InputHandlerType handlerType, HandleEventType eventType,
         TouchGestureType gestureType, int32_t fingers) override { return RET_OK; }
     int32_t RemoveGestureMonitor(InputHandlerType handlerType, HandleEventType eventType,
@@ -344,7 +352,7 @@ public:
         return retCreateVKeyboardDevice_;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override
     {
         return static_cast<int32_t>(autoGenDown);
     }
@@ -8478,6 +8486,42 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceInputEnable_003, Test
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetInputDeviceInputEnable(data, reply));
+}
+
+/**
+ * @tc.name: StubShiftAppPointerEvent_001
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_001, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubShiftAppPointerEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubShiftAppPointerEvent_002
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_002, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubShiftAppPointerEvent(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS

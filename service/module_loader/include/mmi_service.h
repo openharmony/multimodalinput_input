@@ -60,7 +60,7 @@ public:
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
-    int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
+    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
     int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
@@ -96,6 +96,8 @@ public:
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
+    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) override;
+    int32_t RemovePreInputHandler(int32_t handlerId) override;
     int32_t AddGestureMonitor(InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
     int32_t RemoveGestureMonitor(InputHandlerType handlerType,
@@ -199,7 +201,7 @@ public:
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override;
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
