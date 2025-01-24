@@ -126,6 +126,7 @@ declare_args() {
     "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
+    "event_handler/src/touchpad_settings_handler.cpp",
     "key_command/src/setting_datashare.cpp",
     "key_command/src/setting_observer.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
