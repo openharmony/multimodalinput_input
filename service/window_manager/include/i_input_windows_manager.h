@@ -172,6 +172,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr) = 0;
     virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event) = 0;
+    virtual std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
