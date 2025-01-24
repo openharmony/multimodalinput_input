@@ -1148,7 +1148,8 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    bool isHard = true;
+    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
     MMI_HILOGD("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u",
         sp->GetScreenId());
     return RET_OK;
@@ -1201,7 +1202,8 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    bool isHard = false;
+    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
 
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -2946,8 +2948,13 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
             Rosen::RSTransaction::FlushImplicitTransaction();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         }
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        Direction direction = static_cast<Direction>((
+            (displayInfo_.direction * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#else
         Direction direction = static_cast<Direction>((
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
@@ -3302,6 +3309,7 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         .path = mouseIcons_[mouseStyle].iconPath,
         .color = GetPointerColor(),
         .size = GetPointerSize(),
+        .direction = displayInfo_.direction,
         .isHard = true,
     };
 
@@ -3338,6 +3346,7 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         .path = mouseIcons_[mouseStyle].iconPath,
         .color = GetPointerColor(),
         .size = GetPointerSize(),
+        .direction = displayInfo_.direction,
         .isHard = true,
     };
 
@@ -3372,7 +3381,8 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<Rosen::RSSurfaceNode> 
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    bool isHard = false;
+    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
 
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -3398,7 +3408,8 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
     CHKPR(buffer, RET_ERR);
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    bool isHard = true;
+    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
     
     MMI_HILOGD("DrawCursor on ScreenPointer success, screenId=%{public}u", sp->GetScreenId());
     return RET_OK;
