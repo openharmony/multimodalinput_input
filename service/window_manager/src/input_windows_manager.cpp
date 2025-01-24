@@ -355,7 +355,7 @@ bool InputWindowsManager::AdjustFingerFlag(std::shared_ptr<PointerEvent> pointer
         return false;
     }
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    return ((iter == touchItemDownInfos_.end()) || !(iter->second.flag));
+    return (iter != touchItemDownInfos_.end() && !(iter->second.flag));
 }
 
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
