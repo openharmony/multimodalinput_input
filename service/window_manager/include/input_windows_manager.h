@@ -204,6 +204,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
     void CancelAllTouches(std::shared_ptr<PointerEvent> event);
+    std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return lastPointerEventforGesture_; };
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:

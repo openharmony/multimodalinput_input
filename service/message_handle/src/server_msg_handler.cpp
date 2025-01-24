@@ -77,6 +77,7 @@ constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t ERR_DEVICE_NOT_EXIST { 3900002 };
 constexpr int32_t ERR_NON_INPUT_APPLICATION { 3900003 };
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -300,6 +301,25 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell)) {
                 return RET_ERR;
             }
+            MMI_HILOGI("Check : current PointerEvent's info :Id=>%{public}d , pointerId=>%{public}d ",
+                pointerEvent->GetId(), pointerEvent->GetPointerId());
+            std::shared_ptr<PointerEvent> touchEvent = WIN_MGR->GetLastPointerEventForGesture();
+            if (touchEvent != nullptr)
+            {
+                std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
+                MMI_HILOGI("Check : LastPointerEvent's item count is : %{public}d", listPtItems.size());
+                for (auto &item : listPtItems) {
+                    MMI_HILOGI("Check : current Item : pointerId=>%{public}d ,OriginPointerId=>%{public}d",
+                        item.GetPointerId(), item.GetOriginPointerId());
+                    if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) !=
+                        (pointerEvent->GetPointerId() % SIMULATE_EVENT_START_ID)) {
+                        pointerEvent->AddPointerItem(item);
+                        MMI_HILOGI("Check : add Item : pointerId=>%{public}d ,OriginPointerId=>%{public}d",
+                            item.GetPointerId(), item.GetOriginPointerId());
+                    }
+                }
+            }
+            MMI_HILOGI("Check : prepare to send inject pointer event");
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
                 !(IsCastInject(pointerEvent->GetDeviceId())) &&
