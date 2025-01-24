@@ -72,6 +72,7 @@ const std::string PRODUCT_TYPE_PC = "2in1";
 [[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
+constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t ERR_DEVICE_NOT_EXIST { 3900002 };
@@ -301,7 +302,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
-                !(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) &&
+                !(IsCastInject(pointerEvent->GetDeviceId())) &&
                 !IsNavigationWindowInjectEvent(pointerEvent)) {
 #ifndef OHOS_BUILD_ENABLE_WATCH
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
@@ -537,7 +538,7 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         if (isShell) {
             shellTargetWindowIds_[pointerId] = targetWindowId;
-        } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+        } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
             castTargetWindowIds_[pointerId] = targetWindowId;
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             accessTargetWindowIds_[pointerId] = targetWindowId;
@@ -551,7 +552,7 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t pointerId = pointerEvent->GetPointerId();
         if (isShell) {
             shellTargetWindowIds_.erase(pointerId);
-        } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+        } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
             castTargetWindowIds_.erase(pointerId);
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             accessTargetWindowIds_.erase(pointerId);
@@ -579,7 +580,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         if (iter != shellTargetWindowIds_.end()) {
             targetWindowId = iter->second;
         }
-    } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+    } else if ((IsCastInject(pointerEvent->GetDeviceId())) && (pointerEvent->GetZOrder() > 0)) {
         pointerEvent->RemovePointerItem(pointerId);
         pointerId += CAST_POINTER_ID;
         pointerItem.SetPointerId(pointerId);
@@ -685,6 +686,11 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
         return RET_ERR;
     }
     return RET_OK;
+}
+
+bool ServerMsgHandler::IsCastInject(int32_t deviceid)
+{
+    return (deviceid == CAST_INPUT_DEVICEID || deviceid == CAST_SCREEN_DEVICEID);
 }
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
