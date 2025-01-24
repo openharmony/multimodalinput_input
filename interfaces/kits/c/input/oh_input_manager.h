@@ -244,7 +244,7 @@ typedef enum Input_Result {
     /** Parameter check failed */
     INPUT_PARAMETER_ERROR = 401,
     /** Capability not supported */
-    COMMON_CAPABILITY_NOT_SUPPORTED = 801,
+    INPUT_DEVICE_NOT_SUPPORTED = 801,
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
     /** There is currently no keyboard device connected */

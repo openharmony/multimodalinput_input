@@ -435,7 +435,7 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
         subscribeId = InputManager::GetInstance()->SubscribeHotkey(keyOption, SubHotkeyEventCallback);
         if (subscribeId == ERROR_UNSUPPORT) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
-            THROWERR_CUSTOM(env, COMMON_CAPABILITY_NOT_SUPPORTED, "Hotkey occupied by other");
+            THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Hotkey occupied by other");
             return nullptr;
         }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
