@@ -28,6 +28,8 @@
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerRenderer"
+#define FOCUS_COORDINATES(FOCUS_COORDINATES_, CHANGE) float FOCUS_COORDINATES_##CHANGE
+#define CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) float CALCULATE_CANVAS_SIZE_##CHANGE
 
 constexpr uint32_t RENDER_STRIDE{4};
 constexpr int32_t DEVCIE_INDEPENDENT_PIXELS{40};
@@ -40,6 +42,8 @@ constexpr uint32_t FOCUS_POINT{256};
 constexpr float CALCULATE_MOUSE_ICON_BIAS{5.0f};
 constexpr float ROTATION_ANGLE90 {90.0f};
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+float g_hardwareCanvasSize = { 512.0f };
+float g_focalPoint = { 256.0f };
 
 namespace OHOS::MMI {
 
@@ -59,7 +63,7 @@ std::string RenderConfig::ToString() const
     return oss.str();
 }
 
-int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg)
+int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg, bool isHard)
 {
     CHKPR(addr, RET_ERR);
     MMI_HILOGI("shape=(%{public}d, %{public}d), cfg=%{public}s", width, height, cfg.ToString().data());
@@ -82,6 +86,17 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    FOCUS_COORDINATES(FOCUS_COORDINATES_, CHANGE) = g_focalPoint;
+    CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) = g_hardwareCanvasSize;
+    int degree;
+    if (isHard) {
+        degree = static_cast<int>((static_cast<int>(DIRECTION0) - static_cast<int>(cfg.direction)) * ROTATION_ANGLE90);
+    } else {
+        degree = static_cast<int>((static_cast<int>(DIRECTION0) + static_cast<int>(cfg.direction)) * ROTATION_ANGLE90);
+    }
+    canvas.Rotate(degree, FOCUS_COORDINATES_CHANGE, FOCUS_COORDINATES_CHANGE);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
     // load cursor image
     image_ptr_t image = nullptr;
@@ -386,7 +401,9 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
     }
     return RET_OK;
 }
-int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg)
+
+int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg,
+    bool isHard)
 {
     CHKPR(addr, RET_ERR);
     uint32_t addrSize = width * height * RENDER_STRIDE;
@@ -403,6 +420,17 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    FOCUS_COORDINATES(FOCUS_COORDINATES_, CHANGE) = g_focalPoint;
+    CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) = g_hardwareCanvasSize;
+    int degree;
+    if (isHard) {
+        degree = static_cast<int>((static_cast<int>(DIRECTION0) - static_cast<int>(cfg.direction)) * ROTATION_ANGLE90);
+    } else {
+        degree = static_cast<int>((static_cast<int>(DIRECTION0) + static_cast<int>(cfg.direction)) * ROTATION_ANGLE90);
+    }
+    canvas.Rotate(degree, FOCUS_COORDINATES_CHANGE, FOCUS_COORDINATES_CHANGE);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
