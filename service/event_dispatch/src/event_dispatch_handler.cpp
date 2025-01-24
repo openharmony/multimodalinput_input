@@ -120,7 +120,8 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
     int32_t pointerId = point->GetPointerId();
     if (windowInfo == std::nullopt) {
         std::shared_ptr<WindowInfo> curInfo = SearchCancelList(pointerId, windowId);
-        if (curInfo != nullptr && point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+        if (curInfo != nullptr && (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+            point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP)) {
             point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             windowInfo = std::make_optional(*curInfo);
             MMI_HILOG_DISPATCHI("Touch event send cancel to window:%{public}d", windowId);
