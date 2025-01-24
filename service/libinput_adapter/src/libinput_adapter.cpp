@@ -1149,18 +1149,8 @@ bool LibinputAdapter::SkipTouchMove(int touchId, int32_t eventType)
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
-void LibinputAdapter::MultiKeyboardSetLedState(bool oldCapsLockState)
-{
-    std::vector<struct libinput_device*> input_device;
-    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
-    for (auto it = input_device.begin(); it != input_device.end(); ++it) {
-        auto setDevice = (*it);
-        CHKPV(setDevice);
-        DeviceLedUpdate(setDevice, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockState);
-    }
-}
-#else // OHOS_BUILD_ENABLE_VKEYBOARD
 void LibinputAdapter::MultiKeyboardSetLedState(bool oldCapsLockState)
 {
     std::vector<struct libinput_device*> input_device;
@@ -1189,7 +1179,6 @@ void LibinputAdapter::MultiKeyboardSetFuncState(libinput_event* event)
             }
     }
 }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void LibinputAdapter::OnEventHandler()
 {
