@@ -1283,7 +1283,6 @@ public:
          */
         void SetCanceled(bool canceled);
 
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
         /**
          * @brief Obtains the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          */
@@ -1307,16 +1306,13 @@ public:
          * @return void
          */
         void SetFixedDisplayY(int32_t fixedDisplayY);
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
         int32_t displayX_ {};
         int32_t displayY_ {};
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
         int32_t fixedDisplayX_ {};
         int32_t fixedDisplayY_ {};
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
         int32_t windowX_ {};
         int32_t windowY_ {};
         double displayXPos_ {};
@@ -1839,11 +1835,8 @@ public:
 
     void SetScrollRows(int32_t scrollRows);
     int32_t GetScrollRows() const;
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     void SetAutoToVirtualScreen(bool autoToVirtualScreen);
     bool GetAutoToVirtualScreen() const;
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-
     void SetFixedMode(PointerEvent::FixedMode fixedMode);
     PointerEvent::FixedMode GetFixedMode() const;
     std::string GetFixedModeStr() const;
@@ -1901,9 +1894,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_ANCO
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
     Settings settings_ {};
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     bool autoToVirtualScreen_ { true };
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     //Left and right hand steady-state reporting status
     int32_t handOption_ { -1 };
     FixedMode fixedMode_ { FixedMode::NORMAL };

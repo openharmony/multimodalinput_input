@@ -732,10 +732,8 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.height << item.dpi << item.name << item.uniq << item.direction
             << item.displayDirection << item.displayMode << item.transform << item.ppi << item.offsetX
             << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
-            << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination;
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-        pkt << item.oneHandX << item.oneHandY;
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+            << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
+            << item.oneHandX << item.oneHandY;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
