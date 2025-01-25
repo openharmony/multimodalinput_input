@@ -252,6 +252,20 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 
     uint32_t dx = GetOffsetX(align);
     uint32_t dy = GetOffsetY(align);
+    switch (rotation_) {
+        case rotation_t::ROTATION_0:
+            break;
+        case rotation_t::ROTATION_90:
+            dy = GetOffsetYRotated(align);
+            break;
+        case rotation_t::ROTATION_180:
+            dx = GetOffsetXRotated(align);
+            dy = GetOffsetYRotated(align);
+            break;
+        case rotation_t::ROTATION_270:
+            dx = GetOffsetXRotated(align);
+            break;
+    }
     int32_t px = x - dx;
     int32_t py = y - dy;
     if (IsMirror()) {
@@ -289,11 +303,41 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     CHKPF(surfaceNode_);
     uint32_t dx = GetOffsetX(align);
     uint32_t dy = GetOffsetY(align);
+    switch (rotation_) {
+        case rotation_t::ROTATION_0:
+            break;
+        case rotation_t::ROTATION_90:
+            dy = GetOffsetYRotated(align);
+            break;
+        case rotation_t::ROTATION_180:
+            dx = GetOffsetXRotated(align);
+            dy = GetOffsetYRotated(align);
+            break;
+        case rotation_t::ROTATION_270:
+            dx = GetOffsetXRotated(align);
+            break;
+    }
     int32_t px = x - dx;
     int32_t py = y - dy;
     if (IsMirror()) {
         px = paddingLeft_ + x * scale_ - dx;
         py = paddingTop_ + y * scale_ - dy;
+    }
+    int32_t tmpX = px;
+    int32_t tmpY = py;
+    if (rotation_ == rotation_t(DIRECTION90)) {
+        px = tmpY;
+        py = width_ - tmpX;
+        px = height_  - px - DEFAULT_CURSOR_SIZE;
+        py =  width_ - py + DEFAULT_CURSOR_SIZE;
+    } else if (rotation_ == rotation_t(DIRECTION180)) {
+        px = width_ - px;
+        py = height_ - py;
+    } else if (rotation_ == rotation_t(DIRECTION270)) {
+        px = height_ - tmpY;
+        py = tmpX;
+        px =  height_ - px + DEFAULT_CURSOR_SIZE;
+        py =  width_ - py - DEFAULT_CURSOR_SIZE;
     }
     surfaceNode_->SetBounds(px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     return true;
@@ -393,4 +437,50 @@ uint32_t ScreenPointer::GetOffsetY(ICON_TYPE align) const
     }
 }
 
+uint32_t ScreenPointer::GetOffsetXRotated(ICON_TYPE align) const
+{
+    uint32_t width = GetImageSize();
+    switch (align) {
+        case ANGLE_E:
+        case ANGLE_SW:
+        case ANGLE_NW:
+            return FOCUS_POINT;
+        case ANGLE_S:
+        case ANGLE_N:
+        case ANGLE_CENTER:
+            return FOCUS_POINT + width / NUM_TWO;
+        case ANGLE_W:
+        case ANGLE_SE:
+        case ANGLE_NE:
+            return FOCUS_POINT + width;
+        case ANGLE_NW_RIGHT:
+            return FOCUS_POINT + CALCULATE_MOUSE_ICON_BIAS;
+        default:
+            MMI_HILOGE("No need to calculate offset X");
+            return FOCUS_POINT;
+    }
+}
+
+uint32_t ScreenPointer::GetOffsetYRotated(ICON_TYPE align) const
+{
+    uint32_t height = GetImageSize();
+    switch (align) {
+        case ANGLE_S:
+        case ANGLE_NE:
+        case ANGLE_NW:
+        case ANGLE_NW_RIGHT:
+            return FOCUS_POINT;
+        case ANGLE_E:
+        case ANGLE_CENTER:
+            return FOCUS_POINT + height / NUM_TWO;
+        case ANGLE_W:
+        case ANGLE_N:
+        case ANGLE_SE:
+        case ANGLE_SW:
+            return FOCUS_POINT + height;
+        default:
+            MMI_HILOGE("No need to calculate offset Y");
+            return FOCUS_POINT;
+    }
+}
 } // namespace OHOS::MMI

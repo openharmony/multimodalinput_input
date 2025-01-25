@@ -91,6 +91,8 @@ public:
         HardwareKeyEventDetected hardwareKeyEventDetected);
 
 private:
+    void MultiKeyboardSetLedState(bool oldCapsLockState);
+    void MultiKeyboardSetFuncState(libinput_event* event);
     void OnEventHandler();
     void OnDeviceAdded(std::string path);
     void OnDeviceRemoved(std::string path);
@@ -148,7 +150,6 @@ private:
     void HideMouseCursorTemporary();
     double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
     bool SkipTouchMove(int touchId, int32_t eventType); // compress touch move events in consecutive two frame
-    void MultiKeyboardSetLedState(bool oldCapsLockState);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };

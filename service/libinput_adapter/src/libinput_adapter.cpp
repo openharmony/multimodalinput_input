@@ -75,6 +75,8 @@ enum class VKeyboardTouchEventType : int32_t {
     TOUCH_MOVE = 2,
     TOUCH_FRAME = 3,
 };
+#else // OHOS_BUILD_ENABLE_VKEYBOARD
+constexpr uint32_t KEY_CAPSLOCK { 58 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
@@ -1147,6 +1149,7 @@ bool LibinputAdapter::SkipTouchMove(int touchId, int32_t eventType)
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void LibinputAdapter::MultiKeyboardSetLedState(bool oldCapsLockState)
 {
@@ -1154,10 +1157,28 @@ void LibinputAdapter::MultiKeyboardSetLedState(bool oldCapsLockState)
     INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
     for (auto it = input_device.begin(); it != input_device.end(); ++it) {
         auto setDevice = (*it);
+        CHKPV(setDevice);
         DeviceLedUpdate(setDevice, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockState);
     }
 }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
+void LibinputAdapter::MultiKeyboardSetFuncState(libinput_event* event)
+{
+    libinput_event_type eventType = libinput_event_get_type(event);
+    if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
+            struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
+            CHKPV(keyboardEvent);
+            std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+            if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED
+			   && libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK
+			   && keyEvent != nullptr) {
+                bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+                MultiKeyboardSetLedState(oldCapsLockOn);
+                keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
+                libinput_toggle_caps_key();
+            }
+    }
+}
 
 void LibinputAdapter::OnEventHandler()
 {
@@ -1260,6 +1281,7 @@ type:%{private}d, accPressure:%{private}f",
             libinput_event_destroy(event);
         }
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
+        MultiKeyboardSetFuncState(event);
         funInputEvent_(event, frameTime);
         libinput_event_destroy(event);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD

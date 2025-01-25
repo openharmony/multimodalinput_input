@@ -66,10 +66,6 @@ public:
     void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
     void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
-    void UpdateWindowPointerVisible(int32_t pid);
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void DumpDisplayInfo(int32_t fd);
@@ -208,6 +204,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
     void CancelAllTouches(std::shared_ptr<PointerEvent> event);
+    std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return lastPointerEventforGesture_; };
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
@@ -223,6 +220,7 @@ private:
     void CheckZorderWindowChange(const std::vector<WindowInfo> &oldWindowsInfo,
         const std::vector<WindowInfo> &newWindowsInfo);
     void UpdateDisplayIdAndName();
+    void UpdateCustomStyle(int32_t windowId, PointerStyle pointerStyle);
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
     void UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window, DisplayGroupInfo &displayGroupInfo);
@@ -252,7 +250,6 @@ private:
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
@@ -353,7 +350,8 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     bool OnDisplayRemovedOrCombiantionChanged(const DisplayGroupInfo &displayGroupInfo);
     void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
     void ResetPointerPosition(const DisplayGroupInfo &displayGroupInfo);
-    int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo, DisplayInfo &mainScreenDisplayInfo);
+    int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
+        DisplayInfo &mainScreenDisplayInfo) const;
     bool IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);

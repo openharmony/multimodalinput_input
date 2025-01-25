@@ -248,6 +248,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    MMI_HILOGD("isAutoToVirtualScreen=%{public}s", isAutoToVirtualScreen ? "true" : "false");
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
@@ -261,7 +262,18 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s", zOrder, isAutoToVirtualScreen ? "true" : "false");
     InputMgrImpl.SimulateInputEvent(pointerEvent);
+}
+
+void InputManager::SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG)
+{
+    CHKPV(pointerEvent);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    pointerEvent->SetZOrder(touchpadCDG.zOrder);
+    InputMgrImpl.SimulateTouchPadInputEvent(pointerEvent, touchpadCDG);
 }
 
 void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -607,6 +619,11 @@ int32_t InputManager::GetTouchpadPointerSpeed(int32_t &speed)
     return InputMgrImpl.GetTouchpadPointerSpeed(speed);
 }
 
+int32_t InputManager::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    return InputMgrImpl.GetTouchpadCDG(touchpadCDG);
+}
+
 int32_t InputManager::SetTouchpadPinchSwitch(bool switchFlag)
 {
     return InputMgrImpl.SetTouchpadPinchSwitch(switchFlag);
@@ -680,11 +697,6 @@ int32_t InputManager::SetTouchpadScrollRows(int32_t rows)
 int32_t InputManager::GetTouchpadScrollRows(int32_t &rows)
 {
     return InputMgrImpl.GetTouchpadScrollRows(rows);
-}
-
-void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
-{
-    InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
 }
 
 void InputManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)

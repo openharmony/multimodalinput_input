@@ -58,8 +58,8 @@ public:
     PointerRenderer() = default;
     ~PointerRenderer() = default;
 
-    int32_t Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg);
-    int32_t DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg);
+    int32_t Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg, bool isHard);
+    int32_t DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg, bool isHard);
 private:
     image_ptr_t LoadPointerImage(const RenderConfig &cfg);
     pixelmap_ptr_t LoadCursorSvgWithColor(const RenderConfig &cfg);

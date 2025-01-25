@@ -271,6 +271,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_POINTER_EVENT):
             ret = StubInjectPointerEvent(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_TOUCHPAD_EVENT):
+            ret = StubInjectTouchPadEvent(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_ANR_OBSERVER):
             ret = StubSetAnrListener(data, reply);
             break;
@@ -333,6 +336,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_POINTER_SPEED):
             ret = StubGetTouchpadPointerSpeed(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_OPTION):
+            ret = StubGetTouchpadCDG(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_DELAY):
             ret = StubSetKeyboardRepeatDelay(data, reply);
@@ -1107,10 +1113,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
-    if (windowId < 0) {
-        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
-        return RET_ERR;
-    }
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
     PointerStyle pointerStyle;
@@ -1782,6 +1784,43 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
     return ret;
 }
 
+int32_t MultimodalInputConnectStub::StubInjectTouchPadEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (!pointerEvent->ReadFromParcel(data)) {
+        MMI_HILOGE("Read Pointer Event failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    double ppi = 0.0;
+    double size = 0.0;
+    int32_t speed = 0;
+    bool isNativeInject { false };
+    READDOUBLE(data, ppi, IPC_PROXY_DEAD_OBJECT_ERR);
+    READDOUBLE(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, speed, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
+    TouchpadCDG touchpadCDG = {
+        .ppi = ppi,
+        .size = size,
+        .speed = speed,
+    };
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t ret = InjectTouchPadEvent(pointerEvent, touchpadCDG, isNativeInject);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call InjectTouchPadEvent failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -1998,10 +2037,6 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
 
     int32_t windowId = 0;
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -2048,9 +2083,9 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
         MMI_HILOGE("Invalid extraData.sourceType:%{public}d", extraData.sourceType);
         return RET_ERR;
     }
-    if (extraData.pointerId < 0 || extraData.pullId < 0 || extraData.eventId < 0) {
-        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, sourceType:%{public}d,"
-            "pullId:%{public}d, eventId:%{public}d", extraData.sourceType, extraData.pullId, extraData.eventId);
+    if (extraData.pointerId < 0 || extraData.pullId < 0) {
+        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, pointerId:%{public}d,"
+            "pullId:%{public}d, eventId:%{public}d", extraData.pointerId, extraData.pullId, extraData.eventId);
         return RET_ERR;
     }
     
@@ -2284,6 +2319,32 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPointerSpeed(MessageParcel& d
     }
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touchpad pointer speed:%{public}d, ret:%{public}d", speed, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadCDG(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed");
+        return ret;
+    }
+
+    TouchpadCDG touchpadCDG;
+    touchpadCDG.ppi = 0.0;
+    touchpadCDG.size = 0.0;
+    touchpadCDG.speed = 0;
+    ret = GetTouchpadCDG(touchpadCDG);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetTouchpadCDG failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEDOUBLE(reply, touchpadCDG.ppi, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEDOUBLE(reply, touchpadCDG.size, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, touchpadCDG.speed, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touchpad option ppi:%{public}lf size:%{public}lf speed:%{public}d, ret:%{public}d",
+        touchpadCDG.ppi, touchpadCDG.size, touchpadCDG.speed, ret);
     return RET_OK;
 }
 

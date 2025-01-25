@@ -499,6 +499,14 @@ int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<
     return multimodalInputConnectService_->InjectPointerEvent(pointerEvent, isNativeInject);
 }
 
+int32_t MultimodalInputConnectManager::InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG, bool isNativeInject)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->InjectTouchPadEvent(pointerEvent, touchpadCDG, isNativeInject);
+}
+
 int32_t MultimodalInputConnectManager::SetAnrObserver()
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -700,6 +708,13 @@ int32_t MultimodalInputConnectManager::GetTouchpadPointerSpeed(int32_t &speed)
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadPointerSpeed(speed);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadCDG(touchpadCDG);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadPinchSwitch(bool switchFlag)

@@ -642,10 +642,8 @@ int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, 
     CHKRR(SetNameProperty(jsEnv_, value, "rawX", item.GetRawDx()), "Set rawX", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "rawY", item.GetRawDy()), "Set rawY", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "toolType", item.GetToolType()), "Set toolType", RET_ERR);
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     CHKRR(SetNameProperty(jsEnv_, value, "fixedDisplayX", item.GetFixedDisplayX()), "Set fixedDisplayX", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "fixedDisplayY", item.GetFixedDisplayY()), "Set fixedDisplayY", RET_ERR);
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     return RET_OK;
 }
 
@@ -1675,11 +1673,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_SWIPE: {
-                bool canUse = false;
-                if (IsThreeFingersSwipe(pointerEventItem)) {
-                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
-                }
-                if (!canUse) {
+                if (!IsThreeFingersSwipe(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1695,11 +1689,11 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_TAP: {
-                bool canUse = false;
-                InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
-                if (canUse) {
-                    ret = TransformMultiTapEvent(pointerEventItem, napiPointer);
+                if (!IsThreeFingersTap(pointerEventItem)) {
+                    napi_close_handle_scope(jsEnv_, scope);
+                    continue;
                 }
+                ret = TransformMultiTapEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::JOYSTICK:{

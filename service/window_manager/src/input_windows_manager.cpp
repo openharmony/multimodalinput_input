@@ -355,7 +355,7 @@ bool InputWindowsManager::AdjustFingerFlag(std::shared_ptr<PointerEvent> pointer
         return false;
     }
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    return ((iter == touchItemDownInfos_.end()) || !(iter->second.flag));
+    return (iter != touchItemDownInfos_.end() && !(iter->second.flag));
 }
 
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
@@ -1024,7 +1024,8 @@ void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &win
     }
 }
 
-int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo, DisplayInfo &mainScreenDisplayInfo)
+int32_t InputWindowsManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
+    DisplayInfo &mainScreenDisplayInfo) const
 {
     if (displayGroupInfo.displaysInfo.empty()) {
         MMI_HILOGE("displayGroupInfo doesn't contain displayInfo");
@@ -1440,90 +1441,6 @@ bool InputWindowsManager::NeedUpdatePointDrawFlag(const std::vector<WindowInfo> 
 {
     CALL_DEBUG_ENTER;
     return !windows.empty() && windows.back().action == WINDOW_UPDATE_ACTION::ADD_END;
-}
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void InputWindowsManager::GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle)
-{
-    CALL_DEBUG_ENTER;
-    switch (area) {
-        case WindowArea::ENTER:
-        case WindowArea::EXIT:
-            MMI_HILOG_CURSORD("SetPointerStyle for Enter or exit! No need to deal with it now");
-            break;
-        case WindowArea::FOCUS_ON_TOP_LEFT:
-        case WindowArea::FOCUS_ON_BOTTOM_RIGHT:
-            pointerStyle.id = MOUSE_ICON::NORTH_WEST_SOUTH_EAST;
-            break;
-        case WindowArea::FOCUS_ON_TOP_RIGHT:
-        case WindowArea::FOCUS_ON_BOTTOM_LEFT:
-            pointerStyle.id = MOUSE_ICON::NORTH_EAST_SOUTH_WEST;
-            break;
-        case WindowArea::FOCUS_ON_TOP:
-        case WindowArea::FOCUS_ON_BOTTOM:
-            pointerStyle.id = MOUSE_ICON::NORTH_SOUTH;
-            break;
-        case WindowArea::FOCUS_ON_LEFT:
-        case WindowArea::FOCUS_ON_RIGHT:
-            pointerStyle.id = MOUSE_ICON::WEST_EAST;
-            break;
-        case WindowArea::TOP_LEFT_LIMIT:
-            pointerStyle.id = MOUSE_ICON::SOUTH_EAST;
-            break;
-        case WindowArea::TOP_RIGHT_LIMIT:
-            pointerStyle.id = MOUSE_ICON::SOUTH_WEST;
-            break;
-        case WindowArea::TOP_LIMIT:
-            pointerStyle.id = MOUSE_ICON::SOUTH;
-            break;
-        case WindowArea::LEFT_LIMIT:
-            pointerStyle.id = MOUSE_ICON::EAST;
-            break;
-        case WindowArea::RIGHT_LIMIT:
-            pointerStyle.id = MOUSE_ICON::WEST;
-            break;
-        case WindowArea::BOTTOM_LEFT_LIMIT:
-            pointerStyle.id = MOUSE_ICON::NORTH_WEST;
-            break;
-        case WindowArea::BOTTOM_LIMIT:
-            pointerStyle.id = MOUSE_ICON::NORTH_WEST;
-            break;
-        case WindowArea::BOTTOM_RIGHT_LIMIT:
-            pointerStyle.id = MOUSE_ICON::NORTH_WEST;
-            break;
-        case WindowArea::FOCUS_ON_INNER:
-            GetPointerStyle(pid, winId, pointerStyle);
-            break;
-    }
-}
-
-void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
-{
-    CALL_DEBUG_ENTER;
-    PointerStyle pointerStyle;
-    GetPointerStyleByArea(area, pid, windowId, pointerStyle);
-    UpdateWindowPointerVisible(pid);
-    if (lastPointerStyle_.id == pointerStyle.id) {
-        MMI_HILOG_CURSORE("Tha lastPointerStyle is totally equal with this, no need to change it");
-        return;
-    }
-    lastPointerStyle_.id = pointerStyle.id;
-    IconStyle iconStyle = IPointerDrawingManager::GetInstance()->GetIconStyle(MOUSE_ICON(pointerStyle.id));
-    if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        iconStyle.iconPath != DEFAULT_ICON_PATH)) {
-        PointerStyle style;
-        GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
-        lastPointerStyle_ = style;
-    }
-    MMI_HILOG_CURSORI("Window id:%{public}d set pointer style:%{public}d success", windowId, lastPointerStyle_.id);
-    IPointerDrawingManager::GetInstance()->DrawPointerStyle(lastPointerStyle_);
-}
-
-void InputWindowsManager::UpdateWindowPointerVisible(int32_t pid)
-{
-    bool visible = IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
-    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible, 0, false);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -2175,7 +2092,22 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     }
     iter->second = pointerStyle;
     SetMouseFlag(pointerActionFlag_ == PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    UpdateCustomStyle(windowId, pointerStyle);
     return RET_OK;
+}
+
+void InputWindowsManager::UpdateCustomStyle(int32_t windowId, PointerStyle pointerStyle)
+{
+    if (pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        return;
+    }
+    for (auto &item : pointerStyle_) {
+        for (auto &innerIt : item.second) {
+            if (innerIt.first != windowId && innerIt.second.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+                innerIt.second.id = MOUSE_ICON::DEFAULT;
+            }
+        }
+    }
 }
 
 void InputWindowsManager::SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId)
@@ -3288,23 +3220,6 @@ void InputWindowsManager::UpdateDisplayXYInOneHandMode(double& physicalX, double
     physicalY = virtualY / oneHandScale;
 }
 
-void InputWindowsManager::UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent)
-{
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    UpdatePointerItemInOneHandMode(displayInfo, pointerEvent);
-#else
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return;
-    }
-    pointerItem.SetFixedDisplayX(pointerItem.GetDisplayX());
-    pointerItem.SetFixedDisplayY(pointerItem.GetDisplayY());
-    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-}
-
 void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo,
     std::shared_ptr<PointerEvent> &pointerEvent)
 {
@@ -3357,6 +3272,23 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
+void InputWindowsManager::UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    UpdatePointerItemInOneHandMode(displayInfo, pointerEvent);
+#else
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    pointerItem.SetFixedDisplayX(pointerItem.GetDisplayX());
+    pointerItem.SetFixedDisplayY(pointerItem.GetDisplayY());
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+}
 
 void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
     const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
@@ -5221,23 +5153,23 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
     if (!lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
         MMI_HILOGD("shift pointerEvent, current mouse left mouse button is not pressed");
     }
-    const std::optional<WindowInfo> &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
-    const std::optional<WindowInfo> &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
+    const WindowInfo &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
+    const WindowInfo &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
     std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     pointerEvent->ClearButtonPressed();
 
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerId, item);
-    item.SetWindowX(lastLogicX_ - sourceWindowInfo->area.x);
-    item.SetWindowY(lastLogicY_ - sourceWindowInfo->area.y);
+    item.SetWindowX(lastLogicX_ - sourceWindowInfo.area.x);
+    item.SetWindowY(lastLogicY_ - sourceWindowInfo.area.y);
     item.SetPressed(false);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetTargetDisplayId(sourceWindowInfo->displayId);
-    pointerEvent->SetTargetWindowId(sourceWindowInfo->id);
-    pointerEvent->SetAgentWindowId(sourceWindowInfo->agentWindowId);
+    pointerEvent->SetTargetDisplayId(sourceWindowInfo.displayId);
+    pointerEvent->SetTargetWindowId(sourceWindowInfo.id);
+    pointerEvent->SetAgentWindowId(sourceWindowInfo.agentWindowId);
     ClearTargetWindowId(pointerId);
     pointerEvent->UpdatePointerItem(pointerId, item);
     InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
@@ -5245,21 +5177,21 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
         item.SetWindowX(shiftWindowInfo.x);
         item.SetWindowY(shiftWindowInfo.y);
         if (shiftWindowInfo.x == -1 && shiftWindowInfo.y == -1) {
-            item.SetWindowX(lastLogicX_ - targetWindowInfo->area.x);
-            item.SetWindowY(lastLogicY_ - targetWindowInfo->area.y);
+            item.SetWindowX(lastLogicX_ - targetWindowInfo.area.x);
+            item.SetWindowY(lastLogicY_ - targetWindowInfo.area.y);
         }
         item.SetPressed(true);
         pointerEvent->ClearButtonPressed();
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
         pointerEvent->UpdatePointerItem(pointerId, item);
-        pointerEvent->SetTargetDisplayId(targetWindowInfo->displayId);
-        pointerEvent->SetTargetWindowId(targetWindowInfo->id);
-        pointerEvent->SetAgentWindowId(targetWindowInfo->agentWindowId);
+        pointerEvent->SetTargetDisplayId(targetWindowInfo.displayId);
+        pointerEvent->SetTargetWindowId(targetWindowInfo.id);
+        pointerEvent->SetAgentWindowId(targetWindowInfo.agentWindowId);
         HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event dispatch down event");
         InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
     }
-    firstBtnDownWindowInfo_.first = targetWindowInfo->id;
+    firstBtnDownWindowInfo_.first = targetWindowInfo.id;
     MMI_HILOGI("Shift pointer event success for mouse");
     return RET_OK;
 }
@@ -5277,8 +5209,8 @@ int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param,
         return RET_ERR;
     }
     ShiftWindowInfo shiftWindowInfo;
-    shiftWindowInfo.sourceWindowInfo = sourceWindowInfo;
-    shiftWindowInfo.targetWindowInfo = targetWindowInfo;
+    shiftWindowInfo.sourceWindowInfo = *sourceWindowInfo;
+    shiftWindowInfo.targetWindowInfo = *targetWindowInfo;
     shiftWindowInfo.x = param.x;
     shiftWindowInfo.y = param.y;
     return ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown);
