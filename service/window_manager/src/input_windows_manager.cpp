@@ -3205,23 +3205,6 @@ void InputWindowsManager::UpdateDisplayXYInOneHandMode(double& physicalX, double
     physicalY = virtualY / oneHandScale;
 }
 
-void InputWindowsManager::UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent)
-{
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    UpdatePointerItemInOneHandMode(displayInfo, pointerEvent);
-#else
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return;
-    }
-    pointerItem.SetFixedDisplayX(pointerItem.GetDisplayX());
-    pointerItem.SetFixedDisplayY(pointerItem.GetDisplayY());
-    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-}
-
 void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo,
     std::shared_ptr<PointerEvent> &pointerEvent)
 {
@@ -3274,6 +3257,23 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
+void InputWindowsManager::UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    UpdatePointerItemInOneHandMode(displayInfo, pointerEvent);
+#else
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    pointerItem.SetFixedDisplayX(pointerItem.GetDisplayX());
+    pointerItem.SetFixedDisplayY(pointerItem.GetDisplayY());
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+}
 
 void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
     const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)

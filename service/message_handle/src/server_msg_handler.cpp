@@ -671,10 +671,8 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
             >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
             >> info.offsetX >> info.offsetY >> info.isCurrentOffScreenRendering >> info.screenRealWidth
-            >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination;
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-        pkt >> info.oneHandX >> info.oneHandY;
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+            >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
+            >> info.oneHandX >> info.oneHandY;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
