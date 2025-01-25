@@ -732,10 +732,8 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.height << item.dpi << item.name << item.uniq << item.direction
             << item.displayDirection << item.displayMode << item.transform << item.ppi << item.offsetX
             << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
-            << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination;
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-        pkt << item.oneHandX << item.oneHandY;
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+            << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
+            << item.oneHandX << item.oneHandY;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -1130,6 +1128,19 @@ void InputManagerImpl::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+void InputManagerImpl::SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG)
+{
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        if (MMIEventHdl.InjectTouchPadEvent(pointerEvent, touchpadCDG, false) != RET_OK) {
+            MMI_HILOGE("Failed to inject pointer event to touchPad");
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
+
 int32_t InputManagerImpl::SetMouseScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;
@@ -1330,7 +1341,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible, int32_t priority)
     return ret;
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
-    return COMMON_CAPABILITY_NOT_SUPPORTED;
+    return INPUT_DEVICE_NOT_SUPPORTED;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
@@ -2031,6 +2042,22 @@ int32_t InputManagerImpl::GetTouchpadPointerSpeed(int32_t &speed)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadCDG(touchpadCDG);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the touchpad option failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 int32_t InputManagerImpl::SetTouchpadPinchSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
@@ -2273,36 +2300,6 @@ void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, const std::str
     std::lock_guard<std::mutex> guard(eventObserverMtx_);
     CHKPV(eventObserver_);
     eventObserver_->SyncBundleName(pid, uid, bundleName, syncStatus);
-}
-
-void InputManagerImpl::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
-{
-    CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Get mmi client is nullptr");
-        return;
-    }
-    SendWindowAreaInfo(area, pid, windowId);
-#else
-    MMI_HILOGW("Pointer device or pointer drawing module does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-}
-
-void InputManagerImpl::SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId)
-{
-    CALL_INFO_TRACE;
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::WINDOW_AREA_INFO);
-    pkt << area << pid << windowId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write logical data failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-    }
 }
 
 void InputManagerImpl::ClearWindowPointerStyle(int32_t pid, int32_t windowId)

@@ -510,17 +510,17 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnGetFunctionKeyState_001, T
     int32_t funcKey = NUM_LOCK_FUNCTION_KEY;
     bool state = false;
     int32_t ret = handler.OnGetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
     funcKey = CAPS_LOCK_FUNCTION_KEY;
     ret = handler.OnGetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
     funcKey = SCROLL_LOCK_FUNCTION_KEY;
     ret = handler.OnGetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
     funcKey = 10;
     state = true;
     ret = handler.OnGetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
 }
 
 /**
@@ -547,30 +547,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt_001,
     EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false));
     sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
     EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false));
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnWindowAreaInfo_001
- * @tc.desc: Test the function OnWindowAreaInfo
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnWindowAreaInfo_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    SessionPtr sess = nullptr;
-    MmiMessageId idMsg = MmiMessageId::INVALID;
-    NetPacket pkt(idMsg);
-    int32_t ret = handler.OnWindowAreaInfo(sess, pkt);
-    EXPECT_EQ(ret, ERROR_NULL_POINTER);
-    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
-    ret = handler.OnWindowAreaInfo(sess, pkt);
-    EXPECT_EQ(ret, RET_ERR);
-    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
-    ret = handler.OnWindowAreaInfo(sess, pkt);
-    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -1582,14 +1558,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_002, TestS
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
-    handler.authorizationCollection_.insert(std::make_pair(12, AuthorizationStatus::AUTHORIZED));
-    int32_t CurrentPID_ = 12;
-    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
     int32_t ret = handler.OnCancelInjection();
-    EXPECT_EQ(ret, ERR_OK);
-    CurrentPID_ = 1;
-    ret = handler.OnCancelInjection();
-    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_FALSE(ret != ERR_OK);
 }
 
 /**
@@ -1602,12 +1573,10 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_002, TestSize.Le
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
-    handler.CurrentPID_ = 12345;
-    handler.authorizationCollection_.clear();
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
     int32_t result = handler.OnAuthorize(false);
     EXPECT_EQ(result, ERR_OK);
 }
-
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
@@ -1676,7 +1645,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState_002, T
     int32_t pid = 15;
     bool enable = true;
     INPUT_DEV_MGR->IsKeyboardDevice(nullptr);
-    EXPECT_EQ(handler.OnSetFunctionKeyState(pid, funcKey, enable), ERR_DEVICE_NOT_EXIST);
+    EXPECT_EQ(handler.OnSetFunctionKeyState(pid, funcKey, enable), ERR_NON_INPUT_APPLICATION);
 }
 
 /**

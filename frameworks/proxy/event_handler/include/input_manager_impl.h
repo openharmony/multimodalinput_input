@@ -47,6 +47,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "switch_event.h"
+#include "touchpad_control_display_gain.h"
 #include "window_info.h"
 #include "shift_info.h"
 
@@ -64,7 +65,6 @@ public:
     int32_t GetWindowPid(int32_t windowId);
     int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
-    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -125,6 +125,8 @@ public:
     int32_t SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
+    void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG &touchpadCDG);
     void OnConnected();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     template<typename T>
@@ -177,6 +179,7 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag);
     int32_t SetTouchpadPointerSpeed(int32_t speed);
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG);
     int32_t SetTouchpadPinchSwitch(bool switchFlag);
     int32_t GetTouchpadPinchSwitch(bool &switchFlag);
     int32_t SetTouchpadSwipeSwitch(bool switchFlag);

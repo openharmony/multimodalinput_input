@@ -1349,12 +1349,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001
     int32_t keyCode = 1;
     int32_t state = -1;
     Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
-    bool resultState = static_cast<bool>(state);
-    if (resultState) {
-        EXPECT_EQ(retResult, INPUT_SUCCESS);
-    } else {
-        EXPECT_EQ(retResult, INPUT_DEVICE_NOT_EXIST);
-    }
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
 } // namespace MMI
 } // namespace OHOS

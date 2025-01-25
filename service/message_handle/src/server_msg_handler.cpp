@@ -72,10 +72,12 @@ const std::string PRODUCT_TYPE_PC = "2in1";
 [[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
+constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t ERR_DEVICE_NOT_EXIST { 3900002 };
 constexpr int32_t ERR_NON_INPUT_APPLICATION { 3900003 };
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -84,10 +86,6 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
     MsgCallback funs[] = {
         {MmiMessageId::DISPLAY_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnDisplayInfo(sess, pkt); }},
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-        {MmiMessageId::WINDOW_AREA_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
-            return this->OnWindowAreaInfo(sess, pkt); }},
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::WINDOW_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnWindowGroupInfo(sess, pkt); }},
         {MmiMessageId::WINDOW_STATE_ERROR_CALLBACK, [this] (SessionPtr sess, NetPacket &pkt) {
@@ -233,9 +231,80 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     return OnInjectPointerEventExt(pointerEvent, isShell);
 }
 
+int32_t ServerMsgHandler::OnInjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+    const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    if (isNativeInject) {
+        int32_t checkReturn = NativeInjectCheck(pid);
+        if (checkReturn != RET_OK) {
+            return checkReturn;
+        }
+    }
+    return OnInjectTouchPadEventExt(pointerEvent, touchpadCDG, isShell);
+}
+
 bool ServerMsgHandler::IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     return pointerEvent->GetZOrder() > 0;
+}
+
+int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG, bool isShell)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    EndLogTraceId(pointerEvent->GetId());
+    pointerEvent->UpdateId();
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+        int32_t ret = AccelerateMotionTouchpad(pointerEvent, touchpadCDG);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to accelerate motion, error:%{public}d", ret);
+            return ret;
+        }
+        UpdatePointerEvent(pointerEvent);
+        inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+            (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
+            !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
+            IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0, false);
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    } else {
+            MMI_HILOGW("Source types are not Touchpad, source:%{public}d", pointerEvent->GetSourceType());
+    }
+    return SaveTargetWindowId(pointerEvent, isShell);
+}
+
+void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    MMI_HILOGI("Check : current PointerEvent's info :Id=>%{public}d , pointerId=>%{public}d ",
+        pointerEvent->GetId(), pointerEvent->GetPointerId());
+    std::shared_ptr<PointerEvent> touchEvent = WIN_MGR->GetLastPointerEventForGesture();
+    if (touchEvent != nullptr) {
+        std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
+        MMI_HILOGI("Check : LastPointerEvent's item count is : %{public}d", listPtItems.size());
+        for (auto &item : listPtItems) {
+            MMI_HILOGI("Check : current Item : pointerId=>%{public}d ,OriginPointerId=>%{public}d",
+                item.GetPointerId(), item.GetOriginPointerId());
+            if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) !=
+                (pointerEvent->GetPointerId() % SIMULATE_EVENT_START_ID)) {
+                pointerEvent->AddPointerItem(item);
+                MMI_HILOGI("Check : add Item : pointerId=>%{public}d ,OriginPointerId=>%{public}d",
+                    item.GetPointerId(), item.GetOriginPointerId());
+            }
+        }
+    }
 }
 
 int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
@@ -253,9 +322,11 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell)) {
                 return RET_ERR;
             }
+            DealGesturePointers(pointerEvent);
+            MMI_HILOGI("Check : prepare to send inject pointer event");
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
-                !(pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) &&
+                !(IsCastInject(pointerEvent->GetDeviceId())) &&
                 !IsNavigationWindowInjectEvent(pointerEvent)) {
 #ifndef OHOS_BUILD_ENABLE_WATCH
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
@@ -369,6 +440,76 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     return RET_OK;
 }
 
+int32_t ServerMsgHandler::AccelerateMotionTouchpad(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG)
+{
+    PointerEvent::PointerItem pointerItem {};
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Pointer event is corrupted");
+        return RET_ERR;
+    }
+    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    if (cursorPos.displayId < 0) {
+        MMI_HILOGE("No display");
+        return RET_ERR;
+    }
+    Offset offset {
+        .dx = pointerItem.GetRawDx(),
+        .dy = pointerItem.GetRawDy(),
+    };
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_EMULATOR
+    Direction displayDirection = static_cast<Direction>((
+        ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    CalculateOffset(displayDirection, offset);
+#endif // OHOS_BUILD_EMULATOR
+    int32_t ret = RET_OK;
+
+#ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
+    MMI_HILOGE("Hidumper before HandleMotionDynamicAccelerateTouchpad");
+    static uint64_t preTime = -1;
+    uint64_t currentTime = static_cast<uint64_t>(pointerEvent->GetActionTime());
+    preTime = fmin(preTime, currentTime);
+    uint64_t deltaTime = (currentTime - preTime);
+    MMI_HILOGE("DeltaTime before HandleMotionDynamicAccelerateTouchpad: %{public}PRId64 ms", deltaTime);
+
+    double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
+    double touchpadSize = touchpadCDG.size;
+    double touchpadPPi = touchpadCDG.ppi;
+    int32_t touchpadSpeed = touchpadCDG.speed;
+    if (touchpadSize <= 0 || touchpadPPi <= 0 || touchpadSpeed <= 0) {
+        MMI_HILOGE("touchpadSize, touchpadPPi or touchpadSpeed are invalid,
+            touchpadSize:%{public}lf, touchpadPPi:%{public}lf, touchpadSpeed:%{public}d",
+            touchpadSize, touchpadPPi, touchpadSpeed);
+        return RET_ERR;
+    }
+    ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
+        &cursorPos.cursorPos.y, touchpadSpeed, displaySize, touchpadSize, touchpadPPi);
+
+    MMI_HILOGE("DeltaTime after HandleMotionDynamicAccelerateTouchpad: %{public}PRId64 ms", deltaTime);
+    MMI_HILOGE("Hidumper after HandleMotionDynamicAccelerateTouchpad");
+    preTime = currentTime;
+#else
+    ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+        &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
+        MouseTransformProcessor::GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
+#endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);
+        return ret;
+    }
+    WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    } else {
+        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    }
+    return RET_OK;
+}
+
 void ServerMsgHandler::CalculateOffset(Direction direction, Offset &offset)
 {
     std::negate<double> neg;
@@ -421,7 +562,7 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         if (isShell) {
             shellTargetWindowIds_[pointerId] = targetWindowId;
-        } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+        } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
             castTargetWindowIds_[pointerId] = targetWindowId;
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             accessTargetWindowIds_[pointerId] = targetWindowId;
@@ -435,7 +576,7 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t pointerId = pointerEvent->GetPointerId();
         if (isShell) {
             shellTargetWindowIds_.erase(pointerId);
-        } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+        } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
             castTargetWindowIds_.erase(pointerId);
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             accessTargetWindowIds_.erase(pointerId);
@@ -463,7 +604,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         if (iter != shellTargetWindowIds_.end()) {
             targetWindowId = iter->second;
         }
-    } else if ((pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID) && (pointerEvent->GetZOrder() > 0)) {
+    } else if ((IsCastInject(pointerEvent->GetDeviceId())) && (pointerEvent->GetZOrder() > 0)) {
         pointerEvent->RemovePointerItem(pointerId);
         pointerId += CAST_POINTER_ID;
         pointerItem.SetPointerId(pointerId);
@@ -554,10 +695,8 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
             >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
             >> info.offsetX >> info.offsetY >> info.isCurrentOffScreenRendering >> info.screenRealWidth
-            >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination;
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-        pkt >> info.oneHandX >> info.oneHandY;
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+            >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
+            >> info.oneHandX >> info.oneHandY;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -569,6 +708,11 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
         return RET_ERR;
     }
     return RET_OK;
+}
+
+bool ServerMsgHandler::IsCastInject(int32_t deviceid)
+{
+    return (deviceid == CAST_INPUT_DEVICEID || deviceid == CAST_SCREEN_DEVICEID);
 }
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
@@ -612,25 +756,6 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
     return RET_OK;
 }
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t temp = 0;
-    int32_t pid = 0;
-    int32_t windowId = 0;
-    pkt >> temp >> pid >> windowId;
-    WindowArea area = static_cast<WindowArea>(temp);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    WIN_MGR->SetWindowPointerStyle(area, pid, windowId);
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
 {

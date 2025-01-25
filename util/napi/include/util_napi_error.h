@@ -40,7 +40,7 @@ enum NapiErrorCode : int32_t {
     COMMON_PERMISSION_CHECK_ERROR = 201,
     COMMON_PARAMETER_ERROR = 401,
     COMMON_USE_SYSAPI_ERROR = 202,
-    COMMON_CAPABILITY_NOT_SUPPORTED = 801,
+    INPUT_DEVICE_NOT_SUPPORTED = 801,
     INPUT_OCCUPIED_BY_SYSTEM = 4200002,
     INPUT_OCCUPIED_BY_OTHER = 4200003,
     PRE_KEY_NOT_SUPPORTED = 4100001,
@@ -57,7 +57,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { COMMON_KEYBOARD_DEVICE_NOT_EXIST,
         { COMMON_KEYBOARD_DEVICE_NOT_EXIST, "The specified keyboard device does not exist." } },
     { COMMON_NON_INPUT_APPLICATION, { COMMON_NON_INPUT_APPLICATION, "it is prohibited for non-input applications." } },
-    { COMMON_CAPABILITY_NOT_SUPPORTED, { COMMON_CAPABILITY_NOT_SUPPORTED, "Capability not supported.\n" } },
+    { INPUT_DEVICE_NOT_SUPPORTED, { INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.\n" } },
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
