@@ -37,7 +37,6 @@ void OnConnected(const IfMMIClient& client)
 {
     CALL_DEBUG_ENTER;
     InputMgrImpl.OnConnected();
-    PRE_MONITOR_MGR.OnConnected();
     INPUT_DEVICE_IMPL.OnConnected();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();
@@ -47,6 +46,7 @@ void OnConnected(const IfMMIClient& client)
 #endif // OHOS_BUILD_ENABLE_SWITCH
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnConnected();
+    PRE_MONITOR_MGR.OnConnected();
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     InputInterMgr->OnConnected();
