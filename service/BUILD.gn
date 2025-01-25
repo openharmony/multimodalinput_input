@@ -172,6 +172,7 @@ ohos_shared_library("libmmi-server") {
       "display_state_manager/src/display_event_monitor.cpp",
       "key_event_normalize/src/key_event_normalize.cpp",
       "key_event_normalize/src/key_unicode_transformation.cpp",
+      "monitor/src/event_pre_monitor_handler.cpp",
       "subscriber/src/key_gesture_manager.cpp",
       "subscriber/src/key_subscriber_handler.cpp",
     ]
@@ -241,7 +242,6 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_monitor) {
     sources += [
       "monitor/src/event_monitor_handler.cpp",
-      "monitor/src/event_pre_monitor_handler.cpp",
       "monitor/src/gesture_monitor_handler.cpp",
     ]
   }

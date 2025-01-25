@@ -178,7 +178,7 @@ bool EventPreMonitorHandler::MonitorCollection::IsEqualsKeys(std::vector<int32_t
         }
     }
 
-    return false;
+    return true;
 }
 
 void EventPreMonitorHandler::MonitorCollection::RemoveMonitor(SessionPtr sess, int32_t handlerId)
