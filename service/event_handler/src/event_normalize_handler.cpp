@@ -50,6 +50,7 @@
 #include "res_sched_client.h"
 #include "res_type.h"
 #endif // OHOS_RSS_CLIENT
+#include "touchpad_settings_handler.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -1004,6 +1005,8 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
 bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
     enum libinput_event_type type, libinput_event* event)
 {
+    TouchpadSettingsObserver touchpadSettingsObserver;
+    touchpadSettingsObserver.RegisterTpObserver();
     static int32_t angleTolerance = 0;
     static int32_t lastDirection = 0;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
