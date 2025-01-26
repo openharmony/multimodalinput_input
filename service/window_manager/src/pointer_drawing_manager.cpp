@@ -352,8 +352,8 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
     }
     if (!magicCursorSetBounds) {
         if (hardwareCursorPointerManager_->IsSupported()) {
-            if (lastMouseStyle_.id != MOUSE::ICON:::LOADING &&
-                lastMouseStyle_.id != MOUSE::ICON:::RUNNING) {
+            if (lastMouseStyle_.id != MOUSE_ICON::LOADING &&
+                lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
                 // Change the coordinates issued by RS to asynchronous,
                 // without blocking the issuance of HardwareCursor coordinates.
                 SoftwareCursorMoveAsync(physicalX, physicalY, iconType);
@@ -366,8 +366,8 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
     }
     CHKPF(hardwareCursorPointerManager_);
     if (hardwareCursorPointerManager_->IsSupported() &&
-        lastMouseStyle_.id != MOUSE::ICON:::LOADING &&
-        lastMouseStyle_.id != MOUSE::ICON:::RUNNING) {
+        lastMouseStyle_.id != MOUSE_ICON::LOADING &&
+        lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
         HardwareCursorMove(physicalX, physicalY, iconType);
     }
 #else
@@ -1245,8 +1245,6 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
             MMI_HILOGE("Current post task mouse style is not equal to last mouse style");
             return;
         }
-        auto bitmap = DrawDynamicBitmap();
-        CHKPV(bitmap);
 
         auto align = MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id));
         int32_t px = lastPhysicalX_;
@@ -2531,15 +2529,15 @@ void PointerDrawingManager::UpdatePointerVisible()
     if (IsPointerVisible() && mouseDisplayState_) {
         surfaceNode_->SetVisible(true);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (InitLayer(MOUSE_ICON(currentMouseStyle_.id)) != RET_OK) {
+        if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
             MMI_HILOGE("Init Layer failed");
             return;
         }
-        auto align = MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id));
+        auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
         int32_t px = lastPhysicalX_;
         int32_t py = lastPhysicalY_;
         AdjustMouseFocus(currentDirection_, align, px, py);
-        SetHardwareCursorPosition(displayId_, px,  py, align);
+        SetHardwareCursorPosition(displayId_, px,  py, lastMouseStyle_);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s, displayId_:%{public}d",
             mouseDisplayState_ ? "true" : "false", displayId_);
@@ -3196,7 +3194,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
     int32_t px = lastPhysicalX_;
     int32_t py = lastPhysicalY_;
     AdjustMouseFocus(currentDirection_, align, px, py);
-    SetCursorLocation(display, px, py, align);
+    SetCursorLocation(displayId, px, py, align);
 
     lastDisplayId_ = displayId;
 }
@@ -3271,10 +3269,10 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
 
     auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
-    int px = lastPhysicalX_;
-    int py = lastPhysicalY_;
+    int32_t px = lastPhysicalX_;
+    int32_t py = lastPhysicalY_;
     AdjustMouseFocus(currentDirection_, align, px, py);
-    SetCursorLocation(display, px, py, align);
+    SetCursorLocation(displayId_, px, py, align);
 
     Rosen::RSTransaction::FlushImplicitTransaction();
 }

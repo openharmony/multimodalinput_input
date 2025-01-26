@@ -57,11 +57,12 @@ uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
 uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
 {
     uint32_t height = 0;
+    auto modeId = si->GetModeId();
     auto modes = si->GetModes();
     if (modeId < 0 || modeId >= modes.size()) {
         return 0;
     }
-    return modes[modeId]->width_;
+    return modes[modeId]->height_;
 }
 
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const DisplayInfo &di)
@@ -335,6 +336,8 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
         py =  width_ - py - DEFAULT_CURSOR_SIZE;
     }
     surfaceNode_->SetBounds(px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
+    int64_t nodeId = surfaceNode_->GetId();
+    Rosen::RSInterfaces::GetInstance().SetHwcNodeBounds(nodeId, px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     return true;
 }
 

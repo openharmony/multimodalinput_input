@@ -109,9 +109,9 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
         userIconCfg.userIconPixelMap->GetImageInfo(imageInfo);
         float xAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.width;
         float yAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.height;
-        userIconCfg.userIconPixelMap->scale(xAxis, yAxis, Media::AntiAliasignOption::LOW);
-        userIconCfg.userIconHotSpotX->static_cast<int32_t>((float)userIconCfg.userIconHotSpotX * xAxis);
-        userIconCfg.userIconHotSpotY->static_cast<int32_t>((float)userIconCfg.userIconHotSpotY * yAxis);
+        userIconCfg.userIconPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
+        userIconCfg.userIconHotSpotX = static_cast<int32_t>((float)userIconCfg.userIconHotSpotX * xAxis);
+        userIconCfg.userIconHotSpotY = static_cast<int32_t>((float)userIconCfg.userIconHotSpotY * yAxis);
         image = ExtractDrawingImage(userIconCfg.userIconPixelMap);
     }
     CHKPR(image, RET_ERR);
