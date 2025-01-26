@@ -47,26 +47,21 @@ constexpr uint32_t RENDER_STRIDE{4};
 uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
 {
     uint32_t width = 0;
+    auto modeId = si->GetModeId();
     auto modes = si->GetModes();
-    if (modes.size() == 0) {
+    if (modeId < 0 || modeId >= modes.size()) {
         return 0;
     }
-    for (auto &m : modes) {
-        width = std::max(width, m->width_);
-    }
-    return width;
+    return modes[modeId]->width_;
 }
 uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
 {
     uint32_t height = 0;
     auto modes = si->GetModes();
-    if (modes.size() == 0) {
+    if (modeId < 0 || modeId >= modes.size()) {
         return 0;
     }
-    for (auto &m : modes) {
-        height = std::max(height, m->height_);
-    }
-    return height;
+    return modes[modeId]->width_;
 }
 
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const DisplayInfo &di)

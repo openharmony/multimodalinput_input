@@ -103,7 +103,16 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         image = LoadPointerImage(cfg);
     } else {
-        image = ExtractDrawingImage(cfg.userIconPixelMap);
+        RenderConfig userIconCfg = cfg;
+        Media::ImageInfo imageInfo;
+        CHKPR(userIconCfg.userIconPixelMap, RET_ERR);
+        userIconCfg.userIconPixelMap->GetImageInfo(imageInfo);
+        float xAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.width;
+        float yAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.height;
+        userIconCfg.userIconPixelMap->scale(xAxis, yAxis, Media::AntiAliasignOption::LOW);
+        userIconCfg.userIconHotSpotX->static_cast<int32_t>((float)userIconCfg.userIconHotSpotX * xAxis);
+        userIconCfg.userIconHotSpotY->static_cast<int32_t>((float)userIconCfg.userIconHotSpotY * yAxis);
+        image = ExtractDrawingImage(userIconCfg.userIconPixelMap);
     }
     CHKPR(image, RET_ERR);
     //Draw image on canvas

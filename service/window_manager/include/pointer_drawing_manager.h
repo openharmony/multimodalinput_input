@@ -204,7 +204,6 @@ private:
     void ForceClearPointerVisiableStatus() override;
     int32_t UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
     void CreateCanvasNode();
-    void SetSurfaceNodeVisible(bool visible);
     float CalculateHardwareXOffset(ICON_TYPE iconType);
     float CalculateHardwareYOffset(ICON_TYPE iconType);
     bool SetCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
