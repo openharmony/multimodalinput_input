@@ -19,6 +19,7 @@
 #include "transaction/rs_transaction.h"
 #include "bytrace_adapter.h"
 #include "dm_common.h"
+#include "transaction/rs_interfaces.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
