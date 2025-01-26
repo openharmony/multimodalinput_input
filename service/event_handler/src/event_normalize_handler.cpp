@@ -72,7 +72,8 @@ double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
 int32_t g_touchPadDeviceAxisX { 1 }; // max axis size
 int32_t g_touchPadDeviceAxisY { 1 };
-bool g_isSwipeInward = false;
+bool g_isSwipeInward {false};
+bool g_buttonPressed {false};
 constexpr int32_t SWIPE_INWARD_ANGLE_JUDGE { 2 };
 constexpr int32_t MT_TOOL_PALM { 2 };
 [[ maybe_unused ]] constexpr double TOUCH_SLOP { 1.0 };
@@ -188,7 +189,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END:
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
-            if (g_isSwipeInward) {
+            if (g_isSwipeInward &&
+                type != LIBINPUT_EVENT_POINTER_BUTTON &&
+                type != LIBINPUT_EVENT_POINTER_AXIS) {
                 break;
             }
             HandleMouseEvent(event);
@@ -504,6 +507,8 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         MMI_HILOGE("Failed to set origin pointerId");
         return RET_ERR;
     }
+    auto buttonId = pointerEvent->GetButtonId();
+    g_buttonPressed = pointerEvent->IsButtonPressed(buttonId);
     EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
@@ -566,8 +571,11 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         return RET_OK;
     }
     buttonIds_.insert(seatSlot);
-    if (buttonIds_.size() == FINGER_NUM &&
-        (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP)) {
+    if (buttonIds_.size() >= FINGER_NUM && g_isSwipeInward) {
+        MMI_HILOGD("More than one finger, cancel swipeInward");
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        pointerEvent->SetFingerCount(SWIPE_INWARD_FINGER_ONE);
+        nextHandler_->HandlePointerEvent(pointerEvent);
         g_isSwipeInward = false;
     }
     if (buttonIds_.size() == SWIPE_INWARD_FINGER_ONE && JudgeIfSwipeInward(pointerEvent, type, event)) {
@@ -1010,6 +1018,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     static int32_t angleTolerance = 0;
     static int32_t lastDirection = 0;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetFingerCount(SWIPE_INWARD_FINGER_ONE);
     if (g_isSwipeInward == false &&
         type == LIBINPUT_EVENT_TOUCHPAD_DOWN &&
         pointerEvent->GetAllPointerItems().size() == SWIPE_INWARD_FINGER_ONE) {
@@ -1039,6 +1048,12 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     // judge
     if (g_isSwipeInward == true) {
         SwipeInwardProcess(pointerEvent, type, event, &angleTolerance, lastDirection);
+        if (g_buttonPressed) {
+            MMI_HILOGD("Button pressed, response button, cancel swipeInward");
+            pointerEvent->SetPointerEvent(PointerEvent::POINTER_ACTION_CANCEL);
+            nextHandler_->HandlePointerEvent(pointerEvent);
+            g_isSwipeInward = false;
+        }
     }
     return g_isSwipeInward;
 }
