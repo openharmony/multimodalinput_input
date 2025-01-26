@@ -1441,6 +1441,7 @@ int32_t MMIService::AddPreInputHandler(int32_t handlerId, HandleEventType eventT
         auto sess = GetSessionByPid(pid);
         CHKPR(sess, ERROR_NULL_POINTER);
         auto preMonitorHandler = InputHandler->GetEventPreMonitorHandler();
+        CHKPR(preMonitorHandler, RET_ERR);
         return preMonitorHandler->AddInputHandler(sess, handlerId, eventType, keys);
     });
     if (ret != RET_OK) {
@@ -1460,6 +1461,7 @@ int32_t MMIService::RemovePreInputHandler(int32_t handlerId)
         auto sess = GetSessionByPid(pid);
         CHKPR(sess, ERROR_NULL_POINTER);
         auto preMonitorHandler = InputHandler->GetEventPreMonitorHandler();
+        CHKPR(preMonitorHandler, RET_ERR);
         preMonitorHandler->RemoveInputHandler(sess, handlerId);
         return RET_OK;
     });
