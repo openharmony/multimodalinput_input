@@ -213,14 +213,6 @@ group("mmi_tests") {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
   }
 
-  if (!use_clang_coverage) {
-    deps += [
-      "service:rust_mmi_test",
-      "util:rust_mmi_key_config_test",
-      "util:ut-mmi-util-out",
-    ]
-  }
-
   if (input_ext_feature_anco) {
     deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerAncoTest" ]
   }
