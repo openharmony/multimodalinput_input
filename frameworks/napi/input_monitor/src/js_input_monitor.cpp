@@ -178,7 +178,7 @@ void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
 
 std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
     { "none", HANDLE_EVENT_TYPE_NONE },
-    { "keyPressed", HANDLE_EVENT_TYPE_KEY },
+    { "key", HANDLE_EVENT_TYPE_KEY },
     { "pointer", HANDLE_EVENT_TYPE_POINTER },
     { "touch", HANDLE_EVENT_TYPE_TOUCH },
     { "mouse", HANDLE_EVENT_TYPE_MOUSE },
@@ -2042,6 +2042,10 @@ int32_t JsInputMonitor::TransformKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     napi_value keyObject = nullptr;
     CHKRR(napi_create_object(jsEnv_, &keyObject), "napi_create_object is ", RET_ERR);
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+    if (!keyItem) {
+        MMI_HILOGE("The keyItem is nullopt");
+        return false;
+    }
     GetJsKeyItem(keyItem, keyObject);
     if (SetNameProperty(jsEnv_, result, "key", keyObject) != napi_ok) {
         MMI_HILOGE("Set key property failed");
@@ -2151,8 +2155,12 @@ bool JsInputMonitor::GetKeys(
             THROWERR(jsEnv_, "Napi create element failed");
             return false;
         }
-        std::optional<KeyEvent::KeyItem> presssedKeyItem = keyEvent->GetKeyItem(pressedKeyCode);
-        GetJsKeyItem(presssedKeyItem, element);
+        std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent->GetKeyItem(pressedKeyCode);
+        if (!pressedKeyItem) {
+            MMI_HILOGE("The pressedKeyItem is nullopt");
+            return false;
+        }
+        GetJsKeyItem(pressedKeyItem, element);
 
         if (napi_set_element(jsEnv_, keysArray, index, element)) {
             THROWERR(jsEnv_, "Napi set element failed");
