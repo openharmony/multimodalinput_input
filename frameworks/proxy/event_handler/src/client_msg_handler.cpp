@@ -177,7 +177,6 @@ int32_t ClientMsgHandler::OnPreKeyEvent(const UDSClient& client, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     MMI_HILOG_DISPATCHD("PRE key event dispathcer of clent, Fd:%{public}d", fd);
-    MMI_HILOG_DISPATCHI("Received");
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     PRE_MONITOR_MGR.OnPreKeyEvent(keyEvent, handlerId);
     return RET_OK;
