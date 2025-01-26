@@ -2428,8 +2428,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty())) ||
         (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
-        ((action == PointerEvent::POINTER_ACTION_AXIS_BEGIN || action == PointerEvent::POINTER_ACTION_AXIS_END ||
-        action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN || action == PointerEvent::POINTER_ACTION_ROTATE_END) &&
+        ((action == PointerEvent::POINTER_ACTION_AXIS_BEGIN || action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN) &&
         (pointerEvent->GetPressedButtons().empty()));
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
