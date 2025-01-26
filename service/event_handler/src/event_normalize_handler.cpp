@@ -1050,7 +1050,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         SwipeInwardProcess(pointerEvent, type, event, &angleTolerance, lastDirection);
         if (g_buttonPressed) {
             MMI_HILOGD("Button pressed, response button, cancel swipeInward");
-            pointerEvent->SetPointerEvent(PointerEvent::POINTER_ACTION_CANCEL);
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             nextHandler_->HandlePointerEvent(pointerEvent);
             g_isSwipeInward = false;
         }
