@@ -16,6 +16,7 @@
 #include "js_pointer_manager.h"
 
 #include "napi_constants.h"
+#include "pixel_map.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsPointerManager"
@@ -1145,7 +1146,10 @@ napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, Cus
     CHKPP(asyncContext);
     asyncContext->windowId = windowId;
     CHKPP(cursor.pixelMap);
-    asyncContext->cursor.pixelMap = cursor.pixelMap;
+    Parcel *pData = static_cast<Parcel*>(cursor.pixelMap);
+    CHKPP(pData);
+    Media::PixelMap* pixelMapPtr =  Media::PixelMap::Unmarshalling(*pData);
+    asyncContext->cursor.pixelMap = (void*)pixelMapPtr;
     asyncContext->cursor.focusX = cursor.focusX;
     asyncContext->cursor.focusY = cursor.focusY;
     asyncContext->options = options;
