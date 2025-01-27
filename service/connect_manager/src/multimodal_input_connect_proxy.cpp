@@ -2816,9 +2816,7 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, CustomCur
 {
     CALL_DEBUG_ENTER;
     CHKPR(cursor.pixelMap, RET_ERR);
-    Parcel *pData = static_cast<Parcel*>(cursor.pixelMap);
-    CHKPR(pData, RET_ERR);
-    OHOS::Media::PixelMap* pixelMapPtr =  Media::PixelMap::Unmarshalling(*pData);
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(cursor.pixelMap);
     CHKPR(pixelMapPtr, RET_ERR);
     if (pixelMapPtr->GetCapacity() == 0) {
         MMI_HILOGE("pixelMap is empty");
