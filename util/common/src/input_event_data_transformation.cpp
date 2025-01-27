@@ -501,8 +501,8 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         MMI_HILOGE("Malloc failed");
         return RET_ERR;
     }
-    secCompPointEvent->touchX = pointerItem.GetDisplayX();
-    secCompPointEvent->touchY = pointerItem.GetDisplayY();
+    secCompPointEvent->touchX = pointerItem.GetFixedDisplayX();
+    secCompPointEvent->touchY = pointerItem.GetFixedDisplayY();
     secCompPointEvent->timeStamp = event->GetActionTime();
     uint32_t dataLen = sizeof(*secCompPointEvent);
     uint8_t outBuf[MAX_HMAC_SIZE] = { 0 };
