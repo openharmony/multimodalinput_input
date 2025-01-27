@@ -2967,6 +2967,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         } else {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
         }
+        if (extraData_.drawCursor) {
+            MMI_HILOGD("Cursor must be default, pointerStyle:%{public}d globalStyle:%{public}d",
+                dragPointerStyle_.id, globalStyle_.id);
+            dragPointerStyle_ = globalStyle_;
+        }
         IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
