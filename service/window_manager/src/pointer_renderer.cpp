@@ -66,7 +66,6 @@ std::string RenderConfig::ToString() const
 int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg, bool isHard)
 {
     CHKPR(addr, RET_ERR);
-    MMI_HILOGI("shape=(%{public}d, %{public}d), cfg=%{public}s", width, height, cfg.ToString().data());
 
     uint32_t addrSize = width * height * RENDER_STRIDE;
     if (cfg.style == MOUSE_ICON::TRANSPARENT_ICON) {
@@ -98,18 +97,25 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     canvas.Rotate(degree, FOCUS_COORDINATES_CHANGE, FOCUS_COORDINATES_CHANGE);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
-    // load cursor image
     image_ptr_t image = nullptr;
     if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         image = LoadPointerImage(cfg);
     } else {
-        image = ExtractDrawingImage(cfg.userIconPixelMap);
+        RenderConfig userIconCfg = cfg;
+        Media::ImageInfo imageInfo;
+        CHKPR(userIconCfg.userIconPixelMap, RET_ERR);
+        userIconCfg.userIconPixelMap->GetImageInfo(imageInfo);
+        float xAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.width;
+        float yAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.height;
+        userIconCfg.userIconPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
+        userIconCfg.userIconHotSpotX = static_cast<int32_t>((float)userIconCfg.userIconHotSpotX * xAxis);
+        userIconCfg.userIconHotSpotY = static_cast<int32_t>((float)userIconCfg.userIconHotSpotY * yAxis);
+        image = ExtractDrawingImage(userIconCfg.userIconPixelMap);
     }
     CHKPR(image, RET_ERR);
     //Draw image on canvas
     canvas.DrawImage(*image, GetOffsetX(cfg), GetOffsetY(cfg), Rosen::Drawing::SamplingOptions());
 
-    // copy bitmap pixels to addr
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
     if (ret != EOK) {
         return RET_ERR;
