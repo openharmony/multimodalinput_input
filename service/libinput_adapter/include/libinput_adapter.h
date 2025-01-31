@@ -28,7 +28,13 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<void(void *event, int64_t frameTime)> FunInputEvent;
-typedef std::function<int32_t(double screenX, double screenY, int touchId, int32_t eventType)> HandleTouchPoint;
+typedef std::function<int32_t(double screenX,
+                              double screenY,
+                              int touchId,
+                              int32_t eventType,
+                              double touchPressure,
+                              int32_t longAxis,
+                              int32_t shortAxis)> HandleTouchPoint;
 typedef std::function<int32_t(int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode)> GetMessage;
 typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllTouchMessage;
 typedef std::function<void()> ClearTouchMessage;
