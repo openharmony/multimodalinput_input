@@ -239,7 +239,7 @@ sptr<OHOS::SurfaceBuffer> ScreenPointer::GetCurrentBuffer()
     if (bufferId_ >= buffers_.size()) {
         return nullptr;
     }
-    return  buffers_[bufferId_];
+    return buffers_[bufferId_];
 }
 
 bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
@@ -326,15 +326,15 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
         px = tmpY;
         py = width_ - tmpX;
         px = height_  - px - DEFAULT_CURSOR_SIZE;
-        py =  width_ - py + DEFAULT_CURSOR_SIZE;
+        py = width_ - py + DEFAULT_CURSOR_SIZE;
     } else if (rotation_ == rotation_t(DIRECTION180)) {
         px = width_ - px;
         py = height_ - py;
     } else if (rotation_ == rotation_t(DIRECTION270)) {
         px = height_ - tmpY;
         py = tmpX;
-        px =  height_ - px + DEFAULT_CURSOR_SIZE;
-        py =  width_ - py - DEFAULT_CURSOR_SIZE;
+        px = height_ - px + DEFAULT_CURSOR_SIZE;
+        py = width_ - py - DEFAULT_CURSOR_SIZE;
     }
     surfaceNode_->SetBounds(px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     int64_t nodeId = surfaceNode_->GetId();
@@ -349,7 +349,7 @@ bool ScreenPointer::SetInvisible()
     
     auto buffer = RequestBuffer();
     CHKPF(buffer);
-    auto addr  = static_cast<uint8_t*>(buffer->GetVirAddr());
+    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPF(addr);
     uint32_t addrSize = buffer->GetWidth() * buffer->GetHeight() * RENDER_STRIDE;
     memset_s(addr, addrSize, 0, addrSize);

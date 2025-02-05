@@ -1913,7 +1913,7 @@ bool JsPointerContext::CheckIsSetCustomCursorEx(napi_env env, size_t argc, napi_
     bool followSystemValue = false;
     if (argc > INPUT_PARAMETER && JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_object) &&
         napi_has_named_property(env, argv[INPUT_PARAMETER], "followSystem", &followSystemValue) == napi_ok &&
-        followSystemValue)  {
+        followSystemValue) {
         return true;
     }
     return false;
