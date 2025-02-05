@@ -2114,7 +2114,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
     }
     OHOS::Media::SourceOptions opts;
     uint32_t ret = 0;
-    std::unique_ptr<std::istream>  isp(std::make_unique<std::istringstream>(svgContent));
+    std::unique_ptr<std::istream> isp(std::make_unique<std::istringstream>(svgContent));
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(std::move(isp), opts, ret);
     if (!imageSource || ret != ERR_OK) {
         MMI_HILOGE("Get image source failed, ret:%{public}d", ret);
