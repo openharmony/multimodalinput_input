@@ -110,6 +110,8 @@ static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const DisplayInf
     if ((displayInfo.displayDirection - displayInfo.direction) % evenNum != 0) {
         std::swap(width, height);
     }
+    offset.dx -= displayInfo.offsetX;
+    offset.dy -= displayInfo.offsetY;
     if (direction == DIRECTION90) {
         std::swap(offset.dx, offset.dy);
         offset.dx = width - offset.dx;
