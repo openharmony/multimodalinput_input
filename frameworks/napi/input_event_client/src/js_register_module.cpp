@@ -252,7 +252,8 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     return result;
 }
 
-static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_ptr<PointerEvent> pointerEvent)
+static void HandleMouseButton(napi_env env, napi_value mouseHandle,
+    std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
 {
     int32_t button = 0;
     if (GetNamedPropertyInt32(env, mouseHandle, "button", button) != RET_OK) {
@@ -275,7 +276,11 @@ static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_
             break;
     }
     pointerEvent->SetButtonId(button);
-    pointerEvent->SetButtonPressed(button);
+    if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN) {
+        pointerEvent->SetButtonPressed(button);
+    } else if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
+        pointerEvent->DeleteReleaseButton(button);
+    }
 }
 
 static void HandleMouseAction(napi_env env, napi_value mouseHandle,
@@ -310,8 +315,9 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
             MMI_HILOGE("action:%{public}d is unknown", action);
             break;
     }
-    if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
-        HandleMouseButton(env, mouseHandle, pointerEvent);
+    if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP
+        || action == JS_CALLBACK_MOUSE_ACTION_MOVE) {
+        HandleMouseButton(env, mouseHandle, pointerEvent, action);
     }
 }
 
