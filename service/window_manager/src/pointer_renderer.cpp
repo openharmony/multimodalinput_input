@@ -68,7 +68,7 @@ int32_t RenderConfig::GetOffsetX() const
     if (!this->isHard) {
         return 0.0f;
     }
-    int32_t width = cfg.GetImageSize();
+    int32_t width = this->GetImageSize();
     switch (this->align) {
         case ANGLE_E:
             return FOCUS_POINT;
@@ -102,8 +102,8 @@ int32_t RenderConfig::GetOffsetY() const
         return 0.0f;
     }
 
-    int32_t height = cfg.GetImageSize();
-    switch (cfg.align) {
+    int32_t height = this->GetImageSize();
+    switch (this->align) {
         case ANGLE_E:
             return FOCUS_POINT - height / CALCULATE_IMAGE_MIDDLE;
         case ANGLE_S:
@@ -157,13 +157,13 @@ int32_t RenderConfig::GetOffsetXRotated() const
 
 int32_t RenderConfig::GetOffsetYRotated() const
 {
-    uint32_t height = this->GetImageSize();
+    int32_t height = this->GetImageSize();
     switch (this->align) {
         case ANGLE_S:
         case ANGLE_NE:
-        case ANGLE_NW:
-            return FOCUS_POINT;
         case ANGLE_NW_RIGHT:
+            return FOCUS_POINT;
+        case ANGLE_NW:
             return FOCUS_POINT + this->userIconHotSpotY;
         case ANGLE_E:
         case ANGLE_CENTER:
@@ -182,7 +182,7 @@ int32_t RenderConfig::GetOffsetYRotated() const
 image_ptr_t PointerRenderer::UserIconScale(uint32_t width, uint32_t height, const RenderConfig &cfg)
 {
     image_ptr_t image = nullptr;
-    if (userIconFollowSystem) {
+    if (cfg.userIconFollowSystem) {
         RenderConfig userIconCfg = cfg;
         Media::ImageInfo imageInfo;
         CHKPP(userIconCfg.userIconPixelMap);
@@ -237,11 +237,11 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         image = LoadPointerImage(cfg);
     } else {
-        UserIconScale(width, height, cfg)
+        image = UserIconScale(width, height, cfg);
     }
     CHKPR(image, RET_ERR);
     //Draw image on canvas
-    canvas.DrawImage(*image, cfg.GetOffsetX, cfg.GetOffsetY, Rosen::Drawing::SamplingOptions());
+    canvas.DrawImage(*image, cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
 
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
     if (ret != EOK) {
@@ -436,10 +436,12 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
             PushImg(cfg, loadingImg);
         }
         canvas.Rotate(cfg.rotationAngle, cfg.rotationFocusX, cfg.rotationFocusY);
-        canvas.DrawImage(*loadingImg, cfg.GetOffsetX, cfg.GetOffsetY, Rosen::Drawing::SamplingOptions());
+        canvas.DrawImage(*loadingImg, cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
     } else {
         RenderConfig runingLCfg = cfg;
         runingLCfg.style = MOUSE_ICON::RUNNING_LEFT;
+        runingLCfg.align = ANGLE_NW;
+        runingLCfg.path = IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg";
         auto runningImgLeft = FindImg(runingLCfg);
         if (runningImgLeft == nullptr) {
             runningImgLeft = LoadPointerImage(runingLCfg);
@@ -447,7 +449,7 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
             PushImg(runingLCfg, runningImgLeft);
         }
         CHKPR(runningImgLeft, RET_ERR);
-        canvas.DrawImage(*runningImgLeft, runingLCfg.GetOffsetX, runingLCfg.GetOffsetY,
+        canvas.DrawImage(*runningImgLeft, runingLCfg.GetOffsetX(), runingLCfg.GetOffsetY(),
             Rosen::Drawing::SamplingOptions());
         
         RenderConfig runingRCfg = cfg;
@@ -462,7 +464,7 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
         }
         canvas.Rotate(runingRCfg.rotationAngle, runingRCfg.rotationFocusX, runingRCfg.rotationFocusY);
         CHKPR(runningImgRight, RET_ERR);
-        canvas.DrawImage(*runningImgRight, runingRCfg.GetOffsetX, runingRCfg.GetOffsetY,
+        canvas.DrawImage(*runningImgRight, runingRCfg.GetOffsetX(), runingRCfg.GetOffsetY(),
             Rosen::Drawing::SamplingOptions());
     }
     return RET_OK;

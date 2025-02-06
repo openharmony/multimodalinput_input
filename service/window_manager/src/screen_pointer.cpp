@@ -299,7 +299,7 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(surfaceNode_);
     uint32_t dx = softRenderCfg_.GetOffsetX();
-    uint32_t dy = softRenderCfg_.GetOffsetY(align);
+    uint32_t dy = softRenderCfg_.GetOffsetY();
     switch (rotation_) {
         case rotation_t::ROTATION_0:
             break;
