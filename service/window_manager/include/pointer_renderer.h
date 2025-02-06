@@ -76,14 +76,14 @@ public:
         dpi = rhs.dpi;
         isHard = rhs.isHard;
         rotationAngle = rhs.rotationAngle;
-        rotationFocusX = rhs.rotationAngle;
+        rotationFocusX = rhs.rotationFocusX;
         rotationFocusY = rhs.rotationFocusY;
         userIconPixelMap = rhs.userIconPixelMap;
         userIconHotSpotX = rhs.userIconHotSpotX;
         userIconHotSpotY = rhs.userIconHotSpotY;
         
         return *this;
-    };
+    }
 };
 
 class PointerRenderer {
