@@ -1160,6 +1160,7 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
                 cfg.rotationFocusX = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_X_RATIO;
                 cfg.rotationFocusY = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_Y_RATIO;
             }
+            it.second->SetHardRenderCfg(cfg);
             DrawDynamicHardwareCursor(it.second, cfg);
         } else {
             it.second->SetInvisible();
@@ -1227,6 +1228,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
                 cfg.rotationFocusX = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_X_RATIO;
                 cfg.rotationFocusY = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_Y_RATIO;
             }
+            it.second->SetSoftRenderCfg(cfg);
             DrawDynamicSoftCursor(sn, cfg);
         } else {
             it.second->SetInvisible();
@@ -1951,6 +1953,9 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
 {
     CALL_DEBUG_ENTER;
     followSystem_ = false;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    userIconFollowSystem_ = true;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPR(pixelMap, RET_ERR);
     if (pid == -1) {
         MMI_HILOGE("The pid is invalid");
@@ -3300,12 +3305,14 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         cfg.userIconPixelMap = GetUserIconCopy();
         cfg.userIconHotSpotX = userIconHotSpotX_;
         cfg.userIconHotSpotY = userIconHotSpotY_;
+        cfg.userIconFollowSystem = userIconFollowSystem_;
     }
 
     for (auto it : screenPointers) {
         cfg.dpi = it.second->GetRenderDPI();
         MMI_HILOGD("HardwareCursorRender, screen=%{public}u, dpi=%{public}f", it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
+            it.second->SetHardRenderCfg(cfg);
             DrawCursor(it.second, cfg);
         } else {
             it.second->SetInvisible();
@@ -3337,14 +3344,15 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         cfg.userIconPixelMap = GetUserIconCopy();
         cfg.userIconHotSpotX = userIconHotSpotX_;
         cfg.userIconHotSpotY = userIconHotSpotY_;
+        cfg.userIconFollowSystem = userIconFollowSystem_;
     }
 
     for (auto it : screenPointers) {
-        cfg.dpi = it.second->GetDPI();
+        cfg.dpi = it.second->GetRenderDPI();
         MMI_HILOGD("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f,direction = %{public}d",
             it.first, cfg.dpi, cfg.direction);
         if (it.second->IsMirror() || it.first == screenId_) {
-            cfg.dpi *= it.second->GetScale();
+            it.second->SetSoftRenderCfg(cfg);
             DrawCursor(it.second->GetSurfaceNode(), cfg);
         } else {
             it.second->SetInvisible();
@@ -3544,6 +3552,9 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
     followSystem_ = options.followSystem;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    userIconFollowSystem_ = false;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     int32_t ret = UpdateCursorProperty(cursor);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
