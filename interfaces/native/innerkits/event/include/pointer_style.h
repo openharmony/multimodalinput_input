@@ -37,7 +37,7 @@ struct CustomCursor {
     int32_t focusY { 0 };
 };
 
-struct CursorOptions  {
+struct CursorOptions {
     bool followSystem { false };
 };
 

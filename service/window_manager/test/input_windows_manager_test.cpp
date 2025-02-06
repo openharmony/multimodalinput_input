@@ -6433,7 +6433,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_Poin
    
     displayGroupInfo.displaysInfo.erase(displayGroupInfo.displaysInfo.begin());
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
-    CursorPosition  pointerPos = WIN_MGR->GetCursorPos();
+    CursorPosition pointerPos = WIN_MGR->GetCursorPos();
     EXPECT_EQ(pointerPos.displayId, displayInfo1.id);
 }
 
