@@ -18,15 +18,15 @@
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_event_handler.h"
-#include "setting_datashare.h"
 #include "key_subscriber_handler.h"
+#include "setting_datashare.h"
 #include "system_ability_definition.h"
-
-#include "display_event_monitor.h"
 
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "stylus_key_handler.h"
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+
+#include "display_event_monitor.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
