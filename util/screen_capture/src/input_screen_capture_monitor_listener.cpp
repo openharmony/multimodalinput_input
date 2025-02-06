@@ -14,8 +14,9 @@
  */
 
 #include "define_multimodal.h"
-#include "input_screen_capture_monitor_listener.h"
 #include "mmi_log.h"
+
+#include "input_screen_capture_monitor_listener.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputScreenCaptureMonitorListener"
