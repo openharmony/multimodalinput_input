@@ -487,6 +487,9 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         }
         return IsEnableCombineKeySwipe(keyEvent);
     }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_R) {
+        return IsEnableCombineKeyRecord(keyEvent);
+    }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
         for (const auto &item : keyEvent->GetKeyItems()) {
             int32_t keyCode = item.GetKeyCode();
@@ -509,6 +512,19 @@ bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEven
     for (const auto &item : keyEvent->GetKeyItems()) {
         int32_t keyCode = item.GetKeyCode();
         if (keyCode != KeyEvent::KEYCODE_CTRL_LEFT && keyCode != KeyEvent::KEYCODE_META_LEFT &&
+            keyCode != KeyEvent::KEYCODE_DPAD_RIGHT && keyCode != KeyEvent::KEYCODE_CTRL_RIGHT &&
+            keyCode != KeyEvent::KEYCODE_DPAD_LEFT) {
+            return enableCombineKey_;
+        }
+    }
+    return true;
+}
+
+bool KeySubscriberHandler::IsEnableCombineKeyRecond(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    for (const auto &item : keyEvent->GetKeyItems()) {
+        int32_t keyCode = item.GetKeyCode();
+        if (keyCode != KeyEvent::KEYCODE_SHIFT_LEFT && keyCode != KeyEvent::KEYCODE_META_LEFT &&
             keyCode != KeyEvent::KEYCODE_DPAD_RIGHT && keyCode != KeyEvent::KEYCODE_CTRL_RIGHT &&
             keyCode != KeyEvent::KEYCODE_DPAD_LEFT) {
             return enableCombineKey_;
