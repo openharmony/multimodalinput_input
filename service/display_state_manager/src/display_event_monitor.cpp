@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "display_event_monitor.h"
 #include "delegate_interface.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -22,6 +21,8 @@
 #include "setting_datashare.h"
 #include "key_subscriber_handler.h"
 #include "system_ability_definition.h"
+
+#include "display_event_monitor.h"
 
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "stylus_key_handler.h"
