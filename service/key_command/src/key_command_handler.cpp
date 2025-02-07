@@ -2562,7 +2562,7 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
 {
     CALL_DEBUG_ENTER;
     if (businessId.empty() || businessIds_.empty()) {
-        MMI_HILOGE("businessId or businessIds_ is empty");
+        MMI_HILOGE("The business id or business ids is empty");
         return PARAMETER_ERROR;
     }
     if (std::find(businessIds_.begin(), businessIds_.end(), businessId) == businessIds_.end()) {
@@ -2590,7 +2590,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
 {
     CALL_DEBUG_ENTER;
     if (interval < 0) {
-        MMI_HILOGE("invalid interval time:%{public}" PRId64 "", interval);
+        MMI_HILOGE("Invalid interval time:%{public}" PRId64 "", interval);
         return;
     }
     downToPrevUpTimeConfig_ = interval;
@@ -2600,7 +2600,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
 {
     CALL_DEBUG_ENTER;
     if (distance <= std::numeric_limits<float>::epsilon()) {
-        MMI_HILOGE("invalid distance:%{public}f", distance);
+        MMI_HILOGE("Invalid distance:%{public}f", distance);
         return;
     }
     downToPrevDownDistanceConfig_ = distance;

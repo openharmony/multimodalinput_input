@@ -230,7 +230,7 @@ void KeyShortcutManager::ReadSystemKeys(const std::string &cfgPath)
     }
     cJSON* jsonSysKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "SystemKeys");
     if (!cJSON_IsArray(jsonSysKeys)) {
-        MMI_HILOGE("jsonSysKeys is not array");
+        MMI_HILOGE("The system keys is not array");
         return;
     }
     int32_t nSysKeys = cJSON_GetArraySize(jsonSysKeys);
@@ -315,7 +315,7 @@ void KeyShortcutManager::ReadExceptionalSystemKeys(const std::string &cfgPath)
     }
     cJSON* jsonSysKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "ExceptionalSystemKeys");
     if (!cJSON_IsArray(jsonSysKeys)) {
-        MMI_HILOGE("jsonSysKeys is not array");
+        MMI_HILOGE("The exceptional system keys is not array");
         return;
     }
     int32_t nSysKeys = cJSON_GetArraySize(jsonSysKeys);
