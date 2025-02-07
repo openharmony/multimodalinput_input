@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "touch_event_normalize.h"
+
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "gesture_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -27,8 +29,6 @@
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #include "touchpad_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
-
-#include "touch_event_normalize.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH

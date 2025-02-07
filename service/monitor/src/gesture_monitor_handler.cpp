@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "pointer_event.h"
-
 #include "gesture_monitor_handler.h"
+
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "input_event.h"
+
 #include <cassert>
 #include <chrono>
 
@@ -21,8 +23,6 @@
 #include "key_event.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
-
-#include "input_event.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputEvent"

@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
+#include "tablet_tool_tranform_processor.h"
+
 #include "i_input_windows_manager.h"
 #include "mmi_log.h"
-
-#include "tablet_tool_tranform_processor.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
