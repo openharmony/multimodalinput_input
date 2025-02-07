@@ -3271,7 +3271,6 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     PostTask([this]() {
         SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
     });
-    SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
 
     auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
     int32_t px = lastPhysicalX_;
