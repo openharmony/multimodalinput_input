@@ -53,7 +53,7 @@ extern "C" {
     int32_t HandleMotionDynamicAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, uint64_t delta_time, double display_ppi);
     int32_t HandleMotionDynamicAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
-        int32_t speed, double display_size, double touchpad_size, double touchpad_ppi);
+        int32_t speed, double display_size, double touchpad_size, double touchpad_ppi, int32 frequency);
 }
 
 namespace MMI {
