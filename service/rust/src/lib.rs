@@ -860,23 +860,26 @@ fn get_speed_dynamic_gain_touchpad(
     speed: i32,
     display_size: f64,
     touchpad_size: f64,
-    touchpad_ppi: f64
+    touchpad_ppi: f64,
+    frequency: i32
 ) -> bool {
-debug!(LOG_LABEL, "get_speed_gain_touchpad enter vin is set to {}, speed {}", @public(vin), @public(speed));
+debug!(LOG_LABEL,
+    "get_speed_gain_touchpad enter vin is set to {}, speed {}, touchpad_size {}, display_size {}, touchpad_ppi {}, frequency {}",
+    @public(vin), @public(speed), @public(touchpad_size), @public(display_size), @public(touchpad_ppi), @public(frequency));
 if speed < 1 {
     error!(LOG_LABEL, "{} The speed value can't be less than 1", @public(speed));
     return false;
 }
 let speeds_radio = [0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 1.9, 2.3, 2.7];
 let standard_slopes = [0.9728, 1.7024, 3.6480, 7.0528];
-let standard_vins = [0.0803, 0.8026, 1.2039, 5.1368];
+let standard_vins = [7.5, 50.0, 160.0, 640.0];
 unsafe {
     let speed_radio = speeds_radio[speed as usize - 1];
     let mut slopes = Vec::new();
     let mut diff_nums = Vec::new();
     let mut vins = Vec::new();
     for i in 0..4 {
-        vins.push(standard_vins[i] * touchpad_ppi);
+        vins.push(standard_vins[i] * touchpad_ppi / frequency as f64);
         slopes.push(standard_slopes[i] * (display_size / touchpad_size) *
             (TOUCHPAD_STANDARD_SIZE / DISPLAY_STANDARD_SIZE));
         if i < 1 {
