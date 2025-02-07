@@ -39,13 +39,11 @@ size_t GetObject(T& object, const uint8_t* data, size_t size)
 
 bool ShiftAppPointerEvent(const uint8_t* data, const size_t size, size_t& startPos)
 {
-    int32_t sourceWindowId;
-    int32_t targetWindowId;
+    ShiftWindowParam param;
     bool autoGenDown;
-    startPos += GetObject<int32_t>(sourceWindowId, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(targetWindowId, data + startPos, size - startPos);
+    startPos += GetObject<ShiftWindowParam>(param, data + startPos, size - startPos);
     startPos += GetObject<bool>(autoGenDown, data + startPos, size - startPos);
-    InputManager::GetInstance()->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    InputManager::GetInstance()->ShiftAppPointerEvent(param, autoGenDown);
     return true;
 }
 		

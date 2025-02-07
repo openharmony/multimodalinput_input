@@ -4821,8 +4821,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_001, TestSize.L
     CALL_TEST_DEBUG;
     int32_t sourceWindowId = 99;
     int32_t targetWindowId = 99;
+    ShiftWindowParam param {
+      .sourceWindowId = sourceWindowId,
+      .targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
-    int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(param, autoGenDown);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     ASSERT_EQ(ret, ARGV_VALID);
 #else
@@ -4841,8 +4845,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_002, TestSize.L
     CALL_TEST_DEBUG;
     int32_t sourceWindowId = -150;
     int32_t targetWindowId = -99;
+    ShiftWindowParam param {
+      .sourceWindowId = sourceWindowId,
+      .targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
-    int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(param, autoGenDown);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     ASSERT_EQ(ret, RET_ERR);
 #else
