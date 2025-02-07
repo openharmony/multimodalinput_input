@@ -14,6 +14,7 @@
  */
 
 #include "display_event_monitor.h"
+
 #include "delegate_interface.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "switch_subscriber_handler.h"
+
 #include <parameters.h>
 
 #include "bytrace_adapter.h"
@@ -24,8 +26,6 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
-
-#include "switch_subscriber_handler.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
