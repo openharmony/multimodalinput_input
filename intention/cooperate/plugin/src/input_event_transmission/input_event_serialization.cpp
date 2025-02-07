@@ -544,8 +544,8 @@ int32_t InputEventSerialization::MarshallingEnhanceData(std::shared_ptr<MMI::Poi
         FI_HILOGE("Malloc failed");
         return RET_ERR;
     }
-    secCompPointEvent->touchX = pointerItem.GetFixedDisplayX();
-    secCompPointEvent->touchY = pointerItem.GetFixedDisplayY();
+    secCompPointEvent->touchX = pointerItem.GetDisplayX();
+    secCompPointEvent->touchY = pointerItem.GetDisplayY();
     secCompPointEvent->timeStamp = event->GetActionTime();
     uint32_t dataLen = sizeof(*secCompPointEvent);
     uint8_t outBuf[MAX_HMAC_SIZE] = { 0 };
