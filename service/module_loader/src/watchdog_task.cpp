@@ -47,7 +47,7 @@ std::string WatchdogTask::GetFirstLine(const std::string& path)
     }
     std::ifstream inFile(checkPath);
     if (!inFile.is_open()) {
-        MMI_HILOGE("inFile.is_open() false");
+        MMI_HILOGE("Failed to open check path");
         return "";
     }
     std::string firstLine;
@@ -110,7 +110,7 @@ std::string WatchdogTask::GetSelfProcName()
     std::ifstream fin;
     fin.open("/proc/self/comm", std::ifstream::in);
     if (!fin.is_open()) {
-        MMI_HILOGE("fin.is_open() false");
+        MMI_HILOGE("Failed to open file");
         return "";
     }
     char readStr[READ_SIZE] = {'\0'};

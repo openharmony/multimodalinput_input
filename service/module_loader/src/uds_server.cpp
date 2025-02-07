@@ -123,12 +123,12 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
 
     if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
-        MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
+        MMI_HILOGE("Add epoll failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
         goto CLOSE_SOCK;
     }
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
-        MMI_HILOGE("make_shared fail. programName:%{public}s, pid:%{public}d, errCode:%{public}d",
+        MMI_HILOGE("Make shared pointer fail. programName:%{public}s, pid:%{public}d, errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         goto CLOSE_SOCK;
     }
