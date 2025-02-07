@@ -458,6 +458,27 @@ struct DisplayInfo {
     float screenRealPPI = 0.0f;
     int32_t screenRealDPI = 0;
     ScreenCombination screenCombination = ScreenCombination::SCREEN_MAIN;
+
+    /**
+     * Width of the effective area of the screen. When the screen is rotated, the value changes accordingly.
+     *
+     * @since 12
+     */
+    int32_t validWidth = 0;
+
+    /**
+     * Height of the effective area of the screen. When the screen is rotated, the value changes accordingly.
+     *
+     * @since 12
+     */
+    int32_t validHeight = 0;
+
+    /**
+     * Rotation angle of the TP patch offset correction.
+     *
+     * @since 12
+     */
+    Direction fixedDirection;
 };
 
 /**
