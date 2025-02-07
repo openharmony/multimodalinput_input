@@ -18,6 +18,7 @@
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
+
 namespace OHOS {
 namespace MMI {
 bool IsSpecialType(int32_t keyCode, SpecialType type)
