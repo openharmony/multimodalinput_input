@@ -135,6 +135,14 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
 
+    if (MouseState->IsLeftBtnPressed()) {
+        if (!pointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
+            pointerEvent_->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+        }
+    } else {
+        pointerEvent_->DeleteReleaseButton(PointerEvent::MOUSE_BUTTON_LEFT);
+    }
+
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
