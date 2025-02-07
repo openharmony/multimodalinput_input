@@ -790,7 +790,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcAndStoreDistance
 
     detector.downPoint_[1] = Point(1.0f, 2.0f);
     detector.downPoint_[2] = Point(3.0f, 4.0f);
-    ASSERT_NO_FATAL_FAILURE(detector.CalcAndStoreDistance(points));
+    ASSERT_NO_FATAL_FAILURE(detector.CalcAndStoreDistance());
 }
 
 /**
@@ -813,7 +813,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcAndStoreDistance
     detector.downPoint_[2] = Point(3.0f, 4.0f, 150000);
     detector.downPoint_[3] = Point(5.0f, 6.0f, 250000);
     detector.downPoint_[4] = Point(7.0f, 8.0f, 350000);
-    ASSERT_NO_FATAL_FAILURE(detector.CalcAndStoreDistance(points));
+    ASSERT_NO_FATAL_FAILURE(detector.CalcAndStoreDistance());
 }
 
 /**
@@ -840,7 +840,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcAndStoreDistance
     detector.lastDistance_[1] = 10.5;
     detector.lastDistance_[2] = 20.5;
     detector.lastDistance_[3] = 30.5;
-    ASSERT_NO_FATAL_FAILURE(detector.CalcAndStoreDistance(points));
+    ASSERT_NO_FATAL_FAILURE(detector.CalcAndStoreDistance());
 }
 
 /**
@@ -909,7 +909,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_JudgeOperationMode_0
     detector.downPoint_[4] = Point(1.0f, 2.0f, 5000);
     detector.downPoint_[5] = Point(3.0f, 4.0f, 6000);
     detector.downPoint_[6] = Point(5.0f, 6.0f, 7000);
-    detector.haveLastDistance_ = false;
+
     ASSERT_NO_FATAL_FAILURE(detector.JudgeOperationMode(movePoints));
 }
 
@@ -934,7 +934,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_JudgeOperationMode_0
     detector.downPoint_[5] = Point(3.0f, 4.0f, 6000);
     detector.downPoint_[6] = Point(5.0f, 6.0f, 7000);
     detector.downPoint_[7] = Point(7.0f, 8.0f, 8000);
-    detector.haveLastDistance_ = true;
+
     ASSERT_NO_FATAL_FAILURE(detector.JudgeOperationMode(movePoints));
 }
 
@@ -959,7 +959,6 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_JudgeOperationMode_0
     detector.downPoint_[2] = Point(3.0f, 4.0f, 6000);
     detector.downPoint_[3] = Point(5.0f, 6.0f, 7000);
     detector.downPoint_[4] = Point(7.0f, 8.0f, 8000);
-    detector.haveLastDistance_ = true;
 
     detector.lastDistance_[4] = 1.0;
     detector.lastDistance_[5] = 2.0;
@@ -989,7 +988,6 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_JudgeOperationMode_0
     detector.downPoint_[2] = Point(3.0f, 4.0f, 6000);
     detector.downPoint_[3] = Point(5.0f, 6.0f, 7000);
     detector.downPoint_[4] = Point(7.0f, 8.0f, 8000);
-    detector.haveLastDistance_ = true;
 
     detector.lastDistance_[1] = 1.0;
     detector.lastDistance_[2] = 2.0;
