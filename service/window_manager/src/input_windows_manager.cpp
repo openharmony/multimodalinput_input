@@ -4894,31 +4894,31 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
     JsonParser jsonData;
     jsonData.json_ = cJSON_Parse(jsonStr.c_str());
     if (!cJSON_IsObject(jsonData.json_)) {
-        MMI_HILOGE("jsonData.json_ is not object");
+        MMI_HILOGE("The json data is not object");
         return false;
     }
     cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "whiteList");
     if (!cJSON_IsArray(whiteList)) {
-        MMI_HILOGE("whiteList number must be array");
+        MMI_HILOGE("White list number must be array");
         return false;
     }
     int32_t whiteListSize = cJSON_GetArraySize(whiteList);
     for (int32_t i = 0; i < whiteListSize; ++i) {
         cJSON *whiteListJson = cJSON_GetArrayItem(whiteList, i);
         if (!cJSON_IsObject(whiteListJson)) {
-            MMI_HILOGE("whiteListJson is not object");
+            MMI_HILOGE("White list json is not object");
             continue;
         }
         SwitchFocusKey switchFocusKey;
         cJSON *keyCodeJson = cJSON_GetObjectItemCaseSensitive(whiteListJson, "keyCode");
         if (!cJSON_IsNumber(keyCodeJson)) {
-            MMI_HILOGE("keyCodeJson is not number");
+            MMI_HILOGE("Key code json is not number");
             continue;
         }
         switchFocusKey.keyCode = keyCodeJson->valueint;
         cJSON *pressedKeyJson = cJSON_GetObjectItemCaseSensitive(whiteListJson, "pressedKey");
         if (!cJSON_IsNumber(pressedKeyJson)) {
-            MMI_HILOGE("pressedKeyJson is not number");
+            MMI_HILOGE("Pressed key json is not number");
             continue;
         }
         switchFocusKey.pressedKey = pressedKeyJson->valueint;

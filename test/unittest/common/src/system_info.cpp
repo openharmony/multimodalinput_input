@@ -65,7 +65,7 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
         }
         std::string strLine;
         if (!std::getline(file, strLine)) {
-            MMI_HILOGE("getline failed");
+            MMI_HILOGE("Failed to get line");
             file.close();
             return DEFAULT_PID;
         }
