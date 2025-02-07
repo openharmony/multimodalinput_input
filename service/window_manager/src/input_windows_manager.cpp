@@ -2991,13 +2991,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent);
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
-#ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (!(touchWindow->transform.empty())) {
         auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     windowX = static_cast<int32_t>(windowX);
     windowY = static_cast<int32_t>(windowY);
     pointerItem.SetWindowX(windowX);
