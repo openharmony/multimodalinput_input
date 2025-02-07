@@ -1156,7 +1156,8 @@ pub unsafe extern "C" fn HandleMotionDynamicAccelerateTouchpad (
     speed: i32,
     display_size: f64,
     touchpad_size: f64,
-    touchpad_ppi: f64
+    touchpad_ppi: f64,
+    frequency: i32
 ) -> i32 {
     let mut gain = 0.0;
     let vin: f64;
@@ -1167,7 +1168,7 @@ pub unsafe extern "C" fn HandleMotionDynamicAccelerateTouchpad (
     unsafe {
         dx = (*offset).dx;
         dy = (*offset).dy;
-        vin = (fmax(fabs(dx), fabs(dy))) + (fmin(fabs(dx), fabs(dy))) / 2.0;
+        vin = vin = sqrt(dx * dx + dy *dy);
         debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
@@ -1179,7 +1180,7 @@ pub unsafe extern "C" fn HandleMotionDynamicAccelerateTouchpad (
             @public(gain)
         );
         if !get_speed_dynamic_gain_touchpad(vin, &mut gain as *mut f64, speed, display_size,
-            touchpad_size, touchpad_ppi) {
+            touchpad_size, touchpad_ppi, frequency) {
             error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
             return RET_ERR;
         }
