@@ -14,6 +14,7 @@
  */
 
 #include "gesture_monitor_handler.h"
+
 #include "pointer_event.h"
 
 namespace OHOS {
