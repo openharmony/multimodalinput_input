@@ -37,7 +37,7 @@ namespace {
 constexpr int32_t INVALID_USERID { -1 };
 constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_SEND { 0 };
 constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_CLOSE { 1 };
-constexpr std::u16string INJECT_NOTICE_INTERFACE_TOKEN { u"ohos.multimodalinput.IInjectNotice" };
+const std::u16string INJECT_NOTICE_INTERFACE_TOKEN { u"ohos.multimodalinput.IInjectNotice" };
 }
 
 InjectNoticeManager::InjectNoticeManager() : connectionCallback_(new (std::nothrow) InjectNoticeConnection()) {}
