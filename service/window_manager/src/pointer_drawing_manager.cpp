@@ -2070,20 +2070,20 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
 {
     CALL_DEBUG_ENTER;
     if (pid == -1) {
-        MMI_HILOGE("pid is invalid return -1");
+        MMI_HILOGE("Pid is invalid return -1");
         return RET_ERR;
     }
     if (windowId < 0) {
-        MMI_HILOGE("invalid windowId, %{public}d", windowId);
+        MMI_HILOGE("Invalid windowId, %{public}d", windowId);
         return RET_ERR;
     }
     if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
-        MMI_HILOGE("windowId not in right pid");
+        MMI_HILOGE("WindowId not in right pid");
         return RET_ERR;
     }
     auto userIconCopy = GetUserIconCopy();
     if (hotSpotX < 0 || hotSpotY < 0 || userIconCopy == nullptr) {
-        MMI_HILOGE("invalid value");
+        MMI_HILOGE("Invalid value");
         return RET_ERR;
     }
     PointerStyle pointerStyle;
@@ -3580,7 +3580,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
     if (imageInfo.size.width < cursor.focusX || imageInfo.size.width < cursor.focusY) {
-        MMI_HILOGE("focus is invalid");
+        MMI_HILOGE("The focus is invalid");
         return RET_ERR;
     }
     if (imageInfo.size.width > MAX_CUSTOM_CURSOR_SIZE || imageInfo.size.height > MAX_CUSTOM_CURSOR_SIZE ||

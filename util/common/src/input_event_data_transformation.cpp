@@ -282,7 +282,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     }
     std::vector<uint8_t> buffer = event->GetBuffer();
     if (buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
-        MMI_HILOGE("buffer is oversize:%{public}zu", buffer.size());
+        MMI_HILOGE("The buffer is oversize:%{public}zu", buffer.size());
         return RET_ERR;
     }
     pkt << buffer.size();
