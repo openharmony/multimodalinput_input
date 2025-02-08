@@ -1168,7 +1168,7 @@ pub unsafe extern "C" fn HandleMotionDynamicAccelerateTouchpad (
     unsafe {
         dx = (*offset).dx;
         dy = (*offset).dy;
-        vin = vin = sqrt(dx * dx + dy *dy);
+        vin = sqrt(dx * dx + dy *dy);
         debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
