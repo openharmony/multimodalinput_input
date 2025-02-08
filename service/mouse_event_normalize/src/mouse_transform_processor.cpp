@@ -156,17 +156,21 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         const std::string devName = libinput_device_get_name(dev);
         if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
             deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
+            pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+            ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+                &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
+        } else {
+            pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+            double touchpadPPi = libinput_touchpad_device_get_ppi(device);
+            double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
+            int32_t frequency = libinput_touchpad_device_get_frequency(device);
+            if (touchpadPPi < 1.0 || touchpadSize < 1.0 || frequency < 1.0) {
+                MMI_HILOGE("touchpad info get error");
+                return RET_ERR;
+            }
+            ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
+                &cursorPos.cursorPos.y, GetTouchpadSpeed(), displaySize, touchpadSize, touchpadPPi, frequency);
         }
-        pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        auto device = libinput_event_get_device(event);
-        CHKPR(device, ERROR_NULL_POINTER);
-        double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
-        double touchpadPPi = libinput_touchpad_device_get_ppi(device);
-        double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
-        int32_t frequency = libinput_touchpad_device_get_frequency(device);
-        UpdateTouchpadCDG(touchpadPPi, touchpadSize);
-        ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
-            &cursorPos.cursorPos.y, GetTouchpadSpeed(), displaySize, touchpadSize, touchpadPPi, frequency);
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         uint64_t dalta_time = 0;
