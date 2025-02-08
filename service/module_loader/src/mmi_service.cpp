@@ -149,7 +149,8 @@ const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product
 const std::string VKEYBOARD_PATH { "libvkeyboard_device.z.so" };
 void* g_VKeyboardHandle = nullptr;
 typedef int32_t (*HANDLE_TOUCHPOINT_TYPE)(
-    double screenX, double screenY, int touchId, int32_t eventType, double touchPressure);
+    double screenX, double screenY, int touchId, int32_t eventType, double touchPressure,
+    int32_t longAxis, int32_t shortAxis);
 HANDLE_TOUCHPOINT_TYPE handleTouchPoint_ = nullptr;
 typedef int32_t (*STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)(
     int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode);

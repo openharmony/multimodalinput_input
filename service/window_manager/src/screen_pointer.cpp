@@ -19,6 +19,7 @@
 #include "transaction/rs_transaction.h"
 #include "bytrace_adapter.h"
 #include "dm_common.h"
+#include "transaction/rs_interfaces.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -47,26 +48,22 @@ constexpr uint32_t RENDER_STRIDE{4};
 uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
 {
     uint32_t width = 0;
+    auto modeId = si->GetModeId();
     auto modes = si->GetModes();
-    if (modes.size() == 0) {
+    if (modeId < 0 || modeId >= modes.size()) {
         return 0;
     }
-    for (auto &m : modes) {
-        width = std::max(width, m->width_);
-    }
-    return width;
+    return modes[modeId]->width_;
 }
 uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
 {
     uint32_t height = 0;
+    auto modeId = si->GetModeId();
     auto modes = si->GetModes();
-    if (modes.size() == 0) {
+    if (modeId < 0 || modeId >= modes.size()) {
         return 0;
     }
-    for (auto &m : modes) {
-        height = std::max(height, m->height_);
-    }
-    return height;
+    return modes[modeId]->height_;
 }
 
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const DisplayInfo &di)
@@ -242,7 +239,7 @@ sptr<OHOS::SurfaceBuffer> ScreenPointer::GetCurrentBuffer()
     if (bufferId_ >= buffers_.size()) {
         return nullptr;
     }
-    return  buffers_[bufferId_];
+    return buffers_[bufferId_];
 }
 
 bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
@@ -250,20 +247,20 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
 
-    uint32_t dx = GetOffsetX(align);
-    uint32_t dy = GetOffsetY(align);
+    uint32_t dx = hardRenderCfg_.GetOffsetX();
+    uint32_t dy = hardRenderCfg_.GetOffsetY();
     switch (rotation_) {
         case rotation_t::ROTATION_0:
             break;
         case rotation_t::ROTATION_90:
-            dy = GetOffsetYRotated(align);
+            dy = hardRenderCfg_.GetOffsetYRotated();
             break;
         case rotation_t::ROTATION_180:
-            dx = GetOffsetXRotated(align);
-            dy = GetOffsetYRotated(align);
+            dx = hardRenderCfg_.GetOffsetXRotated();
+            dy = hardRenderCfg_.GetOffsetYRotated();
             break;
         case rotation_t::ROTATION_270:
-            dx = GetOffsetXRotated(align);
+            dx = hardRenderCfg_.GetOffsetXRotated();
             break;
     }
     int32_t px = x - dx;
@@ -301,20 +298,20 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(surfaceNode_);
-    uint32_t dx = GetOffsetX(align);
-    uint32_t dy = GetOffsetY(align);
+    uint32_t dx = softRenderCfg_.GetOffsetX();
+    uint32_t dy = softRenderCfg_.GetOffsetY();
     switch (rotation_) {
         case rotation_t::ROTATION_0:
             break;
         case rotation_t::ROTATION_90:
-            dy = GetOffsetYRotated(align);
+            dy = softRenderCfg_.GetOffsetYRotated();
             break;
         case rotation_t::ROTATION_180:
-            dx = GetOffsetXRotated(align);
-            dy = GetOffsetYRotated(align);
+            dx = softRenderCfg_.GetOffsetXRotated();
+            dy = softRenderCfg_.GetOffsetYRotated();
             break;
         case rotation_t::ROTATION_270:
-            dx = GetOffsetXRotated(align);
+            dx = softRenderCfg_.GetOffsetXRotated();
             break;
     }
     int32_t px = x - dx;
@@ -329,17 +326,19 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
         px = tmpY;
         py = width_ - tmpX;
         px = height_  - px - DEFAULT_CURSOR_SIZE;
-        py =  width_ - py + DEFAULT_CURSOR_SIZE;
+        py = width_ - py + DEFAULT_CURSOR_SIZE;
     } else if (rotation_ == rotation_t(DIRECTION180)) {
         px = width_ - px;
         py = height_ - py;
     } else if (rotation_ == rotation_t(DIRECTION270)) {
         px = height_ - tmpY;
         py = tmpX;
-        px =  height_ - px + DEFAULT_CURSOR_SIZE;
-        py =  width_ - py - DEFAULT_CURSOR_SIZE;
+        px = height_ - px + DEFAULT_CURSOR_SIZE;
+        py = width_ - py - DEFAULT_CURSOR_SIZE;
     }
-    surfaceNode_->SetBounds(px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
+
+    int64_t nodeId = surfaceNode_->GetId();
+    Rosen::RSInterfaces::GetInstance().SetHwcNodeBounds(nodeId, px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     return true;
 }
 
@@ -350,7 +349,7 @@ bool ScreenPointer::SetInvisible()
     
     auto buffer = RequestBuffer();
     CHKPF(buffer);
-    auto addr  = static_cast<uint8_t*>(buffer->GetVirAddr());
+    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPF(addr);
     uint32_t addrSize = buffer->GetWidth() * buffer->GetHeight() * RENDER_STRIDE;
     memset_s(addr, addrSize, 0, addrSize);
@@ -367,14 +366,6 @@ bool ScreenPointer::SetInvisible()
     return true;
 }
 
-int32_t ScreenPointer::GetPointerSize() const
-{
-    std::string name = POINTER_SIZE;
-    int32_t size = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_SIZE);
-    MMI_HILOGD("Get pointer size success, ret=%{public}d", size);
-    return size;
-}
-
 float ScreenPointer::GetRenderDPI() const
 {
     if (GetIsCurrentOffScreenRendering() && IsExtend()) {
@@ -384,103 +375,4 @@ float ScreenPointer::GetRenderDPI() const
     }
 }
 
-uint32_t ScreenPointer::GetImageSize() const
-{
-    int32_t size = GetPointerSize();
-    return pow(INCREASE_RATIO, size - 1) * GetRenderDPI() * DEVICE_INDEPENDENT_PIXELS;
-}
-
-uint32_t ScreenPointer::GetOffsetX(ICON_TYPE align) const
-{
-    uint32_t width = GetImageSize();
-    switch (align) {
-        case ANGLE_E:
-        case ANGLE_SW:
-        case ANGLE_NW:
-            return FOCUS_POINT;
-        case ANGLE_S:
-        case ANGLE_N:
-        case ANGLE_CENTER:
-            return FOCUS_POINT - width / NUM_TWO;
-        case ANGLE_W:
-        case ANGLE_SE:
-        case ANGLE_NE:
-            return FOCUS_POINT - width;
-        case ANGLE_NW_RIGHT:
-            return FOCUS_POINT - CALCULATE_MOUSE_ICON_BIAS;
-        default:
-            MMI_HILOGE("No need to calculate offset X");
-            return FOCUS_POINT;
-    }
-}
-
-uint32_t ScreenPointer::GetOffsetY(ICON_TYPE align) const
-{
-    uint32_t height = GetImageSize();
-    switch (align) {
-        case ANGLE_S:
-        case ANGLE_NE:
-        case ANGLE_NW:
-        case ANGLE_NW_RIGHT:
-            return FOCUS_POINT;
-        case ANGLE_E:
-        case ANGLE_CENTER:
-            return FOCUS_POINT - height / NUM_TWO;
-        case ANGLE_W:
-        case ANGLE_N:
-        case ANGLE_SE:
-        case ANGLE_SW:
-            return FOCUS_POINT - height;
-        default:
-            MMI_HILOGE("No need to calculate offset Y");
-            return FOCUS_POINT;
-    }
-}
-
-uint32_t ScreenPointer::GetOffsetXRotated(ICON_TYPE align) const
-{
-    uint32_t width = GetImageSize();
-    switch (align) {
-        case ANGLE_E:
-        case ANGLE_SW:
-        case ANGLE_NW:
-            return FOCUS_POINT;
-        case ANGLE_S:
-        case ANGLE_N:
-        case ANGLE_CENTER:
-            return FOCUS_POINT + width / NUM_TWO;
-        case ANGLE_W:
-        case ANGLE_SE:
-        case ANGLE_NE:
-            return FOCUS_POINT + width;
-        case ANGLE_NW_RIGHT:
-            return FOCUS_POINT + CALCULATE_MOUSE_ICON_BIAS;
-        default:
-            MMI_HILOGE("No need to calculate offset X");
-            return FOCUS_POINT;
-    }
-}
-
-uint32_t ScreenPointer::GetOffsetYRotated(ICON_TYPE align) const
-{
-    uint32_t height = GetImageSize();
-    switch (align) {
-        case ANGLE_S:
-        case ANGLE_NE:
-        case ANGLE_NW:
-        case ANGLE_NW_RIGHT:
-            return FOCUS_POINT;
-        case ANGLE_E:
-        case ANGLE_CENTER:
-            return FOCUS_POINT + height / NUM_TWO;
-        case ANGLE_W:
-        case ANGLE_N:
-        case ANGLE_SE:
-        case ANGLE_SW:
-            return FOCUS_POINT + height;
-        default:
-            MMI_HILOGE("No need to calculate offset Y");
-            return FOCUS_POINT;
-    }
-}
 } // namespace OHOS::MMI

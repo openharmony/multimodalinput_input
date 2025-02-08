@@ -2428,8 +2428,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty())) ||
         (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
-        ((action == PointerEvent::POINTER_ACTION_AXIS_BEGIN || action == PointerEvent::POINTER_ACTION_AXIS_END ||
-        action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN || action == PointerEvent::POINTER_ACTION_ROTATE_END) &&
+        ((action == PointerEvent::POINTER_ACTION_AXIS_BEGIN || action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN) &&
         (pointerEvent->GetPressedButtons().empty()));
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
@@ -2968,6 +2967,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         } else {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
         }
+        if (extraData_.drawCursor) {
+            MMI_HILOGD("Cursor must be default, pointerStyle:%{public}d globalStyle:%{public}d",
+                dragPointerStyle_.id, globalStyle_.id);
+            dragPointerStyle_ = globalStyle_;
+        }
         IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
@@ -2987,13 +2991,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent);
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
-#ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (!(touchWindow->transform.empty())) {
         auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     windowX = static_cast<int32_t>(windowX);
     windowY = static_cast<int32_t>(windowY);
     pointerItem.SetWindowX(windowX);
@@ -4890,31 +4892,31 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
     JsonParser jsonData;
     jsonData.json_ = cJSON_Parse(jsonStr.c_str());
     if (!cJSON_IsObject(jsonData.json_)) {
-        MMI_HILOGE("jsonData.json_ is not object");
+        MMI_HILOGE("The json data is not object");
         return false;
     }
     cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "whiteList");
     if (!cJSON_IsArray(whiteList)) {
-        MMI_HILOGE("whiteList number must be array");
+        MMI_HILOGE("White list number must be array");
         return false;
     }
     int32_t whiteListSize = cJSON_GetArraySize(whiteList);
     for (int32_t i = 0; i < whiteListSize; ++i) {
         cJSON *whiteListJson = cJSON_GetArrayItem(whiteList, i);
         if (!cJSON_IsObject(whiteListJson)) {
-            MMI_HILOGE("whiteListJson is not object");
+            MMI_HILOGE("White list json is not object");
             continue;
         }
         SwitchFocusKey switchFocusKey;
         cJSON *keyCodeJson = cJSON_GetObjectItemCaseSensitive(whiteListJson, "keyCode");
         if (!cJSON_IsNumber(keyCodeJson)) {
-            MMI_HILOGE("keyCodeJson is not number");
+            MMI_HILOGE("Key code json is not number");
             continue;
         }
         switchFocusKey.keyCode = keyCodeJson->valueint;
         cJSON *pressedKeyJson = cJSON_GetObjectItemCaseSensitive(whiteListJson, "pressedKey");
         if (!cJSON_IsNumber(pressedKeyJson)) {
-            MMI_HILOGE("pressedKeyJson is not number");
+            MMI_HILOGE("Pressed key json is not number");
             continue;
         }
         switchFocusKey.pressedKey = pressedKeyJson->valueint;

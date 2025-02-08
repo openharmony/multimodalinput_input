@@ -137,6 +137,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(void, AttachTouchGestureMgr, (std::shared_ptr<TouchGestureManager>));
     MOCK_METHOD(void, CancelAllTouches, (std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(std::shared_ptr<PointerEvent>, GetLastPointerEventForGesture, ());
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();

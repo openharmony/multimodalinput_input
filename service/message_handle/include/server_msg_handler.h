@@ -96,6 +96,7 @@ public:
     int32_t OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bool enable);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void DealGesturePointers(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell);
     int32_t OnInjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,

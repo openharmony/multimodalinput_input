@@ -6433,7 +6433,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_Poin
    
     displayGroupInfo.displaysInfo.erase(displayGroupInfo.displaysInfo.begin());
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
-    CursorPosition  pointerPos = WIN_MGR->GetCursorPos();
+    CursorPosition pointerPos = WIN_MGR->GetCursorPos();
     EXPECT_EQ(pointerPos.displayId, displayInfo1.id);
 }
 
@@ -7033,7 +7033,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_001, 
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7051,7 +7051,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_002, 
     uint32_t flag = 0x00000080;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7069,7 +7069,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_003, 
     uint32_t flag = 0x00000080;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7087,7 +7087,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_004, 
     uint32_t flag = 0x00000100;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
