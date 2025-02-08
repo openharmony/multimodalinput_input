@@ -170,8 +170,8 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
                 MMI_HILOGE("touchpad info get error");
                 return RET_ERR;
             }
-            ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(), 
-                &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), displaySize, 
+            ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+                &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), displaySize,
                 touchpadSize, touchpadPPi, frequency);
         }
     } else {
