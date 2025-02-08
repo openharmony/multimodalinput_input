@@ -110,6 +110,8 @@ static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const DisplayInf
     if ((displayInfo.displayDirection - displayInfo.direction) % evenNum != 0) {
         std::swap(width, height);
     }
+    offset.dx -= displayInfo.offsetX;
+    offset.dy -= displayInfo.offsetY;
     if (direction == DIRECTION90) {
         std::swap(offset.dx, offset.dy);
         offset.dx = width - offset.dx;
@@ -132,6 +134,14 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #ifndef OHOS_BUILD_ENABLE_WATCH
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
+
+    if (MouseState->IsLeftBtnPressed()) {
+        if (!pointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
+            pointerEvent_->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+        }
+    } else {
+        pointerEvent_->DeleteReleaseButton(PointerEvent::MOUSE_BUTTON_LEFT);
+    }
 
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {

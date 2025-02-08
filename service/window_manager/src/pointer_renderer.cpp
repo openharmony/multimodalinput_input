@@ -63,10 +63,145 @@ std::string RenderConfig::ToString() const
     return oss.str();
 }
 
+int32_t RenderConfig::GetOffsetX() const
+{
+    if (!this->isHard) {
+        return 0.0f;
+    }
+    int32_t width = this->GetImageSize();
+    switch (this->align) {
+        case ANGLE_E:
+            return FOCUS_POINT;
+        case ANGLE_S:
+            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
+        case ANGLE_W:
+            return FOCUS_POINT - width;
+        case ANGLE_N:
+            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
+        case ANGLE_SE:
+            return FOCUS_POINT - width;
+        case ANGLE_NE:
+            return FOCUS_POINT - width;
+        case ANGLE_SW:
+            return FOCUS_POINT;
+        case ANGLE_NW:
+            return FOCUS_POINT - this->userIconHotSpotX;
+        case ANGLE_CENTER:
+            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
+        case ANGLE_NW_RIGHT:
+            return FOCUS_POINT - CALCULATE_MOUSE_ICON_BIAS;
+        default:
+            MMI_HILOGW("No need calculate physicalX offset");
+            return FOCUS_POINT;
+    }
+}
+
+int32_t RenderConfig::GetOffsetY() const
+{
+    if (!this->isHard) {
+        return 0.0f;
+    }
+
+    int32_t height = this->GetImageSize();
+    switch (this->align) {
+        case ANGLE_E:
+            return FOCUS_POINT - height / CALCULATE_IMAGE_MIDDLE;
+        case ANGLE_S:
+            return FOCUS_POINT;
+        case ANGLE_W:
+            return FOCUS_POINT - height;
+        case ANGLE_N:
+            return FOCUS_POINT - height;
+        case ANGLE_SE:
+            return FOCUS_POINT - height;
+        case ANGLE_NE:
+            return FOCUS_POINT;
+        case ANGLE_SW:
+            return FOCUS_POINT - height;
+        case ANGLE_NW:
+            return FOCUS_POINT - this->userIconHotSpotY;
+        case ANGLE_CENTER:
+            return FOCUS_POINT - height / CALCULATE_IMAGE_MIDDLE;
+        case ANGLE_NW_RIGHT:
+            return FOCUS_POINT;
+        default:
+            MMI_HILOGW("No need calculate physicalY offset");
+            return FOCUS_POINT;
+    }
+}
+
+int32_t RenderConfig::GetOffsetXRotated() const
+{
+    int32_t width = this->GetImageSize();
+    switch (this->align) {
+        case ANGLE_E:
+        case ANGLE_SW:
+            return FOCUS_POINT;
+        case ANGLE_NW:
+            return FOCUS_POINT + this->userIconHotSpotX;
+        case ANGLE_S:
+        case ANGLE_N:
+        case ANGLE_CENTER:
+            return FOCUS_POINT + width / CALCULATE_IMAGE_MIDDLE;
+        case ANGLE_W:
+        case ANGLE_SE:
+        case ANGLE_NE:
+            return FOCUS_POINT + width;
+        case ANGLE_NW_RIGHT:
+            return FOCUS_POINT + CALCULATE_MOUSE_ICON_BIAS;
+        default:
+            MMI_HILOGE("No need to calculate offset X");
+            return FOCUS_POINT;
+    }
+}
+
+int32_t RenderConfig::GetOffsetYRotated() const
+{
+    int32_t height = this->GetImageSize();
+    switch (this->align) {
+        case ANGLE_S:
+        case ANGLE_NE:
+        case ANGLE_NW_RIGHT:
+            return FOCUS_POINT;
+        case ANGLE_NW:
+            return FOCUS_POINT + this->userIconHotSpotY;
+        case ANGLE_E:
+        case ANGLE_CENTER:
+            return FOCUS_POINT + height / CALCULATE_IMAGE_MIDDLE;
+        case ANGLE_W:
+        case ANGLE_N:
+        case ANGLE_SE:
+        case ANGLE_SW:
+            return FOCUS_POINT + height;
+        default:
+            MMI_HILOGE("No need to calculate offset Y");
+            return FOCUS_POINT;
+    }
+}
+
+image_ptr_t PointerRenderer::UserIconScale(uint32_t width, uint32_t height, const RenderConfig &cfg)
+{
+    image_ptr_t image = nullptr;
+    if (cfg.userIconFollowSystem) {
+        RenderConfig userIconCfg = cfg;
+        Media::ImageInfo imageInfo;
+        CHKPP(userIconCfg.userIconPixelMap);
+        userIconCfg.userIconPixelMap->GetImageInfo(imageInfo);
+        float xAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.width;
+        float yAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.height;
+        userIconCfg.userIconPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
+        userIconCfg.userIconHotSpotX = static_cast<int32_t>((float)userIconCfg.userIconHotSpotX * xAxis);
+        userIconCfg.userIconHotSpotY = static_cast<int32_t>((float)userIconCfg.userIconHotSpotY * yAxis);
+        image = ExtractDrawingImage(userIconCfg.userIconPixelMap);
+    } else {
+        image = ExtractDrawingImage(cfg.userIconPixelMap);
+    }
+    return image;
+}
+
 int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg, bool isHard)
 {
     CHKPR(addr, RET_ERR);
-    MMI_HILOGI("shape=(%{public}d, %{public}d), cfg=%{public}s", width, height, cfg.ToString().data());
 
     uint32_t addrSize = width * height * RENDER_STRIDE;
     if (cfg.style == MOUSE_ICON::TRANSPARENT_ICON) {
@@ -98,18 +233,16 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     canvas.Rotate(degree, FOCUS_COORDINATES_CHANGE, FOCUS_COORDINATES_CHANGE);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
-    // load cursor image
     image_ptr_t image = nullptr;
     if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         image = LoadPointerImage(cfg);
     } else {
-        image = ExtractDrawingImage(cfg.userIconPixelMap);
+        image = UserIconScale(width, height, cfg);
     }
     CHKPR(image, RET_ERR);
     //Draw image on canvas
-    canvas.DrawImage(*image, GetOffsetX(cfg), GetOffsetY(cfg), Rosen::Drawing::SamplingOptions());
+    canvas.DrawImage(*image, cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
 
-    // copy bitmap pixels to addr
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
     if (ret != EOK) {
         return RET_ERR;
@@ -292,73 +425,6 @@ image_ptr_t PointerRenderer::ExtractDrawingImage(pixelmap_ptr_t pixelMap)
     }
     return image;
 }
-
-float PointerRenderer::GetOffsetX(const RenderConfig &cfg)
-{
-    if (!cfg.isHard) {
-        return 0.0f;
-    }
-    int32_t width = cfg.GetImageSize();
-    switch (cfg.align) {
-        case ANGLE_E:
-            return FOCUS_POINT;
-        case ANGLE_S:
-            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_W:
-            return FOCUS_POINT - width;
-        case ANGLE_N:
-            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_SE:
-            return FOCUS_POINT - width;
-        case ANGLE_NE:
-            return FOCUS_POINT - width;
-        case ANGLE_SW:
-            return FOCUS_POINT;
-        case ANGLE_NW:
-            return FOCUS_POINT - cfg.userIconHotSpotX;
-        case ANGLE_CENTER:
-            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_NW_RIGHT:
-            return FOCUS_POINT - CALCULATE_MOUSE_ICON_BIAS;
-        default:
-            MMI_HILOGW("No need calculate physicalX offset");
-            return FOCUS_POINT;
-    }
-}
-
-float PointerRenderer::GetOffsetY(const RenderConfig &cfg)
-{
-    if (!cfg.isHard) {
-        return 0.0f;
-    }
-
-    int32_t height = cfg.GetImageSize();
-    switch (cfg.align) {
-        case ANGLE_E:
-            return FOCUS_POINT - height / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_S:
-            return FOCUS_POINT;
-        case ANGLE_W:
-            return FOCUS_POINT - height;
-        case ANGLE_N:
-            return FOCUS_POINT - height;
-        case ANGLE_SE:
-            return FOCUS_POINT - height;
-        case ANGLE_NE:
-            return FOCUS_POINT;
-        case ANGLE_SW:
-            return FOCUS_POINT - height;
-        case ANGLE_NW:
-            return FOCUS_POINT - cfg.userIconHotSpotY;
-        case ANGLE_CENTER:
-            return FOCUS_POINT - height / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_NW_RIGHT:
-            return FOCUS_POINT;
-        default:
-            MMI_HILOGW("No need calculate physicalY offset");
-            return FOCUS_POINT;
-    }
-}
  
 int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg)
 {
@@ -370,10 +436,12 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
             PushImg(cfg, loadingImg);
         }
         canvas.Rotate(cfg.rotationAngle, cfg.rotationFocusX, cfg.rotationFocusY);
-        canvas.DrawImage(*loadingImg, GetOffsetX(cfg), GetOffsetY(cfg), Rosen::Drawing::SamplingOptions());
+        canvas.DrawImage(*loadingImg, cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
     } else {
         RenderConfig runingLCfg = cfg;
         runingLCfg.style = MOUSE_ICON::RUNNING_LEFT;
+        runingLCfg.align = ANGLE_NW;
+        runingLCfg.path = IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg";
         auto runningImgLeft = FindImg(runingLCfg);
         if (runningImgLeft == nullptr) {
             runningImgLeft = LoadPointerImage(runingLCfg);
@@ -381,7 +449,7 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
             PushImg(runingLCfg, runningImgLeft);
         }
         CHKPR(runningImgLeft, RET_ERR);
-        canvas.DrawImage(*runningImgLeft, GetOffsetX(runingLCfg), GetOffsetY(runingLCfg),
+        canvas.DrawImage(*runningImgLeft, runingLCfg.GetOffsetX(), runingLCfg.GetOffsetY(),
             Rosen::Drawing::SamplingOptions());
         
         RenderConfig runingRCfg = cfg;
@@ -396,7 +464,7 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
         }
         canvas.Rotate(runingRCfg.rotationAngle, runingRCfg.rotationFocusX, runingRCfg.rotationFocusY);
         CHKPR(runningImgRight, RET_ERR);
-        canvas.DrawImage(*runningImgRight, GetOffsetX(runingRCfg), GetOffsetY(runingRCfg),
+        canvas.DrawImage(*runningImgRight, runingRCfg.GetOffsetX(), runingRCfg.GetOffsetY(),
             Rosen::Drawing::SamplingOptions());
     }
     return RET_OK;

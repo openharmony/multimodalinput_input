@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+#include "input_event.h"
+
 #include <cassert>
 #include <chrono>
 
 #include "axis_event.h"
 #include "event_log_helper.h"
-#include "input_event.h"
 #include "key_event.h"
 #include "mmi_log.h"
 #include "pointer_event.h"

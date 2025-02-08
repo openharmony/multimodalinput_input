@@ -14,6 +14,7 @@
  */
 
 #include "touch_event_normalize.h"
+
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "gesture_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_WATCH

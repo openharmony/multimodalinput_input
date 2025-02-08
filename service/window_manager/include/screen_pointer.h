@@ -27,6 +27,7 @@
 #include "ui/rs_canvas_node.h"
 #include "ui/rs_surface_node.h"
 #include "window_info.h"
+#include "pointer_renderer.h"
 
 namespace OHOS::MMI {
 using hwcmgr_ptr_t = std::shared_ptr<HardwareCursorPointerManager>;
@@ -104,8 +105,6 @@ public:
         return mode_ == mode_t::SCREEN_EXTEND;
     }
 
-    int32_t GetPointerSize() const;
-
     bool GetIsCurrentOffScreenRendering() const
     {
         return isCurrentOffScreenRendering_;
@@ -122,16 +121,20 @@ public:
     }
 
     float GetRenderDPI() const;
+    
+    void SetHardRenderCfg(const RenderConfig& cfg)
+    {
+        hardRenderCfg_ = cfg;
+    }
+
+    void SetSoftRenderCfg(const RenderConfig& cfg)
+    {
+        softRenderCfg_ = cfg;
+    }
 
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();
-
-    uint32_t GetImageSize() const;
-    uint32_t GetOffsetX(ICON_TYPE align) const;
-    uint32_t GetOffsetY(ICON_TYPE align) const;
-    uint32_t GetOffsetXRotated(ICON_TYPE align) const;
-    uint32_t GetOffsetYRotated(ICON_TYPE align) const;
 
 private:
     std::mutex mtx_;
@@ -162,6 +165,9 @@ private:
     bool isCurrentOffScreenRendering_ = false;
     float offRenderScale_{1.0f};
     int32_t screenRealDPI_{1.0f};
+    
+    RenderConfig hardRenderCfg_;
+    RenderConfig softRenderCfg_;
 };
 
 } // namespace OHOS::MMI

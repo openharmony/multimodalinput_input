@@ -14,13 +14,14 @@
  */
 
 #include "display_event_monitor.h"
+
 #include "delegate_interface.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_event_handler.h"
-#include "setting_datashare.h"
 #include "key_subscriber_handler.h"
+#include "setting_datashare.h"
 #include "system_ability_definition.h"
 
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY

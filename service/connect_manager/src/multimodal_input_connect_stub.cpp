@@ -2639,7 +2639,7 @@ int32_t MultimodalInputConnectStub::StubSetShieldStatus(MessageParcel& data, Mes
         return ERROR_NOT_SYSAPI;
     }
     if (!PER_HELPER->CheckDispatchControl()) {
-        MMI_HILOGE("input dispatch control permission check failed");
+        MMI_HILOGE("Input dispatch control permission check failed");
         return ERROR_NO_PERMISSION;
     }
     if (!IsRunning()) {
@@ -2668,7 +2668,7 @@ int32_t MultimodalInputConnectStub::StubGetShieldStatus(MessageParcel& data, Mes
         return ERROR_NOT_SYSAPI;
     }
     if (!PER_HELPER->CheckDispatchControl()) {
-        MMI_HILOGE("input dispatch control permission check failed");
+        MMI_HILOGE("Input dispatch control permission check failed");
         return ERROR_NO_PERMISSION;
     }
     if (!IsRunning()) {
@@ -2721,7 +2721,7 @@ int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessagePa
         return ERROR_NOT_SYSAPI;
     }
     if (!PER_HELPER->CheckAuthorize()) {
-        MMI_HILOGE("input authorize permission check failed");
+        MMI_HILOGE("Input authorize permission check failed");
         return ERROR_NO_PERMISSION;
     }
     bool isAuthorize { false };

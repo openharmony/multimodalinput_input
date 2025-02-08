@@ -204,7 +204,6 @@ private:
     void ForceClearPointerVisiableStatus() override;
     int32_t UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
     void CreateCanvasNode();
-    void SetSurfaceNodeVisible(bool visible);
     float CalculateHardwareXOffset(ICON_TYPE iconType);
     float CalculateHardwareYOffset(ICON_TYPE iconType);
     bool SetCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
@@ -318,6 +317,7 @@ private:
     sptr<ScreenModeChangeListener> screenModeChangeListener_ { nullptr };
     std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers_;
     PointerRenderer pointerRenderer_;
+    bool userIconFollowSystem_ { false };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
