@@ -681,7 +681,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
             MMI_HILOGE("Transform pointerItem failed");
             return RET_ERR;
         }
-        if (it.GetPointerId() == pointerEvent->GetPointerId){
+        if (it.GetPointerId() == pointerEvent->GetPointerId()){
             CHKRR(SetNameProperty(jsEnv_, result, "touch", element), "Set touch", RET_ERR);
         }
         CHKRR(napi_set_element(jsEnv_, pointers, index, element), "napi_set_element is", RET_ERR);
