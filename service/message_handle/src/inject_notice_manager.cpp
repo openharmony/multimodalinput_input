@@ -37,6 +37,7 @@ namespace {
 constexpr int32_t INVALID_USERID { -1 };
 constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_SEND { 0 };
 constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_CLOSE { 1 };
+const std::u16string INJECT_NOTICE_INTERFACE_TOKEN { u"ohos.multimodalinput.IInjectNotice" };
 }
 
 InjectNoticeManager::InjectNoticeManager() : connectionCallback_(new (std::nothrow) InjectNoticeConnection()) {}
@@ -141,6 +142,7 @@ bool InjectNoticeManager::InjectNoticeConnection::SendNotice(const InjectNoticeI
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    data.WriteInterfaceToken(INJECT_NOTICE_INTERFACE_TOKEN);
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_SEND;
     std::lock_guard<std::mutex> lock(mutex_);
@@ -161,6 +163,7 @@ bool InjectNoticeManager::InjectNoticeConnection::CancelNotice(const InjectNotic
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    data.WriteInterfaceToken(INJECT_NOTICE_INTERFACE_TOKEN);
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_CLOSE;
     std::lock_guard<std::mutex> lock(mutex_);
