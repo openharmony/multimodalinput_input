@@ -662,6 +662,18 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         MMI_HILOGE("Set sourceType property failed");
         return RET_ERR;
     }
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Get pointer item failed");
+        return RET_ERR;
+    }
+    napi_value element = nullptr;
+    CHKRR(napi_create_object(jsEnv_, &element), "napi_create_object is", RET_ERR);
+    if (GetJsPointerItem(pointerItem, element) != RET_OK) {
+        MMI_HILOGE("Transform pointerItem failed");
+        return RET_ERR;
+    }
+    CHKRR(SetNameProperty(jsEnv_, result, "touch", element), "Set touch", RET_ERR);
     napi_value pointers = nullptr;
     CHKRR(napi_create_array(jsEnv_, &pointers), "napi_create_array is", RET_ERR);
     std::vector<PointerEvent::PointerItem> pointerItems;
