@@ -206,7 +206,7 @@ public:
 protected:
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
-    int32_t AddEpoll(EpollEventType type, int32_t fd) override;
+    int32_t AddEpoll(EpollEventType type, int32_t fd, bool readOnly = false) override;
     int32_t DelEpoll(EpollEventType type, int32_t fd);
     bool IsRunning() const override;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
