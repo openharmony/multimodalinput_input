@@ -162,6 +162,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
                 &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
         } else {
             pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+            double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
             double touchpadPPi = libinput_touchpad_device_get_ppi(device);
             double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
             int32_t frequency = libinput_touchpad_device_get_frequency(device);
