@@ -190,8 +190,6 @@ int32_t UDSServer::SetFdProperty(int32_t &tokenType, int32_t &serverFd, int32_t 
     const std::vector<std::string> programWhitelist = {
         "com.ohos.systemui", "security_component_service"};
     if (std::find(programWhitelist.begin(), programWhitelist.end(), programName) == programWhitelist.end()) {
-        shutdown(toReturnClientFd, SHUT_WR);
-        readOnly = true;
         MMI_HILOGD("toReturnClientFd shutdown SHUT_WR , programName:%{public}s", programName.c_str());
     }
     return RET_OK;
