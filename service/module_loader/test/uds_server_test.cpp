@@ -263,9 +263,10 @@ HWTEST_F(UDSServerTest, SetFdProperty_001, TestSize.Level1)
     const int32_t uid = 2;
     const int32_t pid = 10;
     int32_t toReturnClientFd = 1;
-     
+    bool readOnly = false;
+
     udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
-    ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd);
+    ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -287,9 +288,10 @@ HWTEST_F(UDSServerTest, SetFdProperty_002, TestSize.Level1)
     const int32_t uid = 2;
     const int32_t pid = 10;
     int32_t toReturnClientFd = 1;
-     
+    bool readOnly = false;
+
     udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
-    ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd);
+    ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly);
     EXPECT_EQ(ret, RET_ERR);
 }
 

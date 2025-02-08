@@ -117,12 +117,13 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
 
     SessionPtr sess = nullptr;
-    if (SetFdProperty(tokenType, serverFd, toReturnClientFd) != RET_OK) {
+    bool readOnly = false;
+    if (SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly) != RET_OK) {
         MMI_HILOGE("SetFdProperty failed");
         goto CLOSE_SOCK;
     }
 
-    if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
+    if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd, readOnly) != RET_OK) {
         MMI_HILOGE("Add epoll failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
         goto CLOSE_SOCK;
     }
@@ -148,7 +149,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     return RET_ERR;
 }
 
-int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t& toReturnClientFd)
+int32_t UDSServer::SetFdProperty(int32_t &tokenType, int32_t &serverFd, int32_t &toReturnClientFd,
+    const std::string &programName, bool &readOnly)
 {
     static size_t bufferSize = 64 * 1024;
     static size_t serverBufferSize = 64 * 1024;
@@ -185,6 +187,13 @@ int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t&
             return RET_ERR;
         }
     }
+    const std::vector<std::string> programWhitelist = {
+        "com.ohos.systemui", "security_component_service"};
+    if (std::find(programWhitelist.begin(), programWhitelist.end(), programName) == programWhitelist.end()) {
+        shutdown(toReturnClientFd, SHUT_WR);
+        readOnly = true;
+        MMI_HILOGD("toReturnClientFd shutdown SHUT_WR , programName:%{public}s", programName.c_str());
+    }
     return RET_OK;
 }
 
@@ -215,7 +224,7 @@ void UDSServer::OnDisconnected(SessionPtr sess)
     MMI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
-int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
+int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd, bool readOnly)
 {
     MMI_HILOGE("This information should not exist. Subclasses should implement this function");
     return RET_ERR;
