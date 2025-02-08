@@ -1747,6 +1747,7 @@ void JsEventTarget::CallIntervalSinceLastInputTask(uv_work_t *work)
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
     int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(cb->data.IntervalSinceLastInput);
     cb->errCode = napiCode;
 }
