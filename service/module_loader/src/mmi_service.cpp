@@ -237,7 +237,7 @@ MMIService* MMIService::GetInstance()
     return g_MMIService;
 }
 
-int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
+int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd, bool readOnly)
 {
     if (type < EPOLL_EVENT_BEGIN || type >= EPOLL_EVENT_END) {
         MMI_HILOGE("Invalid param type");
@@ -257,7 +257,11 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     MMI_HILOGI("The userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
-    ev.events = EPOLLIN;
+    if (readOnly) {
+        ev.events = 0;
+    } else {
+        ev.events = EPOLLIN;
+    }
     ev.data.fd = fd;
     auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
     if (ret < 0) {
