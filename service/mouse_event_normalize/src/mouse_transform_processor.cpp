@@ -160,34 +160,28 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     int32_t ret = RET_ERR;
     DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
-        struct libinput_device *dev = libinput_event_get_device(event);
-        const std::string devName = libinput_device_get_name(dev);
+        struct libinput_device *device = libinput_event_get_device(event);
+        CHKPR(device, ERROR_NULL_POINTER);
+        const std::string devName = libinput_device_get_name(device);
         if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
             deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
+            pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+            ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+                &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
+        } else {
+            pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+            double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
+            double touchpadPPi = libinput_touchpad_device_get_ppi(device);
+            double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
+            int32_t frequency = libinput_touchpad_device_get_frequency(device);
+            if (touchpadPPi < 1.0 || touchpadSize < 1.0 || frequency < 1.0) {
+                MMI_HILOGE("touchpad info get error");
+                return RET_ERR;
+            }
+            ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+                &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), displaySize,
+                touchpadSize, touchpadPPi, frequency);
         }
-        pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        auto device = libinput_event_get_device(event);
-        CHKPR(device, ERROR_NULL_POINTER);
-        int32_t resolutionX = libinput_device_get_axis_resolution(device, ABS_MT_POSITION_X);
-        int32_t resolutionY = libinput_device_get_axis_resolution(device, ABS_MT_POSITION_Y);
-        int32_t maxX = libinput_device_get_axis_max(device, ABS_MT_POSITION_X);
-        int32_t maxY = libinput_device_get_axis_max(device, ABS_MT_POSITION_Y);
-        if (maxX <= 0 || maxY <= 0) {
-            MMI_HILOGE("maxX or maxX are less than or equal to 0, maxX:%{public}d, maxX:%{public}d",
-                maxX, maxY);
-            return RET_ERR;
-        }
-        double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
-        double touchpadSize = sqrt(pow(maxX, 2) + pow(maxY, 2));
-        if (resolutionX == 0 || resolutionY == 0) {
-            MMI_HILOGE("resolutionX or resolutionY are equal to 0, resolutionX:%{public}d, resolutionY:%{public}d",
-                resolutionX, resolutionY);
-            return RET_ERR;
-        }
-        double touchpadPPi = touchpadSize / sqrt(pow(maxX / resolutionX, 2) + pow(maxY / resolutionY, 2));
-        UpdateTouchpadCDG(touchpadPPi, touchpadSize);
-        ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
-            &cursorPos.cursorPos.y, GetTouchpadSpeed(), displaySize, touchpadSize, touchpadPPi);
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         uint64_t dalta_time = 0;
