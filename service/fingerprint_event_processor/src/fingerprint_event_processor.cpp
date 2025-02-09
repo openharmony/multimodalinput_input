@@ -242,7 +242,6 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
         ProcessSlideEvent();
         return AnalysePointEvent(event);
     } else if (pos != std::string::npos) { // 设备名称包含hand_status_dev的即为合法设备
-        ProcessSlideEvent();
         return AnalyseMsdpPointEvent(event);
     } else {
         MMI_HILOGI("Unknown input device name:%{public}s", name.c_str());
