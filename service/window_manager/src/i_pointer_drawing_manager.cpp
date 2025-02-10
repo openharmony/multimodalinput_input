@@ -29,5 +29,11 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
     }
     return iPointDrawMgr_;
 }
+
+int32_t IPointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    surfaceId = Rosen::INVALID_NODEID;
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

@@ -414,6 +414,11 @@ int32_t PointerDrawingManager::GetPointerSize()
 {
     return 0;
 }
+int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    surfaceId = uint64_t {};
+    return RET_OK;
+}
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
 {
     return {};
