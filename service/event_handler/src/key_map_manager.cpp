@@ -36,7 +36,7 @@ void KeyMapManager::GetConfigKeyValue(const std::string &fileName, int32_t devic
 {
     CALL_DEBUG_ENTER;
     if (fileName.empty()) {
-        MMI_HILOGE("fileName is empty");
+        MMI_HILOGE("THe fileName is empty");
         return;
     }
     std::string filePath = GetProFilePath(fileName);

@@ -659,7 +659,7 @@ void InputDisplayBindHelper::Load()
     char realPath[PATH_MAX] = {};
     CHKPV(realpath(fileName_.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
-        MMI_HILOGE("file path is invalid");
+        MMI_HILOGE("The file path is invalid");
         return;
     }
     std::ifstream ifs(realPath);

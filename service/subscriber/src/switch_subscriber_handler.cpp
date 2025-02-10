@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include <parameters.h>
 #include "switch_subscriber_handler.h"
+
+#include <parameters.h>
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"

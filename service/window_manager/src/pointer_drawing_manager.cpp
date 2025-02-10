@@ -1160,6 +1160,7 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
                 cfg.rotationFocusX = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_X_RATIO;
                 cfg.rotationFocusY = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_Y_RATIO;
             }
+            it.second->SetHardRenderCfg(cfg);
             DrawDynamicHardwareCursor(it.second, cfg);
         } else {
             it.second->SetInvisible();
@@ -1227,6 +1228,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
                 cfg.rotationFocusX = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_X_RATIO;
                 cfg.rotationFocusY = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_Y_RATIO;
             }
+            it.second->SetSoftRenderCfg(cfg);
             DrawDynamicSoftCursor(sn, cfg);
         } else {
             it.second->SetInvisible();
@@ -1951,6 +1953,9 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
 {
     CALL_DEBUG_ENTER;
     followSystem_ = false;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    userIconFollowSystem_ = true;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPR(pixelMap, RET_ERR);
     if (pid == -1) {
         MMI_HILOGE("The pid is invalid");
@@ -2065,20 +2070,20 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
 {
     CALL_DEBUG_ENTER;
     if (pid == -1) {
-        MMI_HILOGE("pid is invalid return -1");
+        MMI_HILOGE("Pid is invalid return -1");
         return RET_ERR;
     }
     if (windowId < 0) {
-        MMI_HILOGE("invalid windowId, %{public}d", windowId);
+        MMI_HILOGE("Invalid windowId, %{public}d", windowId);
         return RET_ERR;
     }
     if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
-        MMI_HILOGE("windowId not in right pid");
+        MMI_HILOGE("WindowId not in right pid");
         return RET_ERR;
     }
     auto userIconCopy = GetUserIconCopy();
     if (hotSpotX < 0 || hotSpotY < 0 || userIconCopy == nullptr) {
-        MMI_HILOGE("invalid value");
+        MMI_HILOGE("Invalid value");
         return RET_ERR;
     }
     PointerStyle pointerStyle;
@@ -2114,7 +2119,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
     }
     OHOS::Media::SourceOptions opts;
     uint32_t ret = 0;
-    std::unique_ptr<std::istream>  isp(std::make_unique<std::istringstream>(svgContent));
+    std::unique_ptr<std::istream> isp(std::make_unique<std::istringstream>(svgContent));
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(std::move(isp), opts, ret);
     if (!imageSource || ret != ERR_OK) {
         MMI_HILOGE("Get image source failed, ret:%{public}d", ret);
@@ -3266,7 +3271,6 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     PostTask([this]() {
         SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
     });
-    SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
 
     auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
     int32_t px = lastPhysicalX_;
@@ -3300,12 +3304,14 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         cfg.userIconPixelMap = GetUserIconCopy();
         cfg.userIconHotSpotX = userIconHotSpotX_;
         cfg.userIconHotSpotY = userIconHotSpotY_;
+        cfg.userIconFollowSystem = userIconFollowSystem_;
     }
 
     for (auto it : screenPointers) {
         cfg.dpi = it.second->GetRenderDPI();
         MMI_HILOGD("HardwareCursorRender, screen=%{public}u, dpi=%{public}f", it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
+            it.second->SetHardRenderCfg(cfg);
             DrawCursor(it.second, cfg);
         } else {
             it.second->SetInvisible();
@@ -3337,14 +3343,15 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         cfg.userIconPixelMap = GetUserIconCopy();
         cfg.userIconHotSpotX = userIconHotSpotX_;
         cfg.userIconHotSpotY = userIconHotSpotY_;
+        cfg.userIconFollowSystem = userIconFollowSystem_;
     }
 
     for (auto it : screenPointers) {
-        cfg.dpi = it.second->GetDPI();
+        cfg.dpi = it.second->GetRenderDPI();
         MMI_HILOGD("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f,direction = %{public}d",
             it.first, cfg.dpi, cfg.direction);
         if (it.second->IsMirror() || it.first == screenId_) {
-            cfg.dpi *= it.second->GetScale();
+            it.second->SetSoftRenderCfg(cfg);
             DrawCursor(it.second->GetSurfaceNode(), cfg);
         } else {
             it.second->SetInvisible();
@@ -3544,6 +3551,9 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
     followSystem_ = options.followSystem;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    userIconFollowSystem_ = false;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     int32_t ret = UpdateCursorProperty(cursor);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
@@ -3570,7 +3580,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
     if (imageInfo.size.width < cursor.focusX || imageInfo.size.width < cursor.focusY) {
-        MMI_HILOGE("focus is invalid");
+        MMI_HILOGE("The focus is invalid");
         return RET_ERR;
     }
     if (imageInfo.size.width > MAX_CUSTOM_CURSOR_SIZE || imageInfo.size.height > MAX_CUSTOM_CURSOR_SIZE ||
