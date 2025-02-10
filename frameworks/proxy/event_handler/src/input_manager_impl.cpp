@@ -1125,6 +1125,21 @@ int32_t InputManagerImpl::GetPointerSize(int32_t &size)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetCursorSurfaceId(surfaceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetCursorSurfaceId fail, error:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Do not support pointer device");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 int32_t InputManagerImpl::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_INFO_TRACE;
