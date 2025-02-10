@@ -220,9 +220,11 @@ private:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
+    void SoftCursorRenderThreadLoop();
     int32_t RequestNextVSync();
     void OnVsync(uint64_t timestamp);
     void PostTask(std::function<void()> task);
+    void PostSoftCursorTask(std::function<void()> task);
     void DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
         int32_t px, int32_t py, ICON_TYPE align);
     int32_t FlushBuffer();
@@ -318,6 +320,9 @@ private:
     std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers_;
     PointerRenderer pointerRenderer_;
     bool userIconFollowSystem_ { false };
+    std::shared_ptr<AppExecFwk::EventRunner> softCursorRunner_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> softCursorHander_ { nullptr };
+    std::unique_ptr<std::thread> softCursorRenderThread_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR

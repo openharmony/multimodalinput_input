@@ -174,6 +174,8 @@ void PointerDrawingManager::InitPointerCallback()
         std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
         if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
             renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+            softCursorRenderThread_ =
+                std::make_unique<std::thread>([this] { this->SoftCursorRenderThreadLoop(); });
         }
         initEventhandlerFlag_.store(true);
     }
@@ -245,6 +247,13 @@ PointerDrawingManager::~PointerDrawingManager()
     }
     if ((renderThread_ != nullptr) && renderThread_->joinable()) {
         renderThread_->join();
+    }
+
+    if (softCursorRunner_ != nullptr) {
+        softCursorRunner_->Stop();
+    }
+    if ((softCursorRenderThread_ != nullptr) && softCursorRenderThread_->joinable()) {
+        softCursorRenderThread_->join();
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
@@ -799,7 +808,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
             hardwareCanvasSize_ = g_hardwareCanvasSize;
             // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
             // repeatedly obtain the surfaceBuffer.
-            PostTask([this, mouseStyle]() {
+            PostSoftCursorTask([this, mouseStyle]() {
                 SoftwareCursorRender(mouseStyle);
             });
             HardwareCursorRender(mouseStyle);
@@ -1087,6 +1096,17 @@ void PointerDrawingManager::PostTask(std::function<void()> task)
     }
 }
 
+void PointerDrawingManager::PostSoftCursorTask(std::function<void()> task)
+{
+    CHKPV(hardwareCursorPointerManager_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (softCursorHander_ != nullptr) {
+        softCursorHander_->PostTask(task);
+    }
+}
+
 void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
     int32_t px, int32_t py, ICON_TYPE align)
 {
@@ -1255,8 +1275,10 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
 
         HardwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
         HardwareCursorMove(px, py, align);
-        SoftwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
-        SoftwareCursorMoveAsync(px, py, align);
+        PostSoftCursorTask([this, px, py, align]() {
+            SoftwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
+            SoftwareCursorMove(px, py, align);
+        });
         currentFrame_++;
         if (currentFrame_ == frameCount_) {
             currentFrame_ = 0;
@@ -1301,6 +1323,18 @@ void PointerDrawingManager::RenderThreadLoop()
     if (runner_ != nullptr) {
         MMI_HILOGI("Runner is run");
         runner_->Run();
+    }
+}
+
+void PointerDrawingManager::SoftCursorRenderThreadLoop()
+{
+    softCursorRunner_ = AppExecFwk::EventRunner::Create(false);
+    CHKPV(softCursorRunner_);
+    softCursorHander_ = std::make_shared<AppExecFwk::EventHandler>(softCursorRunner_);
+    CHKPV(softCursorHander_);
+    if (softCursorRunner_ != nullptr) {
+        MMI_HILOGI("Runner is run");
+        softCursorRunner_->Run();
     }
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -2548,7 +2582,7 @@ void PointerDrawingManager::UpdatePointerVisible()
             mouseDisplayState_ ? "true" : "false", displayId_);
     } else {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        PostTask([this]() {
+        PostSoftCursorTask([this]() {
             SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON);
         });
         HideHardwareCursors();
@@ -3268,7 +3302,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     }
 
     HardwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
-    PostTask([this]() {
+    PostSoftCursorTask([this]() {
         SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
     });
 

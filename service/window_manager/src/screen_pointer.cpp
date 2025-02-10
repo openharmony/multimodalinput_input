@@ -337,8 +337,13 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
         py = width_ - py - DEFAULT_CURSOR_SIZE;
     }
 
-    int64_t nodeId = surfaceNode_->GetId();
-    Rosen::RSInterfaces::GetInstance().SetHwcNodeBounds(nodeId, px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
+    if (!IsMirror()) {
+        int64_t nodeId = surfaceNode_->GetId();
+        Rosen::RSInterfaces::GetInstance().SetHwcNodeBounds(nodeId, px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
+    } else {
+        surfaceNode_->SetBounds(px, py, DEFAULT_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
+    }
+    
     return true;
 }
 
