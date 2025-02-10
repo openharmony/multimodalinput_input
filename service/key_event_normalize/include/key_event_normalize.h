@@ -39,6 +39,7 @@ class KeyEventNormalize final {
 public:
     DISALLOW_COPY_AND_MOVE(KeyEventNormalize);
     std::shared_ptr<KeyEvent> GetKeyEvent();
+    void Init();
     int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
     void ResetKeyEvent(struct libinput_device* device);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
