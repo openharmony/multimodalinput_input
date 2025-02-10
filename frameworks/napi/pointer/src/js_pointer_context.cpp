@@ -1892,6 +1892,8 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusX is invalid");
             return false;
         }
+    } else {
+        cursor.focusX = 0;
     }
     napi_value focusYValue;
     if (napi_get_named_property(env, obj, "focusY", &focusYValue) == napi_ok) {
@@ -1904,6 +1906,8 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusY is invalid");
             return false;
         }
+    } else {
+        cursor.focusY = 0;
     }
     return true;
 }
