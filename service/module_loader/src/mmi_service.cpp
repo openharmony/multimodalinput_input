@@ -750,6 +750,22 @@ int32_t MMIService::GetPointerSize(int32_t &size)
     return RET_OK;
 }
 
+int32_t MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    auto ret = delegateTasks_.PostSyncTask(
+        [&surfaceId] {
+            return IPointerDrawingManager::GetInstance()->GetCursorSurfaceId(surfaceId);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetCursorSurfaceId fail, error:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_INFO_TRACE;

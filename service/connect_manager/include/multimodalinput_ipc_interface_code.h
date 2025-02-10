@@ -120,6 +120,7 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_POINTER_SNAPSHOT = 99,
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     SKIP_POINTER_LAYER = 101,
+    GET_CURSOR_SURFACE_ID = 205,
 };
 
 enum class MultimodalinputEventObserverCode {

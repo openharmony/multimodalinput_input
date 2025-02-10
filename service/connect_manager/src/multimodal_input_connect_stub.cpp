@@ -407,6 +407,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_CURSOR_SURFACE_ID):
+            ret = StubGetCursorSurfaceId(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -709,6 +712,26 @@ int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, Mess
     }
     WRITEINT32(reply, size, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Pointer size:%{public}d, ret:%{public}d", size, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetCursorSurfaceId(MessageParcel& data, MessageParcel& reply)
+{
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    uint64_t surfaceId {};
+    auto ret = GetCursorSurfaceId(surfaceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetCursorSurfaceId fail, ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEUINT64(reply, surfaceId, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
 }
 
