@@ -134,9 +134,11 @@ public:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MOCK_METHOD(bool, IsSupported, ());
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     MOCK_METHOD(void, AttachTouchGestureMgr, (std::shared_ptr<TouchGestureManager>));
     MOCK_METHOD(void, CancelAllTouches, (std::shared_ptr<PointerEvent>));
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(std::shared_ptr<PointerEvent>, GetLastPointerEventForGesture, ());
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
