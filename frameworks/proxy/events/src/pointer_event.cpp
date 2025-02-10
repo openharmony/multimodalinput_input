@@ -459,7 +459,8 @@ PointerEvent::PointerEvent(const PointerEvent& other)
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-      dispatchTimes_(other.dispatchTimes_)
+      dispatchTimes_(other.dispatchTimes_),
+      handOption_(other.handOption_)
       {}
 
 PointerEvent::~PointerEvent() {}
@@ -474,6 +475,7 @@ std::shared_ptr<PointerEvent> PointerEvent::Create()
 void PointerEvent::Reset()
 {
     InputEvent::Reset();
+    handOption_ = -1;
     pointerId_ = -1;
     pointers_.clear();
     pressedButtons_.clear();
@@ -514,6 +516,16 @@ int32_t PointerEvent::GetOriginPointerAction() const
 void PointerEvent::SetOriginPointerAction(int32_t pointerAction)
 {
     originPointerAction_ = pointerAction;
+}
+
+int32_t PointerEvent::GetHandOption() const
+{
+    return handOption_;
+}
+
+void PointerEvent::SetHandOption(int32_t handOption)
+{
+    handOption_ = handOption;
 }
 
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
@@ -893,6 +905,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     WRITEDOUBLE(out, fingerprintDistanceX_);
     WRITEDOUBLE(out, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    WRITEINT32(out, handOption_);
     return true;
 }
 
@@ -962,6 +975,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     READDOUBLE(in, fingerprintDistanceX_);
     READDOUBLE(in, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    READINT32(in, handOption_);
     return true;
 }
 
