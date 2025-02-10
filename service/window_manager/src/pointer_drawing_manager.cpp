@@ -808,7 +808,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
             hardwareCanvasSize_ = g_hardwareCanvasSize;
             // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
             // repeatedly obtain the surfaceBuffer.
-            PostTask([this, mouseStyle]() {
+            PostSoftCursorTask([this, mouseStyle]() {
                 SoftwareCursorRender(mouseStyle);
             });
             HardwareCursorRender(mouseStyle);
@@ -2582,7 +2582,7 @@ void PointerDrawingManager::UpdatePointerVisible()
             mouseDisplayState_ ? "true" : "false", displayId_);
     } else {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        PostTask([this]() {
+        PostSoftCursorTask([this]() {
             SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON);
         });
         HideHardwareCursors();
@@ -3302,7 +3302,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     }
 
     HardwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
-    PostTask([this]() {
+    PostSoftCursorTask([this]() {
         SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
     });
 
