@@ -1104,7 +1104,7 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 13
      */
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown = true);
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown = true);
 
     /**
      * @brief Sets the custom cursor. You can set whether to adjust the cursor size based on the system settings.

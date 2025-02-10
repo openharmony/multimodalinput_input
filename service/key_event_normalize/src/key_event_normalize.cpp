@@ -19,6 +19,7 @@
 #include <config_policy_utils.h>
 #include <parameters.h>
 
+#include "display_manager.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "key_map_manager.h"
@@ -281,10 +282,12 @@ int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32
         { KeyEvent::KEYCODE_VOLUME_UP, DisplayMode::UNKNOWN },
     };
     static InputProductConfig productConfig {};
+    static bool isFoldable = false;
 
     std::call_once(flag, [this]() {
         ReadProductConfig(productConfig);
         CheckProductParam(productConfig);
+        isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
     });
     if (productConfig.volumeSwap_ != VolumeSwapConfig::SWAP_ON_FOLD) {
         return keyCode;
@@ -295,11 +298,21 @@ int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32
     }
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         iter->second = WIN_MGR->GetDisplayMode();
-        if (iter->second != DisplayMode::SUB && iter->second != DisplayMode::MAIN) {
+        if (!isFoldable) {
+            if (iter->second != DisplayMode::SUB) {
+                return keyCode;
+            }
+        } else if (iter->second != DisplayMode::MAIN) {
             return keyCode;
         }
-    } else if (iter->second != DisplayMode::SUB && iter->second != DisplayMode::MAIN) {
-        return keyCode;
+    } else {
+        if (!isFoldable) {
+            if (iter->second != DisplayMode::SUB) {
+                return keyCode;
+            }
+        } else if (iter->second != DisplayMode::MAIN) {
+            return keyCode;
+        }
     }
     const char *name = libinput_device_get_name(dev);
     int32_t busType = static_cast<int32_t>(libinput_device_get_id_bustype(dev));

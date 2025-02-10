@@ -643,7 +643,7 @@ void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const
         time_t firstTimeT = std::chrono::system_clock::to_time_t(firstTime);
         std::tm *bt = std::localtime(&firstTimeT);
         if (bt == nullptr) {
-            MMI_HILOGE("bt is nullptr, this is a invalid time");
+            MMI_HILOGE("The bt is nullptr, this is a invalid time");
             return;
         }
         oss << std::put_time(bt, "%Y-%m-%d %H:%M:%S");

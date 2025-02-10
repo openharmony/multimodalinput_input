@@ -1662,7 +1662,7 @@ void JsEventTarget::CallKeyboardRepeatRateTask(uv_work_t *work, const std::strin
         auto callback = [&_rate] (int32_t rate) { _rate = rate; };
         int32_t napiCode = InputManager::GetInstance()->GetKeyboardRepeatRate(callback);
         cb->errCode = napiCode;
-        cb->data.keyboardRepeatDelay = _rate;
+        cb->data.keyboardRepeatRate = _rate;
     } else {
         int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatRate(cb->data.keyboardRepeatRate);
         cb->errCode = napiCode;
@@ -1747,6 +1747,7 @@ void JsEventTarget::CallIntervalSinceLastInputTask(uv_work_t *work)
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo*>(work->data));
+    CHKPV(cb->env);
     int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(cb->data.IntervalSinceLastInput);
     cb->errCode = napiCode;
 }

@@ -149,7 +149,8 @@ const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product
 const std::string VKEYBOARD_PATH { "libvkeyboard_device.z.so" };
 void* g_VKeyboardHandle = nullptr;
 typedef int32_t (*HANDLE_TOUCHPOINT_TYPE)(
-    double screenX, double screenY, int touchId, int32_t eventType, double touchPressure);
+    double screenX, double screenY, int touchId, int32_t eventType, double touchPressure,
+    int32_t longAxis, int32_t shortAxis);
 HANDLE_TOUCHPOINT_TYPE handleTouchPoint_ = nullptr;
 typedef int32_t (*STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)(
     int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode);
@@ -236,7 +237,7 @@ MMIService* MMIService::GetInstance()
     return g_MMIService;
 }
 
-int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
+int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd, bool readOnly)
 {
     if (type < EPOLL_EVENT_BEGIN || type >= EPOLL_EVENT_END) {
         MMI_HILOGE("Invalid param type");
@@ -256,7 +257,11 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     MMI_HILOGI("The userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
-    ev.events = EPOLLIN;
+    if (readOnly) {
+        ev.events = 0;
+    } else {
+        ev.events = EPOLLIN;
+    }
     ev.data.fd = fd;
     auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
     if (ret < 0) {

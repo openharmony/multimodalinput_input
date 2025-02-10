@@ -56,11 +56,11 @@ bool UDSSession::SendMsg(const char *buf, size_t size)
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_HILOGE("buf size:%{public}zu", size);
+        MMI_HILOGE("The buf size:%{public}zu", size);
         return false;
     }
     if (fd_ < 0) {
-        MMI_HILOGE("The fd_ is less than 0");
+        MMI_HILOGE("The fd is less than 0");
         return false;
     }
 
@@ -105,7 +105,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size)
 void UDSSession::Close()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Enter fd_:%{public}d", fd_);
+    MMI_HILOGD("Enter fd:%{public}d", fd_);
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
