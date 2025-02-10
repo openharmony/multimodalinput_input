@@ -72,9 +72,9 @@
 #include "timer_manager.h"
 #include "tokenid_kit.h"
 #include "touch_event_normalize.h"
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "touch_gesture_manager.h"
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "util.h"
 #include "util_ex.h"
 #include "watchdog_task.h"
@@ -2261,9 +2261,9 @@ void MMIService::SetMmiServicePriority()
 
 void MMIService::PreEventLoop()
 {
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     SetupTouchGestureHandler();
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     libinputAdapter_.ProcessPendingEvents();
 }
 
@@ -3533,13 +3533,13 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
     return ERROR_UNSUPPORT;
 }
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 void MMIService::SetupTouchGestureHandler()
 {
     touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
     WIN_MGR->AttachTouchGestureMgr(touchGestureMgr_);
 }
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 
 int32_t MMIService::SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess)
 {

@@ -72,7 +72,9 @@ public:
     }
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
+
 private:
+    void PreloadDrawingResources();
     void CreateObserver();
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
         bool isNeedRotate = true);
