@@ -247,14 +247,14 @@ typedef enum Input_Result {
     INPUT_DEVICE_NOT_SUPPORTED = 801,
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
-    /** There is currently no keyboard device connected */
-    INPUT_DEVICE_NOT_EXIST = 3900002,
     /** Interceptor repeatedly created for an application */
     INPUT_REPEAT_INTERCEPTOR = 4200001,
     /** @error Already occupied by the system */
     INPUT_OCCUPIED_BY_SYSTEM = 4200002,
     /** @error Already occupied by the other */
-    INPUT_OCCUPIED_BY_OTHER = 4200003
+    INPUT_OCCUPIED_BY_OTHER = 4200003,
+    /** @error No keyboard device connected */
+    INPUT_KEYBOARD_DEVICE_NOT_EXIST = 3900002
 } Input_Result;
 
 /**
@@ -1809,6 +1809,7 @@ Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **addr
  * @return OH_Input_GetFunctionKeyState function api result code
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} if keyCode is invalid or state is a null pointer.
+ *         {@link INPUT_KEYBOARD_DEVICE_NOT_EXIST} no keyboard device connected.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 15
  */

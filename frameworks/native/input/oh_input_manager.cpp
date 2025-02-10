@@ -2601,9 +2601,9 @@ Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state)
     bool resultState = false;
     int32_t napiCode = OHOS::MMI::InputManager::GetInstance()->GetFunctionKeyState(keyCode, resultState);
     *state = resultState ? 1 : 0;
-    if (napiCode == INPUT_DEVICE_NOT_EXIST) {
+    if (napiCode == INPUT_KEYBOARD_DEVICE_NOT_EXIST) {
         MMI_HILOGE("GetFunctionKeyState fail, no keyboard device connected");
-        return INPUT_DEVICE_NOT_EXIST;
+        return INPUT_KEYBOARD_DEVICE_NOT_EXIST;
     }
     return INPUT_SUCCESS;
 }
