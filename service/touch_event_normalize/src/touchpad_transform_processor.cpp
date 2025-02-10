@@ -837,7 +837,7 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
 int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     if (PutConfigDataToDatabase(g_threeFingerTapKey, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set touchpad three fingers switch flag to mem.");
+        MMI_HILOGE("Failed to set touchpad three fingers switch flag to mem");
         return RET_ERR;
     }
     DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_PINCH_SETTING,

@@ -40,6 +40,7 @@
 #include "touchpad_transform_processor.h"
 #include "util.h"
 #include "util_ex.h"
+#include "linux/input.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -78,10 +79,15 @@ const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
+constexpr int32_t FINE_CALCULATE { 20 };
+constexpr int32_t STEP_CALCULATE { 40 };
+constexpr int32_t STOP_CALCULATE { 5000 };
+constexpr int32_t CALCULATE_STEP { 5 };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
 int32_t MouseTransformProcessor::scrollSwitchPid_ = -1;
+TouchpadCDG MouseTransformProcessor::touchpadOption_;
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
     : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
@@ -94,6 +100,32 @@ std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
     return pointerEvent_;
 }
 
+#ifdef OHOS_BUILD_EMULATOR
+static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const DisplayInfo &displayInfo)
+{
+    auto direction = displayInfo.displayDirection;
+    auto width = displayInfo.width;
+    auto height = displayInfo.height;
+    constexpr int evenNum = 2;
+    if ((displayInfo.displayDirection - displayInfo.direction) % evenNum != 0) {
+        std::swap(width, height);
+    }
+    offset.dx -= displayInfo.offsetX;
+    offset.dy -= displayInfo.offsetY;
+    if (direction == DIRECTION90) {
+        std::swap(offset.dx, offset.dy);
+        offset.dx = width - offset.dx;
+    } else if (direction == DIRECTION180) {
+        offset.dx = width - offset.dx;
+        offset.dy = height - offset.dy;
+    } else if (direction == DIRECTION270) {
+        std::swap(offset.dx, offset.dy);
+        offset.dy = height - offset.dy;
+    }
+    return {offset.dx, offset.dy};
+}
+#endif
+
 int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
@@ -102,6 +134,14 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #ifndef OHOS_BUILD_ENABLE_WATCH
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
+
+    if (MouseState->IsLeftBtnPressed()) {
+        if (!pointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
+            pointerEvent_->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+        }
+    } else {
+        pointerEvent_->DeleteReleaseButton(PointerEvent::MOUSE_BUTTON_LEFT);
+    }
 
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
@@ -115,18 +155,33 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
     CalculateOffset(displayInfo, offset);
+    CalculateMouseResponseTimeProbability(event);
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
-        struct libinput_device *dev = libinput_event_get_device(event);
-        const std::string devName = libinput_device_get_name(dev);
+        struct libinput_device *device = libinput_event_get_device(event);
+        CHKPR(device, ERROR_NULL_POINTER);
+        const std::string devName = libinput_device_get_name(device);
         if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
             deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
+            pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+            ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+                &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
+        } else {
+            pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+            double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
+            double touchpadPPi = libinput_touchpad_device_get_ppi(device);
+            double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
+            int32_t frequency = libinput_touchpad_device_get_frequency(device);
+            if (touchpadPPi < 1.0 || touchpadSize < 1.0 || frequency < 1.0) {
+                MMI_HILOGE("touchpad info get error");
+                return RET_ERR;
+            }
+            ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+                &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), displaySize,
+                touchpadSize, touchpadPPi, frequency);
         }
-        pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         uint64_t dalta_time = 0;
@@ -135,17 +190,21 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         HandleFilterMouseEvent(&offset);
         CalculateOffset(displayInfo, offset);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
-        ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+        if (displayInfo->ppi != 0) {
+            ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, dalta_time,
             static_cast<double>(displayInfo->ppi));
+        } else {
+            ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, static_cast<int32_t>(deviceType));
+        }
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
     }
 #ifdef OHOS_BUILD_EMULATOR
-    cursorPos.cursorPos.x = offset.dx;
-    cursorPos.cursorPos.y = offset.dy;
+    cursorPos.cursorPos = CalculateCursorPosFromOffset(offset, *displayInfo);
 #endif // OHOS_BUILD_EMULATOR
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     pointerEvent_->SetTargetDisplayId(cursorPos.displayId);
@@ -153,6 +212,91 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
 #endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
+}
+
+void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libinput_event *event)
+{
+    struct libinput_device *dev = libinput_event_get_device(event);
+    const std::string mouseName = libinput_device_get_name(dev);
+    const int32_t devType = libinput_device_get_id_bustype(dev);
+    MMI_HILOGD("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
+    if (devType == BUS_USB || devType == BUS_BLUETOOTH) {
+        std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
+        MMI_HILOGD("connectType:%{public}s", connectType.c_str());
+        auto curMouseTimeMap = mouseMap.find(mouseName);
+        if (curMouseTimeMap == mouseMap.end()) {
+            MMI_HILOGD("start to collect");
+            mouseMap[mouseName] = std::chrono::steady_clock::now();
+            mouseResponseMap[mouseName] = {};
+        } else {
+            std::chrono::time_point<std::chrono::steady_clock> curTime = std::chrono::steady_clock::now();
+            long long gap =
+                std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
+            mouseMap[mouseName] = curTime;
+            MMI_HILOGD("current time difference:%{public}lld", gap);
+            std::map<long long, int32_t> &curMap = mouseResponseMap.find(mouseName)->second;
+            if (gap < FINE_CALCULATE) {
+                auto curMapIt = curMap.find(gap);
+                curMap[gap] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
+            } else if (gap >= FINE_CALCULATE && gap < STEP_CALCULATE) {
+                long long tempNum = gap - gap % CALCULATE_STEP;
+                auto curMapIt = curMap.find(tempNum);
+                curMap[tempNum] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
+            } else if (gap >= STEP_CALCULATE && gap < STOP_CALCULATE) {
+                auto curMapIt = curMap.find(STEP_CALCULATE);
+                curMap[STEP_CALCULATE] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
+            } else if (gap > STOP_CALCULATE) {
+                HandleReportMouseResponseTime(connectType, curMap);
+                mouseResponseMap.erase(mouseName);
+                mouseMap.erase(mouseName);
+            }
+        }
+    }
+}
+void MouseTransformProcessor::HandleReportMouseResponseTime(
+    std::string &connectType, std::map<long long, int32_t> &curMap)
+{
+    MMI_HILOGD("start to report");
+    long total = 0;
+    for (const auto &[key, value] : curMap) {
+        total += value;
+    }
+    MMI_HILOGD("total mouse movements: %{public}ld", total);
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "COLLECT_MOUSE_RESPONSE_TIME",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "MOUSE_CONNECT_TYPE", connectType,
+        "MOVING_TOTAL", total,
+        "1ms", curMap.find(1)->second / total,
+        "2ms", curMap.find(2)->second / total,
+        "3ms", curMap.find(3)->second / total,
+        "4ms", curMap.find(4)->second / total,
+        "5ms", curMap.find(5)->second / total,
+        "6ms", curMap.find(6)->second / total,
+        "7ms", curMap.find(7)->second / total,
+        "8ms", curMap.find(8)->second / total,
+        "9ms", curMap.find(9)->second / total,
+        "10ms", curMap.find(10)->second / total,
+        "11ms", curMap.find(11)->second / total,
+        "12ms", curMap.find(12)->second / total,
+        "13ms", curMap.find(13)->second / total,
+        "14ms", curMap.find(14)->second / total,
+        "15ms", curMap.find(15)->second / total,
+        "16ms", curMap.find(16)->second / total,
+        "17ms", curMap.find(17)->second / total,
+        "18ms", curMap.find(18)->second / total,
+        "19ms", curMap.find(19)->second / total,
+        "20ms", curMap.find(FINE_CALCULATE)->second / total,
+        "25ms", curMap.find(25)->second / total,
+        "30ms", curMap.find(30)->second / total,
+        "35ms", curMap.find(35)->second / total,
+        "40ms", curMap.find(STEP_CALCULATE)->second / total,
+        "MSG", "collectiong mouse response time probability");
+    if (ret != RET_OK) {
+        MMI_HILOGE("mouse write failed , ret:%{public}d", ret);
+    }
+    MMI_HILOGD("mouse write end , ret:%{public}d", ret);
 }
 
 void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
@@ -893,7 +1037,8 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y, int32_
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y, false);
     cursorPos = WIN_MGR->GetCursorPos();
-    IPointerDrawingManager::GetInstance()->SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    IPointerDrawingManager::GetInstance()->SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y,
+        cursorPos.displayId);
     MMI_HILOGI("CursorPosX:%f, cursorPosY:%f", cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     return RET_OK;
 }
@@ -947,9 +1092,14 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
         return;
     }
 
-    // touchpad two finger button 272 -> 0
+    // touchpad two finger button 272 -> 273
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
+        uint32_t buttonArea = libinput_event_pointer_get_button_area(data);
+        if (buttonArea == BTN_RIGHT_MENUE_CODE && fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+            button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
+        }
         return;
     }
 }
@@ -1104,6 +1254,18 @@ void MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
     speed = speed > MAX_TOUCHPAD_SPEED ? MAX_TOUCHPAD_SPEED : speed;
 }
 
+void MouseTransformProcessor::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    touchpadCDG = touchpadOption_;
+}
+
+void MouseTransformProcessor::UpdateTouchpadCDG(double touchpadPPi, double touchpadSize)
+{
+    touchpadOption_.ppi = touchpadPPi;
+    touchpadOption_.size = touchpadSize;
+    touchpadOption_.speed = GetTouchpadSpeed();
+}
+
 int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
 {
     std::string name = "rightMenuSwitch";
@@ -1164,12 +1326,7 @@ void MouseTransformProcessor::HandleFilterMouseEvent(Offset* offset)
 bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event)
 {
     CHKPF(event);
-    struct libinput_device *device = libinput_event_get_device(event);
-    CHKPF(device);
 
-    if (libinput_device_get_id_bustype(device) != BUS_USB) {
-        return false;
-    }
     if (libinput_event_get_type(event) != LIBINPUT_EVENT_POINTER_MOTION) {
         return false;
     }
@@ -1190,7 +1347,10 @@ bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event
     filterInsertionPoint_.filterY += dy;
 
     filterInsertionPoint_.filterPrePointTime = currentTime;
-    if (filterInsertionPoint_.filterDeltaTime < FilterInsertionPoint::FILTER_THRESHOLD_US) {
+    struct libinput_device *device = libinput_event_get_device(event);
+    CHKPF(device);
+    if (filterInsertionPoint_.filterDeltaTime < FilterInsertionPoint::FILTER_THRESHOLD_US &&
+        libinput_device_get_id_bustype(device) == BUS_USB) {
         MMI_HILOGD("Mouse motion event delta time is too short");
         return true;
     }

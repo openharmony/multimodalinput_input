@@ -34,11 +34,12 @@ namespace MMI {
 namespace {
 const std::unordered_set<std::string> ACTION_TYPE = {
     "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
-    "fingerprint", "swipeInward", TOUCH_SWIPE_GESTURE, TOUCH_PINCH_GESTURE
+    "fingerprint", "swipeInward", TOUCH_SWIPE_GESTURE, TOUCH_PINCH_GESTURE, "keyPressed"
 };
 constexpr int32_t TWO_PARAMETERS { 2 };
 constexpr int32_t THREE_PARAMETERS { 3 };
 constexpr int32_t RECT_LIST_SIZE { 2 };
+constexpr int32_t KEY_LIST_SIZE { 5 };
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)
@@ -107,6 +108,39 @@ static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value na
     return;
 }
 
+static void AddPreMonitor(napi_env env, napi_callback_info info, napi_value napiKeys, napi_value napiCallback)
+{
+    std::vector<int32_t> keys;
+    uint32_t keysLength = 0;
+    CHKRV(napi_get_array_length(env, napiKeys, &keysLength), GET_ARRAY_LENGTH);
+    if (keysLength <= 0 || keysLength > KEY_LIST_SIZE) {
+        MMI_HILOGE("keys Parameter error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keys Parameter error");
+        return;
+    }
+    if (!JS_INPUT_MONITOR_MGR.GetKeysArray(env, napiKeys, keysLength, keys)) {
+        THROWERR_CUSTOM(env, PRE_KEY_NOT_SUPPORTED, "Event listening not  supported for the key");
+        return;
+    }
+    if (keys.size() != keysLength) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keys Parameter error");
+        MMI_HILOGE("keys Parameter error");
+        return;
+    }
+    napi_valuetype valueType = napi_undefined;
+    CHKRV(napi_typeof(env, napiCallback, &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        MMI_HILOGE("Third Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
+        return;
+    }
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
+        MMI_HILOGE("AddEnv failed");
+        return;
+    }
+    JS_INPUT_MONITOR_MGR.AddPreMonitor(env, "keyPressed", napiCallback, keys);
+}
+
 static napi_value AddMonitor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -129,6 +163,8 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
     }
     if (strcmp(typeName, "mouse") == 0) {
         AddMouseMonitor(env, info, argv[1], argv[TWO_PARAMETERS]);
+    } else if (strcmp(typeName, "keyPressed") == 0) {
+        AddPreMonitor(env, info, argv[1], argv[TWO_PARAMETERS]);
     } else {
         CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
         if (valueType != napi_number) {

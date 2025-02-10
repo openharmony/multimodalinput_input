@@ -21,6 +21,9 @@
 #include "message_parcel.h"
 
 #include "ability_manager_client.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -34,6 +37,7 @@ namespace {
 constexpr int32_t INVALID_USERID { -1 };
 constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_SEND { 0 };
 constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_CLOSE { 1 };
+const std::u16string INJECT_NOTICE_INTERFACE_TOKEN { u"ohos.multimodalinput.IInjectNotice" };
 }
 
 InjectNoticeManager::InjectNoticeManager() : connectionCallback_(new (std::nothrow) InjectNoticeConnection()) {}
@@ -56,7 +60,13 @@ bool InjectNoticeManager::StartNoticeAbility()
     }
     AAFwk::Want want;
     want.SetElementName("com.ohos.powerdialog", "InjectNoticeAbility");
+    auto begin = std::chrono::high_resolution_clock::now();
     int32_t result = client->StartAbility(want);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CLIENT_START_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (result != 0) {
         MMI_HILOGW("Start injectNoticeAbility failed, result:%{public}d", result);
         return false;
@@ -78,7 +88,13 @@ bool InjectNoticeManager::ConnectNoticeSrv()
     CHKPF(abilityMgr);
     AAFwk::Want want;
     want.SetElementName("com.ohos.powerdialog", "InjectNoticeAbility");
+    auto begin = std::chrono::high_resolution_clock::now();
     ErrCode result = abilityMgr->ConnectAbility(want, connectionCallback_, INVALID_USERID);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CONNECT_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (result != ERR_OK) {
         MMI_HILOGW("Connect InjectNoticeAbility failed, result:%{public}d", result);
         return false;
@@ -101,7 +117,7 @@ void InjectNoticeManager::InjectNoticeConnection::OnAbilityConnectDone(const App
     const sptr<IRemoteObject>& remoteObject, int resultCode)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex>  lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(remoteObject);
     if (remoteObject_ == nullptr) {
         remoteObject_ = remoteObject;
@@ -114,7 +130,7 @@ void InjectNoticeManager::InjectNoticeConnection::OnAbilityDisconnectDone(const 
     int resultCode)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex>  lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     isConnected_ = false;
     MMI_HILOGI("InjectNotice disconnected,remoteObject_:%{private}p", &remoteObject_);
     remoteObject_ = nullptr;
@@ -126,9 +142,10 @@ bool InjectNoticeManager::InjectNoticeConnection::SendNotice(const InjectNoticeI
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    data.WriteInterfaceToken(INJECT_NOTICE_INTERFACE_TOKEN);
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_SEND;
-    std::lock_guard<std::mutex>  lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     CHKPF(remoteObject_);
     MMI_HILOGD("Requst send notice begin");
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
@@ -146,9 +163,10 @@ bool InjectNoticeManager::InjectNoticeConnection::CancelNotice(const InjectNotic
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    data.WriteInterfaceToken(INJECT_NOTICE_INTERFACE_TOKEN);
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_CLOSE;
-    std::lock_guard<std::mutex>  lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     CHKPF(remoteObject_);
     MMI_HILOGD("Requst send close notice begin");
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);

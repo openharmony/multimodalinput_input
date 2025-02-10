@@ -243,16 +243,18 @@ typedef enum Input_Result {
     INPUT_NOT_SYSTEM_APPLICATION = 202,
     /** Parameter check failed */
     INPUT_PARAMETER_ERROR = 401,
+    /** Capability not supported */
+    INPUT_DEVICE_NOT_SUPPORTED = 801,
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
-    /** There is currently no keyboard device connected */
-    INPUT_DEVICE_NOT_EXIST = 3900002,
     /** Interceptor repeatedly created for an application */
     INPUT_REPEAT_INTERCEPTOR = 4200001,
     /** @error Already occupied by the system */
     INPUT_OCCUPIED_BY_SYSTEM = 4200002,
     /** @error Already occupied by the other */
-    INPUT_OCCUPIED_BY_OTHER = 4200003
+    INPUT_OCCUPIED_BY_OTHER = 4200003,
+    /** @error No keyboard device connected */
+    INPUT_KEYBOARD_DEVICE_NOT_EXIST = 3900002
 } Input_Result;
 
 /**
@@ -530,6 +532,46 @@ void OH_Input_SetKeyEventActionTime(struct Input_KeyEvent* keyEvent, int64_t act
 int64_t OH_Input_GetKeyEventActionTime(const struct Input_KeyEvent* keyEvent);
 
 /**
+ * @brief Sets the windowId for a key event.
+ *
+ * @param keyEvent Key event object.
+ * @param windowId The windowId for a key event.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+void OH_Input_SetKeyEventWindowId(struct Input_KeyEvent* keyEvent, int32_t windowId);
+
+/**
+ * @brief Obtains the windowId of a key event.
+ *
+ * @param keyEvent Key event object.
+ * @return windowId.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+int32_t OH_Input_GetKeyEventWindowId(const struct Input_KeyEvent* keyEvent);
+
+/**
+ * @brief Sets the displayId for a key event.
+ *
+ * @param keyEvent Key event object.
+ * @param displayId The displayId for a key event.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+void OH_Input_SetKeyEventDisplayId(struct Input_KeyEvent* keyEvent, int32_t displayId);
+
+/**
+ * @brief Obtains the displayId of a key event.
+ *
+ * @param keyEvent Key event object.
+ * @return displayId.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+int32_t OH_Input_GetKeyEventDisplayId(const struct Input_KeyEvent* keyEvent);
+
+/**
  * @brief Inject mouse event.
  *
  * @param mouseEvent - the mouse event to be injected.
@@ -702,6 +744,46 @@ void OH_Input_SetMouseEventActionTime(struct Input_MouseEvent* mouseEvent, int64
 int64_t OH_Input_GetMouseEventActionTime(const struct Input_MouseEvent* mouseEvent);
 
 /**
+ * @brief Sets the windowId for a mouse event.
+ *
+ * @param mouseEvent Mouse event object.
+ * @param windowId The windowId for a mouse event.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+void OH_Input_SetMouseEventWindowId(struct Input_MouseEvent* mouseEvent, int32_t windowId);
+
+/**
+ * @brief Obtains the windowId of a mouse event.
+ *
+ * @param mouseEvent Mouse event object.
+ * @return windowId.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+int32_t OH_Input_GetMouseEventWindowId(const struct Input_MouseEvent* mouseEvent);
+
+/**
+ * @brief Sets the displayId for a mouse event.
+ *
+ * @param mouseEvent Mouse event object.
+ * @param displayId The displayId for a mouse event.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+void OH_Input_SetMouseEventDisplayId(struct Input_MouseEvent* mouseEvent, int32_t displayId);
+
+/**
+ * @brief Obtains the displayId of a mouse event.
+ *
+ * @param mouseEvent Mouse event object.
+ * @return displayId.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+int32_t OH_Input_GetMouseEventDisplayId(const struct Input_MouseEvent* mouseEvent);
+
+/**
  * @brief Inject touch event.
  *
  * @param touchEvent - the touch event to be injected.
@@ -831,6 +913,46 @@ void OH_Input_SetTouchEventActionTime(struct Input_TouchEvent* touchEvent, int64
  * @since 12
  */
 int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Sets the windowId for a touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param windowId The windowId for a touch event.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+void OH_Input_SetTouchEventWindowId(struct Input_TouchEvent* touchEvent, int32_t windowId);
+
+/**
+ * @brief Obtains the windowId of a touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return windowId.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+*/
+int32_t OH_Input_GetTouchEventWindowId(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Sets the displayId for a touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param displayId The displayId for a touch event.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+void OH_Input_SetTouchEventDisplayId(struct Input_TouchEvent* touchEvent, int32_t displayId);
+
+/**
+ * @brief Obtains the displayId of a touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return displayId.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+*/
+int32_t OH_Input_GetTouchEventDisplayId(const struct Input_TouchEvent* touchEvent);
 
 /**
  * @brief Cancels event injection and revokes authorization.
@@ -1048,6 +1170,58 @@ Input_Result OH_Input_SetAxisEventSourceType(Input_AxisEvent* axisEvent, InputEv
  * @since 12
  */
 Input_Result OH_Input_GetAxisEventSourceType(const Input_AxisEvent* axisEvent, InputEvent_SourceType* sourceType);
+
+/**
+ * @brief Sets the windowId of an axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param windowId The windowId for the axis event.
+ * @return OH_Input_SetAxisEventDisplayY function result code.
+ *         {@link INPUT_SUCCESS} Sets the Y coordinate of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+Input_Result OH_Input_SetAxisEventWindowId(Input_AxisEvent* axisEvent, int32_t windowId);
+
+/**
+ * @brief Obtains the windowId of an axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param windowId The windowId for the axis event.
+ * @return OH_Input_GetAxisEventDisplayY function result code.
+ *         {@link INPUT_SUCCESS} Obtains the Y coordinate of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the displayY is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+Input_Result OH_Input_GetAxisEventWindowId(const Input_AxisEvent* axisEvent, int32_t* windowId);
+
+/**
+ * @brief Sets the displayId of an axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param displayId The displayId for the axis event.
+ * @return OH_Input_SetAxisEventDisplayY function result code.
+ *         {@link INPUT_SUCCESS} Sets the Y coordinate of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+Input_Result OH_Input_SetAxisEventDisplayId(Input_AxisEvent* axisEvent, int32_t displayId);
+
+/**
+ * @brief Obtains the displayId of an axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param displayId The displayId for the axis event.
+ * @return OH_Input_GetAxisEventDisplayY function result code.
+ *         {@link INPUT_SUCCESS} Obtains the Y coordinate of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the displayY is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+Input_Result OH_Input_GetAxisEventDisplayId(const Input_AxisEvent* axisEvent, int32_t* displayId);
 
 /**
  * @brief Adds a listener of key events.
@@ -1635,6 +1809,7 @@ Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **addr
  * @return OH_Input_GetFunctionKeyState function api result code
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} if keyCode is invalid or state is a null pointer.
+ *         {@link INPUT_KEYBOARD_DEVICE_NOT_EXIST} no keyboard device connected.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 15
  */

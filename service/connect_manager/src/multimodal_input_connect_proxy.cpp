@@ -218,7 +218,7 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
+int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY,
     void* pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
@@ -233,7 +233,6 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, pid, ERR_INVALID_VALUE);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
     WRITEINT32(data, focusX, ERR_INVALID_VALUE);
     WRITEINT32(data, focusY, ERR_INVALID_VALUE);
@@ -1089,6 +1088,54 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handler
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::AddPreInputHandler(
+    int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
+    WRITEINT32(data, eventType, ERR_INVALID_VALUE);
+    WRITEINT32(data, static_cast<int32_t>(keys.size()), ERR_INVALID_VALUE);
+    for (const auto &item :keys) {
+        WRITEINT32(data, item);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_PRE_INPUT_HANDLER), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::RemovePreInputHandler(int32_t handlerId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_PRE_INPUT_HANDLER), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::HandleGestureMonitor(uint32_t code,
     InputHandlerType handlerType, HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
 {
@@ -1407,6 +1454,35 @@ int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<Po
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_POINTER_EVENT),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG, bool isNativeInject)
+{
+    CHKPR(pointerEvent, ERR_INVALID_VALUE);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    if (!pointerEvent->WriteToParcel(data)) {
+        MMI_HILOGE("Failed to write inject point event");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEDOUBLE(data, touchpadCDG.ppi, ERR_INVALID_VALUE);
+    WRITEDOUBLE(data, touchpadCDG.size, ERR_INVALID_VALUE);
+    WRITEINT32(data, touchpadCDG.speed, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isNativeInject, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_TOUCHPAD_EVENT),
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
@@ -1821,6 +1897,29 @@ int32_t MultimodalInputConnectProxy::GetTouchpadInt32Data(int32_t &value, int32_
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::GetTouchpadCDGData(double &ppi, double &size, int32_t &speed, int32_t type)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(type, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READDOUBLE(reply, ppi, IPC_PROXY_DEAD_OBJECT_ERR);
+    READDOUBLE(reply, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, speed, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::SetTouchpadScrollSwitch(bool switchFlag)
 {
     return SetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
@@ -1867,6 +1966,12 @@ int32_t MultimodalInputConnectProxy::GetTouchpadPointerSpeed(int32_t &speed)
 {
     return GetTouchpadInt32Data(speed, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
         GET_TP_POINTER_SPEED));
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    return GetTouchpadCDGData(touchpadCDG.ppi, touchpadCDG.size, touchpadCDG.speed,
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_OPTION));
 }
 
 int32_t MultimodalInputConnectProxy::SetTouchpadPinchSwitch(bool switchFlag)
@@ -2679,8 +2784,7 @@ int32_t MultimodalInputConnectProxy::SetInputDeviceEnabled(int32_t deviceId, boo
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(int32_t sourceWindowId,
-    int32_t targetWindowId, bool autoGenDown)
+int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -2688,8 +2792,10 @@ int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(int32_t sourceWindowId
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, sourceWindowId, ERR_INVALID_VALUE);
-    WRITEINT32(data, targetWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.sourceWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.targetWindowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.y, ERR_INVALID_VALUE);
     WRITEBOOL(data, autoGenDown, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
@@ -2736,6 +2842,8 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, CustomCur
             data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    } else {
+        READINT32(reply, ret);
     }
     return ret;
 }

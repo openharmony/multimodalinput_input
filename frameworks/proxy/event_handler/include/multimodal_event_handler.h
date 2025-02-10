@@ -24,6 +24,7 @@
 #include "pointer_event.h"
 #include "proto.h"
 #include "switch_event_input_subscribe_manager.h"
+#include "touchpad_control_display_gain.h"
 
 namespace OHOS {
 namespace MMI {
@@ -55,6 +56,10 @@ public:
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,
+        bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);

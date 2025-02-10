@@ -16,8 +16,8 @@
 #include "device.h"
 
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 #include <cstring>
 #include <fstream>

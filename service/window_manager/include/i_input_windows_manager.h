@@ -33,6 +33,7 @@
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #include "uds_server.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -75,9 +76,6 @@ public:
     virtual void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo) = 0;
     virtual void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    virtual void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId) = 0;
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) const = 0;
@@ -166,7 +164,7 @@ public:
     virtual bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    virtual int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) = 0;
+    virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     virtual bool IsSupported() = 0;
@@ -174,6 +172,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr) = 0;
     virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event) = 0;
+    virtual std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();

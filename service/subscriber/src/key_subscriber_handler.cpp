@@ -85,6 +85,7 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
             MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
         }
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
+        DfxHisysevent::ReportKeyEvent("subcriber");
         return;
     }
     CHKPV(nextHandler_);
@@ -135,22 +136,21 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
         sess->GetProgramName(), sess->GetPid());
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisysevent::ReportKeyEvent(keyOption->GetFinalKey(),
-        keyOption->IsFinalKeyDown() ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP,
-        sess->GetProgramName(), DfxHisysevent::KEY_CONSUMPTION_TYPE::NO_TYPE, subscribeId);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         auto ret = AddKeyGestureSubscriber(subscriber, keyOption);
         if (ret != RET_OK) {
             MMI_HILOGE("AddKeyGestureSubscriber fail, error:%{public}d", ret);
+            DfxHisysevent::ReportFailSubscribeKey("SubscribeKeyEvent", sess->GetProgramName(),
+                keyOption->GetFinalKey(), DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
             return ret;
         }
     } else {
         auto ret = AddSubscriber(subscriber, keyOption, true);
         if (ret != RET_OK) {
             MMI_HILOGE("AddSubscriber fail, error:%{public}d", ret);
+            DfxHisysevent::ReportFailSubscribeKey("SubscribeKeyEvent", sess->GetProgramName(),
+                keyOption->GetFinalKey(), DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
             return ret;
         }
     }
@@ -165,6 +165,10 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
     int32_t ret = RemoveSubscriber(sess, subscribeId, true);
     if (ret != RET_OK) {
         ret = RemoveKeyGestureSubscriber(sess, subscribeId);
+    }
+    if (ret == RET_ERR) {
+        DfxHisysevent::ReportFailSubscribeKey("UnsubscribeKeyEvent", sess->GetProgramName(),
+            subscribeId, DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
     }
     return ret;
 }
@@ -329,6 +333,8 @@ int32_t KeySubscriberHandler::SubscribeHotkey(
     auto ret = AddSubscriber(subscriber, keyOption, false);
     if (ret != RET_OK) {
         MMI_HILOGE("AddSubscriber fail, error:%{public}d", ret);
+        DfxHisysevent::ReportFailSubscribeKey("SubscribeHotkey", sess->GetProgramName(),
+            keyOption->GetFinalKey(), DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
         return ret;
     }
     InitSessionDeleteCallback();
@@ -342,6 +348,8 @@ int32_t KeySubscriberHandler::UnsubscribeHotkey(SessionPtr sess, int32_t subscri
     int32_t ret = RemoveSubscriber(sess, subscribeId, false);
     if (ret != RET_OK) {
         MMI_HILOGW("No hot key subscription(%{public}d, No.%{public}d)", sess->GetPid(), subscribeId);
+        DfxHisysevent::ReportFailSubscribeKey("UnsubscribeHotkey", sess->GetProgramName(),
+            subscribeId, DfxHisysevent::KEY_ERROR_CODE::ERROR_RETURN_VALUE);
     }
     return ret;
 }
@@ -479,6 +487,9 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         }
         return IsEnableCombineKeySwipe(keyEvent);
     }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_R) {
+        return IsEnableCombineKeyRecord(keyEvent);
+    }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
         for (const auto &item : keyEvent->GetKeyItems()) {
             int32_t keyCode = item.GetKeyCode();
@@ -489,6 +500,10 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         }
         return true;
     }
+    if (!InterceptByVm(keyEvent)) {
+        return true;
+    }
+
     return enableCombineKey_;
 }
 
@@ -501,6 +516,42 @@ bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEven
             keyCode != KeyEvent::KEYCODE_DPAD_LEFT) {
             return enableCombineKey_;
         }
+    }
+    return true;
+}
+
+bool KeySubscriberHandler::IsEnableCombineKeyRecord(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    for (const auto &item : keyEvent->GetKeyItems()) {
+        int32_t keyCode = item.GetKeyCode();
+        if (keyCode != KeyEvent::KEYCODE_SHIFT_LEFT && keyCode != KeyEvent::KEYCODE_META_LEFT &&
+            keyCode != KeyEvent::KEYCODE_SHIFT_RIGHT && keyCode != KeyEvent::KEYCODE_META_RIGHT &&
+            keyCode != KeyEvent::KEYCODE_R) {
+            return enableCombineKey_;
+        }
+    }
+    return true;
+}
+
+bool KeySubscriberHandler::InterceptByVm(const std::shared_ptr<KeyEvent> keyEvt)
+{
+    // logo + leftShift + E is used by sceneboard, do not intercept by vm
+    const std::vector<int32_t> LOGO_LEFTSHIFT_E = {
+        KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_E};
+    int waitMatchCnt{LOGO_LEFTSHIFT_E.size()};
+    if (keyEvt->GetKeyItems().size() != waitMatchCnt) {
+        return true;
+    }
+    for (auto &&keyItem : keyEvt->GetKeyItems()) {
+        for (auto &&k : LOGO_LEFTSHIFT_E) {
+            if (keyItem.GetKeyCode() == k) {
+                --waitMatchCnt;
+                break;
+            };
+        }
+    }
+    if (waitMatchCnt == 0) {
+        return false;
     }
     return true;
 }
@@ -537,10 +588,22 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
                 MMI_HILOGE("CallManager init fail");
                 return false;
             }
+            auto begin = std::chrono::high_resolution_clock::now();
             callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+            auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_INIT, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
         }
         if (!DEVICE_MONITOR->GetHasHandleRingMute()) {
+            auto begin = std::chrono::high_resolution_clock::now();
             ret = callManagerClientPtr->MuteRinger();
+            auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_MUTE_RINGER, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
             if (ret != ERR_OK) {
                 MMI_HILOGE("Set mute fail, ret:%{public}d", ret);
                 return false;
@@ -615,6 +678,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         handled = HandleKeyUp(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
         hasEventExecuting_ = false;
+        DfxHisysevent::ReportKeyEvent("cancel");
         handled = HandleKeyCancel(keyEvent);
     } else {
         MMI_HILOGW("keyAction exception");
@@ -1348,7 +1412,13 @@ void KeySubscriberHandler::HangUpCallProcess()
         callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     }
     int32_t ret = -1;
+    auto begin = std::chrono::high_resolution_clock::now();
     ret = callManagerClientPtr->HangUpCall(0);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_HANG_UP_CALL, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (ret != ERR_OK) {
         MMI_HILOGE("HangUpCall fail, ret:%{public}d", ret);
         return;
@@ -1367,7 +1437,13 @@ void KeySubscriberHandler::RejectCallProcess()
         callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     }
     int32_t ret = -1;
+    auto begin = std::chrono::high_resolution_clock::now();
     ret = callManagerClientPtr->RejectCall(0, false, u"");
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::TELEPHONY_CALL_MGR_REJECT_CALL, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (ret != ERR_OK) {
         MMI_HILOGE("RejectCall fail, ret:%{public}d", ret);
         return;

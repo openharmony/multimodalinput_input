@@ -24,6 +24,7 @@
 #include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "switch_event_input_subscribe_manager.h"
+#include "pre_monitor_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -45,6 +46,7 @@ void OnConnected(const IfMMIClient& client)
 #endif // OHOS_BUILD_ENABLE_SWITCH
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnConnected();
+    PRE_MONITOR_MGR.OnConnected();
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     InputInterMgr->OnConnected();
@@ -191,6 +193,22 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectPointerEvent(pointerEvent, isNativeInject);
+    if (ret != 0) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+int32_t MultimodalEventHandler::InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG, bool isNativeInject)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectTouchPadEvent(pointerEvent, touchpadCDG, isNativeInject);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;

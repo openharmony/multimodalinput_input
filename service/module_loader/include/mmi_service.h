@@ -32,6 +32,7 @@
 #include "multimodal_input_connect_stub.h"
 #include "nap_process.h"
 #include "server_msg_handler.h"
+#include "touchpad_control_display_gain.h"
 #include "uds_server.h"
 
 namespace OHOS {
@@ -59,7 +60,7 @@ public:
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
-    int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
+    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
     int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
@@ -95,6 +96,8 @@ public:
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
+    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) override;
+    int32_t RemovePreInputHandler(int32_t handlerId) override;
     int32_t AddGestureMonitor(InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
     int32_t RemoveGestureMonitor(InputHandlerType handlerType,
@@ -111,6 +114,8 @@ public:
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
+    int32_t InjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG &touchpadCDG, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>,
@@ -132,6 +137,7 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
     int32_t SetTouchpadPointerSpeed(int32_t speed) override;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG) override;
     int32_t SetTouchpadPinchSwitch(bool switchFlag) override;
     int32_t GetTouchpadPinchSwitch(bool &switchFlag) override;
     int32_t SetTouchpadSwipeSwitch(bool switchFlag) override;
@@ -195,12 +201,12 @@ public:
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) override;
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
-    int32_t AddEpoll(EpollEventType type, int32_t fd) override;
+    int32_t AddEpoll(EpollEventType type, int32_t fd, bool readOnly = false) override;
     int32_t DelEpoll(EpollEventType type, int32_t fd);
     bool IsRunning() const override;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -217,6 +223,7 @@ protected:
     int32_t ReadTouchpadScrollDirection(bool &state);
     int32_t ReadTouchpadTapSwitch(bool &switchFlag);
     int32_t ReadTouchpadPointerSpeed(int32_t &speed);
+    int32_t ReadTouchpadCDG(TouchpadCDG &touchpadCDG);
     int32_t ReadTouchpadPinchSwitch(bool &switchFlag);
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
     int32_t ReadTouchpadRightMenuType(int32_t &type);
@@ -245,6 +252,8 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, bool isNativeInject, bool isShell);
+    int32_t CheckTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+        int32_t pid, const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell);
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();

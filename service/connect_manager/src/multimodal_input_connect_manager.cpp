@@ -138,12 +138,12 @@ int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
     return multimodalInputConnectService_->SetMouseScrollRows(rows);
 }
 
-int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
+int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY,
     void* pixelMap)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
+    return multimodalInputConnectService_->SetCustomCursor(windowId, focusX, focusY, pixelMap);
 }
 
 int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t windowId, void* pixelMap)
@@ -382,6 +382,21 @@ int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handl
         actionsType);
 }
 
+int32_t MultimodalInputConnectManager::AddPreInputHandler(int32_t handlerId, HandleEventType eventType,
+    std::vector<int32_t> keys)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddPreInputHandler(handlerId, eventType, keys);
+}
+
+int32_t MultimodalInputConnectManager::RemovePreInputHandler(int32_t handlerId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemovePreInputHandler(handlerId);
+}
+
 int32_t MultimodalInputConnectManager::AddGestureMonitor(InputHandlerType handlerType,
     HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
 {
@@ -482,6 +497,14 @@ int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->InjectPointerEvent(pointerEvent, isNativeInject);
+}
+
+int32_t MultimodalInputConnectManager::InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG, bool isNativeInject)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->InjectTouchPadEvent(pointerEvent, touchpadCDG, isNativeInject);
 }
 
 int32_t MultimodalInputConnectManager::SetAnrObserver()
@@ -685,6 +708,13 @@ int32_t MultimodalInputConnectManager::GetTouchpadPointerSpeed(int32_t &speed)
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadPointerSpeed(speed);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadCDG(touchpadCDG);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadPinchSwitch(bool switchFlag)
@@ -969,13 +999,12 @@ int32_t MultimodalInputConnectManager::SetInputDeviceEnabled(int32_t deviceId, b
     return multimodalInputConnectService_->SetInputDeviceEnabled(deviceId, enable, index);
 }
 
-int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(int32_t sourceWindowId,
-                                                            int32_t targetWindowId, bool autoGenDown)
+int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    return multimodalInputConnectService_->ShiftAppPointerEvent(param, autoGenDown);
 }
 
 int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)

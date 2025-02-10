@@ -20,8 +20,8 @@
 #include <memory>
 #include <string>
 
-#include <fcntl.h>
 #include "nocopyable.h"
+#include <fcntl.h>
 
 #include "cooperate_events.h"
 #include "delegate_tasks.h"

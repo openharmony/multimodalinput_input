@@ -36,7 +36,9 @@
 #include "nap_process.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
+#include "touchpad_control_display_gain.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -58,7 +60,7 @@ public:
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
-    virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) = 0;
+    virtual int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) = 0;
     virtual int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) = 0;
     virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap) = 0;
     virtual int32_t SetPointerSize(int32_t size) = 0;
@@ -94,6 +96,8 @@ public:
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) = 0;
     virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) = 0;
+    virtual int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) = 0;
+    virtual int32_t RemovePreInputHandler(int32_t handlerId) = 0;
     virtual int32_t AddGestureMonitor(InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) = 0;
     virtual int32_t RemoveGestureMonitor(InputHandlerType handlerType,
@@ -110,6 +114,8 @@ public:
     virtual int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) = 0;
     virtual int32_t UnsubscribeLongPressEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) = 0;
+    virtual int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG &touchpadCDG, bool isNativeInject) = 0;
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas) = 0;
@@ -131,6 +137,7 @@ public:
     virtual int32_t GetTouchpadTapSwitch(bool &switchFlag) = 0;
     virtual int32_t SetTouchpadPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetTouchpadPointerSpeed(int32_t &speed) = 0;
+    virtual int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG) = 0;
     virtual int32_t SetTouchpadPinchSwitch(bool switchFlag) = 0;
     virtual int32_t GetTouchpadPinchSwitch(bool &switchFlag) = 0;
     virtual int32_t SetTouchpadSwipeSwitch(bool switchFlag) = 0;
@@ -176,7 +183,7 @@ public:
     virtual int32_t SkipPointerLayer(bool isSkip) = 0;
     virtual int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) = 0;
     virtual int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) = 0;
-    virtual int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown) = 0;
+    virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

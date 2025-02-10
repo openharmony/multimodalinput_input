@@ -82,7 +82,7 @@ int32_t HardwareCursorPointerManager::SetPosition(uint32_t devId, int32_t x, int
     auto powerInterface = GetPowerInterface();
     CHKPR(powerInterface, RET_ERR);
     if (powerInterface->UpdateHardwareCursor(devId, x, y, buffer) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
-        MMI_HILOGE("UpdateHardwareCursor failed, attempting to reinitialize interface.");
+        MMI_HILOGE("UpdateHardwareCursor failed, attempting to reinitialize interface");
         {
             auto DisplayComposer = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
             std::lock_guard<std::mutex> guard(mtx_);

@@ -26,6 +26,7 @@
 #include "define_multimodal.h"
 #include "timer_manager.h"
 #include "pointer_event.h"
+#include "touchpad_control_display_gain.h"
 #include "window_info.h"
 
 namespace OHOS {
@@ -51,6 +52,8 @@ extern "C" {
     int32_t HandleAxisAccelerateTouchpad(bool mode, double* abs_axis, int32_t deviceType);
     int32_t HandleMotionDynamicAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, uint64_t delta_time, double display_ppi);
+    int32_t HandleMotionDynamicAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
+        int32_t speed, double display_size, double touchpad_size, double touchpad_ppi, int32_t frequency);
 }
 
 namespace MMI {
@@ -122,6 +125,10 @@ private:
     double HandleAxisAccelateTouchPad(double axisValue);
 #endif // OHOS_BUILD_ENABLE_WATCH
     void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
+    void HandleReportMouseResponseTime(std::string &connectType, std::map<long long, int32_t> &curMap);
+    void CalculateMouseResponseTimeProbability(struct libinput_event *event);
+    std::map<std::string, std::map<long long, int32_t>> mouseResponseMap = {};
+    std::map<std::string, std::chrono::time_point<std::chrono::steady_clock>> mouseMap = {};
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
@@ -155,6 +162,8 @@ public:
     static void GetTouchpadRightClickType(int32_t &type);
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static void GetTouchpadPointerSpeed(int32_t &speed);
+    static void GetTouchpadCDG(TouchpadCDG &touchpadCDG);
+    static void UpdateTouchpadCDG(double touchpadPPi, double touchpadSize);
     static int32_t GetTouchpadSpeed();
 
 private:
@@ -169,6 +178,7 @@ private:
     bool isAxisBegin_ { false };
     Movement unaccelerated_ {};
     std::map<int32_t, int32_t> buttonMapping_;
+    static TouchpadCDG touchpadOption_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
                 return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
