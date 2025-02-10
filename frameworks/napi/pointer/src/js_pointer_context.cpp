@@ -1856,6 +1856,19 @@ bool JsPointerContext::GetCursorOptions(napi_env env, napi_value obj, CursorOpti
     return true;
 }
 
+bool JsPointerContext::CheckPixelMapValid(std::shared_ptr<Media::PixelMap> pixelMap)
+{
+    if (pixelMap == nullptr) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
+        return false;
+    }
+    if (pixelMap->GetWidth() > MAX_PIXELMAP_SIZE || pixelMap->GetHeight() > MAX_PIXELMAP_SIZE) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The width or height of the pixelMap exceed 256");
+        return false;
+    }
+    return true;
+}
+
 bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomCursor& cursor)
 {
     if (!JsCommon::TypeOf(env, obj, napi_object)) {
@@ -1869,12 +1882,7 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
         return false;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMapNapi::GetPixelMap(env, pixelMapValue);
-    if (pixelMap == nullptr) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
-        return false;
-    }
-    if (pixelMap->GetWidth() > MAX_PIXELMAP_SIZE || pixelMap->GetHeight() > MAX_PIXELMAP_SIZE) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The width or height of the pixelMap exceed 256");
+    if (!CheckPixelMapValid(pixelMap)) {
         return false;
     }
     Parcel* pixelMapData = new Parcel();
