@@ -103,6 +103,7 @@ private:
     static int32_t GetCursorFocusX(napi_env env, napi_value value);
     static int32_t GetCursorFocusY(napi_env env, napi_value value);
     static bool GetCursorOptions(napi_env env, napi_value obj, CursorOptions& options);
+    static bool CheckPixelMapValid(std::shared_ptr<Media::PixelMap> pixelMap);
     static bool GetCustomCursorInfo(napi_env env, napi_value obj, CustomCursor& cursor);
     static napi_value SetCustomCursorEx(napi_env env, std::shared_ptr<JsPointerManager> jsPointerMgr,
         int32_t windowId, size_t argc, napi_value* argv);
