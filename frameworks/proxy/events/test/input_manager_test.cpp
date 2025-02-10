@@ -5138,5 +5138,177 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_004,
     ret = pointerEvent->GetPointerItem(pointerId, pointerItem);
     ASSERT_EQ(ret, false);
 }
+
+/*
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_016
+ * @tc.desc: Verify subscribe KEYCODE_HOME key up event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_016, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_HOME);
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event KEYCODE_HOME up trigger callback");
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    EXPECT_TRUE(subscribeId >= 0);
+#else
+    EXPECT_TRUE(subscribeId < 0);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/*
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_017
+ * @tc.desc: Verify subscribe KEYCODE_HOME key down event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_017, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_HOME);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event KEYCODE_HOME down trigger callback");
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    EXPECT_TRUE(subscribeId >= 0);
+#else
+    EXPECT_TRUE(subscribeId < 0);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/*
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_018
+ * @tc.desc: Verify subscribe KEYCODE_MENU key up event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_018, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_MENU);
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event KEYCODE_MENU up trigger callback");
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    EXPECT_TRUE(subscribeId >= 0);
+#else
+    EXPECT_TRUE(subscribeId < 0);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/*
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_019
+ * @tc.desc: Verify subscribe KEYCODE_MENU key down event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_019, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_MENU);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event KEYCODE_MENU down trigger callback");
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    EXPECT_TRUE(subscribeId >= 0);
+#else
+    EXPECT_TRUE(subscribeId < 0);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
 } // namespace MMI
 } // namespace OHOS
