@@ -53,7 +53,7 @@ public:
     int32_t SetPointerSize(int32_t size);
     int32_t GetPointerSize(int32_t &size);
     int32_t GetCursorSurfaceId(uint64_t &surfaceId);
-    int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
+    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
     int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
@@ -86,6 +86,8 @@ public:
         uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>());
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>());
+    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys);
+    int32_t RemovePreInputHandler(int32_t handlerId);
     int32_t AddGestureMonitor(InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
     int32_t RemoveGestureMonitor(InputHandlerType handlerType,
@@ -102,6 +104,8 @@ public:
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest);
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
+    int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,
+        bool isNativeInject);
     int32_t SetAnrObserver();
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
@@ -119,6 +123,7 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag);
     int32_t SetTouchpadPointerSpeed(int32_t speed);
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG);
     int32_t SetTouchpadPinchSwitch(bool switchFlag);
     int32_t GetTouchpadPinchSwitch(bool &switchFlag);
     int32_t SetTouchpadSwipeSwitch(bool switchFlag);
@@ -167,7 +172,7 @@ public:
 
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index);
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown);
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
 
 private:
     MultimodalInputConnectManager() = default;

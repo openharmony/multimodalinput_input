@@ -134,6 +134,8 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_INPUT_DEVICE_ENABLE = 109,
     SHIFT_APP_POINTER_EVENT = 110,
     SET_CUSTOM_MOUSE_CURSOR = 120,
+    INJECT_TOUCHPAD_EVENT = 121,
+    GET_TOUCHPAD_OPTION = 122,
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     CREATE_VKEYBOARD_DEVICE = 153,
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -144,6 +146,8 @@ enum class MultimodalinputConnectInterfaceCode {
     UNSUBSCRIBE_LONG_PRESS = 306,
     SET_DOUBLE_TAP_DRAG_STATE = 307,
     GET_DOUBLE_TAP_DRAG_STATE = 308,
+    ADD_PRE_INPUT_HANDLER = 309,
+    REMOVE_PRE_INPUT_HANDLER = 310,
 };
 
 enum class MultimodalinputEventObserverCode {

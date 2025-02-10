@@ -69,7 +69,7 @@ public:
 protected:
     virtual void OnConnected(SessionPtr s);
     virtual void OnDisconnected(SessionPtr s);
-    virtual int32_t AddEpoll(EpollEventType type, int32_t fd);
+    virtual int32_t AddEpoll(EpollEventType type, int32_t fd, bool readOnly = false);
 
     void SetRecvFun(MsgServerFunCallback fun);
     void ReleaseSession(int32_t fd, epoll_event& ev);
@@ -80,7 +80,8 @@ protected:
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
     void NotifySessionDeleted(SessionPtr ses);
-    int32_t SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t& toReturnClientFd);
+    int32_t SetFdProperty(int32_t &tokenType, int32_t &serverFd, int32_t &toReturnClientFd,
+        const std::string &programName, bool &readOnly);
 
 protected:
     MsgServerFunCallback recvFun_ { nullptr };

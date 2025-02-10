@@ -393,6 +393,9 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
+    eventPreMonitorHandler_ = std::make_shared<EventPreMonitorHandler>();
+    handler->SetNext(eventPreMonitorHandler_);
+    handler = eventPreMonitorHandler_;
     eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
     handler->SetNext(eventKeyCommandHandler_);
     handler = eventKeyCommandHandler_;
@@ -466,6 +469,11 @@ std::shared_ptr<EventFilterHandler> InputEventHandler::GetFilterHandler() const
 std::shared_ptr<EventDispatchHandler> InputEventHandler::GetEventDispatchHandler() const
 {
     return eventDispatchHandler_;
+}
+
+std::shared_ptr<EventPreMonitorHandler> InputEventHandler::GetEventPreMonitorHandler() const
+{
+    return eventPreMonitorHandler_;
 }
 
 int32_t InputEventHandler::SetMoveEventFilters(bool flag)

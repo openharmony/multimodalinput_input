@@ -38,10 +38,14 @@ config("libmmi_server_config") {
         "-Wno-error=backend-plugin",
         "-Wno-profile-instr-out-of-date",
         "-Wno-profile-instr-unprofiled",
+        "-Oz",
       ]
     }
     if (input_feature_product == "pc" && target_cpu == "arm64") {
-      cflags += [ "-moutline-atomics" ]
+      cflags += [
+        "-moutline-atomics",
+        "-Oz",
+      ]
     }
   }
   include_dirs = [
@@ -168,6 +172,7 @@ ohos_shared_library("libmmi-server") {
       "display_state_manager/src/display_event_monitor.cpp",
       "key_event_normalize/src/key_event_normalize.cpp",
       "key_event_normalize/src/key_unicode_transformation.cpp",
+      "monitor/src/event_pre_monitor_handler.cpp",
       "subscriber/src/key_gesture_manager.cpp",
       "subscriber/src/key_subscriber_handler.cpp",
     ]
@@ -1478,6 +1483,7 @@ ohos_unittest("MonitorTest") {
 
   sources = [
     "monitor/test/event_monitor_handler_test.cpp",
+    "monitor/test/event_pre_monitor_handler_test.cpp",
     "monitor/test/gesture_monitor_handler_test.cpp",
   ]
 
@@ -2573,7 +2579,10 @@ ohos_unittest("DfxHisysEventTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "dfx/test/dfx_hisysevent_test.cpp" ]
+  sources = [
+    "dfx/test/dfx_hisysevent_device_test.cpp",
+    "dfx/test/dfx_hisysevent_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",

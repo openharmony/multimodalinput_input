@@ -31,6 +31,8 @@ static mut COMPENSATE_VALUEX: f64 = 0.0;
 static mut COMPENSATE_VALUEY: f64 = 0.0;
 static MOUSE_DPI: f64 = 800.0;
 static MS_2_US: f64 = 1000.0;
+static TOUCHPAD_STANDARD_SIZE: f64 = 140.0;
+static DISPLAY_STANDARD_SIZE: f64 = 337.8;
 static MOUSE_GAIN_TYPE: i32 = 1;
 
 struct CurveItem {
@@ -110,8 +112,8 @@ impl FoldPcTouchpadAccelerateCurves {
     }
 }
 impl FoldPcVirtTouchpadAccelerateCurves {
-    fn fold_pc_virt_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        &self.data[speed- 1]
+    fn fold_pc_virt_touchpad_get_curve_by_speed(&self) -> &CurveItem {
+        &self.data[5]
     }
 }
 impl AxisAccelerateCurvesTouchpad {
@@ -659,59 +661,59 @@ impl FoldPcTouchpadAccelerateCurves {
             GLOBAL_CURVES = Some(FoldPcTouchpadAccelerateCurves {
                 data: vec![
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.98],
-                        slopes: vec![0.08, 0.16, 0.62, 0.74],
-                        diff_nums: vec![0.0, -0.32, -22.18, -31.08],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.12, 0.20, 0.44, 0.84],
+                        diff_nums: vec![0.0, -0.22, -6.06, -21.38],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.11, 0.21, 0.82, 0.99],
-                        diff_nums: vec![0.0, -0.43, -29.58, -41.44],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.16, 0.27, 0.58, 1.13],
+                        diff_nums: vec![0.0, -0.29, -8.08, -28.51],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.14, 0.26, 1.03, 1.24],
-                        diff_nums: vec![0.0, -0.54, -39.97, -51.79],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.19, 0.34, 0.73, 1.41],
+                        diff_nums: vec![0.0, -0.37, -10.10, -35.64],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.16, 0.32, 1.24, 1.49],
-                        diff_nums: vec![0.0, -0.65, -44.36, -62.15],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.23, 0.41, 0.87, 1.69],
+                        diff_nums: vec![0.0, -0.44, -12.12, -42.77],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.22, 0.42, 1.65, 1.98],
-                        diff_nums: vec![0.0, -0.86, -59.15, -82.87],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.31, 0.54, 1.16, 2.25],
+                        diff_nums: vec![0.0, -0.58, -16.15, -57.03],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.27, 0.53, 2.06, 2.48],
-                        diff_nums: vec![0.0, -1.08, -73.94, -103.59],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.39, 0.68, 1.46, 2.81],
+                        diff_nums: vec![0.0, -0.73, -20.19, -71.28],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.33, 0.63, 2.47, 2.97],
-                        diff_nums: vec![0.0, -1.29, -88.73, -124.31],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.47, 0.82, 1.75, 3.38],
+                        diff_nums: vec![0.0, -0.88, -24.23, -85.54],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.41, 0.79, 3.09, 3.72],
-                        diff_nums: vec![0.0, -1.61, -110.91, -155.38],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.58, 1.02, 2.18, 4.22],
+                        diff_nums: vec![0.0, -1.1, -30.29, -106.92],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.52, 1.0, 3.92, 4.71],
-                        diff_nums: vec![0.0, -2.05, -140.49, -196.82],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.74, 1.29, 2.77, 5.53],
+                        diff_nums: vec![0.0, -1.39, -38.37, -135.44],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.63, 1.21, 4.74, 5.7],
-                        diff_nums: vec![0.0, -2.48, -170.06, -238.25],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![0.89, 1.56, 3.35, 6.47],
+                        diff_nums: vec![0.0, -1.68, -46.44, -163.95],
                     },
                     CurveItem {
-                        speeds: vec![4.25, 47.49, 71.23, 99.9],
-                        slopes: vec![0.74, 1.42, 5.57, 6.69],
-                        diff_nums: vec![0.0, -2.91, -199.64, -279.69],
+                        speeds: vec![2.51, 25.07, 37.61, 160.43],
+                        slopes: vec![1.05, 1.83, 3.93, 7.6],
+                        diff_nums: vec![0.0, -1.97, -54.52, -192.46],
                     },
                 ],
             });
@@ -852,6 +854,55 @@ fn get_speed_dynamic_gain_mouse(vin: f64, gain: *mut f64, speed: i32, delta_time
     true
 }
 
+fn get_speed_dynamic_gain_touchpad(
+    vin: f64,
+    gain: *mut f64,
+    speed: i32,
+    display_size: f64,
+    touchpad_size: f64,
+    touchpad_ppi: f64,
+    frequency: i32
+) -> bool {
+debug!(LOG_LABEL,
+    "get_speed_gain_touchpad enter vin is set to {}, speed {}, touchpad_size {}, display_size {}, touchpad_ppi {}, frequency {}",
+    @public(vin), @public(speed), @public(touchpad_size), @public(display_size), @public(touchpad_ppi), @public(frequency));
+if speed < 1 {
+    error!(LOG_LABEL, "{} The speed value can't be less than 1", @public(speed));
+    return false;
+}
+let speeds_radio = [0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 1.9, 2.3, 2.7];
+let standard_slopes = [0.9728, 1.7024, 3.6480, 7.0528];
+let standard_vins = [7.5, 50.0, 160.0, 640.0];
+unsafe {
+    let speed_radio = speeds_radio[speed as usize - 1];
+    let mut slopes = Vec::new();
+    let mut diff_nums = Vec::new();
+    let mut vins = Vec::new();
+    for i in 0..4 {
+        vins.push(standard_vins[i] * touchpad_ppi / frequency as f64);
+        slopes.push(standard_slopes[i] * (display_size / touchpad_size) *
+            (TOUCHPAD_STANDARD_SIZE / DISPLAY_STANDARD_SIZE));
+        if i < 1 {
+            diff_nums.push(0.0);
+            continue;
+        }
+        diff_nums.push((slopes[i - 1] - slopes[i]) * vins[i - 1] + diff_nums[i - 1]);
+    }
+    let num: f64 = fabs(vin);
+    for i in 0..4 {
+        if num <= vins[i] {
+            *gain = (slopes[i] * vin + diff_nums[i]) * speed_radio / vin;
+            debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+            return true;
+        }
+    }
+    *gain = (slopes[3] * vin + diff_nums[3]) * speed_radio / vin;
+    debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+}
+debug!(LOG_LABEL, "get_speed_gain_touchpad leave");
+true
+}
+
 fn get_speed_dynamic_gain_mouse_new(vin: f64, gain: *mut f64, speed: i32, display_ppi: f64) -> bool {
     if display_ppi < 1.0 {
         error!(LOG_LABEL, "{} The display_ppi can't be less than 1", @public(display_ppi));
@@ -937,7 +988,7 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         3 => HardPcProTouchpadAccelerateCurves::get_instance().hard_pc_pro_touchpad_get_curve_by_speed(speed as usize),  
         4 => TabletTouchpadAccelerateCurves::get_instance().tablet_touchpad_get_curve_by_speed(speed as usize),
         5 => FoldPcTouchpadAccelerateCurves::get_instance().fold_pc_touchpad_get_curve_by_speed(speed as usize),
-        7 => FoldPcVirtTouchpadAccelerateCurves::get_instance().fold_pc_virt_touchpad_get_curve_by_speed(speed as usize),
+        7 => FoldPcVirtTouchpadAccelerateCurves::get_instance().fold_pc_virt_touchpad_get_curve_by_speed(),
         _ => PCTouchpadAccelerateCurves::get_instance().pc_touchpad_get_curve_by_speed(speed as usize),
     };
     unsafe {
@@ -1088,6 +1139,62 @@ pub unsafe extern "C" fn HandleMotionAccelerateMouse (
         debug!(
             LOG_LABEL,
             "abs_x {} and abs_y {}", @private(*abs_x), @private(*abs_y)
+        );
+    }
+    RET_OK
+}
+
+/// # Safety
+/// HandleMotionDynamicAccelerateTouchpad is the origin C++ function name
+/// C++ will call for rust realization using this name
+#[no_mangle]
+pub unsafe extern "C" fn HandleMotionDynamicAccelerateTouchpad (
+    offset: *const Offset,
+    mode: bool,
+    abs_x: *mut f64,
+    abs_y: *mut f64,
+    speed: i32,
+    display_size: f64,
+    touchpad_size: f64,
+    touchpad_ppi: f64,
+    frequency: i32
+) -> i32 {
+    let mut gain = 0.0;
+    let vin: f64;
+    let dx: f64;
+    let dy: f64;
+    let deltax: f64;
+    let deltay: f64;
+    unsafe {
+        dx = (*offset).dx;
+        dy = (*offset).dy;
+        vin = sqrt(dx * dx + dy *dy);
+        debug!(
+            LOG_LABEL,
+            "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
+            @private(*abs_x),
+            @private(*abs_y),
+            @public(mode),
+            @private(dx),
+            @private(dy),
+            @public(gain)
+        );
+        if !get_speed_dynamic_gain_touchpad(vin, &mut gain as *mut f64, speed, display_size,
+            touchpad_size, touchpad_ppi, frequency) {
+            error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
+            return RET_ERR;
+        }
+        if !mode {
+            deltax = (dx * gain + COMPENSATE_VALUEX).trunc();
+            deltay = (dy * gain + COMPENSATE_VALUEY).trunc();
+            COMPENSATE_VALUEX = (dx * gain + COMPENSATE_VALUEX).fract();
+            COMPENSATE_VALUEY = (dy * gain + COMPENSATE_VALUEY).fract();
+            *abs_x += deltax;
+            *abs_y += deltay;
+        }
+        debug!(
+            LOG_LABEL,
+            "output the abs_x {} and abs_y {}", @private(*abs_x), @private(*abs_y)
         );
     }
     RET_OK

@@ -433,6 +433,11 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
         MMI_HILOGD("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeHotkey(keyOption, SubHotkeyEventCallback);
+        if (subscribeId == ERROR_UNSUPPORT) {
+            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Hotkey occupied by other");
+            return nullptr;
+        }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_SYSTEM, "Hotkey occupied by system");

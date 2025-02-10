@@ -18,6 +18,9 @@
 #include <atomic>
 
 #include "ability_manager_client.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "message_parcel.h"
 
 #include "mmi_log.h"
@@ -67,7 +70,13 @@ bool AuthorizationDialog::ConnectSystemUi()
 
     AAFwk::Want want;
     want.SetElementName("com.ohos.sceneboard", "com.ohos.sceneboard.systemdialog");
+    auto begin = std::chrono::high_resolution_clock::now();
     ErrCode result = abilityMgr->ConnectAbility(want, dialogConnectionCallback_, INVALID_USERID);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::ABILITY_MGR_CONNECT_ABILITY, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (result != ERR_OK) {
         MMI_HILOGW("ConnectAbility systemui dialog failed, result:%{public}d", result);
         return false;

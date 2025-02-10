@@ -105,7 +105,7 @@ void UDSServer::OnConnected(SessionPtr sess)
 void UDSServer::OnDisconnected(SessionPtr sess)
 {}
 
-int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
+int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd, bool readOnly)
 {
     return RET_ERR;
 }
@@ -267,7 +267,7 @@ bool PointerDrawingManager::IsPointerVisible()
 {
     return false;
 }
-void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y) {}
+void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId) {}
 void PointerDrawingManager::SetMouseDisplayState(bool state) {}
 bool PointerDrawingManager::GetMouseDisplayState() const
 {

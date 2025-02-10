@@ -3681,23 +3681,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_001,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetPointerStyleByArea
- * @tc.desc: Test the funcation GetPointerStyleByArea
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyleByArea, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    WindowArea area = static_cast<WindowArea>(100);
-    int32_t pid = 100;
-    int32_t winId = 100;
-    PointerStyle pointerStyle;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetPointerStyleByArea(area, pid, winId, pointerStyle));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle
  * @tc.desc: Test the funcation SetPointerStyle
  * @tc.type: FUNC

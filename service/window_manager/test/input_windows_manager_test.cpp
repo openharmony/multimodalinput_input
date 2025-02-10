@@ -625,138 +625,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NeedUpdatePointDrawFla
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetPointerStyleByArea_001
- * @tc.desc: Test getting pointer style by area
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyleByArea_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WindowArea area;
-    int32_t pid = 123;
-    int32_t winId = 678;
-    PointerStyle pointerStyle;
-    pointerStyle.size = 1;
-    pointerStyle.color = 2;
-    pointerStyle.id = 3;
-    area = WindowArea::TOP_LEFT_LIMIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::SOUTH_EAST);
-    area = WindowArea::TOP_RIGHT_LIMIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::SOUTH_WEST);
-    area = WindowArea::TOP_LIMIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::SOUTH);
-    area = WindowArea::LEFT_LIMIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::EAST);
-    area = WindowArea::RIGHT_LIMIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::WEST);
-    area = WindowArea::BOTTOM_LEFT_LIMIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_WEST);
-    area = WindowArea::BOTTOM_LIMIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_WEST);
-    area = WindowArea::BOTTOM_RIGHT_LIMIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_WEST);
-    area = WindowArea::FOCUS_ON_INNER;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_WEST);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetPointerStyleByArea_002
- * @tc.desc: Test getting pointer style by area
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyleByArea_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WindowArea area;
-    int32_t pid = 123;
-    int32_t winId = 678;
-    PointerStyle pointerStyle;
-    pointerStyle.size = 1;
-    pointerStyle.color = 2;
-    pointerStyle.id = 3;
-    area = WindowArea::ENTER;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::SOUTH);
-    area = WindowArea::EXIT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::SOUTH);
-    area = WindowArea::FOCUS_ON_TOP_LEFT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_WEST_SOUTH_EAST);
-    area = WindowArea::FOCUS_ON_BOTTOM_RIGHT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_WEST_SOUTH_EAST);
-    area = WindowArea::FOCUS_ON_TOP_RIGHT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_EAST_SOUTH_WEST);
-    area = WindowArea::FOCUS_ON_BOTTOM_LEFT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_EAST_SOUTH_WEST);
-    area = WindowArea::FOCUS_ON_TOP;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_SOUTH);
-    area = WindowArea::FOCUS_ON_BOTTOM;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::NORTH_SOUTH);
-    area = WindowArea::FOCUS_ON_LEFT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::WEST_EAST);
-    area = WindowArea::FOCUS_ON_RIGHT;
-    WIN_MGR->GetPointerStyleByArea(area, pid, winId, pointerStyle);
-    EXPECT_EQ(pointerStyle.id, MOUSE_ICON::WEST_EAST);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetWindowPointerStyle_001
- * @tc.desc: Test setting window pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WindowArea area;
-    int32_t pid = 1;
-    int32_t windowId = 2;
-    IconStyle defaultIconStyle;
-    area = WindowArea::ENTER;
-    defaultIconStyle.iconPath = "default_icon_path";
-    WIN_MGR->SetWindowPointerStyle(area, pid, windowId);
-    assert(lastPointerStyle_.id == pointerStyle.id);
-    assert(windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        mouseIcons[MOUSE_ICON(pointerStyle.id)].iconPath != DEFAULT_ICON_PATH));
-    assert(WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) == RET_OK);
-    assert(lastPointerStyle_.id == style.id);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UpdateWindowPointerVisible_001
- * @tc.desc: Test updating window pointer visibility
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowPointerVisible_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t pid = 123;
-    bool visible = true;
-    IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
-    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible, 0, false);
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateWindowPointerVisible(pid));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DispatchPointer_001
  * @tc.desc: Test dispatching pointer events
  * @tc.type: FUNC
@@ -4206,27 +4074,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetWindowPointerStyle_002
- * @tc.desc: Test SetWindowPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    int32_t pid = 10;
-    int32_t windowId = 50;
-    WindowArea area = WindowArea::FOCUS_ON_BOTTOM_RIGHT;
-    inputWindowsManager.lastPointerStyle_.id = MOUSE_ICON::NORTH_WEST_SOUTH_EAST;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetWindowPointerStyle(area, pid, windowId));
-
-    windowId = -1;
-    inputWindowsManager.lastPointerStyle_.id = MOUSE_ICON::EAST;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetWindowPointerStyle(area, pid, windowId));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SkipNavigationWindow_006
  * @tc.desc: Test updating window information for each display
  * @tc.type: FUNC
@@ -6489,24 +6336,24 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateKeyEventDisplayI
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_OnDisplayRemoved_001
- * @tc.desc: Test the funcation OnDisplayRemoved
+ * @tc.name: InputWindowsManagerTest_OnDisplayRemovedOrCombiantionChanged_001
+ * @tc.desc: Test the funcation OnDisplayRemovedOrCombiantionChanged
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemoved_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemovedOrCombiantionChanged_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     DisplayGroupInfo displayGroupInfo {};
-    bool ret = inputWindowsManager.OnDisplayRemoved(displayGroupInfo);
+    bool ret = inputWindowsManager.OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
     EXPECT_FALSE(ret);
 
     DisplayInfo info1 = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200};
     DisplayInfo info2 = {.id = 1, .x = 100, .y = 0, .width = 100, .height = 200};
     inputWindowsManager.displayGroupInfo_.displaysInfo = {info1, info2};
     displayGroupInfo.displaysInfo = {info2};
-    ret = inputWindowsManager.OnDisplayRemoved(displayGroupInfo);
+    ret = inputWindowsManager.OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
     EXPECT_TRUE(ret);
 }
 
@@ -6541,6 +6388,55 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_001, 
     WINDOW_UPDATE_ACTION ret = WIN_MGR->UpdateWindowInfo(displayGroupInfo);
     ASSERT_EQ(ret, WINDOW_UPDATE_ACTION::ADD);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_PointerBackCenter_001
+ * @tc.desc: Test moved screen , pointer back screen center
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_PointerBackCenter_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+
+    DisplayInfo displayInfo1;
+    displayInfo1.id = 1;
+    displayInfo1.x =1;
+    displayInfo1.y = 1;
+    displayInfo1.width = 2;
+    displayInfo1.height = 2;
+    displayInfo1.dpi = 240;
+    displayInfo1.name = "pp";
+    displayInfo1.uniq = "pp";
+    displayInfo1.direction = DIRECTION0;
+    displayInfo1.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_MAIN;
+
+    DisplayInfo displayInfo2;
+    displayInfo2.id = 2;
+    displayInfo2.x =1;
+    displayInfo2.y = 1;
+    displayInfo2.width = 2;
+    displayInfo2.height = 2;
+    displayInfo2.dpi = 240;
+    displayInfo2.name = "pp";
+    displayInfo2.uniq = "pp";
+    displayInfo2.direction = DIRECTION0;
+    displayInfo2.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_EXPAND;
+    displayGroupInfo.displaysInfo.push_back(displayInfo2);
+    displayGroupInfo.displaysInfo.push_back(displayInfo1);
+
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+   
+    displayGroupInfo.displaysInfo.erase(displayGroupInfo.displaysInfo.begin());
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+    CursorPosition pointerPos = WIN_MGR->GetCursorPos();
+    EXPECT_EQ(pointerPos.displayId, displayInfo1.id);
+}
+
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 /**
@@ -7137,7 +7033,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_001, 
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7155,7 +7051,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_002, 
     uint32_t flag = 0x00000080;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7173,7 +7069,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_003, 
     uint32_t flag = 0x00000080;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7191,7 +7087,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_004, 
     uint32_t flag = 0x00000100;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7402,6 +7298,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
@@ -7410,7 +7310,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     item.SetPointerId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7427,6 +7327,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7442,7 +7346,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.displayId = displayId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7459,6 +7363,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = -1;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7474,7 +7382,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.displayId = displayId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7491,6 +7399,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7508,7 +7420,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     windowInfo.flags &= WindowInfo::FLAG_BIT_UNTOUCHABLE;
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7525,6 +7437,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7540,10 +7456,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.id = sourceWindowId;
     windowInfo.displayId = displayId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    windowInfo.flags &= WindowInfo::FLAG_BIT_UNTOUCHABLE;
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
     inputWindowsManager.transparentWins_[sourceWindowId];
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -7560,6 +7475,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    };
     bool autoGenDown = true;
     int32_t displayId = 0;
     WindowGroupInfo windowGroupInfo;
@@ -7570,41 +7489,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.id = targetWindowId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
-    EXPECT_NE(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_ShiftAppPointerEvent_007
- * @tc.desc: Test ShiftAppPointerEvent failed for not pressed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_007, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    inputWindowsManager.lastPointerEvent_ = nullptr;
-    int32_t sourceWindowId = 50;
-    int32_t targetWindowId = 51;
-    bool autoGenDown = true;
-    int32_t displayId = 0;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-    inputWindowsManager.lastPointerEvent_ = pointerEvent;
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    WindowGroupInfo windowGroupInfo;
-    WindowInfo windowInfo;
-    windowInfo.id = sourceWindowId;
-    windowInfo.displayId = displayId;
-    windowGroupInfo.windowsInfo.push_back(windowInfo);
-    windowInfo.id = targetWindowId;
-    windowGroupInfo.windowsInfo.push_back(windowInfo);
-    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

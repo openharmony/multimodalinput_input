@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include <unistd.h>
 
 #include "device_manager.h"
-#include <gtest/gtest.h>
 #include "enumerator.h"
+#include <gtest/gtest.h>
 
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"

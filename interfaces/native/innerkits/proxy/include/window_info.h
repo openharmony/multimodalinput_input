@@ -440,7 +440,13 @@ struct DisplayInfo {
     int32_t offsetX = 0;
     int32_t offsetY = 0;
     float ppi;
-
+    /**
+     * Coordinate of the upper left corner of the virtual screen in one-hand mode.
+     * If oneHandX is 0, the virtual screen is in the lower left corner.
+     * If oneHandX is greater than 0, the virtual screen is in the lower right corner.
+     */
+    int32_t oneHandX = 0;
+    int32_t oneHandY = 0;
     /**
      * Use for off screen policy
      *
@@ -450,8 +456,29 @@ struct DisplayInfo {
     int32_t screenRealWidth = 0;
     int32_t screenRealHeight = 0;
     float screenRealPPI = 0.0f;
-    float screenRealDPI = 0.0f;
+    int32_t screenRealDPI = 0;
     ScreenCombination screenCombination = ScreenCombination::SCREEN_MAIN;
+
+    /**
+     * Width of the effective area of the screen. When the screen is rotated, the value changes accordingly.
+     *
+     * @since 12
+     */
+    int32_t validWidth = 0;
+
+    /**
+     * Height of the effective area of the screen. When the screen is rotated, the value changes accordingly.
+     *
+     * @since 12
+     */
+    int32_t validHeight = 0;
+
+    /**
+     * Rotation angle of the TP patch offset correction.
+     *
+     * @since 12
+     */
+    Direction fixedDirection;
 };
 
 /**

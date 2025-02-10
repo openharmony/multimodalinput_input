@@ -24,6 +24,7 @@
 #include "define_multimodal.h"
 #include "mouse_transform_processor.h"
 #include "pointer_event.h"
+#include "touchpad_control_display_gain.h"
 
 namespace OHOS {
 namespace MMI {
@@ -62,6 +63,7 @@ public:
     void GetTouchpadRightClickType(int32_t &type) const;
     int32_t SetTouchpadPointerSpeed(int32_t speed) const;
     void GetTouchpadPointerSpeed(int32_t &speed) const;
+    void GetTouchpadCDG(TouchpadCDG &touchpadCDG) const;
 
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;

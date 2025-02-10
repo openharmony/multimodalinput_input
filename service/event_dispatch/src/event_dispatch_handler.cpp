@@ -120,7 +120,8 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
     int32_t pointerId = point->GetPointerId();
     if (windowInfo == std::nullopt) {
         std::shared_ptr<WindowInfo> curInfo = SearchCancelList(pointerId, windowId);
-        if (curInfo != nullptr && point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+        if (curInfo != nullptr && (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+            point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL)) {
             point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             windowInfo = std::make_optional(*curInfo);
             MMI_HILOG_DISPATCHI("Touch event send cancel to window:%{public}d", windowId);
@@ -223,7 +224,13 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
     uint32_t pid, int32_t pointCnt)
 {
 #ifndef OHOS_BUILD_ENABLE_WATCH
+    auto begin = std::chrono::high_resolution_clock::now();
     OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #endif // OHOS_BUILD_ENABLE_WATCH
 }
 
@@ -249,6 +256,7 @@ void EventDispatchHandler::SendWindowStateError(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
     auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
     auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid());
     if (sess != nullptr) {
         NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);

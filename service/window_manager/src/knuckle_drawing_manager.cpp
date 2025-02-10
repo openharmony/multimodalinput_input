@@ -786,7 +786,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         DrawTrackCanvas();
         DrawBrushCanvas();
     } else {
-        MMI_HILOGE("isActionUp_ is true");
+        MMI_HILOGE("Action is up");
         return ProcessUpEvent(needDrawParticle);
     }
     path_.Reset();

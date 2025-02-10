@@ -411,6 +411,11 @@ napi_value JsKeyCode::Export(napi_env env, napi_value exports)
             GetNapiInt32(env, KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_CALL_CONTROL_CENTER",
             GetNapiInt32(env, KeyEvent::KEYCODE_CALL_CONTROL_CENTER)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_DAGGER_CLICK", GetNapiInt32(env, KeyEvent::KEYCODE_DAGGER_CLICK)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_DAGGER_DOUBLE_CLICK",
+            GetNapiInt32(env, KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_DAGGER_LONG_PRESS",
+            GetNapiInt32(env, KeyEvent::KEYCODE_DAGGER_LONG_PRESS)),
     };
 
     napi_value result = nullptr;

@@ -225,7 +225,7 @@ int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
 void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
     CALL_INFO_TRACE;
-    if (cfg == nullptr || cfgLen == 0) {
+    if (cfg == nullptr || cfgLen <= 0) {
         MMI_HILOGE("SecCompEnhance cfg info is empty");
         return;
     }
@@ -534,6 +534,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    UpdateDisplayXYInOneHandMode(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
@@ -564,6 +567,29 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         pointerEvent->GetPointerId());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+void InputManagerImpl::UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetFixedMode() != PointerEvent::FixedMode::ONE_HAND) {
+        MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
+            static_cast<int32_t>(pointerEvent->GetFixedMode()), pointerEvent->GetFixedModeStr().c_str());
+        return;
+    }
+    MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
+        static_cast<int32_t>(pointerEvent->GetFixedMode()), pointerEvent->GetFixedModeStr().c_str());
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    pointerItem.SetDisplayX(pointerItem.GetFixedDisplayX());
+    pointerItem.SetDisplayY(pointerItem.GetFixedDisplayY());
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
@@ -705,7 +731,9 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.dpi << item.name << item.uniq << item.direction
             << item.displayDirection << item.displayMode << item.transform << item.ppi << item.offsetX
-            << item.offsetY;
+            << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
+            << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
+            << item.oneHandX << item.oneHandY;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -1100,6 +1128,19 @@ void InputManagerImpl::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+void InputManagerImpl::SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    const TouchpadCDG &touchpadCDG)
+{
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        if (MMIEventHdl.InjectTouchPadEvent(pointerEvent, touchpadCDG, false) != RET_OK) {
+            MMI_HILOGE("Failed to inject pointer event to touchPad");
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
+
 int32_t InputManagerImpl::SetMouseScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;
@@ -1119,12 +1160,7 @@ int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, int32_t focusX, int3
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t winPid = GetWindowPid(windowId);
-    if (winPid == -1) {
-        MMI_HILOGE("The winPid is invalid");
-        return RET_ERR;
-    }
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(winPid, windowId, focusX, focusY, pixelMap);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(windowId, focusX, focusY, pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Set custom cursor failed, ret:%{public}d", ret);
     }
@@ -1305,7 +1341,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible, int32_t priority)
     return ret;
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
-    return ERROR_UNSUPPORT;
+    return INPUT_DEVICE_NOT_SUPPORTED;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
@@ -1793,7 +1829,7 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetFunctionKeyState(funcKey, enable);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 #else
@@ -1998,6 +2034,22 @@ int32_t InputManagerImpl::GetTouchpadPointerSpeed(int32_t &speed)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Get the touchpad pointer speed failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadCDG(touchpadCDG);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the touchpad option failed");
     }
     return ret;
 #else
@@ -2248,36 +2300,6 @@ void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, const std::str
     std::lock_guard<std::mutex> guard(eventObserverMtx_);
     CHKPV(eventObserver_);
     eventObserver_->SyncBundleName(pid, uid, bundleName, syncStatus);
-}
-
-void InputManagerImpl::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
-{
-    CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Get mmi client is nullptr");
-        return;
-    }
-    SendWindowAreaInfo(area, pid, windowId);
-#else
-    MMI_HILOGW("Pointer device or pointer drawing module does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-}
-
-void InputManagerImpl::SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId)
-{
-    CALL_INFO_TRACE;
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::WINDOW_AREA_INFO);
-    pkt << area << pid << windowId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write logical data failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-    }
 }
 
 void InputManagerImpl::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
@@ -2577,16 +2599,16 @@ int32_t InputManagerImpl::SetInputDeviceEnabled(int32_t deviceId, bool enable, s
     return INPUT_DEVICE_IMPL.RegisterInputdevice(deviceId, enable, callback);
 }
 
-int32_t InputManagerImpl::ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown)
+int32_t InputManagerImpl::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::lock_guard<std::mutex> guard(mtx_);
-    if (sourceWindowId == targetWindowId) {
+    if (param.sourceWindowId == param.targetWindowId) {
         MMI_HILOGE("Failed shift pointer Event, sourceWindowId can't be equal to targetWindowId");
         return ARGV_VALID;
     }
-    return MULTIMODAL_INPUT_CONNECT_MGR->ShiftAppPointerEvent(sourceWindowId, targetWindowId, autoGenDown);
+    return MULTIMODAL_INPUT_CONNECT_MGR->ShiftAppPointerEvent(param, autoGenDown);
 #else
     MMI_HILOGW("Pointer device does not support");
     return ERROR_UNSUPPORT;

@@ -40,7 +40,9 @@
 #include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
+#include "touchpad_control_display_gain.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -204,6 +206,29 @@ public:
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
 
     /**
+     * @brief Adds a pre input event monitor. After such a monitor is added,
+     * an input event is copied and distributed to the monitor while being distributed to the original target.
+     * @param monitor Indicates the input event monitor. After an input event is generated,
+     * the functions of the monitor object will be called.
+     * @param eventType Indicates the eventType for monitor.
+     * @param keys Event type, which is **key**.
+     * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
+     * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
+     * the monitor fails to be added.
+     * @since 15
+     */
+    int32_t AddPreMonitor(std::shared_ptr<IInputEventConsumer> monitor,
+        HandleEventType eventType, std::vector<int32_t> keys);
+
+    /**
+     * @brief Removes a pre monitor.
+     * @param monitorId Indicates the monitor ID, which is the return value of <b>AddPreMonitor</b>.
+     * @return void
+     * @since 15
+     */
+    void RemovePreMonitor(int32_t monitorId);
+ 
+    /**
      * @brief Adds an input event monitor. After such a monitor is added,
      * an input event is copied and distributed to the monitor while being distributed to the original target.
      * @param monitor Indicates the input event monitor. After an input event is generated,
@@ -303,10 +328,12 @@ public:
      * This event will be distributed and processed in the same way as the event reported by the input device.
      * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
      * or mouse device input event to simulate.
+     * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
+     * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
      * @return void
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen = true);
 
     /**
      * @brief Simulates a touchpad input event, touchscreen input event, or mouse device input event.
@@ -314,10 +341,14 @@ public:
      * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
      * or mouse device input event to simulate.
      * @param zOrder Indicates the point event will inject to the window whose index value is less than the zOrder
+     * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
+     * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
      * @return void
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
+        bool isAutoToVirtualScreen = true);
+    void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG);
 
     /**
      * @brief Simulates a touchpad input event.
@@ -758,6 +789,7 @@ public:
      * @since 9
      */
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG);
 
     /**
      * @brief Set the switch of touchpad pinch.
@@ -806,15 +838,6 @@ public:
      * @since 9
      */
     int32_t GetTouchpadRightClickType(int32_t &type);
-     /**
-     * @brief SetWindowPointerStyle.
-     * @param area Indicates area.
-     * @param pid Indicates pid.
-     * @param windowId Indicates windowId.
-     * @return void.
-     * @since 9
-     */
-    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 
      /**
      * @brief Turn on or off hard cursor statistics.
@@ -1076,13 +1099,12 @@ public:
 
     /**
      * @brief shift AppPointerEvent from source window to target window
-     * @param sourceWindowId - source window id.
-     * @param targetWindowId - target window id.
+     * @param param - param for shift pointer event.
      * @param autoGenDown - send down event if true.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 13
      */
-    int32_t ShiftAppPointerEvent(int32_t sourceWindowId, int32_t targetWindowId, bool autoGenDown = true);
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown = true);
 
     /**
      * @brief Sets the custom cursor. You can set whether to adjust the cursor size based on the system settings.

@@ -151,7 +151,7 @@ int32_t InputEventDataTransformation::LongPressEventToNetPacket(const LongPressE
 {
     pkt << longPressEvent.fingerCount << longPressEvent.duration << longPressEvent.pid << longPressEvent.displayId
         << longPressEvent.displayX << longPressEvent.displayY << longPressEvent.result << longPressEvent.windowId
-        << longPressEvent.pointerId;
+        << longPressEvent.pointerId << longPressEvent.downTime;
     if (!pkt.Write(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet write long press event failed");
         return RET_ERR;
@@ -184,6 +184,9 @@ int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, 
     longPressEvent.windowId = data;
     pkt >> data;
     longPressEvent.pointerId = data;
+    int64_t downTime;
+    pkt >> downTime;
+    longPressEvent.downTime = downTime;
     if (!pkt.Read(longPressEvent.bundleName)) {
         MMI_HILOGE("Packet read long press event failed");
         return RET_ERR;
@@ -279,7 +282,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     }
     std::vector<uint8_t> buffer = event->GetBuffer();
     if (buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
-        MMI_HILOGE("buffer is oversize:%{public}zu", buffer.size());
+        MMI_HILOGE("The buffer is oversize:%{public}zu", buffer.size());
         return RET_ERR;
     }
     pkt << buffer.size();
@@ -310,6 +313,13 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
     pkt << event->GetVelocity();
     pkt << event->GetAxisEventType();
     pkt << event->GetHandOption();
+    PointerEvent::FixedMode fixedMode = event->GetFixedMode();
+    if (fixedMode > PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN &&
+        fixedMode < PointerEvent::FixedMode::SCREEN_MODE_MAX) {
+        pkt << static_cast<int32_t>(fixedMode);
+    } else {
+        pkt << static_cast<int32_t>(PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN);
+    }
 }
 
 void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
@@ -344,6 +354,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     SetAxisInfo(pkt, event);
     pkt >> tField;
     event->SetHandOption(tField);
+    pkt >> tField;
+    event->SetFixedMode(static_cast<PointerEvent::FixedMode>(tField));
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
@@ -489,8 +501,13 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         MMI_HILOGE("Malloc failed");
         return RET_ERR;
     }
-    secCompPointEvent->touchX = pointerItem.GetDisplayX();
-    secCompPointEvent->touchY = pointerItem.GetDisplayY();
+    if (event->GetFixedMode() == PointerEvent::FixedMode::ONE_HAND) {
+        secCompPointEvent->touchX = pointerItem.GetFixedDisplayX();
+        secCompPointEvent->touchY = pointerItem.GetFixedDisplayY();
+    } else {
+        secCompPointEvent->touchX = pointerItem.GetDisplayX();
+        secCompPointEvent->touchY = pointerItem.GetDisplayY();
+    }
     secCompPointEvent->timeStamp = event->GetActionTime();
     uint32_t dataLen = sizeof(*secCompPointEvent);
     uint8_t outBuf[MAX_HMAC_SIZE] = { 0 };

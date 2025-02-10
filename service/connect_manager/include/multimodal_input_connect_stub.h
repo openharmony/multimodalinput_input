@@ -89,6 +89,8 @@ protected:
     int32_t StubGetKeyboardRepeatRate(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);
+    int32_t StubAddPreInputHandler(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRemovePreInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddGestureMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveGestureMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply);
@@ -103,6 +105,7 @@ protected:
     int32_t StubSubscribeLongPressEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeLongPressEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubInjectTouchPadEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetAllMmiSubscribedEvents(MessageParcel& data, MessageParcel& reply);
@@ -128,6 +131,7 @@ protected:
     int32_t StubGetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadCDG(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadPinchSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadPinchSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadSwipeSwitch(MessageParcel& data, MessageParcel& reply);

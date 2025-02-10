@@ -2583,7 +2583,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputEventFilter_111, TestSize.L
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubAddInputEventFilter(data, reply);
-    int32_t returnCode = -201;
+    int32_t returnCode = 201;
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -2600,7 +2600,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventFilter_111, TestSiz
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubRemoveInputEventFilter(data, reply);
-    int32_t returnCode = -201;
+    int32_t returnCode = 201;
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -2617,7 +2617,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerLocation_111, TestSize.Le
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetPointerLocation(data, reply);
-    int32_t returnCode = -201;
+    int32_t returnCode = 201;
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -2634,7 +2634,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAuthorize_111, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubAuthorize(data, reply);
-    int32_t returnCode = -201;
+    int32_t returnCode = 201;
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -2670,6 +2670,25 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceInputEnable_001, Test
     MessageOption option;
     int32_t returnCode = 65142800;
     uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INPUT_DEVICE_ENABLE);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubShiftAppPointerEvent_001
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t returnCode = MMISERVICE_NOT_RUNNING;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SHIFT_APP_POINTER_EVENT);
     data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
     int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(ret, returnCode);

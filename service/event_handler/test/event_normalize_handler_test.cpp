@@ -20,6 +20,7 @@
 #include "event_normalize_handler.h"
 #include "event_resample.h"
 #include "general_touchpad.h"
+#include "general_uwb_remote_control.h"
 #include "input_device_manager.h"
 #include "input_scene_board_judgement.h"
 #include "i_input_windows_manager.h"
@@ -32,6 +33,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t POINTER_MOVEFLAG = { 7 };
 } // namespace
 
 class EventNormalizeHandlerTest : public testing::Test {
@@ -42,11 +44,15 @@ public:
 private:
     static void SetupTouchpad();
     static void CloseTouchpad();
+    static void SetupUwbRemoteControl();
+    static void CloseUwbRemoteControl();
+    static GeneralUwbRemoteControl vUwbRemoteControl_;
     static GeneralTouchpad vTouchpad_;
     static LibinputWrapper libinput_;
     int32_t trackingID_ { 0 };
 };
 
+GeneralUwbRemoteControl EventNormalizeHandlerTest::vUwbRemoteControl_;
 GeneralTouchpad EventNormalizeHandlerTest::vTouchpad_;
 LibinputWrapper EventNormalizeHandlerTest::libinput_;
 
@@ -54,11 +60,13 @@ void EventNormalizeHandlerTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupTouchpad();
+    SetupUwbRemoteControl();
 }
 
 void EventNormalizeHandlerTest::TearDownTestCase(void)
 {
     CloseTouchpad();
+    CloseUwbRemoteControl();
 }
 
 void EventNormalizeHandlerTest::SetupTouchpad()
@@ -78,6 +86,24 @@ void EventNormalizeHandlerTest::CloseTouchpad()
 {
     libinput_.RemovePath(vTouchpad_.GetDevPath());
     vTouchpad_.Close();
+}
+
+void EventNormalizeHandlerTest::SetupUwbRemoteControl()
+{
+    ASSERT_TRUE(vUwbRemoteControl_.SetUp());
+    std::cout << "device node name: " << vUwbRemoteControl_.GetDevPath() << std::endl;
+    ASSERT_TRUE(libinput_.AddPath(vUwbRemoteControl_.GetDevPath()));
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
+    struct libinput_device *device = libinput_event_get_device(event);
+    ASSERT_TRUE(device != nullptr);
+}
+
+void EventNormalizeHandlerTest::CloseUwbRemoteControl()
+{
+    libinput_.RemovePath(vUwbRemoteControl_.GetDevPath());
+    vUwbRemoteControl_.Close();
 }
 
 /**
@@ -803,6 +829,57 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
     int64_t frametime = 30;
     bool flag = eventNormalizeHandler.ProcessNullEvent(event, frametime);
     ASSERT_FALSE(flag);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_HandleTouchEvent_003
+ * @tc.desc: Test the function HandleTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_.DrainEvents();
+    EventNormalizeHandler handler;
+    int64_t frameTime = 10000;
+    int32_t varMoveFlag = POINTER_MOVEFLAG;
+    std::cout << "varMoveFlag: " << POINTER_MOVEFLAG << std::endl;
+    for (int32_t index = 1; index < POINTER_MOVEFLAG; ++index) {
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 0);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 5190 + index*30);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 8306);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_PRESSURE, 321);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_MOVEFLAG, varMoveFlag);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TOUCH_MAJOR, 198);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TOUCH_MINOR, 180);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_ORIENTATION, -64);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_BLOB_ID, 2);
+        vUwbRemoteControl_.SendEvent(EV_SYN, SYN_MT_REPORT, 0);
+        vUwbRemoteControl_.SendEvent(EV_KEY, BTN_TOUCH, 0);
+        vUwbRemoteControl_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    }
+    libinput_event* event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    while (event != nullptr) {
+        auto type = libinput_event_get_type(event);
+        if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+            event = libinput_.Dispatch();
+            continue;
+        }
+        std::cout << "type: " << type << std::endl;
+        auto touch = libinput_event_get_touch_event(event);
+        ASSERT_TRUE(touch != nullptr);
+        int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
+        std::cout << "moveFlag: " << moveFlag << std::endl;
+        auto dev = libinput_event_get_device(event);
+        ASSERT_TRUE(dev != nullptr);
+        std::cout << "touch device: " << libinput_device_get_name(dev) << std::endl;
+        handler.nextHandler_ = std::make_shared<EventFilterHandler>();
+        handler.SetNext(handler.nextHandler_);
+        EXPECT_NO_FATAL_FAILURE(handler.HandleTouchEvent(event, frameTime));
+        event = libinput_.Dispatch();
+    }
 }
 } // namespace MMI
 } // namespace OHOS

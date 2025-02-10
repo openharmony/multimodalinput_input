@@ -23,19 +23,67 @@
 namespace OHOS::MMI {
 using image_ptr_t = std::shared_ptr<Rosen::Drawing::Image>;
 using pixelmap_ptr_t = std::shared_ptr<OHOS::Media::PixelMap>;
+constexpr int32_t DEFAULT_IMG_SIZE{ 10 };
 
-struct RenderConfig {
-    MOUSE_ICON style;   // 光标样式
-    ICON_TYPE align;    // 光标对齐方式
-    std::string path;   // 光标路径
-    uint32_t color;     // 光标颜色
-    uint32_t size;      // 光标大小
-    uint32_t rotation;  // 光标朝向
-    float dpi;          // 屏幕 DPI
-    bool isHard;        // 是否是硬光标
-
+class RenderConfig {
+public:
+    MOUSE_ICON style;
+    ICON_TYPE align;
+    std::string path;
+    uint32_t color { 0 };
+    uint32_t size { 0 };
+    uint32_t direction { 0 };
+    float dpi { 0 };
+    bool isHard { false };
+    int32_t rotationAngle { 0 };
+    uint32_t rotationFocusX { 0 };
+    uint32_t rotationFocusY { 0 };
+    pixelmap_ptr_t userIconPixelMap { nullptr };
+    int32_t userIconHotSpotX { 0 };
+    int32_t userIconHotSpotY { 0 };
+    bool userIconFollowSystem { false };
     int32_t GetImageSize() const;
     std::string ToString() const;
+    int32_t GetOffsetX() const;
+    int32_t GetOffsetY() const;
+    int32_t GetOffsetXRotated() const;
+    int32_t GetOffsetYRotated() const;
+
+    RenderConfig() = default;
+    ~RenderConfig() = default;
+
+    bool operator == (const RenderConfig& rhs) const
+    {
+        return style == rhs.style && GetImageSize() == rhs.GetImageSize() && color == rhs.color;
+    }
+
+    bool operator != (const RenderConfig& rhs) const
+    {
+        return style != rhs.style || GetImageSize() != rhs.GetImageSize() || color != rhs.color;
+    }
+
+    RenderConfig& operator = (const RenderConfig& rhs)
+    {
+        if (this == &rhs) {
+            return *this;
+        }
+        style = rhs.style;
+        align = rhs.align;
+        path = rhs.path;
+        color = rhs.color;
+        size = rhs.size;
+        direction = rhs.direction;
+        dpi = rhs.dpi;
+        isHard = rhs.isHard;
+        rotationAngle = rhs.rotationAngle;
+        rotationFocusX = rhs.rotationFocusX;
+        rotationFocusY = rhs.rotationFocusY;
+        userIconPixelMap = rhs.userIconPixelMap;
+        userIconHotSpotX = rhs.userIconHotSpotX;
+        userIconHotSpotY = rhs.userIconHotSpotY;
+        
+        return *this;
+    }
 };
 
 class PointerRenderer {
@@ -43,16 +91,32 @@ public:
     PointerRenderer() = default;
     ~PointerRenderer() = default;
 
-    int32_t Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg);
-
+    int32_t Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg, bool isHard);
+    int32_t DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg, bool isHard);
+    image_ptr_t UserIconScale(uint32_t width, uint32_t height, const RenderConfig &cfg);
 private:
     image_ptr_t LoadPointerImage(const RenderConfig &cfg);
     pixelmap_ptr_t LoadCursorSvgWithColor(const RenderConfig &cfg);
     image_ptr_t ExtractDrawingImage(pixelmap_ptr_t pixelMap);
-    float GetOffsetX(const RenderConfig &cfg);
-    float GetOffsetY(const RenderConfig &cfg);
+    int32_t DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg);
+    std::vector<std::tuple<RenderConfig, image_ptr_t>> imgMaps_;
+    image_ptr_t FindImg(const RenderConfig &cfg)
+    {
+        for (auto& data : imgMaps_) {
+            if (std::get<0>(data) == cfg) {
+                return std::get<1>(data);
+            }
+        }
+        return nullptr;
+    }
+    void PushImg(const RenderConfig &cfg, image_ptr_t img)
+    {
+        if (imgMaps_.size() >= DEFAULT_IMG_SIZE) {
+            imgMaps_.erase(imgMaps_.begin());
+        }
+        imgMaps_.push_back({cfg, img});
+    }
 };
-
 } // namespace OHOS::MMI
 
 #endif // POINTER_RENDERER_H

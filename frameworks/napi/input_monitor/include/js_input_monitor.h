@@ -46,6 +46,8 @@ public:
     void Stop();
     void MarkConsumed(int32_t eventId);
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
+    void SetKeyCallback(std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    void SetKeys(std::vector<int32_t> keys);
     void SetId(int32_t id);
     void SetFingers(int32_t fingers);
     void SetHotRectArea(std::vector<Rect> hotRectArea);
@@ -63,6 +65,7 @@ private:
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
+    std::function<void(std::shared_ptr<KeyEvent>)> keyCallback_;
     int32_t id_ { -1 };
     int32_t monitorId_ { -1 };
     int32_t fingers_ { 0 };
@@ -72,14 +75,18 @@ private:
     mutable std::mutex mutex_;
     mutable int32_t flowCtrl_ { 0 };
     std::string typeName_;
+    std::vector<int32_t> keys_;
 };
 
 class JsInputMonitor final {
 public:
     static void JsCallback(uv_work_t *work, int32_t status);
+    static void JsPreCallback(uv_work_t *work, int32_t status);
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, std::vector<Rect> hotRectArea,
         int32_t rectTotal, napi_value callback, int32_t id, int32_t fingers);
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id, int32_t fingers);
+    JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback,
+        int32_t id, std::vector<int32_t> keys);
     ~JsInputMonitor();
 
     int32_t Start(const std::string &typeName);
@@ -90,8 +97,10 @@ public:
     int32_t GetId() const;
     int32_t GetFingers() const;
     void OnPointerEventInJsThread(const std::string &typeName, const int32_t fingers);
+    void OnKeyEventInJsThread(const std::string &typeName);
     void CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent);
     void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    void OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     std::string GetTypeName() const;
     bool IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, std::vector<Rect> hotRectArea);
 private:
@@ -144,10 +153,18 @@ private:
     bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
     MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
+    int32_t TransformKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, napi_value result);
+    int32_t GetKeyEventAction(int32_t action) const;
+    int32_t GetJsKeyItem(const std::optional<MMI::KeyEvent::KeyItem> keyItem, napi_value value) const;
+    bool GetFunctionKeyState(const std::shared_ptr<KeyEvent> keyEvent, napi_value value) const;
+    bool GetKeys(const std::shared_ptr<KeyEvent> keyEvent,
+        const std::vector<int32_t> &pressedKeys, napi_value value) const;
+
 private:
     std::shared_ptr<InputMonitor> monitor_ { nullptr };
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
     std::queue<std::shared_ptr<PointerEvent>> pointerQueue_;
+    std::queue<std::shared_ptr<KeyEvent>> preEvQueue_;
     napi_ref receiver_ { nullptr };
     napi_env jsEnv_ { nullptr };
     std::string typeName_;
@@ -156,6 +173,7 @@ private:
     bool isMonitoring_ { false };
     std::mutex mutex_;
     std::mutex resourcemutex_;
+    std::vector<int32_t> keys_;
 };
 } // namespace MMI
 } // namespace OHOS

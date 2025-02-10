@@ -252,7 +252,8 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     return result;
 }
 
-static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_ptr<PointerEvent> pointerEvent)
+static void HandleMouseButton(napi_env env, napi_value mouseHandle,
+    std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
 {
     int32_t button = 0;
     if (GetNamedPropertyInt32(env, mouseHandle, "button", button) != RET_OK) {
@@ -275,7 +276,11 @@ static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_
             break;
     }
     pointerEvent->SetButtonId(button);
-    pointerEvent->SetButtonPressed(button);
+    if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN) {
+        pointerEvent->SetButtonPressed(button);
+    } else if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
+        pointerEvent->DeleteReleaseButton(button);
+    }
 }
 
 static void HandleMouseAction(napi_env env, napi_value mouseHandle,
@@ -310,8 +315,9 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
             MMI_HILOGE("action:%{public}d is unknown", action);
             break;
     }
-    if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
-        HandleMouseButton(env, mouseHandle, pointerEvent);
+    if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP
+        || action == JS_CALLBACK_MOUSE_ACTION_MOVE) {
+        HandleMouseButton(env, mouseHandle, pointerEvent, action);
     }
 }
 
@@ -437,6 +443,70 @@ static napi_value HandleTouchProperty(napi_env env, napi_value touchHandle)
     return touchProperty;
 }
 
+static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> pointerEvent,
+    PointerEvent::PointerItem &pointerItem, napi_value &touchObject, bool isTouch)
+{
+    int32_t pointerId = 0;
+    if (GetNamedPropertyInt32(env, touchObject, "id", pointerId, false) != RET_OK) {
+        MMI_HILOGE("Get id failed");
+    }
+    int32_t screenX = 0;
+    if (GetNamedPropertyInt32(env, touchObject, "screenX", screenX) != RET_OK) {
+        MMI_HILOGE("Get screenX failed");
+    }
+    int32_t screenY = 0;
+    if (GetNamedPropertyInt32(env, touchObject, "screenY", screenY) != RET_OK) {
+        MMI_HILOGE("Get screenY failed");
+    }
+    int64_t pressedTime;
+    if (GetNamedPropertyInt64(env, touchObject, "pressedTime", pressedTime) != RET_OK) {
+        MMI_HILOGE("Get pressed time failed");
+    }
+    int32_t toolType = 0;
+    if (GetNamedPropertyInt32(env, touchObject, "toolType", toolType) != RET_OK) {
+        MMI_HILOGE("Get toolType failed");
+    }
+    double pressure;
+    if (GetNamedPropertyDouble(env, touchObject, "pressure", pressure) != RET_OK) {
+        MMI_HILOGE("Get pressure failed");
+    }
+    pointerItem.SetDisplayX(screenX);
+    pointerItem.SetDisplayY(screenY);
+    pointerItem.SetPointerId(pointerId);
+    pointerItem.SetToolType(toolType);
+    pointerItem.SetPressure(pressure);
+    if (isTouch) {
+        pointerEvent->SetPointerId(pointerId);
+        pointerEvent->SetActionTime(pressedTime);
+    }
+}
+static void HandleTouchesProperty(napi_env env, std::shared_ptr<PointerEvent> pointerEvent, napi_value touchHandle,
+    std::vector<PointerEvent::PointerItem> &pointerItems)
+{
+    napi_value touchsProperty = {};
+    if (napi_get_named_property(env, touchHandle, "touches", &touchsProperty) != RET_OK) {
+        MMI_HILOGE("Get touch failed");
+        return;
+    }
+    CHKPV(touchsProperty);
+    uint32_t arrayLength = 0;
+    if (napi_get_array_length(env, touchsProperty, &arrayLength) != napi_ok) {
+        MMI_HILOGE("Call napi_get_array_length failed");
+        return;
+    }
+    for (uint32_t i = 0; i < arrayLength; i++) {
+        napi_value touchObject = {};
+        if (napi_get_element(env, touchsProperty, i, &touchObject) != napi_ok) {
+            MMI_HILOGE("Call napi_get_element failed");
+            return;
+        }
+        CHKPV(touchObject);
+        PointerEvent::PointerItem pointerItem;
+        HandleTouchAttribute(env, pointerEvent, pointerItem, touchObject, false);
+        pointerItems.push_back(pointerItem);
+    }
+}
+
 static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item, int32_t action)
 {
@@ -457,38 +527,20 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     }
     napi_value touchProperty = HandleTouchProperty(env, touchHandle);
     CHKPV(touchProperty);
-    int32_t screenX = 0;
-    if (GetNamedPropertyInt32(env, touchProperty, "screenX", screenX) != RET_OK) {
-        MMI_HILOGE("Get screenX failed");
-    }
-    int32_t screenY = 0;
-    if (GetNamedPropertyInt32(env, touchProperty, "screenY", screenY) != RET_OK) {
-        MMI_HILOGE("Get screenY failed");
-    }
-    int64_t pressedTime;
-    if (GetNamedPropertyInt64(env, touchProperty, "pressedTime", pressedTime) != RET_OK) {
-        MMI_HILOGE("Get pressed time failed");
-    }
-    int32_t toolType = 0;
-    if (GetNamedPropertyInt32(env, touchProperty, "toolType", toolType) != RET_OK) {
-        MMI_HILOGE("Get toolType failed");
-    }
-    double pressure;
-    if (GetNamedPropertyDouble(env, touchProperty, "pressure", pressure) != RET_OK) {
-        MMI_HILOGE("Get pressure failed");
-    }
-    item.SetDisplayX(screenX);
-    item.SetDisplayY(screenY);
-    item.SetPointerId(0);
-    item.SetToolType(toolType);
-    item.SetPressure(pressure);
-    pointerEvent->SetPointerId(0);
+    HandleTouchAttribute(env, pointerEvent, item, touchProperty, true);
+   
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetSourceType(sourceType);
-    pointerEvent->SetActionTime(pressedTime);
     pointerEvent->SetTargetDisplayId(screenId);
+   
+    std::vector<PointerEvent::PointerItem> pointerItems;
+    HandleTouchesProperty(env, pointerEvent, touchHandle, pointerItems);
+    for (auto &pointeritem : pointerItems) {
+        pointerEvent->AddPointerItem(pointeritem);
+    }
+    
     if ((action == JS_CALLBACK_TOUCH_ACTION_MOVE) || (action == JS_CALLBACK_TOUCH_ACTION_UP)) {
-        pointerEvent->UpdatePointerItem(0, item);
+        pointerEvent->UpdatePointerItem(item.GetPointerId(), item);
     }
 }
 

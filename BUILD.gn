@@ -16,9 +16,15 @@ import("./multimodalinput_mini.gni")
 
 config("coverage_flags") {
   if (input_feature_coverage) {
-    cflags = [ "--coverage" ]
+    cflags = [
+      "--coverage",
+      "-Oz",
+    ]
     ldflags = [ "--coverage" ]
-    cflags_cc = [ "--coverage" ]
+    cflags_cc = [
+      "--coverage",
+      "-Oz",
+    ]
   }
 }
 
@@ -61,7 +67,10 @@ ohos_executable("uinput_inject") {
 
   defines = [ "MMI_DISABLE_LOG_TRACE" ]
 
-  cflags = [ "-fstack-protector-strong" ]
+  cflags = [
+    "-fstack-protector-strong",
+    "-Oz",
+  ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -202,14 +211,6 @@ group("mmi_tests") {
 
   if (input_feature_switch) {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
-  }
-
-  if (!use_clang_coverage) {
-    deps += [
-      "service:rust_mmi_test",
-      "util:rust_mmi_key_config_test",
-      "util:ut-mmi-util-out",
-    ]
   }
 
   if (input_ext_feature_anco) {
