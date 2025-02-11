@@ -1239,7 +1239,7 @@ void LibinputAdapter::OnEventHandler()
             int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
             int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
             MMI_HILOGD("touch event. deviceId:%{private}d, touchId:%{private}d, x:%{private}d, y:%{private}d, \
-type:%{private}d, accPressure:%{private}f, longAxis: %{private}d, shortAxis: %{private}d",
+type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{private}d",
                 deviceId,
                 touchId,
                 static_cast<int32_t>(x),
