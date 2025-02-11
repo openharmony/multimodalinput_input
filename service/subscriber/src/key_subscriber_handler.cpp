@@ -1475,7 +1475,7 @@ void KeySubscriberHandler::InitDataShareListener()
 
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
         DataShare::DataShareHelper::Create(remoteObj, SETTINGS_DATA_SYSTEM_URI, SETTINGS_DATA_EXT_URI);
-    MMI_HILOGE("create data_share helper, ret=%{public}d", ret.first);
+    MMI_HILOGE("Create data_share helper, ret=%{public}d", ret.first);
 
     if (ret.first == ERR_OK) {
         std::shared_ptr<DataShare::DataShareHelper> helper = ret.second;
