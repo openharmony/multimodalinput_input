@@ -1500,15 +1500,9 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     } else {
         pointerEvent->ClearBuffer();
     }
-    auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
-    auto sess = udsServer_->GetSession(fd);
-    CHKPRV(sess, "The last window has disappeared");
-    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-    if (!sess->SendMsg(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
+    auto filter = InputHandler->GetFilterHandler();
+    CHKPV(filter);
+    filter->HandlePointerEvent(pointerEvent);
 }
 
 void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowId)
@@ -3972,12 +3966,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     }
 
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
-    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-    if (!sess->SendMsg(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
+    auto filter = InputHandler->GetFilterHandler();
+    CHKPV(filter);
+    filter->HandlePointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
