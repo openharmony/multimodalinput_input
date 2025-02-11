@@ -1555,7 +1555,7 @@ Input_Result OH_Input_RemoveMouseEventMonitor(Input_MouseEventCallback callback)
     std::lock_guard guard(g_mutex);
     auto it = g_mouseMonitorCallbacks.find(callback);
     if (it == g_mouseMonitorCallbacks.end()) {
-        MMI_HILOGE("The callback has not been added.");
+        MMI_HILOGE("The callback has not been added");
         return INPUT_PARAMETER_ERROR;
     }
     g_mouseMonitorCallbacks.erase(it);
