@@ -78,7 +78,7 @@ constexpr char ROTATE_WINDOW_ROTATE { '0' };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
-const std::string PRODUCT_PHONE { "phone" };
+const char* PRODUCT_PHONE { "phone" };
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager()

@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string FINGERSENSE_WRAPPER_PATH { "libfingersense_wrapper.z.so" };
+const char* FINGERSENSE_WRAPPER_PATH { "libfingersense_wrapper.z.so" };
 } // namespace
 
 FingersenseWrapper::FingersenseWrapper() {}
@@ -44,7 +44,7 @@ FingersenseWrapper::~FingersenseWrapper()
 void FingersenseWrapper::InitFingerSenseWrapper()
 {
     CALL_DEBUG_ENTER;
-    fingerSenseWrapperHandle_ = dlopen(FINGERSENSE_WRAPPER_PATH.c_str(), RTLD_NOW);
+    fingerSenseWrapperHandle_ = dlopen(FINGERSENSE_WRAPPER_PATH, RTLD_NOW);
     if (fingerSenseWrapperHandle_ == nullptr) {
         MMI_HILOGE("libfingersense_wrapper.z.so was not loaded, error:%{public}s", dlerror());
         return;

@@ -33,8 +33,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string CROWN_SOURCE { "rotary_crown" };
-const std::string VIRTUAL_CROWN_SOURCE { "Virtual Crown" };
+const char* CROWN_SOURCE { "rotary_crown" };
+const char* VIRTUAL_CROWN_SOURCE { "Virtual Crown" };
 constexpr double DEGREE_ZERO { 0.0 };
 constexpr double VELOCITY_ZERO { 0.0 };
 constexpr uint64_t MICROSECONDS_PER_SECOND = 1000 * 1000;
