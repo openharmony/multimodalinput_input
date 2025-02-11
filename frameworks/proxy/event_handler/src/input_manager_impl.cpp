@@ -233,7 +233,7 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
     CHKPV(enhanceCfg_);
     errno_t ret = memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen);
     if (ret != EOK) {
-        MMI_HILOGE("cfg memcpy failed");
+        MMI_HILOGE("The cfg memcpy failed");
         return;
     }
     enhanceCfgLen_ = cfgLen;
