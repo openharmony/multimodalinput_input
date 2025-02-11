@@ -1881,27 +1881,31 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
     CHKPF(pixelMapData);
     pixelMap->Marshalling(*pixelMapData);
     cursor.pixelMap = pixelMapData;
-    napi_value focusXValue;
-    if (napi_get_named_property(env, obj, "focusX", &focusXValue) == napi_ok) {
-        if (!JsCommon::TypeOf(env, focusXValue, napi_number)) {
-            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "focusX", "number");
-            return false;
-        }
-        CHKRF(napi_get_value_int32(env, focusXValue, &cursor.focusX), GET_VALUE_INT32);
-        if (cursor.focusX < 0 || cursor.focusX > pixelMap->GetWidth()) {
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusX is invalid");
-            return false;
-        }
+    if (!GetFocusInfo(env, obj, "focusX", cursor.focusX, pixelMap->GetWidth())) {
+        return false;
     }
-    napi_value focusYValue;
-    if (napi_get_named_property(env, obj, "focusY", &focusYValue) == napi_ok) {
-        if (!JsCommon::TypeOf(env, focusYValue, napi_number)) {
-            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "focusY", "number");
+    if (!GetFocusInfo(env, obj, "focusY", cursor.focusY, pixelMap->GetHeight())) {
+        return false;
+    }
+    return true;
+}
+
+bool JsPointerContext::GetFocusInfo(napi_env env, napi_value obj, const std::string& propertyName,
+    int32_t& focusValue, int32_t maxSize)
+{
+    napi_value focusValueNapi;
+    bool isExist = false;
+    CHKRF(napi_has_named_property(env, obj, propertyName.c_str(), &isExist), HAS_NAMED_PROPERTY);
+    if (!isExist) {
+        focusValue = 0;
+    } else if (napi_get_named_property(env, obj, propertyName.c_str(), &focusValueNapi) == napi_ok) {
+        if (!JsCommon::TypeOf(env, focusValueNapi, napi_number)) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, propertyName.c_str(), "number");
             return false;
         }
-        CHKRF(napi_get_value_int32(env, focusYValue, &cursor.focusY), GET_VALUE_INT32);
-        if (cursor.focusY < 0 || cursor.focusY > pixelMap->GetHeight()) {
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusY is invalid");
+        CHKRF(napi_get_value_int32(env, focusValueNapi, &focusValue), GET_VALUE_INT32);
+        if (focusValue < 0 || focusValue > maxSize) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, (propertyName + " is invalid").c_str());
             return false;
         }
     }
