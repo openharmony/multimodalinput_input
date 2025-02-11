@@ -463,8 +463,8 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
 #endif // OHOS_BUILD_ENABLE_ANCO
         MMI_HILOGI("Knuckle gesture start launch ability");
         knuckleCount_ = 0;
-        if ((type == Knuckle::KNUCKLE_TYPE_SINGLE && screenshotSwitch_.statusConfigValue) ||
-            (type == Knuckle::KNUCKLE_TYPE_DOUBLE && recordSwitch_.statusConfigValue)) {
+        if ((type == KnuckleType::KNUCKLE_TYPE_SINGLE && screenshotSwitch_.statusConfigValue) ||
+            (type == KnuckleType::KNUCKLE_TYPE_DOUBLE && recordSwitch_.statusConfigValue)) {
             DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
             BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
             LaunchAbility(knuckleGesture.ability, NO_DELAY);
