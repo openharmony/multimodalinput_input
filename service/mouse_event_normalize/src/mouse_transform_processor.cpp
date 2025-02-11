@@ -256,12 +256,12 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
 void MouseTransformProcessor::HandleReportMouseResponseTime(
     std::string &connectType, std::map<long long, int32_t> &curMap)
 {
-    MMI_HILOGD("start to report");
+    MMI_HILOGD("Start to report");
     long total = 0;
     for (const auto &[key, value] : curMap) {
         total += value;
     }
-    MMI_HILOGD("total mouse movements: %{public}ld", total);
+    MMI_HILOGD("Total mouse movements: %{public}ld", total);
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
         "COLLECT_MOUSE_RESPONSE_TIME",
@@ -294,9 +294,9 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(
         "40ms", curMap.find(STEP_CALCULATE)->second / total,
         "MSG", "collectiong mouse response time probability");
     if (ret != RET_OK) {
-        MMI_HILOGE("mouse write failed , ret:%{public}d", ret);
+        MMI_HILOGE("Mouse write failed , ret:%{public}d", ret);
     }
-    MMI_HILOGD("mouse write end , ret:%{public}d", ret);
+    MMI_HILOGD("Mouse write end , ret:%{public}d", ret);
 }
 
 void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
