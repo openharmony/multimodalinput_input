@@ -46,8 +46,7 @@ namespace MMI {
 namespace {
 constexpr int32_t INVALID_DEVICE_ID { -1 };
 constexpr int32_t SUPPORT_KEY { 1 };
-const std::string UNKNOWN_SCREEN_ID { "" };
-const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
+const char* INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
 constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID { 1000 };
 constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM { 128 };
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };

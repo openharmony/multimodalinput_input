@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string GESTURESENSE_WRAPPER_PATH { "libgesture.z.so" };
+const char* GESTURESENSE_WRAPPER_PATH = "libgesture.z.so";
 } // namespace
 
 GesturesenseWrapper::GesturesenseWrapper() {}
@@ -42,10 +42,10 @@ GesturesenseWrapper::~GesturesenseWrapper()
 void GesturesenseWrapper::InitGestureSenseWrapper()
 {
     CALL_INFO_TRACE;
-    gesturesenseWrapperHandle_ = dlopen(GESTURESENSE_WRAPPER_PATH.c_str(), RTLD_NOW);
+    gesturesenseWrapperHandle_ = dlopen(GESTURESENSE_WRAPPER_PATH, RTLD_NOW);
     if (gesturesenseWrapperHandle_ == nullptr) {
         MMI_HILOGE("libgesture.z.so was not loaded, path:%{private}s, error:%{public}s",
-            GESTURESENSE_WRAPPER_PATH.c_str(), dlerror());
+            GESTURESENSE_WRAPPER_PATH, dlerror());
         goto fail;
         return;
     }

@@ -49,7 +49,7 @@ constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t DEFAULT_ROWS { 3 };
 constexpr int32_t MAX_N_POINTER_ITEMS { 10 };
 
-const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
+const char* TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 std::string g_threeFingerTapKey = "touchpadThreeFingerTap";
 } // namespace
 

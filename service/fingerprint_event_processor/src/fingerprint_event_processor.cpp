@@ -40,11 +40,11 @@ constexpr int32_t MUTE_KEY_DOWN { 1 };
 constexpr int32_t MUTE_KEY_UP { 2 };
 constexpr int32_t POWER_KEY_UP_TIME { 1000 }; // 1000ms
 constexpr int32_t VOLUME_KEY_UP_TIME { 500 }; // 500ms
-const std::string IS_START_SMART_KEY = "close_fingerprint_nav_event_key";
-const std::string IS_SMART_KEY_USE = "close_fingerprint_event_key";
-const std::string NEED_SHOW_DIALOG = "1";
-const std::string SMART_KEY_IS_OPEN = "1";
-const std::string SMART_KEY_IS_CLOSE = "0";
+const char* IS_START_SMART_KEY = "close_fingerprint_nav_event_key";
+const char* IS_SMART_KEY_USE = "close_fingerprint_event_key";
+const char* NEED_SHOW_DIALOG = "1";
+const char* SMART_KEY_IS_OPEN = "1";
+const char* SMART_KEY_IS_CLOSE = "0";
 constexpr int32_t IS_SHOW_DIALOG = 1;
 }
 FingerprintEventProcessor::FingerprintEventProcessor()
