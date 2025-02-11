@@ -38,7 +38,7 @@ void TouchpadSettingsObserver::RegisterUpdateFunc()
     SettingObserver::UpdateFunc UpdateFunc = [datashareUri, libthpPath, keyToCmd](const std::string& key) {
         typedef const char* (*ThpExtraRunCommandFunc)(const char* command, const char* parameters);
         const char* (*ThpExtraRunCommand)(const char* command, const char* parameters) {};
-        MMI_HILOGD("update func");
+        MMI_HILOGD("Update func");
         std::string value;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetStringValue(key, value, datashareUri);
         if (ret != 0) {
@@ -47,14 +47,14 @@ void TouchpadSettingsObserver::RegisterUpdateFunc()
         }
         auto iter = keyToCmd.find(key);
         if (iter != keyToCmd.end()) {
-            MMI_HILOGE("invalid key");
+            MMI_HILOGE("Invalid key");
             return;
         }
-        MMI_HILOGD("get value: %{public}s", value.c_str());
+        MMI_HILOGD("Get value: %{public}s", value.c_str());
         void *handle = nullptr;
         handle = dlopen(libthpPath.c_str(), RTLD_LAZY);
         if (handle == nullptr) {
-            MMI_HILOGE("handle is null");
+            MMI_HILOGE("Handle is null");
             return;
         }
         ThpExtraRunCommand = reinterpret_cast<ThpExtraRunCommandFunc>(dlsym(handle, "ThpExtraRunCommand"));
@@ -65,7 +65,7 @@ void TouchpadSettingsObserver::RegisterUpdateFunc()
         const std::string param =
             std::string("#").append(std::to_string(iter->second)).append("#").append(value);
         ThpExtraRunCommand("THP_TouchpadStatusChange", param.c_str());
-        MMI_HILOGD("update func success");
+        MMI_HILOGD("Update func success");
     };
     updateFunc_ = UpdateFunc;
     return;
