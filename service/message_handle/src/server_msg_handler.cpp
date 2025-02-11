@@ -49,9 +49,9 @@
 #include "running_process_info.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -328,9 +328,9 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
                 !(IsCastInject(pointerEvent->GetDeviceId())) &&
                 !IsNavigationWindowInjectEvent(pointerEvent)) {
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
             }
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
