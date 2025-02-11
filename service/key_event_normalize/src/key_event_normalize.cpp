@@ -36,11 +36,37 @@ namespace MMI {
 namespace {
 constexpr uint32_t KEYSTATUS { 0 };
 constexpr int32_t SWAP_VOLUME_KEYS_ON_FOLD { 0 };
+class FoldStatusCallback : public Rosen::DisplayManager::IFoldStatusListener {
+public:
+    FoldStatusCallback() = default;
+    ~FoldStatusCallback() = default;
+    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        foldStatus_ = foldStatus;
+    }
+    Rosen::FoldStatus GetFoldStatus()
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        return foldStatus_;
+    }
+private:
+    std::mutex mutex_;
+    Rosen::FoldStatus foldStatus_ { Rosen::FoldStatus::UNKNOWN };
+};
+sptr<FoldStatusCallback> g_foldStatusCallback { nullptr };
 } // namespace
 
 KeyEventNormalize::KeyEventNormalize() {}
 
 KeyEventNormalize::~KeyEventNormalize() {}
+
+void KeyEventNormalize::Init()
+{
+    g_foldStatusCallback = new (std::nothrow) FoldStatusCallback();
+    CHKPV(g_foldStatusCallback);
+    Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(g_foldStatusCallback);
+}
 
 std::shared_ptr<KeyEvent> KeyEventNormalize::GetKeyEvent()
 {
@@ -276,18 +302,17 @@ void KeyEventNormalize::CheckProductParam(InputProductConfig &productConfig) con
 
 int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32_t keyCode, int32_t keyAction) const
 {
+    CHKPR(g_foldStatusCallback, keyCode);
     static std::once_flag flag;
-    static std::map<int32_t, DisplayMode> displayModes {
-        { KeyEvent::KEYCODE_VOLUME_DOWN, DisplayMode::UNKNOWN },
-        { KeyEvent::KEYCODE_VOLUME_UP, DisplayMode::UNKNOWN },
+    static std::map<int32_t, Rosen::FoldStatus> displayModes {
+        { KeyEvent::KEYCODE_VOLUME_DOWN, Rosen::FoldStatus::UNKNOWN },
+        { KeyEvent::KEYCODE_VOLUME_UP, Rosen::FoldStatus::UNKNOWN },
     };
     static InputProductConfig productConfig {};
-    static bool isFoldable = false;
 
     std::call_once(flag, [this]() {
         ReadProductConfig(productConfig);
         CheckProductParam(productConfig);
-        isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
     });
     if (productConfig.volumeSwap_ != VolumeSwapConfig::SWAP_ON_FOLD) {
         return keyCode;
@@ -297,22 +322,10 @@ int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32
         return keyCode;
     }
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        iter->second = WIN_MGR->GetDisplayMode();
-        if (!isFoldable) {
-            if (iter->second != DisplayMode::SUB) {
-                return keyCode;
-            }
-        } else if (iter->second != DisplayMode::MAIN) {
-            return keyCode;
-        }
-    } else {
-        if (!isFoldable) {
-            if (iter->second != DisplayMode::SUB) {
-                return keyCode;
-            }
-        } else if (iter->second != DisplayMode::MAIN) {
-            return keyCode;
-        }
+        iter->second = g_foldStatusCallback->GetFoldStatus();
+    }
+    if (iter->second != Rosen::FoldStatus::FOLDED) {
+        return keyCode;
     }
     const char *name = libinput_device_get_name(dev);
     int32_t busType = static_cast<int32_t>(libinput_device_get_id_bustype(dev));
