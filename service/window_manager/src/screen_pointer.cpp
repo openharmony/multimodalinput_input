@@ -27,8 +27,8 @@
 #define MMI_LOG_TAG "ScreenPointer"
 
 namespace OHOS::MMI {
-const std::string RS_SURFACE_NODE_NAME{"pointer window"};
-const std::string POINTER_SIZE{"pointerSize"};
+const char* RS_SURFACE_NODE_NAME{"pointer window"};
+const char* POINTER_SIZE{"pointerSize"};
 constexpr int32_t RS_NODE_CANVAS_INDEX{-1};
 constexpr int32_t DEFAULT_POINTER_SIZE{1};
 constexpr int32_t DEVICE_INDEPENDENT_PIXELS{40};

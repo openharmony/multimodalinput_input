@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string IR_WRAPPER_PATH { "libconsumer_ir_service_1.0.z.so" };
+const char* IR_WRAPPER_PATH = "libconsumer_ir_service_1.0.z.so";
 std::mutex mutex_;
 }
 using namespace OHOS::HDI::V1_0;
@@ -60,9 +60,9 @@ void InfraredEmitterController::InitInfraredEmitter()
         return;
     }
     if (soIrHandle_ == nullptr) {
-        soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
+        soIrHandle_ = dlopen(IR_WRAPPER_PATH, RTLD_NOW);
         if (soIrHandle_ == nullptr) {
-            MMI_HILOGE("Loaded %{public}s failed:%{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
+            MMI_HILOGE("Loaded %{public}s failed:%{public}s", IR_WRAPPER_PATH, dlerror());
             return;
         }
     }
