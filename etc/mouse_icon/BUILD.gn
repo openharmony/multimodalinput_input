@@ -35,13 +35,6 @@ ohos_prebuilt_etc("drawing_pointer_image_Cross") {
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_Custom_Cursor_Circle") {
-  source = "src/Custom_Cursor_Circle.svg"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-  relative_install_dir = "multimodalinput/mouse_icon"
-}
-
 ohos_prebuilt_etc("drawing_pointer_image_Default") {
   source = "src/Default.svg"
   part_name = "input"
@@ -392,7 +385,6 @@ group("input_mouse_icon") {
     ":drawing_pointer_image_Cross",
     ":drawing_pointer_image_Cursor_Circle",
     ":drawing_pointer_image_Cursor_Cross",
-    ":drawing_pointer_image_Custom_Cursor_Circle",
     ":drawing_pointer_image_Default",
     ":drawing_pointer_image_East",
     ":drawing_pointer_image_Forbid",
