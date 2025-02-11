@@ -16,8 +16,8 @@
 #ifndef I_MULTIMODAL_INPUT_CONNECT_H
 #define I_MULTIMODAL_INPUT_CONNECT_H
 
-#include "iremote_broker.h"
-#include "system_ability_definition.h"
+#include <iremote_broker.h>
+#include <system_ability_definition.h>
 
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -62,6 +62,7 @@ public:
     virtual int32_t SetPointerSize(int32_t size) = 0;
     virtual int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) = 0;
     virtual int32_t GetPointerSize(int32_t &size) = 0;
+    virtual int32_t GetCursorSurfaceId(uint64_t &surfaceId) = 0;
     virtual int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
