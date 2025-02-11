@@ -288,19 +288,19 @@ int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<Pointer
 
 void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGI("Check : current PointerEvent's info :Id=>%{public}d , pointerId=>%{public}d ",
+    MMI_HILOGI("Check : current PointerEvent's info :Id=>%{public}d, pointerId=>%{public}d",
         pointerEvent->GetId(), pointerEvent->GetPointerId());
     std::shared_ptr<PointerEvent> touchEvent = WIN_MGR->GetLastPointerEventForGesture();
     if (touchEvent != nullptr) {
         std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
-        MMI_HILOGI("Check : LastPointerEvent's item count is : %{public}d", listPtItems.size());
+        MMI_HILOGI("Check : LastPointerEvent's item count is:%{public}d", listPtItems.size());
         for (auto &item : listPtItems) {
-            MMI_HILOGI("Check : current Item : pointerId=>%{public}d ,OriginPointerId=>%{public}d",
+            MMI_HILOGI("Check : current Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
                 item.GetPointerId(), item.GetOriginPointerId());
             if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) !=
                 (pointerEvent->GetPointerId() % SIMULATE_EVENT_START_ID)) {
                 pointerEvent->AddPointerItem(item);
-                MMI_HILOGI("Check : add Item : pointerId=>%{public}d ,OriginPointerId=>%{public}d",
+                MMI_HILOGI("Check : add Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
                     item.GetPointerId(), item.GetOriginPointerId());
             }
         }
