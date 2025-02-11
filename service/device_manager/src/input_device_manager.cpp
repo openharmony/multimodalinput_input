@@ -998,7 +998,7 @@ void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
         if (session->GetPid() == item->second) {
             auto device = inputDevice_.find(item->first);
             if (device != inputDevice_.end()) {
-                MMI_HILOGI("Recover input device : %{public}d", item->first);
+                MMI_HILOGI("Recover input device:%{public}d", item->first);
                 device->second.enable = true;
             }
             item = recoverList_.erase(item);
