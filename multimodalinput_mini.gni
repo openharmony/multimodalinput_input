@@ -56,6 +56,7 @@ declare_args() {
   input_feature_virtual_keyboard = false
   input_feature_dfx_radar_enable = false
   input_feature_one_hand_mode_enable = false
+  input_feature_touch_drawing = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -459,4 +460,8 @@ if (input_feature_virtual_keyboard) {
 
 if (input_feature_dfx_radar_enable) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_DFX_RADAR" ]
+}
+
+if (input_feature_touch_drawing) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCH_DRAWING" ]
 }
