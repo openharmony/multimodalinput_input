@@ -649,8 +649,21 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
         MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerId, pointerItem);
+    int32_t displayX = pointerItem.GetDisplayX();
+    int32_t displayY = pointerItem.GetDisplayY();
     for (const auto &monitor : monitors_) {
         IsSendToClient(monitor, pointerEvent, pkt);
+        PointerEvent::PointerItem pointerItem1;
+        pointerEvent->GetPointerItem(pointerId, pointerItem1);
+        int32_t displayX1 = pointerItem1.GetDisplayX();
+        int32_t displayY1 = pointerItem1.GetDisplayY();
+        if (displayX != displayX1 || displayY != displayY1) {
+            MMI_HILOGW("Display coord changed %{public}d, %{public}d, %{public}d, %{public}d, %{public}d",
+                pointerId, displayX, displayY, displayX1, displayY1);
+        }
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
         NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
