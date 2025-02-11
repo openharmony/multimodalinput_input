@@ -1221,7 +1221,7 @@ void JsPointerManager::HandleSetCustomCursorCompletion(napi_env env, napi_status
         if (asyncContext->errorCode == RET_OK) {
             CHKRV(napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
         } else {
-            CHKRV(napi_reject_deferred(env, asyncContext->deferred, results[1]), REJECT_DEFERRED);
+            CHKRV(napi_reject_deferred(env, asyncContext->deferred, results[0]), REJECT_DEFERRED);
         }
     }
     asyncContext->DecStrongRef(nullptr);
