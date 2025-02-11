@@ -114,10 +114,10 @@ std::string TransformPointTest::GetDeviceNodeName()
 bool TransformPointTest::SendEvent(const Context& ctx, struct input_event* event)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGD("Send input event.");
+    MMI_HILOGD("Send input event");
     struct timeval tv;
     if (gettimeofday(&tv, nullptr)) {
-        MMI_HILOGE("Failed to get current time.");
+        MMI_HILOGE("Failed to get current time");
         return false;
     }
     event->input_event_sec = tv.tv_sec;
