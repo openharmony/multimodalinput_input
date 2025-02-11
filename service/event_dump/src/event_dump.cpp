@@ -41,9 +41,9 @@
 #include "mouse_event_normalize.h"
 #include "switch_subscriber_handler.h"
 #include "securec.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "util_ex.h"
 #include "util.h"
 
@@ -210,9 +210,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 mprintf(fd, "Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
                 TOUCH_DRAWING_MGR->Dump(fd, args);
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #else
                 mprintf(fd, "Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_TOUCH

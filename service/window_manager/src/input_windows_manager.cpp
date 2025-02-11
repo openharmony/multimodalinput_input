@@ -42,9 +42,9 @@
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "timer_manager.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -883,10 +883,10 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGr
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayGroupInfo.displaysInfo[0].id);
     CHKPV(physicDisplayInfo);
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->RotationScreen();
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 }
 
 void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window,
@@ -2950,10 +2950,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             direction = physicalDisplayInfo->direction;
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
             physicalDisplayInfo->height, physicalX, physicalY);
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_POINTER_VELOCITY_TRACKER->MonitorCursorMovement(pointerEvent);
@@ -4101,10 +4101,10 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY && OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

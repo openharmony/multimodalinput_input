@@ -216,6 +216,13 @@ group("mmi_tests") {
   if (input_ext_feature_anco) {
     deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerAncoTest" ]
   }
+
+  if (input_feature_touch_drawing) {
+    deps += [
+      "service:TouchDrawingManagerAiTest",
+      "service:TouchDrawingManagerTest",
+    ]
+  }
 }
 
 group("examples_group") {
