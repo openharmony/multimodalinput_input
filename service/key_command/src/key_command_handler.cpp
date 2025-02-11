@@ -475,7 +475,6 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
             ReportKnuckleScreenCapture(touchEvent);
         }
         knuckleGesture.state = true;
-
     } else {
         if (knuckleCount_ > KNUCKLE_KNOCKS) {
             knuckleCount_ = 0;
