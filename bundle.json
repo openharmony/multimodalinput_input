@@ -42,7 +42,8 @@
       "input_ext_feature_magiccursor",
       "input_feature_infrared_emitter",
       "input_feature_joystick",
-      "input_feature_coverage"
+      "input_feature_coverage",
+      "input_feature_one_hand_mode_enable"
     ],
     "adapted_system_type": [
       "standard"
