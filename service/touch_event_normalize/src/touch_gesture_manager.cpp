@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string TOUCH_GESTURE_RECOGNIZER_NAME { "touchGesture" };
+const char* TOUCH_GESTURE_RECOGNIZER_NAME { "touchGesture" };
 }
 
 TouchGestureManager::TouchGestureManager(std::shared_ptr<DelegateInterface> delegate)

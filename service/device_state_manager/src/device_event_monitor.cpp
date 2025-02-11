@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
-const std::string SOS_PAGE_CHANGE_EVENTS = "emergencycommunication.event.SOS_EMERGENCY_CALL_ABILITY_PAGE_CHANGE";
+const char* SOS_PAGE_CHANGE_EVENTS = "emergencycommunication.event.SOS_EMERGENCY_CALL_ABILITY_PAGE_CHANGE";
 DeviceEventMonitor::DeviceEventMonitor() {}
 DeviceEventMonitor::~DeviceEventMonitor() {}
 

@@ -67,11 +67,11 @@ const std::string CursorIconPath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.p
 const std::string CustomCursorIconPath = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
 const std::string LoadingIconPath = IMAGE_POINTER_DEFAULT_PATH + "Loading.svg";
 const std::string LoadingRightIconPath = IMAGE_POINTER_DEFAULT_PATH + "Loading_Right.svg";
-const std::string POINTER_COLOR { "pointerColor" };
-const std::string POINTER_SIZE { "pointerSize" };
-const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
-const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
-const std::string POINTER_CURSOR_RENDER_RECEIVER_NAME { "PointerCursorReceiver" };
+const char* POINTER_COLOR { "pointerColor" };
+const char* POINTER_SIZE { "pointerSize" };
+const char* MAGIC_POINTER_COLOR { "magicPointerColor" };
+const char* MAGIC_POINTER_SIZE { "magicPointerSize"};
+const char* POINTER_CURSOR_RENDER_RECEIVER_NAME { "PointerCursorReceiver" };
 const std::vector<std::string> DEVICE_TYPES = {};
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
@@ -1715,7 +1715,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
     BytraceAdapter::StartRsSurfaceNode(displayId);
-   
+
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     auto sp = GetScreenPointer(displayId);
     CHKPV(sp);
@@ -2089,7 +2089,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         std::lock_guard<std::mutex> guard(mtx_);
         userIcon_.reset(pixelMapPtr);
     }
-    
+
     mouseIconUpdate_ = true;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
@@ -2195,7 +2195,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
             return item->second.pixelMap;
         }
     }
-    
+
     return LoadCursorSvgWithColor(type, GetPointerColor());
 }
 
@@ -3439,7 +3439,7 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
         std::lock_guard<std::mutex> lock(mtx_);
         pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
     }
-    
+
     MMI_HILOGD("DrawCursor on ScreenPointer success, screenId=%{public}u", sp->GetScreenId());
     return RET_OK;
 }
@@ -3474,7 +3474,7 @@ void PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
         MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", displayId_);
         return;
     }
-    
+
     for (auto msp : GetMirrorScreenPointers()) {
         if (!msp->Move(x, y, align)) {
             MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", msp->GetScreenId());
@@ -3487,7 +3487,7 @@ void PointerDrawingManager::SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     auto sp = GetScreenPointer(displayId_);
     CHKPV(sp);
     sp->MoveSoft(x, y, align);
-    
+
     for (auto msp : GetMirrorScreenPointers()) {
         msp->MoveSoft(x, y, align);
     }

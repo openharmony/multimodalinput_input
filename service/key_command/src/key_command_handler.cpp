@@ -83,8 +83,8 @@ const char* WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const char* SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const char* SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const char* SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
-const std::string WALLET_BUNDLE_NAME { "com.hmos.wallet" };
+const char* SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
+const char* WALLET_BUNDLE_NAME { "com.hmos.wallet" };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int64_t POWER_ACTION_INTERVAL { 600 };
 constexpr int64_t SOS_WAIT_TIME { 3000 };
@@ -92,8 +92,8 @@ const char* PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const char* PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const char* PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const char* PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
-const std::string KEY_ENABLE { "enable" };
-const std::string KEY_STATUS { "status" };
+const char* KEY_ENABLE { "enable" };
+const char* KEY_STATUS { "status" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2804,8 +2804,8 @@ bool KeyCommandHandler::ParseLongPressJson(const std::string &configFile)
         if (!cJSON_IsObject(item)) {
             continue;
         }
-        enable = cJSON_GetObjectItem(item, KEY_ENABLE.c_str());
-        status = cJSON_GetObjectItem(item, KEY_STATUS.c_str());
+        enable = cJSON_GetObjectItem(item, KEY_ENABLE);
+        status = cJSON_GetObjectItem(item, KEY_STATUS);
         if (enable == NULL || status == NULL) {
             continue;
         }
