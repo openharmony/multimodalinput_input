@@ -463,15 +463,19 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
 #endif // OHOS_BUILD_ENABLE_ANCO
         MMI_HILOGI("Knuckle gesture start launch ability");
         knuckleCount_ = 0;
-        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
-        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
-        LaunchAbility(knuckleGesture.ability, NO_DELAY);
-        BytraceAdapter::StopLaunchAbility();
-        knuckleGesture.state = true;
-        if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
-            DfxHisysevent::ReportScreenRecorderGesture(intervalTime);
+        if ((type == Knuckle::KNUCKLE_TYPE_SINGLE && screenshotSwitch_.statusConfigValue) ||
+            (type == Knuckle::KNUCKLE_TYPE_DOUBLE && recordSwitch_.statusConfigValue)) {
+            DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
+            BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
+            LaunchAbility(knuckleGesture.ability, NO_DELAY);
+            BytraceAdapter::StopLaunchAbility();
+            if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
+                DfxHisysevent::ReportScreenRecorderGesture(intervalTime);
+            }
+            ReportKnuckleScreenCapture(touchEvent);
         }
-        ReportKnuckleScreenCapture(touchEvent);
+        knuckleGesture.state = true;
+
     } else {
         if (knuckleCount_ > KNUCKLE_KNOCKS) {
             knuckleCount_ = 0;
@@ -747,6 +751,10 @@ bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touc
     }
     if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
+        return false;
+    }
+    if (!screenshotSwitch_.statusConfigValue) {
+        MMI_HILOGI("Screenshot knuckle switch closed");
         return false;
     }
     if (CheckInputMethodArea(touchEvent)) {
@@ -1111,6 +1119,10 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_, repeatKeyMaxTimes_);
     knuckleSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    screenshotSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    screenshotSwitch_.statusConfigValue = true;
+    recordSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    recordSwitch_.statusConfigValue = true;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
         MMI_HILOGE("Parse configFile failed");
@@ -1452,6 +1464,8 @@ void KeyCommandHandler::InitKeyObserver()
     }
     if (!isKnuckleSwitchConfig_) {
         CreateStatusConfigObserver(knuckleSwitch_);
+        CreateStatusConfigObserver(screenshotSwitch_);
+        CreateStatusConfigObserver(recordSwitch_);
         isKnuckleSwitchConfig_ = true;
     }
 }
