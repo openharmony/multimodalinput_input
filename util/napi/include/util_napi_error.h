@@ -59,7 +59,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         { COMMON_KEYBOARD_DEVICE_NOT_EXIST, "The specified keyboard device does not exist." } },
     { COMMON_NON_INPUT_APPLICATION, { COMMON_NON_INPUT_APPLICATION, "it is prohibited for non-input applications." } },
     { INPUT_DEVICE_NOT_SUPPORTED, { INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.\n" } },
-    { ERROR_WINDOW_ID_PERMISSION_DENIED, { ERROR_WINDOW_ID_PERMISSION_DENIED, "windowId is invalide.\n" } },
+    { ERROR_WINDOW_ID_PERMISSION_DENIED, { ERROR_WINDOW_ID_PERMISSION_DENIED, "windowId is invalid.\n" } },
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
