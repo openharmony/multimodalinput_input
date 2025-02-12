@@ -420,6 +420,13 @@ struct DisplayInfo {
      * @since 12
      */
     std::vector<float> transform;
+    /**
+     * Coordinate of the upper left corner of the virtual screen in one-hand mode.
+     * If oneHandX is 0, the virtual screen is in the lower left corner.
+     * If oneHandY is greater than 0, the virtual screen is in the lower right corner.
+     */
+    int32_t oneHandX = 0;
+    int32_t oneHandY = 0;
 };
 
 /**

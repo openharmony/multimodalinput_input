@@ -260,6 +260,13 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
     }
     pkt << event->GetVelocity();
     pkt << event->GetAxisEventType();
+    PointerEvent::FixedMode fixedMode = event->GetFixedMode();
+    if (fixedMode > PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN &&
+        fixedMode < PointerEvent::FixedMode::SCREEN_MODE_MAX) {
+        pkt << static_cast<int32_t>(fixedMode);
+    } else {
+        pkt << static_cast<int32_t>(PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN);
+    }
     pkt << event->GetHandOption();
 }
 
@@ -291,6 +298,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     pkt >> tField;
     event->SetDispatchTimes(tField);
     SetAxisInfo(pkt, event);
+    pkt >> tField;
+    event->SetFixedMode(static_cast<PointerEvent::FixedMode>(tField));
     pkt >> tField;
     event->SetHandOption(tField);
 
@@ -431,8 +440,13 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         MMI_HILOGE("Malloc failed");
         return RET_ERR;
     }
-    secCompPointEvent->touchX = pointerItem.GetDisplayX();
-    secCompPointEvent->touchY = pointerItem.GetDisplayY();
+    if (event->GetFixedMode() == PointerEvent::FixedMode::ONE_HAND) {
+        secCompPointEvent->touchX = pointerItem.GetFixedDisplayX();
+        secCompPointEvent->touchY = pointerItem.GetFixedDisplayY();
+    } else {
+        secCompPointEvent->touchX = pointerItem.GetDisplayX();
+        secCompPointEvent->touchY = pointerItem.GetDisplayY();
+    }
     secCompPointEvent->timeStamp = event->GetActionTime();
     uint32_t dataLen = sizeof(*secCompPointEvent);
     uint8_t outBuf[MAX_HMAC_SIZE] = { 0 };

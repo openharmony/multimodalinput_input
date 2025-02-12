@@ -305,6 +305,25 @@ public:
         AXIS_TYPE_MAX
     };
 
+    enum FixedMode {
+        /**
+         * Indicates unknown.
+         */
+        SCREEN_MODE_UNKNOWN = 0,
+        /**
+         * Indicates normal mode.
+         */
+        NORMAL,
+        /**
+         * Indicates one-hand mode.
+         */
+        ONE_HAND,
+        /**
+         * Indicates invalid max.
+         */
+        SCREEN_MODE_MAX
+    };
+
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
      *
@@ -1252,11 +1271,36 @@ public:
          * @since 12
          */
         int32_t GetRawDisplayY() const;
+        /**
+         * @brief Obtains the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         */
+        int32_t GetFixedDisplayX() const;
+
+        /**
+         * @brief Sets the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         * @param fixedDisplayX Indicates the x coordinate to set.
+         * @return void
+         */
+        void SetFixedDisplayX(int32_t fixedDisplayX);
+
+        /**
+         * @brief Obtains the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         */
+        int32_t GetFixedDisplayY() const;
+
+        /**
+         * @brief Sets the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         * @param fixedDisplayY Indicates the y coordinate to set.
+         * @return void
+         */
+        void SetFixedDisplayY(int32_t fixedDisplayY);
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
         int32_t displayX_ {};
         int32_t displayY_ {};
+        int32_t fixedDisplayX_ {};
+        int32_t fixedDisplayY_ {};
         int32_t windowX_ {};
         int32_t windowY_ {};
         double displayXPos_ {};
@@ -1765,6 +1809,11 @@ public:
     double GetFingerprintDistanceY() const;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
+    void SetAutoToVirtualScreen(bool autoToVirtualScreen);
+    bool GetAutoToVirtualScreen() const;
+    void SetFixedMode(PointerEvent::FixedMode fixedMode);
+    PointerEvent::FixedMode GetFixedMode() const;
+    std::string GetFixedModeStr() const;
     /**
      * @brief The number of times the input event is dispatched.
      * @return Return the event dispatch times.
@@ -1803,6 +1852,7 @@ private:
     bool ReadEnhanceDataFromParcel(Parcel &in);
     bool ReadBufferFromParcel(Parcel &in);
     bool ReadAxisFromParcel(Parcel &in);
+    bool ReadFixedModeFromParcel(Parcel &in);
 
 private:
     int32_t pointerId_ { -1 };
@@ -1833,6 +1883,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool ancoDeal_ { false };
 #endif // OHOS_BUILD_ENABLE_ANCO
+    bool autoToVirtualScreen_ { true };
+    FixedMode fixedMode_ { FixedMode::NORMAL };
     //Left and right hand steady-state reporting status
     int32_t handOption_ { -1 };
 };

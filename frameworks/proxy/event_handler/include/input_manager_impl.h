@@ -249,6 +249,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_ANCO
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    void UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
