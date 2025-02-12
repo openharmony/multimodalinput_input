@@ -2418,7 +2418,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
 {
     CALL_DEBUG_ENTER;
     int32_t action = pointerEvent->GetPointerAction();
-    bool checkFlag = (firstBtnDownWindowInfo_.first == -1) || (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) ||
+    bool checkFlag = (firstBtnDownWindowInfo_.first == -1) ||
+        ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() <= 1)) ||
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty())) ||
         (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
