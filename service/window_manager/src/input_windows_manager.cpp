@@ -498,20 +498,20 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     auto displayId = pointerEvent->GetTargetDisplayId();
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    if (lastDirection_ == static_cast<Direction>(-1)) {
-        lastDirection_ = physicDisplayInfo->direction;
+    if (lastDirection_.first != displayId || lastDirection_.second == static_cast<Direction>(-1)) {
+        lastDirection_ = std::make_pair(displayId, physicDisplayInfo->direction);
         return;
     }
-    if (physicDisplayInfo->direction != lastDirection_) {
+    if (physicDisplayInfo->direction != lastDirection_.second) {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             PointerEvent::PointerItem item;
             if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
                 MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
-                lastDirection_ = physicDisplayInfo->direction;
+                lastDirection_.second = physicDisplayInfo->direction;
                 return;
             }
             if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE && !(item.IsPressed())) {
-                lastDirection_ = physicDisplayInfo->direction;
+                lastDirection_.second = physicDisplayInfo->direction;
                 return;
             }
         }
@@ -534,7 +534,7 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
             }
         }
     }
-    lastDirection_ = physicDisplayInfo->direction;
+    lastDirection_.second = physicDisplayInfo->direction;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
