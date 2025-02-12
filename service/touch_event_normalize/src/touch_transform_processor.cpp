@@ -25,6 +25,7 @@
 #include "fingersense_wrapper.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
+#include "input_event_handler.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -92,7 +93,12 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     item.SetDeviceId(deviceId_);
     int32_t toolType = GetTouchToolType(touch, device);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    NotifyFingersenseProcess(item, toolType);
+    auto keyHandler = InputHandler->GetKeyCommandHandler();
+    if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect())) {
+        NotifyFingersenseProcess(item, toolType);
+    } else {
+        MMI_HILOGD("Skip fingersense detect")
+    }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     item.SetToolType(toolType);
     pointerEvent_->SetDeviceId(deviceId_);
@@ -221,20 +227,25 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
     }
     item.SetPressed(false);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    TransformTouchProperties(rawTouch_, item);
-    if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
-        MMI_HILOGD("Notify fingersense touch up event");
-        TouchType rawTouchTmp = rawTouch_;
-        int32_t displayX = item.GetRawDisplayX();
-        int32_t displayY = item.GetRawDisplayY();
+    auto keyHandler = InputHandler->GetKeyCommandHandler();
+    if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect())) {
+        TransformTouchProperties(rawTouch_, item);
+        if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
+            MMI_HILOGD("Notify fingersense touch up event");
+            TouchType rawTouchTmp = rawTouch_;
+            int32_t displayX = item.GetRawDisplayX();
+            int32_t displayY = item.GetRawDisplayY();
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-        WIN_MGR->ReverseXY(displayX, displayY);
+            WIN_MGR->ReverseXY(displayX, displayY);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-        rawTouchTmp.x = displayX * DRIVER_NUMBER;
-        rawTouchTmp.y = displayY * DRIVER_NUMBER;
-        BytraceAdapter::StartTouchUp(item.GetPointerId());
-        FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouchTmp);
-        BytraceAdapter::StopTouchUp();
+            rawTouchTmp.x = displayX * DRIVER_NUMBER;
+            rawTouchTmp.y = displayY * DRIVER_NUMBER;
+            BytraceAdapter::StartTouchUp(item.GetPointerId());
+            FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouchTmp);
+            BytraceAdapter::StopTouchUp();
+        }
+    } else {
+        MMI_HILOGD("Skip fingersense detect")
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     pointerEvent_->UpdatePointerItem(seatSlot, item);
