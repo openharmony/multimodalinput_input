@@ -1065,7 +1065,7 @@ void PointerDrawingManager::DrawDynamicCursor(std::shared_ptr<OHOS::Rosen::Drawi
         };
         auto ret = layer->FlushBuffer(buffer, DEFAULT_VALUE, cfg);
         if (ret != OHOS::SURFACE_ERROR_OK) {
-            MMI_HILOGE("DrawDynamicCursor FlushBuffer failed, return: %{public}s", SurfaceErrorStr(ret).data());
+            MMI_HILOGE("DrawDynamicCursor FlushBuffer failed, return:%{public}s", SurfaceErrorStr(ret).data());
             layer->CancelBuffer(buffer);
             return;
         }
