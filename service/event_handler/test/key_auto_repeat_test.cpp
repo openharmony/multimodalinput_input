@@ -16,9 +16,9 @@
 #include <gtest/gtest.h>
 #include <libinput.h>
 
+#include "i_preference_manager.h"
 #include "key_auto_repeat.h"
 #include "mmi_log.h"
-#include "i_preference_manager.h"
 #include "timer_manager.h"
 
 #undef MMI_LOG_TAG
@@ -27,10 +27,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t DEFAULT_KEY_REPEAT_DELAY = 500;
-constexpr int32_t DEFAULT_KEY_REPEAT_RATE = 50;
-constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
-const std::string KEYBOARD_FILE_NAME = "keyboard_settings.xml";
+constexpr int32_t DEFAULT_KEY_REPEAT_DELAY { 500 };
+constexpr int32_t DEFAULT_KEY_REPEAT_RATE { 50 };
+constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
+const std::string KEYBOARD_FILE_NAME { "keyboard_settings.xml" };
 } // namespace
 
 class KeyAutoRepeatTest : public testing::Test {
