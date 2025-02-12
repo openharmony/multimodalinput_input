@@ -128,7 +128,7 @@ bool MMIClient::StartEventRunner()
     } else {
         if (!USE_FILE_DESCRIPTION) {
             MMI_HILOGE("const.sys.param_file_description_monitor is false, can not reuse fd thread");
-            return false;
+            return true;
         }
         if (isConnected_ && fd_ >= 0 && isListening_) {
             MMI_HILOGI("File fd is in listening");
