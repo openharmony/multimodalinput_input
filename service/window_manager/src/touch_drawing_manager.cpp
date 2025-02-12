@@ -173,6 +173,21 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
             rectTopPosition_ = PHONE_RECT_TOP;
         }
     }
+    if (isChangedMode_) {
+        if (trackerCanvasNode_ != nullptr) {
+            trackerCanvasNode_->reset();
+        }
+        if (bubbleCanvasNode_ != nullptr) {
+            bubbleCanvasNode_->reset();
+        }
+        if (crosshairCanvasNode_ != nullptr) {
+            crosshairCanvasNode_->reset();
+        }
+        if (labelsCanvasNode_ != nullptr) {
+            labelsCanvasNode_->reset();
+        }
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
 }
 
 void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
@@ -248,7 +263,7 @@ void TouchDrawingManager::RotationScreen()
         RotationCanvasNode(bubbleCanvasNode_);
     }
 
-    if (pointerMode_.isShow) {
+    if (pointerMode_.isShow && !isChangedMode_) {
         if (!lastPointerItem_.empty() || stopRecord_) {
             Snapshot();
         } else if (!stopRecord_) {
