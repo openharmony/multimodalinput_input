@@ -295,15 +295,15 @@ bool GetKeyCode(const cJSON* jsonData, int32_t &keyCodeInt)
     }
     cJSON *keyCode = cJSON_GetObjectItemCaseSensitive(jsonData, "keyCode");
     if (keyCode == nullptr) {
-        MMI_HILOGE("keyCode init failed");
+        MMI_HILOGE("The keyCode init failed");
         return false;
     }
     if (!cJSON_IsNumber(keyCode)) {
-        MMI_HILOGE("keyCode is not number");
+        MMI_HILOGE("The keyCode is not number");
         return false;
     }
     if (keyCode->valueint < 0) {
-        MMI_HILOGE("keyCode must be number and bigger and equal zero");
+        MMI_HILOGE("The keyCode must be number and bigger and equal zero");
         return false;
     }
     keyCodeInt = keyCode->valueint;
