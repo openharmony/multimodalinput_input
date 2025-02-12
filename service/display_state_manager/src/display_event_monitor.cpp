@@ -54,7 +54,7 @@ public:
         CALL_DEBUG_ENTER;
         std::string action = eventData.GetWant().GetAction();
         if (action.empty()) {
-            MMI_HILOGE("action is empty");
+            MMI_HILOGE("The action is empty");
             return;
         }
         MMI_HILOGD("Received screen status:%{public}s", action.c_str());
