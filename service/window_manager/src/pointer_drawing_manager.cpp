@@ -895,7 +895,7 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
                 }
                 RotateDegree(currentDirection_);
             });
-        MMI_HILOGE("current pointer is not loading");
+        MMI_HILOGE("Current pointer is not loading");
         Rosen::RSTransaction::FlushImplicitTransaction();
         return;
     }
