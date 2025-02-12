@@ -265,17 +265,17 @@ void KeyEventNormalize::ReadProductConfig(const std::string &cfgPath, InputProdu
     }
     cJSON *jsonKeyboard = cJSON_GetObjectItemCaseSensitive(parser.json_, "keyboard");
     if (!cJSON_IsObject(jsonKeyboard)) {
-        MMI_HILOGE("jsonKeyboard is not object");
+        MMI_HILOGE("The jsonKeyboard is not object");
         return;
     }
     cJSON *jsonVolumeSwap = cJSON_GetObjectItemCaseSensitive(jsonKeyboard, "volumeSwap");
     if (!cJSON_IsObject(jsonVolumeSwap)) {
-        MMI_HILOGE("jsonVolumeSwap is not object");
+        MMI_HILOGE("The jsonVolumeSwap is not object");
         return;
     }
     cJSON *jsonWhen = cJSON_GetObjectItemCaseSensitive(jsonVolumeSwap, "when");
     if (!cJSON_IsNumber(jsonWhen)) {
-        MMI_HILOGE("jsonWhen is not number");
+        MMI_HILOGE("The jsonWhen is not number");
         return;
     }
     if (static_cast<int32_t>(cJSON_GetNumberValue(jsonWhen)) == SWAP_VOLUME_KEYS_ON_FOLD) {
