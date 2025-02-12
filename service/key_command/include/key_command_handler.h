@@ -357,6 +357,8 @@ private:
     bool isDistanceConfig_ { false };
     bool isKnuckleSwitchConfig_ { false };
     struct KnuckleSwitch knuckleSwitch_;
+    struct KnuckleSwitch screenshotSwitch_;
+    struct KnuckleSwitch recordSwitch_;
     int32_t checkAdjustIntervalTimeCount_ { 0 };
     int32_t checkAdjustDistanceCount_ { 0 };
     int64_t downToPrevUpTimeConfig_ { 0 };
