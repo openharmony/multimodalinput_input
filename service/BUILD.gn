@@ -1939,8 +1939,8 @@ ohos_unittest("ConnectManagerEXTest") {
   ]
 
   deps = [
+    "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
