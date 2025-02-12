@@ -33,7 +33,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t POINTER_MOVEFLAG = { 7 };
+constexpr int32_t POINTER_MOVEFLAG { 7 };
 } // namespace
 
 class EventNormalizeHandlerTest : public testing::Test {
