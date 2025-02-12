@@ -623,6 +623,21 @@ struct libinput_device *InputDeviceManager::GetKeyboardDevice() const
     return nullptr;
 }
 
+void InputDeviceManager::GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> keyCodes;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
+    for (const auto &item : inputDevice_) {
+        const auto &device = item.second.inputDeviceOrigin;
+        if (IsMatchKeys(device, keyCodes)) {
+            MMI_HILOGI("Find keyboard device success id %{public}d", item.first);
+            inputDevice.push_back(device);
+        }
+    }
+}
+
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;

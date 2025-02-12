@@ -49,6 +49,7 @@ public:
     bool CheckMouseCursor();
     bool CheckInputEventFilter();
     bool CheckAuthorize();
+    bool CheckFunctionKeyEnabled();
 
 private:
     PermissionHelper() {}
