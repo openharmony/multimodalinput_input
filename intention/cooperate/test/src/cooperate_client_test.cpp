@@ -62,66 +62,66 @@ void CooperateClientTest::TearDown()
 }
 
 class CoordinationListenerTest : public ICoordinationListener {
-    public:
-        CoordinationListenerTest() : ICoordinationListener() {}
-        void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override
-        {
-            FI_HILOGD("Register coordination listener test");
-            (void) networkId;
-        };
+public:
+    CoordinationListenerTest() : ICoordinationListener() {}
+    void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override
+    {
+        FI_HILOGD("Register coordination listener test");
+        (void) networkId;
     };
+};
 
 class TunnelClientTest : public ITunnelClient {
-    public:
-        TunnelClientTest() : ITunnelClient() {}
-        int32_t Enable(Intention intention, ParamBase &data, ParamBase &reply)
-        {
-            return RET_ERR;
-        }
-        int32_t Disable(Intention intention, ParamBase &data, ParamBase &reply)
-        {
-            return RET_ERR;
-        }
-        int32_t Start(Intention intention, ParamBase &data, ParamBase &reply)
-        {
-            return RET_ERR;
-        }
-        int32_t Stop(Intention intention, ParamBase &data, ParamBase &reply)
-        {
-            return RET_ERR;
-        }
-        int32_t AddWatch(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
-        {
-            return RET_OK;
-        }
-        int32_t RemoveWatch(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
-        {
-            return RET_ERR;
-        }
-        int32_t SetParam(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
-        {
-            return RET_ERR;
-        }
-        int32_t GetParam(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
-        {
-            return RET_OK;
-        }
-        int32_t Control(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
-        {
-            return RET_ERR;
-        }
-    };
+public:
+    TunnelClientTest() : ITunnelClient() {}
+    int32_t Enable(Intention intention, ParamBase &data, ParamBase &reply)
+    {
+        return RET_ERR;
+    }
+    int32_t Disable(Intention intention, ParamBase &data, ParamBase &reply)
+    {
+        return RET_ERR;
+    }
+    int32_t Start(Intention intention, ParamBase &data, ParamBase &reply)
+    {
+        return RET_ERR;
+    }
+    int32_t Stop(Intention intention, ParamBase &data, ParamBase &reply)
+    {
+        return RET_ERR;
+    }
+    int32_t AddWatch(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
+    {
+        return RET_OK;
+    }
+    int32_t RemoveWatch(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
+    {
+        return RET_ERR;
+    }
+    int32_t SetParam(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
+    {
+        return RET_ERR;
+    }
+    int32_t GetParam(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
+    {
+        return RET_OK;
+    }
+    int32_t Control(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
+    {
+        return RET_ERR;
+    }
+};
 
 class StreamClientTest : public StreamClient {
-    public:
-        StreamClientTest() = default;
-        void Stop() override
-        {}
-        int32_t Socket() override
-        {
-            return RET_ERR;
-        }
-    };
+public:
+    StreamClientTest() = default;
+    void Stop() override
+    {}
+    int32_t Socket() override
+    {
+        return RET_ERR;
+    }
+};
 
 /**
  * @tc.name: CooperateClientTest_RegisterListener_001
