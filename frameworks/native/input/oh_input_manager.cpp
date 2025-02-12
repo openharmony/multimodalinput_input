@@ -479,7 +479,7 @@ static int32_t HandleMouseAction(const struct Input_MouseEvent* mouseEvent, OHOS
             g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
             break;
         default:
-            MMI_HILOGE("action:%{public}d is invalid", mouseEvent->action);
+            MMI_HILOGE("The action:%{public}d is invalid", mouseEvent->action);
             return INPUT_PARAMETER_ERROR;
     }
     if (mouseEvent->axisType == MOUSE_AXIS_SCROLL_VERTICAL) {
