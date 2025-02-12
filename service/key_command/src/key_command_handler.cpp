@@ -161,6 +161,12 @@ bool KeyCommandHandler::GetKnuckleSwitchValue()
     return knuckleSwitch_.statusConfigValue;
 }
 
+bool KeyCommandHandler::SkipKnuckleDetect()
+{
+    return ((!screenshotSwitch_.statusConfigValue) && (!recordSwitch_.statusConfigValue)) ||
+        knuckleSwitch_.statusConfigValue;
+}
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
@@ -749,11 +755,17 @@ bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touc
         }
     }
     if (knuckleSwitch_.statusConfigValue) {
-        MMI_HILOGI("Knuckle switch closed");
+        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            MMI_HILOGI("Knuckle switch closed");
+        }
         return false;
     }
     if (!screenshotSwitch_.statusConfigValue) {
-        MMI_HILOGI("Screenshot knuckle switch closed");
+        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            MMI_HILOGI("Screenshot knuckle switch closed");
+        }
         return false;
     }
     if (CheckInputMethodArea(touchEvent)) {
