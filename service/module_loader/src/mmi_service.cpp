@@ -2456,7 +2456,7 @@ int32_t MMIService::CheckPidPermission(int32_t pid)
     CALL_DEBUG_ENTER;
     int32_t checkingPid = GetCallingPid();
     if (checkingPid != pid) {
-        MMI_HILOGE("check pid failed, input pid:%{public}d, but checking pid:%{public}d", pid, checkingPid);
+        MMI_HILOGE("Check pid failed, input pid:%{public}d, but checking pid:%{public}d", pid, checkingPid);
         return RET_ERR;
     }
     return RET_OK;
