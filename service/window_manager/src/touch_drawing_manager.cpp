@@ -175,16 +175,16 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     }
     if (isChangedMode_) {
         if (trackerCanvasNode_ != nullptr) {
-            trackerCanvasNode_->reset();
+            trackerCanvasNode_.reset();
         }
         if (bubbleCanvasNode_ != nullptr) {
-            bubbleCanvasNode_->reset();
+            bubbleCanvasNode_.reset();
         }
         if (crosshairCanvasNode_ != nullptr) {
-            crosshairCanvasNode_->reset();
+            crosshairCanvasNode_.reset();
         }
         if (labelsCanvasNode_ != nullptr) {
-            labelsCanvasNode_->reset();
+            labelsCanvasNode_.reset();
         }
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
