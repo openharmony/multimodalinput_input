@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "mmi_transform.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
 #include "window_manager_lite.h"
@@ -235,6 +236,7 @@ private:
     void UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
+    Direction GetDisplayDirection(const DisplayInfo *displayInfo);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height, bool isRealData = true);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
@@ -272,6 +274,7 @@ private:
         const std::vector<WindowInfo>& windowInfos, int32_t& windowId);
     std::optional<WindowInfo> GetWindowInfo(int32_t logicalX, int32_t logicalY);
     bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY);
+    bool CalculateLayout(const DisplayInfo& displayInfo, const Vector2D<int32_t> &physical, Vector2D<int32_t>& layout);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
         int32_t& physicalY, int32_t& displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
