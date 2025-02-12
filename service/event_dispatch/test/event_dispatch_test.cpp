@@ -27,10 +27,10 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t UID_ROOT { 0 };
-static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
-int32_t g_moduleType = 3;
-int32_t g_pid = 0;
-int32_t g_writeFd = -1;
+static constexpr char PROGRAM_NAME[] { "uds_sesion_test" };
+int32_t g_moduleType { 3 };
+int32_t g_pid { 0 };
+int32_t g_writeFd { -1 };
 } // namespace
 
 class EventDispatchTest : public testing::Test {
