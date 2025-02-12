@@ -427,7 +427,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<PointerEvent> lastPointerEventforWindowChange_ { nullptr };
     bool cancelTouchStatus_ { false };
-    Direction lastDirection_ = static_cast<Direction>(-1);
+    std::pair<int32_t, Direction> lastDirection_ { -1, static_cast<Direction>(-1) };
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;
     bool isParseConfig_ { false };
