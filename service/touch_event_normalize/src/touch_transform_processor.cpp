@@ -97,7 +97,7 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect())) {
         NotifyFingersenseProcess(item, toolType);
     } else {
-        MMI_HILOGD("Skip fingersense detect")
+        MMI_HILOGD("Skip fingersense detect");
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     item.SetToolType(toolType);
@@ -245,7 +245,7 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
             BytraceAdapter::StopTouchUp();
         }
     } else {
-        MMI_HILOGD("Skip fingersense detect")
+        MMI_HILOGD("Skip fingersense detect");
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     pointerEvent_->UpdatePointerItem(seatSlot, item);
