@@ -4619,7 +4619,7 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
         return true;
     }
     if (MMI_GE(window.zOrder, pointerEvent->GetZOrder())) {
-        MMI_HILOGE("current window zorder:%{public}f greater than the simulate target zOrder:%{public}f, "
+        MMI_HILOGE("Current window zorder:%{public}f greater than the simulate target zOrder:%{public}f, "
             "ignore this window::%{public}d", window.zOrder, pointerEvent->GetZOrder(), window.id);
         return false;
     }
