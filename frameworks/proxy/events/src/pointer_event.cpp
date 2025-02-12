@@ -155,6 +155,26 @@ void PointerEvent::PointerItem::SetWindowYPos(double y)
     windowYPos_ = y;
 }
 
+int32_t PointerEvent::PointerItem::GetFixedDisplayX() const
+{
+    return fixedDisplayX_;
+}
+
+void PointerEvent::PointerItem::SetFixedDisplayX(int32_t fixedDisplayX)
+{
+    fixedDisplayX_ = fixedDisplayX;
+}
+
+int32_t PointerEvent::PointerItem::GetFixedDisplayY() const
+{
+    return fixedDisplayY_;
+}
+
+void PointerEvent::PointerItem::SetFixedDisplayY(int32_t fixedDisplayY)
+{
+    fixedDisplayY_ = fixedDisplayY;
+}
+
 int32_t PointerEvent::PointerItem::GetWidth() const
 {
     return width_;
@@ -406,6 +426,10 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(displayYPos_) &&
         out.WriteDouble(windowXPos_) &&
         out.WriteDouble(windowYPos_)
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        && out.WriteInt32(fixedDisplayX_) &&
+        out.WriteInt32(fixedDisplayY_)
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     );
 }
 
@@ -444,6 +468,10 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(displayYPos_) &&
         in.ReadDouble(windowXPos_) &&
         in.ReadDouble(windowYPos_)
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        && in.ReadInt32(fixedDisplayX_) &&
+        in.ReadInt32(fixedDisplayY_)
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     );
 }
 
@@ -460,6 +488,8 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
       dispatchTimes_(other.dispatchTimes_),
+      autoToVirtualScreen_(other.autoToVirtualScreen_),
+      fixedMode_(other.fixedMode_),
       handOption_(other.handOption_)
       {}
 
@@ -905,6 +935,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     WRITEDOUBLE(out, fingerprintDistanceX_);
     WRITEDOUBLE(out, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    WRITEINT32(out, static_cast<int32_t>(fixedMode_));
     WRITEINT32(out, handOption_);
     return true;
 }
@@ -975,7 +1006,23 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     READDOUBLE(in, fingerprintDistanceX_);
     READDOUBLE(in, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    if (!ReadFixedModeFromParcel(in)) {
+        return false;
+    }
     READINT32(in, handOption_);
+    return true;
+}
+
+bool PointerEvent::ReadFixedModeFromParcel(Parcel &in)
+{
+    int32_t value = 0;
+    READINT32(in, value);
+    if (value < static_cast<int32_t>(FixedMode::SCREEN_MODE_UNKNOWN) ||
+        value >= static_cast<int32_t>(FixedMode::SCREEN_MODE_MAX)) {
+            MMI_HILOGE("invalid fixed mode %{public}d", value);
+            return false;
+    }
+    fixedMode_ = static_cast<FixedMode>(value);
     return true;
 }
 
@@ -1283,6 +1330,38 @@ bool PointerEvent::GetAncoDeal() const
     return ancoDeal_;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+void PointerEvent::SetAutoToVirtualScreen(bool autoToVirtualScreen)
+{
+    autoToVirtualScreen_ = autoToVirtualScreen;
+}
+
+bool PointerEvent::GetAutoToVirtualScreen() const
+{
+    return autoToVirtualScreen_;
+}
+
+void PointerEvent::SetFixedMode(PointerEvent::FixedMode fixedMode)
+{
+    fixedMode_ = fixedMode;
+}
+
+PointerEvent::FixedMode PointerEvent::GetFixedMode() const
+{
+    return fixedMode_;
+}
+
+std::string PointerEvent::GetFixedModeStr() const
+{
+    switch (fixedMode_) {
+        case PointerEvent::FixedMode::NORMAL:
+            return std::move("normal");
+        case PointerEvent::FixedMode::ONE_HAND:
+            return std::move("one-hand");
+        default:
+            return std::move("unknown");
+    }
+}
 
 std::string_view PointerEvent::ActionToShortStr(int32_t action)
 {
