@@ -131,6 +131,15 @@ public:
     {
         softRenderCfg_ = cfg;
     }
+    void SetRotation(const rotation_t rotation)
+    {
+        rotation_ = rotation;
+    }
+
+    rotation_t GetRotation()
+    {
+        return rotation_;
+    }
 
 private:
     bool InitSurfaceNode();
