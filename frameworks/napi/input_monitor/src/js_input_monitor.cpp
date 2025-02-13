@@ -73,6 +73,16 @@ enum TypeName : int32_t {
     JOYSTICK = 7,
     FINGERPRINT = 8,
     SWIPE_INWARD = 9,
+    PRE_KEY = 10,
+};
+
+enum InputKeyEventAction  {
+    /** Cancellation of a key action. */
+    KEY_ACTION_CANCEL = 0,
+    /** Pressing of a key. */
+    KEY_ACTION_DOWN = 1,
+    /** Release of a key. */
+    KEY_ACTION_UP = 2,
 };
 
 std::map<std::string, int32_t> TO_GESTURE_TYPE = {
@@ -86,6 +96,10 @@ std::map<std::string, int32_t> TO_GESTURE_TYPE = {
     { "joystick", JOYSTICK},
     { "fingerprint", FINGERPRINT},
     { "swipeInward", SWIPE_INWARD},
+};
+
+std::map<std::string, int32_t> TO_PRE_MONITOR_TYPE = {
+    { "keyPressed", PRE_KEY },
 };
 
 struct MonitorInfo {
@@ -121,6 +135,10 @@ std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
     { "fingerprint", HANDLE_EVENT_TYPE_FINGERPRINT },
 };
 
+std::map<std::string, int32_t> TO_HANDLE_PRE_EVENT_TYPE = {
+    { "keyPressed", HANDLE_EVENT_TYPE_PRE_KEY },
+};
+
 int32_t InputMonitor::Start(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
@@ -130,6 +148,10 @@ int32_t InputMonitor::Start(const std::string &typeName)
         auto it = TO_HANDLE_EVENT_TYPE.find(typeName.c_str());
         if (it != TO_HANDLE_EVENT_TYPE.end()) {
             eventType = it->second;
+        }
+        auto iter = TO_HANDLE_PRE_EVENT_TYPE.find(typeName.c_str());
+        if (iter != TO_HANDLE_PRE_EVENT_TYPE.end()) {
+            eventType = iter->second;
         }
         monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this(), eventType);
     }
@@ -142,6 +164,12 @@ void InputMonitor::Stop()
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         MMI_HILOGE("Invalid values");
+        return;
+    }
+    auto iter = TO_HANDLE_PRE_EVENT_TYPE.find(typeName_.c_str());
+    if (iter != TO_HANDLE_PRE_EVENT_TYPE.end()) {
+        InputManager::GetInstance()->RemovePreMonitor(monitorId_);
+        monitorId_ = -1;
         return;
     }
     InputManager::GetInstance()->RemoveMonitor(monitorId_);
@@ -163,6 +191,17 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
 {
     std::lock_guard<std::mutex> guard(mutex_);
     callback_ = callback;
+}
+
+void InputMonitor::SetKeyCallback(std::function<void(std::shared_ptr<KeyEvent>)> keyCallback)
+{
+    std::lock_guard<std::mutex> guard(mutex_);
+    keyCallback_ = keyCallback;
+}
+
+void InputMonitor::SetKeys(std::vector<int32_t> keys)
+{
+    keys_ = keys;
 }
 
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
@@ -268,7 +307,23 @@ uint32_t InputMonitor::GetRectTotal()
     return rectTotal_;
 }
 
-void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const {}
+void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    std::function<void(std::shared_ptr<KeyEvent>)> callback;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        auto typeName = JS_INPUT_MONITOR_MGR.GetPreMonitorTypeName(id_);
+        if (typeName == INVALID_TYPE_NAME || typeName != "keyPressed") {
+            MMI_HILOGE("Failed to process key event, id:%{public}d", id_);
+            return;
+        }
+        callback = keyCallback_;
+    }
+    CHKPV(callback);
+    callback(keyEvent);
+}
 
 void InputMonitor::OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const {}
 
@@ -319,6 +374,21 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
     monitor_->SetTypeName(typeName_);
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
+}
+
+JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
+    napi_value callback, int32_t id, std::vector<int32_t> keys)
+    : monitor_(std::make_shared<InputMonitor>()), jsEnv_(jsEnv), typeName_(typeName), monitorId_(id),
+    keys_(keys)
+{
+    SetCallback(callback);
+    CHKPV(monitor_);
+    monitor_->SetKeyCallback([jsId = id](std::shared_ptr<KeyEvent> keyEvent) {
+        JS_INPUT_MONITOR_MGR.OnKeyEventByMonitorId(jsId, keyEvent);
+    });
+    monitor_->SetTypeName(typeName_);
+    monitor_->SetId(monitorId_);
+    monitor_->SetKeys(keys_);
 }
 
 void JsInputMonitor::SetCallback(napi_value callback)
@@ -1509,5 +1579,269 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
+void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (!isMonitoring_) {
+        MMI_HILOGE("Js monitor stop");
+        return;
+    }
+    CHKPV(monitor_);
+    CHKPV(keyEvent);
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        preEvQueue_.push(keyEvent);
+    }
+    if (!preEvQueue_.empty()) {
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
+        MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
+        if (monitorInfo == nullptr) {
+            MMI_HILOGE("The monitorInfo is nullptr");
+            delete work;
+            work = nullptr;
+            return;
+        }
+        monitorInfo->monitorId = monitorId_;
+        work->data = monitorInfo;
+        uv_loop_s *loop = nullptr;
+        auto status = napi_get_uv_event_loop(jsEnv_, &loop);
+        if (status != napi_ok) {
+            THROWERR(jsEnv_, "napi_get_uv_event_loop is failed");
+            CleanData(&monitorInfo, &work);
+            return;
+        }
+        int32_t ret = uv_queue_work_with_qos(
+            loop,
+            work,
+            [](uv_work_t *work) { MMI_HILOGD("uv_queue_work callback function is called"); },
+            &JsInputMonitor::JsPreCallback,
+            uv_qos_user_initiated);
+        if (ret != 0) {
+            MMI_HILOGE("Add uv_queue failed, ret is %{public}d", ret);
+            CleanData(&monitorInfo, &work);
+        }
+    }
+}
+
+void JsInputMonitor::JsPreCallback(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    auto temp = static_cast<MonitorInfo*>(work->data);
+    delete work;
+    work = nullptr;
+    auto jsMonitor { JS_INPUT_MONITOR_MGR.GetPreMonitor(temp->monitorId) };
+    CHKPV(jsMonitor);
+    jsMonitor->OnKeyEventInJsThread(jsMonitor->GetTypeName());
+    delete temp;
+    temp = nullptr;
+}
+
+void JsInputMonitor::OnKeyEventInJsThread(const std::string &typeName)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(resourcesmutex_);
+    if (!isMonitoring_) {
+        MMI_HILOGE("Js monitor stop");
+        return;
+    }
+    CHKPV(jsEnv_);
+    CHKPV(receiver_);
+    while (!preEvQueue_.empty()) {
+        auto keyEventItem = preEvQueue_.front();
+        preEvQueue_.pop();
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(jsEnv_, &scope);
+        CHKPV(scope);
+        napi_value napiKeyEvent = nullptr;
+        auto status = napi_create_object(jsEnv_, &napiKeyEvent);
+        if (status != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        auto ret = RET_ERR;
+        switch (TO_PRE_MONITOR_TYPE[typeName.c_str()]) {
+            case TypeName::PRE_KEY: {
+                ret = TransformKeyEvent(keyEventItem, napiKeyEvent);
+                break;
+            }
+            default: {
+                MMI_HILOGE("This event is invalid");
+                break;
+            }
+        }
+        bool checkFlag = ret != RET_OK || napiKeyEvent == nullptr;
+        if (checkFlag) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        napi_value callback = nullptr;
+        status = napi_get_reference_value(jsEnv_, receiver_, &callback);
+        if (status != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        napi_value result = nullptr;
+        if (napi_call_function(jsEnv_, nullptr, callback, 1, &napiKeyEvent, &result) != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            return;
+        }
+        napi_close_handle_scope(jsEnv_, scope);
+    }
+}
+
+int32_t JsInputMonitor::TransformKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, napi_value result)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    // set inputEvent
+    if (SetInputEventProperty(keyEvent, result) != RET_OK) {
+        MMI_HILOGE("Set inputEvent property failed");
+        return RET_ERR;
+    }
+
+    // set action
+    if (SetNameProperty(jsEnv_, result, "action", GetKeyEventAction(keyEvent->GetKeyAction())) != napi_ok) {
+        MMI_HILOGE("Set action property failed");
+        return RET_ERR;
+    }
+
+    // set key
+    napi_value keyObject = nullptr;
+    CHKRR(napi_create_object(jsEnv_, &keyObject), "napi_create_object is ", RET_ERR);
+    std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+    if (!keyItem) {
+        MMI_HILOGE("The keyItem is nullopt");
+        return false;
+    }
+    GetJsKeyItem(keyItem, keyObject);
+    if (SetNameProperty(jsEnv_, result, "key", keyObject) != napi_ok) {
+        MMI_HILOGE("Set key property failed");
+        return RET_ERR;
+    }
+
+    // set unicodeChar
+    if (SetNameProperty(jsEnv_, result, "unicodeChar", keyItem->GetUnicode()) != napi_ok) {
+        MMI_HILOGE("Set unicodeChar property failed");
+        return RET_ERR;
+    }
+
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    // set keys
+    if (!GetKeys(keyEvent, pressedKeys, result)) {
+        MMI_HILOGE("Get pressedKeys failed");
+        return RET_ERR;
+    }
+
+    if (!GetPressedKey(pressedKeys, result)) {
+        MMI_HILOGE("Get single pressedKey failed");
+        return RET_ERR;
+    }
+
+    if (!GetFunctionKeyState(keyEvent, result)) {
+        MMI_HILOGE("Get FunctionKey failed");
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
+int32_t JsInputMonitor::GetKeyEventAction(int32_t action) const
+{
+    if (KeyEvent::KEY_ACTION_CANCEL == action) {
+        return InputKeyEventAction ::KEY_ACTION_CANCEL;
+    } else if (KeyEvent::KEY_ACTION_DOWN == action) {
+        return InputKeyEventAction ::KEY_ACTION_DOWN;
+    } else if (KeyEvent::KEY_ACTION_UP == action) {
+        return InputKeyEventAction ::KEY_ACTION_UP;
+    } else {
+        return RET_ERR;
+    }
+}
+
+int32_t JsInputMonitor::GetJsKeyItem(const std::optional<MMI::KeyEvent::KeyItem> keyItem, napi_value value) const
+{
+    CALL_DEBUG_ENTER;
+    CHKRR(SetNameProperty(jsEnv_, value, "code", keyItem->GetKeyCode()), "Set code", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "pressedTime", keyItem->GetDownTime()), "Set pressedTime", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "deviceId", keyItem->GetDeviceId()), "Set deviceId", RET_ERR);
+    return RET_OK;
+}
+
+bool JsInputMonitor::GetFunctionKeyState(const std::shared_ptr<KeyEvent> keyEvent, napi_value result) const
+{
+    CALL_DEBUG_ENTER;
+    // set capsLock
+    napi_value capsLockValue = nullptr;
+    napi_status status =
+        napi_get_boolean(jsEnv_, keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY), &capsLockValue);
+    if (status != napi_ok) {
+        return false;
+    }
+    if (SetNameProperty(jsEnv_, result, "capsLock", capsLockValue) != napi_ok) {
+        MMI_HILOGE("Set capsLock property failed");
+        return false;
+    }
+
+    // set numLock
+    napi_value numLockValue = nullptr;
+    if (napi_get_boolean(jsEnv_, keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY), &numLockValue) != napi_ok) {
+        return false;
+    }
+    if (SetNameProperty(jsEnv_, result, "numLock", numLockValue) != napi_ok) {
+        MMI_HILOGE("Set numLock property failed");
+        return false;
+    }
+
+    // set scrollLock
+    napi_value scrollLockValue = nullptr;
+    if (napi_get_boolean(jsEnv_, keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), &scrollLockValue) !=
+        napi_ok) {
+        return false;
+    }
+    if (SetNameProperty(jsEnv_, result, "scrollLock", scrollLockValue) != napi_ok) {
+        MMI_HILOGE("Set scrollLock property failed");
+        return false;
+    }
+    return true;
+}
+
+bool JsInputMonitor::GetKeys(
+    const std::shared_ptr<KeyEvent> keyEvent, const std::vector<int32_t> &pressedKeys, napi_value result) const
+{
+    CALL_DEBUG_ENTER;
+    napi_value keysArray = nullptr;
+    napi_status status = napi_create_array(jsEnv_, &keysArray);
+    if (status != napi_ok || keysArray == nullptr) {
+        THROWERR(jsEnv_, "napi_create_array is failed");
+        return false;
+    }
+    uint32_t index = 0;
+    for (const auto &pressedKeyCode : pressedKeys) {
+        napi_value element = nullptr;
+        if (napi_create_object(jsEnv_, &element) != napi_ok) {
+            THROWERR(jsEnv_, "Napi create element failed");
+            return false;
+        }
+        std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent->GetKeyItem(pressedKeyCode);
+        if (!pressedKeyItem) {
+            MMI_HILOGE("The pressedKeyItem is nullopt");
+            return false;
+        }
+        GetJsKeyItem(pressedKeyItem, element);
+
+        if (napi_set_element(jsEnv_, keysArray, index, element)) {
+            THROWERR(jsEnv_, "Napi set element failed");
+            return false;
+        }
+        ++index;
+    }
+    if (SetNameProperty(jsEnv_, result, "keys", keysArray) != napi_ok) {
+        MMI_HILOGE("Set keys property failed");
+        return false;
+    }
+    return true;
+}
 } // namespace MMI
 } // namespace OHOS

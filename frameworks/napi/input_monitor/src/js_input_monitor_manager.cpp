@@ -29,6 +29,12 @@ namespace MMI {
 namespace {
 constexpr int32_t MONITOR_REGISTER_EXCEED_MAX { 4100001 };
 } // namespace
+static const std::vector<int32_t> supportedKeyCodes = {
+    KeyEvent::KEYCODE_POWER,
+    KeyEvent::KEYCODE_META_LEFT,
+    KeyEvent::KEYCODE_VOLUME_UP,
+    KeyEvent::KEYCODE_VOLUME_DOWN
+};
 
 JsInputMonitorManager& JsInputMonitorManager::GetInstance()
 {
@@ -73,6 +79,27 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     int32_t ret = monitor->Start(typeName);
     if (ret < 0) {
         MMI_HILOGE("js monitor startup failed");
+        ThrowError(jsEnv, ret);
+        return;
+    }
+    monitors_.push_back(monitor);
+}
+
+void JsInputMonitorManager::AddPreMonitor(napi_env jsEnv, const std::string &typeName,
+    napi_value callback, std::vector<int32_t> keys)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
+            MMI_HILOGW("Add js monitor failed");
+            return;
+        }
+    }
+    auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++, keys);
+    int32_t ret = monitor->Start(typeName);
+    if (ret < 0) {
+        MMI_HILOGE("Js monitor startup failed");
         ThrowError(jsEnv, ret);
         return;
     }
@@ -171,6 +198,30 @@ void JsInputMonitorManager::OnPointerEventByMonitorId(int32_t id, int32_t finger
     }
 }
 
+void JsInputMonitorManager::OnKeyEventByMonitorId(int32_t id, std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if (item != nullptr && item->GetId() == id) {
+            item->OnKeyEvent(keyEvent);
+        }
+    }
+}
+
+const std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetPreMonitor(int32_t id)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if (item != nullptr && item->GetId() == id) {
+            return item;
+        }
+    }
+    MMI_HILOGD("No monitor found");
+    return nullptr;
+}
+
 const std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id, int32_t fingers)
 {
     CALL_DEBUG_ENTER;
@@ -190,6 +241,19 @@ std::string JsInputMonitorManager::GetMonitorTypeName(int32_t id, int32_t finger
     std::lock_guard<std::mutex> guard(mutex_);
     for (const auto &item : monitors_) {
         if ((item != nullptr) && (item->GetId() == id && item->GetFingers() == fingers)) {
+            return item->GetTypeName();
+        }
+    }
+    MMI_HILOGD("No monitor found");
+    return "";
+}
+
+std::string JsInputMonitorManager::GetPreMonitorTypeName(int32_t id)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if (item != nullptr && item->GetId() == id) {
             return item->GetTypeName();
         }
     }
@@ -356,7 +420,7 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
 bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
     napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers)
 {
-    if ((monitor->GetTypeName() == typeName) && (monitor->GetFingers() == fingers)) {
+    if ((monitor->GetTypeName() == typeName) && (typeName == "keyPressed" || monitor->GetFingers() == fingers)) {
         if (monitor->IsMatch(jsEnv, callback) == RET_OK) {
             return true;
         }
@@ -367,12 +431,30 @@ bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMo
 bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
     napi_env jsEnv, const std::string &typeName, const int32_t fingers)
 {
-    if ((monitor->GetTypeName() == typeName) && (monitor->GetFingers() == fingers)) {
+    if ((monitor->GetTypeName() == typeName) && (typeName == "keyPressed" || monitor->GetFingers() == fingers)) {
         if (monitor->IsMatch(jsEnv) == RET_OK) {
             return true;
         }
     }
     return false;
+}
+
+bool JsInputMonitorManager::GetKeysArray(napi_env env, napi_value keysNapiValue, uint32_t keysLength,
+    std::vector<int32_t>& keys)
+{
+    for (uint32_t i = 0; i < keysLength; i++) {
+        napi_value napiElement;
+        CHKRR(napi_get_element(env, keysNapiValue, i, &napiElement), GET_ELEMENT, false);
+        int32_t keycode;
+        CHKRR(napi_get_value_int32(env, napiElement, &keycode), GET_VALUE_INT32, false);
+        auto it = std::find(supportedKeyCodes.begin(), supportedKeyCodes.end(), keycode);
+        if (it == supportedKeyCodes.end()) {
+            MMI_HILOGE("PreKeys is not expect");
+            return false;
+        }
+        keys.push_back(keycode);
+    }
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

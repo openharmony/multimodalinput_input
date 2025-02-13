@@ -38,6 +38,7 @@ enum class MmiMessageId : int32_t {
     WINDOW_INFO,
     WINDOW_STATE_ERROR_CALLBACK,
     WINDOW_STATE_ERROR_NOTIFY,
+    ON_PRE_KEY_EVENT,
 };
 
 enum TokenType : int32_t {
