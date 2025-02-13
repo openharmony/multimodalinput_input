@@ -1144,8 +1144,7 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    bool isHard = true;
-    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
+    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
     MMI_HILOGD("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u",
         sp->GetScreenId());
     return RET_OK;
@@ -1180,6 +1179,7 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
                 cfg.rotationFocusX = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_X_RATIO;
                 cfg.rotationFocusY = GetFocusCoordinates() + cfg.GetImageSize() * RUNNING_Y_RATIO;
             }
+            cfg.direction = it.second->IsMirror() ? DIRECTION0 : displayInfo_.direction;
             it.second->SetHardRenderCfg(cfg);
             DrawDynamicHardwareCursor(it.second, cfg);
         } else {
@@ -1199,8 +1199,7 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    bool isHard = false;
-    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
+    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
 
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -1232,7 +1231,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         .color = GetPointerColor(),
         .size = GetPointerSize(),
         .direction = displayInfo_.direction,
-        .isHard = true,
+        .isHard = false,
         .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
     };
     for (auto it : screenPointers) {
@@ -2324,6 +2323,14 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
     }
+    if (sp->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
+        uint32_t mainWidth = sp->GetScreenWidth();
+        uint32_t mainHeight = sp->GetScreenHeight();
+        for (auto msp : GetMirrorScreenPointers()) {
+            msp->SetRotation(static_cast<rotation_t>(displayInfo.direction));
+            msp->UpdatePadding(mainWidth, mainHeight);
+        }
+    }
     sp->OnDisplayInfo(displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hasDisplay_ = true;
@@ -3250,6 +3257,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     std::set<uint32_t> sids;
     uint32_t mainWidth = 0;
     uint32_t mainHeight = 0;
+    rotation_t mainRotation = static_cast<rotation_t>(DIRECTION0);
     {
         std::lock_guard<std::mutex> lock(mtx_);
         // construct ScreenPointers for new screens
@@ -3267,6 +3275,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             if (si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
                 mainWidth = GetScreenInfoWidth(si);
                 mainHeight = GetScreenInfoHeight(si);
+                mainRotation = static_cast<rotation_t>(si->GetRotation());
             }
 
             auto it = screenPointers_.find(sid);
@@ -3297,6 +3306,9 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
 
         // update screen scale and padding
         for (auto sp : screenPointers_) {
+            if (sp.second->IsMirror()){
+                sp.second->SetRotation(mainRotation);
+            }
             sp.second->UpdatePadding(mainWidth, mainHeight);
         }
     }
@@ -3344,6 +3356,7 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
     for (auto it : screenPointers) {
         cfg.dpi = it.second->GetRenderDPI();
         MMI_HILOGD("HardwareCursorRender, screen=%{public}u, dpi=%{public}f", it.first, cfg.dpi);
+        cfg.direction = it.second->IsMirror() ? DIRECTION0 : displayInfo_.direction;
         if (it.second->IsMirror() || it.first == screenId_) {
             it.second->SetHardRenderCfg(cfg);
             DrawCursor(it.second, cfg);
@@ -3369,7 +3382,7 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         .color = GetPointerColor(),
         .size = GetPointerSize(),
         .direction = displayInfo_.direction,
-        .isHard = true,
+        .isHard = false,
     };
 
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
@@ -3404,10 +3417,9 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<Rosen::RSSurfaceNode> 
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    bool isHard = false;
     {
         std::lock_guard<std::mutex> lock(mtx_);
-        pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
+        pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
     }
 
     OHOS::BufferFlushConfig flushConfig = {
@@ -3434,10 +3446,9 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
     CHKPR(buffer, RET_ERR);
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-    bool isHard = true;
     {
         std::lock_guard<std::mutex> lock(mtx_);
-        pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg, isHard);
+        pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
     }
 
     MMI_HILOGD("DrawCursor on ScreenPointer success, screenId=%{public}u", sp->GetScreenId());
