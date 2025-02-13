@@ -3463,6 +3463,21 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
     return RET_OK;
 }
 
+void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, DisplayInfo displayInfo)
+{
+    if (sp->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
+        uint32_t mainWidth = sp->GetScreenWidth();
+        uint32_t mainHeight = sp->GetScreenHeight();
+        auto mirrorScreens = GetMirrorScreenPointers();
+        for (auto mirrorScreen : mirrorScreens) {
+            if (mirrorScreen != nullptr) {
+                mirrorScreen->SetRotation(static_cast<rotation_t>(displayInfo.direction));
+                mirrorScreen->UpdatePadding(mainWidth, mainHeight);
+            }
+        }
+    }
+}
+
 std::vector<std::shared_ptr<ScreenPointer>> PointerDrawingManager::GetMirrorScreenPointers()
 {
     std::vector<std::shared_ptr<ScreenPointer>> mirrors;
