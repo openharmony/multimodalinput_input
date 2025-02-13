@@ -154,9 +154,10 @@ void InputEventHandler::UpdateDwtTouchpadRecord(libinput_event *event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
         touchpadEventAbsX_ = libinput_event_touchpad_get_x(touchpadEvent);
         touchpadEventAbsY_ = libinput_event_touchpad_get_y(touchpadEvent);
-
+        int32_t toolType = libinput_event_touchpad_get_tool_type(touchpadEvent);
         if (touchpadEventAbsX_ > TOUCHPAD_EDGE_WIDTH_RELEASE &&
-            touchpadEventAbsX_ < touchpadSizeX - TOUCHPAD_EDGE_WIDTH_RELEASE) {
+            touchpadEventAbsX_ < touchpadSizeX - TOUCHPAD_EDGE_WIDTH_RELEASE &&
+            toolType != MT_TOOL_PALM) {
             isDwtEdgeAreaForTouchpadMotionActing_ = false;
             MMI_HILOGD("Pointer edge dwt unlocked, coordX = %{public}f", touchpadEventDownAbsX_);
         }
@@ -225,7 +226,7 @@ bool InputEventHandler::IsModifierKey(uint32_t keycode)
 void InputEventHandler::RefreshDwtActingState()
 {
     isDwtEdgeAreaForTouchpadMotionActing_ = true;
-    isDwtEdgeAreaForTouchpadButtonActing_ = false;
+    isDwtEdgeAreaForTouchpadButtonActing_ = true;
     isDwtEdgeAreaForTouchpadTapActing_ = true;
 }
 
