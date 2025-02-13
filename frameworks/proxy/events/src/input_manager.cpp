@@ -20,6 +20,7 @@
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
+#include "pre_monitor_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManager"
@@ -136,6 +137,17 @@ int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, H
 void InputManager::RemoveMonitor(int32_t monitorId)
 {
     InputMgrImpl.RemoveMonitor(monitorId);
+}
+
+int32_t InputManager::AddPreMonitor(
+    std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType, std::vector<int32_t> keys)
+{
+    return PRE_MONITOR_MGR.AddHandler(monitor, eventType, keys);
+}
+
+void InputManager::RemovePreMonitor(int32_t monitorId)
+{
+    PRE_MONITOR_MGR.RemoveHandler(monitorId);
 }
 
 void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)

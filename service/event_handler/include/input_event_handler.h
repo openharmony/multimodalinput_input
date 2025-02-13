@@ -35,6 +35,7 @@
 // #ifdef OHOS_BUILD_ENABLE_SWITCH
 #include "switch_subscriber_handler.h"
 // #endif // OHOS_BUILD_ENABLE_SWITCH
+#include "event_pre_monitor_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,6 +58,7 @@ public:
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
     std::shared_ptr<EventDispatchHandler> GetEventDispatchHandler() const;
+    std::shared_ptr<EventPreMonitorHandler> GetEventPreMonitorHandler() const;
 
 private:
     int32_t BuildInputHandlerChain();
@@ -72,6 +74,7 @@ private:
     std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_ { nullptr };
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
     std::shared_ptr<EventDispatchHandler> eventDispatchHandler_ { nullptr };
+    std::shared_ptr<EventPreMonitorHandler> eventPreMonitorHandler_ { nullptr };
 
     uint64_t idSeed_ { 0 };
     bool isTyping_ { false };
