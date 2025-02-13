@@ -200,7 +200,7 @@ void RenderConfig::RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX += MOUSE_CALCULATE_MOUSE_ICON_BIASICON_BAIS;
+            physicalX += CALCULATE_MOUSE_ICON_BIAS;
             physicalY += CALCULATE_MOUSE_ICON_BIAS;
             [[fallthrough]];
         }
