@@ -37,6 +37,7 @@ namespace MMI {
 namespace {
 const std::string THREAD_NAME { "OS_mmi_EventHdr" };
 static const bool USE_ISOLATE_DISPATCH_THREAD = false;
+static const bool USE_FILE_DESCRIPTION = system::GetBoolParameter("const.sys.param_file_description_monitor", false);
 } // namespace
 
 using namespace AppExecFwk;
@@ -125,6 +126,10 @@ bool MMIClient::StartEventRunner()
             return false;
         }
     } else {
+        if (!USE_FILE_DESCRIPTION) {
+            MMI_HILOGE("const.sys.param_file_description_monitor is false, can not reuse fd thread");
+            return true;
+        }
         if (isConnected_ && fd_ >= 0 && isListening_) {
             MMI_HILOGI("File fd is in listening");
             return true;
