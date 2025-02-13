@@ -2288,21 +2288,6 @@ int32_t PointerDrawingManager::GetPointerColor()
     return pointerColor;
 }
 
-void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, DisplayInfo displayInfo)
-{
-    if (sp->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
-        uint32_t mainWidth = sp->GetScreenWidth();
-        uint32_t mainHeight = sp->GetScreenHeight();
-        auto mirrorScreens = GetMirrorScreenPointers();
-        for (auto mirrorScreen : mirrorScreens) {
-            if (mirrorScreen != nullptr) {
-                mirrorScreen->SetRotation(static_cast<rotation_t>(displayInfo.direction));
-                mirrorScreen->UpdatePadding(mainWidth, mainHeight);
-            }
-        }
-    }
-}
-
 void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 {
     CALL_DEBUG_ENTER;
