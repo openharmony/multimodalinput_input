@@ -479,6 +479,20 @@ struct DisplayInfo {
      * @since 12
      */
     Direction fixedDirection;
+    
+    /**
+     * The physical width of the screen, in millimeters.
+     *
+     * @since 12
+     */
+    float physicalWidth { 0.0f };
+
+    /**
+     * The physical height of the screen, in millimeters.
+     *
+     * @since 12
+     */
+    float physicalHeight { 0.0f };
 };
 
 /**

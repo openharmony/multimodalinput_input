@@ -733,6 +733,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.displayDirection << item.displayMode << item.transform << item.ppi << item.offsetX
             << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
+            << item.physicalWidth << item.physicalHeight
             << item.oneHandX << item.oneHandY;
     }
     if (pkt.ChkRWError()) {
