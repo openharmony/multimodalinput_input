@@ -710,6 +710,32 @@ bool PointerDrawingManager::HasMagicCursor()
     return hasMagicCursor_.isShow;
 }
 
+int32_t PointerDrawingManager::ParsingDynamicImage(MOUSE_ICON mouseStyle)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelmap = nullptr;
+    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        MMI_HILOGD("Set mouseicon by userIcon_");
+        auto userIconCopy = GetUserIconCopy();
+        image_ = ExtractDrawingImage(userIconCopy);
+    } else {
+        if (mouseStyle == MOUSE_ICON::RUNNING) {
+            pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
+        } else {
+            pixelmap = DecodeImageToPixelMap(mouseStyle);
+        }
+        CHKPR(pixelmap, RET_ERR);
+        if (mouseStyle == MOUSE_ICON::RUNNING_RIGHT) {
+            runningRightImage_ = ExtractDrawingImage(pixelmap);
+            CHKPR(runningRightImage_, RET_ERR);
+            return RET_OK;
+        }
+        image_ = ExtractDrawingImage(pixelmap);
+        CHKPR(image_, RET_ERR);
+    }
+    return RET_OK;
+}
+ 
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
 {
@@ -970,6 +996,91 @@ std::shared_ptr<Rosen::Drawing::Image> PointerDrawingManager::ExtractDrawingImag
         delete releaseContext;
     }
     return image;
+}
+
+std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> PointerDrawingManager::DrawDynamicBitmap()
+{
+    auto bitmap = std::make_shared<OHOS::Rosen::Drawing::Bitmap>();
+    CHKPP(bitmap);
+ 
+    auto size = GetCanvasSize();
+    OHOS::Rosen::Drawing::BitmapFormat format = {
+        OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE
+    };
+    bitmap->Build(size, size, format);
+    auto canvas = std::make_shared<OHOS::Rosen::Drawing::Canvas>();
+    CHKPP(canvas);
+    canvas->Bind(*bitmap);
+    canvas->Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    FOCUS_COORDINATES(FOCUS_COORDINATES_, CHANGE) = GetFocusCoordinates();
+    CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) = GetCanvasSize();
+ 
+    if (hasLoadingPointerStyle_) {
+        canvas->Rotate(DYNAMIC_ROTATION_ANGLE * currentFrame_, FOCUS_COORDINATES_CHANGE, FOCUS_COORDINATES_CHANGE);
+        currentFrame_++;
+        if (currentFrame_ == frameCount_) {
+            currentFrame_ = 0;
+        }
+    }
+    DrawDynamicImage(*canvas, MOUSE_ICON(lastMouseStyle_.id));
+    if (hasHardwareCursorAnimate_) {
+        canvas->Rotate(
+            DYNAMIC_ROTATION_ANGLE * currentFrame_,
+            FOCUS_COORDINATES_CHANGE + imageWidth_ * RUNNING_X_RATIO,
+            FOCUS_COORDINATES_CHANGE + imageHeight_ * RUNNING_Y_RATIO);
+        DrawDynamicImage(*canvas, MOUSE_ICON::RUNNING_RIGHT);
+        currentFrame_++;
+        if (currentFrame_ == frameCount_) {
+            currentFrame_ = 0;
+        }
+    }
+    canvas->Restore();
+    return bitmap;
+}
+ 
+void PointerDrawingManager::DrawDynamicCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
+    int32_t px, int32_t py, ICON_TYPE align)
+{
+    auto layer = GetLayer();
+    CHKPV(layer);
+    auto buffer = GetSurfaceBuffer(layer);
+    CHKPV(buffer);
+    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
+    CHKPV(addr);
+ 
+    uint32_t addrSize = buffer->GetWidth() * buffer->GetHeight() * CURSOR_STRIDE;
+    auto ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), addrSize);
+    if (ret != EOK) {
+        MMI_HILOGE("memcpy_s error, ret: %{public}d", ret);
+        return;
+    }
+    auto func = [this, layer, buffer, px, py, align]() mutable {
+        OHOS::BufferFlushConfig cfg = {
+            .damage = {
+                .w = buffer->GetWidth(),
+                .h = buffer->GetHeight(),
+            },
+        };
+        auto ret = layer->FlushBuffer(buffer, DEFAULT_VALUE, cfg);
+        if (ret != OHOS::SURFACE_ERROR_OK) {
+            MMI_HILOGE("DrawDynamicCursor FlushBuffer failed, return: %{public}s", SurfaceErrorStr(ret).data());
+            layer->CancelBuffer(buffer);
+            return;
+        }
+ 
+        surfaceNode_->SetBounds(
+            px - CalculateHardwareXOffset(align),
+            py - CalculateHardwareYOffset(align),
+            g_hardwareCanvasSize,
+            g_hardwareCanvasSize);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    };
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    PostTask(func);
+#else
+    func();
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -1755,6 +1866,35 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
         MMI_HILOGE("Failed to create surface, this buffer is not available");
     }
     return buffer;
+}
+
+void PointerDrawingManager::DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Rosen::Drawing::Pen pen;
+    pen.SetAntiAlias(true);
+    pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
+    OHOS::Rosen::Drawing::scalar penWidth = 1;
+    pen.SetWidth(penWidth);
+    canvas.AttachPen(pen);
+    CHKPV(image_);
+    OHOS::Rosen::Drawing::Brush brush;
+    brush.SetColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    canvas.DrawBackground(brush);
+    ICON_TYPE iconType = ICON_TYPE::ANGLE_NW;
+    if (mouseStyle == MOUSE_ICON::LOADING) {
+        iconType = ICON_TYPE::ANGLE_CENTER;
+    } else {
+        iconType = ICON_TYPE::ANGLE_NW;
+    }
+    float physicalXOffset = CalculateHardwareXOffset(iconType);
+    float physicalYOffset = CalculateHardwareYOffset(iconType);
+    if (mouseStyle == MOUSE_ICON::RUNNING_RIGHT) {
+        CHKPV(runningRightImage_);
+        canvas.DrawImage(*runningRightImage_, physicalXOffset, physicalYOffset, Rosen::Drawing::SamplingOptions());
+    } else {
+        canvas.DrawImage(*image_, physicalXOffset, physicalYOffset, Rosen::Drawing::SamplingOptions());
+    }
 }
 
 void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle)
