@@ -250,6 +250,7 @@ private:
     int32_t DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
     void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle);
+    void UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, DisplayInfo displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:

@@ -169,7 +169,29 @@ int32_t RenderConfig::GetOffsetYRotated() const
     }
 }
 
-void RenderConfig::RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_t &physicalY)
+void RenderConfig::CalculateRotatedOffset(uint32_t rotation, int32_t &dx, int32_t &dy) const
+{
+    switch (rotation) {
+        case DIRECTION0:
+            dx = GetOffsetX();
+            dy = GetOffsetY();
+            break;
+        case DIRECTION90:
+            dx = GetOffsetX();
+            dy = GetOffsetYRotated();
+            break;
+        case DIRECTION180:
+            dx = GetOffsetXRotated();
+            dy = GetOffsetYRotated();
+            break;
+        case DIRECTION270:
+            dx = GetOffsetXRotated();
+            dy = GetOffsetY();
+            break;
+    }
+}
+
+void RenderConfig::RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_t &physicalY) const
 {
     int32_t size = this->GetImageSize();
     switch (this->align) {
@@ -190,7 +212,7 @@ void RenderConfig::RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_
     }
 }
 
-void RenderConfig::RevertAdjustMouseFocusByRotation270(int32_t &physicalX, int32_t &physicalY)
+void RenderConfig::RevertAdjustMouseFocusByRotation270(int32_t &physicalX, int32_t &physicalY) const
 {
     int32_t size = this->GetImageSize();
     switch (this->align) {
