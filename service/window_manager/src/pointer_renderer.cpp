@@ -275,8 +275,11 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    int32_t degree = (cfg.isHard ? -1 : 1) * ROTATION_ANGLE90 * static_cast<int>(cfg.direction);
-    canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
+    if (cfg.direction) {
+        int32_t directionFlag = cfg.isHard ? -1 : 1; // hwc: counterclockwise RS: clockwise
+        int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
+        canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
+    }
 
     image_ptr_t image = nullptr;
     if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
@@ -532,8 +535,11 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    int32_t degree = (cfg.isHard ? -1 : 1) * ROTATION_ANGLE90 * static_cast<int>(cfg.direction);
-    canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
+    if (cfg.direction) {
+        int32_t directionFlag = cfg.isHard ? -1 : 1; // hwc: counterclockwise RS: clockwise
+        int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
+        canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
+    }
 
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);

@@ -249,6 +249,11 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
+    if (rotation_ != static_cast<rotation_t>(hardRenderCfg_.direction) && !IsMirror()) {
+        MMI_HILOGE("ScreenPointer rotation=%{public}u, hardRenderCfg rotation=%{public}u",
+            rotation_, hardRenderCfg_.direction);
+        return false;
+    }
 
     int32_t dx = 0;
     int32_t dy = 0;
@@ -290,6 +295,11 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(surfaceNode_);
+    if (rotation_ != static_cast<rotation_t>(softRenderCfg_.direction) && !IsMirror()) {
+        MMI_HILOGE("ScreenPointer rotation=%{public}u, softRenderCfg rotation=%{public}u",
+            rotation_, softRenderCfg_.direction);
+        return false;
+    }
     int32_t dx = 0;
     int32_t dy = 0;
     int32_t px = 0;

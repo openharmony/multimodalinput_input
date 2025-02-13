@@ -159,6 +159,8 @@ private:
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
+    int32_t CreatePointerWindowForScreenPointer(int32_t displayId, int32_t physicalX, int32_t physicalY);
+    int32_t CreatePointerWindowForNoScreenPointer(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
     sptr<OHOS::SurfaceBuffer> RetryGetSurfaceBuffer(sptr<OHOS::Surface> layer);
@@ -209,13 +211,7 @@ private:
     bool SetCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
     void SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle);
-    int32_t ParsingDynamicImage(MOUSE_ICON mouseStyle);
-    void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
-    bool DrawDynamicCanvas();
-    std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> DrawDynamicBitmap();
-    void DrawDynamicCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
-        int32_t px, int32_t py, ICON_TYPE align);
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);

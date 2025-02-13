@@ -29,6 +29,11 @@ namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void HardwareCursorPointerManager::SetTargetDevice(uint32_t devId)
 {
+    if (static_cast<int32_t>(devId) < 0) {
+        MMI_HILOGE("SetTargetDevice devId %{public}d is invalid", static_cast<int32_t>(devId));
+        return;
+    }
+ 
     if (devId != devId_) {
         devId_ = devId;
         MMI_HILOGI("SetTargetDevice devId_ changed");
