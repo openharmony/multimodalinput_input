@@ -48,8 +48,9 @@ public:
     int32_t GetOffsetY() const;
     int32_t GetOffsetXRotated() const;
     int32_t GetOffsetYRotated() const;
-    void RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_t &physicalY);
-    void RevertAdjustMouseFocusByRotation270(int32_t &physicalX, int32_t &physicalY);
+    void CalculateRotatedOffset(uint32_t rotation, int32_t &offsetX, int32_t &offsetY) const;
+    void RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_t &physicalY) const;
+    void RevertAdjustMouseFocusByRotation270(int32_t &physicalX, int32_t &physicalY) const;
 
     RenderConfig() = default;
     ~RenderConfig() = default;
