@@ -262,7 +262,7 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     hardRenderCfg_.CalculateRotatedOffset(static_cast<uint32_t>(rotation_), dx, dy);
     if (IsMirror()) {
         CalculatePositionForMirror(x, y, &px, &py);
-    } else if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+    } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
         float renderDPI = GetRenderDPI();
         if (renderDPI == 0) {
             MMI_HILOGE("SetPosition failed, RenderDPI = %{public}f", renderDPI);
@@ -399,7 +399,7 @@ bool ScreenPointer::SetInvisible()
 
 float ScreenPointer::GetRenderDPI() const
 {
-    if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+    if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
         return float(GetScreenRealDPI()) / BASELINE_DENSITY;
     } else {
         return dpi_ * scale_;
