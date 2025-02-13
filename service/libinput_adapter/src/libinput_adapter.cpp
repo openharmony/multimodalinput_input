@@ -173,10 +173,6 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             return;
         }
         MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
-        auto touchpadDevice = INPUT_DEV_MGR->GetTouchPadDeviceOrigin();
-        if (touchpadDevice != nullptr) {
-            libinput_touchpad_event_clear(touchpadDevice);
-        }
         close(fd);
     },
 };
