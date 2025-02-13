@@ -1593,7 +1593,8 @@ void PointerDrawingManager::CreateCanvasNode()
     canvasNode_->SetRotation(0);
     surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
 }
- 
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displayId,
     int32_t physicalX, int32_t physicalY)
 {
@@ -1643,6 +1644,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
         CALCULATE_CANVAS_SIZE_CHANGE);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
  
 int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t displayId,
     int32_t physicalX, int32_t physicalY)

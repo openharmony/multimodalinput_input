@@ -39,7 +39,6 @@ constexpr float CALCULATE_IMAGE_MIDDLE{2.0f};
 constexpr uint32_t FOCUS_POINT{256};
 constexpr float CALCULATE_MOUSE_ICON_BIAS{5.0f};
 constexpr float ROTATION_ANGLE90 {90.0f};
-constexpr int32_t MOUSE_ICON_BAIS { 5 };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 
 namespace OHOS::MMI {
@@ -201,8 +200,8 @@ void RenderConfig::RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX += MOUSE_ICON_BAIS;
-            physicalY += MOUSE_ICON_BAIS;
+            physicalX += MOUSE_CALCULATE_MOUSE_ICON_BIASICON_BAIS;
+            physicalY += CALCULATE_MOUSE_ICON_BIAS;
             [[fallthrough]];
         }
         default: {
@@ -222,8 +221,8 @@ void RenderConfig::RevertAdjustMouseFocusByRotation270(int32_t &physicalX, int32
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX -= MOUSE_ICON_BAIS;
-            physicalY -= MOUSE_ICON_BAIS;
+            physicalX -= CALCULATE_MOUSE_ICON_BIAS;
+            physicalY -= CALCULATE_MOUSE_ICON_BIAS;
             [[fallthrough]];
         }
         default: {
@@ -276,7 +275,7 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     if (cfg.direction) {
-        int32_t directionFlag = cfg.isHard ? -1 : 1; // hwc: counterclockwise RS: clockwise
+        int32_t directionFlag = cfg.isHard ? -1 : 1;
         int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
         canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
     }
@@ -536,7 +535,7 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     if (cfg.direction) {
-        int32_t directionFlag = cfg.isHard ? -1 : 1; // hwc: counterclockwise RS: clockwise
+        int32_t directionFlag = cfg.isHard ? -1 : 1;
         int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
         canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
     }
