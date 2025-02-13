@@ -2642,6 +2642,9 @@ void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vecto
     std::vector<Rect> &windowHotAreas)
 {
     CALL_DEBUG_ENTER;
+    if (pointerChangeAreas.empty()) {
+        return;
+    }
     Rect newTopRect;
     newTopRect.x = windowArea.x + pointerChangeAreas[TOP_LEFT_AREA];
     newTopRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
@@ -2669,6 +2672,9 @@ void InputWindowsManager::UpdateLeftRightArea(const Rect &windowArea, std::vecto
     std::vector<Rect> &windowHotAreas)
 {
     CALL_DEBUG_ENTER;
+    if (pointerChangeAreas.empty()) {
+        return;
+    }
     Rect newLeftRect;
     newLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
     newLeftRect.y = windowArea.y + pointerChangeAreas[TOP_LEFT_AREA];
@@ -2696,6 +2702,9 @@ void InputWindowsManager::UpdateInnerAngleArea(const Rect &windowArea, std::vect
     std::vector<Rect> &windowHotAreas)
 {
     CALL_DEBUG_ENTER;
+    if (pointerChangeAreas.empty()) {
+        return;
+    }
     Rect newTopLeftRect;
     newTopLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
     newTopLeftRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
