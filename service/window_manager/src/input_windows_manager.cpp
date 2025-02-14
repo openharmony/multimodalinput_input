@@ -1634,6 +1634,51 @@ void InputWindowsManager::NotifyPointerToWindow()
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+void InputWindowsManager::PrintHighZorder(const std::vector<WindowInfo> &windowsInfo, std::shared_ptr<PointerEvent> pointerEvent,
+    const WindowInfo &targetWindow)
+{
+    bool isPrint = false;
+    std::string window;
+    window += StringPrintf("highZorder");
+    for (const auto &item : windowsInfo) {
+        if (item.zOrder > targetWindow.zOrder && !item.flags &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
+            PrintZorderInfo(item, window);
+            isPrint = true;
+        }
+    }
+    if (isPrint) {
+        MMI_HILOGW("%{public}s", window.c_str());
+    }
+}
+
+void InputWindowsManager::PrintZorderInfo(const WindowInfo &windowInfo, std::string &window)
+{
+    window += StringPrintf("|");
+    window += StringPrintf("%d", windowInfo.id);
+    window += StringPrintf("|");
+    window += StringPrintf("%d", windowInfo.pid);
+    window += StringPrintf("|");
+    window += StringPrintf("%.2f", windowInfo.zOrder);
+    window += StringPrintf("|");
+    for (const auto &win : windowInfo.defaultHotAreas) {
+        window += StringPrintf("%d ", win.x);
+        window += StringPrintf("%d ", win.y);
+        window += StringPrintf("%d ", win.width);
+        window += StringPrintf("%d,", win.height);
+    }
+    window += StringPrintf("|");
+    for (auto it : windowInfo.transform) {
+        window += StringPrintf("%.2f,", it);
+    }
+    window += StringPrintf("|");
+}
+
 void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
     std::string window;
@@ -2426,6 +2471,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         ((action == PointerEvent::POINTER_ACTION_AXIS_BEGIN || action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN) &&
         (pointerEvent->GetPressedButtons().empty()));
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    WindowInfo tempInfo;
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         static std::unordered_map<int32_t, int32_t> winId2ZorderMap;
@@ -2499,6 +2545,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowInfo_.first = targetWindowId;
                 firstBtnDownWindowInfo_.second = item.displayId;
+                tempInfo = item;
                 MMI_HILOG_DISPATCHD("Find out the dispatch window of this pointer event when the targetWindowId "
                     "has been set up already, window:%{public}d, pid:%{public}d",
                     firstBtnDownWindowInfo_.first, item.pid);
@@ -2521,6 +2568,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         firstBtnDownWindowInfo_ = { axisBeginWindowInfo_->id, axisBeginWindowInfo_->displayId };
     }
     MMI_HILOG_DISPATCHD("firstBtnDownWindowInfo_.first:%{public}d", firstBtnDownWindowInfo_.first);
+    PrintHighZorder(windowsInfo, pointerEvent, tempInfo);
     for (const auto &item : windowsInfo) {
         for (const auto &windowInfo : item.uiExtentionWindowInfo) {
             if (windowInfo.id == firstBtnDownWindowInfo_.first) {
@@ -3688,6 +3736,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         pointerEvent->SetAncoDeal(false);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
+    PrintHighZorder(windowsInfo, pointerEvent, *touchWindow);
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
             lastTouchEventOnBackGesture_ = std::make_shared<PointerEvent>(*pointerEvent);
