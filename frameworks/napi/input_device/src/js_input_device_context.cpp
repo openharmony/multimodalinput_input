@@ -695,7 +695,7 @@ napi_value JsInputDeviceContext::SetFunctionKeyEnabled(napi_env env, napi_callba
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    int32_t count = 2;
+    size_t count = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < count) {
