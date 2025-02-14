@@ -21,6 +21,7 @@
 
 #include <linux/input-event-codes.h>
 #include <linux/input.h>
+#include <cmath>
 
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
@@ -83,6 +84,18 @@ constexpr int32_t FINE_CALCULATE { 20 };
 constexpr int32_t STEP_CALCULATE { 40 };
 constexpr int32_t STOP_CALCULATE { 5000 };
 constexpr int32_t CALCULATE_STEP { 5 };
+constexpr float MM_TO_INCH { 25.4f };
+constexpr int32_t SCREEN_DIAGONAL_0 { 0 };
+constexpr int32_t SCREEN_DIAGONAL_8 { 8 };
+constexpr int32_t SCREEN_DIAGONAL_18 { 18 };
+constexpr int32_t SCREEN_DIAGONAL_27 { 27 };
+constexpr int32_t SCREEN_DIAGONAL_55 { 55 };
+constexpr float FACTOR_0 { 1.0f };
+constexpr float FACTOR_8 { 0.7f };
+constexpr float FACTOR_18 { 1.0f };
+constexpr float FACTOR_27 { 1.2f };
+constexpr float FACTOR_55 { 1.6f };
+constexpr float FACTOR_MAX { 2.4f };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -125,6 +138,23 @@ static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const DisplayInf
     return {offset.dx, offset.dy};
 }
 #endif
+
+float ScreenFactor(const int32_t diagonalInch)
+{
+    if (diagonalInch < SCREEN_DIAGONAL_0) {
+        return FACTOR_0;
+    } else if (diagonalInch < SCREEN_DIAGONAL_8) {
+        return FACTOR_8;
+    } else if (diagonalInch < SCREEN_DIAGONAL_18) {
+        return FACTOR_18;
+    } else if (diagonalInch < SCREEN_DIAGONAL_27) {
+        return FACTOR_27;
+    } else if (diagonalInch < SCREEN_DIAGONAL_55) {
+        return FACTOR_55;
+    } else {
+        return FACTOR_MAX;
+    }
+}
 
 int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event* event)
 {
@@ -191,9 +221,17 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         CalculateOffset(displayInfo, offset);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
         if (displayInfo->ppi != 0) {
+            int32_t diagonalMm = static_cast<int32_t>(sqrt((displayInfo->physicalWidth * displayInfo->physicalWidth) +
+            (displayInfo->physicalHeight * displayInfo->physicalHeight)));
+            if (diagonalMm <= 0) {
+                MMI_HILOGE("Get screen diagonal failed");
+                return RET_ERR;
+            }
+            int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
+            float factor = ScreenFactor(diagonalInch);
             ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, dalta_time,
-            static_cast<double>(displayInfo->ppi));
+            static_cast<double>(displayInfo->ppi), static_cast<double>(factor));
         } else {
             ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, static_cast<int32_t>(deviceType));

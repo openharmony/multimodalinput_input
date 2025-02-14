@@ -78,6 +78,18 @@ constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t ERR_DEVICE_NOT_EXIST { 3900002 };
 constexpr int32_t ERR_NON_INPUT_APPLICATION { 3900003 };
 constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
+constexpr float MM_TO_INCH { 25.4f };
+constexpr int32_t SCREEN_DIAGONAL_0 { 0 };
+constexpr int32_t SCREEN_DIAGONAL_8 { 8 };
+constexpr int32_t SCREEN_DIAGONAL_18 { 18 };
+constexpr int32_t SCREEN_DIAGONAL_27 { 27 };
+constexpr int32_t SCREEN_DIAGONAL_55 { 55 };
+constexpr float FACTOR_0 { 1.0f };
+constexpr float FACTOR_8 { 0.7f };
+constexpr float FACTOR_18 { 1.0f };
+constexpr float FACTOR_27 { 1.2f };
+constexpr float FACTOR_55 { 1.6f };
+constexpr float FACTOR_MAX { 2.4f };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -371,6 +383,23 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
+float ServerMsgHandler::ScreenFactor(const int32_t diagonalInch)
+{
+    if (diagonalInch < SCREEN_DIAGONAL_0) {
+        return FACTOR_0;
+    } else if (diagonalInch < SCREEN_DIAGONAL_8) {
+        return FACTOR_8;
+    } else if (diagonalInch < SCREEN_DIAGONAL_18) {
+        return FACTOR_18;
+    } else if (diagonalInch < SCREEN_DIAGONAL_27) {
+        return FACTOR_27;
+    } else if (diagonalInch < SCREEN_DIAGONAL_55) {
+        return FACTOR_55;
+    } else {
+        return FACTOR_MAX;
+    }
+}
+
 int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
@@ -416,9 +445,17 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         preTime = currentTime;
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
         if (displayInfo->ppi != 0) {
+            int32_t diagonalMm = static_cast<int32_t>(sqrt((displayInfo->physicalWidth * displayInfo->physicalWidth) +
+            (displayInfo->physicalHeight * displayInfo->physicalHeight)));
+            if (diagonalMm <= 0) {
+                MMI_HILOGE("Get screen diagonal failed");
+                return RET_ERR;
+            }
+            int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
+            float factor = ScreenFactor(diagonalInch);
             ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed(),
-            deltaTime, static_cast<double>(displayInfo->ppi));
+            deltaTime, static_cast<double>(displayInfo->ppi), static_cast<double>(factor));
         } else {
             ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,

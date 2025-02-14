@@ -1054,7 +1054,8 @@ pub unsafe extern "C" fn HandleMotionDynamicAccelerateMouse (
     abs_y: *mut f64,
     speed: i32,
     delta_time: u64,
-    display_ppi: f64
+    display_ppi: f64,
+    factor: f64
 ) -> i32 {
     let mut gain = 0.0;
     let vin: f64;
@@ -1087,8 +1088,8 @@ pub unsafe extern "C" fn HandleMotionDynamicAccelerateMouse (
             }
         }
         if !mode {
-            *abs_x += dx * gain;
-            *abs_y += dy * gain;
+            *abs_x += dx * factor * gain;
+            *abs_y += dy * factor * gain;
         }
         debug!(
             LOG_LABEL,
