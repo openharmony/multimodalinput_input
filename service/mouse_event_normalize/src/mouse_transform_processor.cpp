@@ -90,12 +90,12 @@ constexpr int32_t SCREEN_DIAGONAL_8 { 8 };
 constexpr int32_t SCREEN_DIAGONAL_18 { 18 };
 constexpr int32_t SCREEN_DIAGONAL_27 { 27 };
 constexpr int32_t SCREEN_DIAGONAL_55 { 55 };
-constexpr float FACTOR_0 { 1.0 };
-constexpr float FACTOR_8 { 0.7 };
-constexpr float FACTOR_18 { 1.0 };
-constexpr float FACTOR_27 { 1.2 };
-constexpr float FACTOR_55 { 1.6 };
-constexpr float FACTOR_MAX { 2.4 };
+constexpr float FACTOR_0 { 1.0f };
+constexpr float FACTOR_8 { 0.7f };
+constexpr float FACTOR_18 { 1.0f };
+constexpr float FACTOR_27 { 1.2f };
+constexpr float FACTOR_55 { 1.6f };
+constexpr float FACTOR_MAX { 2.4f };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
