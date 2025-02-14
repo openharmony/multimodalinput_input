@@ -485,14 +485,14 @@ struct DisplayInfo {
      *
      * @since 12
      */
-    float physicalWidth { 0.0f };
+    int32_t physicalWidth { 0 };
 
     /**
      * The physical height of the screen, in millimeters.
      *
      * @since 12
      */
-    float physicalHeight { 0.0f };
+    int32_t physicalHeight { 0 };
 };
 
 /**

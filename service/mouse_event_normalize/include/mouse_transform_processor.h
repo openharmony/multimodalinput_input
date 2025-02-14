@@ -51,7 +51,7 @@ extern "C" {
         int32_t speed, int32_t deviceType);
     int32_t HandleAxisAccelerateTouchpad(bool mode, double* abs_axis, int32_t deviceType);
     int32_t HandleMotionDynamicAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
-        int32_t speed, uint64_t delta_time, double display_ppi);
+        int32_t speed, uint64_t delta_time, double display_ppi, double factor);
     int32_t HandleMotionDynamicAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, double display_size, double touchpad_size, double touchpad_ppi, int32_t frequency);
 }
