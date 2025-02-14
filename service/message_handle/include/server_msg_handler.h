@@ -141,6 +141,7 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t AccelerateMotionTouchpad(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG);
+    float ScreenFactor(const int32_t diagonal_inch);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
