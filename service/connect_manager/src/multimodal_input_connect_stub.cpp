@@ -1947,7 +1947,7 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->CheckFunctionKeyEnabled()) {
         MMI_HILOGE("Set function key state permission check failed");
-        return ERROR_NO_PERMISSION;
+        return ERROR_KEYBOARD_NO_PERMISSION;
     }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
