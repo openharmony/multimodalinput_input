@@ -139,17 +139,17 @@ static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const DisplayInf
 }
 #endif
 
-float ScreenFactor(const int32_t diagonal_inch)
+float ScreenFactor(const int32_t diagonalInch)
 {
-    if (diagonal_inch < SCREEN_DIAGONAL_0) {
+    if (diagonalInch < SCREEN_DIAGONAL_0) {
         return FACTOR_0;
-    } else if (diagonal_inch < SCREEN_DIAGONAL_8) {
+    } else if (diagonalInch < SCREEN_DIAGONAL_8) {
         return FACTOR_8;
-    } else if (diagonal_inch < SCREEN_DIAGONAL_18) {
+    } else if (diagonalInch < SCREEN_DIAGONAL_18) {
         return FACTOR_18;
-    } else if (diagonal_inch < SCREEN_DIAGONAL_27) {
+    } else if (diagonalInch < SCREEN_DIAGONAL_27) {
         return FACTOR_27;
-    } else if (diagonal_inch < SCREEN_DIAGONAL_55) {
+    } else if (diagonalInch < SCREEN_DIAGONAL_55) {
         return FACTOR_55;
     } else {
         return FACTOR_MAX;
@@ -221,14 +221,14 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         CalculateOffset(displayInfo, offset);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
         if (displayInfo->ppi != 0) {
-            int32_t diagonal_mm = static_cast<int32_t>(sqrt((displayInfo->physicalWidth * displayInfo->physicalWidth) +
+            int32_t diagonalMm = static_cast<int32_t>(sqrt((displayInfo->physicalWidth * displayInfo->physicalWidth) +
             (displayInfo->physicalHeight * displayInfo->physicalHeight)));
-            if (diagonal_mm <= 0) {
+            if (diagonalMm <= 0) {
                 MMI_HILOGE("Get screen diagonal failed");
                 return RET_ERR;
             }
-            int32_t diagonal_inch = static_cast<int32_t>(diagonal_mm / MM_TO_INCH);
-            float factor = ScreenFactor(diagonal_inch);
+            int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
+            float factor = ScreenFactor(diagonalInch);
             ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, dalta_time,
             static_cast<double>(displayInfo->ppi), static_cast<double>(factor));
