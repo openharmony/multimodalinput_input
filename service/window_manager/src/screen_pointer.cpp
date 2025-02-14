@@ -212,6 +212,9 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
         MMI_HILOGE("Invalid parameters, mainWidth=%{public}u, mainHeight=%{public}u", mainWidth, mainHeight);
         return false;
     }
+    if (rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270) {
+        std::swap(mainWidth, mainHeight);
+    }
 
     // caculate padding for mirror screens
     scale_ = fmin(float(width_) / mainWidth, float(height_) / mainHeight);
@@ -246,29 +249,20 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
-
-    uint32_t dx = hardRenderCfg_.GetOffsetX();
-    uint32_t dy = hardRenderCfg_.GetOffsetY();
-    switch (rotation_) {
-        case rotation_t::ROTATION_0:
-            break;
-        case rotation_t::ROTATION_90:
-            dy = hardRenderCfg_.GetOffsetYRotated();
-            break;
-        case rotation_t::ROTATION_180:
-            dx = hardRenderCfg_.GetOffsetXRotated();
-            dy = hardRenderCfg_.GetOffsetYRotated();
-            break;
-        case rotation_t::ROTATION_270:
-            dx = hardRenderCfg_.GetOffsetXRotated();
-            break;
+    if (rotation_ != static_cast<rotation_t>(hardRenderCfg_.direction) && !IsMirror()) {
+        MMI_HILOGE("ScreenPointer rotation=%{public}u, hardRenderCfg rotation=%{public}u",
+            rotation_, hardRenderCfg_.direction);
+        return false;
     }
-    int32_t px = x - dx;
-    int32_t py = y - dy;
+
+    int32_t dx = 0;
+    int32_t dy = 0;
+    int32_t px = 0;
+    int32_t py = 0;
+    hardRenderCfg_.CalculateRotatedOffset(static_cast<uint32_t>(rotation_), dx, dy);
     if (IsMirror()) {
-        px = paddingLeft_ + x * scale_ - dx;
-        py = paddingTop_ + y * scale_ - dy;
-    } else if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+        CalculatePositionForMirror(x, y, &px, &py);
+    } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
         float renderDPI = GetRenderDPI();
         if (renderDPI == 0) {
             MMI_HILOGE("SetPosition failed, RenderDPI = %{public}f", renderDPI);
@@ -280,6 +274,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
             (dpi_ * scale_) / renderDPI);
         px = x * offRenderScale_ + adjustX * offRenderScale_ - FOCUS_POINT;
         py = y * offRenderScale_ + adjustY * offRenderScale_ - FOCUS_POINT;
+    } else {
+        px = x - dx;
+        py = y - dy;
     }
 
     auto buffer = GetCurrentBuffer();
@@ -298,43 +295,38 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(surfaceNode_);
-    uint32_t dx = softRenderCfg_.GetOffsetX();
-    uint32_t dy = softRenderCfg_.GetOffsetY();
-    switch (rotation_) {
-        case rotation_t::ROTATION_0:
-            break;
-        case rotation_t::ROTATION_90:
-            dy = softRenderCfg_.GetOffsetYRotated();
-            break;
-        case rotation_t::ROTATION_180:
-            dx = softRenderCfg_.GetOffsetXRotated();
-            dy = softRenderCfg_.GetOffsetYRotated();
-            break;
-        case rotation_t::ROTATION_270:
-            dx = softRenderCfg_.GetOffsetXRotated();
-            break;
+    if (rotation_ != static_cast<rotation_t>(softRenderCfg_.direction) && !IsMirror()) {
+        MMI_HILOGE("ScreenPointer rotation=%{public}u, softRenderCfg rotation=%{public}u",
+            rotation_, softRenderCfg_.direction);
+        return false;
     }
-    int32_t px = x - dx;
-    int32_t py = y - dy;
+    int32_t dx = 0;
+    int32_t dy = 0;
+    int32_t px = 0;
+    int32_t py = 0;
     if (IsMirror()) {
-        px = paddingLeft_ + x * scale_ - dx;
-        py = paddingTop_ + y * scale_ - dy;
-    }
-    int32_t tmpX = px;
-    int32_t tmpY = py;
-    if (rotation_ == rotation_t(DIRECTION90)) {
-        px = tmpY;
-        py = width_ - tmpX;
-        px = height_  - px - DEFAULT_CURSOR_SIZE;
-        py = width_ - py + DEFAULT_CURSOR_SIZE;
-    } else if (rotation_ == rotation_t(DIRECTION180)) {
-        px = width_ - px;
-        py = height_ - py;
-    } else if (rotation_ == rotation_t(DIRECTION270)) {
-        px = height_ - tmpY;
-        py = tmpX;
-        px = height_ - px + DEFAULT_CURSOR_SIZE;
-        py = width_ - py - DEFAULT_CURSOR_SIZE;
+        px = paddingLeft_ + x * scale_ - softRenderCfg_.GetOffsetX();
+        py = paddingTop_ + y * scale_ - softRenderCfg_.GetOffsetY();
+    } else {
+        softRenderCfg_.CalculateRotatedOffset(static_cast<uint32_t>(rotation_), dx, dy);
+        px = x - dx;
+        py = y - dy;
+        int32_t tmpX = px;
+        int32_t tmpY = py;
+        if (rotation_ == rotation_t(DIRECTION90)) {
+            px = tmpY;
+            py = width_ - tmpX;
+            px = height_ - px - DEFAULT_CURSOR_SIZE;
+            py = width_ - py + DEFAULT_CURSOR_SIZE;
+        } else if (rotation_ == rotation_t(DIRECTION180)) {
+            px = width_ - px;
+            py = height_ - py;
+        } else if (rotation_ == rotation_t(DIRECTION270)) {
+            px = height_ - tmpY;
+            py = tmpX;
+            px = height_ - px + DEFAULT_CURSOR_SIZE;
+            py = width_ - py - DEFAULT_CURSOR_SIZE;
+        }
     }
 
     if (!IsMirror()) {
@@ -345,6 +337,40 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     }
     
     return true;
+}
+
+void ScreenPointer::CalculatePositionForMirror(int32_t x, int32_t y, int32_t* px, int32_t* py)
+{
+    int32_t tmpX = x * scale_;
+    int32_t tmpY = y * scale_;
+    int32_t revert_dx = width_ - NUM_TWO * paddingLeft_;
+    int32_t revert_dy = height_ - NUM_TWO * paddingTop_;
+    switch (rotation_) {
+        case rotation_t::ROTATION_0:
+            *px = tmpX;
+            *py = tmpY;
+            break;
+        case rotation_t::ROTATION_90:
+            hardRenderCfg_.RevertAdjustMouseFocusByRotation90(tmpX, tmpY);
+            *px = -tmpY;
+            *py = tmpX;
+            *px = revert_dx + *px;
+            break;
+        case rotation_t::ROTATION_180:
+            *px = -tmpX;
+            *py = -tmpY;
+            *px = revert_dx + *px;
+            *py = revert_dy + *py;
+            break;
+        case rotation_t::ROTATION_270:
+            hardRenderCfg_.RevertAdjustMouseFocusByRotation270(tmpX, tmpY);
+            *px = tmpY;
+            *py = -tmpX;
+            *py = revert_dy + *py;
+            break;
+    }
+    *px = *px + paddingLeft_ - hardRenderCfg_.GetOffsetX();
+    *py = *py + paddingTop_ - hardRenderCfg_.GetOffsetY();
 }
 
 bool ScreenPointer::SetInvisible()
@@ -373,7 +399,7 @@ bool ScreenPointer::SetInvisible()
 
 float ScreenPointer::GetRenderDPI() const
 {
-    if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+    if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
         return float(GetScreenRealDPI()) / BASELINE_DENSITY;
     } else {
         return dpi_ * scale_;

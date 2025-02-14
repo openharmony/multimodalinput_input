@@ -58,6 +58,7 @@ public:
 
     bool Move(int32_t x, int32_t y, ICON_TYPE align);
     bool MoveSoft(int32_t x, int32_t y, ICON_TYPE align);
+    void CalculatePositionForMirror(int32_t x, int32_t y, int32_t* px, int32_t* py);
     bool SetInvisible();
 
     uint32_t GetScreenId() const
@@ -130,6 +131,15 @@ public:
     void SetSoftRenderCfg(const RenderConfig& cfg)
     {
         softRenderCfg_ = cfg;
+    }
+    void SetRotation(const rotation_t rotation)
+    {
+        rotation_ = rotation;
+    }
+
+    rotation_t GetRotation()
+    {
+        return rotation_;
     }
 
 private:
