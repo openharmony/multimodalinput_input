@@ -2619,9 +2619,11 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
         windowArea.height = windowInfo.transform[SCALE_Y] != 0 ? windowInfo.area.height / windowInfo.transform[SCALE_Y]
             : windowInfo.area.height;
         std::vector<int32_t> pointerChangeAreas = windowInfo.pointerChangeAreas;
-        UpdateTopBottomArea(windowArea, pointerChangeAreas, windowHotAreas);
-        UpdateLeftRightArea(windowArea, pointerChangeAreas, windowHotAreas);
-        UpdateInnerAngleArea(windowArea, pointerChangeAreas, windowHotAreas);
+        if (!pointerChangeAreas.empty()) {
+            UpdateTopBottomArea(windowArea, pointerChangeAreas, windowHotAreas);
+            UpdateLeftRightArea(windowArea, pointerChangeAreas, windowHotAreas);
+            UpdateInnerAngleArea(windowArea, pointerChangeAreas, windowHotAreas);
+        }
         if (windowsHotAreas_.find(windowId) == windowsHotAreas_.end()) {
             windowsHotAreas_.emplace(windowId, windowHotAreas);
         } else {
