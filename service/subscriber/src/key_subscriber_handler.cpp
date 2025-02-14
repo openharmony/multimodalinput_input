@@ -538,7 +538,7 @@ bool KeySubscriberHandler::InterceptByVm(const std::shared_ptr<KeyEvent> keyEvt)
     // logo + leftShift + E is used by sceneboard, do not intercept by vm
     const std::vector<int32_t> LOGO_LEFTSHIFT_E = {
         KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_E};
-    int waitMatchCnt{LOGO_LEFTSHIFT_E.size()};
+    size_t waitMatchCnt{LOGO_LEFTSHIFT_E.size()};
     if (keyEvt->GetKeyItems().size() != waitMatchCnt) {
         return true;
     }
