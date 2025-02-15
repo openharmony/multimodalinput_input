@@ -385,7 +385,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 #ifdef OHOS_BUILD_ENABLE_POINTER
 float ServerMsgHandler::ScreenFactor(const int32_t diagonalInch)
 {
-    if (diagonalInch < SCREEN_DIAGONAL_0) {
+    if (diagonalInch <= SCREEN_DIAGONAL_0) {
         return FACTOR_0;
     } else if (diagonalInch < SCREEN_DIAGONAL_8) {
         return FACTOR_8;
@@ -447,10 +447,6 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         if (displayInfo->ppi != 0) {
             int32_t diagonalMm = static_cast<int32_t>(sqrt((displayInfo->physicalWidth * displayInfo->physicalWidth) +
             (displayInfo->physicalHeight * displayInfo->physicalHeight)));
-            if (diagonalMm <= 0) {
-                MMI_HILOGE("Get screen diagonal failed");
-                return RET_ERR;
-            }
             int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
             float factor = ScreenFactor(diagonalInch);
             ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),

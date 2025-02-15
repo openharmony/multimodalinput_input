@@ -141,7 +141,7 @@ static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const DisplayInf
 
 float ScreenFactor(const int32_t diagonalInch)
 {
-    if (diagonalInch < SCREEN_DIAGONAL_0) {
+    if (diagonalInch <= SCREEN_DIAGONAL_0) {
         return FACTOR_0;
     } else if (diagonalInch < SCREEN_DIAGONAL_8) {
         return FACTOR_8;
@@ -223,10 +223,6 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         if (displayInfo->ppi != 0) {
             int32_t diagonalMm = static_cast<int32_t>(sqrt((displayInfo->physicalWidth * displayInfo->physicalWidth) +
             (displayInfo->physicalHeight * displayInfo->physicalHeight)));
-            if (diagonalMm <= 0) {
-                MMI_HILOGE("Get screen diagonal failed");
-                return RET_ERR;
-            }
             int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
             float factor = ScreenFactor(diagonalInch);
             ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
