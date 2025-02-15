@@ -729,6 +729,7 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
             >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
             >> info.offsetX >> info.offsetY >> info.isCurrentOffScreenRendering >> info.screenRealWidth
             >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
+            >> info.validWidth >> info.validHeight >> info.fixedDirection
             >> info.physicalWidth >> info.physicalHeight
             >> info.oneHandX >> info.oneHandY;
         displayGroupInfo.displaysInfo.push_back(info);

@@ -16,9 +16,9 @@
 #include "input_manager_impl.h"
 
 #include <cinttypes>
-
 #include <unistd.h>
-
+#include <parameters.h>
+#include <regex>
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "anco_channel.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -62,6 +62,7 @@ const std::map<int32_t, int32_t> g_keyActionMap = {
     {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
     {KeyEvent::KEY_ACTION_CANCEL, KEY_ACTION_CANCEL}
 };
+static const std::string g_foldScreenType = system::GetParameter("const.window.foldscreen.type", "0,0,0,0");
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -722,17 +723,72 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanit
     return RET_OK;
 }
 
+std::vector<std::string> InputManagerImpl::StringSplit(const std::string &str, char delim)
+{
+    std::size_t previous = 0;
+    std::size_t current = str.find(delim);
+    std::vector<std::string> elems;
+    while (current != std::string::npos) {
+        if (current > previous) {
+            elems.push_back(str.substr(previous, current - previous));
+        }
+        previous = current + 1;
+        current = str.find(delim, previous);
+    }
+    if (previous != str.size()) {
+        elems.push_back(str.substr(previous));
+    }
+    return elems;
+}
+
+bool InputManagerImpl::IsGRLOrHopper()
+{
+    std::regex reg("^([0-9],){3}[0-9]{1}$");
+    if (!std::regex_match(g_foldScreenType, reg)) {
+        MMI_HILOGE("invalid params g_foldScreenType:%s", g_foldScreenType.c_str());
+        return false;
+    }
+    std::vector<std::string> foldTypes = StringSplit(g_foldScreenType, ',');
+    if (foldTypes.empty()) {
+        return false;
+    }
+    std::string deviceType = foldTypes[0];
+    std::string grlType = "6";
+    std::string hprType = "5";
+    MMI_HILOGD("deviceType:%s", deviceType.c_str());
+    if (deviceType == grlType || deviceType == hprType) {
+        MMI_HILOGD("device is grl or hopper");
+        return true;
+    }
+    return false;
+}
+
 int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.displaysInfo.size());
     pkt << num;
-    for (const auto &item : displayGroupInfo_.displaysInfo) {
+    int32_t hprId = 999;
+    for (auto &item : displayGroupInfo_.displaysInfo) {
+        if (!IsGRLOrHopper() || !(item.id == 0 || item.id == hprId) || item.validWidth == 0 || item.validHeight == 0) {
+            int32_t validW = item.validWidth;
+            int32_t validH = item.validHeight;
+            item.validWidth = item.width;
+            item.validHeight = item.height;
+            MMI_HILOGD("id:%{private}d not grl or hopper, "
+                       "change validWH:{%{private}d %{private}d}->{%{private}d %{private}d}",
+                item.id,
+                validW,
+                validH,
+                item.validWidth,
+                item.validHeight);
+        }
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.dpi << item.name << item.uniq << item.direction
             << item.displayDirection << item.displayMode << item.transform << item.ppi << item.offsetX
             << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
+            << item.validWidth << item.validHeight << item.fixedDirection
             << item.physicalWidth << item.physicalHeight
             << item.oneHandX << item.oneHandY;
     }
@@ -815,12 +871,28 @@ void InputManagerImpl::PrintDisplayInfo()
 
     MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d,"
-            "dpi:%{public}d,name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
-            "displayMode:%{public}d,oneHandX:%{public}d,oneHandY:%{public}d",
-            item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(),
-            item.uniq.c_str(), item.direction, item.displayDirection, item.displayMode,
-            item.oneHandX, item.oneHandY);
+        MMI_HILOGD("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
+                   "dpi:%{public}d,name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
+                   "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,validWH:{%{private}d %{private}d}"
+                   "fixedDirection:%{public}d,physicalWH:{%{private}d %{private}d}",
+            item.id,
+            item.x,
+            item.y,
+            item.width,
+            item.height,
+            item.dpi,
+            item.name.c_str(),
+            item.uniq.c_str(),
+            item.direction,
+            item.displayDirection,
+            item.displayMode,
+            item.oneHandX,
+            item.oneHandY,
+            item.validWidth,
+            item.validHeight,
+            item.fixedDirection,
+            item.physicalWidth,
+            item.physicalHeight);
     }
 }
 
