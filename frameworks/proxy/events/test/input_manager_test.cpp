@@ -3233,5 +3233,97 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSi
     ASSERT_EQ(result, RET_OK);
     EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
 }
+
+/**
+ * @tc.name: InputManagerTest_SetCustomCursorEx_001
+ * @tc.desc: Test SetCustomCursorEx_001
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fakeWindowId = 100;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    CustomCursor cursor;
+    cursor.pixelMap = (void *)pixelMap.get();
+    cursor.focusX = 32;
+    cursor.focusY = 32;
+    CursorOptions options;
+    options.followSystem = true;
+    ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) != RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetCustomCursorEx_002
+ * @tc.desc: Test SetCustomCursorEx_002
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fakeWindowId = 100;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    CustomCursor cursor;
+    cursor.pixelMap = (void *)pixelMap.get();
+    cursor.focusX = 32;
+    cursor.focusY = 32;
+    CursorOptions options;
+    options.followSystem = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) != RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetCustomCursorEx_003
+ * @tc.desc: Test SetCustomCursorEx_003
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fakeWindowId = 100;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    CustomCursor cursor;
+    cursor.pixelMap = (void *)pixelMap.get();
+    cursor.focusX = 512;
+    cursor.focusY = 512;
+    CursorOptions options;
+    options.followSystem = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) != RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetCustomCursorEx_004
+ * @tc.desc: Test SetCustomCursorEx_004
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fakeWindowId = 100;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    Media::ImageInfo imageInfo;
+    imageInfo.size.width = 280;
+    imageInfo.size.height = 280;
+    pixelMap->SetImageInfo(imageInfo);
+    CustomCursor cursor;
+    cursor.pixelMap = (void *)pixelMap.get();
+    cursor.focusX = 32;
+    cursor.focusY = 32;
+    CursorOptions options;
+    options.followSystem = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) != RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -398,6 +398,19 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
 {
     return 0;
 }
+int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor,
+    CursorOptions options)
+{
+    return 0;
+}
+std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
+{
+    return nullptr;
+}
+int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
+{
+    return 0;
+}
 int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     return 0;

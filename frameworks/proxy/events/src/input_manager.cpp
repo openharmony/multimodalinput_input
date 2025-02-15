@@ -646,5 +646,10 @@ int32_t InputManager::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     return InputMgrImpl.GetIntervalSinceLastInput(timeInterval);
 }
+
+int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+{
+    return InputMgrImpl.SetCustomCursor(windowId, cursor, options);
+}
 } // namespace MMI
 } // namespace OHOS
