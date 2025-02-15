@@ -725,7 +725,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintDisplayInfo_001, 
     manager.displayGroupInfo_.focusWindowId = 1;
     manager.displayGroupInfo_.windowsInfo.push_back(WindowInfo());
     manager.displayGroupInfo_.displaysInfo.push_back(DisplayInfo());
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->PrintDisplayInfo());
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->PrintDisplayGroupInfo(manager.displayGroupInfo_));
 }
 
 /**

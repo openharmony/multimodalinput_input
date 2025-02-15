@@ -218,7 +218,8 @@ private:
         int32_t targetWindowId, int32_t logicalX, int32_t logicalY);
     void PrintZorderInfo(const WindowInfo &windowInfo, std::string &window);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
-    void PrintDisplayInfo();
+    void PrintDisplayGroupInfo(const DisplayGroupInfo displayGroupInfo);
+    void PrintDisplayInfo(const DisplayInfo displayInfo);
     int32_t ConvertToolType(int32_t toolType);
     void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
     void PrintWindowNavbar();
@@ -326,7 +327,7 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     void DispatchTouch(int32_t pointerAction);
     const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
-    void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
+    bool GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo);
     void SetAntiMisTake(bool state);
     void SetAntiMisTakeStatus(bool state);
@@ -353,6 +354,13 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     int32_t UpdateCrownTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
     void UpdateDisplayMode();
+    void HandleValidDisplayChange(const DisplayGroupInfo &displayGroupInfo);
+    void ResetPointerPositionIfOutValidDisplay(const DisplayGroupInfo &displayGroupInfo);
+    void CancelMouseEvent();
+    bool IsPositionOutValidDisplay(
+        Coordinate2D &position, const DisplayInfo &currentDisplay, bool isPhysicalPos = false);
+    void CancelTouchScreenEventIfValidDisplayChange(const DisplayGroupInfo &displayGroupInfo);
+    bool IsValidDisplayChange(const DisplayInfo &displayInfo);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
     bool OnDisplayRemovedOrCombiantionChanged(const DisplayGroupInfo &displayGroupInfo);
