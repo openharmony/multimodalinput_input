@@ -50,6 +50,11 @@ public:
         PEN = 1,
         TOUCH_PAD = 2,
     };
+
+    enum class FixedMode : int32_t {
+        NORMAL = 1,
+        ONE_HAND = 2,
+    };
     JsTouchEvent() = default;
     ~JsTouchEvent() = default;
     DISALLOW_COPY_AND_MOVE(JsTouchEvent);

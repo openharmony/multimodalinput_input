@@ -688,7 +688,8 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         ++index;
     }
     CHKRR(SetNameProperty(jsEnv_, result, "touches", pointers), "Set touches", RET_ERR);
-    CHKRR(SetNameProperty(jsEnv_, result, "fixedMode", pointerEvent->GetFixedModeStr()), "Set fixedMode", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, result, "fixedMode", static_cast<int32_t>(pointerEvent->GetFixedMode())),
+        "Set fixedMode", RET_ERR);
     return RET_OK;
 }
 
