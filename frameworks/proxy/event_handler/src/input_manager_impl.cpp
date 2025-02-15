@@ -2441,5 +2441,20 @@ int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
     }
     return RET_OK;
 }
+
+int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+{
+    CALL_INFO_TRACE;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(windowId, cursor, options);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set custom cursor failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
 } // namespace MMI
 } // namespace OHOS

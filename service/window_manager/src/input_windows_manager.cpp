@@ -1884,7 +1884,22 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     }
     iter->second = pointerStyle;
     SetMouseFlag(pointerActionFlag_ == PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    UpdateCustomStyle(windowId, pointerStyle);
     return RET_OK;
+}
+
+void InputWindowsManager::UpdateCustomStyle(int32_t windowId, PointerStyle pointerStyle)
+{
+    if (pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        return;
+    }
+    for (auto &item : pointerStyle_) {
+        for (auto &innerIt : item.second) {
+            if (innerIt.first != windowId && innerIt.second.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+                innerIt.second.id = MOUSE_ICON::DEFAULT;
+            }
+        }
+    }
 }
 
 void InputWindowsManager::SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId)

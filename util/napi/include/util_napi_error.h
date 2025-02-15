@@ -42,12 +42,14 @@ enum NapiErrorCode : int32_t {
     COMMON_USE_SYSAPI_ERROR = 202,
     COMMON_CAPABILITY_NOT_SUPPORTED = 801,
     PRE_KEY_NOT_SUPPORTED = 4100001,
+    ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { COMMON_PERMISSION_CHECK_ERROR,
         { COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s." } },
     { COMMON_PARAMETER_ERROR, { COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s." } },
+    { ERROR_WINDOW_ID_PERMISSION_DENIED, { ERROR_WINDOW_ID_PERMISSION_DENIED, "windowId is invalid.\n" } },
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
