@@ -528,10 +528,19 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     napi_value touchProperty = HandleTouchProperty(env, touchHandle);
     CHKPV(touchProperty);
     HandleTouchAttribute(env, pointerEvent, item, touchProperty, true);
+
+    bool autoToVirtualScreen = true;
+    int32_t fixedMode = 2;
+    if (GetNamedPropertyInt32(env, touchHandle, "fixedMode", fixedMode, false) == RET_OK) {
+        if (fixedMode != static_cast<int32_t>(PointerEvent::FixedMode::ONE_HAND)) {
+            autoToVirtualScreen = false;
+        }
+    }
    
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetSourceType(sourceType);
     pointerEvent->SetTargetDisplayId(screenId);
+    pointerEvent->SetAutoToVirtualScreen(autoToVirtualScreen);
    
     std::vector<PointerEvent::PointerItem> pointerItems;
     HandleTouchesProperty(env, pointerEvent, touchHandle, pointerItems);
@@ -582,7 +591,7 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
 
     int32_t action = HandleTouchAction(env, touchHandle, pointerEvent, item);
     HandleTouchPropertyInt32(env, touchHandle, pointerEvent, item, action);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, pointerEvent->GetAutoToVirtualScreen());
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
