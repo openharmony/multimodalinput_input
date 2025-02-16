@@ -23,11 +23,13 @@
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <libudev.h>
 
 #include "define_multimodal.h"
 #include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "param_wrapper.h"
+#include "property_reader.h"
 #include "util.h"
 #include "input_device_manager.h"
 #include "key_event_normalize.h"
@@ -1317,12 +1319,20 @@ void LibinputAdapter::OnDeviceAdded(std::string path)
         MMI_HILOGD("Path is found");
         return;
     }
-    libinput_device* device = libinput_path_add_device(input_, path.c_str());
-    if (device != nullptr) {
-        devices_[std::move(path)] = libinput_device_ref(device);
-        // Libinput doesn't signal device adding event in path mode. Process manually.
-        OnEventHandler();
-    }
+
+    DTaskCallback cb = [this, path] {
+        MMI_HILOGI("OnDeviceAdded, path:%{public}s", path.c_str());
+        udev_device_record_devnode(path.c_str());
+        libinput_device* device = libinput_path_add_device(input_, path.c_str());
+        if (device != nullptr) {
+            devices_[std::move(path)] = libinput_device_ref(device);
+            // Libinput doesn't signal device adding event in path mode. Process manually.
+            OnEventHandler();
+        }
+        udev_device_property_remove(path.c_str());
+        return 0;
+    };
+    PropReader->ReadPropertys(path, cb);
 }
 
 void LibinputAdapter::OnDeviceRemoved(std::string path)
