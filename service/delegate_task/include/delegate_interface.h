@@ -35,10 +35,11 @@ class DelegateInterface final :
     public std::enable_shared_from_this<DelegateInterface> {
 public:
     DISALLOW_COPY_AND_MOVE(DelegateInterface);
-    explicit DelegateInterface(std::function<int32_t(DTaskCallback)> delegate)
-        : delegateTasks_(delegate) {}
+    explicit DelegateInterface(std::function<int32_t(DTaskCallback)> delegate,
+        std::function<int32_t(DTaskCallback)> asyncFun) : delegateTasks_(delegate), asyncDelegateTasks_(asyncFun) {}
     void Init();
     int32_t OnPostSyncTask(DTaskCallback cb) const;
+    int32_t OnPostAsyncTask(DTaskCallback cb) const;
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     struct HandlerSummary {
@@ -74,6 +75,7 @@ private:
 
 private:
     std::function<int32_t(DTaskCallback)> delegateTasks_;
+    std::function<int32_t(DTaskCallback)> asyncDelegateTasks_;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     std::unordered_multimap<InputHandlerType, HandlerSummary> handlers_;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR

@@ -365,7 +365,10 @@ bool MMIService::InitDelegateTasks()
     std::function<int32_t(DTaskCallback)> fun = [this](DTaskCallback cb) -> int32_t {
         return delegateTasks_.PostSyncTask(cb);
     };
-    delegateInterface_ = std::make_shared<DelegateInterface>(fun);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return delegateTasks_.PostAsyncTask(cb);
+    };
+    delegateInterface_ = std::make_shared<DelegateInterface>(fun, asyncFun);
     delegateInterface_->Init();
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
@@ -394,15 +397,15 @@ int32_t MMIService::Init()
     }
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);
-    MMI_HILOGD("Libinput service init");
-    if (!InitLibinputService()) {
-        MMI_HILOGE("Libinput init failed");
-        return LIBINPUT_INIT_FAIL;
-    }
     MMI_HILOGD("Init DelegateTasks init");
     if (!InitDelegateTasks()) {
         MMI_HILOGE("Delegate tasks init failed");
         return ETASKS_INIT_FAIL;
+    }
+    MMI_HILOGD("Libinput service init");
+    if (!InitLibinputService()) {
+        MMI_HILOGE("Libinput init failed");
+        return LIBINPUT_INIT_FAIL;
     }
     SetRecvFun([this] (SessionPtr sess, NetPacket& pkt) {sMsgHandler_.OnMsgHandler(sess, pkt);});
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());

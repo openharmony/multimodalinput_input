@@ -132,6 +132,7 @@ declare_args() {
     "key_command/src/setting_observer.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
+    "libinput_adapter/src/property_reader.cpp",
     "message_handle/src/authorization_dialog.cpp",
     "message_handle/src/authorize_helper.cpp",
     "message_handle/src/client_death_handler.cpp",
