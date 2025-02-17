@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t KEY_ITEM_SIZE = 2;
+constexpr int32_t KEY_ITEM_SIZE { 2 };
 } // namespace
 
 class KeyEventValueTransformationTest : public testing::Test {
