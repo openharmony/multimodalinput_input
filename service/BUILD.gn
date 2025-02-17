@@ -222,12 +222,16 @@ ohos_shared_library("libmmi-server") {
       sources += [
         "event_resample/src/event_resample.cpp",
         "touch_event_normalize/src/remote_control_transform_processor.cpp",
-        "touch_event_normalize/src/touch_gesture_adapter.cpp",
-        "touch_event_normalize/src/touch_gesture_detector.cpp",
-        "touch_event_normalize/src/touch_gesture_manager.cpp",
         "touch_event_normalize/src/touch_transform_processor.cpp",
       ]
     }
+  }
+  if (input_feature_touchscreen && input_feature_monitor) {
+    sources += [
+      "touch_event_normalize/src/touch_gesture_adapter.cpp",
+      "touch_event_normalize/src/touch_gesture_detector.cpp",
+      "touch_event_normalize/src/touch_gesture_manager.cpp",
+    ]
   }
   if (input_feature_fingerprint) {
     sources +=

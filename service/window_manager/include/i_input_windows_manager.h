@@ -28,9 +28,9 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "struct_multimodal.h"
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "touch_gesture_manager.h"
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "uds_server.h"
 #include "window_info.h"
 #include "shift_info.h"
@@ -169,9 +169,11 @@ public:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     virtual bool IsSupported() = 0;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     virtual void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr) = 0;
     virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event) = 0;
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
