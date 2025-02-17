@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t EVENT_OUT_SIZE = 30;
+constexpr int32_t EVENT_OUT_SIZE { 30 };
 } // namespace
 
 class EventStatisticTest : public testing::Test {
