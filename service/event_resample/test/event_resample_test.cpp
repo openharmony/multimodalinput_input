@@ -31,11 +31,11 @@ namespace MMI {
 
 namespace {
 using namespace testing::ext;
-constexpr int64_t START_TIME = 10000;
-constexpr int64_t TIME_DELTA = 2500;
-constexpr uint32_t INITIAL_COORDS = 10;
-constexpr uint32_t COORDS_DELTA = 10;
-constexpr int64_t FRAME_TIME = 8000;
+constexpr int64_t START_TIME { 10000 };
+constexpr int64_t TIME_DELTA { 2500 };
+constexpr uint32_t INITIAL_COORDS { 10 };
+constexpr uint32_t COORDS_DELTA { 10 };
+constexpr int64_t FRAME_TIME { 8000 };
 } // namespace
 
 class EventResampleTest : public testing::Test {
