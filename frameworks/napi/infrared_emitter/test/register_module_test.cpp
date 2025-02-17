@@ -19,9 +19,9 @@ namespace {
 using namespace testing::ext;
 } // namespace
 class RegisterModuleTest : public testing::Test {
-    public:
-        int64_t frequency_Max;
-        int64_t frequency_Min;
+public:
+    int64_t frequency_Max;
+    int64_t frequency_Min;
 };
 } // namespace MMI
 } // namespace OHOS
