@@ -94,6 +94,9 @@ const char* PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const char* PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
 const char* KEY_ENABLE { "enable" };
 const char* KEY_STATUS { "status" };
+constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
+const std::string SECURE_SETTING_URI_PROXY {
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_%d?Proxy=true" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1326,6 +1329,47 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
     item.statusConfigValue = configVlaue;
 }
 
+template <class T>
+void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
+{
+    CALL_DEBUG_ENTER;
+    char buf[DEFAULT_BUFFER_LENGTH] {};
+    if (sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), WIN_MGR->GetCurrentUserId()) < 0) {
+        MMI_HILOGE("Failed to format URI");
+        return;
+    }
+    SettingObserver::UpdateFunc updateFunc = [&item, buf](const std::string& key) {
+        bool statusValue = true;
+        ErrCode ret = RET_ERR;
+        MMI_HILOGI("The statusConfig:%s", item.statusConfig.c_str());
+        ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue,
+            std::string(buf));
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get value from setting date fail");
+            return;
+        }
+        MMI_HILOGI("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
+        item.statusConfigValue = statusValue;
+    };
+    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .CreateObserver(item.statusConfig, updateFunc);
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver,
+        std::string(buf));
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
+        statusObserver = nullptr;
+    }
+    bool configVlaue = true;
+    ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .GetBoolValue(item.statusConfig, configVlaue, std::string(buf));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get value from setting date fail");
+        return;
+    }
+    MMI_HILOGI("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
+    item.statusConfigValue = configVlaue;
+}
+
 std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed)
 {
     CALL_DEBUG_ENTER;
@@ -1475,8 +1519,8 @@ void KeyCommandHandler::InitKeyObserver()
     }
     if (!isKnuckleSwitchConfig_) {
         CreateStatusConfigObserver(knuckleSwitch_);
-        CreateStatusConfigObserver(screenshotSwitch_);
-        CreateStatusConfigObserver(recordSwitch_);
+        CreateKnuckleConfigObserver(screenshotSwitch_);
+        CreateKnuckleConfigObserver(recordSwitch_);
         isKnuckleSwitchConfig_ = true;
     }
 }
