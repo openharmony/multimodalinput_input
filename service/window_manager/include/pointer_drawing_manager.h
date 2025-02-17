@@ -219,6 +219,7 @@ private:
     void DrawDynamicCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
         int32_t px, int32_t py, ICON_TYPE align);
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
+    void SetFaceNodeBounds();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();

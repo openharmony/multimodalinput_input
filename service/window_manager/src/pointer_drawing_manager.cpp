@@ -3647,6 +3647,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
         cursorHeight_ = static_cast<int32_t>((float)imageInfo.size.height * axis);
         userIconHotSpotX_ = static_cast<int32_t>((float)focusX_ * axis);
         userIconHotSpotY_ = static_cast<int32_t>((float)focusY_ * axis);
+        SetFaceNodeBounds();
         MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d,"
             "imageHeight:%{public}d, focusX:%{public}d, focusY:%{public}d, axis:%{public}f,"
             "userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
@@ -3654,7 +3655,18 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
             focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
         return pixelMapPtr;
     }
+    SetFaceNodeBounds();
     return userIcon_;
+}
+
+void PointerDrawingManager::SetFaceNodeBounds()
+{
+#ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    canvasWidth_ = cursorWidth_;
+    canvasHeight_ = cursorHeight_;
+    CHKPV(surfaceNode_);
+    surfaceNode_->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor,
@@ -3674,6 +3686,7 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
         MMI_HILOGE("UpdateCursorProperty is failed");
         return ret;
     }
+    SetFaceNodeBounds();
     mouseIconUpdate_ = true;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
