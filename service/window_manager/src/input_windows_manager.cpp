@@ -963,7 +963,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
 
     windowsPerDisplay_ = windowsPerDisplay;
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     for (const auto &window : displayGroupInfo.windowsInfo) {
         if (window.windowType == static_cast<int32_t>(Rosen::WindowType::WINDOW_TYPE_TRANSPARENT_VIEW)) {
             MMI_HILOGI("Transparent window of UNI-CUBIC emerges, redirect touches");
@@ -973,7 +973,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
             break;
         }
     }
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 }
 
 WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo)
@@ -5260,7 +5260,7 @@ int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param,
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 bool InputWindowsManager::CancelTouch(int32_t touch)
 {
     auto iter = touchItemDownInfos_.find(touch);
@@ -5309,6 +5309,6 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
         CancelTouch(item.GetPointerId());
     }
 }
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 } // namespace MMI
 } // namespace OHOS
