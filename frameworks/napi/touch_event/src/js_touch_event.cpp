@@ -84,6 +84,15 @@ napi_value JsTouchEvent::Export(napi_env env, napi_value exports)
     CHKRP(napi_define_class(env, "SourceType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(sourceTypeArr) / sizeof(*sourceTypeArr), sourceTypeArr, &sourceType), DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "SourceType", sourceType), SET_NAMED_PROPERTY);
+
+    napi_property_descriptor fixedModeArr[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("NORMAL", GetNapiInt32(env, static_cast<int32_t>(FixedMode::NORMAL))),
+        DECLARE_NAPI_STATIC_PROPERTY("ONE_HAND", GetNapiInt32(env, static_cast<int32_t>(FixedMode::ONE_HAND))),
+    };
+    napi_value fixedMode = nullptr;
+    CHKRP(napi_define_class(env, "FixedMode", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(fixedModeArr) / sizeof(*fixedModeArr), fixedModeArr, &fixedMode), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "FixedMode", fixedMode), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI

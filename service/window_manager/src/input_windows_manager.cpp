@@ -1704,11 +1704,10 @@ void InputWindowsManager::PrintDisplayInfo()
 
     MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        MMI_HILOGD("displayInfos,id:%{public}d,x:%d,y:%d,"
-            "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d",
-            item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
-            item.uniq.c_str(), item.direction, item.displayDirection);
+        MMI_HILOGD("displayInfos,id:%{public}d,x:%d,y:%d,width:%{public}d,height:%{public}d,name:%{public}s,"
+            "uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,oneHandX:%{public}d,oneHandY:%{public}d",
+            item.id, item.x, item.y, item.width, item.height, item.name.c_str(), item.uniq.c_str(), item.direction,
+            item.displayDirection, item.oneHandX, item.oneHandY);
     }
 }
 
