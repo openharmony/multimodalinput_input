@@ -94,6 +94,9 @@ const char* PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const char* PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
 const char* KEY_ENABLE { "enable" };
 const char* KEY_STATUS { "status" };
+constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
+const std::string SECURE_SETTING_URI_PROXY {
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_%d?Proxy=true" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
