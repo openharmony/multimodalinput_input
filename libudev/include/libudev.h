@@ -22,6 +22,7 @@
 #include <sys/sysmacros.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,6 +78,9 @@ struct udev_device *udev_device_new_from_subsystem_sysname(
     struct udev *udev, const char *subsystem, const char *sysname);
 struct udev_device *udev_device_new_from_device_id(struct udev *udev, const char *id);
 struct udev_device *udev_device_new_from_environment(struct udev *udev);
+bool udev_device_property_add(char type, const char *devnode);
+void udev_device_property_remove(const char *devnode);
+void udev_device_record_devnode(const char *devnode);
 
 /**
  * udev_device_get_parent_*() does not take a reference on the returned device, it is automatically unref'd with the

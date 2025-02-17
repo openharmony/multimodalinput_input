@@ -136,6 +136,8 @@ private:
 
 struct udev {};
 
+typedef std::map<std::string, std::vector<std::string>> Propertys;
+typedef std::map<std::string, Propertys> AllPropertys;
 struct udev_device {
 public:
     // Not copyable and not movable
@@ -189,6 +191,97 @@ public:
         auto majStr = std::to_string(major(devnum));
         auto minStr = std::to_string(minor(devnum));
         return NewFromSyspath("/sys/dev/"s + typeStr + "/" + majStr + ":" + minStr);
+    }
+
+    static void AddPropertys(char type, dev_t devnum, const char *devnode)
+    {
+        const char *typeStr = nullptr;
+
+        if (type == 'b') {
+            typeStr = "block";
+        } else if (type == 'c') {
+            typeStr = "char";
+        } else {
+            MMI_HILOGE("Param invalid");
+            errno = EINVAL;
+            return;
+        }
+
+        // use /sys/dev/{block,char}/<maj>:<min> link
+        auto majStr = std::to_string(major(devnum));
+        auto minStr = std::to_string(minor(devnum));
+        std::string syspathParam = "/sys/dev/"s + typeStr + "/" + majStr + ":" + minStr;
+        Propertys propertys;
+        if (IsFromSyspath(syspathParam)) {
+            AddProperty(syspathParam, propertys);
+        }
+
+        while (true) {
+            std::string_view path = syspathParam;
+            if (!ChopTail(path, '/')) {
+                break;
+            }
+
+            syspathParam = std::string {path};
+
+            if (IsFromSyspath(syspathParam)) {
+                AddProperty(syspathParam, propertys);
+            }
+        }
+        std::lock_guard<std::mutex> lock(mutex_);
+        allPropertys_[devnode] = propertys;
+    }
+
+    static bool IsFromSyspath(std::string& syspathParam)
+    {
+        // path starts in sys
+        if (!StartsWith(syspathParam, "/sys/") || syspathParam.back() == '/') {
+            errno = EINVAL;
+            return false;
+        }
+
+        // resolve possible symlink to real path
+        std::string path = ResolveSymLink(syspathParam);
+        if (StartsWith(path, "/sys/devices/")) {
+            // all "devices" require a "uevent" file
+            struct stat statbuf;
+            std::string filename = path + "/uevent";
+            if (stat(filename.c_str(), &statbuf) != 0) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        syspathParam = path;
+        return true;
+    }
+
+    static void AddProperty(const std::string& path, Propertys& propertys)
+    {
+        auto filename = path + "/uevent";
+        char realPath[PATH_MAX] = {};
+        CHKPV(realpath(filename.c_str(), realPath));
+        std::ifstream f(realPath, std::ios_base::in);
+        if (!f.is_open()) {
+            MMI_HILOGE("ReadUeventFile(): path:%{private}s, error:%{public}s", realPath, std::strerror(errno));
+            return;
+        }
+
+        char line[UTIL_LINE_SIZE];
+        while (f.getline(line, sizeof(line))) {
+            propertys[filename].push_back(line);
+        }
+    }
+
+    static void RemoveProperty(const char *devnode)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        allPropertys_.erase(devnode);
+    }
+
+    static void RecordDevNode(const char *devnode)
+    {
+        devnode_ = devnode;
     }
 
     void Ref()
@@ -344,11 +437,12 @@ private:
         }
         ueventLoaded = true;
 
-        char line[UTIL_LINE_SIZE];
-        while (f.getline(line, sizeof(line))) {
-            AddPropertyFromString(line);
+        std::lock_guard<std::mutex> lock(mutex_);
+        auto propertys = allPropertys_[devnode_];
+        auto lines = propertys[filename];
+        for (auto it = lines.begin(); it != lines.end(); it++) {
+            AddPropertyFromString(*it);
         }
-
         CheckInputProperties();
     }
 
@@ -606,7 +700,13 @@ private:
 
     bool ueventLoaded = false;
     std::unordered_map<std::string, std::string> property_;
+    static AllPropertys allPropertys_;
+    static std::mutex mutex_;
+    static std::string devnode_;
 };
+AllPropertys udev_device::allPropertys_;
+std::mutex udev_device::mutex_;
+std::string udev_device::devnode_;
 
 // C-style interface
 
@@ -713,4 +813,25 @@ const char *udev_device_get_property_value(udev_device *device, const char *key)
         return nullptr;
     }
     return device->GetProperty(key).c_str();
+}
+
+bool udev_device_property_add(char type, const char *devnode)
+{
+    struct stat st;
+    if (stat(devnode, &st) < 0) {
+        MMI_HILOGW("udev_device_property_add stat failed, devnode:%{public}s", devnode);
+        return false;
+    }
+    udev_device::AddPropertys(type, st.st_rdev, devnode);
+    return true;
+}
+
+void udev_device_property_remove(const char *devnode)
+{
+    udev_device::RemoveProperty(devnode);
+}
+
+void udev_device_record_devnode(const char *devnode)
+{
+    udev_device::RecordDevNode(devnode);
 }

@@ -21,6 +21,7 @@
 #include "error_multimodal.h"
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
+#include "property_reader.h"
 #include "mmi_log.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
@@ -44,6 +45,7 @@ void DelegateInterface::Init()
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     IPointerDrawingManager::GetInstance()->SetDelegateProxy(shared_from_this());
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    PropReader->SetDelegateProxy(shared_from_this());
 }
 
 int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
@@ -52,6 +54,16 @@ int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
     int32_t ret = delegateTasks_(cb);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to execute the task, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DelegateInterface::OnPostAsyncTask(DTaskCallback cb) const
+{
+    CHKPR(asyncDelegateTasks_, ERROR_NULL_POINTER);
+    int32_t ret = asyncDelegateTasks_(cb);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to execute the async task, ret:%{public}d", ret);
     }
     return ret;
 }
