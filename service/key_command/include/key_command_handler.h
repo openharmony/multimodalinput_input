@@ -259,6 +259,8 @@ private:
     bool IsMusicActivate();
     template <class T>
     void CreateStatusConfigObserver(T& item);
+    template <class T>
+    void CreateKnuckleConfigObserver(T& item);
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
