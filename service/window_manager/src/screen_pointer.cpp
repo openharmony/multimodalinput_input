@@ -382,8 +382,14 @@ bool ScreenPointer::SetInvisible()
     CHKPF(buffer);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPF(addr);
-    uint32_t addrSize = buffer->GetWidth() * buffer->GetHeight() * RENDER_STRIDE;
-    memset_s(addr, addrSize, 0, addrSize);
+    if (buffer->GetWidth() >= 0 && buffer->GetHeight() >= 0) {
+        uint32_t addrSize = static_cast<uint32_t>(buffer->GetWidth()) *
+            static_cast<uint32_t>(buffer->GetHeight()) * RENDER_STRIDE;
+        memset_s(addr, addrSize, 0, addrSize);
+    } else {
+        MMI_HILOGI("The input data is negative, and the data is incorrect.");
+        return false;
+    }
 
     auto bh = buffer->GetBufferHandle();
     CHKPF(bh);
