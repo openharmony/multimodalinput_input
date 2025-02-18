@@ -149,7 +149,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_AddInputHandler_
     EXPECT_EQ(ret, RET_ERR);
     eventType = HANDLE_EVENT_TYPE_NONE;
     ret = eventPreMonitorHandler.AddInputHandler(sess, 1, eventType, keys);
-    EXPECT_EQ(ret, 1);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
