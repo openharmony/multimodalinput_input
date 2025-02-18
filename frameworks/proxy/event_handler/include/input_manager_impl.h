@@ -137,6 +137,7 @@ public:
     int32_t GetPointerSize(int32_t &size);
     int32_t GetCursorSurfaceId(uint64_t &surfaceId);
     int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
     int32_t SetMousePrimaryButton(int32_t primaryButton);

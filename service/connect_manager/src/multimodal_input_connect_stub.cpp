@@ -427,6 +427,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_CURSOR_SURFACE_ID):
             ret = StubGetCursorSurfaceId(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_MOUSE_CURSOR):
+            ret = StubSetCustomMouseCursor(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2697,6 +2700,32 @@ int32_t MultimodalInputConnectStub::StubGetIntervalSinceLastInput(MessageParcel&
         WRITEINT64(reply, timeInterval);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetCustomMouseCursor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t windowId = 0;
+    CustomCursor cursor;
+    CursorOptions options;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    OHOS::Media::PixelMap* pixelMapPtr = Media::PixelMap::Unmarshalling(data);
+    CHKPR(pixelMapPtr, RET_ERR);
+    cursor.pixelMap = (void*)pixelMapPtr;
+    READINT32(data, cursor.focusX, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, cursor.focusY, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, options.followSystem, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SetCustomCursor(windowId, cursor, options);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
