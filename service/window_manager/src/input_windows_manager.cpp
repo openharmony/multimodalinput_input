@@ -1870,7 +1870,7 @@ void InputWindowsManager::RotateDisplayScreen(const DisplayInfo& info, PhysicalC
 void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
     const DisplayInfo& info, EventTouch& touchInfo)
 {
-    MMI_HILOGI("DisplayInfo.width:%{public}d, DisplayInfo.height:%{public}d, "
+    MMI_HILOGD("DisplayInfo.width:%{public}d, DisplayInfo.height:%{public}d, "
                "DisplayInfo.topLeftX:%{public}d, DisplayInfo.topLeftY:%{public}d, "
                 "DisplayInfo.offsetX:%{public}d, DisplayInfo.offsetY:%{public}d",
                 info.width, info.height, info.x, info.y, info.offsetX, info.offsetY);
