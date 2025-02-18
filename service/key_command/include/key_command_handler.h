@@ -174,6 +174,7 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void PrintGestureInfo(int32_t fd);
     std::string ConvertKeyActionToString(int32_t keyAction);
+    int32_t SetCurrentUser(int32_t userId);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -413,6 +414,7 @@ private:
     int64_t walletLaunchDelayTimes_ { 0 };
     int64_t sosLaunchTime_ { -1 };
     int64_t powerUpTime_ { 0 };
+    int32_t currentUserId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
