@@ -68,6 +68,8 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     PointerEvent::PointerItem item;
+    int32_t blobId = libinput_event_touch_get_blob_id(touch);
+    item.SetBlobId(blobId);
     double pressure = libinput_event_touch_get_pressure(touch);
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     // we clean up pointerItem's cancel mark at down stage to ensure newer event
@@ -162,6 +164,8 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
         MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
+    int32_t blobId = libinput_event_touch_get_blob_id(touch);
+    item.SetBlobId(blobId);
     double pressure = libinput_event_touch_get_pressure(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     if (static_cast<uint32_t>(longAxis) & TOUCH_CANCEL_MASK) {
