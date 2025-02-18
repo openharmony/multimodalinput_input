@@ -30,6 +30,16 @@ struct PointerStyle {
         return id == rhs.id && size == rhs.size && color == rhs.color && options == rhs.options;
     }
 };
+
+struct CustomCursor {
+    void* pixelMap { nullptr };
+    int32_t focusX { 0 };
+    int32_t focusY { 0 };
+};
+
+struct CursorOptions  {
+    bool followSystem { false };
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_STYLE_H
