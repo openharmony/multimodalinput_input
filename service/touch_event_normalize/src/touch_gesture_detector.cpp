@@ -138,8 +138,6 @@ void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
     if (!IsMatchGesture(event->GetPointerCount()) && !IsMatchGesture(ALL_FINGER_COUNT)) {
         return;
     }
-    CheckGestureTrend(event);
-
     if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
         HandleSwipeMoveEvent(event);
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
@@ -147,6 +145,9 @@ void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
     }
     if (isRecognized_) {
         lastTouchEvent_ = std::make_shared<PointerEvent>(*event);
+        if (listener_ != nullptr) {
+            listener_->OnGestureTrend(event);
+        }
     }
 }
 
