@@ -1329,6 +1329,15 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
     item.statusConfigValue = configVlaue;
 }
 
+int32_t KeyCommandHandler::SetCurrentUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    currentUserId_ = userId;
+    CreateKnuckleConfigObserver(screenshotSwitch_);
+    CreateKnuckleConfigObserver(recordSwitch_);
+    return RET_OK;
+}
+
 template <class T>
 void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
 {
