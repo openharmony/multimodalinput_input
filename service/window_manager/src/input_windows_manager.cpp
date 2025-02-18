@@ -1602,8 +1602,9 @@ void InputWindowsManager::NotifyPointerToWindow()
         return;
     }
     if ((lastPointerEvent_->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (lastPointerEvent_->GetButtonId() >= 0)) {
-        MMI_HILOGD("No need to respond to new interface layouts");
+        (!lastPointerEvent_->GetPressedButtons().empty())) {
+        MMI_HILOGD("No need to respond to new interface layouts, btnCounts:%{public}d",
+            static_cast<int32_t>(lastPointerEvent_->GetPressedButtons().size()));
         return;
     }
     windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
