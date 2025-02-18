@@ -1333,8 +1333,8 @@ int32_t KeyCommandHandler::SetCurrentUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
     currentUserId_ = userId;
-    CreateScreenShotsConfigObserver(screenshotSwitch_);
-    CreateScreenShotsConfigObserver(recordSwitch_);
+    CreateKnuckleConfigObserver(screenshotSwitch_);
+    CreateKnuckleConfigObserver(recordSwitch_);
     return RET_OK;
 }
 
