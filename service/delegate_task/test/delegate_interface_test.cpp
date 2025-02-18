@@ -46,7 +46,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetDeviceTags_01, TestSize
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     InputHandlerType type = InputHandlerType::MONITOR;
     uint32_t ret = delegateInterface.GetDeviceTags(type);
     EXPECT_EQ(ret, 0);
@@ -69,7 +72,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetDeviceTags_02, TestSize
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     InputHandlerType type = InputHandlerType::INTERCEPTOR;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
@@ -96,7 +102,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_RemoveLocal_01, TestSize.L
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     InputHandlerType type = InputHandlerType::NONE;
     std::string name = "handler";
     uint32_t deviceTags = 1;
@@ -127,7 +136,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetPriority_01, TestSize.L
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     InputHandlerType type = InputHandlerType::INTERCEPTOR;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
@@ -154,7 +166,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetEventType_01, TestSize.
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     InputHandlerType type = InputHandlerType::MONITOR;
     EXPECT_TRUE(delegateInterface.handlers_.empty());
     uint32_t ret = delegateInterface.GetEventType(type);
@@ -173,7 +188,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetEventType_02, TestSize.
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     InputHandlerType type = InputHandlerType::MONITOR;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
@@ -195,7 +213,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnPostSyncTask_01, TestSiz
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     DTaskCallback myCallback = []() -> int32_t {
         return RET_OK;
     };
@@ -215,7 +236,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnInputEventHandler_01, Te
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -248,7 +272,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_01, TestSize.Le
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     DelegateInterface::HandlerSummary summary;
     summary.handlerName = "handler1";
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
@@ -277,7 +304,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_02, TestSize.Le
     std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
         return 0;
     };
-    DelegateInterface delegateInterface(delegate);
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
     DelegateInterface::HandlerSummary summary;
     summary.handlerName = "handler";
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
