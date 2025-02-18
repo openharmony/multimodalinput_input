@@ -3190,6 +3190,17 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return ret;
     }
+    auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPR(eventKeyCommandHandler, RET_ERR);
+    ret = delegateTasks_.PostSyncTask(
+        [userId, eventKeyCommandHandler] {
+            return eventKeyCommandHandler->SetCurrentUser(userId);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 
