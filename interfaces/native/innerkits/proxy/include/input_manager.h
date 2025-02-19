@@ -40,6 +40,7 @@
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -178,6 +179,29 @@ public:
      */
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
 
+    /**
+     * @brief Adds a pre input event monitor. After such a monitor is added,
+     * an input event is copied and distributed to the monitor while being distributed to the original target.
+     * @param monitor Indicates the input event monitor. After an input event is generated,
+     * the functions of the monitor object will be called.
+     * @param eventType Indicates the eventType for monitor.
+     * @param keys Event type, which is **key**.
+     * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
+     * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
+     * the monitor fails to be added.
+     * @since 15
+     */
+    int32_t AddPreMonitor(std::shared_ptr<IInputEventConsumer> monitor,
+        HandleEventType eventType, std::vector<int32_t> keys);
+
+    /**
+     * @brief Removes a pre monitor.
+     * @param monitorId Indicates the monitor ID, which is the return value of <b>AddPreMonitor</b>.
+     * @return void
+     * @since 15
+     */
+    void RemovePreMonitor(int32_t monitorId);
+ 
     /**
      * @brief Adds an input event monitor. After such a monitor is added,
      * an input event is copied and distributed to the monitor while being distributed to the original target.
@@ -939,6 +963,26 @@ public:
      * @since 13
      */
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
+
+    /**
+     * @brief Sets the custom cursor. You can set whether to adjust the cursor size based on the system settings.
+     * @param windowId Indicates the windowId of the window
+     * @param cursor Custom cursor, including the custom cursor resource and focus position.
+     * @param options Custom cursor option
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 14
+     */
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
+
+    /**
+     * @brief shift AppPointerEvent from source window to target window
+     * @param param - param for shift pointer event.
+     * @param autoGenDown - send down event if true.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown = true);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

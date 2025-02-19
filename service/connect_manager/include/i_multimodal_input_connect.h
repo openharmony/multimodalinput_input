@@ -36,6 +36,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -58,6 +59,7 @@ public:
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
     virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) = 0;
+    virtual int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) = 0;
     virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap) = 0;
     virtual int32_t SetPointerSize(int32_t size) = 0;
     virtual int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) = 0;
@@ -92,6 +94,8 @@ public:
         int32_t priority, uint32_t deviceTags) = 0;
     virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) = 0;
+    virtual int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) = 0;
+    virtual int32_t RemovePreInputHandler(int32_t handlerId) = 0;
     virtual int32_t MarkEventConsumed(int32_t eventId) = 0;
     virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) = 0;
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) = 0;
@@ -155,6 +159,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
     virtual int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) = 0;
     virtual int32_t SkipPointerLayer(bool isSkip) = 0;
+    virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

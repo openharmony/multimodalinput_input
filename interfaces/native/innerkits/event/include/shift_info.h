@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,33 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef POINTER_STYLE_H
-#define POINTER_STYLE_H
+#ifndef SHIFT_INFO_H
+#define SHIFT_INFO_H
 
-#include <iostream>
+#include "nocopyable.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
-struct PointerStyle {
-    int32_t size{ -1 };
-    int32_t color{ 0 };
-    int32_t id{ 0 };
-    int32_t options{ 0 };
-    bool operator==(const PointerStyle& rhs) const
-    {
-        return id == rhs.id && size == rhs.size && color == rhs.color && options == rhs.options;
-    }
+struct ShiftWindowParam {
+    int32_t sourceWindowId { -1 };
+    int32_t targetWindowId { -1 };
+    int32_t x { -1 };
+    int32_t y { -1 };
 };
 
-struct CustomCursor {
-    void* pixelMap { nullptr };
-    int32_t focusX { 0 };
-    int32_t focusY { 0 };
-};
-
-struct CursorOptions  {
-    bool followSystem { false };
+struct ShiftWindowInfo {
+    WindowInfo sourceWindowInfo;
+    WindowInfo targetWindowInfo;
+    int32_t x { -1 };
+    int32_t y { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // POINTER_STYLE_H
+#endif // SHIFT_INFO_H

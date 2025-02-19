@@ -39,6 +39,7 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);
     int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
+    int32_t OnPreKeyEvent(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);

@@ -20,6 +20,8 @@
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
+#include "pre_monitor_manager.h"
+#include "hitrace_meter.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManager"
@@ -136,6 +138,17 @@ int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, H
 void InputManager::RemoveMonitor(int32_t monitorId)
 {
     InputMgrImpl.RemoveMonitor(monitorId);
+}
+
+int32_t InputManager::AddPreMonitor(
+    std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType, std::vector<int32_t> keys)
+{
+    return PRE_MONITOR_MGR.AddHandler(monitor, eventType, keys);
+}
+
+void InputManager::RemovePreMonitor(int32_t monitorId)
+{
+    PRE_MONITOR_MGR.RemoveHandler(monitorId);
 }
 
 void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -633,6 +646,17 @@ int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
 int32_t InputManager::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     return InputMgrImpl.GetIntervalSinceLastInput(timeInterval);
+}
+
+int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+{
+    return InputMgrImpl.SetCustomCursor(windowId, cursor, options);
+}
+
+int32_t InputManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event entry");
+    return InputMgrImpl.ShiftAppPointerEvent(param, autoGenDown);
 }
 } // namespace MMI
 } // namespace OHOS

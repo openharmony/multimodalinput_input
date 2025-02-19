@@ -30,6 +30,7 @@
 #include "struct_multimodal.h"
 #include "uds_server.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -160,6 +161,10 @@ public:
     virtual void CleanShellWindowIds() = 0;
     virtual bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();

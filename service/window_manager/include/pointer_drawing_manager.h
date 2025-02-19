@@ -90,6 +90,7 @@ public:
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
     int32_t SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY) override;
+    int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options) override;
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
@@ -137,6 +138,7 @@ private:
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     void UpdateMouseStyle();
     int32_t UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY);
+    int32_t UpdateCursorProperty(CustomCursor cursor);
     void RotateDegree(Direction direction);
     int32_t DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle, Direction direction);
@@ -163,6 +165,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     void ForceClearPointerVisiableStatus() override;
     void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
+    std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
 
 private:
     struct PidInfo {
@@ -183,6 +186,8 @@ private:
     int32_t imageHeight_ { 0 };
     int32_t canvasWidth_ { 64 };
     int32_t canvasHeight_ { 64 };
+    int32_t cursorWidth_ { 0 };
+    int32_t cursorHeight_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     std::list<PidInfo> hapPidInfos_;
@@ -200,6 +205,7 @@ private:
     isMagicCursor hasMagicCursor_;
     bool hasInitObserver_ { false };
     bool isInit_ { false };
+    std::mutex mtx_;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -207,6 +213,9 @@ private:
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
+    bool followSystem_ { false };
+    int32_t focusX_ { 0 };
+    int32_t focusY_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

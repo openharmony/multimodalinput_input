@@ -44,6 +44,8 @@ enum NapiErrorCode : int32_t {
     COMMON_DEVICE_NOT_EXIST = 3900001,
     COMMON_KEYBOARD_DEVICE_NOT_EXIST = 3900002,
     COMMON_NON_INPUT_APPLICATION = 3900003,
+    PRE_KEY_NOT_SUPPORTED = 4100001,
+    ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
@@ -53,6 +55,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { COMMON_KEYBOARD_DEVICE_NOT_EXIST,
         { COMMON_KEYBOARD_DEVICE_NOT_EXIST, "The specified keyboard device does not exist." } },
     { COMMON_NON_INPUT_APPLICATION, { COMMON_NON_INPUT_APPLICATION, "it is prohibited for non-input applications." } },
+    { ERROR_WINDOW_ID_PERMISSION_DENIED, { ERROR_WINDOW_ID_PERMISSION_DENIED, "windowId is invalid.\n" } },
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
