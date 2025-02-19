@@ -4169,49 +4169,44 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     return RET_ERR;
 }
 
-bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY)
+bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, double physicalX, double physicalY)
 {
     auto displayDirection = GetDisplayDirection(&displayInfo);
     auto physicalRect = RotateRect<int32_t>(displayDirection, { displayInfo.width, displayInfo.height });
     return (physicalX >= 0 && physicalX < physicalRect.x) && (physicalY >= 0 && physicalY < physicalRect.y);
 }
 
-bool InputWindowsManager::CalculateLayout(const DisplayInfo &displayInfo, const Vector2D<int32_t> &physical,
-    Vector2D<int32_t> &layout)
+bool InputWindowsManager::CalculateLayout(const DisplayInfo &displayInfo, const Vector2D<double> &physical,
+    Vector2D<double> &layout)
 {
     Direction direction = GetDisplayDirection(&displayInfo);
-    Vector2D<int32_t> logical = physical;
+    Vector2D<double> logical = physical;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (IsSupported()) {
-        auto screenRect = RotateRect<int32_t>(direction, {displayInfo.width, displayInfo.height});
+        auto screenRect = RotateRect<double>(direction, {displayInfo.width, displayInfo.height});
         auto transforms = RotateAndFitScreen(direction, screenRect);
         logical = MMI::ApplyTransformSteps(transforms, physical);
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (!AddInt32(logical.x, displayInfo.x, layout.x)) {
-        MMI_HILOGE("The addition of layout.x_ overflows");
-        return false;
-    }
-    if (!AddInt32(logical.y, displayInfo.y, layout.y)) {
-        MMI_HILOGE("The addition of layout.x_ overflows");
-        return false;
-    }
+    layout.x = logical.x + displayInfo.x;
+    layout.y = logical.y + displayInfo.y;
+
     MMI_HILOGD("calculated layout point, id:%{public}d, d:%{public}d, dd:%{public}d, ddd:%{public}d, "
-        "dx:%{private}d, dy:%{private}d, px:%{private}d, py:%{private}d, "
-        "lx:%{private}d, ly:%{private}d, lax:%{private}d, lay:%{private}d ",
+        "dx:%{private}d, dy:%{private}d, px:%{private}f, py:%{private}f, "
+        "lx:%{private}f, ly:%{private}f, lax:%{private}f, lay:%{private}f ",
         displayInfo.id, direction, displayInfo.direction, displayInfo.displayDirection,
         displayInfo.x, displayInfo.y, physical.x, physical.y,
         logical.x, logical.y, layout.x, layout.y);
     return true;
 }
 
-void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
-    int32_t& physicalY, int32_t& displayId)
+void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, double& physicalX,
+    double& physicalY, int32_t& displayId)
 {
     CALL_DEBUG_ENTER;
-    Vector2D<int32_t> physical = { physicalX, physicalY };
-    Vector2D<int32_t> logical = physical;
-    Vector2D<int32_t> layout = { 0, 0 };
+    Vector2D<double> physical = { physicalX, physicalY };
+    Vector2D<double> logical = physical;
+    Vector2D<double> layout = { 0, 0 };
     if (!CalculateLayout(displayInfo, physical, layout)) {
         return;
     }
@@ -4232,7 +4227,7 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
             Direction direction = GetDisplayDirection(&item);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             if (IsSupported()) {
-                auto screenRect = RotateRect<int32_t>(direction, { item.width, item.height });
+                auto screenRect = RotateRect<double>(direction, { item.width, item.height });
                 auto transforms = RotateAndFitScreen(direction, screenRect);
                 physical = ResetTransformSteps(transforms, logical);
             }
@@ -4242,7 +4237,7 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
             displayId = item.id;
             MMI_HILOGD("switched into display, id:%{public}d, d:%{public}d, dd:%{public}d, ddd:%{public}d, "
                 "dx:%{private}d, dy:%{private}d, dw:%{private}d, dh:%{private}d, "
-                "mx:%{private}d, my:%{private}d, lx:%{private}d, ly:%{private}d, px:%{private}d, py:%{private}d",
+                "mx:%{private}d, my:%{private}d, lx:%{private}f, ly:%{private}f, px:%{private}f, py:%{private}f",
                 displayId, direction, item.direction, item.displayDirection,
                 item.x, item.y, item.width, item.height,
                 layoutMax.x, layoutMax.y, logical.x, logical.y, physicalX, physicalY);
@@ -4395,11 +4390,9 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
 {
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
-    int32_t integerX = static_cast<int32_t>(x);
-    int32_t integerY = static_cast<int32_t>(y);
     int32_t lastDisplayId = displayId;
-    if (!IsInsideDisplay(*displayInfo, integerX, integerY)) {
-        FindPhysicalDisplay(*displayInfo, integerX, integerY, displayId);
+    if (!IsInsideDisplay(*displayInfo, x, y)) {
+        FindPhysicalDisplay(*displayInfo, x, y, displayId);
     }
     if (displayId != lastDisplayId) {
         displayInfo = GetPhysicalDisplay(displayId);
@@ -4408,6 +4401,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     int32_t width = 0;
     int32_t height = 0;
     GetWidthAndHeight(displayInfo, width, height, isRealData);
+    int32_t integerX = static_cast<int32_t>(x);
+    int32_t integerY = static_cast<int32_t>(y);
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
