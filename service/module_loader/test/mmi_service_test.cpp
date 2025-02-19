@@ -51,6 +51,23 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnThread_01, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ShiftAppPointerEvent_001
+ * @tc.desc: Test the function ShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, ShiftAppPointerEvent_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    ShiftWindowParam param;
+    param.sourceWindowId = -100;
+    param.targetWindowId = -200;
+    bool autoGenDown = true;
+    int32_t ret = mmiService.ShiftAppPointerEvent(param, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
  * @tc.name: MMIServerTest_OnThread_02
  * @tc.desc: Test OnThread
  * @tc.type: FUNC

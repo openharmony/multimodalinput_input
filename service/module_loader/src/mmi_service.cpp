@@ -2921,5 +2921,22 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, Curso
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
+
+int32_t MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [param, autoGenDown]() {
+            return WIN_MGR->ShiftAppPointerEvent(param, autoGenDown);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Shift AppPointerEvent failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
