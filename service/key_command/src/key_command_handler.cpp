@@ -1329,7 +1329,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
     item.statusConfigValue = configVlaue;
 }
 
-int32_t KeyCommandHandler::SetCurrentUser(int32_t userId)
+int32_t KeyCommandHandler::RegisterKnuckleSwitchByUserId(int32_t userId)
 {
     CALL_DEBUG_ENTER;
     currentUserId_ = userId;
@@ -1343,7 +1343,7 @@ void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
 {
     CALL_DEBUG_ENTER;
     char buf[DEFAULT_BUFFER_LENGTH] {};
-    if (sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), WIN_MGR->GetCurrentUserId()) < 0) {
+    if (sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), currentUserId_) < 0) {
         MMI_HILOGE("Failed to format URI");
         return;
     }
@@ -1354,7 +1354,8 @@ void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
         ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue,
             std::string(buf));
         if (ret != RET_OK) {
-            MMI_HILOGE("Get value from setting date fail");
+            MMI_HILOGE("Get value from setting data fail");
+            item.statusConfigValue = true;
             return;
         }
         MMI_HILOGI("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
@@ -1368,15 +1369,16 @@ void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
     }
-    bool configVlaue = true;
+    bool configValue = true;
     ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .GetBoolValue(item.statusConfig, configVlaue, std::string(buf));
+        .GetBoolValue(item.statusConfig, configValue, std::string(buf));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get value from setting date fail");
+        MMI_HILOGE("Get value from setting data fail");
+        item.statusConfigValue = true;
         return;
     }
-    MMI_HILOGI("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
-    item.statusConfigValue = configVlaue;
+    MMI_HILOGI("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configValue);
+    item.statusConfigValue = configValue;
 }
 
 std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed)
