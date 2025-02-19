@@ -3635,6 +3635,7 @@ int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> 
     }
     CHKPR(windowInfo, ERROR_NULL_POINTER);
     SetPrivacyModeFlag(windowInfo->privacyMode, pointerEvent);
+    pointerEvent->SetTargetDisplayId(windowInfo->displayId);
     pointerEvent->SetTargetWindowId(windowInfo->id);
     pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOG_DISPATCHD("focusWindow:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
