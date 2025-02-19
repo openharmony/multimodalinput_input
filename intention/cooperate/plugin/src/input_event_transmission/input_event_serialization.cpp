@@ -208,11 +208,12 @@ int32_t InputEventSerialization::SerializeBaseInfo(std::shared_ptr<MMI::PointerE
 {
     int32_t pointerAction = event->GetPointerAction();
     int32_t pointerId = event->GetPointerId();
+    int32_t sourceType = event->GetSourceType();
     int32_t btnId = event->GetButtonId();
     int32_t fingerCnt = event->GetFingerCount();
     float zOrder = event->GetZOrder();
 
-    pkt << pointerAction << pointerId << btnId << fingerCnt << zOrder;
+    pkt << pointerAction << pointerId << sourceType << btnId << fingerCnt << zOrder;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Failed to serialize base information of pointer event");
         return RET_ERR;
@@ -229,13 +230,14 @@ int32_t InputEventSerialization::DeserializeBaseInfo(NetPacket &pkt, std::shared
     int32_t fingerCnt {};
     float zOrder {};
 
-    pkt >> pointerAction >> pointerId >> btnId >> fingerCnt >> zOrder;
+    pkt >> pointerAction >> pointerId >> sourceType >> btnId >> fingerCnt >> zOrder;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Failed to deserialize base information of pointer event");
         return RET_ERR;
     }
     event->SetPointerAction(pointerAction);
     event->SetPointerId(pointerId);
+    event->SetSourceType(sourceType);
     event->SetButtonId(btnId);
     event->SetFingerCount(fingerCnt);
     event->SetZOrder(zOrder);

@@ -477,6 +477,7 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
     {(int64_t)KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_LEFT},
     {(int64_t)KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_RIGHT},
     {(int64_t)KeyEvent::KEYCODE_SPACE, KeyEvent::INTENTION_SELECT},
+    {(int64_t)KeyEvent::KEYCODE_ENTER, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_NUMPAD_ENTER, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_ESCAPE, KeyEvent::INTENTION_ESCAPE},
     {((int64_t)KeyEvent::KEYCODE_ALT_LEFT << 16) + KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_BACK},
