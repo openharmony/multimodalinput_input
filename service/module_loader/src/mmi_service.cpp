@@ -3197,7 +3197,7 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
     CHKPR(eventKeyCommandHandler, RET_ERR);
     ret = delegateTasks_.PostSyncTask(
         [userId, eventKeyCommandHandler] {
-            return eventKeyCommandHandler->SetCurrentUser(userId);
+            return eventKeyCommandHandler->RegisterKnuckleSwitchByUserId(userId);
         }
         );
     if (ret != RET_OK) {
