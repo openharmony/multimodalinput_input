@@ -275,10 +275,10 @@ private:
     void CheckUIExtentionWindowPointerHotArea(int32_t logicalX, int32_t logicalY,
         const std::vector<WindowInfo>& windowInfos, int32_t& windowId);
     std::optional<WindowInfo> GetWindowInfo(int32_t logicalX, int32_t logicalY);
-    bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY);
-    bool CalculateLayout(const DisplayInfo& displayInfo, const Vector2D<int32_t> &physical, Vector2D<int32_t>& layout);
-    void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
-        int32_t& physicalY, int32_t& displayId);
+    bool IsInsideDisplay(const DisplayInfo& displayInfo, double physicalX, double physicalY);
+    bool CalculateLayout(const DisplayInfo& displayInfo, const Vector2D<double> &physical, Vector2D<double>& layout);
+    void FindPhysicalDisplay(const DisplayInfo& displayInfo, double& physicalX,
+        double& physicalY, int32_t& displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void InitMouseDownInfo();

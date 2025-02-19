@@ -1963,7 +1963,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
 {
     CALL_TEST_DEBUG;
     DisplayInfo displayInfo = {10, 20};
-    int32_t physicalX, physicalY, displayId;
+    double physicalX, physicalY;
+    int32_t displayId;
     WIN_MGR->FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(physicalX, RET_OK);
     EXPECT_EQ(physicalY, RET_OK);
@@ -3393,10 +3394,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     InputWindowsManager inputWindowsManager;
     DisplayInfo displayInfo;
     DisplayInfo displaysInfo;
-    int32_t logicalX = 300;
-    int32_t logicalY = 400;
-    int32_t physicalX = 100;
-    int32_t physicalY =200;
+    double logicalX = 300;
+    double logicalY = 400;
+    double physicalX = 100;
+    double physicalY = 200;
     int32_t displayId = -1;
     displayInfo.x = INT32_MAX;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
@@ -3426,10 +3427,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     InputWindowsManager inputWindowsManager;
     DisplayInfo displayInfo;
     DisplayInfo displaysInfo;
-    int32_t logicalX = 300;
-    int32_t logicalY = 400;
-    int32_t physicalX = 100;
-    int32_t physicalY =200;
+    double logicalX = 300;
+    double logicalY = 400;
+    double physicalX = 100;
+    double physicalY = 200;
     int32_t displayMaxX = 300;
     int32_t displayMaxY = 400;
     int32_t displayId = -1;
