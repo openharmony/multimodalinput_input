@@ -2407,10 +2407,6 @@ int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, Messag
 int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("GetInfraredFrequencies Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     if (!PER_HELPER->CheckInfraredEmmit()) {
         MMI_HILOGE("Infrared permission check failed");
         return ERROR_NO_PERMISSION;
@@ -2432,10 +2428,6 @@ int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& da
 int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("StubTransmitInfrared Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     if (!PER_HELPER->CheckInfraredEmmit()) {
         MMI_HILOGE("StubTransmitInfrared permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
         return ERROR_NO_PERMISSION;
