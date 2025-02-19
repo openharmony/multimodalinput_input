@@ -253,6 +253,10 @@ ohos_shared_library("libmmi-server") {
     sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
   }
 
+  if (input_feature_touch_drawing) {
+    sources += [ "window_manager/src/touch_drawing_manager.cpp" ]
+  }
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
@@ -316,6 +320,16 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
+  if (input_feature_touch_drawing) {
+    external_deps += [
+      "graphic_2d:2d_graphics",
+      "graphic_2d:libcomposer",
+      "graphic_2d:librender_service_base",
+      "graphic_2d:librender_service_client",
+      "graphic_2d:window_animation",
+    ]
+  }
+
   external_deps += [
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
@@ -344,7 +358,6 @@ ohos_shared_library("libmmi-server") {
       "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
       "window_manager/src/knuckle_glow_point.cpp",
       "window_manager/src/knuckle_glow_trace_system.cpp",
-      "window_manager/src/touch_drawing_manager.cpp",
     ]
 
     deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
