@@ -209,12 +209,18 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             HandleTableToolEvent(event);
             break;
         }
-        case LIBINPUT_EVENT_JOYSTICK_BUTTON:
-        case LIBINPUT_EVENT_JOYSTICK_AXIS: {
-            HandleJoystickEvent(event);
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+        case LIBINPUT_EVENT_JOYSTICK_BUTTON: {
+            HandleJoystickButtonEvent(event);
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+        case LIBINPUT_EVENT_JOYSTICK_AXIS: {
+            HandleJoystickAxisEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
         case LIBINPUT_EVENT_SWITCH_TOGGLE: {
             HandleSwitchInputEvent(event);
             break;
@@ -640,22 +646,41 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK
     CHKPR(event, ERROR_NULL_POINTER);
-    BytraceAdapter::StartPackageEvent("package joystickEvent");
-    auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
+    BytraceAdapter::StartPackageEvent("package joystick button event");
+    auto keyEvent = joystick_.OnButtonEvent(event);
+    BytraceAdapter::StopPackageEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    BytraceAdapter::StartBytrace(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    nextHandler_->HandleKeyEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
+{
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
+    CHKPR(event, ERROR_NULL_POINTER);
+    BytraceAdapter::StartPackageEvent("package joystick axis event");
+    auto pointerEvent = joystick_.OnAxisEvent(event);
     BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
-#else
-    MMI_HILOGW("Joystick device does not support");
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
+    joystick_.CheckIntention(pointerEvent, [this](std::shared_ptr<KeyEvent> keyEvent) {
+        BytraceAdapter::StartBytrace(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+        nextHandler_->HandleKeyEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    });
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 
 int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 {

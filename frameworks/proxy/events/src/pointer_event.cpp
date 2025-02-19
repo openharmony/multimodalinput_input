@@ -811,6 +811,11 @@ void PointerEvent::ClearAxisValue()
     axes_ = 0;
 }
 
+void PointerEvent::ClearAxisStatus(AxisType axis)
+{
+    axes_ &= ~static_cast<uint32_t>(1U << axis);
+}
+
 bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
 {
     bool ret { false };

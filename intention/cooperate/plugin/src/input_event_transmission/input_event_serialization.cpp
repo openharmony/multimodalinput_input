@@ -158,7 +158,7 @@ int32_t InputEventSerialization::SerializeInputEvent(std::shared_ptr<MMI::InputE
     CHKPR(event, ERROR_NULL_POINTER);
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
-        << event->GetTargetDisplayId() << event->GetTargetWindowId()
+        << event->GetSourceType() << event->GetTargetDisplayId() << event->GetTargetWindowId()
         << event->GetAgentWindowId() << event->GetFlag();
     if (pkt.ChkRWError()) {
         FI_HILOGE("Serialize packet is failed");
@@ -186,6 +186,8 @@ int32_t InputEventSerialization::DeserializeInputEvent(NetPacket &pkt, std::shar
     event->SetSensorInputTime(sensorTime);
     pkt >> tField;
     event->SetDeviceId(tField);
+    pkt >> tField;
+    event->SetSourceType(tField);
     pkt >> tField;
     event->SetTargetDisplayId(tField);
     pkt >> tField;

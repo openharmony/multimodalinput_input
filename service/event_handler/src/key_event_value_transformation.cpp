@@ -477,6 +477,7 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
     {(int64_t)KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_LEFT},
     {(int64_t)KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_RIGHT},
     {(int64_t)KeyEvent::KEYCODE_SPACE, KeyEvent::INTENTION_SELECT},
+    {(int64_t)KeyEvent::KEYCODE_ENTER, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_NUMPAD_ENTER, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_ESCAPE, KeyEvent::INTENTION_ESCAPE},
     {((int64_t)KeyEvent::KEYCODE_ALT_LEFT << 16) + KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_BACK},
@@ -503,6 +504,13 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
     {(int64_t)KeyEvent::KEYCODE_APPSELECT, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_BACK, KeyEvent::INTENTION_BACK},
     {(int64_t)KeyEvent::KEYCODE_MOVE_HOME, KeyEvent::INTENTION_HOME},
+    {(int64_t)KeyEvent::KEYCODE_BUTTON_A, KeyEvent::INTENTION_SELECT},
+    {(int64_t)KeyEvent::KEYCODE_BUTTON_B, KeyEvent::INTENTION_BACK},
+    {(int64_t)KeyEvent::KEYCODE_BUTTON_SELECT, KeyEvent::INTENTION_MENU},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_UP, KeyEvent::INTENTION_UP},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::INTENTION_DOWN},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_LEFT},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_RIGHT},
 };
 } // namespace
 

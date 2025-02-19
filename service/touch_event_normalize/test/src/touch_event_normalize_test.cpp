@@ -26,11 +26,8 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
 using namespace testing::ext;
-constexpr int32_t LIBINPUT_HOMEPAGE_BUTTON_CODE = 172;
-constexpr int32_t LIBINPUT_BUTTON_NONE = -1;
-} // namespace
+
 class TouchEventNormalizeTest : public testing::Test {
 public:
     void SetUp();
@@ -72,23 +69,6 @@ void TouchEventNormalizeTest::TearDown()
 }
 
 /**
- * @tc.name: JoystickTransformProcessorTest_LibinputButtonToPointer
- * @tc.desc: Test LibinputButtonToPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(JoystickTransformProcessorTest, JoystickTransformProcessorTest_LibinputButtonToPointer, TestSize.Level1)
-{
-    int32_t deviceId = 123;
-    JoystickTransformProcessor joystickTransformProcessor(deviceId);
-    uint32_t button = LIBINPUT_HOMEPAGE_BUTTON_CODE;
-    ASSERT_EQ(joystickTransformProcessor.LibinputButtonToPointer(button), PointerEvent::JOYSTICK_BUTTON_HOMEPAGE);
-
-    button = LIBINPUT_BUTTON_NONE;
-    ASSERT_EQ(joystickTransformProcessor.LibinputButtonToPointer(button), PointerEvent::BUTTON_NONE);
-}
-
-/**
  * @tc.name: TouchTransformProcessorTest_UpdatePointerItemProperties
  * @tc.desc: Test UpdatePointerItemProperties
  * @tc.type: FUNC
@@ -124,7 +104,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_MakeTransformProcessor
     ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TABLET_TOOL), nullptr);
     ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TOUCH_PAD), nullptr);
     ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::GESTURE), nullptr);
-    ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::JOYSTICK), nullptr);
     ASSERT_EQ(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::KNUCKLE), nullptr);
 }
 
