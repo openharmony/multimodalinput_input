@@ -2324,5 +2324,24 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_001, TestSize.Le
     ret = stub->StubInjectPointerEvent(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: StubShiftAppPointerEvent_001
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t returnCode = MMISERVICE_NOT_RUNNING;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SHIFT_APP_POINTER_EVENT);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(ret, returnCode);
+}
 } // namespace MMI
 } // namespace OHOS

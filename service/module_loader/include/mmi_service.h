@@ -170,6 +170,7 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
 #endif // OHOS_BUILD_ENABLE_ANCO
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

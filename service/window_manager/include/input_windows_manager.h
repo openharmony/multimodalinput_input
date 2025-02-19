@@ -189,6 +189,9 @@ public:
     void CleanInvalidPiexMap();
     void HandleWindowPositionChange();
     void SendCancelEventWhenWindowChange(int32_t pointerId);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -319,6 +322,10 @@ void UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent>
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
 
     void UpdateDisplayMode();
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
+    int32_t ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     UDSServer* udsServer_ { nullptr };

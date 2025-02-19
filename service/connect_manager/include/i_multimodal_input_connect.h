@@ -36,6 +36,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -158,6 +159,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
     virtual int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) = 0;
     virtual int32_t SkipPointerLayer(bool isSkip) = 0;
+    virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

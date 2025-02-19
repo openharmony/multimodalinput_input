@@ -54,6 +54,7 @@
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "magic_pointer_velocity_tracker.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#include "hitrace_meter.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
@@ -4591,5 +4592,96 @@ void InputWindowsManager::SetFoldState()
 {
     IsFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
 }
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowId) const
+{
+    for (auto iter = windowsPerDisplay_.begin(); iter != windowsPerDisplay_.end(); ++iter) {
+        int32_t displayId = iter->first;
+        const std::vector<WindowInfo> &windowsInfo = iter->second.windowsInfo;
+        if (displayId < 0) {
+            MMI_HILOGE("windowsPerDisplay_ contain invalid displayId: %{public}d", displayId);
+            continue;
+        }
+        for (const auto& item : windowsInfo) {
+            if (item.id == windowId &&
+                (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) != WindowInfo::FLAG_BIT_UNTOUCHABLE &&
+                transparentWins_.find(item.id) == transparentWins_.end()) {
+                return std::make_optional(item);
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown)
+{
+    if (!lastPointerEvent_ || !lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
+        MMI_HILOGE("Failed shift pointerEvent, left mouse button is not pressed");
+        return RET_ERR;
+    }
+    const WindowInfo &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
+    const WindowInfo &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
+    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    pointerEvent->ClearButtonPressed();
+
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(pointerId, item);
+    item.SetWindowX(lastLogicX_ - sourceWindowInfo.area.x);
+    item.SetWindowY(lastLogicY_ - sourceWindowInfo.area.y);
+    item.SetPressed(false);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetTargetDisplayId(sourceWindowInfo.displayId);
+    pointerEvent->SetTargetWindowId(sourceWindowInfo.id);
+    pointerEvent->SetAgentWindowId(sourceWindowInfo.agentWindowId);
+    ClearTargetWindowId(pointerId);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
+    if (autoGenDown) {
+        item.SetWindowX(shiftWindowInfo.x);
+        item.SetWindowY(shiftWindowInfo.y);
+        if (shiftWindowInfo.x == -1 && shiftWindowInfo.y == -1) {
+            item.SetWindowX(lastLogicX_ - targetWindowInfo.area.x);
+            item.SetWindowY(lastLogicY_ - targetWindowInfo.area.y);
+        }
+        item.SetPressed(true);
+        pointerEvent->ClearButtonPressed();
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+        pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+        pointerEvent->UpdatePointerItem(pointerId, item);
+        pointerEvent->SetTargetDisplayId(targetWindowInfo.displayId);
+        pointerEvent->SetTargetWindowId(targetWindowInfo.id);
+        pointerEvent->SetAgentWindowId(targetWindowInfo.agentWindowId);
+        HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event dispatch down event");
+        InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
+    }
+    firstBtnDownWindowId_ = targetWindowInfo.id;
+    MMI_HILOGI("shift pointer event success for mouse");
+    return RET_OK;
+}
+
+int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
+{
+    MMI_HILOGI("Start shift pointer event, sourceWindowId: %{public}d, targetWindowId: %{public}d,"
+               "x: %{private}d, y: %{private}d, autoGenDown: %{public}d",
+        param.sourceWindowId, param.targetWindowId, param.x, param.y, static_cast<int32_t>(autoGenDown));
+    std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(param.sourceWindowId);
+    std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(param.targetWindowId);
+    if (!sourceWindowInfo || !targetWindowInfo) {
+        MMI_HILOGE("Failed shift pointerEvent, get null sourceWindowInfo, source:%{public}d, target:%{public}d",
+        static_cast<int32_t>(!!sourceWindowInfo), static_cast<int32_t>(!!targetWindowInfo));
+        return RET_ERR;
+    }
+    ShiftWindowInfo shiftWindowInfo;
+    shiftWindowInfo.sourceWindowInfo = *sourceWindowInfo;
+    shiftWindowInfo.targetWindowInfo = *targetWindowInfo;
+    shiftWindowInfo.x = param.x;
+    shiftWindowInfo.y = param.y;
+    return ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
