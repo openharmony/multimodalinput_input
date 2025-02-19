@@ -2456,5 +2456,21 @@ int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, CustomCursor cursor,
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
+
+int32_t InputManagerImpl::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (param.sourceWindowId == param.targetWindowId) {
+        MMI_HILOGE("Failed shift pointer Event, sourceWindowId can't be equal to targetWindowId");
+        return ARGV_VALID;
+    }
+    return MULTIMODAL_INPUT_CONNECT_MGR->ShiftAppPointerEvent(param, autoGenDown);
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
 } // namespace MMI
 } // namespace OHOS

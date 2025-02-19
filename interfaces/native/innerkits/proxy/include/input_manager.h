@@ -40,6 +40,7 @@
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "shift_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -972,6 +973,16 @@ public:
      * @since 14
      */
     int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
+
+    /**
+     * @brief shift AppPointerEvent from source window to target window
+     * @param param - param for shift pointer event.
+     * @param autoGenDown - send down event if true.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown = true);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

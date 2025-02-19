@@ -21,6 +21,7 @@
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "pre_monitor_manager.h"
+#include "hitrace_meter.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManager"
@@ -650,6 +651,12 @@ int32_t InputManager::GetIntervalSinceLastInput(int64_t &timeInterval)
 int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
 {
     return InputMgrImpl.SetCustomCursor(windowId, cursor, options);
+}
+
+int32_t InputManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event entry");
+    return InputMgrImpl.ShiftAppPointerEvent(param, autoGenDown);
 }
 } // namespace MMI
 } // namespace OHOS
