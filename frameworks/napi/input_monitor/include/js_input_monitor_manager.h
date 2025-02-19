@@ -41,13 +41,18 @@ public:
     void RemoveMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers = 0);
     void RemoveMonitor(napi_env jsEnv, const std::string &typeName, const int32_t fingers = 0);
     void RemoveMonitor(napi_env jsEnv);
+    void AddPreMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, std::vector<int32_t> keys);
     void OnPointerEventByMonitorId(int32_t id, int32_t fingers, std::shared_ptr<PointerEvent> pointEvent);
+    void OnKeyEventByMonitorId(int32_t id, std::shared_ptr<KeyEvent> keyEvent);
     const std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id, int32_t fingers);
+    const std::shared_ptr<JsInputMonitor> GetPreMonitor(int32_t id);
     std::string GetMonitorTypeName(int32_t id, int32_t fingers);
+    std::string GetPreMonitorTypeName(int32_t id);
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
     void RemoveEnv(napi_env env);
     void ThrowError(napi_env env, int32_t code);
     std::vector<Rect> GetHotRectAreaList(napi_env env, napi_value rectNapiValue, uint32_t rectListLength);
+    bool GetKeysArray(napi_env env, napi_value keysNapiValue, uint32_t keysLength, std::vector<int32_t>& keys);
 
 private:
     JsInputMonitorManager() = default;

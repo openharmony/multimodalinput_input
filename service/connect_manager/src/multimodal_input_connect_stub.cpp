@@ -47,6 +47,7 @@ namespace {
 constexpr int32_t MAX_AXIS_INFO { 64 };
 constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 const std::string SCENEBOARD_NAME { "com.ohos.sceneboard" };
+constexpr int32_t KEY_MAX_LIST_SIZE { 5 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -236,11 +237,20 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER):
             ret = StubRemoveInputHandler(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_PRE_INPUT_HANDLER):
+            ret = StubAddPreInputHandler(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_PRE_INPUT_HANDLER):
+            ret = StubRemovePreInputHandler(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED):
             ret = StubMarkEventConsumed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MOVE_MOUSE):
             ret = StubMoveMouseEvent(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SHIFT_APP_POINTER_EVENT):
+            ret = StubShiftAppPointerEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_KEY_EVENT):
             ret = StubInjectKeyEvent(data, reply);
@@ -419,6 +429,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_CURSOR_SURFACE_ID):
             ret = StubGetCursorSurfaceId(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_MOUSE_CURSOR):
+            ret = StubSetCustomMouseCursor(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
@@ -1197,6 +1210,72 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubAddPreInputHandler(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t handlerId = -1;
+    READINT32(data, handlerId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t eventType = 0;
+    READINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::vector<int32_t> keys;
+    int32_t keysLen = 0;
+    int32_t key = 0;
+    READINT32(data, keysLen, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (keysLen <= 0 || keysLen > KEY_MAX_LIST_SIZE) {
+        MMI_HILOGE("Invalid keysLen:%{public}d", keysLen);
+        return RET_ERR;
+    }
+    for (int32_t i = 0; i < keysLen; ++i) {
+        READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
+        keys.push_back(key);
+    }
+
+    int32_t ret = AddPreInputHandler(handlerId, eventType, keys);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call AddPreInputHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemovePreInputHandler(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t handlerId = -1;
+    READINT32(data, handlerId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemovePreInputHandler(handlerId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RemovePreInputHandler failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -2628,6 +2707,57 @@ int32_t MultimodalInputConnectStub::StubGetIntervalSinceLastInput(MessageParcel&
         WRITEINT64(reply, timeInterval);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubShiftAppPointerEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    ShiftWindowParam param;
+    READINT32(data, param.sourceWindowId, ERR_INVALID_VALUE);
+    READINT32(data, param.targetWindowId, ERR_INVALID_VALUE);
+    READINT32(data, param.x, ERR_INVALID_VALUE);
+    READINT32(data, param.y, ERR_INVALID_VALUE);
+    bool autoGenDown = true;
+    READBOOL(data, autoGenDown, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = ShiftAppPointerEvent(param, autoGenDown);
+    if (ret != RET_OK) {
+        MMI_HILOGE("shift AppPointerEvent failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetCustomMouseCursor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t windowId = 0;
+    CustomCursor cursor;
+    CursorOptions options;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    OHOS::Media::PixelMap* pixelMapPtr = Media::PixelMap::Unmarshalling(data);
+    CHKPR(pixelMapPtr, RET_ERR);
+    cursor.pixelMap = (void*)pixelMapPtr;
+    READINT32(data, cursor.focusX, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, cursor.focusY, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, options.followSystem, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SetCustomCursor(windowId, cursor, options);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

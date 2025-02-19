@@ -380,6 +380,21 @@ int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handl
     return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
 }
 
+int32_t MultimodalInputConnectManager::AddPreInputHandler(int32_t handlerId, HandleEventType eventType,
+    std::vector<int32_t> keys)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddPreInputHandler(handlerId, eventType, keys);
+}
+
+int32_t MultimodalInputConnectManager::RemovePreInputHandler(int32_t handlerId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemovePreInputHandler(handlerId);
+}
+
 int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -855,6 +870,21 @@ int32_t MultimodalInputConnectManager::GetIntervalSinceLastInput(int64_t &timeIn
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetIntervalSinceLastInput(timeInterval);
+}
+
+int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetCustomCursor(windowId, cursor, options);
+}
+
+int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->ShiftAppPointerEvent(param, autoGenDown);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -47,6 +47,7 @@ public:
     int32_t GetPointerSize(int32_t &size) override;
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
@@ -77,6 +78,8 @@ public:
         int32_t priority, uint32_t deviceTags) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) override;
+    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) override;
+    int32_t RemovePreInputHandler(int32_t handlerId) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
@@ -140,6 +143,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 	int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SkipPointerLayer(bool isSkip) override;
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

@@ -44,6 +44,8 @@ struct Input_KeyEvent {
     int32_t action;
     int32_t keyCode;
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_MouseEvent {
@@ -54,6 +56,8 @@ struct Input_MouseEvent {
     int32_t axisType { -1 };
     float axisValue { 0.0f };
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_TouchEvent {
@@ -62,6 +66,8 @@ struct Input_TouchEvent {
     int32_t displayX;
     int32_t displayY;
     int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 struct Input_AxisEvent {
@@ -72,6 +78,8 @@ struct Input_AxisEvent {
     int64_t actionTime { -1 };
     int32_t sourceType;
     int32_t axisEventType { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
 };
 
 constexpr int32_t SIZE_ARRAY = 64;
@@ -337,6 +345,30 @@ int64_t OH_Input_GetKeyEventActionTime(const struct Input_KeyEvent* keyEvent)
     return keyEvent->actionTime;
 }
 
+void OH_Input_SetKeyEventWindowId(struct Input_KeyEvent* keyEvent, int32_t windowId)
+{
+    CHKPV(keyEvent);
+    keyEvent->windowId = windowId;
+}
+
+int32_t OH_Input_GetKeyEventWindowId(const struct Input_KeyEvent* keyEvent)
+{
+    CHKPR(keyEvent, RET_ERR);
+    return keyEvent->windowId;
+}
+
+void OH_Input_SetKeyEventDisplayId(struct Input_KeyEvent* keyEvent, int32_t displayId)
+{
+    CHKPV(keyEvent);
+    keyEvent->displayId = displayId;
+}
+
+int32_t OH_Input_GetKeyEventDisplayId(const struct Input_KeyEvent* keyEvent)
+{
+    CHKPR(keyEvent, RET_ERR);
+    return keyEvent->displayId;
+}
+
 static int32_t HandleMouseButton(const struct Input_MouseEvent* mouseEvent)
 {
     int32_t button = mouseEvent->button;
@@ -581,6 +613,34 @@ int64_t OH_Input_GetMouseEventActionTime(const struct Input_MouseEvent* mouseEve
     return mouseEvent->actionTime;
 }
 
+void OH_Input_SetMouseEventWindowId(struct Input_MouseEvent* mouseEvent, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(mouseEvent);
+    mouseEvent->windowId = windowId;
+}
+
+int32_t OH_Input_GetMouseEventWindowId(const struct Input_MouseEvent* mouseEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(mouseEvent, RET_ERR);
+    return mouseEvent->windowId;
+}
+
+void OH_Input_SetMouseEventDisplayId(struct Input_MouseEvent* mouseEvent, int32_t displayId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(mouseEvent);
+    mouseEvent->displayId = displayId;
+}
+
+int32_t OH_Input_GetMouseEventDisplayId(const struct Input_MouseEvent* mouseEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(mouseEvent, RET_ERR);
+    return mouseEvent->displayId;
+}
+
 static void HandleTouchActionDown(OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
 {
     auto pointIds = g_touchEvent->GetPointerIds();
@@ -782,6 +842,34 @@ int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEve
     return touchEvent->actionTime;
 }
 
+void OH_Input_SetTouchEventWindowId(struct Input_TouchEvent* touchEvent, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    touchEvent->windowId = windowId;
+}
+
+int32_t OH_Input_GetTouchEventWindowId(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(touchEvent, RET_ERR);
+    return touchEvent->windowId;
+}
+
+void OH_Input_SetTouchEventDisplayId(struct Input_TouchEvent* touchEvent, int32_t displayId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    touchEvent->displayId = displayId;
+}
+
+int32_t OH_Input_GetTouchEventDisplayId(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(touchEvent, RET_ERR);
+    return touchEvent->displayId;
+}
+
 void OH_Input_CancelInjection()
 {
     CALL_DEBUG_ENTER;
@@ -951,6 +1039,36 @@ Input_Result OH_Input_GetAxisEventSourceType(const Input_AxisEvent* axisEvent, I
     return INPUT_SUCCESS;
 }
 
+Input_Result OH_Input_SetAxisEventWindowId(Input_AxisEvent* axisEvent, int32_t windowId)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->windowId = windowId;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventWindowId(const Input_AxisEvent* axisEvent, int32_t* windowId)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(windowId, INPUT_PARAMETER_ERROR);
+    *windowId = axisEvent->windowId;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventDisplayId(Input_AxisEvent* axisEvent, int32_t displayId)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->displayId = displayId;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventDisplayId(const Input_AxisEvent* axisEvent, int32_t* displayId)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(displayId, INPUT_PARAMETER_ERROR);
+    *displayId = axisEvent->displayId;
+    return INPUT_SUCCESS;
+}
+
 static Input_Result NormalizeResult(int32_t result)
 {
     if (result < RET_OK) {
@@ -990,6 +1108,8 @@ static void KeyEventMonitorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
     }
     keyEvent->keyCode = event->GetKeyCode();
     keyEvent->actionTime = event->GetActionTime();
+    keyEvent->windowId = event->GetTargetWindowId();
+    keyEvent->displayId = event->GetTargetDisplayId();
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_keyMonitorCallbacks) {
         callback(keyEvent);
@@ -1079,6 +1199,8 @@ static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
     touchEvent->displayX = item.GetDisplayX();
     touchEvent->displayY = item.GetDisplayY();
     touchEvent->actionTime = event->GetActionTime();
+    touchEvent->windowId = event->GetTargetWindowId();
+    touchEvent->displayId = event->GetTargetDisplayId();
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_touchMonitorCallbacks) {
         callback(touchEvent);
@@ -1160,6 +1282,8 @@ static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
     mouseEvent->displayX = item.GetDisplayX();
     mouseEvent->displayY = item.GetDisplayY();
     mouseEvent->actionTime = event->GetActionTime();
+    mouseEvent->windowId = event->GetTargetWindowId();
+    mouseEvent->displayId = event->GetTargetDisplayId();
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_mouseMonitorCallbacks) {
         callback(mouseEvent);
@@ -1205,6 +1329,8 @@ static void AxisEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> ev
     axisEvent->displayY = item.GetDisplayY();
     axisEvent->actionTime = event->GetActionTime();
     axisEvent->sourceType = event->GetSourceType();
+    axisEvent->windowId = event->GetTargetWindowId();
+    axisEvent->displayId = event->GetTargetDisplayId();
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_axisMonitorAllCallbacks) {
         callback(axisEvent);
@@ -1451,6 +1577,8 @@ static void KeyEventInterceptorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> eve
     }
     keyEvent->keyCode = event->GetKeyCode();
     keyEvent->actionTime = event->GetActionTime();
+    keyEvent->windowId = event->GetTargetWindowId();
+    keyEvent->displayId = event->GetTargetDisplayId();
     std::lock_guard guard(g_mutex);
     if (g_keyInterceptorCallback != nullptr) {
         g_keyInterceptorCallback(keyEvent);
@@ -1505,6 +1633,8 @@ static void TouchEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     touchEvent->displayX = item.GetDisplayX();
     touchEvent->displayY = item.GetDisplayY();
     touchEvent->actionTime = event->GetActionTime();
+    touchEvent->windowId = event->GetTargetWindowId();
+    touchEvent->displayId = event->GetTargetDisplayId();
     g_pointerInterceptorCallback->touchCallback(touchEvent);
     OH_Input_DestroyTouchEvent(&touchEvent);
 }
@@ -1537,6 +1667,8 @@ static void MouseEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     mouseEvent->displayX = item.GetDisplayX();
     mouseEvent->displayY = item.GetDisplayY();
     mouseEvent->actionTime = event->GetActionTime();
+    mouseEvent->windowId = event->GetTargetWindowId();
+    mouseEvent->displayId = event->GetTargetDisplayId();
     g_pointerInterceptorCallback->mouseCallback(mouseEvent);
     OH_Input_DestroyMouseEvent(&mouseEvent);
 }
@@ -1568,6 +1700,8 @@ static void AxisEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent
     axisEvent->displayY = item.GetDisplayY();
     axisEvent->actionTime = event->GetActionTime();
     axisEvent->sourceType = event->GetSourceType();
+    axisEvent->windowId = event->GetTargetWindowId();
+    axisEvent->displayId = event->GetTargetDisplayId();
     g_pointerInterceptorCallback->axisCallback(axisEvent);
     OH_Input_DestroyAxisEvent(&axisEvent);
 }

@@ -75,6 +75,10 @@ public:
     {
         return pid;
     }
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override
+    {
+        return windowId;
+    }
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override { return retSetMouseIcon_; }
     int32_t SetPointerSize(int32_t size) override
     {
@@ -156,6 +160,14 @@ public:
         int32_t priority, uint32_t deviceTags) override { return priority; }
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) override { return priority; }
+    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) override
+    {
+        return RET_OK;
+    }
+    int32_t RemovePreInputHandler(int32_t handlerId) override
+    {
+        return RET_OK;
+    }
     int32_t MarkEventConsumed(int32_t eventId) override { return eventId; }
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override { return offsetX; }
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override
@@ -287,6 +299,11 @@ public:
     int32_t SkipPointerLayer(bool isSkip) override
     {
         return skipMouseLayer_;
+    }
+
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override
+    {
+        return static_cast<int32_t>(autoGenDown);
     }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -7376,5 +7393,40 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadDoubleTapAndDragState_00
     EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadDoubleTapAndDragState(data, reply));
 }
 
+/**
+ * @tc.name: StubShiftAppPointerEvent_001
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_001, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubShiftAppPointerEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubShiftAppPointerEvent_002
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_002, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubShiftAppPointerEvent(data, reply));
+}
 } // namespace MMI
 } // namespace OHOS

@@ -105,7 +105,7 @@ private:
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
+    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t& button, int32_t type);
     DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();

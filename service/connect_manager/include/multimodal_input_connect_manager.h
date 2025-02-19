@@ -54,6 +54,7 @@ public:
     int32_t GetPointerSize(int32_t &size);
     int32_t GetCursorSurfaceId(uint64_t &surfaceId);
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
@@ -85,6 +86,8 @@ public:
         uint32_t deviceTags);
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
+    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys);
+    int32_t RemovePreInputHandler(int32_t handlerId);
     int32_t MarkEventConsumed(int32_t eventId);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
@@ -146,6 +149,8 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
 
 private:
     MultimodalInputConnectManager() = default;

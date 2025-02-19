@@ -22,6 +22,7 @@
             OHOS::MMI::InputInterceptorManager*;
             OHOS::MMI::InputManager*;
             OHOS::MMI::InputManagerImpl*;
+            OHOS::MMI::PreMonitorManager*;
             OHOS::MMI::InputMonitorManager*;
             OHOS::MMI::KeyEvent*;
             OHOS::MMI::KeyEventInputSubscribeManager*;
