@@ -96,6 +96,7 @@ private:
 private:
     bool sessionLostCallbackInitialized_ { false };
     InterceptorCollection interceptors_;
+    static std::unique_ptr<std::string> keyevent_intercept_whitelist;
 };
 } // namespace MMI
 } // namespace OHOS
