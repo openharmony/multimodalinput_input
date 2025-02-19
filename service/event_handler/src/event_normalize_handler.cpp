@@ -656,7 +656,6 @@ int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
     BytraceAdapter::StopPackageEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(keyEvent);
-    EventStatistic::PushEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -675,7 +674,6 @@ int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
     nextHandler_->HandlePointerEvent(pointerEvent);
     joystick_.CheckIntention(pointerEvent, [this](std::shared_ptr<KeyEvent> keyEvent) {
         BytraceAdapter::StartBytrace(keyEvent);
-        EventStatistic::PushEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
