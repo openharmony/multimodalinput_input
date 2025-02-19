@@ -65,6 +65,7 @@ group("test") {
     "setpointervisible_fuzzer:fuzztest",
     "setshieldstatus_fuzzer:fuzztest",
     "setwindowinputeventconsumer_fuzzer:fuzztest",
+    "shiftapppointerevent_fuzzer:fuzztest",
     "simulateinputevent_fuzzer:fuzztest",
     "skippointerlayer_fuzzer:fuzztest",
     "stubaddinputeventfilter_fuzzer:fuzztest",

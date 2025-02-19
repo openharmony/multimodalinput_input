@@ -878,5 +878,13 @@ int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomC
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCustomCursor(windowId, cursor, options);
 }
+
+int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->ShiftAppPointerEvent(param, autoGenDown);
+}
 } // namespace MMI
 } // namespace OHOS

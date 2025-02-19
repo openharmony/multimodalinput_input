@@ -150,6 +150,8 @@ public:
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
+
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

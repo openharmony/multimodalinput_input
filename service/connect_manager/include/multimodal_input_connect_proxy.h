@@ -143,6 +143,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 	int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SkipPointerLayer(bool isSkip) override;
+    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
