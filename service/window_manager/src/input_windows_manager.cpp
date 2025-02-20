@@ -5185,12 +5185,9 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
 
 int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown)
 {
-    if (!lastPointerEvent_) {
-        MMI_HILOGE("Failed shift pointerEvent, lastPointerEvent_ is null");
+    if (!lastPointerEvent_ || !lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
+        MMI_HILOGE("Failed shift pointerEvent, left mouse button is not pressed");
         return RET_ERR;
-    }
-    if (!lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
-        MMI_HILOGD("shift pointerEvent, current mouse left mouse button is not pressed");
     }
     const WindowInfo &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
     const WindowInfo &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
@@ -5231,7 +5228,7 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
         InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
     }
     firstBtnDownWindowInfo_.first = targetWindowInfo.id;
-    MMI_HILOGI("Shift pointer event success for mouse");
+    MMI_HILOGI("shift pointer event success for mouse");
     return RET_OK;
 }
 
