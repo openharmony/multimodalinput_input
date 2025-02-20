@@ -37,7 +37,7 @@ namespace {
 [[ maybe_unused ]] constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME { 50000 };
 [[ maybe_unused ]] constexpr int32_t INVALID_OR_PROCESSED_ID { -1 };
 [[ maybe_unused ]] constexpr int32_t TIME_TRANSITION { 1000 };
-constexpr int32_t PRINT_INTERVAL_COUNT { 30 };
+constexpr int32_t PRINT_INTERVAL_COUNT { 100 };
 } // namespace
 
 ANRHandler::ANRHandler() {}
