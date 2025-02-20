@@ -412,6 +412,10 @@
         "name": "OH_Input_UnregisterDeviceListeners"
     },
     {
+        "first_introduced": "15",
+        "name": "OH_Input_GetFunctionKeyState"
+    },
+    {
         "first_introduced": "13",
         "name": "OH_Input_GetIntervalSinceLastInput"
     },

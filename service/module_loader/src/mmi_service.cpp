@@ -1824,9 +1824,10 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, funcKey, enable] {
-            return sMsgHandler_.OnSetFunctionKeyState(funcKey, enable);
+        [this, clientPid, funcKey, enable] {
+            return sMsgHandler_.OnSetFunctionKeyState(clientPid, funcKey, enable);
         }
         );
     if (ret != RET_OK) {

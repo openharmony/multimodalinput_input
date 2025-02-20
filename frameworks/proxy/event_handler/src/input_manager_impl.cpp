@@ -1706,19 +1706,21 @@ void InputManagerImpl::OnAnr(int32_t pid, int32_t eventId)
     MMI_HILOG_ANRDETECTI("ANR noticed pid:%{public}d eventId:%{public}d", pid, eventId);
 }
 
-bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
+int32_t InputManagerImpl::GetFunctionKeyState(int32_t funcKey, bool &resultState)
 {
     CALL_INFO_TRACE;
+    int32_t ret = -1;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool state { false };
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetFunctionKeyState(funcKey, state);
+    ret = MULTIMODAL_INPUT_CONNECT_MGR->GetFunctionKeyState(funcKey, state);
+    resultState = state;
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
-    return state;
+    return ret;
 #else
     MMI_HILOGW("Keyboard device does not support");
-    return false;
+    return ret;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -1729,7 +1731,7 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetFunctionKeyState(funcKey, enable);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 #else
