@@ -212,8 +212,8 @@ private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
-    void PrintHighZorder(const std::vector<WindowInfo> &windowsInfo, std::shared_ptr<PointerEvent> pointerEvent,
-        const WindowInfo &targetWindow);
+    void PrintHighZorder(const std::vector<WindowInfo> &windowsInfo, int32_t pointerAction,
+        int32_t targetWindowId, int32_t logicalX, int32_t logicalY);
     void PrintZorderInfo(const WindowInfo &windowInfo, std::string &window);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
