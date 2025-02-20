@@ -47,6 +47,7 @@ private:
     bool DumpInner();
 private:
     const int32_t deviceId_ { -1 };
+    int32_t processedCount_ { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     std::unordered_map<int32_t, bool> pointerItemCancelMarks_;
