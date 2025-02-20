@@ -40,6 +40,7 @@ private:
     void InitToolTypes();
 private:
     int32_t buttonId_ { -1 };
+    int32_t processedCount_ { 0 };
     const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     bool isPressed_ { false };

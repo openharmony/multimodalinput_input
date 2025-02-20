@@ -34,7 +34,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr int32_t POINTER_MOVEFLAG = { 7 };
+constexpr int32_t POINTER_MOVEFLAG { 7 };
+constexpr int32_t PRINT_INTERVAL_COUNT { 100 };
 }
 
 Remote_ControlTransformProcessor::Remote_ControlTransformProcessor(int32_t deviceId)
@@ -76,7 +77,11 @@ std::shared_ptr<PointerEvent> Remote_ControlTransformProcessor::OnEvent(struct l
             return pointerEvent_;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            CHKFR(OnEventTouchMotion(event), nullptr, "Get OnEventTvTouchMotion failed");
+            processedCount_++;
+            if (!OnEventTouchMotion(event) && (processedCount_ == PRINT_INTERVAL_COUNT)) {
+                MMI_HILOGE("Get OnEventTvTouchMotion failed");
+                processedCount_ = 0;
+            }
             break;
         }
         default: {

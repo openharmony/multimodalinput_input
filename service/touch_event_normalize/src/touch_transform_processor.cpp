@@ -39,6 +39,7 @@ constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t DRIVER_NUMBER { 8 };
 constexpr uint32_t TOUCH_CANCEL_MASK { 1U << 29U };
+constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
 } // namespace
 
 TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
@@ -166,7 +167,11 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
     if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
-        MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
+        processedCount_++;
+        if (processedCount_ == PRINT_INTERVAL_COUNT) {
+            MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
+            processedCount_ = 0;
+        }
         return false;
     }
     PointerEvent::PointerItem item;
