@@ -1635,6 +1635,56 @@ void InputWindowsManager::NotifyPointerToWindow()
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+void InputWindowsManager::PrintHighZorder(const std::vector<WindowInfo> &windowsInfo, int32_t pointerAction,
+    int32_t targetWindowId, int32_t logicalX, int32_t logicalY)
+{
+    std::optional<WindowInfo> info = GetWindowInfoById(targetWindowId);
+    if (!info) {
+        return;
+    }
+    WindowInfo targetWindow = *info;
+    bool isPrint = false;
+    std::string windowPrint;
+    windowPrint += StringPrintf("highZorder");
+    for (const auto &windowInfo : windowsInfo) {
+        if (MMI_GNE(windowInfo.zOrder, targetWindow.zOrder) && !windowInfo.flags &&
+            pointerAction == PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+            windowInfo.windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+            windowInfo.windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE &&
+            windowInfo.windowInputType != WindowInputType::TRANSMIT_ALL) {
+            if (IsInHotArea(logicalX, logicalY, windowInfo.pointerHotAreas, windowInfo)) {
+                PrintZorderInfo(windowInfo, windowPrint);
+                isPrint = true;
+            }
+        }
+    }
+    if (isPrint) {
+        MMI_HILOGW("%{public}s", windowPrint.c_str());
+    }
+}
+
+void InputWindowsManager::PrintZorderInfo(const WindowInfo &windowInfo, std::string &windowPrint)
+{
+    windowPrint += StringPrintf("|");
+    windowPrint += StringPrintf("%d", windowInfo.id);
+    windowPrint += StringPrintf("|");
+    windowPrint += StringPrintf("%d", windowInfo.pid);
+    windowPrint += StringPrintf("|");
+    windowPrint += StringPrintf("%.2f", windowInfo.zOrder);
+    windowPrint += StringPrintf("|");
+    for (const auto &win : windowInfo.defaultHotAreas) {
+        windowPrint += StringPrintf("%d ", win.x);
+        windowPrint += StringPrintf("%d ", win.y);
+        windowPrint += StringPrintf("%d ", win.width);
+        windowPrint += StringPrintf("%d,", win.height);
+    }
+    windowPrint += StringPrintf("|");
+    for (auto it : windowInfo.transform) {
+        windowPrint += StringPrintf("%.2f,", it);
+    }
+    windowPrint += StringPrintf("|");
+}
+
 void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
     std::string window;
@@ -2521,6 +2571,9 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         firstBtnDownWindowInfo_ = { axisBeginWindowInfo_->id, axisBeginWindowInfo_->displayId };
     }
     MMI_HILOG_DISPATCHD("firstBtnDownWindowInfo_.first:%{public}d", firstBtnDownWindowInfo_.first);
+#ifdef OHOS_BUILD_PC_PRIORITY
+    PrintHighZorder(windowsInfo, pointerEvent->GetPointerAction(), firstBtnDownWindowInfo_.first, logicalX, logicalY);
+#endif // OHOS_BUILD_PC_PRIORITY
     for (const auto &item : windowsInfo) {
         for (const auto &windowInfo : item.uiExtentionWindowInfo) {
             if (windowInfo.id == firstBtnDownWindowInfo_.first) {
