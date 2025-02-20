@@ -2823,13 +2823,15 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             axisBeginWindowInfo_ == std::nullopt)) {
             MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
             if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
-                IsMouseDrawing(pointerEvent->GetPointerAction())) {
+                IsMouseDrawing(pointerEvent->GetPointerAction()) &&
+                pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
                     MMI_HILOGD("Turn the mouseDisplay from false to true");
                     IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
             }
             int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER) &&
+            pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
                 IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
             } else {
                 IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
@@ -2877,7 +2879,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             timerId_ = DEFAULT_VALUE;
         }
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
-            IsMouseDrawing(pointerEvent->GetPointerAction())) {
+            IsMouseDrawing(pointerEvent->GetPointerAction()) &&
+            pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
             MMI_HILOGD("Turn the mouseDisplay from false to true");
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
         }
@@ -2905,7 +2908,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_EMULATOR
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN &&
-        !IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        !IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+        pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
         IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     }
 #endif
