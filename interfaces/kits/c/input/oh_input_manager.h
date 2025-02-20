@@ -250,6 +250,8 @@ typedef enum Input_Result {
     INPUT_DEVICE_NOT_SUPPORTED = 801,
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
+    /** There is currently no keyboard device connected */
+    INPUT_DEVICE_NOT_EXIST = 3900002,
     /** Interceptor repeatedly created for an application */
     INPUT_REPEAT_INTERCEPTOR = 4200001,
     /**
@@ -1753,6 +1755,20 @@ Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *ven
  * @since 13
  */
 Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **address);
+
+/**
+ * @brief Obtains the function key status.
+ *
+ * @param keyCode Function key value. Supported function keys include capsLock, NumLock, and ScrollLock.
+ * @param state Function key status. The value 0 indicates that the function key is disabled,
+ * and the value 1 indicates the opposite.
+ * @return OH_Input_GetFunctionKeyState function api result code
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if keyCode is invalid or state is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 15
+ */
+Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state);
 
 /**
  * @brief Registers a listener for device hot swap events.

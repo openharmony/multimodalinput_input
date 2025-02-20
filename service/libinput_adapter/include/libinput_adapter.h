@@ -46,6 +46,8 @@ public:
     }
 
 private:
+    void MultiKeyboardSetLedState(bool oldCapsLockState);
+    void MultiKeyboardSetFuncState(libinput_event* event);
     void OnEventHandler();
     void OnDeviceAdded(std::string path);
     void OnDeviceRemoved(std::string path);

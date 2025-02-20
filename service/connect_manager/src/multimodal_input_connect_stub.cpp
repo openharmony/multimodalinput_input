@@ -1661,6 +1661,10 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckFunctionKeyEnabled()) {
+        MMI_HILOGE("Set function key state permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;

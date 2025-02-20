@@ -26,6 +26,9 @@
 #include "define_multimodal.h"
 #include "i_input_windows_manager.h"
 #include "util.h"
+#include "input_device_manager.h"
+#include "key_event_normalize.h"
+
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -37,6 +40,7 @@ namespace MMI {
 namespace {
 constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
 constexpr int32_t MAX_RETRY_COUNT { 5 };
+constexpr uint32_t KEY_CAPSLOCK { 58 };
 
 void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
@@ -164,6 +168,7 @@ void LibinputAdapter::OnEventHandler()
     libinput_event *event = nullptr;
     int64_t frameTime = GetSysClockTime();
     while ((event = libinput_get_event(input_))) {
+        MultiKeyboardSetFuncState(event);
         funInputEvent_(event, frameTime);
         libinput_event_destroy(event);
     }
@@ -206,6 +211,34 @@ void LibinputAdapter::OnDeviceRemoved(std::string path)
         devices_.erase(pos);
         // Libinput doesn't signal device removing event in path mode. Process manually.
         OnEventHandler();
+    }
+}
+
+void LibinputAdapter::MultiKeyboardSetLedState(bool oldCapsLockState)
+{
+    std::vector<struct libinput_device*> input_device;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
+    for (auto it = input_device.begin(); it != input_device.end(); ++it) {
+        auto setDevice = (*it);
+        CHKPV(setDevice);
+        DeviceLedUpdate(setDevice, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockState);
+    }
+}
+
+void LibinputAdapter::MultiKeyboardSetFuncState(libinput_event* event)
+{
+    libinput_event_type eventType = libinput_event_get_type(event);
+    if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
+            struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
+            CHKPV(keyboardEvent);
+            std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+            if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED
+			   && libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK
+			   && keyEvent != nullptr) {
+                bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+                MultiKeyboardSetLedState(oldCapsLockOn);
+                keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
+            }
     }
 }
 } // namespace MMI

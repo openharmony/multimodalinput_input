@@ -567,5 +567,20 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
     EXPECT_EQ(OH_Input_RegisterDeviceListener(&listener), INPUT_PARAMETER_ERROR);
     EXPECT_EQ(OH_Input_UnregisterDeviceListener(&listener), INPUT_PARAMETER_ERROR);
 }
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState
+ * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001, TestSize.Level1)
+{
+    int32_t keyCode = 1;
+    int32_t state = -1;
+    Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    int32_t res = 3900002;
+    EXPECT_EQ(retResult, res);
+}
 } // namespace MMI
 } // namespace OHOS

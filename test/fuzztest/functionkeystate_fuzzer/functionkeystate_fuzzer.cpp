@@ -45,7 +45,8 @@ void FunctionkeyStateFuzzTest(const uint8_t *data, size_t size)
     bool enable = (random % 2) ? false : true;
     InputManager::GetInstance()->SetFunctionKeyState(funcKey, enable);
 
-    InputManager::GetInstance()->GetFunctionKeyState(funcKey);
+    bool state = false;
+    InputManager::GetInstance()->GetFunctionKeyState(funcKey, state);
 }
 } // namespace MMI
 } // namespace OHOS

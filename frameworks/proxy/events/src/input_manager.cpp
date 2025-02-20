@@ -358,9 +358,9 @@ int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerSty
     return InputMgrImpl.GetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
-bool InputManager::GetFunctionKeyState(int32_t funcKey)
+int32_t InputManager::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
-    return InputMgrImpl.GetFunctionKeyState(funcKey);
+    return InputMgrImpl.GetFunctionKeyState(funcKey, state);
 }
 
 int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
