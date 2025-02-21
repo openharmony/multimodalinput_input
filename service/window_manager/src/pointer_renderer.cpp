@@ -119,119 +119,6 @@ int32_t RenderConfig::GetOffsetY() const
     }
 }
 
-int32_t RenderConfig::GetOffsetXRotated() const
-{
-    int32_t width = this->GetImageSize();
-    switch (this->align) {
-        case ANGLE_E:
-        case ANGLE_SW:
-            return FOCUS_POINT;
-        case ANGLE_NW:
-            return FOCUS_POINT + this->userIconHotSpotX;
-        case ANGLE_S:
-        case ANGLE_N:
-        case ANGLE_CENTER:
-            return FOCUS_POINT + width / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_W:
-        case ANGLE_SE:
-        case ANGLE_NE:
-            return FOCUS_POINT + width;
-        case ANGLE_NW_RIGHT:
-            return FOCUS_POINT + CALCULATE_MOUSE_ICON_BIAS;
-        default:
-            MMI_HILOGE("No need to calculate offset X");
-            return FOCUS_POINT;
-    }
-}
-
-int32_t RenderConfig::GetOffsetYRotated() const
-{
-    int32_t height = this->GetImageSize();
-    switch (this->align) {
-        case ANGLE_S:
-        case ANGLE_NE:
-        case ANGLE_NW_RIGHT:
-            return FOCUS_POINT;
-        case ANGLE_NW:
-            return FOCUS_POINT + this->userIconHotSpotY;
-        case ANGLE_E:
-        case ANGLE_CENTER:
-            return FOCUS_POINT + height / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_W:
-        case ANGLE_N:
-        case ANGLE_SE:
-        case ANGLE_SW:
-            return FOCUS_POINT + height;
-        default:
-            MMI_HILOGE("No need to calculate offset Y");
-            return FOCUS_POINT;
-    }
-}
-
-void RenderConfig::CalculateRotatedOffset(uint32_t rotation, int32_t &dx, int32_t &dy) const
-{
-    switch (rotation) {
-        case DIRECTION0:
-            dx = GetOffsetX();
-            dy = GetOffsetY();
-            break;
-        case DIRECTION90:
-            dx = GetOffsetX();
-            dy = GetOffsetYRotated();
-            break;
-        case DIRECTION180:
-            dx = GetOffsetXRotated();
-            dy = GetOffsetYRotated();
-            break;
-        case DIRECTION270:
-            dx = GetOffsetXRotated();
-            dy = GetOffsetY();
-            break;
-    }
-}
-
-void RenderConfig::RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_t &physicalY) const
-{
-    int32_t size = this->GetImageSize();
-    switch (this->align) {
-        case ANGLE_SW: {
-            physicalX -= size;
-            physicalY -= size;
-            break;
-        }
-        case ANGLE_NW_RIGHT: {
-            physicalX += CALCULATE_MOUSE_ICON_BIAS;
-            physicalY += CALCULATE_MOUSE_ICON_BIAS;
-            [[fallthrough]];
-        }
-        default: {
-            MMI_HILOGD("No need revert adjust mouse focus,iconType:%{public}d", this->align);
-            break;
-        }
-    }
-}
-
-void RenderConfig::RevertAdjustMouseFocusByRotation270(int32_t &physicalX, int32_t &physicalY) const
-{
-    int32_t size = this->GetImageSize();
-    switch (this->align) {
-        case ANGLE_SW: {
-            physicalX += size;
-            physicalY += size;
-            break;
-        }
-        case ANGLE_NW_RIGHT: {
-            physicalX -= CALCULATE_MOUSE_ICON_BIAS;
-            physicalY -= CALCULATE_MOUSE_ICON_BIAS;
-            [[fallthrough]];
-        }
-        default: {
-            MMI_HILOGD("No need revert adjust mouse focus,iconType:%{public}d", this->align);
-            break;
-        }
-    }
-}
-
 image_ptr_t PointerRenderer::UserIconScale(uint32_t width, uint32_t height, const RenderConfig &cfg)
 {
     image_ptr_t image = nullptr;
@@ -255,6 +142,7 @@ image_ptr_t PointerRenderer::UserIconScale(uint32_t width, uint32_t height, cons
 int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg)
 {
     CHKPR(addr, RET_ERR);
+    MMI_HILOGI("Render %{public}s", cfg.ToString().c_str());
 
     uint32_t addrSize = width * height * RENDER_STRIDE;
     if (cfg.style == MOUSE_ICON::TRANSPARENT_ICON) {
@@ -275,11 +163,10 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     if (cfg.direction) {
-        int32_t directionFlag = cfg.isHard ? -1 : 1;
+        int32_t directionFlag = cfg.isHard ? -1 : 0;
         int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
         canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
     }
-
     image_ptr_t image = nullptr;
     if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         image = LoadPointerImage(cfg);
@@ -534,11 +421,6 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    if (cfg.direction) {
-        int32_t directionFlag = cfg.isHard ? -1 : 1;
-        int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
-        canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
-    }
 
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
@@ -550,6 +432,13 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
     OHOS::Rosen::Drawing::Brush brush;
     brush.SetColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
     canvas.DrawBackground(brush);
+ 
+    if (cfg.direction) {
+        int32_t directionFlag = cfg.isHard ? -1 : 0;
+        int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
+        canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
+    }
+ 
     if (DrawImage(canvas, cfg) != RET_OK) {
         return RET_ERR;
     }
