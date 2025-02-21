@@ -79,6 +79,7 @@ constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 const char* PRODUCT_PHONE { "phone" };
+const char* PRODUCT_TYPE_PC = { "2in1" };
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager()
@@ -170,7 +171,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
             rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
         }
     } else {
-        if (displayInfo_.direction == DIRECTION90) {
+        if (displayInfo_.direction == DIRECTION90 && PRODUCT_TYPE != PRODUCT_TYPE_PC) {
             rectTopPosition_ = PHONE_RECT_TOP;
         }
     }
