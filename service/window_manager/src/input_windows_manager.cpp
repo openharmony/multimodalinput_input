@@ -1557,6 +1557,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         currentPointerItem.SetDisplayY(mouseLocation_.physicalY);
         pointerEvent->SetTargetDisplayId(mouseLocation_.displayId);
     } else {
+        if (IsMouseSimulate()) {
+            currentPointerItem.SetWindowX(lastPointerItem.GetWindowX());
+            currentPointerItem.SetWindowY(lastPointerItem.GetWindowY());
+        }
         currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
         currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
         pointerEvent->SetTargetDisplayId(lastPointerEvent_->GetTargetDisplayId());
