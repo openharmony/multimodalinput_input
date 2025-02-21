@@ -1148,7 +1148,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_00
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = 1;
-    int32_t windowId = -1;
+    int32_t windowId = 1;
     int32_t focusX = 2;
     int32_t focusY = 3;
     int32_t ret = pointerDrawingManager.SetCustomCursor((void *)pixelMap.get(), pid, windowId, focusX, focusY);

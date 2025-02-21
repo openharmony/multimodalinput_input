@@ -725,7 +725,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintDisplayInfo_001, 
     manager.displayGroupInfo_.focusWindowId = 1;
     manager.displayGroupInfo_.windowsInfo.push_back(WindowInfo());
     manager.displayGroupInfo_.displaysInfo.push_back(DisplayInfo());
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->PrintDisplayInfo());
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->PrintDisplayGroupInfo(manager.displayGroupInfo_));
 }
 
 /**
@@ -813,6 +813,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, Test
     info.direction = DIRECTION90;
     info.width = 800;
     info.height = 600;
+    info.validWidth = info.width;
+    info.validHeight = info.height;
     coord.x = 10;
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
@@ -834,6 +836,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_003, Test
     info.direction = DIRECTION180;
     info.width = 800;
     info.height = 600;
+    info.validWidth = info.width;
+    info.validHeight = info.height;
     coord.x = 10;
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
@@ -855,6 +859,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
     info.direction = DIRECTION270;
     info.width = 800;
     info.height = 600;
+    info.validWidth = info.width;
+    info.validHeight = info.height;
     coord.x = 10;
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
@@ -1058,6 +1064,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
     DisplayInfo displayInfo;
     displayInfo.width = 10;
     displayInfo.height = 20;
+    displayInfo.validWidth = info.width;
+    displayInfo.validHeight = info.height;
     displayInfo.direction = DIRECTION90;
     double physicalX = -5;
     double physicalY = 15;
@@ -1066,6 +1074,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
     EXPECT_EQ(physicalY, 9);
     displayInfo.width = 10;
     displayInfo.height = 20;
+    displayInfo.validWidth = info.width;
+    displayInfo.validHeight = info.height;
     displayInfo.direction = DIRECTION270;
     physicalX = 15;
     physicalY = 25;
@@ -1074,6 +1084,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
     EXPECT_EQ(physicalY, 9);
     displayInfo.width = 10;
     displayInfo.height = 20;
+    displayInfo.validWidth = info.width;
+    displayInfo.validHeight = info.height;
     displayInfo.direction = DIRECTION270;
     physicalX = -5;
     physicalY = -15;
@@ -1935,6 +1947,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInsideDisplay_001, T
     DisplayInfo displayInfo;
     displayInfo.width = 1920;
     displayInfo.height = 1080;
+    displayInfo.validWidth = info.width;
+    displayInfo.validHeight = info.height;
     int32_t physicalX = 500;
     int32_t physicalY = 10;
     bool result = WIN_MGR->IsInsideDisplay(displayInfo, physicalX, physicalY);
@@ -2025,6 +2039,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReverseRotateScreen_00
     info.direction = DIRECTION0;
     info.width = 1920;
     info.height = 1080;
+    info.validWidth = info.width;
+    info.validHeight = info.height;
     WIN_MGR->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);
     EXPECT_EQ(cursorPos.x, 100);
     EXPECT_EQ(cursorPos.y, 200);
@@ -3655,6 +3671,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo_002, Test
     displaysInfo.id = 2;
     displaysInfo.width = 20;
     displaysInfo.height = 30;
+    displaysInfo.validWidth = info.width;
+    displaysInfo.validHeight = info.height;
     displaysInfo.name = "name1";
     displaysInfo.uniq = "uniq1";
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
@@ -3680,6 +3698,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_002, Test
     displaysInfo.id = 2;
     displaysInfo.width = 30;
     displaysInfo.height = 40;
+    displaysInfo.validWidth = info.width;
+    displaysInfo.validHeight = info.height;
     displaysInfo.name = "name2";
     displaysInfo.uniq = "uniq2";
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
@@ -3705,6 +3725,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_002, Te
     displaysInfo.id = 3;
     displaysInfo.width = 40;
     displaysInfo.height = 50;
+    displaysInfo.validWidth = info.width;
+    displaysInfo.validHeight = info.height;
     displaysInfo.name = "name3";
     displaysInfo.uniq = "uniq3";
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);

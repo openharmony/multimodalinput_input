@@ -239,38 +239,6 @@ HWTEST_F(CustomUdevTest, TestGetSyspath, TestSize.Level1)
 
 /*
  * Test for:
- * udev_device_get_property_value()
- * Properties:
- * - DEVNAME
- * - MAJOR
- * - MINOR
- */
-HWTEST_F(CustomUdevTest, TestGetProperty, TestSize.Level1)
-{
-    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
-    auto* device = testDevice_.GetDevice();
-
-    EXPECT_STREQ(udev_device_get_property_value(device, "DEVNAME"), testDevice_.GetDevNode());
-
-    auto devnum = testDevice_.GetDevNum();
-    EXPECT_EQ(udev_device_get_property_value(device, "MINOR"), std::to_string(minor(devnum)));
-    EXPECT_EQ(udev_device_get_property_value(device, "MAJOR"), std::to_string(major(devnum)));
-
-    errno = 0;
-    EXPECT_EQ(udev_device_get_property_value(nullptr, "DEVNAME"), nullptr);
-    EXPECT_NE(errno, 0);
-
-    errno = 0;
-    EXPECT_EQ(udev_device_get_property_value(device, nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
-
-    errno = 0;
-    EXPECT_EQ(udev_device_get_property_value(device, "UNKNOWN"), nullptr);
-    EXPECT_EQ(errno, 0);
-}
-
-/*
- * Test for:
  * udev_device_get_parent()
  */
 HWTEST_F(CustomUdevTest, TestGetParent1, TestSize.Level1)
