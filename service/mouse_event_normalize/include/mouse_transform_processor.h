@@ -117,6 +117,10 @@ private:
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
+    int32_t UpdateMouseMoveLocation(const DisplayInfo* displayInfo, Offset &offset,
+        double &abs_x, double &abs_y, int32_t deviceType);
+    int32_t UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo, struct libinput_event* event,
+        Offset &offset, double &abs_x, double &abs_y, int32_t deviceType);
 #ifndef OHOS_BUILD_ENABLE_WATCH
     void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
