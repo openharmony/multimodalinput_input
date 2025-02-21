@@ -96,6 +96,8 @@ constexpr float FACTOR_18 { 1.0f };
 constexpr float FACTOR_27 { 1.2f };
 constexpr float FACTOR_55 { 1.6f };
 constexpr float FACTOR_MAX { 2.4f };
+constexpr double CONST_HALF { 0.5 };
+constexpr int32_t CONST_TWO { 2 };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -223,14 +225,18 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
     CalculateOffset(displayInfo, offset);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     if (displayInfo->ppi != 0) {
-        double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
-        double diagonalMm = sqrt(pow(displayInfo->physicalWidth, 2) + pow(displayInfo->physicalHeight, 2));
+        double displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height, CONST_TWO));
+        double diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
+            + pow(displayInfo->physicalHeight, CONST_TWO));
         double displayPpi = static_cast<double>(displayInfo->ppi);
-        if (displayInfo->validWidth != 0 && displayInfo->validHeight != 0 && 
+        if (displayInfo->validWidth != 0 && displayInfo->validHeight != 0 &&
             (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
-            displaySize = sqrt(pow(displayInfo->validWidth, 2) + pow(displayInfo->validHeight, 2));
-            diagonalMm = sqrt(pow(displayInfo->physicalWidth, 2) + pow(displayInfo->physicalHeight / 2, 2));
-            displayPpi = displaySize * MM_TO_INCH / diagonalMm;
+            displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
+            diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
+                + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
+            if ( diagonalMm > 0.0 ) {
+                displayPpi = displaySize * MM_TO_INCH / diagonalMm;
+            }            
         }
         int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
         float factor = ScreenFactor(diagonalInch);
@@ -244,8 +250,8 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
     }
 }
 
-int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo, struct libinput_event* event,
-    Offset &offset, double &abs_x, double &abs_y, int32_t deviceType)
+int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo,
+    struct libinput_event* event, Offset &offset, double &abs_x, double &abs_y, int32_t deviceType)
 {
     int32_t ret = RET_ERR;
     CalculateOffset(displayInfo, offset);
@@ -264,7 +270,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
     } else {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
-        if (displayInfo->validWidth != 0 && displayInfo->validHeight != 0 && 
+        if (displayInfo->validWidth != 0 && displayInfo->validHeight != 0 &&
             (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
             displaySize = sqrt(pow(displayInfo->validWidth, 2) + pow(displayInfo->validHeight, 2));
         }
