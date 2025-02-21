@@ -46,11 +46,6 @@ public:
     std::string ToString() const;
     int32_t GetOffsetX() const;
     int32_t GetOffsetY() const;
-    int32_t GetOffsetXRotated() const;
-    int32_t GetOffsetYRotated() const;
-    void CalculateRotatedOffset(uint32_t rotation, int32_t &offsetX, int32_t &offsetY) const;
-    void RevertAdjustMouseFocusByRotation90(int32_t &physicalX, int32_t &physicalY) const;
-    void RevertAdjustMouseFocusByRotation270(int32_t &physicalX, int32_t &physicalY) const;
 
     RenderConfig() = default;
     ~RenderConfig() = default;
@@ -63,29 +58,6 @@ public:
     bool operator != (const RenderConfig& rhs) const
     {
         return style != rhs.style || GetImageSize() != rhs.GetImageSize() || color != rhs.color;
-    }
-
-    RenderConfig& operator = (const RenderConfig& rhs)
-    {
-        if (this == &rhs) {
-            return *this;
-        }
-        style = rhs.style;
-        align = rhs.align;
-        path = rhs.path;
-        color = rhs.color;
-        size = rhs.size;
-        direction = rhs.direction;
-        dpi = rhs.dpi;
-        isHard = rhs.isHard;
-        rotationAngle = rhs.rotationAngle;
-        rotationFocusX = rhs.rotationFocusX;
-        rotationFocusY = rhs.rotationFocusY;
-        userIconPixelMap = rhs.userIconPixelMap;
-        userIconHotSpotX = rhs.userIconHotSpotX;
-        userIconHotSpotY = rhs.userIconHotSpotY;
-        
-        return *this;
     }
 };
 

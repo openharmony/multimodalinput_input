@@ -122,16 +122,7 @@ public:
     }
 
     float GetRenderDPI() const;
-    
-    void SetHardRenderCfg(const RenderConfig& cfg)
-    {
-        hardRenderCfg_ = cfg;
-    }
 
-    void SetSoftRenderCfg(const RenderConfig& cfg)
-    {
-        softRenderCfg_ = cfg;
-    }
     void SetRotation(const rotation_t rotation)
     {
         rotation_ = rotation;
@@ -145,6 +136,9 @@ public:
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();
+    void Rotate(rotation_t rotation, int32_t& x, int32_t& y);
+    void CalculateHwcPositionForMirror(int32_t& x, int32_t& y);
+    void CalculateHwcPositionForExtend(int32_t& x, int32_t& y);
 
 private:
     std::mutex mtx_;
@@ -175,9 +169,6 @@ private:
     bool isCurrentOffScreenRendering_ = false;
     float offRenderScale_{1.0f};
     int32_t screenRealDPI_{1.0f};
-    
-    RenderConfig hardRenderCfg_;
-    RenderConfig softRenderCfg_;
 };
 
 } // namespace OHOS::MMI

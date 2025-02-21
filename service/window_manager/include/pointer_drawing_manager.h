@@ -206,18 +206,10 @@ private:
     void ForceClearPointerVisiableStatus() override;
     int32_t UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
     void CreateCanvasNode();
-    float CalculateHardwareXOffset(ICON_TYPE iconType);
-    float CalculateHardwareYOffset(ICON_TYPE iconType);
     bool SetCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
     void SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle);
-    int32_t ParsingDynamicImage(MOUSE_ICON mouseStyle);
-    void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
-    bool DrawDynamicCanvas();
-    std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> DrawDynamicBitmap();
-    void DrawDynamicCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
-        int32_t px, int32_t py, ICON_TYPE align);
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
     void SetFaceNodeBounds();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -237,8 +229,8 @@ private:
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void DumpScreenInfo(std::ostringstream& oss);
     bool IsSupported() override;
-    int32_t DrawCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
-    int32_t DrawCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
+    int32_t DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
+    int32_t DrawHardCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
     std::shared_ptr<ScreenPointer> GetScreenPointer(uint32_t screenId);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
@@ -299,18 +291,9 @@ private:
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
     bool hasInitObserver_ { false };
-    std::atomic<bool> hasHardwareCursorAnimate_ { false };
-    std::atomic<bool> hasLoadingPointerStyle_ { false };
     int32_t frameCount_ { DEFAULT_FRAME_RATE };
     int32_t currentFrame_ { 0 };
-    sptr<OHOS::Surface> layer_ { nullptr };
-    sptr<OHOS::SurfaceBuffer> buffer_ { nullptr };
-    std::shared_ptr<uint8_t *> addr_ { nullptr };
     int32_t displayId_ { INVALID_DISPLAY_ID };
-    std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> dynamicBitmap_ { nullptr };
-    std::shared_ptr<OHOS::Rosen::Drawing::Canvas> dynamicCanvas_ { nullptr };
-    std::shared_ptr<Rosen::Drawing::Image> runningRightImage_ { nullptr };
-    std::shared_ptr<Rosen::Drawing::Image> image_ { nullptr };
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
