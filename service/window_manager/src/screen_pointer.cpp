@@ -72,6 +72,11 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const D
     screenId_ = di.id;
     width_ = di.width;
     height_ = di.height;
+    rotation_ = static_cast<rotation_t>(di.direction);
+    if (rotation_ == rotation_t::ROTATION_90 ||
+        rotation_ == rotation_t::ROTATION_270) {
+        std::swap(width_, height_);
+    }
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
     MMI_HILOGI("Construct with DisplayInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
@@ -193,7 +198,7 @@ void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
     if (isCurrentOffScreenRendering_) {
         screenRealDPI_ = di.screenRealDPI;
         offRenderScale_ = float(di.screenRealWidth) / di.width;
-        MMI_HILOGI("Update with DisplayInfo, screenRealDPI=%{public}u, offRenderScale_=(%{public}f ",
+        MMI_HILOGD("Update with DisplayInfo, screenRealDPI=%{public}u, offRenderScale_=(%{public}f ",
             screenRealDPI_, offRenderScale_);
     }
 }
@@ -245,39 +250,65 @@ sptr<OHOS::SurfaceBuffer> ScreenPointer::GetCurrentBuffer()
     return buffers_[bufferId_];
 }
 
+void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y)
+{
+    // 坐标轴绕原点旋转 再平移
+    int32_t tmpX = x;
+    int32_t tmpY = y;
+    int32_t width = width_;
+    int32_t height = height_;
+    if (IsMirror()) {
+        height -= paddingTop_ * NUM_TWO;
+        width -= paddingLeft_ * NUM_TWO;
+    }
+    // 主屏旋转 坐标系会一起旋转，但镜像屏此时坐标系不旋转
+    if (IsMirror() && (rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
+        std::swap(width, height);
+    }
+ 
+    if (rotation == rotation_t(DIRECTION90)) {
+        x = height - tmpY;
+        y = tmpX;
+    } else if (rotation == rotation_t(DIRECTION180)) {
+        x = width - tmpX;
+        y = height - tmpY;
+    } else if (rotation == rotation_t(DIRECTION270)) {
+        x = tmpY;
+        y = width - tmpX;
+    }
+}
+
+void ScreenPointer::CalculateHwcPositionForMirror(int32_t& x, int32_t& y)
+{
+    x = x * scale_;
+    y = y * scale_;
+    Rotate(rotation_, x, y);
+ 
+    x += paddingLeft_;
+    y += paddingTop_;
+}
+ 
+void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
+{
+    x = x * offRenderScale_;
+    y = y * offRenderScale_;
+}
+
 bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
-    if (rotation_ != static_cast<rotation_t>(hardRenderCfg_.direction) && !IsMirror()) {
-        MMI_HILOGE("ScreenPointer rotation=%{public}u, hardRenderCfg rotation=%{public}u",
-            rotation_, hardRenderCfg_.direction);
-        return false;
-    }
 
-    int32_t dx = 0;
-    int32_t dy = 0;
     int32_t px = 0;
     int32_t py = 0;
-    hardRenderCfg_.CalculateRotatedOffset(static_cast<uint32_t>(rotation_), dx, dy);
     if (IsMirror()) {
-        CalculatePositionForMirror(x, y, &px, &py);
+        CalculateHwcPositionForMirror(x, y);
     } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
-        float renderDPI = GetRenderDPI();
-        if (renderDPI == 0) {
-            MMI_HILOGE("SetPosition failed, RenderDPI = %{public}f", renderDPI);
-            return false;
-        }
-        int32_t adjustX = static_cast<int32_t>(float(FOCUS_POINT - dx) *
-            (dpi_ * scale_) / renderDPI);
-        int32_t adjustY = static_cast<int32_t>(float(FOCUS_POINT - dy) *
-            (dpi_ * scale_) / renderDPI);
-        px = x * offRenderScale_ + adjustX * offRenderScale_ - FOCUS_POINT;
-        py = y * offRenderScale_ + adjustY * offRenderScale_ - FOCUS_POINT;
-    } else {
-        px = x - dx;
-        py = y - dy;
+        CalculateHwcPositionForExtend(x, y);
     }
+
+    px = x - FOCUS_POINT;
+    py = y - FOCUS_POINT;
 
     auto buffer = GetCurrentBuffer();
     CHKPF(buffer);
@@ -295,38 +326,18 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(surfaceNode_);
-    if (rotation_ != static_cast<rotation_t>(softRenderCfg_.direction) && !IsMirror()) {
-        MMI_HILOGE("ScreenPointer rotation=%{public}u, softRenderCfg rotation=%{public}u",
-            rotation_, softRenderCfg_.direction);
-        return false;
-    }
-    int32_t dx = 0;
-    int32_t dy = 0;
     int32_t px = 0;
     int32_t py = 0;
     if (IsMirror()) {
-        px = paddingLeft_ + x * scale_ - softRenderCfg_.GetOffsetX();
-        py = paddingTop_ + y * scale_ - softRenderCfg_.GetOffsetY();
+        // 镜像屏图层放在左上角
+    } else if (IsExtend()) {
+        px = x - FOCUS_POINT;
+        py = y - FOCUS_POINT;
     } else {
-        softRenderCfg_.CalculateRotatedOffset(static_cast<uint32_t>(rotation_), dx, dy);
-        px = x - dx;
-        py = y - dy;
-        int32_t tmpX = px;
-        int32_t tmpY = py;
-        if (rotation_ == rotation_t(DIRECTION90)) {
-            px = tmpY;
-            py = width_ - tmpX;
-            px = height_ - px - DEFAULT_CURSOR_SIZE;
-            py = width_ - py + DEFAULT_CURSOR_SIZE;
-        } else if (rotation_ == rotation_t(DIRECTION180)) {
-            px = width_ - px;
-            py = height_ - py;
-        } else if (rotation_ == rotation_t(DIRECTION270)) {
-            px = height_ - tmpY;
-            py = tmpX;
-            px = height_ - px + DEFAULT_CURSOR_SIZE;
-            py = width_ - py - DEFAULT_CURSOR_SIZE;
-        }
+        // rotation_代表的是屏幕坐标系 即多模坐标系 逆时针
+        Rotate(rotation_, x, y);
+        px = x - FOCUS_POINT;
+        py = y - FOCUS_POINT;
     }
 
     if (!IsMirror()) {
@@ -337,40 +348,6 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     }
     
     return true;
-}
-
-void ScreenPointer::CalculatePositionForMirror(int32_t x, int32_t y, int32_t* px, int32_t* py)
-{
-    int32_t tmpX = x * scale_;
-    int32_t tmpY = y * scale_;
-    int32_t revert_dx = width_ - NUM_TWO * paddingLeft_;
-    int32_t revert_dy = height_ - NUM_TWO * paddingTop_;
-    switch (rotation_) {
-        case rotation_t::ROTATION_0:
-            *px = tmpX;
-            *py = tmpY;
-            break;
-        case rotation_t::ROTATION_90:
-            hardRenderCfg_.RevertAdjustMouseFocusByRotation90(tmpX, tmpY);
-            *px = -tmpY;
-            *py = tmpX;
-            *px = revert_dx + *px;
-            break;
-        case rotation_t::ROTATION_180:
-            *px = -tmpX;
-            *py = -tmpY;
-            *px = revert_dx + *px;
-            *py = revert_dy + *py;
-            break;
-        case rotation_t::ROTATION_270:
-            hardRenderCfg_.RevertAdjustMouseFocusByRotation270(tmpX, tmpY);
-            *px = tmpY;
-            *py = -tmpX;
-            *py = revert_dy + *py;
-            break;
-    }
-    *px = *px + paddingLeft_ - hardRenderCfg_.GetOffsetX();
-    *py = *py + paddingTop_ - hardRenderCfg_.GetOffsetY();
 }
 
 bool ScreenPointer::SetInvisible()
