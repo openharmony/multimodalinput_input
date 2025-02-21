@@ -3607,36 +3607,27 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_003, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
+        .WillRepeatedly(Return(true))
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(true)));
 #else
-        .WillOnce(Return(true));
+        .WillRepeatedly(Return(true));
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     EXPECT_CALL(*messageParcelMock_, ReadInt64(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillRepeatedly(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadUint32(_))
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(0));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillRepeatedly(Return(0));
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
@@ -3657,36 +3648,27 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_004, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
+        .WillRepeatedly(Return(true))
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(true)));
 #else
-        .WillOnce(Return(true));
+        .WillRepeatedly(Return(true));
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     EXPECT_CALL(*messageParcelMock_, ReadInt64(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillRepeatedly(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadUint32(_))
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(0));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillRepeatedly(Return(0));
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
@@ -3707,36 +3689,27 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_005, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
+        .WillRepeatedly(Return(true))
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(true)));
 #else
-        .WillOnce(Return(true));
+        .WillRepeatedly(Return(true));
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     EXPECT_CALL(*messageParcelMock_, ReadInt64(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillRepeatedly(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadUint32(_))
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+        .ReadUint32(DoAll(SetArgReferee<0>(0), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(0));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillRepeatedly(Return(0));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
