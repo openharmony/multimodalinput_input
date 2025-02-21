@@ -184,7 +184,6 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     Offset offset { unaccelerated_.dx, unaccelerated_.dy };
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
-    CalculateOffset(displayInfo, offset);
     CalculateMouseResponseTimeProbability(event);
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
