@@ -234,9 +234,9 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
             displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
             diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
                 + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
-            if ( diagonalMm > 0.0 ) {
+            if (diagonalMm != 0.) {
                 displayPpi = displaySize * MM_TO_INCH / diagonalMm;
-            }            
+            }
         }
         int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
         float factor = ScreenFactor(diagonalInch);
