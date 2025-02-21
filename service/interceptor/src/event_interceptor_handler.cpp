@@ -39,8 +39,7 @@ namespace {
 constexpr int32_t ACCESSIBILITY_UID { 1103 };
 const std::string DEFAULT_KEYEVENT_INTERCEPT_WHITELIST =
     "KEYCODE_ASSISTANT;KEYCODE_BRIGHTNESS_DOWN;KEYCODE_BRIGHTNESS_UP;KEYCODE_FN;KEYCODE_VOLUME_MUTE;KEYCODE_VOLUME_"
-    "DOWN;KEYCODE_VOLUME_UP;KEYCODE_MUTE;KEYCODE_SWITCHVIDEOMODE;KEYCODE_SEARCH;KEYCODE_MEDIA_RECORD;KEYCODE_SYSRQ;"
-    "KEYCODE_INSERT;";
+    "DOWN;KEYCODE_VOLUME_UP;KEYCODE_MUTE;KEYCODE_SWITCHVIDEOMODE;KEYCODE_SEARCH;KEYCODE_MEDIA_RECORD;KEYCODE_INSERT;";
 } // namespace
 
 std::unique_ptr<std::string> EventInterceptorHandler::keyevent_intercept_whitelist = nullptr;
@@ -74,12 +73,10 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
         MMI_HILOGD("Initialize interception white list is %{public}s",
             keyevent_intercept_whitelist->c_str());
     }
-    const std::string keyString = KeyEvent::KeyCodeToString(keyEvent->GetKeyCode());
-    uint32_t len = keyString.size();
-    uint32_t pos = keyevent_intercept_whitelist->find(keyString);
-    bool isIntercept = pos == std::string::npos || (pos + len < keyevent_intercept_whitelist->size() &&
-                                                       keyevent_intercept_whitelist->at(pos + len) != ';');
-    MMI_HILOGD("Received key event is %{public}s, isIntercept is %{public}d",
+    std::string keyString = KeyEvent::KeyCodeToString(keyEvent->GetKeyCode());
+    keyString += ";";
+    bool isIntercept = keyevent_intercept_whitelist->find(keyString) == std::string::npos;
+    MMI_HILOGD("Received key event is %{public}s  isIntercept is %{public}d",
         keyString.c_str(), isIntercept);
 
     if (isIntercept && OnHandleEvent(keyEvent)) {
