@@ -26,6 +26,7 @@
 #include "napi_constants.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "multimodal_event_handler.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PreMonitorManager"
@@ -40,6 +41,10 @@ int32_t PreMonitorManager::AddHandler(
 {
     CALL_DEBUG_ENTER;
     CHKPR(consumer, INVALID_HANDLER_ID);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t handlerId = GetNextId();
     if (RET_OK == AddLocal(handlerId, eventType, keys, consumer)) {
@@ -62,6 +67,10 @@ int32_t PreMonitorManager::RemoveHandler(int32_t handlerId)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Unregister handler:%{public}d", handlerId);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     const HandleEventType currentType = GetEventType();
     int32_t ret = RemoveLocal(handlerId);
