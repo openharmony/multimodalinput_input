@@ -269,10 +269,10 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
         return ret;
     } else {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        double displaySize = sqrt(pow(displayInfo->width, 2) + pow(displayInfo->height, 2));
+        double displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height, CONST_TWO));
         if (displayInfo->validWidth != 0 && displayInfo->validHeight != 0 &&
             (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
-            displaySize = sqrt(pow(displayInfo->validWidth, 2) + pow(displayInfo->validHeight, 2));
+            displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
         }
         double touchpadPPi = libinput_touchpad_device_get_ppi(device);
         double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
