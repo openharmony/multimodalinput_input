@@ -3054,30 +3054,30 @@ int32_t MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
     CALL_INFO_TRACE;
     isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
-    if (!isHPR_) {
-        MMI_HILOGE("Failed to create vkeyboard device, feature not support");
-        return RET_ERR;
-    }
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &vkeyboardDevice] {
-            return this->OnCreateVKeyboardDevice(vkeyboardDevice);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to create vkeyboard device, ret:%{public}d", ret);
-    }
-    return ret;
-}
+    int32_t ret = RET_OK;
 
-int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
-{
+    // init keyboard handler
     if (g_VKeyboardHandle == nullptr) {
         InitVKeyboardFuncHandler();
     }
     if (g_VKeyboardHandle == nullptr) {
         MMI_HILOGE("VKeyboard handler is nullptr");
         return RET_ERR;
+    } else {
+        ret = delegateTasks_.PostSyncTask(
+            [this, &vkeyboardDevice] {
+                return this->OnCreateVKeyboardDevice(vkeyboardDevice);
+            }
+            );
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to create vkeyboard device, ret:%{public}d", ret);
+        }
     }
+    return ret;
+}
+
+int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+{
     vkeyboard_createVKeyboardDevice_ = (VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)dlsym(
         g_VKeyboardHandle, "CreateVKeyboardDevice");
     IRemoteObject* vkbDevice = nullptr;
