@@ -69,6 +69,8 @@ enum class VTPStateMachineMessageType : int32_t {
     ROT_BEGIN = 15,
     ROT_UPDATE = 16,
     ROT_END = 17,
+    LEFT_TOUCH_DOWN = 18,
+    LEFT_TOUCH_UP = 19,
 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 class LibinputAdapter final {

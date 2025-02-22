@@ -381,11 +381,13 @@ void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
                 }
                 break;
             case VTPStateMachineMessageType::LEFT_CLICK_DOWN:
+            case VTPStateMachineMessageType::LEFT_TOUCH_DOWN:
                 if (!HandleVKeyTrackPadLeftBtnDown(touch, msgItem)) {
                     MMI_HILOGE("Virtual TrackPad left button down event cannot be handled");
                 }
                 break;
             case VTPStateMachineMessageType::LEFT_CLICK_UP:
+            case VTPStateMachineMessageType::LEFT_TOUCH_UP:
                 if (!HandleVKeyTrackPadLeftBtnUp(touch, msgItem)) {
                     MMI_HILOGE("Virtual TrackPad left button up event cannot be handled");
                 }
