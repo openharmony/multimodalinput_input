@@ -33,6 +33,10 @@
 #include "dfx_hisysevent.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#include "touchpad_settings_handler.h"
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
@@ -277,6 +281,10 @@ AccountManager::AccountManager()
             EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED,
             [this](const EventFwk::CommonEventData &data) {
                 OnSwitchUser(data);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+                std::shared_ptr<TouchpadSettingsObserver> touchpadMgr = TOUCHPAD_MGR;
+                touchpadMgr->UnregisterTpObserver(data.GetCode()) && touchpadMgr->RegisterTpObserver(data.GetCode());
+#endif // OHOS_BUILD_ENABLE_POINTER
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
