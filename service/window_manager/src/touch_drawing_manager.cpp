@@ -158,13 +158,13 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     CALL_DEBUG_ENTER;
     isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
     isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
-    scaleW_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
-    scaleH_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
+    scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
+    scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     displayInfo_ = displayInfo;
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
-    itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
+    itemRectW_ = static_cast<double>(displayInfo_.validWidth) / RECT_COUNT;
     rectTopPosition_ = 0;
     if (IsWindowRotation()) {
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
@@ -404,10 +404,10 @@ void TouchDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode
         canvasNode->SetTranslateX(0);
     } else if (displayDirection == Direction::DIRECTION270) {
         canvasNode->SetRotation(ROTATION_ANGLE_90);
-        canvasNode->SetTranslateX(-std::fabs(displayInfo_.width - displayInfo_.height));
+        canvasNode->SetTranslateX(-std::fabs(displayInfo_.validWidth - displayInfo_.validHeight));
     } else if (displayDirection == Direction::DIRECTION180) {
         canvasNode->SetRotation(ROTATION_ANGLE_180);
-        canvasNode->SetTranslateX(-std::fabs(displayInfo_.width - displayInfo_.height));
+        canvasNode->SetTranslateX(-std::fabs(displayInfo_.validWidth - displayInfo_.validHeight));
     } else {
         canvasNode->SetRotation(ROTATION_ANGLE_0);
         canvasNode->SetTranslateX(0);
@@ -428,13 +428,13 @@ void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction directio
 {
     CHKPV(canvas);
     if (direction == Direction::DIRECTION90) {
-        canvas->Translate(0, displayInfo_.width);
+        canvas->Translate(0, displayInfo_.validWidth);
         canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
     } else if (direction == Direction::DIRECTION180) {
-        canvas->Rotate(ROTATION_ANGLE_180, static_cast<float>(displayInfo_.width) / CALCULATE_MIDDLE,
-            static_cast<float>(displayInfo_.height) / CALCULATE_MIDDLE);
+        canvas->Rotate(ROTATION_ANGLE_180, static_cast<float>(displayInfo_.validWidth) / CALCULATE_MIDDLE,
+            static_cast<float>(displayInfo_.validHeight) / CALCULATE_MIDDLE);
     } else if (direction == Direction::DIRECTION270) {
-        canvas->Translate(displayInfo_.height, 0);
+        canvas->Translate(displayInfo_.validHeight, 0);
         canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
     }
 }
