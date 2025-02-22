@@ -3628,8 +3628,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
     displayInfo.uniq = "uniq";
     displayInfo.width = 100;
     displayInfo.height = 100;
+    displayInfo.validWidth = displayInfo.width;
+    displayInfo.validHeight = displayInfo.height;
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_TRUE(inputWindowsManager.TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+    EXPECT_FALSE(inputWindowsManager.TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
 }
 
 /**
