@@ -45,6 +45,7 @@ private:
     void UpdatePointerItemProperties(PointerEvent::PointerItem &item, EventTouch &touchInfo);
     void InitToolTypes();
     bool DumpInner();
+    void CancelPointerEvent();
 private:
     const int32_t deviceId_ { -1 };
     int32_t processedCount_ { 0 };

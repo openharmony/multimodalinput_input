@@ -1062,8 +1062,8 @@ void InputWindowsManager::ResetPointerPosition(const DisplayGroupInfo &displayGr
 
 bool InputWindowsManager::IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay)
 {
-    auto displayCenterX = currentDisplay.width * HALF_RATIO;
-    auto displayCenterY = currentDisplay.height * HALF_RATIO;
+    auto displayCenterX = currentDisplay.validWidth * HALF_RATIO;
+    auto displayCenterY = currentDisplay.validHeight * HALF_RATIO;
     if ((currentPos.cursorPos.x == displayCenterX) &&
         (currentPos.cursorPos.y == displayCenterY)) {
         return true;
@@ -1071,6 +1071,216 @@ bool InputWindowsManager::IsPointerOnCenter(const CursorPosition &currentPos, co
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
+void InputWindowsManager::HandleValidDisplayChange(const DisplayGroupInfo &displayGroupInfo)
+{
+    ResetPointerPositionIfOutValidDisplay(displayGroupInfo);
+    CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo);
+}
+
+void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const DisplayGroupInfo &displayGroupInfo)
+{
+    if (displayGroupInfo.displaysInfo.empty()) {
+        MMI_HILOGD("DisplayInfo empty");
+        return;
+    }
+    CursorPosition cursorPos = GetCursorPos();
+    int32_t cursorDisplayId = cursorPos.displayId;
+    for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
+        if (cursorDisplayId == currentDisplay.id) {
+            bool isOut = IsPositionOutValidDisplay(cursorPos.cursorPos, currentDisplay);
+            bool isChange = IsValidDisplayChange(currentDisplay);
+            MMI_HILOGD("CurDisplayId = %{public}d CurPos = {x:%{private}d, y:%{private}d}, isOut = %{public}d, "
+                       "isChange = %{public}d",
+                cursorDisplayId,
+                static_cast<int32_t>(cursorPos.cursorPos.x),
+                static_cast<int32_t>(cursorPos.cursorPos.y),
+                static_cast<int32_t>(isOut),
+                static_cast<int32_t>(isChange));
+            if (isOut && isChange) {
+                double curX = currentDisplay.validWidth * HALF_RATIO;
+                double curY = currentDisplay.validHeight * HALF_RATIO;
+                UpdateAndAdjustMouseLocation(cursorDisplayId, curX, curY);
+            }
+            if (isChange) {
+                CancelMouseEvent();
+            }
+            return;
+        }
+    }
+    MMI_HILOGE("Can't find displayInfo by displayId:%{public}d", cursorDisplayId);
+}
+
+bool InputWindowsManager::IsPositionOutValidDisplay(
+    Coordinate2D &position, const DisplayInfo &currentDisplay, bool isPhysicalPos)
+{
+    int32_t posX = static_cast<int32_t>(position.x);
+    int32_t posY = static_cast<int32_t>(position.y);
+    int32_t posWidth = currentDisplay.width;
+    int32_t posHeight = currentDisplay.height;
+    int32_t rotateX = posX;
+    int32_t rotateY = posY;
+    int32_t validW = currentDisplay.validWidth;
+    int32_t validH = currentDisplay.validHeight;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    
+    if (isPhysicalPos) {
+        Direction displayDirection = static_cast<Direction>((
+        ((currentDisplay.direction - currentDisplay.fixedDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
+            std::swap(validW, validH);
+            std::swap(posWidth, posHeight);
+        }
+        if (currentDisplay.fixedDirection == DIRECTION0) {
+            rotateX = posX;
+            rotateY = posY;
+        } else if (currentDisplay.fixedDirection == DIRECTION90) {
+            rotateX = posWidth - posY;
+            rotateY = posX;
+        } else if (currentDisplay.fixedDirection == DIRECTION180) {
+            rotateX = posWidth - posX;
+            rotateY = posHeight - posY;
+        } else if (currentDisplay.fixedDirection == DIRECTION270) {
+            rotateX = posY;
+            rotateY = posHeight - posX;
+        } else {
+            MMI_HILOGD("Invalid fixedDirection:%{public}d", currentDisplay.fixedDirection);
+        }
+        offsetX = currentDisplay.offsetX;
+        offsetY = currentDisplay.offsetY;
+    }
+    bool isOut = (rotateX < offsetX) || (rotateX > offsetX + validW) ||
+                 (rotateY < offsetY) || (rotateY > offsetX + validH);
+    PrintDisplayInfo(currentDisplay);
+    MMI_HILOGD("isOut=%{public}d,isPhysicalPos=%{public}d Position={%{private}d %{private}d}"
+               "->{%{private}d %{private}d} RealValidWH={w:%{private}d h:%{private}d}",
+        static_cast<int32_t>(isOut),
+        static_cast<int32_t>(isPhysicalPos),
+        posX,
+        posY,
+        rotateX,
+        rotateY,
+        validW,
+        validH);
+
+    if (!isOut && isPhysicalPos) {
+        int32_t rotateX1 = rotateX - currentDisplay.offsetX;
+        int32_t rotateY1 = rotateY - currentDisplay.offsetY;
+        if (currentDisplay.fixedDirection == DIRECTION0) {
+            position.x = rotateX1;
+            position.y = rotateY1;
+        } else if (currentDisplay.fixedDirection == DIRECTION90) {
+            position.x = rotateY1;
+            position.y = posWidth - rotateX1;
+        } else if (currentDisplay.fixedDirection == DIRECTION180) {
+            position.x = posWidth - rotateX1;
+            position.y = posHeight - rotateY1;
+        } else if (currentDisplay.fixedDirection == DIRECTION270) {
+            position.x = posHeight - rotateY1;
+            position.y = rotateX1;
+        } else {
+            MMI_HILOGD("Invalid fixedDirection:%{public}d", currentDisplay.fixedDirection);
+        }
+        MMI_HILOGD("rerotate={%{private}d %{private}d}->{%{private}f %{private}f} RealValidWH = "
+                   "{w:%{private}d h:%{private}d} RealWH{w:%{private}d h:%{private}d}",
+            rotateX1,
+            rotateY1,
+            position.x,
+            position.y,
+            validW,
+            validH,
+            posWidth,
+            posHeight);
+    }
+
+    return isOut;
+}
+
+void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const DisplayGroupInfo &displayGroupInfo)
+{
+    if (lastPointerEventforGesture_ == nullptr) {
+        MMI_HILOGD("lastPointerEventforGesture_ is null");
+        return;
+    }
+    if (lastPointerEventforGesture_->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGD("lastPointerEventforGesture_ is not touchscreen");
+        return;
+    }
+    int32_t touchDisplayId = lastPointerEventforGesture_->GetTargetDisplayId();
+    for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
+        if (touchDisplayId == currentDisplay.id && IsValidDisplayChange(currentDisplay)) {
+            CancelAllTouches(lastPointerEventforGesture_);
+            return;
+        }
+    }
+}
+
+void InputWindowsManager::CancelMouseEvent()
+{
+    if (lastPointerEvent_ == nullptr) {
+        MMI_HILOGD("lastPointerEvent_ is null");
+        return;
+    }
+    if (lastPointerEvent_->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
+        !lastPointerEvent_->GetPressedButtons().empty()) {
+        MMI_HILOGD("Cancel mouse event for valid display change");
+        auto lastPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+        lastPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        lastPointerEvent->UpdateId();
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        CHKPV(eventDispatchHandler);
+        lastPointerEvent_->DeleteReleaseButton(lastPointerEvent_->GetPointerId());
+        eventDispatchHandler->HandlePointerEvent(lastPointerEvent);
+    }
+}
+
+bool InputWindowsManager::IsValidDisplayChange(const DisplayInfo &displayInfo)
+{
+    int32_t touchDisplayId = displayInfo.id;
+    for (auto &currentDisplay : displayGroupInfo_.displaysInfo) {
+        if (touchDisplayId == currentDisplay.id) {
+            auto currentDirection = currentDisplay.direction;
+            auto currentValidWH =
+                RotateRect<int32_t>(currentDirection, {currentDisplay.validWidth, currentDisplay.validHeight});
+            auto newDirection = displayInfo.direction;
+            auto newValidWH = RotateRect<int32_t>(newDirection, {displayInfo.validWidth, displayInfo.validHeight});
+            bool isChange =
+                !(displayInfo.offsetX == currentDisplay.offsetX && displayInfo.offsetY == currentDisplay.offsetY &&
+                    newValidWH.x == currentValidWH.x && newValidWH.y == currentValidWH.y);
+            MMI_HILOGD("isChange=%{private}d CurDisplayId=%{private}d "
+                       "oldDisplayInfo={{w:%{private}d h:%{private}d} validWH:{%{private}d %{private}d} "
+                       "offsetXY:{%{private}d %{private}d} direction:{%{private}d %{private}d %{private}d}} "
+                       "newDisplayInfo={{w:%{private}d h:%{private}d} validWH:{%{private}d %{private}d}} "
+                       "offsetXY:{%{private}d %{private}d} direction:{%{private}d %{private}d %{private}d}}"
+                       "useDirection:{old:%{private}d new:%{private}d}}",
+                static_cast<int32_t>(isChange),
+                touchDisplayId,
+                currentDisplay.width,
+                currentDisplay.height,
+                currentDisplay.validWidth,
+                currentDisplay.validHeight,
+                currentDisplay.offsetX,
+                currentDisplay.offsetY,
+                currentDisplay.direction,
+                currentDisplay.displayDirection,
+                currentDisplay.fixedDirection,
+                displayInfo.width,
+                displayInfo.height,
+                displayInfo.validWidth,
+                displayInfo.validHeight,
+                displayInfo.offsetX,
+                displayInfo.offsetY,
+                displayInfo.direction,
+                displayInfo.displayDirection,
+                displayInfo.fixedDirection,
+                currentDirection,
+                newDirection);
+            return isChange;
+        }
+    }
+    return false;
+}
 
 void InputWindowsManager::HandleWindowPositionChange()
 {
@@ -1149,22 +1359,22 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     bool isDisplayChanged = OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     displayGroupInfoTmp_ = displayGroupInfo;
-    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
-        action == WINDOW_UPDATE_ACTION::ADD_END) {
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END) {
         if ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfoTmp_.currentUserId)) {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             if (isDisplayChanged) {
                 ResetPointerPosition(displayGroupInfoTmp_);
-        }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+            }
+#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             PrintChangedWindowBySync(displayGroupInfoTmp_);
             CleanInvalidPiexMap();
+            HandleValidDisplayChange(displayGroupInfoTmp_);
             displayGroupInfo_ = displayGroupInfoTmp_;
             UpdateWindowsInfoPerDisplay(displayGroupInfo);
             HandleWindowPositionChange();
         }
     }
-    PrintDisplayInfo();
+    PrintDisplayGroupInfo(displayGroupInfo_);
     if (!displayGroupInfo_.displaysInfo.empty()) {
         UpdateDisplayIdAndName();
     }
@@ -1747,23 +1957,50 @@ void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGrou
     PrintWindowInfo(windowGroupInfo.windowsInfo);
 }
 
-void InputWindowsManager::PrintDisplayInfo()
+void InputWindowsManager::PrintDisplayGroupInfo(const DisplayGroupInfo displayGroupInfo)
 {
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
-        displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
-    MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
-    PrintWindowInfo(displayGroupInfo_.windowsInfo);
-
-    MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
-    for (const auto &item : displayGroupInfo_.displaysInfo) {
-        MMI_HILOGD("displayInfos,id:%{public}d,x:%d,y:%d,width:%{public}d,height:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,oneHandX:%{public}d,oneHandY:%{public}d",
-            item.id, item.x, item.y, item.width, item.height, item.name.c_str(), item.uniq.c_str(), item.direction,
-            item.displayDirection, item.oneHandX, item.oneHandY);
+    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d,"
+               "windowsInfosNum:%{public}zu,displayInfosNum:%{public}zu",
+        displayGroupInfo.width,
+        displayGroupInfo.height,
+        displayGroupInfo.focusWindowId,
+        displayGroupInfo.windowsInfo.size(),
+        displayGroupInfo.displaysInfo.size());
+    PrintWindowInfo(displayGroupInfo.windowsInfo);
+    for (const auto &item : displayGroupInfo.displaysInfo) {
+        PrintDisplayInfo(item);
     }
+}
+
+void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
+{
+    if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
+        return;
+    }
+    MMI_HILOGD("displayInfo{id:%{public}d,name:%{public}s,uniq:%{public}s "
+               "XY:{%{private}d %{private}d} offsetXY:{%{private}d %{private}d} "
+               "WH:{%{private}d %{private}d} validWH:{%{private}d %{private}d} "
+               "direction:%{public}d,displayDirection:%{public}d,fixedDirection:%{public}d} "
+               "oneHandXY:{%{private}d %{private}d}",
+        displayInfo.id,
+        displayInfo.name.c_str(),
+        displayInfo.uniq.c_str(),
+        displayInfo.x,
+        displayInfo.y,
+        displayInfo.offsetX,
+        displayInfo.offsetY,
+        displayInfo.width,
+        displayInfo.height,
+        displayInfo.validWidth,
+        displayInfo.validHeight,
+        displayInfo.direction,
+        displayInfo.displayDirection,
+        displayInfo.fixedDirection,
+        displayInfo.oneHandX,
+        displayInfo.oneHandY);
 }
 
 const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
@@ -1802,13 +2039,13 @@ const DisplayInfo *InputWindowsManager::GetDefaultDisplayInfo() const
 void InputWindowsManager::ScreenRotateAdjustDisplayXY(const DisplayInfo& info, PhysicalCoordinate& coord) const
 {
     Direction rotation = info.direction;
-    Direction lastRotation =cursorPos_.direction;
-    int32_t width = info.width;
-    int32_t height = info.height;
+    Direction lastRotation = cursorPos_.direction;
+    int32_t width = info.validWidth;
+    int32_t height = info.validHeight;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
         (rotation == DIRECTION90 || rotation == DIRECTION270)) {
-        height = info.width;
-        width = info.height;
+        height = info.validWidth;
+        width = info.validHeight;
     }
     if ((static_cast<int32_t>(lastRotation) + 1) % 4 == static_cast<int32_t>(rotation)) {
         double temp = coord.x;
@@ -1826,108 +2063,107 @@ void InputWindowsManager::ScreenRotateAdjustDisplayXY(const DisplayInfo& info, P
 
 void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const
 {
+    double oldX = coord.x;
+    double oldY = coord.y;
     const Direction direction = info.direction;
     if (direction == DIRECTION0) {
         if (cursorPos_.displayDirection != info.displayDirection && cursorPos_.direction != info.direction) {
             if (cursorPos_.direction == Direction::DIRECTION90) {
                 double temp = coord.y;
-                coord.y = info.height - coord.x;
+                coord.y = info.validHeight - coord.x;
                 coord.x = temp;
             } else if (cursorPos_.direction == Direction::DIRECTION270) {
                 double temp = coord.x;
-                coord.x = info.width - coord.y;
+                coord.x = info.validWidth - coord.y;
                 coord.y = temp;
             }
         }
-        MMI_HILOGD("direction is DIRECTION0");
+        MMI_HILOGD("DIRECTION0, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
         return;
     }
     if (direction == DIRECTION90) {
-        MMI_HILOGD("direction is DIRECTION90");
         double temp = coord.x;
         if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-            coord.x = info.height - coord.y;
+            coord.x = info.validHeight - coord.y;
         } else {
-            coord.x = info.width - coord.y;
+            coord.x = info.validWidth - coord.y;
         }
         coord.y = temp;
-        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
+        MMI_HILOGD("DIRECTION90, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
         return;
     }
     if (direction == DIRECTION180) {
-        MMI_HILOGD("direction is DIRECTION180");
-        coord.x = info.width - coord.x;
-        coord.y = info.height - coord.y;
-        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
+        coord.x = info.validWidth - coord.x;
+        coord.y = info.validHeight - coord.y;
+        MMI_HILOGD("DIRECTION180, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
         return;
     }
     if (direction == DIRECTION270) {
-        MMI_HILOGD("direction is DIRECTION270");
         double temp = coord.y;
         if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-            coord.y = info.width - coord.x;
+            coord.y = info.validWidth - coord.x;
         } else {
-            coord.y = info.height - coord.x;
+            coord.y = info.validHeight - coord.x;
         }
         coord.x = temp;
-        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
+        MMI_HILOGD("DIRECTION270, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
     }
 }
 
 void InputWindowsManager::RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord)
 {
-    Direction displayDirection = static_cast<Direction>((
-        ((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    Direction displayDirection = static_cast<Direction>(
+        (((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (IsSupported()) {
         displayDirection = info.direction;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    bool isEnable = Rosen::SceneBoardJudgement::IsSceneBoardEnabled();
+    double oldX = coord.x;
+    double oldY = coord.y;
     if (displayDirection == DIRECTION0) {
-        MMI_HILOGD("displayDirection is DIRECTION0");
+        MMI_HILOGD("DIRECTION0, IsSceneBoardEnabled:%d physicalXY:{%f,%f}", isEnable, oldX, oldY);
         return;
     }
     if (displayDirection == DIRECTION90) {
-        MMI_HILOGD("displayDirection is DIRECTION90");
         double temp = coord.x;
-        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-            coord.x = info.height - coord.y;
+        if (!isEnable) {
+            coord.x = info.validHeight - coord.y;
         } else {
-            coord.x = info.width - coord.y;
+            coord.x = info.validWidth - coord.y;
         }
         coord.y = temp;
-        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
+        MMI_HILOGD(
+            "DIRECTION90, IsSceneBoardEnabled:%d physicalXY:{%f,%f}->{%f,%f}", isEnable, oldX, oldY, coord.x, coord.y);
         return;
     }
     if (displayDirection == DIRECTION180) {
-        MMI_HILOGD("displayDirection is DIRECTION180");
-        coord.x = info.width - coord.x;
-        coord.y = info.height - coord.y;
-        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
+        coord.x = info.validWidth - coord.x;
+        coord.y = info.validHeight - coord.y;
+        MMI_HILOGD(
+            "DIRECTION180, IsSceneBoardEnabled:%d physicalXY:{%f,%f}->{%f,%f}", isEnable, oldX, oldY, coord.x, coord.y);
         return;
     }
     if (displayDirection == DIRECTION270) {
-        MMI_HILOGD("displayDirection is DIRECTION270");
         double temp = coord.y;
-        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-            coord.y = info.width - coord.x;
+        if (!isEnable) {
+            coord.y = info.validWidth - coord.x;
         } else {
-            coord.y = info.height - coord.x;
+            coord.y = info.validHeight - coord.x;
         }
         coord.x = temp;
-        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
+        MMI_HILOGD(
+            "DIRECTION270, IsSceneBoardEnabled:%d physicalXY:{%f,%f}->{%f,%f}", isEnable, oldX, oldY, coord.x, coord.y);
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
+bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
     const DisplayInfo& info, EventTouch& touchInfo)
 {
-    MMI_HILOGD("DisplayInfo.width:%{public}d, DisplayInfo.height:%{public}d, "
-               "DisplayInfo.topLeftX:%{public}d, DisplayInfo.topLeftY:%{public}d, "
-                "DisplayInfo.offsetX:%{public}d, DisplayInfo.offsetY:%{public}d",
-                info.width, info.height, info.x, info.y, info.offsetX, info.offsetY);
+    PrintDisplayInfo(info);
     auto width = info.width;
     auto height = info.height;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
@@ -1942,8 +2178,15 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     };
     MMI_HILOGD("width:%{private}d, height:%{private}d, physicalX:%{private}f, physicalY:%{private}f",
         width, height, coord.x, coord.y);
-    coord.x = coord.x - info.offsetX;
-    coord.y = coord.y - info.offsetY;
+    Coordinate2D pos = { .x = coord.x, .y = coord.y };
+    if (IsPositionOutValidDisplay(pos, info, true)) {
+        MMI_HILOGD("The position is out of the valid display");
+        return false;
+    }
+    MMI_HILOGD("IsPositionOutValidDisplay physicalXY:{%{private}f %{private}f}->{%{private}f %{private}f}",
+        coord.x, coord.y, pos.x, pos.y);
+    coord.x = pos.x;
+    coord.y = pos.y;
     RotateScreen(info, coord);
     touchInfo.point.x = static_cast<int32_t>(coord.x);
     touchInfo.point.y = static_cast<int32_t>(coord.y);
@@ -1953,6 +2196,7 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         libinput_event_touch_get_tool_width_transformed(touch, width));
     touchInfo.toolRect.height = static_cast<int32_t>(
         libinput_event_touch_get_tool_height_transformed(touch, height));
+    return true;
 }
 
 void InputWindowsManager::SetAntiMisTake(bool state)
@@ -1980,8 +2224,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
-    GetPhysicalDisplayCoord(touch, *info, touchInfo);
-    return true;
+    return GetPhysicalDisplayCoord(touch, *info, touchInfo);
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
@@ -2007,7 +2250,7 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
     RotateScreen(*displayInfo, phys);
     coord.x = phys.x;
     coord.y = phys.y;
-    MMI_HILOGD("physicalX:%{public}f, physicalY:%{public}f, displayId:%{public}d", phys.x, phys.y, displayId);
+    MMI_HILOGD("physicalX:%{private}f, physicalY:%{private}f, displayId:%{public}d", phys.x, phys.y, displayId);
     return true;
 }
 
@@ -2425,8 +2668,8 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
 void InputWindowsManager::AdjustDisplayCoordinate(
     const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const
 {
-    int32_t width = displayInfo.width;
-    int32_t height = displayInfo.height;
+    int32_t width = displayInfo.validWidth;
+    int32_t height = displayInfo.validHeight;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
             width = displayInfo.height;
@@ -4233,8 +4476,18 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
 bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, double physicalX, double physicalY)
 {
     auto displayDirection = GetDisplayDirection(&displayInfo);
-    auto physicalRect = RotateRect<int32_t>(displayDirection, { displayInfo.width, displayInfo.height });
-    return (physicalX >= 0 && physicalX < physicalRect.x) && (physicalY >= 0 && physicalY < physicalRect.y);
+    auto physicalRect = RotateRect<int32_t>(displayDirection, { displayInfo.validWidth, displayInfo.validHeight });
+    bool isInside = (physicalX >= 0 && physicalX < physicalRect.x) && (physicalY >= 0 && physicalY < physicalRect.y);
+    PrintDisplayInfo(displayInfo);
+    MMI_HILOGD("isInside:%{public}d physicalXY={%{private}f %{private}f} "
+               "physicalRect={%{public}d %{public}d} useDirection:%{public}d}",
+        static_cast<int32_t>(isInside),
+        physicalX,
+        physicalY,
+        physicalRect.x,
+        physicalRect.y,
+        displayDirection);
+    return isInside;
 }
 
 bool InputWindowsManager::CalculateLayout(const DisplayInfo &displayInfo, const Vector2D<double> &physical,
@@ -4273,11 +4526,11 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
     }
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         Vector2D<int32_t> layoutMax;
-        if (!AddInt32(item.x, item.width, layoutMax.x)) {
+        if (!AddInt32(item.x, item.validWidth, layoutMax.x)) {
             MMI_HILOGE("The addition of layoutMax.x overflows");
             return;
         }
-        if (!AddInt32(item.y, item.height, layoutMax.y)) {
+        if (!AddInt32(item.y, item.validHeight, layoutMax.y)) {
             MMI_HILOGE("The addition of layoutMax.y overflows");
             return;
         }
@@ -4345,16 +4598,16 @@ void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int3
 {
     auto displayDirection = GetDisplayDirection(displayInfo);
     if (displayDirection == DIRECTION0 || displayDirection == DIRECTION180) {
-        width = displayInfo->width;
-        height = displayInfo->height;
+        width = displayInfo->validWidth;
+        height = displayInfo->validHeight;
     } else {
         if (!isRealData) {
-            width = displayInfo->width;
-            height = displayInfo->height;
+            width = displayInfo->validWidth;
+            height = displayInfo->validHeight;
             return;
         }
-        height = displayInfo->width;
-        width = displayInfo->height;
+        height = displayInfo->validWidth;
+        width = displayInfo->validHeight;
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -4364,39 +4617,43 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
     Coordinate2D& cursorPos) const
 {
     const Direction direction = info.direction;
-    MMI_HILOGD("X:%.2f, Y:%.2f, info.width:%d, info.height:%d",
-        x, y, info.width, info.height);
+    MMI_HILOGD("X:%{private}.2f, Y:%{private}.2f, offsetXY={%{private}d %{private}d},"
+               "info.WH:{%{private}d %{private}d} info.validWH:{%{private}d %{private}d}",
+        x,
+        y,
+        info.offsetX,
+        info.offsetY,
+        info.width,
+        info.height,
+        info.validWidth,
+        info.validHeight);
     switch (direction) {
         case DIRECTION0: {
-            MMI_HILOGD("direction is DIRECTION0");
             cursorPos.x = x;
             cursorPos.y = y;
-            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("DIRECTION0, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION90: {
-            MMI_HILOGD("direction is DIRECTION90");
-            cursorPos.y = static_cast<double>(info.width) - x;
+            cursorPos.y = static_cast<double>(info.validWidth) - x;
             cursorPos.x = y;
-            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("DIRECTION90, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION180: {
-            MMI_HILOGD("direction is DIRECTION180");
-            cursorPos.x = static_cast<double>(info.width) - x;
-            cursorPos.y = static_cast<double>(info.height) - y;
-            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
+            cursorPos.x = static_cast<double>(info.validWidth) - x;
+            cursorPos.y = static_cast<double>(info.validHeight) - y;
+            MMI_HILOGD("DIRECTION180, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION270: {
-            MMI_HILOGD("direction is DIRECTION270");
-            cursorPos.x = static_cast<double>(info.height) - y;
+            cursorPos.x = static_cast<double>(info.validHeight) - y;
             cursorPos.y = x;
-            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("DIRECTION270, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         default: {
-            MMI_HILOGE("direction is invalid, direction:%d", direction);
+            MMI_HILOGE("direction is invalid, direction:%{private}d", direction);
             break;
         }
     }
@@ -4407,39 +4664,41 @@ void InputWindowsManager::ReverseRotateDisplayScreen(const DisplayInfo& info, co
 {
     const Direction displayDirection = static_cast<Direction>((
         ((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    MMI_HILOGD("X:%.2f, Y:%.2f, info.width:%d, info.height:%d",
-        x, y, info.width, info.height);
+    MMI_HILOGD(
+        "X:%{private}.2f, Y:%{private}.2f, info.WH:{%{private}d %{private}d}, info.validWH:{%{private}d %{private}d}",
+        x,
+        y,
+        info.width,
+        info.height,
+        info.validWidth,
+        info.validHeight);
     switch (displayDirection) {
         case DIRECTION0: {
-            MMI_HILOGD("displayDirection is DIRECTION0");
             cursorPos.x = x;
             cursorPos.y = y;
-            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("DIRECTION0, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION90: {
-            MMI_HILOGD("displayDirection is DIRECTION90");
-            cursorPos.y = static_cast<double>(info.width) - x;
+            cursorPos.y = static_cast<double>(info.validWidth) - x;
             cursorPos.x = y;
-            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("DIRECTION90, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION180: {
-            MMI_HILOGD("displayDirection is DIRECTION180");
-            cursorPos.x = static_cast<double>(info.width) - x;
-            cursorPos.y = static_cast<double>(info.height) - y;
-            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
+            cursorPos.x = static_cast<double>(info.validWidth) - x;
+            cursorPos.y = static_cast<double>(info.validHeight) - y;
+            MMI_HILOGD("DIRECTION180, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION270: {
-            MMI_HILOGD("displayDirection is DIRECTION270");
-            cursorPos.x = static_cast<double>(info.height) - y;
+            cursorPos.x = static_cast<double>(info.validHeight) - y;
             cursorPos.y = x;
-            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("DIRECTION270, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         default: {
-            MMI_HILOGE("displayDirection is invalid, displayDirection:%d", displayDirection);
+            MMI_HILOGE("displayDirection is invalid, displayDirection:%{private}d", displayDirection);
             break;
         }
     }
@@ -4451,9 +4710,13 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
 {
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
+    double oldX = x;
+    double oldY = y;
     int32_t lastDisplayId = displayId;
     if (!IsInsideDisplay(*displayInfo, x, y)) {
         FindPhysicalDisplay(*displayInfo, x, y, displayId);
+        MMI_HILOGD("not IsInsideDisplay,cursorXY:{%{private}f %{private}f}->{%{private}f %{private}f}",
+            oldX, oldY, x, y);
     }
     if (displayId != lastDisplayId) {
         displayInfo = GetPhysicalDisplay(displayId);
@@ -4468,6 +4731,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
 
+    mouseLocation_.displayId = displayId;
+    cursorPos_.displayId = displayId;
     if (isRealData) {
         PhysicalCoordinate coord {
             .x = integerX,
@@ -4476,20 +4741,22 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         RotateDisplayScreen(*displayInfo, coord);
         mouseLocation_.physicalX = static_cast<int32_t>(coord.x);
         mouseLocation_.physicalY = static_cast<int32_t>(coord.y);
+        cursorPos_.cursorPos.x = x;
+        cursorPos_.cursorPos.y = y;
     } else {
         mouseLocation_.physicalX = integerX;
         mouseLocation_.physicalY = integerY;
-    }
-    mouseLocation_.displayId = displayId;
-    MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
-        mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
-    cursorPos_.displayId = displayId;
-    if (!isRealData) {
         ReverseRotateDisplayScreen(*displayInfo, x, y, cursorPos_.cursorPos);
-        return;
     }
-    cursorPos_.cursorPos.x = x;
-    cursorPos_.cursorPos.y = y;
+    MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{public}d, %{public}d}, "
+               "cursorPosXY: {%{public}.2f, %{public}.2f} -> {%{public}.2f %{public}.2f}",
+        static_cast<int32_t>(isRealData),
+        displayId,
+        mouseLocation_.physicalX,
+        mouseLocation_.physicalY,
+        oldX, oldY,
+        cursorPos_.cursorPos.x,
+        cursorPos_.cursorPos.y);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
@@ -4500,8 +4767,8 @@ MouseLocation InputWindowsManager::GetMouseInfo()
         (void)GetMainScreenDisplayInfo(displayGroupInfo_, displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         mouseLocation_.displayId = displayInfo.id;
-        mouseLocation_.physicalX = displayInfo.width / TWOFOLD;
-        mouseLocation_.physicalY = displayInfo.height / TWOFOLD;
+        mouseLocation_.physicalX = displayInfo.validWidth / TWOFOLD;
+        mouseLocation_.physicalY = displayInfo.validHeight / TWOFOLD;
     }
     return mouseLocation_;
 }
@@ -4514,8 +4781,8 @@ CursorPosition InputWindowsManager::GetCursorPos()
         (void)GetMainScreenDisplayInfo(displayGroupInfo_, displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         cursorPos_.displayId = displayInfo.id;
-        cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
-        cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
+        cursorPos_.cursorPos.x = displayInfo.validWidth * HALF_RATIO;
+        cursorPos_.cursorPos.y = displayInfo.validHeight * HALF_RATIO;
     }
     return cursorPos_;
 }
@@ -4528,8 +4795,8 @@ CursorPosition InputWindowsManager::ResetCursorPos()
         (void)GetMainScreenDisplayInfo(displayGroupInfo_, displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         cursorPos_.displayId = displayInfo.id;
-        cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
-        cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
+        cursorPos_.cursorPos.x = displayInfo.validWidth * HALF_RATIO;
+        cursorPos_.cursorPos.y = displayInfo.validHeight * HALF_RATIO;
     } else {
         cursorPos_.displayId = -1;
         cursorPos_.cursorPos.x = 0;
