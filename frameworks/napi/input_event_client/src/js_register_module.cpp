@@ -256,7 +256,9 @@ static void HandleMouseButton(napi_env env, napi_value mouseHandle,
     std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
 {
     int32_t button = 0;
-    if (GetNamedPropertyInt32(env, mouseHandle, "button", button) != RET_OK) {
+    bool required = ((action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN) ||
+                     (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP));
+    if (GetNamedPropertyInt32(env, mouseHandle, "button", button, required) != RET_OK) {
         MMI_HILOGE("Get button failed");
     }
     if (button < 0) {
