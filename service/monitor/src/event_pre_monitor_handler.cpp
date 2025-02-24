@@ -131,6 +131,7 @@ void EventPreMonitorHandler::SessionHandler::SendToClient(
 {
     CHKPV(keyEvent);
     CHKPV(session_);
+    pkt.Clean();
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
