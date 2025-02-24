@@ -1529,6 +1529,10 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragFlag_ = false;
             isDragBorder_ = false;
         }
+        if (firstBtnDownWindowInfo_.first != displayGroupInfo_.focusWindowId && !extraData_.appended) {
+            dragPointerStyle_ = pointerStyle;
+            MMI_HILOGI("Window is changed, pointerStyle is:%{public}d", dragPointerStyle_.id);
+        }
         DrawPointer(isDisplayRemoved);
     }
 }
