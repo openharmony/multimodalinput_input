@@ -3054,8 +3054,11 @@ int32_t MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
     CALL_INFO_TRACE;
     isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
+    if (!isHPR_) {
+        MMI_HILOGE("Failed to create vkeyboard device, feature not support");
+        return RET_ERR;
+    }
     int32_t ret = RET_OK;
-
     // init keyboard handler
     if (g_VKeyboardHandle == nullptr) {
         InitVKeyboardFuncHandler();
@@ -3078,6 +3081,10 @@ int32_t MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 
 int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
+    if (g_VKeyboardHandle == nullptr) {
+        MMI_HILOGE("VKeyboard handler is nullptr");
+        return RET_ERR;
+    }
     vkeyboard_createVKeyboardDevice_ = (VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)dlsym(
         g_VKeyboardHandle, "CreateVKeyboardDevice");
     IRemoteObject* vkbDevice = nullptr;
