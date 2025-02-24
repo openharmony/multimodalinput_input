@@ -85,7 +85,7 @@ public:
     int32_t RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
     int32_t NotifyNapOnline();
     void NotifyBundleName(int32_t pid, int32_t uid, const std::string &bundleName, int32_t syncStatus);
-    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    int32_t SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
