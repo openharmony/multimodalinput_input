@@ -15,34 +15,34 @@
 #ifndef TOUCHPAD_SETTINGS_HANDLER_H
 #define TOUCHPAD_SETTINGS_HANDLER_H
 
-#include "setting_datashare.h"
 #include <dlfcn.h>
+#include "setting_observer.h"
 
 namespace OHOS {
 namespace MMI {
 class TouchpadSettingsObserver {
 public:
+static std::shared_ptr<TouchpadSettingsObserver> GetInstance();
     TouchpadSettingsObserver();
     ~TouchpadSettingsObserver();
-    void RegisterTpObserver();
+    bool RegisterTpObserver(const int32_t accountId);
+    bool UnregisterTpObserver(const int32_t accountId);
     void RegisterUpdateFunc();
+    void SyncTouchpadSettingsData();
 private:
-    const std::string pressureKey_ {"settings.trackpad.press_level"};
-    const std::string vibrationKey_ {"settings.trackpad.shock_level"};
-    const std::string touchpadSwitchesKey_ {"settings.trackpad.touchpad_switches"};
-    const std::string knuckleSwitchesKey_ {"settings.trackpad.touchpad_switches"};
-    const std::string datashareUri_ =
-        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
-    const std::string libthpPath_ {"/system/lib64/libthp_extra_innerapi.z.so"};
-    const std::map<std::string, int> keyToCmd_ = {
-        {pressureKey_, 103}, //pressure cmd 103
-        {vibrationKey_, 104}, // vibration cmd 104
-        {touchpadSwitchesKey_, 108}, // touchpad switches cmd 108
-        {knuckleSwitchesKey_, 109} // knuckle switches cmd 109
-    };
+    static std::shared_ptr<TouchpadSettingsObserver> instance_;
+    static std::mutex mutex_;
+    std::mutex lock_;
     SettingObserver::UpdateFunc updateFunc_ = nullptr;
-    std::mutex mutex_;
+    bool hasRegistered_ = false;
+    int32_t currentAccountId_ = -1;
+    sptr<SettingObserver> pressureObserver_ {nullptr};
+    sptr<SettingObserver> vibrationObserver_ {nullptr};
+    sptr<SettingObserver> touchpadSwitchesObserver_ {nullptr};
+    sptr<SettingObserver> knuckleSwitchesObserver_ {nullptr};
+    std::string datashareUri_ = "";
 };
+#define TOUCHPAD_MGR ::OHOS::MMI::TouchpadSettingsObserver::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif
