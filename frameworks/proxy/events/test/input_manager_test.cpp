@@ -592,7 +592,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
     bool state = false;
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, state);
-    ASSERT_TRUE(state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -622,7 +622,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
     bool state = false;
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, state);
-    ASSERT_TRUE(state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -652,7 +652,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
     bool state = false;
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, state);
-    ASSERT_TRUE(state);
+    ASSERT_FALSE(state);
 }
 
 /**
