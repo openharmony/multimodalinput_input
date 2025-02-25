@@ -333,6 +333,8 @@ struct WindowInfo {
     bool rectChangeBySystem { false };
 
     bool isDisplayCoord { false };
+
+    bool isSkipSelfWhenShowOnVirtualScreen { false };
 };
 
 /**

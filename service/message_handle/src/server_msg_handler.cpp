@@ -709,7 +709,7 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.flags >> extensionInfo.action >> extensionInfo.displayId >> extensionInfo.zOrder
             >> extensionInfo.pointerChangeAreas >> extensionInfo.transform >> extensionInfo.windowInputType
             >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag
-            >> extensionInfo.rectChangeBySystem;
+            >> extensionInfo.rectChangeBySystem >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen;
         info.uiExtentionWindowInfo.push_back(extensionInfo);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read extention window info failed");
@@ -775,7 +775,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType >> info.privacyMode >> info.windowType >> byteCount;
+            >> info.windowInputType >> info.privacyMode >> info.windowType
+            >> info.isSkipSelfWhenShowOnVirtualScreen >> byteCount;
 
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
@@ -815,7 +816,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType >> info.privacyMode >> info.windowType;
+            >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen;
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
         windowGroupInfo.windowsInfo.push_back(info);
