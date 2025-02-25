@@ -2845,6 +2845,12 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 void PointerDrawingManager::SubscribeScreenModeChange()
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screenInfos;
+    OHOS::Rosen::ScreenManagerLite::GetInstance().GetPhysicalScreenInfos(screenInfos);
+    if (!screenInfos.empty()) {
+        OnScreenModeChange(screenInfos);
+    }
+
     auto callback = [this](const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens) {
         CHKPV(hardwareCursorPointerManager_);
         if (g_isHdiRemoteDied) {
