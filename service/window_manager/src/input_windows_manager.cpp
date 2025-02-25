@@ -99,6 +99,7 @@ constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
+constexpr size_t POINTER_STYLE_WINDOW_NUM = { 10 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -2364,9 +2365,11 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     }
     auto sceneIter = pointerStyle_.find(scenePid);
     if (sceneIter == pointerStyle_.end() || sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
-        pointerStyle_[scenePid] = {};
-        MMI_HILOG_CURSORE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on pointerStyle_",
-            scenePid, sceneWinId);
+        if (sceneIter->second.size() > POINTER_STYLE_WINDOW_NUM) {
+            pointerStyle_[scenePid] = {};
+            MMI_HILOG_CURSORE("SceneBoardPid %{public}d windowId:%{public}d exceed",
+                scenePid, sceneWinId);
+        }
     }
     pointerStyle_[scenePid][sceneWinId] = pointerStyle;
     MMI_HILOG_CURSORD("Sceneboard pid:%{public}d windowId:%{public}d is set to %{public}d",
