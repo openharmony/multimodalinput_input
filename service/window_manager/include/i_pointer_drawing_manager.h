@@ -158,6 +158,11 @@ public:
     virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
     virtual void SubscribeScreenModeChange() {}
+    virtual int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
+        int32_t displayId, int32_t physicalX, int32_t physicalY)
+    {
+        return 0;
+    }
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     virtual bool IsSupported()
     {

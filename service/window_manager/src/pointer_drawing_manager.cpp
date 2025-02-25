@@ -320,6 +320,20 @@ void PointerDrawingManager::ForceClearPointerVisiableStatus()
     UpdatePointerVisible();
 }
 
+int32_t PointerDrawingManager::UpdateMouseLayer(const PointerStyle& pointerStyle,
+    int32_t displayId, int32_t physicalX, int32_t physicalY)
+{
+    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
+        mouseIconUpdate_ = false;
+        MMI_HILOGE("Init layer failed");
+        return RET_ERR;
+    }
+    if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
@@ -352,15 +366,24 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         lastDirection_ = direction;
     }
     lastMouseStyle_ = pointerStyle;
-    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
-        mouseIconUpdate_ = false;
-        MMI_HILOGE("Init layer failed");
-        return RET_ERR;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPR(hardwareCursorPointerManager_, RET_ERR);
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        UpdatePointerVisible();
+    } else {
+        int32_t UpdateLayerRes = UpdateMouseLayer(pointerStyle, displayId, physicalX, physicalY);
+        if (UpdateLayerRes != RET_OK) {
+            MMI_HILOGE("Update Mouse Layer failed.");
+        }
+        UpdatePointerVisible();
     }
-    if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
-        return RET_ERR;
+#else
+    int32_t UpdateLayerRes = UpdateMouseLayer(pointerStyle, displayId, physicalX, physicalY);
+    if (UpdateLayerRes != RET_OK) {
+        MMI_HILOGE("Update Mouse Layer failed.");
     }
     UpdatePointerVisible();
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     mouseIconUpdate_ = false;
     MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
         displayId, physicalX, physicalY);
