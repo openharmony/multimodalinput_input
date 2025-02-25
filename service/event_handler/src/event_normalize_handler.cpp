@@ -68,6 +68,7 @@ constexpr int32_t SWIPE_INWARD_EDGE_X_THRE { 8 };
 constexpr int32_t SWIPE_INWARD_ANGLE_TOLERANCE { 8 };
 constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
 constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
+constexpr int64_t KNUCKLE_BLOCK_THRETHOLD { MS2US(800) };
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
 int32_t g_touchPadDeviceAxisX { 1 }; // max axis size
@@ -75,6 +76,7 @@ int32_t g_touchPadDeviceAxisY { 1 };
 bool g_isSwipeInward {false};
 bool g_buttonPressed {false};
 constexpr int32_t SWIPE_INWARD_ANGLE_JUDGE { 2 };
+int64_t g_lastKeyboardEventTime { 0 };
 constexpr int32_t MT_TOOL_PALM { 2 };
 [[ maybe_unused ]] constexpr double TOUCH_SLOP { 1.0 };
 [[ maybe_unused ]] constexpr int32_t SQUARE { 2 };
@@ -391,6 +393,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    g_lastKeyboardEventTime = GetSysClockTime();
     BytraceAdapter::StartPackageEvent("package keyEvent");
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -1108,13 +1111,16 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     double value = libinput_event_touchpad_get_pressure(touchpadEvent);
     std::shared_ptr<MMI::KeyEvent> keyEvent = KeyEvent::Create();
     CHKPF(keyEvent);
-    if (std::fabs(SINGLE_KNUCKLE_ABS_PRESSURE_VALUE - value) <= std::numeric_limits<double>::epsilon()) {
+    int64_t currentTime = GetSysClockTime();
+    if (std::fabs(SINGLE_KNUCKLE_ABS_PRESSURE_VALUE - value) <= std::numeric_limits<double>::epsilon() &&
+        currentTime - g_lastKeyboardEventTime > KNUCKLE_BLOCK_THRETHOLD) {
         keyEvent->SetKeyAction(KNUCKLE_1F_DOUBLE_CLICK);
         MMI_HILOGI("Current is touchPad single knuckle double click action");
         nextHandler_->HandleKeyEvent(keyEvent);
         return true;
     }
-    if (value == DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
+    if (value == DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > KNUCKLE_BLOCK_THRETHOLD) {
         keyEvent->SetKeyAction(KNUCKLE_2F_DOUBLE_CLICK);
         MMI_HILOGI("Current is touchPad double knuckle double click action");
         nextHandler_->HandleKeyEvent(keyEvent);
