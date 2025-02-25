@@ -297,36 +297,44 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
     const std::string mouseName = libinput_device_get_name(dev);
     const int32_t devType = libinput_device_get_id_bustype(dev);
     MMI_HILOGD("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
-    if (devType == BUS_USB || devType == BUS_BLUETOOTH) {
-        std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
-        MMI_HILOGD("connectType:%{public}s", connectType.c_str());
-        auto curMouseTimeMap = mouseMap.find(mouseName);
-        if (curMouseTimeMap == mouseMap.end()) {
-            MMI_HILOGD("start to collect");
-            mouseMap[mouseName] = std::chrono::steady_clock::now();
-            mouseResponseMap[mouseName] = {};
-        } else {
-            std::chrono::time_point<std::chrono::steady_clock> curTime = std::chrono::steady_clock::now();
-            long long gap =
-                std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
-            mouseMap[mouseName] = curTime;
-            MMI_HILOGD("current time difference:%{public}lld", gap);
-            std::map<long long, int32_t> &curMap = mouseResponseMap.find(mouseName)->second;
-            if (gap < FINE_CALCULATE) {
-                auto curMapIt = curMap.find(gap);
-                curMap[gap] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
-            } else if (gap >= FINE_CALCULATE && gap < STEP_CALCULATE) {
-                long long tempNum = gap - gap % CALCULATE_STEP;
-                auto curMapIt = curMap.find(tempNum);
-                curMap[tempNum] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
-            } else if (gap >= STEP_CALCULATE && gap < STOP_CALCULATE) {
-                auto curMapIt = curMap.find(STEP_CALCULATE);
-                curMap[STEP_CALCULATE] = curMapIt == curMap.end() ? 1 : curMapIt->second + 1;
-            } else if (gap > STOP_CALCULATE) {
-                HandleReportMouseResponseTime(connectType, curMap);
-                mouseResponseMap.erase(mouseName);
-                mouseMap.erase(mouseName);
+    if (devType != BUS_USB && devType != BUS_BLUETOOTH) {
+        return;
+    }
+    std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
+    MMI_HILOGD("connectType:%{public}s", connectType.c_str());
+    auto curMouseTimeMap = mouseMap.find(mouseName);
+    if (curMouseTimeMap == mouseMap.end()) {
+        MMI_HILOGD("start to collect");
+        mouseMap[mouseName] = std::chrono::steady_clock::now();
+        mouseResponseMap[mouseName] = {};
+    } else {
+        std::chrono::time_point<std::chrono::steady_clock> curTime = std::chrono::steady_clock::now();
+        long long gap =
+            std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
+        mouseMap[mouseName] = curTime;
+        MMI_HILOGD("current time difference:%{public}lld", gap);
+        std::map<long long, int32_t> &curMap = mouseResponseMap.find(mouseName)->second;
+
+        if (gap < FINE_CALCULATE) {
+            auto curMapIt = curMap.try_emplace(gap, 1);
+            if (!curMapIt.second) {
+                curMapIt.first->second += 1;
             }
+        } else if (gap >= FINE_CALCULATE && gap < STEP_CALCULATE) {
+            long long tempNum = gap - gap % CALCULATE_STEP;
+            auto curMapIt = curMap.try_emplace(tempNum, 1);
+            if (!curMapIt.second) {
+                curMapIt.first->second += 1;
+            }
+        } else if (gap >= STEP_CALCULATE && gap < STOP_CALCULATE) {
+            auto curMapIt = curMap.try_emplace(STEP_CALCULATE, 1);
+            if (!curMapIt.second) {
+                curMapIt.first->second += 1;
+            }
+        } else if (gap > STOP_CALCULATE) {
+            HandleReportMouseResponseTime(connectType, curMap);
+            mouseResponseMap.erase(mouseName);
+            mouseMap.erase(mouseName);
         }
     }
 }
