@@ -152,6 +152,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
+    int32_t displayId, int32_t physicalX, int32_t physicalY) override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
