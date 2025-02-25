@@ -345,6 +345,8 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     template <class T>
     void CreateAntiMisTakeObserver(T& item);
+    template <class T>
+    void CreatePrivacyProtectionObserver(T& item);
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -432,6 +434,10 @@ private:
         bool isOpen { false };
     } antiMistake_;
     bool isOpenAntiMisTakeObserver_ { false };
+    struct PrivacyProtection {
+        std::string switchName;
+        bool isOpen { false };
+    } privacyProtection_;
 #ifndef OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_WATCH
