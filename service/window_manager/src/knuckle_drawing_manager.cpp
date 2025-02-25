@@ -251,8 +251,8 @@ void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
         MMI_HILOGD("DisplayInfo direction change");
         isRotate_ = true;
     }
-    scaleW_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
-    scaleH_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
+    scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
+    scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     displayInfo_ = displayInfo;
 }
 
@@ -280,10 +280,10 @@ void KnuckleDrawingManager::RotationCanvasNode(
         canvasNode->SetTranslateX(0);
     } else if (displayDirection == Direction::DIRECTION270) {
         canvasNode->SetRotation(ROTATION_ANGLE_90);
-        canvasNode->SetTranslateX(-std::fabs(displayInfo.width - displayInfo.height));
+        canvasNode->SetTranslateX(-std::fabs(displayInfo.validWidth - displayInfo.validHeight));
     } else if (displayDirection == Direction::DIRECTION180) {
         canvasNode->SetRotation(ROTATION_ANGLE_180);
-        canvasNode->SetTranslateX(-std::fabs(displayInfo.width - displayInfo.height));
+        canvasNode->SetTranslateX(-std::fabs(displayInfo.validWidth - displayInfo.validHeight));
     } else {
         canvasNode->SetRotation(ROTATION_ANGLE_0);
         canvasNode->SetTranslateX(0);

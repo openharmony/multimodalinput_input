@@ -1434,18 +1434,18 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         direction = displayInfo_.direction;
     }
     if (direction == DIRECTION0 || direction == DIRECTION180) {
-        if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
-            physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
+        if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
+            physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
         }
-        if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
-            physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
+        if (physicalY > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
+            physicalY = displayInfo_.validHeight - imageHeight_ / cursorUnit;
         }
     } else {
-        if (physicalX > (displayInfo_.height - imageHeight_ / cursorUnit)) {
-            physicalX = displayInfo_.height - imageHeight_ / cursorUnit;
+        if (physicalX > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
+            physicalX = displayInfo_.validHeight - imageHeight_ / cursorUnit;
         }
-        if (physicalY > (displayInfo_.width - imageWidth_ / cursorUnit)) {
-            physicalY = displayInfo_.width - imageWidth_ / cursorUnit;
+        if (physicalY > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
+            physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
         }
     }
 }
@@ -2205,8 +2205,8 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
     (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     UpdateDisplayInfo(displayInfo);
-    lastPhysicalX_ = displayInfo.width / CALCULATE_MIDDLE;
-    lastPhysicalY_ = displayInfo.height / CALCULATE_MIDDLE;
+    lastPhysicalX_ = displayInfo.validWidth / CALCULATE_MIDDLE;
+    lastPhysicalY_ = displayInfo.validHeight / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.id);
     if (surfaceNode_ != nullptr) {
 #ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -2217,7 +2217,7 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
         MMI_HILOGD("Pointer window destroy success");
     }
     MMI_HILOGD("displayId_:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d",
-        displayInfo_.id, displayInfo_.width, displayInfo_.height);
+        displayInfo_.id, displayInfo_.validWidth, displayInfo_.validHeight);
 }
 
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
@@ -2285,8 +2285,8 @@ void PointerDrawingManager::DrawManager()
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         lastDrawPointerStyle_ = pointerStyle;
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
-                pointerStyle, direction);
+            DrawPointer(displayInfo_.id, displayInfo_.validWidth / CALCULATE_MIDDLE,
+                displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
@@ -2759,8 +2759,8 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
-                pointerStyle, direction);
+            DrawPointer(displayInfo_.id, displayInfo_.validWidth / CALCULATE_MIDDLE,
+                displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
             MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
             return;
         }
@@ -3366,8 +3366,8 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
         }
         Direction direction = static_cast<Direction>((
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
-            pointerStyle, direction);
+        DrawPointer(displayInfo_.id, displayInfo_.validWidth / CALCULATE_MIDDLE,
+            displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
     }
 }
 
