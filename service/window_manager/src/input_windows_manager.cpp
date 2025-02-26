@@ -1102,6 +1102,9 @@ void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const DisplayGro
                 double curX = currentDisplay.validWidth * HALF_RATIO;
                 double curY = currentDisplay.validHeight * HALF_RATIO;
                 UpdateAndAdjustMouseLocation(cursorDisplayId, curX, curY);
+                IPointerDrawingManager::GetInstance()->SetPointerLocation(static_cast<int32_t>(cursorPos_.cursorPos.x),
+                    static_cast<int32_t>(cursorPos_.cursorPos.y),
+                    cursorPos_.displayId);
             }
             if (isChange) {
                 CancelMouseEvent();
