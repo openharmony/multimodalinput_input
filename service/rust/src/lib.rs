@@ -575,6 +575,11 @@ impl AxisAccelerateCurvesTouchpad {
                         slopes: vec![4.60, 3.16, 2.63, 2.30, 2.01, 1.78, 0.84, 2.27],
                         diff_nums: vec![0.00, 0.52, 0.90, 1.26, 1.68, 2.10, 4.11, 0.00]
                     },
+                    CurveItem {
+                        speeds: vec![0.008, 0.009, 0.01, 0.011, 0.015, 0.02, 0.1, 0.17],
+                        slopes: vec![1500.0, 1000.0, 700.0, 500.0 , 200.0, 150.0, 125.0, 100.0],
+                        diff_nums: vec![0.0, 2.475, 4.125, 5.335, 7.81, 8.36, 9.735, 12.0725]
+                    },
                 ],
             });
         });
@@ -757,8 +762,8 @@ impl FoldPcVirtTouchpadAccelerateCurves {
                     },
                     CurveItem {
                         speeds: vec![1.53, 3.73, 4.54, 5.19],
-                        slopes: vec![1.50, 3.23, 8.32, 11.70],
-                        diff_nums: vec![0.00, -2.65, -21.64, -36.98]
+                        slopes: vec![1.50, 3.01, 6.34, 9.66],
+                        diff_nums: vec![0.00, -2.31, -14.73, -29.8]
                     },
                     CurveItem {
                         speeds: vec![1.53, 3.73, 4.54, 5.19],
@@ -1014,6 +1019,7 @@ fn get_axis_gain_touchpad(gain: *mut f64, axis_speed: f64, device_type: i32) -> 
         1..=2 => device_type,
         4 => 3,
         5 => 4,
+        7 => 5,
         _ => 1,
     };
     let item = AxisAccelerateCurvesTouchpad::get_instance().get_axis_curve_by_speed_touchpad(valid_device_type as usize);
