@@ -1632,10 +1632,6 @@ int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1657,10 +1653,6 @@ int32_t MultimodalInputConnectStub::StubGetFunctionKeyState(MessageParcel &data,
 int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     if (!PER_HELPER->CheckFunctionKeyEnabled()) {
         MMI_HILOGE("Set function key state permission check failed");
         return ERROR_NO_PERMISSION;
