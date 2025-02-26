@@ -124,6 +124,8 @@ constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
+constexpr int32_t RETRY_CHECK_TIMES { 5 };
+constexpr int32_t CHECK_EEVENT_INTERVAL_TIME { 4000 };
 const std::set<int32_t> g_keyCodeValueSet = {
 #ifndef OHOS_BUILD_ENABLE_WATCH
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
@@ -3384,6 +3386,7 @@ int32_t MMIService::AncoAddChannel(sptr<IAncoChannel> channel)
     if (ret != RET_OK) {
         MMI_HILOGE("AncoAddChannel fail, error:%{public}d", ret);
     }
+    SyncKnuckleStatus();
     return ret;
 }
 
@@ -3625,5 +3628,42 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, Curso
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+int32_t MMIService::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
+    int tryTimes = RETRY_CHECK_TIMES;
+    int32_t ret = RET_ERR;
+    for (int count = 0; count < tryTimes; ++count) {
+        ret = FINGERSENSE_WRAPPER->CheckKnuckleEvent(pointX, pointY, isKnuckleType);
+        if (ret == RET_OK) {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::microseconds(CHECK_EEVENT_INTERVAL_TIME));
+    }
+    return ret;
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    return RET_OK;
+}
+
+int32_t MMIService::SyncKnuckleStatus()
+{
+    CALL_DEBUG_ENTER;
+    int ret = delegateTasks_.PostSyncTask([] {
+        auto keyHandler = InputHandler->GetKeyCommandHandler();
+        if (keyHandler == nullptr) {
+            return RET_ERR;
+        }
+        bool isKnuckleEnable = !keyHandler->SkipKnuckleDetect();
+        return WIN_MGR->SyncKnuckleStatus(isKnuckleEnable);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("post sync knuckle status fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+#endif
 } // namespace MMI
 } // namespace OHOS
