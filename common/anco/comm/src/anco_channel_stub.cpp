@@ -33,6 +33,7 @@ AncoChannelStub::AncoChannelStub()
         { AncoRequestId::SYNC_POINTER_EVENT, &AncoChannelStub::StubSyncPointerEvent },
         { AncoRequestId::SYNC_KEY_EVENT, &AncoChannelStub::StubSyncKeyEvent },
         { AncoRequestId::UPDATE_WINDOW_INFO, &AncoChannelStub::StubUpdateWindowInfo },
+        { AncoRequestId::SYNC_KNUCKLE_STATUS, &AncoChannelStub::StubSyncKnuckleStatus },
     };
 }
 
@@ -88,6 +89,16 @@ int32_t AncoChannelStub::StubUpdateWindowInfo(MessageParcel &data, MessageParcel
         return RET_ERR;
     }
     return UpdateWindowInfo(windows);
+}
+
+int32_t AncoChannelStub::StubSyncKnuckleStatus(MessageParcel &data, MessageParcel &reply)
+{
+    bool touchType = false;
+    if (!data.ReadBool(touchType)) {
+        MMI_HILOGE("Failed to read status.");
+        return RET_ERR;
+    }
+    return SyncKnuckleStatus(touchType);
 }
 } // namespace MMI
 } // namespace OHOS

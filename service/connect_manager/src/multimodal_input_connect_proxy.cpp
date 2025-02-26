@@ -2629,6 +2629,31 @@ int32_t MultimodalInputConnectProxy::AncoRemoveChannel(sptr<IAncoChannel> channe
     READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::CheckKnuckleEvent(float pointX, float pointY, bool &touchType)
+{
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+
+    WRITEFLOAT(data, pointX, ERR_INVALID_VALUE);
+    WRITEFLOAT(data, pointY, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CHECK_KNUCKLE_EVENT), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SendRequest fail, error:%{public}d", ret);
+        return ret;
+    }
+    READBOOL(reply, touchType, RET_ERR);
+    return RET_OK;
+}
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 int32_t MultimodalInputConnectProxy::TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject)

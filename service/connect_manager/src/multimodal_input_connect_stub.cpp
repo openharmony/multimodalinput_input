@@ -459,6 +459,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_ANCO_CHANNEL):
             ret = StubAncoRemoveChannel(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CHECK_KNUCKLE_EVENT):
+            ret = StubCheckKnuckleEvent(data, reply);
+            break;
 #endif // OHOS_BUILD_ENABLE_ANCO
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
@@ -3127,6 +3130,28 @@ int32_t MultimodalInputConnectStub::StubAncoRemoveChannel(MessageParcel& data, M
     }
     WRITEINT32(reply, ret);
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubCheckKnuckleEvent(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    float pointX = 0;
+    float pointY = 0;
+    bool touchType = false;
+    READFLOAT(data, pointX, RET_ERR);
+    READFLOAT(data, pointY, RET_ERR);
+    int32_t ret = CheckKnuckleEvent(pointX, pointY, touchType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call CheckKnuckleEvent failed:%{public}d", ret);
+        return ret;
+    }
+
+    WRITEBOOL(reply, touchType, RET_ERR);
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 

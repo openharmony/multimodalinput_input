@@ -192,6 +192,8 @@ public:
         bool isNativeInject, bool isShell);
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
+    int32_t CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType) override;
+    int32_t SyncKnuckleStatus();
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     static void ScreenCaptureCallback(int32_t pid, bool isStart);

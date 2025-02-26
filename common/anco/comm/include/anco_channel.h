@@ -32,6 +32,7 @@ public:
     int32_t SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) override;
+    int32_t SyncKnuckleStatus(bool isKnuckleEnable) override;
 
 private:
     std::shared_ptr<IAncoConsumer> consumer_;

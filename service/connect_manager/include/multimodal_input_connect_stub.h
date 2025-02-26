@@ -172,6 +172,7 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t StubAncoAddChannel(MessageParcel& data, MessageParcel& reply);
     int32_t StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply);
+    int32_t StubCheckKnuckleEvent(MessageParcel& data, MessageParcel& reply);
 #endif // OHOS_BUILD_ENABLE_ANCO
     int32_t StubTransferBinderClientService(MessageParcel& data, MessageParcel& reply);
     int32_t StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply);
