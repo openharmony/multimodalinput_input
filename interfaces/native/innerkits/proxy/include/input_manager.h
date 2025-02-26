@@ -116,7 +116,7 @@ public:
      * will be called back to the consumer object for processing.
      * @since 9
      */
-    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
+    int32_t SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
     /**
      * @brief Sets a window input event consumer that runs on the specified thread.
@@ -124,7 +124,7 @@ public:
      * @param eventHandler Indicates the thread running the consumer.
      * @since 9
      */
-    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    int32_t SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
 
     /**
