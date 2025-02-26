@@ -3341,12 +3341,21 @@ void PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     CHKPV(sp);
     if (!sp->Move(x, y, align)) {
         MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", displayId_);
-        return;
     }
-
-    for (auto msp : GetMirrorScreenPointers()) {
-        if (!msp->Move(x, y, align)) {
-            MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", msp->GetScreenId());
+    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        screenPointers = screenPointers_;
+    }
+    for (auto it : screenPointers) {
+        if (it.second->IsMirror()) {
+            if (!it.second->Move(x, y, align)) {
+                MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
+            }
+        } else if (it.first != displayId_) {
+            if (!it.second->Move(0, 0, align)) {
+                MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
+            }
         }
     }
 }
