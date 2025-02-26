@@ -2112,7 +2112,9 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
         if (screenPointers_.count(displayInfo.id)) {
             auto sp = screenPointers_[displayInfo.id];
             CHKPV(sp);
-            UpdateMirrorScreens(sp, displayInfo);
+            if (sp->IsMain()) {
+                UpdateMirrorScreens(sp, displayInfo);
+            }
             sp->OnDisplayInfo(displayInfo);
         }
     }
