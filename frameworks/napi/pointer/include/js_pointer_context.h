@@ -102,6 +102,8 @@ private:
     static napi_value SetCustomCursorEx(napi_env env, std::shared_ptr<JsPointerManager> jsPointerMgr,
         int32_t windowId, size_t argc, napi_value* argv);
     static bool CheckIsSetCustomCursorEx(napi_env env, size_t argc, napi_value* argv);
+    static bool GetFocusInfo(napi_env env, napi_value obj, const std::string& propertyName,
+        int32_t& focusValue, int32_t maxSize);
     std::shared_ptr<JsPointerManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
     static bool isCustomCursorEx_;
