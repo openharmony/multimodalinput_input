@@ -681,24 +681,19 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
     const int32_t initRows = 3;
     DeviceType deviceType = DeviceType::DEVICE_PC;
-    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT)
-    {
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
         deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
         double speedAdjustCoef = 0.1;
         axisValue = axisValue * speedAdjustCoef;
-    }
-    else
+    } else
     {
-        if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO)
-        {
+        if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
             deviceType = DeviceType::DEVICE_SOFT_PC_PRO;
         }
-        if (PRODUCT_TYPE == DEVICE_TYPE_TABLET)
-        {
+        if (PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
             deviceType = DeviceType::DEVICE_TABLET;
         }
-        if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC)
-        {
+        if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
             deviceType = DeviceType::DEVICE_FOLD_PC;
         }
     }
