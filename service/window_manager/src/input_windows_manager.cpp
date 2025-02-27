@@ -4546,7 +4546,7 @@ AcrossDirection InputWindowsManager::CalculateAcrossDirection(const DisplayInfo 
     if (layout.y < displayInfo.y) {
         return AcrossDirection::UPWARDS;
     } else if (layout.y >= layoutMax.y) {
-        return AcrossDirection::DOWNWARDS
+        return AcrossDirection::DOWNWARDS;
     }
 
     return AcrossDirection::ACROSS_ERROR;
@@ -4560,7 +4560,7 @@ bool InputWindowsManager::AcrossDisplay(const DisplayInfo &displayInfoDes, const
     int32_t pointerWidth = 0, pointerHeight = 0;
     bool re = false;
     layoutX = layout.x;
-    layoutY = layout.y
+    layoutY = layout.y;
     IPointerDrawingManager::GetInstance()->GetPointerImageSize(pointerWidth, pointerHeight);
     if (!AddInt32(displayInfoDes.x, displayInfoDes.validWidth, layoutMax.x)) {
         MMI_HILOGE("The addition of layoutMax.x overflows");
@@ -4590,7 +4590,7 @@ bool InputWindowsManager::AcrossDisplay(const DisplayInfo &displayInfoDes, const
     } else if (layout.y >= layoutMax.y) {
         layoutY = layoutMax.y - pointerHeight;
     }
-    logical = { layoutX - displayInfoDex.x, layoutY - displayInfoDes.y };
+    logical = { layoutX - displayInfoDes.x, layoutY - displayInfoDes.y };
     return re;
 }
 
@@ -4614,7 +4614,7 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
         if (acrossDirection == AcrossDirection::ACROSS_ERROR) {
             return;
         }
-        if (!AcrossDirection(item, displayInfo, logical, layout, acrossDirection)) {
+        if (!AcrossDisplay(item, displayInfo, logical, layout, acrossDirection)) {
             continue;
         }
         physical = logical;

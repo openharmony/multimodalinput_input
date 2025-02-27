@@ -2208,7 +2208,7 @@ int32_t PointerDrawingManager::GetPointerSize()
     return pointerSize;
 }
 
-void PointerDrawingManager::GetPointerImageSize(int32_t &width, int32_t)
+void PointerDrawingManager::GetPointerImageSize(int32_t &width, int32_t &height)
 {
     width = imageWidth_;
     height = imageHeight_;
