@@ -15,9 +15,6 @@
 
 #include "account_manager.h"
 
-#include <securec.h>
-#include <common_event_manager.h>
-#include <common_event_support.h>
 #ifdef SCREENLOCK_MANAGER_ENABLED
 #include <screenlock_manager.h>
 #endif // SCREENLOCK_MANAGER_ENABLED

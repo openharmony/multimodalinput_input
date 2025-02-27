@@ -14,34 +14,14 @@
  */
 
 #include "input_windows_manager.h"
-
-#include <algorithm>
-#include <cstdlib>
-#include <cstdio>
 #include <linux/input.h>
-#include <unordered_map>
 
-#include "bytrace_adapter.h"
-#include "cJSON.h"
 #include "display_manager.h"
-#include "dfx_hisysevent.h"
 #include "event_log_helper.h"
-#include "fingersense_wrapper.h"
-#include "input_device_manager.h"
-#include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
-#include "i_preference_manager.h"
-#include "mouse_event_normalize.h"
-#include "util.h"
 #include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
-#include "uds_session.h"
-#include "util_ex.h"
 #include "scene_board_judgement.h"
-#include "parameters.h"
-#include "setting_datashare.h"
-#include "system_ability_definition.h"
-#include "timer_manager.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
@@ -50,7 +30,6 @@
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "magic_pointer_velocity_tracker.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-#include "wm/wm_common.h"
 #include "hitrace_meter.h"
 
 #undef MMI_LOG_DOMAIN

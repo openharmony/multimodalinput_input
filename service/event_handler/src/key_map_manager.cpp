@@ -15,12 +15,7 @@
 
 #include "key_map_manager.h"
 
-#include <array>
-
-#include "define_multimodal.h"
 #include "input_device_manager.h"
-#include "mmi_log.h"
-#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH

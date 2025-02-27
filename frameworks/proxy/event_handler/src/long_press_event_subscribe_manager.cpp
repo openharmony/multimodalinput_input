@@ -15,9 +15,6 @@
 
 #include "long_press_event_subscribe_manager.h"
 
-#include <cinttypes>
-
-#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "multimodal_event_handler.h"

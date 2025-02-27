@@ -16,12 +16,6 @@
 #ifndef EVENT_FILTER_HANDLER_H
 #define EVENT_FILTER_HANDLER_H
 
-#include <memory>
-#include <mutex>
-#include <queue>
-
-#include "nocopyable.h"
-
 #include "event_filter_death_recipient.h"
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"

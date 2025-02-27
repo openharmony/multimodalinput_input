@@ -16,16 +16,10 @@
 #ifndef JS_INPUT_MONITOR_H
 #define JS_INPUT_MONITOR_H
 
-#include <cinttypes>
 #include <map>
-#include <mutex>
 #include <queue>
 #include <uv.h>
 
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "nocopyable.h"
-#include "util_napi.h"
 #include "window_info.h"
 
 #include "i_input_event_consumer.h"

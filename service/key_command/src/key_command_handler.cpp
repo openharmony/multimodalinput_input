@@ -15,46 +15,20 @@
 
 #include "key_command_handler.h"
 
-#include <ostream>
-#include <sstream>
-
-#include "cJSON.h"
-#include "config_policy_utils.h"
-#include "file_ex.h"
-#include "system_ability_definition.h"
-
 #include "ability_manager_client.h"
 #include "audio_stream_manager.h"
-#include "bytrace_adapter.h"
-#include "define_multimodal.h"
 #include "device_event_monitor.h"
-#include "dfx_hisysevent.h"
-#include "display_event_monitor.h"
-#include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
-#include "input_event_data_transformation.h"
-#include "input_event_handler.h"
-#include "i_input_windows_manager.h"
-#include "i_preference_manager.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_command_handler_util.h"
 #include "long_press_subscriber_handler.h"
-#include "mmi_log.h"
-#include "nap_process.h"
-#include "net_packet.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
-#include "proto.h"
-#include "setting_datashare.h"
 #include "stylus_key_handler.h"
-#include "table_dump.h"
-#include "timer_manager.h"
-#include "util.h"
-#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

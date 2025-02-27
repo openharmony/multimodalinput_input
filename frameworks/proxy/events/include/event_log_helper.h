@@ -16,14 +16,10 @@
 #ifndef EVENT_LOG_HELPER_H
 #define EVENT_LOG_HELPER_H
 
-#include <memory>
-
 #if !defined(ANDROID_PLATFORM) && !defined(IOS_PLATFORM)
 #include "parameters.h"
 #endif // !defined(ANDROID_PLATFORM) && !defined(IOS_PLATFORM)
 
-#include "define_multimodal.h"
-#include "input_event.h"
 #include "key_event.h"
 #include "mmi_log.h"
 #include "pointer_event.h"

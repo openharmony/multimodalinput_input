@@ -15,7 +15,6 @@
 
 #include "js_input_device_manager.h"
 
-#include "input_device_impl.h"
 #include "util_napi_error.h"
 
 #undef MMI_LOG_TAG

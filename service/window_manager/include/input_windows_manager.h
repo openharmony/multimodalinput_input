@@ -16,16 +16,11 @@
 #ifndef INPUT_WINDOWS_MANAGER_H
 #define INPUT_WINDOWS_MANAGER_H
 
-#include <vector>
-
 #include "mmi_transform.h"
-#include "nocopyable.h"
-#include "pixel_map.h"
 #include "window_manager_lite.h"
 
 #include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
-#include "input_event_data_transformation.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_manager.h"
 #include "knuckle_dynamic_drawing_manager.h"

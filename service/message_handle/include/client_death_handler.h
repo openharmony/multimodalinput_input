@@ -16,14 +16,7 @@
 #ifndef CLIENT_DEATH_HANDLER_H
 #define CLIENT_DEATH_HANDLER_H
 
-#include <functional>
 #include <map>
-#include <mutex>
-#include <vector>
-
-#include "iremote_object.h"
-#include "refbase.h"
-#include "nocopyable.h"
 
 #include "input_binder_client_death_recipient.h"
 

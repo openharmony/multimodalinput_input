@@ -14,7 +14,6 @@
  */
 
 #include "js_pointer_context.h"
-#include "pixel_map.h"
 #include "pixel_map_napi.h"
 
 #undef MMI_LOG_TAG

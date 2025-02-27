@@ -14,32 +14,14 @@
  */
 
 #include "mouse_transform_processor.h"
-
-#include <cinttypes>
-#include <chrono>
-#include <functional>
-
-#include <linux/input-event-codes.h>
-#include <linux/input.h>
-#include <cmath>
-
-#include "define_multimodal.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
-#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "i_preference_manager.h"
-#include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "mouse_device_state.h"
-#include "parameters.h"
-#include "preferences.h"
-#include "preferences_errno.h"
-#include "preferences_helper.h"
 #include "scene_board_judgement.h"
-#include "timer_manager.h"
 #include "touchpad_transform_processor.h"
-#include "util.h"
 #include "util_ex.h"
 #include "linux/input.h"
 

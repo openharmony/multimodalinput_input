@@ -16,7 +16,6 @@
 #ifndef APP_DEBUG_LISTENER_H
 #define APP_DEBUG_LISTENER_H
 
-#include "app_debug_info.h"
 #include "app_debug_listener_stub.h"
 
 namespace OHOS {

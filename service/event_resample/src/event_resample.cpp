@@ -18,8 +18,6 @@
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
-#include "mmi_log.h"
-#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER

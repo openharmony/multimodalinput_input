@@ -16,8 +16,6 @@
 #ifndef AXIS_EVENT_H
 #define AXIS_EVENT_H
 
-#include "nocopyable.h"
-
 #include "input_event.h"
 
 namespace OHOS {

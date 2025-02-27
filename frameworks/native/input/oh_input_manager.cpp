@@ -15,13 +15,9 @@
 
 #include "oh_input_manager.h"
 
-#include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"
-#include "key_event.h"
-#include "mmi_log.h"
-#include "oh_axis_type.h"
 #include "oh_input_device_listener.h"
 #include "oh_input_interceptor.h"
 #include "oh_key_code.h"

@@ -16,20 +16,10 @@
 #ifndef JS_POINTER_MANAGER_H
 #define JS_POINTER_MANAGER_H
 
-#include <memory>
-
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "refbase.h"
-#include "utils/log.h"
-
-#include "define_multimodal.h"
-#include "error_multimodal.h"
 #include "input_manager.h"
 #include "napi_constants.h"
-#include "pointer_style.h"
 #include "stream_buffer.h"
-#include "util_napi.h"
 #include "util_napi_error.h"
 
 namespace OHOS {

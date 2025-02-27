@@ -17,16 +17,8 @@
 #define UDS_SESSION_H
 
 #include <list>
-#include <memory>
-#include <unordered_map>
-
-#include <sys/socket.h>
-#include <sys/un.h>
-
-#include "nocopyable.h"
 
 #include "net_packet.h"
-#include "proto.h"
 
 namespace OHOS {
 namespace MMI {

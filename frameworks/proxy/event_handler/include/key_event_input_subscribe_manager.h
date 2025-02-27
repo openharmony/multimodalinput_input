@@ -16,10 +16,6 @@
 #ifndef KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H
 #define KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H
 
-#include <functional>
-#include <memory>
-#include <set>
-
 #include <singleton.h>
 
 #include "key_event.h"

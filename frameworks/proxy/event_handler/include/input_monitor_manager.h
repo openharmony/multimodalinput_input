@@ -16,13 +16,9 @@
 #ifndef INPUT_MONITOR_MANAGER_H
 #define INPUT_MONITOR_MANAGER_H
 
-#include <memory>
-
 #include "singleton.h"
 
 #include "input_handler_manager.h"
-#include "input_handler_type.h"
-#include "i_input_event_consumer.h"
 
 namespace OHOS {
 namespace MMI {

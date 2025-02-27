@@ -16,11 +16,8 @@
 #ifndef INPUT_DISPLAY_BIND_HELPER_H
 #define INPUT_DISPLAY_BIND_HELPER_H
 
-#include <cstdint>
 #include <list>
-#include <memory>
 #include <set>
-#include <string>
 
 #include "window_info.h"
 

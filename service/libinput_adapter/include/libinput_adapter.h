@@ -16,14 +16,8 @@
 #ifndef LIBINPUT_ADAPTER_H
 #define LIBINPUT_ADAPTER_H
 
-#include <array>
-#include <functional>
-#include <thread>
-#include <unordered_map>
-
 #include "hotplug_detector.h"
 #include "libinput.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {

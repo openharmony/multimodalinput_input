@@ -16,15 +16,10 @@
 #ifndef STREAM_BUFFER_H
 #define STREAM_BUFFER_H
 
-#include <cstdint>
-#include <string>
-#include <vector>
-
 #include "nocopyable.h"
 #include "securec.h"
 
 #include "config_multimodal.h"
-#include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
 

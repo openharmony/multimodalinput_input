@@ -17,14 +17,9 @@
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "iremote_stub.h"
-#include "message_parcel.h"
-#include "nocopyable.h"
 
 #include "i_multimodal_input_connect.h"
-#include "mmi_event_observer.h"
-#include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
-#include "multimodal_input_connect_define.h"
 
 namespace OHOS {
 namespace MMI {

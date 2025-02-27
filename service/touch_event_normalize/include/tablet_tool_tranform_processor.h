@@ -16,8 +16,6 @@
 #ifndef TABLET_TOOL_TRANSFORM_PROCESSOR_H
 #define TABLET_TOOL_TRANSFORM_PROCESSOR_H
 
-#include "nocopyable.h"
-
 #include "transform_processor.h"
 
 namespace OHOS {

@@ -16,15 +16,6 @@
 #ifndef JS_INPUT_MONITOR_MANAGER_H
 #define JS_INPUT_MONITOR_MANAGER_H
 
-#include <cinttypes>
-#include <list>
-#include <map>
-#include <mutex>
-
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "nocopyable.h"
-
 #include "js_input_monitor.h"
 
 namespace OHOS {

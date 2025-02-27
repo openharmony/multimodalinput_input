@@ -16,12 +16,9 @@
 #include "stylus_key_handler.h"
 
 #include "ability_manager_client.h"
-#include "define_multimodal.h"
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
-#include "error_multimodal.h"
-#include "mmi_log.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 

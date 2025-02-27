@@ -15,10 +15,6 @@
 
 #include "stream_buffer.h"
 
-#include <vector>
-
-#include "define_multimodal.h"
-
 namespace OHOS {
 namespace MMI {
 StreamBuffer::StreamBuffer(const StreamBuffer &buf)

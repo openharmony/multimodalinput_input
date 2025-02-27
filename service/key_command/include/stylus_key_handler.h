@@ -17,7 +17,6 @@
 #define STYLUS_KEY_HANDLER_H
 
 #include "key_command_handler.h"
-#include "key_event.h"
 
 #include "singleton.h"
 

@@ -16,11 +16,8 @@
 #ifndef MMI_CLIENT_H
 #define MMI_CLIENT_H
 
-#include "nocopyable.h"
-
 #include "if_mmi_client.h"
 
-#include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
 
 namespace OHOS {

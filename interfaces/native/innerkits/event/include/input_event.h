@@ -16,11 +16,6 @@
 #ifndef INPUT_EVENT_H
 #define INPUT_EVENT_H
 
-#include <functional>
-#include <memory>
-#include <mutex>
-
-#include "nocopyable.h"
 #include "parcel.h"
 
 namespace OHOS {

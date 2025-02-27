@@ -16,7 +16,6 @@
 #ifndef JS_JOYSTICK_EVENT
 #define JS_JOYSTICK_EVENT
 
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 

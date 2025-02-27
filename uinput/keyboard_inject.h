@@ -17,8 +17,6 @@
 #define KEYBOARD_INJECT_H
 
 #include <map>
-#include <memory>
-#include <mutex>
 
 #include "singleton.h"
 

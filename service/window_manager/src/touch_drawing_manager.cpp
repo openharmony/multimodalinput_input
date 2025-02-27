@@ -16,14 +16,11 @@
 #include "touch_drawing_manager.h"
 
 #include "bytrace_adapter.h"
-#include "delegate_interface.h"
 #include "parameters.h"
 #include "setting_datashare.h"
-#include "text/font_mgr.h"
 
 #include "i_multimodal_input_connect.h"
 #include "input_windows_manager.h"
-#include "mmi_log.h"
 #include "table_dump.h"
 
 #undef MMI_LOG_DOMAIN

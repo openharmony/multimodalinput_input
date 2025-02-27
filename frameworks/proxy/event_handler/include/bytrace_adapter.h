@@ -16,8 +16,6 @@
 #ifndef BYTRACE_ADAPTER_H
 #define BYTRACE_ADAPTER_H
 
-#include <memory>
-
 #include "key_event.h"
 #include "pointer_event.h"
 

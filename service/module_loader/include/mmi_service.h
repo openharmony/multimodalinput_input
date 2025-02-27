@@ -16,24 +16,13 @@
 #ifndef MMI_SERVICE_H
 #define MMI_SERVICE_H
 
-#include <atomic>
-#include <mutex>
-#include <thread>
-
-#include "iremote_object.h"
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
-#include "delegate_interface.h"
-#include "delegate_tasks.h"
-#include "infrared_frequency_info.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
-#include "nap_process.h"
 #include "server_msg_handler.h"
-#include "touchpad_control_display_gain.h"
-#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {

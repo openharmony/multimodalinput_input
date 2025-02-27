@@ -15,35 +15,22 @@
 
 #include "key_subscriber_handler.h"
 
-#include <sstream>
-
-#include "common_event_support.h"
-
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
 #include "call_manager_client.h"
-#include "common_event_data.h"
-#include "common_event_manager.h"
-#include "common_event_support.h"
 #include "display_event_monitor.h"
-#include "define_multimodal.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
 #include "display_event_monitor.h"
-#include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
-#include "net_packet.h"
-#include "proto.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "setting_datashare.h"
-#include "timer_manager.h"
 #include "util_ex.h"
-#include "want.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

@@ -16,13 +16,9 @@
 #ifndef EVENT_RESAMPLE_H
 #define EVENT_RESAMPLE_H
 
-#include <vector>
 #include <map>
-#include <list>
 
-#include "proto.h"
 #include "singleton.h"
-#include "nocopyable.h"
 #include "error_multimodal.h"
 #include "pointer_event.h"
 

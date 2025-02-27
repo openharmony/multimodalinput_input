@@ -15,15 +15,12 @@
 
 #include "js_register_module.h"
 
-#include <cinttypes>
-
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "napi_constants.h"
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 #include "oh_input_manager.h"
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-#include "util_napi.h"
 #include "util_napi_error.h"
 
 #undef MMI_LOG_TAG

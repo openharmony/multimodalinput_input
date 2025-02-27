@@ -17,7 +17,6 @@
 #define DISPLAY_INFO_H
 
 #include <string>
-#include <vector>
 
 namespace OHOS {
 namespace MMI {
