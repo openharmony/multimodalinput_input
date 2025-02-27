@@ -846,5 +846,10 @@ int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, Cur
 {
     return InputMgrImpl.SetCustomCursor(windowId, cursor, options);
 }
+
+int32_t InputManager::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
+{
+    return InputMgrImpl.CheckKnuckleEvent(pointX, pointY, isKnuckleType);
+}
 } // namespace MMI
 } // namespace OHOS

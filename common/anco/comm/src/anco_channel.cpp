@@ -46,5 +46,11 @@ int32_t AncoChannel::UpdateWindowInfo(std::shared_ptr<AncoWindows> windows)
     CHKPR(consumer_, RET_ERR);
     return consumer_->UpdateWindowInfo(windows);
 }
+
+int32_t AncoChannel::SyncKnuckleStatus(bool isKnuckleEnable)
+{
+    CHKPR(consumer_, RET_ERR);
+    return consumer_->SyncKnuckleStatus(isKnuckleEnable);
+}
 } // namespace MMI
 } // namespace OHOS

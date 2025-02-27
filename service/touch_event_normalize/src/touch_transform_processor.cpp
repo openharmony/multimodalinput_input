@@ -158,8 +158,10 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
         BytraceAdapter::StartToolType(toolType);
         FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
         BytraceAdapter::StopToolType();
+        FINGERSENSE_WRAPPER->SaveTouchInfo(rawTouchTmp.x, rawTouchTmp.y, toolType);
     }
 }
+
 void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;

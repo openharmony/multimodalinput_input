@@ -39,6 +39,7 @@ public:
     int32_t SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) override;
+    int32_t SyncKnuckleStatus(bool isKnuckleEnable) override;
 };
 
 int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -56,6 +57,11 @@ int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 }
 
 int32_t AncoMonitor::UpdateWindowInfo(std::shared_ptr<AncoWindows> windows)
+{
+    return RET_OK;
+}
+
+int32_t AncoMonitor::SyncKnuckleStatus(bool isKnuckleEnable)
 {
     return RET_OK;
 }

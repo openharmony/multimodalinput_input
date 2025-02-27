@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const char* FINGERSENSE_WRAPPER_PATH { "libfingersense_wrapper.z.so" };
+constexpr int32_t MAX_TOUCH_INFO_SIZE = 10;
 } // namespace
 
 FingersenseWrapper::FingersenseWrapper() {}
@@ -39,6 +40,7 @@ FingersenseWrapper::~FingersenseWrapper()
     MMI_HILOGD("Start release fingersense wrapper");
     dlclose(fingerSenseWrapperHandle_);
     fingerSenseWrapperHandle_ = nullptr;
+    touchInfos_.clear();
 }
 
 void FingersenseWrapper::InitFingerSenseWrapper()
@@ -68,6 +70,37 @@ void FingersenseWrapper::InitFingerSenseWrapper()
         return;
     }
     MMI_HILOGD("Fingersense wrapper init success");
+}
+
+void FingersenseWrapper::SaveTouchInfo(float pointX, float pointY, int32_t toolType)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    while (touchInfos_.size() >= MAX_TOUCH_INFO_SIZE) {
+        touchInfos_.erase(touchInfos_.begin());
+    }
+    TouchInfo touchInfo;
+    touchInfo.x = pointX;
+    touchInfo.y = pointY;
+    touchInfo.touch_type = toolType;
+    touchInfos_.push_back(touchInfo);
+}
+
+bool FingersenseWrapper::IsEqual(float a, float b, float epsilon)
+{
+    return fabs(a - b) < epsilon;
+}
+
+int32_t FingersenseWrapper::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    for (size_t i = 0; i < touchInfos_.size(); i++) {
+        TouchInfo touchInfo = touchInfos_[i];
+        if (IsEqual(touchInfo.x, pointX) && IsEqual(touchInfo.y, pointY)) {
+            isKnuckleType = touchInfo.touch_type == MMI::PointerEvent::TOOL_TYPE_KNUCKLE;
+            return RET_OK;
+        }
+    }
+    return RET_ERR;
 }
 } // namespace MMI
 } // namespace OHOS

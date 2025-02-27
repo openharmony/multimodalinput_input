@@ -1115,6 +1115,16 @@ public:
      * @since 14
      */
     int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
+
+    /**
+     * @brief Check whether the touch position is a knuckle event.
+     * @param pointX X coordinate of the touch position
+     * @param pointY Y coordinate of the touch position
+     * @param isKnuckleType true is kunckle type
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 14
+     */
+    int32_t CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

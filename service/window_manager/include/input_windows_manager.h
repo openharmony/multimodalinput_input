@@ -191,6 +191,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
+    int32_t SyncKnuckleStatus(bool isKnuckleEnable);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);

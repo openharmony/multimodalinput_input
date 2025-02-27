@@ -46,6 +46,10 @@ public:
     {
         return 0;
     }
+    int32_t SyncKnuckleStatus(bool isKnuckleEnable)
+    {
+        return 0;
+    }
 };
 } // namespace
 
@@ -152,6 +156,22 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubUpdateWindowInfo, Test
     MessageParcel data;
     MessageParcel reply;
     EXPECT_EQ(ancoChannel->StubUpdateWindowInfo(data, reply), RET_ERR);
+}
+
+/**
+ * @tc.name: AncoChannelStubExTest_StubSyncKnuckleStatus
+ * @tc.desc: Test StubSyncKnuckleStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKnuckleStatus, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<AncoChannelStub> ancoChannel = std::make_shared<AncoChannelTest>();
+    ASSERT_NE(ancoChannel, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(ancoChannel->StubSyncKnuckleStatus(data, reply), RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS
