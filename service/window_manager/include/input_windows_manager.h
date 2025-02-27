@@ -44,6 +44,14 @@ struct SwitchFocusKey {
     int32_t pressedKey { -1 };
 };
 
+enum AcrossDirection : int32_t {
+    ACROSS_ERROR = 0,
+    UPWARDS = 1,
+    DOWNWARDS = 2,
+    LEFTWARDS = 3,
+    RIGHTWARDS = 4,
+};
+
 class InputWindowsManager final : public IInputWindowsManager {
 public:
     InputWindowsManager();
@@ -283,6 +291,9 @@ private:
     bool CalculateLayout(const DisplayInfo& displayInfo, const Vector2D<double> &physical, Vector2D<double>& layout);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, double& physicalX,
         double& physicalY, int32_t& displayId);
+    bool AcrossDisplay(const DisplayInfo &displayInfoDes, const DisplayInfo &displayInfoOri, Vector2D<double> &logical,
+        Vector2D<double> &layout, const AcrossDirection &acrossDirection);
+    AcrossDirection CalculateAcrossDirection(const DisplayInfo &displayInfo, const Vector2D<double>layout);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void InitMouseDownInfo();
