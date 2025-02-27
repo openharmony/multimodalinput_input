@@ -1209,6 +1209,19 @@ public:
         void SetBlobId(int32_t blobId);
 
         /**
+         * @brief Obtains the angle in this event.
+         * @return Returns the angle.
+         */
+        int32_t GetAngle() const;
+        
+        /**
+         * @brief Sets the angle in this event.
+         * @param angle Indicates the angle to set.
+         * @return void
+         */
+        void SetAngle(int32_t angle);
+
+        /**
          * @brief Checks whether the pointer is canceled.
          * @return Returns <b>true</b> if the pointer is canceled; returns <b>false</b> otherwise.
          * @since 9
@@ -1285,6 +1298,7 @@ public:
         int32_t rawDisplayX_ {};
         int32_t rawDisplayY_ {};
         int32_t blobId_ {};
+        int32_t angle_ {};
         bool canceled_ { false };
     };
 
