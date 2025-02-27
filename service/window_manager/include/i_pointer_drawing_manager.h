@@ -163,6 +163,10 @@ public:
     {
         return 0;
     }
+    virtual int32_t DrawNewDpiPointer()
+    {
+        return 0;
+    }
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     virtual bool IsSupported()
     {

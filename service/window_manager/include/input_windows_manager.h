@@ -457,6 +457,7 @@ private:
     static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
+    int32_t lastDpi_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
