@@ -248,7 +248,15 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    MMI_HILOGD("isAutoToVirtualScreen=%{public}s", isAutoToVirtualScreen ? "true" : "false");
+    PointerEvent::PointerItem pointerItem;
+    if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGD("isAutoToVirtualScreen=%{public}s, DX=%{private}d, DY=%{private}d, "
+            "FDX=%{private}d, FDY=%{private}d",
+            isAutoToVirtualScreen ? "true" : "false", pointerItem.GetDisplayX(), pointerItem.GetDisplayY(),
+            pointerItem.GetFixedDisplayX(), pointerItem.GetFixedDisplayY());
+    } else {
+        MMI_HILOGD("isAutoToVirtualScreen=%{public}s", isAutoToVirtualScreen ? "true" : "false");
+    }
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
@@ -262,7 +270,16 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s", zOrder, isAutoToVirtualScreen ? "true" : "false");
+    PointerEvent::PointerItem pointerItem;
+    if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s, DX=%{private}d, DY=%{private}d, "
+            "FDX=%{private}d, FDY=%{private}d",
+            zOrder, isAutoToVirtualScreen ? "true" : "false", pointerItem.GetDisplayX(), pointerItem.GetDisplayY(),
+            pointerItem.GetFixedDisplayX(), pointerItem.GetFixedDisplayY());
+    } else {
+        MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s", zOrder,
+            isAutoToVirtualScreen ? "true" : "false");
+    }
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 

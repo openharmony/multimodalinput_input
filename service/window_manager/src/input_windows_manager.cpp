@@ -3604,7 +3604,7 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
     double physicalX = pointerItem.GetDisplayXPos();
     double physicalY = pointerItem.GetDisplayYPos();
     if (displayInfo.height == 0 || displayInfo.height == displayInfo.oneHandY) {
-        MMI_HILOG_DISPATCHE("displayInfo.height=%{public}d, displayInfo.oneHandY=%{public}d is invalid",
+        MMI_HILOG_DISPATCHE("displayInfo.height=%{private}d, displayInfo.oneHandY=%{private}d is invalid",
             displayInfo.height, displayInfo.oneHandY);
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN);
         pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
@@ -3616,17 +3616,15 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
     bool isOneHandMode = displayInfo.oneHandY > 0;
     if (isOneHandMode) {
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
-        MMI_HILOG_DISPATCHD("displayInfo.oneHandY=%{public}d, fixedMode=%{public}d, fixedModeStr=%{public}s",
-            displayInfo.oneHandY, static_cast<int32_t>(pointerEvent->GetFixedMode()),
+        MMI_HILOG_DISPATCHD("displayInfo.oneHandY=%{private}d, fixedModeStr=%{public}s", displayInfo.oneHandY,
             pointerEvent->GetFixedModeStr().c_str());
         double fixedDisplayX = physicalX;
         double fixedDisplayY = physicalY;
         float oneHandScale = (displayInfo.height - displayInfo.oneHandY) * 1.0 / displayInfo.height;
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+            MMI_HILOG_DISPATCHD("autoToVirtualScreen=%{public}s", autoToVirtualScreen ? "true" : "false");
             if (autoToVirtualScreen) {
                 UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
-            } else {
-                MMI_HILOG_DISPATCHD("autoToVirtualScreen=%{public}s", autoToVirtualScreen ? "true" : "false");
             }
         } else {
             UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
@@ -3637,11 +3635,13 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
         pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
         pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
-        MMI_HILOG_DISPATCHD("displayInfo.oneHandY=%{public}d, fixedMode=%{public}d, fixedModeStr=%{public}s",
-            displayInfo.oneHandY, static_cast<int32_t>(pointerEvent->GetFixedMode()),
-            pointerEvent->GetFixedModeStr().c_str());
+        MMI_HILOG_DISPATCHD("displayInfo.oneHandY=%{private}d, fixedModeStr=%{public}s",
+            displayInfo.oneHandY, pointerEvent->GetFixedModeStr().c_str());
     }
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    MMI_HILOG_DISPATCHD("targetDisplayId=%{private}d, DX=%{private}d, DY=%{private}d, FDX=%{private}d, "
+        "FDY=%{private}d", pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(),
+        pointerItem.GetDisplayY(), pointerItem.GetFixedDisplayX(), pointerItem.GetFixedDisplayY());
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
