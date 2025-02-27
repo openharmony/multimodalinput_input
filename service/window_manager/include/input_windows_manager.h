@@ -369,6 +369,7 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
         DisplayInfo &mainScreenDisplayInfo) const;
     bool IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay);
+    void SendBackCenterPointerEevent(const CursorPosition &cursorPos);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
