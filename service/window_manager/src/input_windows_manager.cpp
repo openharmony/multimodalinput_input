@@ -1227,15 +1227,24 @@ void InputWindowsManager::CancelMouseEvent()
         MMI_HILOGD("lastPointerEvent_ is null");
         return;
     }
+    int32_t action = PointerEvent::POINTER_ACTION_CANCEL;
+    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+        action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
+    }
     if (lastPointerEvent_->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
         !lastPointerEvent_->GetPressedButtons().empty()) {
-        MMI_HILOGD("Cancel mouse event for valid display change");
+        int32_t pointerId = lastPointerEvent_->GetPointerId();
+        int32_t originAction = lastPointerEvent_->GetPointerAction();
+        MMI_HILOGD("Cancel mouse event for valid display change,pointerId:%{private}d action:%{private}d->%{private}d",
+            pointerId,
+            originAction,
+            action);
         auto lastPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
-        lastPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-        lastPointerEvent->UpdateId();
+        lastPointerEvent->SetPointerAction(action);
+        lastPointerEvent->SetOriginPointerAction(originAction);
+        lastPointerEvent->SetPointerId(pointerId);
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         CHKPV(eventDispatchHandler);
-        lastPointerEvent_->DeleteReleaseButton(lastPointerEvent_->GetPointerId());
         eventDispatchHandler->HandlePointerEvent(lastPointerEvent);
     }
 }
