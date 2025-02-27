@@ -326,6 +326,7 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     CHKPV(nextHandler_);
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
+    PointerEvent::PointerItem item;
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
         MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d, PointerId:%{public}d,"
             "SourceType:%{public}d, ButtonId:%{public}d,"
@@ -333,7 +334,6 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
             pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
             pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
-        PointerEvent::PointerItem item;
         if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
             MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
             return;
@@ -354,7 +354,9 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         WIN_MGR->UpdateTargetPointer(pointerEvent);
     }
-    nextHandler_->HandlePointerEvent(pointerEvent);
+    if (!item.IsCanceled()) {
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    }
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
 }
@@ -513,7 +515,11 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     auto buttonId = pointerEvent->GetButtonId();
     g_buttonPressed = pointerEvent->IsButtonPressed(buttonId);
     EventStatistic::PushPointerEvent(pointerEvent);
-    nextHandler_->HandlePointerEvent(pointerEvent);
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
+    if (!item.IsCanceled()) {
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    }
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER

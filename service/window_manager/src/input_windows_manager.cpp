@@ -1029,6 +1029,7 @@ void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &win
 int32_t InputWindowsManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
     DisplayInfo &mainScreenDisplayInfo) const
 {
+    CALL_DEBUG_ENTER;
     if (displayGroupInfo.displaysInfo.empty()) {
         MMI_HILOGE("displayGroupInfo doesn't contain displayInfo");
         return RET_ERR;
@@ -1039,27 +1040,68 @@ int32_t InputWindowsManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &di
             return RET_OK;
         }
     }
+    MMI_HILOGD("displayGroupInfo has no main screen, get displayGroupInfo.displaysInfo[0] back");
     mainScreenDisplayInfo = displayGroupInfo.displaysInfo[0];
     return RET_OK;
 }
 
+void InputWindowsManager::SendBackCenterPointerEevent(const CursorPosition &cursorPos)
+{
+    CALL_DEBUG_ENTER;
+    int32_t lastPointerAction = lastPointerEvent_->GetPointerAction();
+    std::shared_ptr<PointerEvent> pointerBackCenterEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    pointerBackCenterEvent->SetTargetDisplayId(cursorPos.displayId);
+    auto mainDisplayInfo = GetPhysicalDisplay(cursorPos.displayId);
+    int32_t logicalX = cursorPos.cursorPos.x + mainDisplayInfo->x;
+    int32_t logicalY = cursorPos.cursorPos.y + mainDisplayInfo->y;
+    auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerBackCenterEvent);
+    if (touchWindow == std::nullopt) {
+        MMI_HILOGD("Maybe just down left mouse button, the mouse did not on the window");
+        return;
+    }
+    int32_t pointerId = pointerBackCenterEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerBackCenterEvent->GetPointerItem(pointerId, item);
+    item.SetDisplayX(cursorPos.cursorPos.x);
+    item.SetDisplayY(cursorPos.cursorPos.y);
+    item.SetCanceled(true);
+    pointerBackCenterEvent->UpdatePointerItem(pointerId, item);
+    pointerBackCenterEvent->SetTargetWindowId(touchWindow->id);
+    pointerBackCenterEvent->SetAgentWindowId(touchWindow->id);
+
+    if (lastPointerAction == PointerEvent::POINTER_ACTION_MOVE) {
+        pointerBackCenterEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    } else if (lastPointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        pointerBackCenterEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
+    }
+    MMI_HILOGD("pointerBackCenterEvent status: %{public}s", pointerBackCenterEvent->ToString().c_str());
+    InputHandler->GetFilterHandler()->HandlePointerEvent(pointerBackCenterEvent);
+}
+
 void InputWindowsManager::ResetPointerPosition(const DisplayGroupInfo &displayGroupInfo)
 {
+    CALL_DEBUG_ENTER;
     if (displayGroupInfo.displaysInfo.empty()) {
         return;
     }
     CursorPosition oldPtrPos = GetCursorPos();
-    int32_t oldDisplayId = oldPtrPos.displayId;
+    CursorPosition cursorPos;
     for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
         if ((currentDisplay.screenCombination == OHOS::MMI::ScreenCombination::SCREEN_MAIN)) {
-            MMI_HILOGD("CurDisplayId = %{public}d oldDisplayId = %{public}d", currentDisplay.id, oldDisplayId);
-            if (oldDisplayId != currentDisplay.id || !IsPointerOnCenter(oldPtrPos, currentDisplay)) {
-                CursorPosition cursorPos = ResetCursorPos();
+            MMI_HILOGD("CurDisplayId = %{public}d oldDisplayId = %{public}d", currentDisplay.id, oldPtrPos.displayId);
+            if ((oldPtrPos.displayId != currentDisplay.id) || (!IsPointerOnCenter(oldPtrPos, currentDisplay))) {
+                cursorPos = ResetCursorPos();
                 UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
             }
             break;
         }
     }
+
+    if ((lastPointerEvent_ != nullptr) && (!lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT))) {
+        MMI_HILOGD("Reset pointer position, left mouse button is not pressed");
+        return;
+    }
+    (void)SendBackCenterPointerEevent(cursorPos);
 }
 
 bool InputWindowsManager::IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay)
