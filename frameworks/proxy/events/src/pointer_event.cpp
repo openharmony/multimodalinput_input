@@ -469,6 +469,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(windowXPos_) &&
         out.WriteDouble(windowYPos_) &&
         out.WriteInt32(blobId_) &&
+        out.WriteInt32(angle_) &&
         out.WriteInt32(fixedDisplayX_) &&
         out.WriteInt32(fixedDisplayY_)
     );
@@ -510,6 +511,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(windowXPos_) &&
         in.ReadDouble(windowYPos_) &&
         in.ReadInt32(blobId_) &&
+        in.ReadInt32(angle_) &&
         in.ReadInt32(fixedDisplayX_) &&
         in.ReadInt32(fixedDisplayY_)
     );
