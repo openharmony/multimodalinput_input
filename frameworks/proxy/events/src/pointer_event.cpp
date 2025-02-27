@@ -413,6 +413,16 @@ void PointerEvent::PointerItem::SetBlobId(int32_t blobId)
     blobId_ = blobId;
 }
 
+int32_t PointerEvent::PointerItem::GetAngle() const
+{
+    return angle_;
+}
+
+void PointerEvent::PointerItem::SetAngle(int32_t angle)
+{
+    angle_ = angle;
+}
+
 bool PointerEvent::PointerItem::IsCanceled() const
 {
     return canceled_;
