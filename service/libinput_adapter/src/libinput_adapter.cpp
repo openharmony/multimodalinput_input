@@ -1099,7 +1099,7 @@ void LibinputAdapter::ShowMouseCursor()
 
 void LibinputAdapter::HideMouseCursorTemporary()
 {
-    MMI_HILOGD("Switch layout");
+    MMI_HILOGI("VKeyboard hide mouse.");
     if (IPointerDrawingManager::GetInstance() != nullptr &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
         IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);

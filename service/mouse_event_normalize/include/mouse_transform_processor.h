@@ -171,6 +171,7 @@ public:
     static int32_t GetTouchpadSpeed();
 
 private:
+    static DeviceType deviceTypeGlobal_;
     static int32_t globalPointerSpeed_;
     static int32_t scrollSwitchPid_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
