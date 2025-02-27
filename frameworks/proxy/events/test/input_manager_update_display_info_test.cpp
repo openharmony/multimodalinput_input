@@ -52,12 +52,12 @@ std::shared_ptr<OHOS::Media::PixelMap> InputManagerUpdateDisplayInfoTest::Matrix
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap;
     uint32_t maskHeight = windowMask.size();
     if (maskHeight < 1) {
-        MMI_HILOGE("Filed to create a pixelMap, err maskHeight %{public}d <1", maskHeight);
+        MMI_HILOGE("Failed to create a pixelMap, err maskHeight %{public}d <1", maskHeight);
         return pixelMap;
     }
     uint32_t maskWidth = windowMask[0].size();
     if (maskHeight < 1) {
-        MMI_HILOGE("Filed to create a pixelMap, err maskWidth %{public}d <1", maskWidth);
+        MMI_HILOGE("Failed to create a pixelMap, err maskWidth %{public}d <1", maskWidth);
         return pixelMap;
     }
     OHOS::Media::InitializationOptions ops;
@@ -72,7 +72,7 @@ std::shared_ptr<OHOS::Media::PixelMap> InputManagerUpdateDisplayInfoTest::Matrix
     for (uint32_t i = 0; i < maskHeight; i++) {
         if (windowMask[i].size() != maskWidth) {
             MMI_HILOGE(
-                "Filed to create a pixelMap,row:%{public}d curSize:%{public}zu not equal frist row size:%{public}d",
+                "Failed to create a pixelMap,row:%{public}d curSize:%{public}zu not equal frist row size:%{public}d",
                 i, windowMask[i].size(), maskWidth);
             return nullptr;
         }
@@ -93,11 +93,11 @@ std::vector<std::vector<uint32_t>> InputManagerUpdateDisplayInfoTest::CreateMatr
 {
     MMI_HILOGD("CreateMatrix--enter");
     if (width < 1) {
-        MMI_HILOGE("Filed to create a Matrix, err width %{public}d <1", width);
+        MMI_HILOGE("Failed to create a Matrix, err width %{public}d <1", width);
         return std::vector<std::vector<uint32_t>>();
     }
     if (height < 1) {
-        MMI_HILOGE("Filed to create a Matrix, err height %{public}d <1", height);
+        MMI_HILOGE("Failed to create a Matrix, err height %{public}d <1", height);
         return std::vector<std::vector<uint32_t>>();
     }
     std::vector<std::vector<uint32_t>> matrix(height, std::vector<uint32_t>(width, 0));

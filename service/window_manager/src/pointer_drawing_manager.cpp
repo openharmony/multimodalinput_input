@@ -3518,5 +3518,17 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
         imageInfo.size.width, imageInfo.size.height, cursor.focusX, cursor.focusY);
     return RET_OK;
 }
+
+int32_t PointerDrawingManager::DrawNewDpiPointer()
+{
+    mouseIconUpdate_ = true;
+    int32_t updateRes = DrawMovePointer(lastDisplayId_, lastPhysicalX_, lastPhysicalY_,
+        lastMouseStyle_, currentDirection_);
+    if (updateRes != RET_OK) {
+        MMI_HILOGE("Forced refresh DPI drawing failed.");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
