@@ -463,13 +463,6 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
     if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
-#ifdef OHOS_BUILD_ENABLE_ANCO
-        if (WIN_MGR->IsKnuckleOnAncoWindow(touchEvent)) {
-            knuckleCount_ = 0;
-            SendNotSupportMsg(touchEvent);
-            return;
-        }
-#endif // OHOS_BUILD_ENABLE_ANCO
         MMI_HILOGI("Knuckle gesture start launch ability");
         knuckleCount_ = 0;
         if ((type == KnuckleType::KNUCKLE_TYPE_SINGLE && screenshotSwitch_.statusConfigValue) ||
@@ -878,15 +871,6 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
         gesturePoints_.size(), isGesturing_, isLetterGesturing_);
     NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
         isGesturing_, isLetterGesturing_));
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    if (WIN_MGR->IsKnuckleOnAncoWindow(touchEvent) && (notifyType == NotifyType::REGIONGESTURE ||
-        notifyType == NotifyType::LETTERGESTURE)) {
-        MMI_HILOGI("Anco single knuckle toast");
-        SendNotSupportMsg(touchEvent);
-        ResetKnuckleGesture();
-        return;
-    }
-#endif // OHOS_BUILD_ENABLE_ANCO
     switch (notifyType) {
         case NotifyType::REGIONGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
@@ -1300,7 +1284,11 @@ template <class T>
 void KeyCommandHandler::CreateStatusConfigObserver(T& item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [weak = weak_from_this(), &item](const std::string& key) {
+        auto ptr = weak.lock();
+        if (ptr == nullptr) {
+            return;
+        }
         bool statusValue = true;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetBoolValue(key, statusValue);
@@ -1310,6 +1298,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
         }
         MMI_HILOGI("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
         item.statusConfigValue = statusValue;
+        ptr->OnKunckleSwitchStatusChange(item.statusConfig);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.statusConfig, updateFunc);
@@ -1347,7 +1336,11 @@ void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
         MMI_HILOGE("Failed to format URI");
         return;
     }
-    SettingObserver::UpdateFunc updateFunc = [&item, buf](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [weak = weak_from_this(), &item, buf](const std::string& key) {
+        auto ptr = weak.lock();
+        if (ptr == nullptr) {
+            return;
+        }
         bool statusValue = true;
         ErrCode ret = RET_ERR;
         MMI_HILOGI("The statusConfig:%s", item.statusConfig.c_str());
@@ -1360,6 +1353,7 @@ void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
         }
         MMI_HILOGI("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
         item.statusConfigValue = statusValue;
+        ptr->OnKunckleSwitchStatusChange(item.statusConfig);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.statusConfig, updateFunc);
@@ -2919,6 +2913,21 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
         return false;
     }
     return true;
+}
+
+void KeyCommandHandler::OnKunckleSwitchStatusChange(const std::string switchName)
+{
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (switchName != SETTING_KNUCKLE_SWITCH && switchName != SNAPSHOT_KNUCKLE_SWITCH
+        && switchName != RECORD_KNUCKLE_SWITCH) {
+        return;
+    }
+    bool isKnuckleEnable = !SkipKnuckleDetect();
+    int32_t ret = WIN_MGR->SyncKnuckleStatus(isKnuckleEnable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("sync knuckle status error., ret:%{public}d", ret);
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 } // namespace MMI
 } // namespace OHOS

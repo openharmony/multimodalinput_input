@@ -89,6 +89,7 @@ public:
     virtual int32_t SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) = 0;
+    virtual int32_t SyncKnuckleStatus(bool isKnuckleEnable) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

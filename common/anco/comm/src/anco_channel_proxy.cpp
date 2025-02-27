@@ -111,5 +111,30 @@ int32_t AncoChannelProxy::UpdateWindowInfo(std::shared_ptr<AncoWindows> windows)
     READINT32(reply, ret, RET_ERR);
     return ret;
 }
+
+int32_t AncoChannelProxy::SyncKnuckleStatus(bool isKnuckleEnable)
+{
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IAncoChannel::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+    if (!data.WriteBool(isKnuckleEnable)) {
+        MMI_HILOGE("Failed to write knuckle status");
+        return RET_ERR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(AncoRequestId::SYNC_KNUCKLE_STATUS), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SendRequest fail, error:%{public}d", ret);
+        return ret;
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

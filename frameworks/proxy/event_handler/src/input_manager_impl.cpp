@@ -2706,5 +2706,19 @@ int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, CustomCursor cursor,
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
+
+int32_t InputManagerImpl::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (MULTIMODAL_INPUT_CONNECT_MGR->CheckKnuckleEvent(pointX, pointY, isKnuckleType) != RET_OK) {
+        MMI_HILOGE("CheckKnuckleEvent failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_ANCO
+    MMI_HILOGI("CheckKnuckleEvent function does not support");
+    return ERROR_UNSUPPORT;
+}
 } // namespace MMI
 } // namespace OHOS
