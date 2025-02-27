@@ -1492,6 +1492,14 @@ void PointerDrawingManager::AttachToDisplay()
         auto sp = GetScreenPointer(screenId_);
         CHKPV(sp);
         surfaceNode_ = sp->GetSurfaceNode();
+        if (originSetColor_ != -1 && surfaceNode_ != nullptr) {
+            float alphaRatio = (static_cast<uint32_t>(originSetColor_) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
+            if (alphaRatio > 1) {
+                MMI_HILOGW("Invalid alphaRatio:%{public}f", alphaRatio);
+            } else {
+                surfaceNode_->SetAlpha(1 - alphaRatio);
+            }
+        }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     surfaceNode_->AttachToDisplay(screenId_);
@@ -2046,6 +2054,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("PointerColor:%{public}x", color);
+    originSetColor_ = color;
     // ARGB从表面看比RGB多了个A，也是一种色彩模式，是在RGB的基础上添加了Alpha（透明度）通道。
     // 透明度也是以0到255表示的，所以也是总共有256级，透明是0，不透明是255。
     // 这个color每8位代表一个通道值，分别是alpha和rgb，总共32位。
