@@ -475,22 +475,12 @@ int32_t LongPressSubscriberHandler::GetBundleName(std::string &bundleName, int32
     if (userid < 0) {
         userid = DEFAULT_USER_ID;
     }
-    std::vector<AppExecFwk::RunningProcessInfo> info;
-    auto begin = std::chrono::high_resolution_clock::now();
-    appMgrClient->GetProcessRunningInfosByUserId(info, userid);
-    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::high_resolution_clock::now() - begin).count();
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_PROC_RUNNING_INFOS_BY_UID, durationMS);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
-    for (const auto &item : info) {
-        if (item.bundleNames.empty()) {
-            continue;
-        }
-        if (item.pid_ == windowPid) {
-            bundleName = item.bundleNames[0].c_str();
-            return RET_OK;
-        }
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPR(udsServer, RET_ERR);
+    auto sess = udsServer->GetSessionByPid(windowPid);
+    if (sess != nullptr) {
+        bundleName = sess->GetProgramName();
+        return RET_OK;
     }
     return RET_ERR;
 }
