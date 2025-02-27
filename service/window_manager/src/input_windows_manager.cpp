@@ -4754,12 +4754,7 @@ void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int3
 void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const double x, const double y,
     Coordinate2D& cursorPos) const
 {
-    Direction direction = info.direction;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (WIN_MGR->IsSupported()) {
-            direction = info.direction;
-        }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    const Direction direction = info.direction;
     MMI_HILOGD("X:%{private}.2f, Y:%{private}.2f, offsetXY={%{private}d %{private}d},"
                "info.WH:{%{private}d %{private}d} info.validWH:{%{private}d %{private}d}",
         x,
@@ -4805,8 +4800,13 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
 void InputWindowsManager::ReverseRotateDisplayScreen(const DisplayInfo& info, const double x, const double y,
     Coordinate2D& cursorPos) const
 {
-    const Direction displayDirection = static_cast<Direction>((
+    Direction displayDirection = static_cast<Direction>((
         ((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (WIN_MGR->IsSupported()) {
+        direction = info.direction;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGD(
         "X:%{private}.2f, Y:%{private}.2f, info.WH:{%{private}d %{private}d}, info.validWH:{%{private}d %{private}d}",
         x,
