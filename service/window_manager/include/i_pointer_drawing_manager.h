@@ -109,6 +109,10 @@ public:
     {
         return 0;
     }
+    virtual void GetPointerImageSize(int32_t &width, int32_t &height)
+    {
+        return;
+    }
 
     virtual int32_t GetCursorSurfaceId(uint64_t &surfaceId);
 
