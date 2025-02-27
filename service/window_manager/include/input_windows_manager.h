@@ -293,7 +293,7 @@ private:
         double& physicalY, int32_t& displayId);
     bool AcrossDisplay(const DisplayInfo &displayInfoDes, const DisplayInfo &displayInfoOri, Vector2D<double> &logical,
         Vector2D<double> &layout, const AcrossDirection &acrossDirection);
-    AcrossDirection CalculateAcrossDirection(const DisplayInfo &displayInfo, const Vector2D<double>layout);
+    AcrossDirection CalculateAcrossDirection(const DisplayInfo &displayInfo, const Vector2D<double> &layout);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void InitMouseDownInfo();
