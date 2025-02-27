@@ -2208,6 +2208,12 @@ int32_t PointerDrawingManager::GetPointerSize()
     return pointerSize;
 }
 
+void PointerDrawingManager::GetPointerImageSize(int32_t &width, int32_t)
+{
+    width = imageWidth_;
+    height = imageHeight_;
+}
+
 int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
 {
     surfaceId = (surfaceNode_ != nullptr ? surfaceNode_->GetId() : Rosen::INVALID_NODEID);

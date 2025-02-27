@@ -4524,6 +4524,63 @@ bool InputWindowsManager::CalculateLayout(const DisplayInfo &displayInfo, const 
     return true;
 }
 
+AcrossDirection InputWindowsManager::CalculateAcrossDirection(const DisplayInfo &displayInfo,
+    const Vector2D<double> &layout)
+{
+    Vector2D<int32_t> layoutMax;
+
+    if (!AddInt32(displayInfo.x, displayInfo.validWidth, layoutMax.x)) {
+        MMI_HILOGE("The addition of layoutMax.x overflows");
+        return AcrossDirection::ACROSS_ERROR;
+    }
+    if (!AddInt32(displayInfo.y, displayInfo.validHeight, layoutMax.y)) {
+        MMI_HILOGE("The addition of layoutMax.y overflows");
+        return AcrossDirection::ACROSS_ERROR;
+    }
+
+    if (layout.x < displayInfo.x) {
+        return AcrossDirection::LEFTWARDS;
+    } else if (layout.x >= layoutMax.x) {
+        return AcrossDirection::RIGHTWARDS;
+    }
+    if (layout.y < displayInfo.y) {
+        return AcrossDirection::UPWARDS;
+    } else if (layout.y >= layoutMax.y) {
+        return AcrossDirection::DOWNWARDS
+    }
+
+    return AcrossDirection::ACROSS_ERROR;
+}
+
+bool InputWindowsManager::AcrossDisplay(const DisplayInfo &displayInfoDes, const DisplayInfo &displayInfoOri,
+    Vector2D<double> &logical, Vector2D<double> &layout, const AcrossDirection &acrossDirection)
+{
+    Vector2D<int32_t> layoutMax;
+    double layouX, layouY;
+    int32_t pointerWidth = 0, pointerHeight = 0;
+    bool re = false;
+    layoutX = layout.x;
+    layoutY = layout.y
+    IPointerDrawingManager::GetInstance()->GetPointerImageSize(pointerWidth, pointerHeight);
+    if (!AddInt32(displayInfoDes.x, displayInfoDes.validWidth, layoutMax.x)) {
+        MMI_HILOGE("The addition of layoutMax.x overflows");
+        return false;
+    }
+    if (!AddInt32(displayInfoDes.y, displayInfoDes.validHeight, layoutMax.y)) {
+        MMI_HILOGE("The addition of layoutMax.y overflows");
+        return false;
+    }
+
+    re |= (acrossDirection == RIGHTWARDS && displayInfoDes.x == displayInfoOri.x + displayInfoOri.validWidth);
+    re |= (acrossDirection == LEFTWARDS && displayInfoDes.x + displayInfoDes.validWidth == displayInfoOri.x);
+    re |= (acrossDirection == DOWNWARDS && displayInfoDes.y == displayInfoOri.y + displayInfoOri.validHeight);
+    re |= (acrossDirection == UPWARDS && displayInfoDes.y + displayInfoDes.validHeight == displayInfoOri.y);
+    if (!re) {
+        MMI_HILOGI("the display is not in across direction.");
+        return re;
+    }
+}
+
 void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, double& physicalX,
     double& physicalY, int32_t& displayId)
 {
@@ -4531,41 +4588,41 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
     Vector2D<double> physical = { physicalX, physicalY };
     Vector2D<double> logical = physical;
     Vector2D<double> layout = { 0, 0 };
+    AcrossDirection acrossDirection;
     if (!CalculateLayout(displayInfo, physical, layout)) {
         return;
     }
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        Vector2D<int32_t> layoutMax;
-        if (!AddInt32(item.x, item.validWidth, layoutMax.x)) {
-            MMI_HILOGE("The addition of layoutMax.x overflows");
+        if (item.id == displayInfo.id) {
+            continue;
+        }
+        acrossDirection = CalculateAcrossDirection(displayInfo, layout);
+        MMI_HILOGI("acrossDirection :%{public}d.", acrossDirection);
+        if (acrossDirection == AcrossDirection::ACROSS_ERROR) {
             return;
         }
-        if (!AddInt32(item.y, item.validHeight, layoutMax.y)) {
-            MMI_HILOGE("The addition of layoutMax.y overflows");
-            return;
+        if (!AcrossDirection(item, displayInfo, logical, layout, acrossDirection)) {
+            continue;
         }
-        if ((layout.x >= item.x && layout.x < layoutMax.x) &&
-            (layout.y >= item.y && layout.y < layoutMax.y)) {
-            logical = { layout.x - item.x, layout.y - item.y };
-            physical = logical;
-            Direction direction = GetDisplayDirection(&item);
+        physical = logical;
+        Direction direction = GetDisplayDirection(&item);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            if (IsSupported()) {
-                auto screenRect = RotateRect<double>(direction, { item.width, item.height });
-                auto transforms = RotateAndFitScreen(direction, screenRect);
-                physical = ResetTransformSteps(transforms, logical);
-            }
+        if (IsSupported()) {
+            auto screenRect = RotateRect<double>(direction, { item.width, item.height });
+            auto transforms = RotateAndFitScreen(direction, screenRect);
+            physical = ResetTransformSteps(transforms, logical);
+        }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            physicalX = physical.x;
-            physicalY = physical.y;
-            displayId = item.id;
-            MMI_HILOGD("switched into display, id:%{public}d, d:%{public}d, dd:%{public}d, ddd:%{public}d, "
-                "dx:%{private}d, dy:%{private}d, dw:%{private}d, dh:%{private}d, "
-                "mx:%{private}d, my:%{private}d, lx:%{private}f, ly:%{private}f, px:%{private}f, py:%{private}f",
-                displayId, direction, item.direction, item.displayDirection,
-                item.x, item.y, item.width, item.height,
-                layoutMax.x, layoutMax.y, logical.x, logical.y, physicalX, physicalY);
-            break;
+        physicalX = physical.x;
+        physicalY = physical.y;
+        displayId = item.id;
+        MMI_HILOGD("switched into display, id:%{public}d, d:%{public}d, dd:%{public}d, ddd:%{public}d, "
+            "dx:%{private}d, dy:%{private}d, dw:%{private}d, dh:%{private}d, "
+            "lx:%{private}f, ly:%{private}f, px:%{private}f, py:%{private}f",
+            displayId, direction, item.direction, item.displayDirection,
+            item.x, item.y, item.width, item.height,
+            logical.x, logical.y, physicalX, physicalY);
+        break;
         }
     }
 }
