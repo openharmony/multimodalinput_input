@@ -127,10 +127,10 @@ void HotplugDetector::OnEvent() const
         auto err = SystemError();
         auto errMsg = err.message();
         if (err != std::errc::resource_unavailable_try_again) {
-            MMI_HILOGE("Filed to read inotify event. Error:%{public}s", errMsg.c_str());
+            MMI_HILOGE("Failed to read inotify event. Error:%{public}s", errMsg.c_str());
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
             DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
-                                                   "Filed to read inotify event. Error:" + errMsg);
+                                                   "Failed to read inotify event. Error:" + errMsg);
 #endif
         }
         return;
