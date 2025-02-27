@@ -15,13 +15,10 @@
 
 #include "authorization_dialog.h"
 
-#include <atomic>
-
 #include "ability_manager_client.h"
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
-#include "message_parcel.h"
 
 #include "mmi_log.h"
 

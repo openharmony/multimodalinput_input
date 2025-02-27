@@ -16,17 +16,8 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_MANAGER_H
 #define MULTIMODAL_INPUT_CONNECT_MANAGER_H
 
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-
-#include "nocopyable.h"
-
 #include "i_input_service_watcher.h"
 #include "i_multimodal_input_connect.h"
-#include "infrared_frequency_info.h"
-#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {

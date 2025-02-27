@@ -16,14 +16,9 @@
 #ifndef MOUSE_TRANSFORM_PROCESSOR_H
 #define MOUSE_TRANSFORM_PROCESSOR_H
 
-#include <map>
-#include <memory>
-
 #include "libinput.h"
-#include "singleton.h"
 
 #include "aggregator.h"
-#include "define_multimodal.h"
 #include "timer_manager.h"
 #include "pointer_event.h"
 #include "touchpad_control_display_gain.h"

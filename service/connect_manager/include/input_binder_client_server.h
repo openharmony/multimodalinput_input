@@ -16,11 +16,8 @@
 #ifndef INPUT_BINDER_CLIENT_SERVER_H
 #define INPUT_BINDER_CLIENT_SERVER_H
 
-#include <mutex>
-
 #include "singleton.h"
 
-#include "i_multimodal_input_connect.h"
 #include "input_binder_client_stub.h"
 
 namespace OHOS {

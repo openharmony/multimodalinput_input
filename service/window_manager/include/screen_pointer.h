@@ -16,16 +16,8 @@
 #ifndef SCREEN_POINTER_H
 #define SCREEN_POINTER_H
 
-#include <memory>
-#include <vector>
-
-#include "event_handler.h"
-#include "nocopyable.h"
 #include "screen_info.h"
-#include "struct_multimodal.h"
 #include "hardware_cursor_pointer_manager.h"
-#include "ui/rs_canvas_node.h"
-#include "ui/rs_surface_node.h"
 #include "window_info.h"
 #include "pointer_renderer.h"
 

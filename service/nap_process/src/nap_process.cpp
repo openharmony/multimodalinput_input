@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include "nap_process.h"
-
 #include "ipc_skeleton.h"
 
 #include "input_event_handler.h"

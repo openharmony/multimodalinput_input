@@ -16,13 +16,7 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
 
-#include <list>
-#include <map>
-#include <memory>
-#include <vector>
-
 #include "event_handler.h"
-#include "nocopyable.h"
 
 #include "error_multimodal.h"
 #include "extra_data.h"
@@ -35,13 +29,11 @@
 #include "i_window_checker.h"
 #include "infrared_frequency_info.h"
 #include "input_device.h"
-#include "input_handler_type.h"
 #include "key_option.h"
 #include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
 #include "touchpad_control_display_gain.h"
-#include "window_info.h"
 #include "shift_info.h"
 
 namespace OHOS {

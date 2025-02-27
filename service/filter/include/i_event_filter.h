@@ -18,7 +18,6 @@
 
 #include "iremote_broker.h"
 
-#include "i_input_event_filter.h"
 #include "key_event.h"
 #include "pointer_event.h"
 

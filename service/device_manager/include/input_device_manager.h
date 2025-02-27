@@ -16,17 +16,10 @@
 #ifndef INPUT_DEVICE_MANAGER_H
 #define INPUT_DEVICE_MANAGER_H
 
-#include <list>
-#include <string>
-
 #include "device_config_file_parser.h"
 #include "device_observer.h"
 #include "input_device.h"
-#include "msg_handler.h"
-#include "nocopyable.h"
-#include "singleton.h"
 #include "uds_session.h"
-#include "util.h"
 
 namespace OHOS {
 namespace MMI {

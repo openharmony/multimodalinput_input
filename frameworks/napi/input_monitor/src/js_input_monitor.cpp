@@ -12,15 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
 #include "js_input_monitor.h"
 
-#include <cinttypes>
-
-#include "securec.h"
-
 #include "define_multimodal.h"
-#include "error_multimodal.h"
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
 #include "js_gesture_event.h"

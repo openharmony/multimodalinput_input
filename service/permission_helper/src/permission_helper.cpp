@@ -19,7 +19,6 @@
 #include "tokenid_kit.h"
 
 #include "mmi_log.h"
-#include "proto.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER

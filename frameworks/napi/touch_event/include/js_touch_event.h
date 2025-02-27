@@ -16,7 +16,6 @@
 #ifndef JS_TOUCH_EVENT
 #define JS_TOUCH_EVENT
 
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 

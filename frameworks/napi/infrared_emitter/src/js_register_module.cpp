@@ -13,14 +13,10 @@
  * limitations under the License.
  */
 
-#include "js_register_module.h"
-#include <linux/input.h>
-
 #include "input_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
-#include "util_napi.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsInfraredRegister"

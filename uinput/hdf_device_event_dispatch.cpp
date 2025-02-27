@@ -15,10 +15,7 @@
 
 #include "hdf_device_event_dispatch.h"
 
-#include <memory>
-
 #include "mmi_log.h"
-#include "virtual_touch_screen.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "HdfDeviceEventDispatch"

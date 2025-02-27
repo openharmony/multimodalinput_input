@@ -974,7 +974,7 @@ Input_AxisEvent* OH_Input_CreateAxisEvent(void);
 
 /**
  * @brief Destroys an axis event object.
- * 
+ *
  * @param axisEvent Pointer to the axis event object.
  * @return OH_Input_DestroyAxisEvent function result code.
  *         {@link INPUT_SUCCESS} Destroys axisEvent success.\n

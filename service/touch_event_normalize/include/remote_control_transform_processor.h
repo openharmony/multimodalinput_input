@@ -16,10 +16,7 @@
 #ifndef REMOTE_CONTROL_TRANSFORM_PROCESSOR_H
 #define REMOTE_CONTROL_TRANSFORM_PROCESSOR_H
 
-#include "nocopyable.h"
-
 #include "aggregator.h"
-#include "struct_multimodal.h"
 #include "timer_manager.h"
 #include "transform_processor.h"
 

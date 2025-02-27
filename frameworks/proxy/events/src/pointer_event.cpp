@@ -15,8 +15,6 @@
 
 #include "pointer_event.h"
 
-#include <iomanip>
-
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG

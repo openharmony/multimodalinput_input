@@ -14,27 +14,16 @@
  */
 
 #include "util.h"
-
-#include <array>
-#include <chrono>
-#include <cinttypes>
-#include <cstdarg>
 #include <fstream>
-#include <iostream>
 #include <regex>
 
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
-#include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include "aggregator.h"
-#include "config_multimodal.h"
-#include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "mmi_log.h"
 #include "securec.h"
 
 #undef MMI_LOG_TAG

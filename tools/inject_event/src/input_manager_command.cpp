@@ -17,28 +17,13 @@
 
 #include <getopt.h>
 
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
-#include <limits>
-#include <thread>
-
-#include <sys/time.h>
-#include <unistd.h>
 
 #include "string_ex.h"
 
-#include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "hos_key_event.h"
 #include "input_manager.h"
-#include "mmi_log.h"
-#include "multimodal_event_handler.h"
-#include "util.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerCommand"

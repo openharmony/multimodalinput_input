@@ -15,18 +15,10 @@
 
 #include "multimodal_input_connect_proxy.h"
 
-#include <unistd.h>
-
-#include "message_option.h"
 #include "pixel_map.h"
-#include "string_ex.h"
 
-#include "infrared_frequency_info.h"
-#include "input_scene_board_judgement.h"
-#include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
 #include "multimodal_input_connect_def_parcel.h"
-#include "multimodal_input_connect_define.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER

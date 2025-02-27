@@ -16,7 +16,6 @@
 #ifndef JS_MOUSE_EVENT
 #define JS_MOUSE_EVENT
 
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 

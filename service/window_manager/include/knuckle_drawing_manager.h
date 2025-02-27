@@ -16,9 +16,6 @@
 #ifndef KNUCKLE_DRAWING_MANAGER_H
 #define KNUCKLE_DRAWING_MANAGER_H
 
-#include "draw/canvas.h"
-#include "nocopyable.h"
-#include "singleton.h"
 #include "transaction/rs_transaction.h"
 #include "ui/rs_canvas_drawing_node.h"
 #include "ui/rs_surface_node.h"

@@ -17,8 +17,6 @@
 #define MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
 
 #include "nocopyable.h"
-#include "preferences.h"
-#include "preferences_errno.h"
 #include "preferences_helper.h"
 
 #include "i_preference_manager.h"

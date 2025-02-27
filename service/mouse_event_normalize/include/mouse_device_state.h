@@ -17,9 +17,7 @@
 #define MOUSE_DEVICE_STATE_H
 
 #include <map>
-#include <mutex>
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "pointer_event.h"

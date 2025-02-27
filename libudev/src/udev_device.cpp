@@ -13,18 +13,7 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include <cerrno>
-#include <climits>
-#include <cstring>
 #include <fstream>
-#include <iostream>
-#include <iterator>
-#include <optional>
-#include <sstream>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 #include <unistd.h>
 

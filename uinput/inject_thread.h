@@ -16,10 +16,7 @@
 #ifndef INJECT_THREAD_H
 #define INJECT_THREAD_H
 
-#include <cstdint>
-#include <memory>
 #include <mutex>
-#include <vector>
 
 #include "virtual_keyboard.h"
 #include "virtual_touch_screen.h"

@@ -17,10 +17,8 @@
 #define OH_INPUT_DEVICE_LISTENER_H
 
 #include <mutex>
-#include <memory>
 
 #include "i_input_device_listener.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {

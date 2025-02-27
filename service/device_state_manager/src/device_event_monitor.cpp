@@ -16,8 +16,6 @@
 #include "device_event_monitor.h"
 
 #include "input_event_handler.h"
-#include "mmi_log.h"
-#include "want.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "DeviceEventMonitor"

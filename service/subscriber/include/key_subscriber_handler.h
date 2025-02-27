@@ -16,19 +16,8 @@
 #ifndef KEY_SUBSCRIBER_HANDLER_H
 #define KEY_SUBSCRIBER_HANDLER_H
 
-#include <algorithm>
-#include <list>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <set>
-#include <thread>
-
 #include "i_input_event_handler.h"
-#include "key_event.h"
 #include "key_gesture_manager.h"
-#include "key_option.h"
-#include "uds_server.h"
 #include "nap_process.h"
 
 namespace OHOS {

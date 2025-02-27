@@ -17,8 +17,6 @@
 #define INPUT_SCREEN_CAPTURE_AGENT_H
 
 #include <dlfcn.h>
-#include <mutex>
-#include <list>
 
 #include "singleton.h"
 #include "util.h"

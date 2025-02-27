@@ -15,17 +15,11 @@
 
 #include "multimodal_input_connect_stub.h"
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 #include "string_ex.h"
 
 #include "bytrace_adapter.h"
-#include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
-#include "multimodalinput_ipc_interface_code.h"
-#include "nap_process.h"
 #include "permission_helper.h"
 #include "pixel_map.h"
 #include "time_cost_chk.h"

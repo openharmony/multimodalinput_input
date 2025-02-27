@@ -16,8 +16,6 @@
 #ifndef SWITCH_EVENT_H
 #define SWITCH_EVENT_H
 
-#include "nocopyable.h"
-
 #include "input_event.h"
 
 namespace OHOS {

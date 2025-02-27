@@ -17,9 +17,7 @@
 #define MMI_LOG_H
 
 #include <cinttypes>
-#include <functional>
 #include <future>
-#include <string>
 #include <sstream>
 
 #include "hilog/log.h"

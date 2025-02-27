@@ -16,12 +16,9 @@
 #ifndef INPUT_INTERCEPTOR_MANAGER_H
 #define INPUT_INTERCEPTOR_MANAGER_H
 
-#include <memory>
-
 #include "singleton.h"
 
 #include "input_handler_manager.h"
-#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {

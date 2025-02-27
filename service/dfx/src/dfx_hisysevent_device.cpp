@@ -15,11 +15,6 @@
 
 #include "dfx_hisysevent_device.h"
 
-#include <fstream>
-
-#include "i_input_windows_manager.h"
-#include "parameters.h"
-
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG

@@ -16,15 +16,8 @@
 #ifndef EVENT_DISPATCH_HANDLER_H
 #define EVENT_DISPATCH_HANDLER_H
 
-#include <mutex>
-#include <chrono>
-
-#include "nocopyable.h"
-
 #include "i_input_event_handler.h"
-#include "key_event.h"
 #include "key_event_value_transformation.h"
-#include "pointer_event.h"
 #include "uds_server.h"
 #include "window_info.h"
 

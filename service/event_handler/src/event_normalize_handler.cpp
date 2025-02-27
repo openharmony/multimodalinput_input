@@ -17,9 +17,7 @@
 
 #include "bytrace_adapter.h"
 #include "crown_transform_processor.h"
-#include "define_multimodal.h"
 #include "dfx_hisysevent.h"
-#include "error_multimodal.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 #include "event_resample.h"

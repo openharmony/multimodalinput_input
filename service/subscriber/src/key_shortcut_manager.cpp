@@ -15,10 +15,7 @@
 
 #include "key_shortcut_manager.h"
 
-#include <config_policy_utils.h>
-
 #include "app_state_observer.h"
-#include "define_multimodal.h"
 #include "key_command_handler_util.h"
 
 #undef MMI_LOG_DOMAIN

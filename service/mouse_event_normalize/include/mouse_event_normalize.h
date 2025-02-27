@@ -16,15 +16,7 @@
 #ifndef MOUSE_EVENT_NORMALIZE_H
 #define MOUSE_EVENT_NORMALIZE_H
 
-#include <memory>
-
-#include "libinput.h"
-#include "singleton.h"
-
-#include "define_multimodal.h"
 #include "mouse_transform_processor.h"
-#include "pointer_event.h"
-#include "touchpad_control_display_gain.h"
 
 namespace OHOS {
 namespace MMI {

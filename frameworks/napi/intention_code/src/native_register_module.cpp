@@ -14,7 +14,6 @@
  */
 
 #include "js_intention_code.h"
-#include "node_api.h"
 
 namespace OHOS {
 namespace MMI {

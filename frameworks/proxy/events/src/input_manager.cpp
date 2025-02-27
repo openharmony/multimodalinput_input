@@ -15,11 +15,7 @@
 
 #include "input_manager.h"
 
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-#include "input_handler_type.h"
 #include "input_manager_impl.h"
-#include "multimodal_event_handler.h"
 #include "hitrace_meter.h"
 #include "pre_monitor_manager.h"
 

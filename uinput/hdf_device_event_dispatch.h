@@ -16,10 +16,7 @@
 #ifndef HDF_DEVICE_EVENT_DISPATCH_H
 #define HDF_DEVICE_EVENT_DISPATCH_H
 
-#include <cstdint>
-
 #include "inject_thread.h"
-#include "nocopyable.h"
 #include "v1_0/iinput_interfaces.h"
 
 namespace OHOS {
