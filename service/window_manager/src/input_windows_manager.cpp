@@ -100,6 +100,7 @@ constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
 constexpr size_t POINTER_STYLE_WINDOW_NUM = { 10 };
+constexpr int32_t DEFAULT_DPI { 0 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1403,6 +1404,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
+    lastDpi_ = displayGroupInfo_.displaysInfo[0].dpi;
     if (INPUT_DEV_MGR->HasPointerDevice() && pointerDrawFlag_) {
         NotifyPointerToWindow();
     }
@@ -1477,6 +1479,12 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
     bool isDisplayRemoved)
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
+    if (lastDpi_ != DEFAULT_DPI && lastDpi_ != displayGroupInfo_.displaysInfo[0].dpi) {
+        auto drawNewDpiRes = IPointerDrawingManager::GetInstance()->DrawNewDpiPointer();
+        if (drawNewDpiRes != RET_OK) {
+            MMI_HILOGE("Draw New Dpi pointer failed.");
+        }
+    }
     CHKPV(lastPointerEvent_);
     if (INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice()) {
         MouseLocation mouseLocation = GetMouseInfo();
