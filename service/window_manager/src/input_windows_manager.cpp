@@ -4556,7 +4556,7 @@ bool InputWindowsManager::AcrossDisplay(const DisplayInfo &displayInfoDes, const
     Vector2D<double> &logical, Vector2D<double> &layout, const AcrossDirection &acrossDirection)
 {
     Vector2D<int32_t> layoutMax;
-    double layouX, layouY;
+    double layoutX, layoutY;
     int32_t pointerWidth = 0, pointerHeight = 0;
     bool re = false;
     layoutX = layout.x;
@@ -4579,6 +4579,19 @@ bool InputWindowsManager::AcrossDisplay(const DisplayInfo &displayInfoDes, const
         MMI_HILOGI("the display is not in across direction.");
         return re;
     }
+
+    if (layout.x < displayInfoDes.x) {
+        layoutX = displayInfoDes.x;
+    } else if (layout.x >= layoutMax.x) {
+        layoutX = layoutMax.x - pointerWidth;
+    }
+    if (layout.y < displayInfoDes.y) {
+        layoutY = displayInfoDes.y;
+    } else if (layout.y >= layoutMax.y) {
+        layoutY = layoutMax.y - pointerHeight;
+    }
+    logical = { layoutX - displayInfoDex.x, layoutY - displayInfoDes.y };
+    return re;
 }
 
 void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, double& physicalX,
@@ -4623,7 +4636,6 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
             item.x, item.y, item.width, item.height,
             logical.x, logical.y, physicalX, physicalY);
         break;
-        }
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
