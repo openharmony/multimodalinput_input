@@ -162,6 +162,7 @@ public:
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
     virtual void CleanShellWindowIds() = 0;
     virtual bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual int32_t SyncKnuckleStatus(bool isKnuckleEnable) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;

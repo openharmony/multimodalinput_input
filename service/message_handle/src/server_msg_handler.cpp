@@ -428,6 +428,11 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
 #ifndef OHOS_BUILD_EMULATOR
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (WIN_MGR->IsSupported()) {
+            direction = displayInfo->direction;
+        }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CalculateOffset(displayDirection, offset);
 #endif // OHOS_BUILD_EMULATOR
     int32_t ret = RET_OK;

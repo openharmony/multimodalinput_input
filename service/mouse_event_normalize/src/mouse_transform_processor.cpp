@@ -105,6 +105,7 @@ constexpr double CONST_DOUBLE_ONE { 1.0 };
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
 int32_t MouseTransformProcessor::scrollSwitchPid_ = -1;
 TouchpadCDG MouseTransformProcessor::touchpadOption_;
+DeviceType MouseTransformProcessor::deviceTypeGlobal_ = DeviceType::DEVICE_UNKOWN;
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
     : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
@@ -192,6 +193,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
+    deviceTypeGlobal_ = deviceType;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         ret = UpdateTouchpadMoveLocation(displayInfo, event, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
@@ -268,6 +270,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
         return ret;
     } else if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
+        deviceTypeGlobal_ = DeviceType::DEVICE_FOLD_PC_VIRT;
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, GetTouchpadSpeed(), deviceType);
         return ret;
@@ -678,14 +681,20 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
     const int32_t initRows = 3;
     DeviceType deviceType = DeviceType::DEVICE_PC;
-    if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
-        deviceType = DeviceType::DEVICE_SOFT_PC_PRO;
-    }
-    if (PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
-        deviceType = DeviceType::DEVICE_TABLET;
-    }
-    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
-        deviceType = DeviceType::DEVICE_FOLD_PC;
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
+        double speedAdjustCoef = 0.1;
+        axisValue = axisValue * speedAdjustCoef;
+    } else {
+        if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
+            deviceType = DeviceType::DEVICE_SOFT_PC_PRO;
+        }
+        if (PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
+            deviceType = DeviceType::DEVICE_TABLET;
+        }
+        if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+            deviceType = DeviceType::DEVICE_FOLD_PC;
+        }
     }
     int32_t ret =
         HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));

@@ -92,7 +92,7 @@ const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
-const std::string PRIVACY_SWITCH_NAME {"settings.domainName.USER_SECURITY"};
+const std::string PRIVACY_SWITCH_NAME {"huaweicast.data.privacy_projection_state"};
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 constexpr int32_t REPEAT_COOLING_TIME { 100 };
 constexpr int32_t REPEAT_ONCE { 1 };
@@ -101,6 +101,9 @@ constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
 constexpr size_t POINTER_STYLE_WINDOW_NUM = { 10 };
+constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
+constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
+constexpr int32_t DEFAULT_DPI { 0 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1029,6 +1032,7 @@ void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &win
 int32_t InputWindowsManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
     DisplayInfo &mainScreenDisplayInfo) const
 {
+    CALL_DEBUG_ENTER;
     if (displayGroupInfo.displaysInfo.empty()) {
         MMI_HILOGE("displayGroupInfo doesn't contain displayInfo");
         return RET_ERR;
@@ -1039,27 +1043,68 @@ int32_t InputWindowsManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &di
             return RET_OK;
         }
     }
+    MMI_HILOGD("displayGroupInfo has no main screen, get displayGroupInfo.displaysInfo[0] back");
     mainScreenDisplayInfo = displayGroupInfo.displaysInfo[0];
     return RET_OK;
 }
 
+void InputWindowsManager::SendBackCenterPointerEevent(const CursorPosition &cursorPos)
+{
+    CALL_DEBUG_ENTER;
+    int32_t lastPointerAction = lastPointerEvent_->GetPointerAction();
+    std::shared_ptr<PointerEvent> pointerBackCenterEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    pointerBackCenterEvent->SetTargetDisplayId(cursorPos.displayId);
+    auto mainDisplayInfo = GetPhysicalDisplay(cursorPos.displayId);
+    int32_t logicalX = cursorPos.cursorPos.x + mainDisplayInfo->x;
+    int32_t logicalY = cursorPos.cursorPos.y + mainDisplayInfo->y;
+    auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerBackCenterEvent);
+    if (touchWindow == std::nullopt) {
+        MMI_HILOGD("Maybe just down left mouse button, the mouse did not on the window");
+        return;
+    }
+    int32_t pointerId = pointerBackCenterEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerBackCenterEvent->GetPointerItem(pointerId, item);
+    item.SetDisplayX(cursorPos.cursorPos.x);
+    item.SetDisplayY(cursorPos.cursorPos.y);
+    item.SetCanceled(true);
+    pointerBackCenterEvent->UpdatePointerItem(pointerId, item);
+    pointerBackCenterEvent->SetTargetWindowId(touchWindow->id);
+    pointerBackCenterEvent->SetAgentWindowId(touchWindow->id);
+
+    if (lastPointerAction == PointerEvent::POINTER_ACTION_MOVE) {
+        pointerBackCenterEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    } else if (lastPointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        pointerBackCenterEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
+    }
+    MMI_HILOGD("pointerBackCenterEvent status: %{public}s", pointerBackCenterEvent->ToString().c_str());
+    InputHandler->GetFilterHandler()->HandlePointerEvent(pointerBackCenterEvent);
+}
+
 void InputWindowsManager::ResetPointerPosition(const DisplayGroupInfo &displayGroupInfo)
 {
+    CALL_DEBUG_ENTER;
     if (displayGroupInfo.displaysInfo.empty()) {
         return;
     }
     CursorPosition oldPtrPos = GetCursorPos();
-    int32_t oldDisplayId = oldPtrPos.displayId;
+    CursorPosition cursorPos;
     for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
         if ((currentDisplay.screenCombination == OHOS::MMI::ScreenCombination::SCREEN_MAIN)) {
-            MMI_HILOGD("CurDisplayId = %{public}d oldDisplayId = %{public}d", currentDisplay.id, oldDisplayId);
-            if (oldDisplayId != currentDisplay.id || !IsPointerOnCenter(oldPtrPos, currentDisplay)) {
-                CursorPosition cursorPos = ResetCursorPos();
+            MMI_HILOGD("CurDisplayId = %{public}d oldDisplayId = %{public}d", currentDisplay.id, oldPtrPos.displayId);
+            if ((oldPtrPos.displayId != currentDisplay.id) || (!IsPointerOnCenter(oldPtrPos, currentDisplay))) {
+                cursorPos = ResetCursorPos();
                 UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
             }
             break;
         }
     }
+
+    if ((lastPointerEvent_ != nullptr) && (!lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT))) {
+        MMI_HILOGD("Reset pointer position, left mouse button is not pressed");
+        return;
+    }
+    (void)SendBackCenterPointerEevent(cursorPos);
 }
 
 bool InputWindowsManager::IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay)
@@ -1227,15 +1272,24 @@ void InputWindowsManager::CancelMouseEvent()
         MMI_HILOGD("lastPointerEvent_ is null");
         return;
     }
+    int32_t action = PointerEvent::POINTER_ACTION_CANCEL;
+    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+        action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
+    }
     if (lastPointerEvent_->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
         !lastPointerEvent_->GetPressedButtons().empty()) {
-        MMI_HILOGD("Cancel mouse event for valid display change");
+        int32_t pointerId = lastPointerEvent_->GetPointerId();
+        int32_t originAction = lastPointerEvent_->GetPointerAction();
+        MMI_HILOGD("Cancel mouse event for valid display change,pointerId:%{private}d action:%{private}d->%{private}d",
+            pointerId,
+            originAction,
+            action);
         auto lastPointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
-        lastPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-        lastPointerEvent->UpdateId();
+        lastPointerEvent->SetPointerAction(action);
+        lastPointerEvent->SetOriginPointerAction(originAction);
+        lastPointerEvent->SetPointerId(pointerId);
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         CHKPV(eventDispatchHandler);
-        lastPointerEvent_->DeleteReleaseButton(lastPointerEvent_->GetPointerId());
         eventDispatchHandler->HandlePointerEvent(lastPointerEvent);
     }
 }
@@ -1404,6 +1458,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
+    lastDpi_ = displayGroupInfo_.displaysInfo[0].dpi;
     if (INPUT_DEV_MGR->HasPointerDevice() && pointerDrawFlag_) {
         NotifyPointerToWindow();
     }
@@ -1478,6 +1533,12 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
     bool isDisplayRemoved)
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
+    if (lastDpi_ != DEFAULT_DPI && lastDpi_ != displayGroupInfo_.displaysInfo[0].dpi) {
+        auto drawNewDpiRes = IPointerDrawingManager::GetInstance()->DrawNewDpiPointer();
+        if (drawNewDpiRes != RET_OK) {
+            MMI_HILOGE("Draw New Dpi pointer failed.");
+        }
+    }
     CHKPV(lastPointerEvent_);
     if (INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice()) {
         MouseLocation mouseLocation = GetMouseInfo();
@@ -2749,15 +2810,9 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             }
-            if (pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID ||
-                pointerEvent->GetDeviceId() == CAST_SCREEN_DEVICEID) {
-                privacyProtection_.switchName = PRIVACY_SWITCH_NAME;
-                CreatePrivacyProtectionObserver(privacyProtection_);
-                if (privacyProtection_.isOpen && item.isSkipSelfWhenShowOnVirtualScreen) {
-                    winId2ZorderMap.insert({item.id, item.zOrder});
-                    MMI_HILOG_DISPATCHE("It's a Privacy protection window and pointer find the next window");
-                    continue;
-                }
+            if (SkipPrivacyProtectionWindow(pointerEvent, item.isSkipSelfWhenShowOnVirtualScreen)) {
+                winId2ZorderMap.insert({item.id, item.zOrder});
+                continue;
             }
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
@@ -3477,6 +3532,27 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
     return false;
 }
 
+bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent,
+    const bool &isSkip)
+{
+    if (pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID ||
+        pointerEvent->GetDeviceId() == CAST_SCREEN_DEVICEID) {
+        if (!isOpenPrivacyProtectionserver_) {
+            privacyProtection_.switchName = PRIVACY_SWITCH_NAME;
+            CreatePrivacyProtectionObserver(privacyProtection_);
+            isOpenPrivacyProtectionserver_ = true;
+            SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
+                antiMistake_.isOpen);
+            MMI_HILOGD("Get privacy protection switch end");
+        }
+        if (privacyProtection_.isOpen && isSkip) {
+            MMI_HILOGD("It's a Privacy protection window and pointer find the next window");
+            return true;
+        }
+    }
+    return false;
+}
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
 {
@@ -3797,6 +3873,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (checkWindow) {
             MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
                 "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            winMap.insert({item.id, item});
+            continue;
+        }
+        if (SkipPrivacyProtectionWindow(pointerEvent, item.isSkipSelfWhenShowOnVirtualScreen)) {
             winMap.insert({item.id, item});
             continue;
         }
@@ -4555,6 +4635,76 @@ bool InputWindowsManager::CalculateLayout(const DisplayInfo &displayInfo, const 
     return true;
 }
 
+AcrossDirection InputWindowsManager::CalculateAcrossDirection(const DisplayInfo &displayInfo,
+    const Vector2D<double> &layout)
+{
+    Vector2D<int32_t> layoutMax;
+
+    if (!AddInt32(displayInfo.x, displayInfo.validWidth, layoutMax.x)) {
+        MMI_HILOGE("The addition of layoutMax.x overflows");
+        return AcrossDirection::ACROSS_ERROR;
+    }
+    if (!AddInt32(displayInfo.y, displayInfo.validHeight, layoutMax.y)) {
+        MMI_HILOGE("The addition of layoutMax.y overflows");
+        return AcrossDirection::ACROSS_ERROR;
+    }
+
+    if (layout.x < displayInfo.x) {
+        return AcrossDirection::LEFTWARDS;
+    } else if (layout.x >= layoutMax.x) {
+        return AcrossDirection::RIGHTWARDS;
+    }
+    if (layout.y < displayInfo.y) {
+        return AcrossDirection::UPWARDS;
+    } else if (layout.y >= layoutMax.y) {
+        return AcrossDirection::DOWNWARDS;
+    }
+
+    return AcrossDirection::ACROSS_ERROR;
+}
+
+bool InputWindowsManager::AcrossDisplay(const DisplayInfo &displayInfoDes, const DisplayInfo &displayInfoOri,
+    Vector2D<double> &logical, Vector2D<double> &layout, const AcrossDirection &acrossDirection)
+{
+    Vector2D<int32_t> layoutMax;
+    double layoutX, layoutY;
+    int32_t pointerWidth = 0, pointerHeight = 0;
+    bool re = false;
+    layoutX = layout.x;
+    layoutY = layout.y;
+    IPointerDrawingManager::GetInstance()->GetPointerImageSize(pointerWidth, pointerHeight);
+    if (!AddInt32(displayInfoDes.x, displayInfoDes.validWidth, layoutMax.x)) {
+        MMI_HILOGE("The addition of layoutMax.x overflows");
+        return false;
+    }
+    if (!AddInt32(displayInfoDes.y, displayInfoDes.validHeight, layoutMax.y)) {
+        MMI_HILOGE("The addition of layoutMax.y overflows");
+        return false;
+    }
+
+    re |= (acrossDirection == RIGHTWARDS && displayInfoDes.x == displayInfoOri.x + displayInfoOri.validWidth);
+    re |= (acrossDirection == LEFTWARDS && displayInfoDes.x + displayInfoDes.validWidth == displayInfoOri.x);
+    re |= (acrossDirection == DOWNWARDS && displayInfoDes.y == displayInfoOri.y + displayInfoOri.validHeight);
+    re |= (acrossDirection == UPWARDS && displayInfoDes.y + displayInfoDes.validHeight == displayInfoOri.y);
+    if (!re) {
+        MMI_HILOGI("the display is not in across direction.");
+        return re;
+    }
+
+    if (layout.x < displayInfoDes.x) {
+        layoutX = displayInfoDes.x;
+    } else if (layout.x >= layoutMax.x) {
+        layoutX = layoutMax.x - pointerWidth;
+    }
+    if (layout.y < displayInfoDes.y) {
+        layoutY = displayInfoDes.y;
+    } else if (layout.y >= layoutMax.y) {
+        layoutY = layoutMax.y - pointerHeight;
+    }
+    logical = { layoutX - displayInfoDes.x, layoutY - displayInfoDes.y };
+    return re;
+}
+
 void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, double& physicalX,
     double& physicalY, int32_t& displayId)
 {
@@ -4562,42 +4712,41 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
     Vector2D<double> physical = { physicalX, physicalY };
     Vector2D<double> logical = physical;
     Vector2D<double> layout = { 0, 0 };
+    AcrossDirection acrossDirection;
     if (!CalculateLayout(displayInfo, physical, layout)) {
         return;
     }
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        Vector2D<int32_t> layoutMax;
-        if (!AddInt32(item.x, item.validWidth, layoutMax.x)) {
-            MMI_HILOGE("The addition of layoutMax.x overflows");
+        if (item.id == displayInfo.id) {
+            continue;
+        }
+        acrossDirection = CalculateAcrossDirection(displayInfo, layout);
+        MMI_HILOGI("acrossDirection :%{public}d.", acrossDirection);
+        if (acrossDirection == AcrossDirection::ACROSS_ERROR) {
             return;
         }
-        if (!AddInt32(item.y, item.validHeight, layoutMax.y)) {
-            MMI_HILOGE("The addition of layoutMax.y overflows");
-            return;
+        if (!AcrossDisplay(item, displayInfo, logical, layout, acrossDirection)) {
+            continue;
         }
-        if ((layout.x >= item.x && layout.x < layoutMax.x) &&
-            (layout.y >= item.y && layout.y < layoutMax.y)) {
-            logical = { layout.x - item.x, layout.y - item.y };
-            physical = logical;
-            Direction direction = GetDisplayDirection(&item);
+        physical = logical;
+        Direction direction = GetDisplayDirection(&item);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            if (IsSupported()) {
-                auto screenRect = RotateRect<double>(direction, { item.width, item.height });
-                auto transforms = RotateAndFitScreen(direction, screenRect);
-                physical = ResetTransformSteps(transforms, logical);
-            }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            physicalX = physical.x;
-            physicalY = physical.y;
-            displayId = item.id;
-            MMI_HILOGD("switched into display, id:%{public}d, d:%{public}d, dd:%{public}d, ddd:%{public}d, "
-                "dx:%{private}d, dy:%{private}d, dw:%{private}d, dh:%{private}d, "
-                "mx:%{private}d, my:%{private}d, lx:%{private}f, ly:%{private}f, px:%{private}f, py:%{private}f",
-                displayId, direction, item.direction, item.displayDirection,
-                item.x, item.y, item.width, item.height,
-                layoutMax.x, layoutMax.y, logical.x, logical.y, physicalX, physicalY);
-            break;
+        if (IsSupported()) {
+            auto screenRect = RotateRect<double>(direction, { item.width, item.height });
+            auto transforms = RotateAndFitScreen(direction, screenRect);
+            physical = ResetTransformSteps(transforms, logical);
         }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        physicalX = physical.x;
+        physicalY = physical.y;
+        displayId = item.id;
+        MMI_HILOGD("switched into display, id:%{public}d, d:%{public}d, dd:%{public}d, ddd:%{public}d, "
+            "dx:%{private}d, dy:%{private}d, dw:%{private}d, dh:%{private}d, "
+            "lx:%{private}f, ly:%{private}f, px:%{private}f, py:%{private}f",
+            displayId, direction, item.direction, item.displayDirection,
+            item.x, item.y, item.width, item.height,
+            logical.x, logical.y, physicalX, physicalY);
+        break;
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -4703,8 +4852,13 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
 void InputWindowsManager::ReverseRotateDisplayScreen(const DisplayInfo& info, const double x, const double y,
     Coordinate2D& cursorPos) const
 {
-    const Direction displayDirection = static_cast<Direction>((
+    Direction displayDirection = static_cast<Direction>((
         ((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (WIN_MGR->IsSupported()) {
+        direction = info.direction;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGD(
         "X:%{private}.2f, Y:%{private}.2f, info.WH:{%{private}d %{private}d}, info.validWH:{%{private}d %{private}d}",
         x,

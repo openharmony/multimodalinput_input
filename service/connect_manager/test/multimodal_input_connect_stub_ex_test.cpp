@@ -321,6 +321,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
+    int32_t CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType) override { return retKnuckle_; }
 #endif // OHOS_BUILD_ENABLE_ANCO
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override
     {
@@ -401,6 +402,7 @@ public:
     int32_t retAddVirtualInputDevice_ = 0;
     int32_t retSetPixelMapData_ = 0;
     int32_t retChannel_ = 0;
+    int32_t retKnuckle_ = 0;
     int32_t retSetMouseIcon_ = 0;
     int32_t retGetTouchpadThreeFingersTapSwitch_ = 0;
     int32_t retTransferBinderClientSrv_ = 0;
@@ -7655,6 +7657,64 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAnco
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubAncoRemoveChannel(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubCheckKnuckleEvent
+ * @tc.desc: Cover if (!PER_HELPER->VerifySystemApp()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubCheckKnuckleEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubCheckKnuckleEvent(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubCheckKnuckleEvent_001
+ * @tc.desc: Cover if (ret != RET_OK) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubCheckKnuckleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retKnuckle_ = RET_ERR;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubCheckKnuckleEvent(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubCheckKnuckleEvent_002
+ * @tc.desc: Cover the else branch of if (ret == RET_OK)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubCheckKnuckleEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadFloat(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1.0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retKnuckle_ = RET_OK;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubCheckKnuckleEvent(data, reply));
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 

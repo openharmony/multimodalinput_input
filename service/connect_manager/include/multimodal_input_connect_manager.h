@@ -168,6 +168,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
+    int32_t CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions);

@@ -148,6 +148,9 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_DOUBLE_TAP_DRAG_STATE = 308,
     ADD_PRE_INPUT_HANDLER = 309,
     REMOVE_PRE_INPUT_HANDLER = 310,
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    CHECK_KNUCKLE_EVENT = 311,
+#endif // OHOS_BUILD_ENABLE_ANCO
 };
 
 enum class MultimodalinputEventObserverCode {

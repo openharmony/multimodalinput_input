@@ -162,7 +162,7 @@ struct KnuckleSwitch {
     bool statusConfigValue { false };
 };
 
-class KeyCommandHandler final : public IInputEventHandler {
+class KeyCommandHandler final : public IInputEventHandler, public std::enable_shared_from_this<KeyCommandHandler> {
 public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
@@ -332,6 +332,7 @@ private:
         const std::string action);
     void SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEvent);
     bool CheckBundleName(const std::shared_ptr<PointerEvent> touchEvent);
+    void OnKunckleSwitchStatusChange(const std::string switchName);
 
 private:
     Sequence matchedSequence_;

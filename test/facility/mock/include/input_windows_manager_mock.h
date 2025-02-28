@@ -127,6 +127,7 @@ public:
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(void, CleanShellWindowIds, ());
     MOCK_METHOD(bool, IsKnuckleOnAncoWindow, (std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(int32_t, SyncKnuckleStatus, (bool));
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(int32_t, ShiftAppPointerEvent, (const ShiftWindowParam&, bool));

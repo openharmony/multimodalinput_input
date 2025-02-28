@@ -44,6 +44,14 @@ struct SwitchFocusKey {
     int32_t pressedKey { -1 };
 };
 
+enum AcrossDirection : int32_t {
+    ACROSS_ERROR = 0,
+    UPWARDS = 1,
+    DOWNWARDS = 2,
+    LEFTWARDS = 3,
+    RIGHTWARDS = 4,
+};
+
 class InputWindowsManager final : public IInputWindowsManager {
 public:
     InputWindowsManager();
@@ -191,6 +199,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
+    int32_t SyncKnuckleStatus(bool isKnuckleEnable);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
@@ -234,6 +243,7 @@ private:
     void UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &displayGroupInfo);
     std::pair<int32_t, int32_t> TransformSampleWindowXY(int32_t logicX, int32_t logicY) const;
     bool IsValidZorderWindow(const WindowInfo &window, const std::shared_ptr<PointerEvent>& pointerEvent);
+    bool SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent, const bool &isSkip);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
@@ -283,6 +293,9 @@ private:
     bool CalculateLayout(const DisplayInfo& displayInfo, const Vector2D<double> &physical, Vector2D<double>& layout);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, double& physicalX,
         double& physicalY, int32_t& displayId);
+    bool AcrossDisplay(const DisplayInfo &displayInfoDes, const DisplayInfo &displayInfoOri, Vector2D<double> &logical,
+        Vector2D<double> &layout, const AcrossDirection &acrossDirection);
+    AcrossDirection CalculateAcrossDirection(const DisplayInfo &displayInfo, const Vector2D<double> &layout);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void InitMouseDownInfo();
@@ -371,6 +384,7 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
         DisplayInfo &mainScreenDisplayInfo) const;
     bool IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay);
+    void SendBackCenterPointerEevent(const CursorPosition &cursorPos);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -438,6 +452,7 @@ private:
         std::string switchName;
         bool isOpen { false };
     } privacyProtection_;
+    bool isOpenPrivacyProtectionserver_ { false };
 #ifndef OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -463,6 +478,7 @@ private:
     static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
+    int32_t lastDpi_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

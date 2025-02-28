@@ -962,6 +962,14 @@ int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> chan
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->AncoRemoveChannel(channel);
 }
+
+int32_t MultimodalInputConnectManager::CheckKnuckleEvent(float pointX, float pointY, bool &touchType)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->CheckKnuckleEvent(pointX, pointY, touchType);
+}
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 int32_t MultimodalInputConnectManager::SkipPointerLayer(bool isSkip)

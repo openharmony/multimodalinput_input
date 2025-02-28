@@ -112,6 +112,7 @@ public:
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
+    void GetPointerImageSize(int32_t &width, int32_t &height) override;
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
@@ -214,6 +215,7 @@ private:
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
     void SetFaceNodeBounds();
+    int32_t DrawNewDpiPointer() override;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
@@ -289,6 +291,7 @@ private:
     int32_t userIconHotSpotX_ { 0 };
     int32_t userIconHotSpotY_ { 0 };
     int32_t tempPointerColor_ { -1 };
+    int32_t originSetColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;

@@ -517,6 +517,11 @@ int32_t InputWindowsManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> c
 
 void InputWindowsManager::CleanShellWindowIds()
 {}
+
+int32_t InputWindowsManager::SyncKnuckleStatus(bool isKnuckleEnable)
+{
+    return ERR_OK;
+}
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 bool KeyCommandHandler::GetKnuckleSwitchValue()
