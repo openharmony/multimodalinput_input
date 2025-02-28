@@ -45,17 +45,26 @@ enum NapiErrorCode : int32_t {
     COMMON_KEYBOARD_DEVICE_NOT_EXIST = 3900002,
     COMMON_NON_INPUT_APPLICATION = 3900003,
     PRE_KEY_NOT_SUPPORTED = 4100001,
+    INPUT_OCCUPIED_BY_SYSTEM = 4200002,
+    INPUT_OCCUPIED_BY_OTHER = 4200003,
     ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { COMMON_PERMISSION_CHECK_ERROR,
         { COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s." } },
+    { COMMON_USE_SYSAPI_ERROR,
+        { COMMON_USE_SYSAPI_ERROR, "Permission denied, non-system application called system api." } },
     { COMMON_PARAMETER_ERROR, { COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s." } },
+    { COMMON_DEVICE_NOT_EXIST, { COMMON_DEVICE_NOT_EXIST, "The specified device does not exist." } },
+    { COMMON_CAPABILITY_NOT_SUPPORTED, { COMMON_CAPABILITY_NOT_SUPPORTED, "Capability not supported.\n" } },
     { COMMON_KEYBOARD_DEVICE_NOT_EXIST,
         { COMMON_KEYBOARD_DEVICE_NOT_EXIST, "The specified keyboard device does not exist." } },
     { COMMON_NON_INPUT_APPLICATION, { COMMON_NON_INPUT_APPLICATION, "it is prohibited for non-input applications." } },
     { ERROR_WINDOW_ID_PERMISSION_DENIED, { ERROR_WINDOW_ID_PERMISSION_DENIED, "windowId is invalid.\n" } },
+    { PRE_KEY_NOT_SUPPORTED, { PRE_KEY_NOT_SUPPORTED, "Invalid combination of keys." } },
+    { INPUT_OCCUPIED_BY_SYSTEM, { INPUT_OCCUPIED_BY_SYSTEM, "The hotkey has been subscribed by system." } },
+    { INPUT_OCCUPIED_BY_OTHER, { INPUT_OCCUPIED_BY_OTHER, "The hotkey has been subscribed by other one." } },
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
