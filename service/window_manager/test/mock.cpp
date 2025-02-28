@@ -211,12 +211,10 @@ PointerDrawingManager::PointerDrawingManager() {}
 
 PointerDrawingManager::~PointerDrawingManager() {}
 
-std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
+IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 {
-    if (iPointDrawMgr_ == nullptr) {
-        iPointDrawMgr_ = std::make_shared<PointerDrawingManager>();
-    }
-    return iPointDrawMgr_;
+    static PointerDrawingManager instance;
+    return &instance;
 }
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible,

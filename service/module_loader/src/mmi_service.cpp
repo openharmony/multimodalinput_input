@@ -19,7 +19,7 @@
 #include <sched.h>
 #endif // OHOS_BUILD_PC_PRIORITY
 #include <sys/signalfd.h>
-
+#include <csignal>
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif // OHOS_RSS_CLIENT
