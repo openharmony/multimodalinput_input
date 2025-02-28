@@ -180,6 +180,10 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     mode_ = si->GetSourceMode();
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
+    if (IsExtend()) {
+        surfaceNode_->AttachToDisplay(screenId_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
     MMI_HILOGI("Update with ScreenInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
