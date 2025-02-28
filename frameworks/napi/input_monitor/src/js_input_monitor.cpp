@@ -519,6 +519,7 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 }
 
 MapFun JsInputMonitor::GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent)
+    __attribute__((no_sanitize("cfi")))
 {
     MapFun mapFunc;
     mapFunc["id"] = [inputEvent] { return inputEvent->GetId(); };
