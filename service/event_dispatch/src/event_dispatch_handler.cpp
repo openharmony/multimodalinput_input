@@ -366,11 +366,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t pointerAc = pointerEvent->GetPointerAction();
-    if (pointerAc == PointerEvent::POINTER_ACTION_PULL_DOWN || pointerAc == PointerEvent::POINTER_ACTION_UP ||
-        pointerAc == PointerEvent::POINTER_ACTION_DOWN || pointerAc == PointerEvent::POINTER_ACTION_PULL_UP) {
-        NotifyPointerEventToRS(pointerAc, sess->GetProgramName(),
-            static_cast<uint32_t>(sess->GetPid()), pointerEvent->GetPointerCount());
-    }
+    NotifyPointerEventToRS(pointerAc, sess->GetProgramName(),
+        static_cast<uint32_t>(sess->GetPid()), pointerEvent->GetPointerCount());
     if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
