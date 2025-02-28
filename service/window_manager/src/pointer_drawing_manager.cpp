@@ -1492,6 +1492,14 @@ void PointerDrawingManager::AttachToDisplay()
         auto sp = GetScreenPointer(screenId_);
         CHKPV(sp);
         surfaceNode_ = sp->GetSurfaceNode();
+        if (originSetColor_ != -1 && surfaceNode_ != nullptr) {
+            float alphaRatio = (static_cast<uint32_t>(originSetColor_) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
+            if (alphaRatio > 1) {
+                MMI_HILOGW("Invalid alphaRatio:%{public}f", alphaRatio);
+            } else {
+                surfaceNode_->SetAlpha(1 - alphaRatio);
+            }
+        }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     surfaceNode_->AttachToDisplay(screenId_);
@@ -2046,6 +2054,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("PointerColor:%{public}x", color);
+    originSetColor_ = color;
     // ARGB从表面看比RGB多了个A，也是一种色彩模式，是在RGB的基础上添加了Alpha（透明度）通道。
     // 透明度也是以0到255表示的，所以也是总共有256级，透明是0，不透明是255。
     // 这个color每8位代表一个通道值，分别是alpha和rgb，总共32位。
@@ -2206,6 +2215,12 @@ int32_t PointerDrawingManager::GetPointerSize()
     int32_t pointerSize = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_SIZE);
     MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
     return pointerSize;
+}
+
+void PointerDrawingManager::GetPointerImageSize(int32_t &width, int32_t &height)
+{
+    width = imageWidth_;
+    height = imageHeight_;
 }
 
 int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
@@ -3341,12 +3356,21 @@ void PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     CHKPV(sp);
     if (!sp->Move(x, y, align)) {
         MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", displayId_);
-        return;
     }
-
-    for (auto msp : GetMirrorScreenPointers()) {
-        if (!msp->Move(x, y, align)) {
-            MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", msp->GetScreenId());
+    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        screenPointers = screenPointers_;
+    }
+    for (auto it : screenPointers) {
+        if (it.second->IsMirror()) {
+            if (!it.second->Move(x, y, align)) {
+                MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
+            }
+        } else if (it.first != displayId_) {
+            if (!it.second->Move(0, 0, align)) {
+                MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
+            }
         }
     }
 }
@@ -3516,6 +3540,18 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     userIconHotSpotY_ = cursor.focusY;
     MMI_HILOGI("imageWidth:%{public}d, imageHeight:%{public}d, focusX:%{public}d, focusY:%{public}d",
         imageInfo.size.width, imageInfo.size.height, cursor.focusX, cursor.focusY);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::DrawNewDpiPointer()
+{
+    mouseIconUpdate_ = true;
+    int32_t updateRes = DrawMovePointer(lastDisplayId_, lastPhysicalX_, lastPhysicalY_,
+        lastMouseStyle_, currentDirection_);
+    if (updateRes != RET_OK) {
+        MMI_HILOGE("Forced refresh DPI drawing failed.");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 } // namespace MMI
