@@ -15,18 +15,10 @@
 
 #include "mmi_client.h"
 
-#include <cinttypes>
-#include <condition_variable>
-
 #include "anr_handler.h"
-#include "input_manager_impl.h"
 #include "mmi_fd_listener.h"
-#include "mmi_log.h"
-#include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "qos.h"
-#include "proto.h"
-#include "util.h"
 #include "parameters.h"
 
 #undef MMI_LOG_TAG

@@ -16,14 +16,6 @@
 #ifndef NAP_PROCESS_H
 #define NAP_PROCESS_H
 
-#include <map>
-#include <memory>
-#include <mutex>
-
-#include "nocopyable.h"
-#include "singleton.h"
-
-#include "define_multimodal.h"
 #include "uds_server.h"
 
 namespace OHOS {

@@ -15,7 +15,6 @@
 
 #include "key_option.h"
 
-#include "config_multimodal.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG

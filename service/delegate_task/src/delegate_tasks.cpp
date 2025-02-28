@@ -16,11 +16,9 @@
 #include "delegate_tasks.h"
 
 #include <fcntl.h>
-#include <sys/syscall.h>
 #include <unistd.h>
 
 #include "error_multimodal.h"
-#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER

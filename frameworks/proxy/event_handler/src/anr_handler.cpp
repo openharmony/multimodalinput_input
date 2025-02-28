@@ -15,14 +15,9 @@
 
 #include "anr_handler.h"
 
-#include <cinttypes>
-
-#include "ffrt.h"
 #include "ffrt_inner.h"
 
 #include "bytrace_adapter.h"
-#include "define_multimodal.h"
-#include "input_manager_impl.h"
 #include "multimodal_input_connect_manager.h"
 
 #undef MMI_LOG_DOMAIN

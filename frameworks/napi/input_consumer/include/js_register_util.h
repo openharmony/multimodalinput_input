@@ -16,13 +16,9 @@
 #ifndef JS_REGISTER_UTIL_H
 #define JS_REGISTER_UTIL_H
 
-#include <array>
 #include <uv.h>
 
-#include "refbase.h"
-
 #include "js_register_module.h"
-#include "key_event.h"
 
 namespace OHOS {
 namespace MMI {

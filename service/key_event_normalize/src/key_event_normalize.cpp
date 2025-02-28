@@ -16,12 +16,9 @@
 #include "key_event_normalize.h"
 
 #include <linux/input.h>
-#include <config_policy_utils.h>
 #include <parameters.h>
 
 #include "display_manager.h"
-#include "input_device_manager.h"
-#include "input_windows_manager.h"
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
 #include "key_unicode_transformation.h"

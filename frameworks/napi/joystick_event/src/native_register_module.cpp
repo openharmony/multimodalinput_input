@@ -14,7 +14,6 @@
  */
 
 #include "js_joystick_event.h"
-#include "node_api.h"
 
 namespace OHOS {
 namespace MMI {

@@ -17,8 +17,6 @@
 #define SETTING_DATASHARE_H
 
 #include "datashare_helper.h"
-#include "errors.h"
-#include "mutex"
 #include "setting_observer.h"
 
 namespace OHOS {

@@ -18,7 +18,6 @@
 
 #include <map>
 #include <unordered_set>
-#include <vector>
 
 #include "pointer_event.h"
 

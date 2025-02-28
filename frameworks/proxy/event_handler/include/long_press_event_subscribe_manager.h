@@ -16,9 +16,7 @@
 #ifndef LONG_PRESS_EVENT_SUBSCRIBE_MANAGER_H
 #define LONG_PRESS_EVENT_SUBSCRIBE_MANAGER_H
 
-#include <functional>
 #include <map>
-#include <memory>
 
 #include <singleton.h>
 

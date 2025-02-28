@@ -15,14 +15,10 @@
 #ifndef MULTIMODAL_EVENT_HANDLER_H
 #define MULTIMODAL_EVENT_HANDLER_H
 
-#include "nocopyable.h"
-#include "singleton.h"
-
 #include "if_mmi_client.h"
 #include "key_event_input_subscribe_manager.h"
 #include "long_press_event.h"
 #include "pointer_event.h"
-#include "proto.h"
 #include "switch_event_input_subscribe_manager.h"
 #include "touchpad_control_display_gain.h"
 

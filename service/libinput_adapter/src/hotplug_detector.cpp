@@ -15,15 +15,9 @@
 
 #include "hotplug_detector.h"
 
-#include <string>
-#include <system_error>
-#include <thread>
-
 #include <dirent.h>
 #include <sys/inotify.h>
-#include <unistd.h>
 
-#include "mmi_log.h"
 #include "dfx_hisysevent_device.h"
 
 #undef MMI_LOG_DOMAIN

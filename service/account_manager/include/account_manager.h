@@ -16,11 +16,7 @@
 #ifndef ACCOUNT_MANAGER_H
 #define ACCOUNT_MANAGER_H
 
-#include <map>
-#include <memory>
-
 #include <common_event_subscriber.h>
-#include <nocopyable.h>
 
 #include "setting_observer.h"
 

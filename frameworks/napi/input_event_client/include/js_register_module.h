@@ -16,16 +16,6 @@
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
 
-#include <cstdio>
-#include <cstring>
-#include <iostream>
-#include <list>
-#include <map>
-
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "utils/log.h"
-
 #include "define_multimodal.h"
 #include "js_joystick_event.h"
 

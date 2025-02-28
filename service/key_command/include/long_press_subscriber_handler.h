@@ -16,15 +16,6 @@
 #ifndef LONG_PRESS_SUBSCRIBER_HANDLER_H
 #define LONG_PRESS_SUBSCRIBER_HANDLER_H
 
-#include <algorithm>
-#include <atomic>
-#include <list>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <set>
-#include <thread>
-
 #include "singleton.h"
 
 #include "long_press_event.h"

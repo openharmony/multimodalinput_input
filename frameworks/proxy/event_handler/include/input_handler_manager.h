@@ -16,15 +16,11 @@
 #ifndef INPUT_HANDLER_MANAGER_H
 #define INPUT_HANDLER_MANAGER_H
 
-#include <limits>
 #include <map>
 #include <mutex>
-#include <iterator>
 
 #include "input_device.h"
-#include "input_handler_type.h"
 #include "i_input_event_consumer.h"
-#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {

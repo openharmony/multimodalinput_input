@@ -15,17 +15,11 @@
 
 #include "multimodal_input_connect_manager.h"
 
-#include <chrono>
-#include <thread>
 
 #include "iservice_registry.h"
-#include "system_ability_definition.h"
 
 #include "input_binder_client_server.h"
-#include "mmi_log.h"
 #include "multimodal_input_connect_death_recipient.h"
-#include "multimodal_input_connect_define.h"
-#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER

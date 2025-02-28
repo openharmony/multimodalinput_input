@@ -15,14 +15,8 @@
 
 #include "input_event.h"
 
-#include <cassert>
-#include <chrono>
-
 #include "axis_event.h"
 #include "event_log_helper.h"
-#include "key_event.h"
-#include "mmi_log.h"
-#include "pointer_event.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputEvent"

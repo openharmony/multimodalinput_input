@@ -15,10 +15,6 @@
 
 #include "input_screen_capture_agent.h"
 
-#include <climits>
-#include <list>
-#include "mmi_log.h"
-
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputScreenCaptureAgent"
 

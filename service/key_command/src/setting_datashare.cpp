@@ -15,19 +15,11 @@
 
 #include "setting_datashare.h"
 
-#include <thread>
-
 #include "bytrace_adapter.h"
-#include "datashare_predicates.h"
-#include "datashare_result_set.h"
-#include "datashare_values_bucket.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "mmi_log.h"
-#include "rdb_errno.h"
-#include "result_set.h"
 #include "system_ability_definition.h"
-#include "uri.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

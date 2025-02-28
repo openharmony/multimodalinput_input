@@ -15,10 +15,6 @@
 
 #include "event_dispatch_handler.h"
 
-#include <cinttypes>
-
-#include <linux/input-event-codes.h>
-
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "transaction/rs_interfaces.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -27,15 +23,9 @@
 #include "app_debug_listener.h"
 #include "bytrace_adapter.h"
 #include "dfx_hisysevent.h"
-#include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
-#include "mouse_device_state.h"
-#include "napi_constants.h"
-#include "proto.h"
-#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH

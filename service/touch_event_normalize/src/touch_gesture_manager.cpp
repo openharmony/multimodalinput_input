@@ -15,9 +15,6 @@
 
 #include "touch_gesture_manager.h"
 
-#include <config_policy_utils.h>
-
-#include "input_event_handler.h"
 #include "key_command_handler_util.h"
 
 #undef MMI_LOG_DOMAIN

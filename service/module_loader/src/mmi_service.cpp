@@ -15,29 +15,21 @@
 
 #include "mmi_service.h"
 
-#include <parameters.h>
 #ifdef OHOS_BUILD_PC_PRIORITY
 #include <sched.h>
 #endif // OHOS_BUILD_PC_PRIORITY
 #include <sys/signalfd.h>
 
-#include <cinttypes>
-#include <csignal>
-#include <cstdlib>
-#include "string_ex.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif // OHOS_RSS_CLIENT
 
 #include "ability_manager_client.h"
 #include "anr_manager.h"
-#include "app_debug_listener.h"
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
-#include "dfx_define.h"
 #include "dfx_dump_catcher.h"
 #include "dfx_hisysevent.h"
-#include "dfx_json_formatter.h"
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
@@ -55,32 +47,20 @@
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "infrared_emitter_controller.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
-#include "input_device_manager.h"
 #include "ipc_skeleton.h"
-#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "i_preference_manager.h"
 #include "key_auto_repeat.h"
-#include "key_command_handler.h"
-#include "key_map_manager.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
-#include "mmi_log.h"
-#include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
-#include "timer_manager.h"
-#include "tokenid_kit.h"
 #include "touch_event_normalize.h"
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "touch_gesture_manager.h"
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-#include "util.h"
 #include "util_ex.h"
-#include "watchdog_task.h"
-#include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
-#include "xcollie/xcollie_define.h"
 
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"

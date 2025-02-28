@@ -16,8 +16,6 @@
 #ifndef CLIENT_MSG_HANDLER_H
 #define CLIENT_MSG_HANDLER_H
 
-#include "nocopyable.h"
-
 #include "aggregator.h"
 #include "msg_handler.h"
 #include "uds_client.h"

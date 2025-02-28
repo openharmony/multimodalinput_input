@@ -16,8 +16,6 @@
 #ifndef I_INPUT_EVENT_CONSUMER_H
 #define I_INPUT_EVENT_CONSUMER_H
 
-#include <memory>
-
 #include "axis_event.h"
 #include "key_event.h"
 #include "pointer_event.h"

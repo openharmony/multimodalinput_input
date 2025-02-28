@@ -14,11 +14,8 @@
  */
 #include "screen_pointer.h"
 
-#include "i_preference_manager.h"
 #include "define_multimodal.h"
 #include "transaction/rs_transaction.h"
-#include "bytrace_adapter.h"
-#include "dm_common.h"
 #include "transaction/rs_interfaces.h"
 
 #undef MMI_LOG_DOMAIN

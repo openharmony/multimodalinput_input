@@ -16,7 +16,6 @@
 #ifndef VIRTUAL_DEVICE_H
 #define VIRTUAL_DEVICE_H
 
-#include <cstdint>
 #include <vector>
 
 #include "linux/uinput.h"

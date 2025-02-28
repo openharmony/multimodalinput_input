@@ -16,8 +16,6 @@
 #ifndef TOUCH_GESTURE_ADAPTER_H
 #define TOUCH_GESTURE_ADAPTER_H
 
-#include <memory>
-
 #include "touch_gesture_detector.h"
 
 namespace OHOS {

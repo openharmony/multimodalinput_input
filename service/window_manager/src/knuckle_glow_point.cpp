@@ -15,7 +15,6 @@
 
 #include "knuckle_glow_point.h"
 
-#include "include/core/SkColorFilter.h"
 #include "mmi_log.h"
 #include "platform/ohos/overdraw/rs_overdraw_controller.h"
 

@@ -16,8 +16,6 @@
 #ifndef I_INPUT_EVENT_HANDLER_H
 #define I_INPUT_EVENT_HANDLER_H
 
-#include <memory>
-
 #include "axis_event.h"
 #include "define_multimodal.h"
 #include "key_event.h"

@@ -16,7 +16,6 @@
 #ifndef I_MULTIMODAL_INPUT_CONNECT_H
 #define I_MULTIMODAL_INPUT_CONNECT_H
 
-#include <iremote_broker.h>
 #include <system_ability_definition.h>
 
 #include "extra_data.h"
@@ -24,20 +23,13 @@
 #include "i_anco_channel.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
 #include "i_event_filter.h"
-#include "i_input_event_filter.h"
 #include "infrared_frequency_info.h"
 #include "input_device.h"
-#include "input_handler_type.h"
-#include "key_event.h"
 #include "key_option.h"
 #include "long_press_event.h"
-#include "mmi_event_observer.h"
-#include "multimodalinput_ipc_interface_code.h"
 #include "nap_process.h"
-#include "pointer_event.h"
 #include "pointer_style.h"
 #include "touchpad_control_display_gain.h"
-#include "window_info.h"
 #include "shift_info.h"
 
 namespace OHOS {

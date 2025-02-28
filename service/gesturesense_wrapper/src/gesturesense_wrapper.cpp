@@ -18,7 +18,6 @@
 #include <dlfcn.h>
 
 #include "define_multimodal.h"
-#include "pointer_event.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "GesturesenseWrapper"

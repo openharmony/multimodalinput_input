@@ -13,18 +13,8 @@
  * limitations under the License.
  */
 
-#include "uds_server.h"
-
-#include <cinttypes>
-#include <list>
-
-#include <sys/socket.h>
-
 #include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
-#include "mmi_log.h"
-#include "multimodalinput_ipc_interface_code.h"
-#include "util.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN

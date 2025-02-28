@@ -15,12 +15,6 @@
 
 #include "oh_input_device_listener.h"
 
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-#include "input_manager.h"
-#include "input_manager_impl.h"
-#include "mmi_log.h"
-
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputDeviceListener"
 

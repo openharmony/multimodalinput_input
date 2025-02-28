@@ -17,13 +17,8 @@
 #define UTIL_NAPI_ERROR_H
 
 #include <map>
-#include <string>
-
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 
 #include "securec.h"
-#include "utils/log.h"
 
 #include "util_napi.h"
 

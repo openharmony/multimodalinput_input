@@ -15,22 +15,10 @@
 
 #include "libinput_adapter.h"
 
-#include <cinttypes>
-#include <climits>
 #include <regex>
 
-#include <dirent.h>
-#include <fcntl.h>
-#include <sys/epoll.h>
-#include <unistd.h>
-#include <libudev.h>
-
-#include "define_multimodal.h"
-#include "i_input_windows_manager.h"
-#include "i_pointer_drawing_manager.h"
 #include "param_wrapper.h"
 #include "property_reader.h"
-#include "util.h"
 #include "input_device_manager.h"
 #include "key_event_normalize.h"
 
@@ -253,7 +241,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     hardwareKeyEventDetected_ = hardwareKeyEventDetected;
 
     deviceId = -1;
-	
+
     auto vTrackpad = std::make_shared<InputDevice>();
     vTrackpad->SetName("VirtualTrackpad");
     vTrackpad->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
@@ -1235,7 +1223,7 @@ void LibinputAdapter::OnEventHandler()
                     touchPoints_.erase(pos);
                 }
             }
-			
+
             int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
             int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
             MMI_HILOGD("touch event. deviceId:%{private}d, touchId:%{private}d, x:%{private}d, y:%{private}d, \
@@ -1271,7 +1259,7 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                 HandleHWKeyEventForVKeyboard(event);
                 funInputEvent_(event, frameTime);
                 libinput_event_destroy(event);
-				
+
                 MultiKeyboardSetLedState(oldCapsLockOn);
                 keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
                 libinput_toggle_caps_key();
