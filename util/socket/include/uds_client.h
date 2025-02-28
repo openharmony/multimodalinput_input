@@ -16,12 +16,6 @@
 #ifndef UDS_CLIENT_H
 #define UDS_CLIENT_H
 
-#include <functional>
-#include <future>
-#include <thread>
-
-#include "net_packet.h"
-#include "nocopyable.h"
 #include "uds_socket.h"
 
 namespace OHOS {

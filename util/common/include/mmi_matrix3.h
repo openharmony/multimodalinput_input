@@ -17,8 +17,6 @@
 #define MMI_MATRIX3_H
 
 #define USE_MATH_DEFINES
-#include <cmath>
-#include <vector>
 
 #include "mmi_vector2.h"
 #include "mmi_vector3.h"

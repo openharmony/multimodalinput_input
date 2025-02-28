@@ -16,9 +16,6 @@
 #ifndef CROWN_TRANSFORM_PROCESSOR_H
 #define CROWN_TRANSFORM_PROCESSOR_H
 
-#include <map>
-#include <memory>
-
 #include "libinput.h"
 #include "singleton.h"
 

@@ -15,14 +15,8 @@
 
 #include "input_device_impl.h"
 
-#include <algorithm>
-#include <string_view>
-
-#include "mmi_log.h"
-#include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "bytrace_adapter.h"
-#include "net_packet.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputDeviceImpl"

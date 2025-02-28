@@ -15,10 +15,6 @@
 
 #include "event_filter_stub.h"
 
-#include <sys/socket.h>
-#include <sys/types.h>
-
-#include "ipc_skeleton.h"
 #include "string_ex.h"
 
 #include "mmi_log.h"

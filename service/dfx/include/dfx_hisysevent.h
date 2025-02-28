@@ -16,9 +16,6 @@
 #ifndef DFX_HISYSEVENT_H
 #define DFX_HISYSEVENT_H
 
-#include <chrono>
-#include <string>
-
 #include "hisysevent.h"
 
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
@@ -27,9 +24,7 @@
 
 #include "input_device_manager.h"
 #include "key_event.h"
-#include "mmi_log.h"
 #include "pointer_event.h"
-#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {

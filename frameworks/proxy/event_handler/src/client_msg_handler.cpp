@@ -13,19 +13,10 @@
  * limitations under the License.
  */
 
-#include "client_msg_handler.h"
-
-#include <cinttypes>
-#include <iostream>
-#include <sstream>
-
 #include "anr_handler.h"
 #include "bytrace_adapter.h"
 #include "event_log_helper.h"
-#include "input_device.h"
-#include "input_device_impl.h"
 #include "input_event_data_transformation.h"
-#include "input_handler_manager.h"
 #include "input_manager_impl.h"
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
@@ -34,10 +25,7 @@
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
-#include "napi_constants.h"
-#include "proto.h"
 #include "time_cost_chk.h"
-#include "util.h"
 #include "pre_monitor_manager.h"
 
 #undef MMI_LOG_TAG

@@ -16,9 +16,6 @@
 #include "event_filter_handler.h"
 
 #include "dfx_hisysevent.h"
-#include "error_multimodal.h"
-#include "input_device_manager.h"
-#include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

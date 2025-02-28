@@ -14,22 +14,9 @@
  */
 
 #include "klog.h"
-
-#include <cerrno>
-#include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-
 #include <fcntl.h>
-#include <pthread.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
-#include "hilog/log.h"
 #include "securec.h"
 
 namespace OHOS {

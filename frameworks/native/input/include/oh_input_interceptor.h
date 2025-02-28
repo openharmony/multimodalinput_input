@@ -19,7 +19,6 @@
 #include <mutex>
 
 #include "i_input_event_consumer.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {

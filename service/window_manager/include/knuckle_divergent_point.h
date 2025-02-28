@@ -16,11 +16,8 @@
 #ifndef KNUCKLE_GIVERGENT_POINT_H
 #define KNUCKLE_GIVERGENT_POINT_H
 
-#include "draw/canvas.h"
-#include "image/bitmap.h"
 #include "pipeline/rs_recording_canvas.h"
 #include "render/rs_pixel_map_util.h"
-#include "utils/matrix.h"
 
 namespace OHOS {
 namespace MMI {

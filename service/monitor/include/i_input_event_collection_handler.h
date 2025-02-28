@@ -16,11 +16,8 @@
 #ifndef I_INPUT_EVENT_MONITOR_HANDLER_H
 #define I_INPUT_EVENT_MONITOR_HANDLER_H
 
-#include <mutex>
-
 #include "key_event.h"
 #include "pointer_event.h"
-#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {

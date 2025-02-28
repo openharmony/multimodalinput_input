@@ -15,19 +15,8 @@
 
 #include "event_pre_monitor_handler.h"
 
-#include "common_event_support.h"
-
-#include "anr_manager.h"
-#include "app_debug_listener.h"
-#include "bytrace_adapter.h"
-#include "define_multimodal.h"
-#include "display_event_monitor.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "mmi_log.h"
-#include "napi_constants.h"
-#include "net_packet.h"
-#include "proto.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN

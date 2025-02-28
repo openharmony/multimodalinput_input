@@ -15,8 +15,6 @@
 
 #ifndef FINGERSENSE_MANAGER_H
 #define FINGERSENSE_MANAGER_H
-
-#include "nocopyable.h"
 #include "singleton.h"
 
 namespace OHOS {

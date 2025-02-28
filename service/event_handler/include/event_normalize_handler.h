@@ -16,9 +16,6 @@
 #ifndef EVENT_NORMALIZE_HANDLER_H
 #define EVENT_NORMALIZE_HANDLER_H
 
-#include <memory>
-
-#include "i_input_event_handler.h"
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
 #include "joystick_event_normalize.h"
 #endif // OHOS_BUILD_ENABLE_JOYSTICK

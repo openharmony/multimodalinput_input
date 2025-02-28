@@ -13,13 +13,8 @@
  * limitations under the License.
  */
 
-#include "js_register_util.h"
-
-#include <cinttypes>
-
 #include "js_register_module.h"
 #include "napi_constants.h"
-#include "util_napi.h"
 #include "util_napi_error.h"
 
 #undef MMI_LOG_TAG

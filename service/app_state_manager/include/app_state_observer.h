@@ -16,16 +16,12 @@
 #ifndef OHOS_APP_STATE_OBSERVER_H
 #define OHOS_APP_STATE_OBSERVER_H
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "app_mgr_interface.h"
 #include "application_state_observer_stub.h"
-#include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "mmi_log.h"
-#include "running_process_info.h"
-#include "system_ability.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {

@@ -16,12 +16,6 @@
 #ifndef INPUT_AGGREGATOR_H
 #define INPUT_AGGREGATOR_H
 
-#include <iostream>
-#include <map>
-#include <set>
-#include <string>
-#include <utility>
-
 #include "mmi_log.h"
 
 namespace OHOS {

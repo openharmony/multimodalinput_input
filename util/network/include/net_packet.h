@@ -16,7 +16,6 @@
 #ifndef NET_PACKET_H
 #define NET_PACKET_H
 
-#include "proto.h"
 #include "stream_buffer.h"
 
 #undef MMI_LOG_TAG

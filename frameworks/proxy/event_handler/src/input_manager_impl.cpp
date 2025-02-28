@@ -15,27 +15,19 @@
 
 #include "input_manager_impl.h"
 
-#include <cinttypes>
-#include <unistd.h>
-#include <parameters.h>
 #include <regex>
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "anco_channel.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
 #include "anr_handler.h"
 #include "bytrace_adapter.h"
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-#include "event_filter_service.h"
 #include "event_log_helper.h"
-#include "input_scene_board_judgement.h"
 #include "long_press_event_subscribe_manager.h"
-#include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "oh_input_manager.h"
 #include "pixel_map.h"
-#include "switch_event_input_subscribe_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImpl"
@@ -432,7 +424,7 @@ int32_t InputManagerImpl::SubscribeLongPressEvent(const LongPressRequest &longPr
     CHKPR(callback, RET_ERR);
     return LONG_PRESS_EVENT_SUBSCRIBE_MGR.SubscribeLongPressEvent(longPressRequest, callback);
 }
- 
+
 void InputManagerImpl::UnsubscribeLongPressEvent(int32_t subscriberId)
 {
     CALL_INFO_TRACE;

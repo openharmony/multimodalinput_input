@@ -16,19 +16,11 @@
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
 
-#include <cstdio>
-#include <cstring>
-#include <iostream>
 #include <list>
-#include <map>
 
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "refbase.h"
-#include "utils/log.h"
 
 #include "define_multimodal.h"
-#include "key_event.h"
 #include "key_option.h"
 
 #define SUCCESS_CODE 0

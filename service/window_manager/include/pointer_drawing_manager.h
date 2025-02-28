@@ -16,19 +16,8 @@
 #ifndef POINTER_DRAWING_MANAGER_H
 #define POINTER_DRAWING_MANAGER_H
 
-#include <iostream>
-#include <list>
-
-#include "common/rs_thread_handler.h"
-#include "draw/canvas.h"
-#include "event_handler.h"
-#include "nocopyable.h"
-#include "pixel_map.h"
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
-#include "ui/rs_canvas_node.h"
-#include "ui/rs_surface_node.h"
-#include "window.h"
 
 #include "device_observer.h"
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -38,10 +27,7 @@
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
-#include "pointer_renderer.h"
 #include "screen_pointer.h"
-#include "setting_observer.h"
-#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -74,7 +60,7 @@ public:
     using callback_t = std::function<void(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &)>;
     explicit ScreenModeChangeListener(callback_t func): callback_(func) {}
     virtual ~ScreenModeChangeListener() = default;
-    
+
     void NotifyScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens) override
     {
         return callback_(screens);

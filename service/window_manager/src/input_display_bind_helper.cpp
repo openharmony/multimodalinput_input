@@ -15,15 +15,8 @@
  
 #include "input_display_bind_helper.h"
 
-#include <algorithm>
-#include <cctype>
-#include <filesystem>
 #include <fstream>
-#include <iostream>
-#include <list>
-#include <sstream>
 
-#include "mmi_log.h"
 #include "parameters.h"
 #include "util.h"
 

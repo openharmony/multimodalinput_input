@@ -15,7 +15,6 @@
 
 #include "keyboard_inject.h"
 
-#include "linux/input-event-codes.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG

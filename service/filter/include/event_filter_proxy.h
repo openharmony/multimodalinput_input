@@ -15,10 +15,7 @@
 
 #ifndef EVENT_FILTER_PROXY_H
 #define EVENT_FILTER_PROXY_H
-
-#include "iremote_object.h"
 #include "iremote_proxy.h"
-#include "nocopyable.h"
 
 #include "i_event_filter.h"
 

@@ -13,11 +13,8 @@
  * limitations under the License.
  */
 
-#include <list>
-
 #include "define_multimodal.h"
 #include "input_screen_capture_monitor_listener.h"
-#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputScreenCapture"

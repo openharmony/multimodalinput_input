@@ -12,8 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "define_multimodal.h"
+ 
 #include "mmi_log.h"
 
 #include "input_screen_capture_monitor_listener.h"

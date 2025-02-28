@@ -16,12 +16,7 @@
 #ifndef TOUCHPAD_TRANSFORM_PROCESSOR_H
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
-#include <map>
 #include <deque>
-#include <vector>
-
-#include "nocopyable.h"
-#include "singleton.h"
 
 #include "aggregator.h"
 #include "timer_manager.h"

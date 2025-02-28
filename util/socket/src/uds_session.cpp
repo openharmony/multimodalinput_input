@@ -15,16 +15,7 @@
 
 #include "uds_session.h"
 
-#include <cinttypes>
-#include <sstream>
-
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/un.h>
-#include <unistd.h>
-
 #include "hisysevent.h"
-#include "proto.h"
 #include "uds_socket.h"
 
 #undef MMI_LOG_TAG

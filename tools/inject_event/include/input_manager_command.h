@@ -16,10 +16,6 @@
 #ifndef INPUT_MANAGER_COMMAND_H
 #define INPUT_MANAGER_COMMAND_H
 
-#include <string>
-#include <vector>
-
-#include "nocopyable.h"
 #include "pointer_event.h"
 
 namespace OHOS {

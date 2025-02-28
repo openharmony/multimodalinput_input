@@ -16,7 +16,6 @@
 #include "js_event_target.h"
 
 #include "bytrace_adapter.h"
-#include "js_util.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 

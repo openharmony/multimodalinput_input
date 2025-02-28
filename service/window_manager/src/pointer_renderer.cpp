@@ -16,12 +16,8 @@
 #include "pointer_renderer.h"
 
 #include <regex>
-#include <sstream>
-
-#include "define_multimodal.h"
 #include "image_source.h"
 #include "window_info.h"
-#include "mmi_log.h"
 #include "util.h"
 
 #undef MMI_LOG_DOMAIN

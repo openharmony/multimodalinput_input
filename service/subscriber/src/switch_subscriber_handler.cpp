@@ -17,14 +17,9 @@
 
 #include <parameters.h>
 
-#include "bytrace_adapter.h"
-#include "define_multimodal.h"
 #include "dfx_hisysevent.h"
-#include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "net_packet.h"
-#include "proto.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN

@@ -16,20 +16,15 @@
 #ifndef SERVER_MSG_HANDLER_H
 #define SERVER_MSG_HANDLER_H
 
-#include "nocopyable.h"
-
 #include "client_death_handler.h"
 #include "event_dispatch_handler.h"
 #include "i_event_filter.h"
 #include "inject_notice_manager.h"
-#include "input_handler_type.h"
 #include "key_option.h"
 #include "long_press_event.h"
 #include "mouse_event_normalize.h"
 #include "msg_handler.h"
 #include "pixel_map.h"
-#include "touchpad_control_display_gain.h"
-#include "window_info.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT

@@ -15,10 +15,7 @@
 
 #include "key_event_value_transformation.h"
 
-#include <map>
-
 #include "hos_key_event.h"
-#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH

@@ -16,13 +16,9 @@
 #ifndef OHOS_INPUT_DEVICE_EVENT_H
 #define OHOS_INPUT_DEVICE_EVENT_H
 
-#include <functional>
 #include <list>
 #include <map>
 #include <mutex>
-#include <vector>
-
-#include <nocopyable.h>
 
 #include "i_input_device_listener.h"
 #include "input_device.h"

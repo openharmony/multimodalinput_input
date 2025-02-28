@@ -16,15 +16,8 @@
 #ifndef POINTER_EVENT_H
 #define POINTER_EVENT_H
 
-#include <array>
 #include <list>
-#include <memory>
 #include <set>
-#include <unordered_map>
-#include <vector>
-
-#include "nocopyable.h"
-#include "parcel.h"
 
 #include "input_event.h"
 #include "input_handler_type.h"

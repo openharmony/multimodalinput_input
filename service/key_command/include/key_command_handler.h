@@ -16,25 +16,9 @@
 #ifndef KEY_COMMAND_HANDLER_H
 #define KEY_COMMAND_HANDLER_H
 
-#include <chrono>
-#include <condition_variable>
-#include <functional>
-#include <fstream>
-#include <map>
-#include <mutex>
-#include <set>
-#include <thread>
-#include <vector>
-
-#include "nocopyable.h"
-#include "preferences.h"
-#include "preferences_errno.h"
-#include "preferences_helper.h"
 #include "window_info.h"
 
 #include "i_input_event_handler.h"
-#include "key_event.h"
-#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {

@@ -15,39 +15,21 @@
 
 #include "server_msg_handler.h"
 
-#include <cinttypes>
-#include "ipc_skeleton.h"
-
-#include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "app_mgr_client.h"
 #include "authorization_dialog.h"
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
-#include "client_death_handler.h"
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "display_event_monitor.h"
-#include "event_dump.h"
-#include "event_interceptor_handler.h"
-#include "event_monitor_handler.h"
 #include "event_log_helper.h"
-#include "hos_key_event.h"
 #include "input_device_manager.h"
-#include "input_event.h"
-#include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
-#include "key_event_normalize.h"
-#include "key_event_value_transformation.h"
-#include "key_subscriber_handler.h"
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
-#include "parameters.h"
-#include "running_process_info.h"
-#include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"

@@ -16,11 +16,6 @@
 #ifndef EVENT_FILTER_SERVICE_H
 #define EVENT_FILTER_SERVICE_H
 
-#include <list>
-
-#include "iremote_object.h"
-#include "nocopyable.h"
-
 #include "event_filter_stub.h"
 #include "i_input_event_filter.h"
 

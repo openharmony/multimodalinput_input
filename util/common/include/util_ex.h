@@ -16,17 +16,8 @@
 #ifndef UTIL_EX_H
 #define UTIL_EX_H
 
-#include <ctime>
-#include <map>
-#include <string>
-#include <type_traits>
-#include <vector>
-
 #include "securec.h"
 
-#include "define_multimodal.h"
-#include "mmi_log.h"
-#include "struct_multimodal.h"
 #include "util.h"
 
 #undef MMI_LOG_TAG

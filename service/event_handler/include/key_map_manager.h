@@ -17,7 +17,6 @@
 #define KEY_MAP_MANAGER_H
 
 #include <map>
-#include <string>
 
 #include "key_event_value_transformation.h"
 #include "libinput.h"

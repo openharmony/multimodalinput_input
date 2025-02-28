@@ -16,8 +16,6 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_DEF_PARCEL_H
 #define MULTIMODAL_INPUT_CONNECT_DEF_PARCEL_H
 
-#include "parcel.h"
-
 #include "multimodal_input_connect_define.h"
 
 namespace OHOS {

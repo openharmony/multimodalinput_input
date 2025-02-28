@@ -18,7 +18,6 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "utils/log.h"
 
 namespace OHOS {
 namespace MMI {

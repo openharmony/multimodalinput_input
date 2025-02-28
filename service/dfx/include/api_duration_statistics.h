@@ -16,15 +16,7 @@
 #ifndef API_DURATION_STATISTICS_H
 #define API_DURATION_STATISTICS_H
 
-#include <atomic>
-#include <chrono>
-#include <functional>
-#include <iostream>
-#include <map>
 #include <shared_mutex>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 namespace OHOS {
 namespace MMI {

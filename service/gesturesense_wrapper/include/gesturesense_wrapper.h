@@ -16,7 +16,6 @@
 #ifndef GESTURESENSE_WRAPPER_H
 #define GESTURESENSE_WRAPPER_H
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 namespace OHOS {

@@ -16,14 +16,8 @@
 #ifndef I_POINTER_DRAWING_MANAGER_H
 #define I_POINTER_DRAWING_MANAGER_H
 
-#include <map>
-#include <memory>
-
-#include <pixel_map.h>
-
 #include "pointer_style.h"
 #include "window_info.h"
-#include "struct_multimodal.h"
 #include "delegate_interface.h"
 
 namespace OHOS {

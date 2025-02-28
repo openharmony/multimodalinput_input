@@ -16,16 +16,8 @@
 #ifndef EVENT_PRE_MONITOR_HANDLER_H
 #define EVENT_PRE_MONITOR_HANDLER_H
 
-#include <mutex>
-#include <set>
-#include <unordered_map>
-#include <unordered_set>
-
-#include "nocopyable.h"
-
 #include "i_input_event_collection_handler.h"
 #include "i_input_event_handler.h"
-#include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {

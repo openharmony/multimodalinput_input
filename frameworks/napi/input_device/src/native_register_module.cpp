@@ -14,7 +14,6 @@
  */
 
 #include "js_input_device_context.h"
-#include "node_api.h"
 
 namespace OHOS {
 namespace MMI {

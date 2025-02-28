@@ -17,7 +17,6 @@
 #define DEVICE_CONFIG_FILE_PARSER_H
 
 #include <map>
-#include <string>
 
 struct libinput_device;
 
