@@ -74,7 +74,6 @@ public:
         PointerEvent::PointerItem pointerItem);
 
 private:
-    void PreloadDrawingResources();
     void CreateObserver();
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
         bool isNeedRotate = true);
