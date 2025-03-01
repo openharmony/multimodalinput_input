@@ -40,16 +40,14 @@ private:
 };
 #endif
 
-std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
+IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 {
-    if (iPointDrawMgr_ == nullptr) {
 #ifndef OHOS_BUILD_EMULATOR
-        iPointDrawMgr_ = std::make_shared<IPointerDrawingManager>();
+    static IPointerDrawingManager iPointDrawMgr_;
 #else
-        iPointDrawMgr_ = std::make_shared<EmulatorPointerDrawingManager>();
+    static EmulatorPointerDrawingManager iPointDrawMgr_;
 #endif
-    }
-    return iPointDrawMgr_;
+    return &iPointDrawMgr_;
 }
 
 int32_t IPointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
