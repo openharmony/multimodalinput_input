@@ -221,6 +221,7 @@ private:
     int32_t DrawHardCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
     std::shared_ptr<ScreenPointer> GetScreenPointer(uint32_t screenId);
+    void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
     void HardwareCursorRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);

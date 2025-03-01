@@ -330,16 +330,13 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     int32_t px = 0;
     int32_t py = 0;
     if (IsMirror()) {
-        // 镜像屏图层放在左上角
+        CalculateHwcPositionForMirror(x, y);
     } else if (IsExtend()) {
-        px = x - FOCUS_POINT;
-        py = y - FOCUS_POINT;
     } else {
-        // rotation_代表的是屏幕坐标系 即多模坐标系 逆时针
         Rotate(rotation_, x, y);
-        px = x - FOCUS_POINT;
-        py = y - FOCUS_POINT;
     }
+    px = x - FOCUS_POINT;
+    py = y - FOCUS_POINT;
 
     if (!IsMirror()) {
         int64_t nodeId = surfaceNode_->GetId();
