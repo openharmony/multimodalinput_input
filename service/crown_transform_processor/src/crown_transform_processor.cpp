@@ -97,7 +97,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
             HandleCrownRotateUpdate(rawPointerEvent);
             TimerMgr->ResetTimer(timerId_);
         } else {
-            static constexpr int32_t timeout = 100;
+            static constexpr int32_t timeout = 30;
             std::weak_ptr<CrownTransformProcessor> weakPtr = shared_from_this();
 
             timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
