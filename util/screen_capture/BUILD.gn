@@ -15,6 +15,10 @@ import("../../multimodalinput_mini.gni")
 
 config("screen_capture_config") {
   include_dirs = [
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/screen_capture/include",
   ]
@@ -39,15 +43,20 @@ ohos_shared_library("libmmi-screen_capture") {
 
   public_configs = [ ":screen_capture_config" ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
-
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
   ]
 
   if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
+    external_deps += [
+      "audio_framework:audio_client",
+      "player_framework:media_client",
+    ]
   }
 
   innerapi_tags = [ "platformsdk" ]

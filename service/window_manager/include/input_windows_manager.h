@@ -321,6 +321,9 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
     void HandleGestureInjection(bool gestureInject);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdateTargetTouchWinIds(const WindowInfo &item, PointerEvent::PointerItem &pointerItem,
+        std::shared_ptr<PointerEvent> pointerEvent, int32_t pointerId, int32_t displayId);
+    void ClearMismatchTypeWinIds(int32_t pointerId, int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
