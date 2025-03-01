@@ -80,9 +80,7 @@ const char* PRODUCT_TYPE_PC = { "2in1" };
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager()
-{
-    PreloadDrawingResources();
-}
+{}
 
 TouchDrawingManager::~TouchDrawingManager() {}
 
@@ -270,19 +268,6 @@ void TouchDrawingManager::RotationScreen()
         }
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
-}
-
-void TouchDrawingManager::PreloadDrawingResources()
-{
-    std::string text { "DUMMY" };
-    MMI_HILOGI("Preload text-drawing resources");
-    auto textBlob = Rosen::Drawing::TextBlob::MakeFromString(
-        text.c_str(),
-        Rosen::Drawing::Font(nullptr, TEXT_SIZE, TEXT_SCALE, TEXT_SKEW),
-        Rosen::Drawing::TextEncoding::UTF8);
-    if (textBlob == nullptr) {
-        MMI_HILOGE("Drawing::TextBlob::MakeFromString(%{public}s) fail", text.c_str());
-    }
 }
 
 void TouchDrawingManager::CreateObserver()
