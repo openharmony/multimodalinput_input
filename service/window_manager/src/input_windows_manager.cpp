@@ -1452,7 +1452,9 @@ void InputWindowsManager::AdjustDisplayRotation()
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos_.displayId);
     CHKPV(displayInfo);
     if (cursorPos_.displayDirection != displayInfo->displayDirection) {
-        ScreenRotateAdjustDisplayXY(*displayInfo, coord);
+        if (cursorPos_.direction == displayInfo->direction) {
+            ScreenRotateAdjustDisplayXY(*displayInfo, coord);
+        }
         cursorPos_.direction = displayInfo->direction;
         cursorPos_.displayDirection = displayInfo->displayDirection;
         UpdateAndAdjustMouseLocation(cursorPos_.displayId, coord.x, coord.y);
@@ -4915,10 +4917,20 @@ CursorPosition InputWindowsManager::ResetCursorPos()
         DisplayInfo displayInfo = displayGroupInfo_.displaysInfo[0];
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         (void)GetMainScreenDisplayInfo(displayGroupInfo_, displayInfo);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        cursorPos_.displayId = displayInfo.id;
+        if (IsSupported()) {
+            int32_t x = displayInfo.width * HALF_RATIO;
+            int32_t y = displayInfo.height * HALF_RATIO;
+            if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
+                std::swap(x, y);
+            }
+            cursorPos_.cursorPos.x = x;
+            cursorPos_.cursorPos.y = y;
+        }
+#else
         cursorPos_.cursorPos.x = displayInfo.validWidth * HALF_RATIO;
         cursorPos_.cursorPos.y = displayInfo.validHeight * HALF_RATIO;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        cursorPos_.displayId = displayInfo.id;
     } else {
         cursorPos_.displayId = -1;
         cursorPos_.cursorPos.x = 0;
