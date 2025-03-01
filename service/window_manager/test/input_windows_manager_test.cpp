@@ -7563,6 +7563,169 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPositionIf
     // isOut = false, isChange = false
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ResetPointerPositionIfOutValidDisplay(displayGroupInfo));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPositionOutValidDisplay_001
+ * @tc.desc: Test if (!isOut && isPhysicalPos)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPositionOutValidDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 1;
+    displayInfo.height = 1;
+
+    Coordinate2D position;
+    position.x = -1;
+
+    // isOut = true, isChange = false
+    bool isPhysicalPos = false;
+    InputWindowsManager inputWindowsManager;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.IsPositionOutValidDisplay(position, displayInfo, isPhysicalPos));
+
+    position.x = 1;
+    position.y = 1;
+    displayInfo.validWidth = 1;
+    displayInfo.validHeight = 1;
+    // isOut = false, isChange = true, currentDisplay.fixedDirection = DIRECTION0
+    isPhysicalPos = true;
+    displayInfo.fixedDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.IsPositionOutValidDisplay(position, displayInfo, isPhysicalPos));
+
+    displayInfo.fixedDirection = DIRECTION90;
+    // isOut = false, isChange = true, currentDisplay.fixedDirection = DIRECTION90
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.IsPositionOutValidDisplay(position, displayInfo, isPhysicalPos));
+
+    displayInfo.fixedDirection = DIRECTION180;
+    // isOut = false, isChange = true, currentDisplay.fixedDirection = DIRECTION180
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.IsPositionOutValidDisplay(position, displayInfo, isPhysicalPos));
+
+    displayInfo.fixedDirection = DIRECTION270;
+    // isOut = false, isChange = true, currentDisplay.fixedDirection = DIRECTION270
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.IsPositionOutValidDisplay(position, displayInfo, isPhysicalPos));
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_001
+ * @tc.desc: Test if (lastPointerEventforGesture_->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    inputWindowsManager.lastPointerEventforGesture_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
+
+    inputWindowsManager.lastPointerEventforGesture_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_002
+ * @tc.desc: Test if (touchDisplayId == currentDisplay.id && IsValidDisplayChange(currentDisplay))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    inputWindowsManager.lastPointerEventforGesture_ = pointerEvent;
+    inputWindowsManager.lastPointerEventforGesture_->SetTargetDisplayId(displayInfo.id);
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    // true false
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
+
+    // false false
+    inputWindowsManager.lastPointerEventforGesture_->SetTargetDisplayId(0);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
+
+    // false true
+    displayGroupInfo.displaysInfo.clear();
+    displayInfo.offsetX = 1;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.lastPointerEventforGesture_->SetTargetDisplayId(0);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
+
+    // true true
+    inputWindowsManager.lastPointerEventforGesture_->SetTargetDisplayId(displayInfo.id);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelMouseEvent_001
+ * @tc.desc: Test if (lastPointerEvent_ == nullptr)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelMouseEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastPointerEvent_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+
+    inputWindowsManager.lastPointerEvent_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelMouseEvent_002
+ * @tc.desc: Test if (lastPointerEvent_->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
+             !lastPointerEvent_->GetPressedButtons().empty())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelMouseEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastPointerEvent_ = pointerEvent;
+    // true false
+    inputWindowsManager.lastPointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+
+    // true true
+    inputWindowsManager.lastPointerEvent_->pressedButtons_.insert(0);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+
+    // false true
+    inputWindowsManager.lastPointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+
+    // false false
+    inputWindowsManager.lastPointerEvent_->pressedButtons_.clear();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
