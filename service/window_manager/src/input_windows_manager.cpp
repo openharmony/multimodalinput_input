@@ -1434,7 +1434,11 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
-    lastDpi_ = displayGroupInfo_.displaysInfo[0].dpi;
+    if (displayGroupInfo_.displaysInfo.empty()) {
+        lastDpi_ = DEFAULT_DPI;
+    } else {
+        lastDpi_ = displayGroupInfo_.displaysInfo[0].dpi;
+    }
     if (INPUT_DEV_MGR->HasPointerDevice() && pointerDrawFlag_) {
         NotifyPointerToWindow();
     }
@@ -1509,6 +1513,10 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
     bool isDisplayRemoved)
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
+    if (displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGE("displayGroupInfo_ is empty.");
+        return;
+    }
     if (lastDpi_ != DEFAULT_DPI && lastDpi_ != displayGroupInfo_.displaysInfo[0].dpi) {
         auto drawNewDpiRes = IPointerDrawingManager::GetInstance()->DrawNewDpiPointer();
         if (drawNewDpiRes != RET_OK) {
