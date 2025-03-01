@@ -7614,7 +7614,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPositionOutValidDisp
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_001,
+    TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DisplayInfo displayInfo;
@@ -7639,7 +7640,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_002,
+    TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DisplayInfo displayInfo;
