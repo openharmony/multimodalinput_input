@@ -7515,6 +7515,54 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_ResetPointerPositionIfOutValidDisplay_001
+ * @tc.desc: Test if (isOut && isChange)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPositionIfOutValidDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.cursorPos_.displayId = 1;
+    inputWindowsManager.cursorPos_.cursorPos.x = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+
+    // isOut = true, isChange = false
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ResetPointerPositionIfOutValidDisplay(displayGroupInfo));
+
+    displayGroupInfo.displaysInfo.clear();
+    displayInfo.offsetX = 1;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    // isOut = true, isChange = true
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ResetPointerPositionIfOutValidDisplay(displayGroupInfo));
+
+    inputWindowsManager.cursorPos_.cursorPos.x = 10;
+    inputWindowsManager.cursorPos_.cursorPos.y = 10;
+    displayGroupInfo.displaysInfo.clear();
+    displayInfo.validWidth = 11;
+    displayInfo.validHeight = 11;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    // isOut = false, isChange = true
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ResetPointerPositionIfOutValidDisplay(displayGroupInfo));
+
+    displayGroupInfo.displaysInfo.clear();
+    displayInfo.offsetX = 0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.displayGroupInfo_.displaysInfo.clear();
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    // isOut = false, isChange = false
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ResetPointerPositionIfOutValidDisplay(displayGroupInfo));
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
