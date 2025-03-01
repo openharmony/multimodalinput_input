@@ -241,6 +241,7 @@ PointerDrawingManager::PointerDrawingManager()
 
 PointerDrawingManager::~PointerDrawingManager()
 {
+    MMI_HILOGI("~PointerDrawingManager enter");
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (runner_ != nullptr) {
         runner_->Stop();
@@ -256,6 +257,7 @@ PointerDrawingManager::~PointerDrawingManager()
         softCursorRenderThread_->join();
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    MMI_HILOGI("~PointerDrawingManager complete");
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -2353,7 +2355,8 @@ void PointerDrawingManager::InitLoadingAndLoadingRightPixelMap()
 bool PointerDrawingManager::Init()
 {
     CALL_DEBUG_ENTER;
-    INPUT_DEV_MGR->Attach(shared_from_this());
+    auto self = std::shared_ptr<PointerDrawingManager>(this, [](PointerDrawingManager*) {});
+    INPUT_DEV_MGR->Attach(self);
     pidInfos_.clear();
     hapPidInfos_.clear();
     mousePixelMap_[MOUSE_ICON::LOADING];
@@ -2362,12 +2365,10 @@ bool PointerDrawingManager::Init()
     return true;
 }
 
-std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
+IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 {
-    if (iPointDrawMgr_ == nullptr) {
-        iPointDrawMgr_ = std::make_shared<PointerDrawingManager>();
-    }
-    return iPointDrawMgr_;
+    static PointerDrawingManager instance;
+    return &instance;
 }
 
 void PointerDrawingManager::UpdatePointerVisible()
@@ -3246,7 +3247,7 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
     for (auto it : screenPointers) {
         CHKPV(it.second);
         cfg.dpi = it.second->GetRenderDPI();
-        MMI_HILOGD("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f,direction = %{public}d",
+        MMI_HILOGI("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f,direction = %{public}d",
             it.first, cfg.dpi, cfg.direction);
         if (it.second->IsMirror() || it.first == screenId_) {
             DrawSoftCursor(it.second->GetSurfaceNode(), cfg);
@@ -3309,7 +3310,7 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
         pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
     }
 
-    MMI_HILOGD("DrawHardCursor on ScreenPointer success, screenId=%{public}u", sp->GetScreenId());
+    MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u", sp->GetScreenId());
     return RET_OK;
 }
 

@@ -72,9 +72,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 class DelegateInterface;
-class PointerDrawingManager final : public IPointerDrawingManager,
-                                    public IDeviceObserver,
-                                    public std::enable_shared_from_this<PointerDrawingManager> {
+class PointerDrawingManager final : public IPointerDrawingManager, public IDeviceObserver {
 public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
