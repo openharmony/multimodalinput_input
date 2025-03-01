@@ -20,6 +20,7 @@
 #include "param_wrapper.h"
 #include "property_reader.h"
 #include "input_device_manager.h"
+#include "input_windows_manager.h"
 #include "key_event_normalize.h"
 
 #undef MMI_LOG_DOMAIN
@@ -59,6 +60,7 @@ constexpr uint32_t LIBINPUT_KEY_VOLUME_DOWN { 114 };
 constexpr uint32_t LIBINPUT_KEY_VOLUME_UP { 115 };
 constexpr uint32_t LIBINPUT_KEY_POWER { 116 };
 constexpr uint32_t LIBINPUT_KEY_FN { 240 };
+constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
@@ -1180,7 +1182,20 @@ void LibinputAdapter::OnEventHandler()
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
 
-        if (eventType == LIBINPUT_EVENT_TOUCH_DOWN
+        bool isCaptureMode = false;
+        InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
+        if (inputWindowsManager != nullptr) {
+            DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
+
+            for (auto &windowInfo : displayGroupInfo.windowsInfo) {
+                if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
+                    isCaptureMode = true;
+                    break;
+                }
+            }
+        }
+
+        if ((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
             || eventType == LIBINPUT_EVENT_TOUCH_FRAME
