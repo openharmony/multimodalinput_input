@@ -3878,6 +3878,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 if (item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
                     continue;
                 }
+                UpdateTargetTouchWinIds(item, pointerItem, pointerEvent, pointerId, displayId);
                 touchWindow = &item;
                 break;
             } else {
@@ -4204,6 +4205,30 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         ClearExtraData();
     }
     return ERR_OK;
+}
+
+void InputWindowsManager::UpdateTargetTouchWinIds(const WindowInfo &item, PointerEvent::PointerItem &pointerItem,
+    std::shared_ptr<PointerEvent> pointerEvent, int32_t pointerId, int32_t displayId) {
+    if (item.windowInputType != WindowInputType::TRANSMIT_ALL) {
+        WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), pointerEvent->GetSourceType(),
+            targetTouchWinIds_[pointerId]);
+        if (!targetTouchWinIds_[pointerId].empty()) {
+            ClearMismatchTypeWinIds(pointerId, displayId);
+            targetTouchWinIds_[pointerId].push_back(item.id);
+        }
+    }
+}
+
+void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t displayId) {
+    for (int32_t windowId : targetTouchWinIds_[pointerId]) {
+        auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, displayId);
+        if (windowInfo->windowInputType != WindowInputType::TRANSMIT_ALL) {
+            auto it = std::find(targetTouchWinIds_[pointerId].begin(), targetTouchWinIds_[pointerId].end(), windowId);
+            if (it != targetTouchWinIds_[pointerId].end()) {
+                targetTouchWinIds_[pointerId].erase(it);
+            }
+        }
+    }
 }
 
 void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t, int32_t> logicalXY,

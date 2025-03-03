@@ -279,10 +279,8 @@ ohos_shared_library("libmmi-server") {
   }
 
   external_deps = [
-    "audio_framework:audio_client",
     "cJSON:cjson",
     "c_utils:utils",
-    "eventhandler:libeventhandler",
     "graphic_surface:surface",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -341,12 +339,10 @@ ohos_shared_library("libmmi-server") {
     "faultloggerd:libdfx_dumpcatcher",
     "faultloggerd:libjson_stack_formatter",
     "ffrt:libffrt",
-    "hdf_core:libhdi",
     "hicollie:libhicollie",
     "hisysevent:libhisysevent",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
 
@@ -374,27 +370,18 @@ ohos_shared_library("libmmi-server") {
     }
 
     external_deps += [
-      "ability_base:want",
-      "ability_base:zuri",
-      "ability_runtime:ability_connect_callback_stub",
-      "ability_runtime:dataobs_manager",
-      "access_token:libaccesstoken_sdk",
       "common_event_service:cesfwk_innerkits",
       "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
       "drivers_interface_display:libdisplay_composer_proxy_1.0",
-      "graphic_2d:2d_graphics",
       "graphic_2d:libcomposer",
       "graphic_2d:librender_service_base",
       "graphic_2d:librender_service_client",
-      "graphic_2d:window_animation",
       "hilog:libhilog",
       "image_framework:image_native",
       "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
-      "window_manager:libdm",
-      "window_manager:libdms",
     ]
   }
 

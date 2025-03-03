@@ -16,10 +16,10 @@
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
-#include "audio_stream_manager.h"
 #include "device_event_monitor.h"
 #include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
+#include "input_screen_capture_agent.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
@@ -1621,32 +1621,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
 
 bool KeyCommandHandler::IsMusicActivate()
 {
-    CALL_INFO_TRACE;
-    std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
-    auto begin = std::chrono::high_resolution_clock::now();
-    auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
-    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::high_resolution_clock::now() - begin).count();
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_CUR_RENDERER_CHANGE_INFOS, durationMS);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
-    if (ret != ERR_OK) {
-        MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
-        return false;
-    }
-    if (rendererChangeInfo.empty()) {
-        MMI_HILOGI("Music info empty");
-        return false;
-    }
-    for (const auto &info : rendererChangeInfo) {
-        if (info->rendererState == AudioStandard::RENDERER_RUNNING &&
-            (info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
-            info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
-            MMI_HILOGI("Find music activate");
-            return true;
-        }
-    }
-    return false;
+    return InputScreenCaptureAgent::GetInstance().IsMusicActivate();
 }
 
 void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)
