@@ -292,7 +292,7 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
             MMI_HILOGI("Check : current Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
                 item.GetPointerId(), item.GetOriginPointerId());
             if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) !=
-                (pointerEvent->GetPointerId() % SIMULATE_EVENT_START_ID)) {
+                (pointerEvent->GetPointerId() % SIMULATE_EVENT_START_ID) && item.IsPressed()) {
                 pointerEvent->AddPointerItem(item);
                 MMI_HILOGI("Check : add Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
                     item.GetPointerId(), item.GetOriginPointerId());
