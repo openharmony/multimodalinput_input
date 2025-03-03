@@ -89,5 +89,40 @@ void InputScreenCaptureAgent::RegisterListener(ScreenCaptureCallback callback)
     }
     handle_.registerListener(callback);
 }
+
+bool InputScreenCaptureAgent::IsMusicActivate()
+{
+    if (LoadAudioLibrary() != RET_OK) {
+        MMI_HILOGE("LoadLibrary fail");
+        return false;
+    }
+    return handle_.isMusicActivate();
+}
+
+int32_t InputScreenCaptureAgent::LoadAudioLibrary()
+{
+    std::lock_guard<std::mutex> guard(agentMutex_);
+    if (handle_.handle != nullptr) {
+        MMI_HILOGD("The library has already been loaded");
+        return RET_OK;
+    }
+    char libRealPath[PATH_MAX] = {};
+    if (realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath) == nullptr) {
+        MMI_HILOGE("Get file real path fail");
+        return RET_ERR;
+    }
+    handle_.handle = dlopen(libRealPath, RTLD_LAZY);
+    if (handle_.handle == nullptr) {
+        MMI_HILOGE("dlopen failed, reason:%{public}s", dlerror());
+        return RET_ERR;
+    }
+    handle_.isMusicActivate = reinterpret_cast<bool (*)()>(dlsym(handle_.handle, "IsMusicActivate"));
+    if (handle_.isMusicActivate == nullptr) {
+        MMI_HILOGE("dlsym isWorking failed: error:%{public}s", dlerror());
+        handle_.Free();
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 }
 }

@@ -28,8 +28,10 @@ struct ScreenCaptureHandle {
     void *handle;
     int32_t (*isWorking)(int32_t);
     void (*registerListener)(ScreenCaptureCallback);
+    bool (*isMusicActivate)();
 
-    ScreenCaptureHandle(): handle(nullptr), isWorking(nullptr), registerListener(nullptr) {}
+    ScreenCaptureHandle(): handle(nullptr), isWorking(nullptr), registerListener(nullptr),
+        isMusicActivate(nullptr) {}
 
     void Free()
     {
@@ -39,6 +41,7 @@ struct ScreenCaptureHandle {
         }
         isWorking = nullptr;
         registerListener = nullptr;
+        isMusicActivate = nullptr;
     }
 };
 
@@ -47,9 +50,10 @@ public:
     ~InputScreenCaptureAgent() override;
     bool IsScreenCaptureWorking(int32_t capturePid);
     void RegisterListener(ScreenCaptureCallback callback);
-
+    bool IsMusicActivate();
 private:
     int32_t LoadLibrary();
+    int32_t LoadAudioLibrary();
     ScreenCaptureHandle handle_;
     std::mutex agentMutex_;
 };
