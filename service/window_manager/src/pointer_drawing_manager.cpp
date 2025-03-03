@@ -89,7 +89,7 @@ constexpr int32_t ANIMATION_DURATION { 500 };
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
-constexpr int32_t MOUSE_ICON_BAIS { 5 };
+constexpr float MOUSE_ICON_BIAS_RATIO { 5 / 33.0f };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
 [[ maybe_unused ]] constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 6000 };
 constexpr float ROTATION_ANGLE { 360.f };
@@ -1305,7 +1305,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX -= MOUSE_ICON_BAIS;
+            physicalX -= width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -1348,7 +1348,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX -= MOUSE_ICON_BAIS;
+            physicalX -= width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -1391,7 +1391,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, i
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX += MOUSE_ICON_BAIS;
+            physicalX += width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -1434,7 +1434,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX += MOUSE_ICON_BAIS;
+            physicalX += width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
