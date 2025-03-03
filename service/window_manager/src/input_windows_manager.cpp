@@ -442,7 +442,8 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         }
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) ||
+        (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_CROWN)) {
         if (mouseDownInfo_.pid != -1) {
             pid = GetWindowPid(mouseDownInfo_.agentWindowId);
             if (pid < 0) {
