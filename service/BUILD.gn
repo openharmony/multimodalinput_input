@@ -1038,7 +1038,10 @@ ohos_unittest("TouchDrawingManagerTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
-  sources = [ "window_manager/test/touch_drawing_manager_test.cpp" ]
+  sources = [
+    "window_manager/test/pointer_renderer_test.cpp",
+    "window_manager/test/touch_drawing_manager_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
