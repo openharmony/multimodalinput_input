@@ -7784,12 +7784,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintHighZorder_001, T
 
     InputWindowsManager inputWindowsManager;
     inputWindowsManager.windowsPerDisplay_[0] = windowGroupInfo;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_BEGIN,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
 
     inputWindowsManager.windowsPerDisplay_.clear();
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_BEGIN,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
 }
 
 /**
@@ -7821,35 +7821,35 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintHighZorder_002, T
     windowInfo.zOrder = 10;
     windowInfo.windowInputType = WindowInputType::NORMAL;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_BEGIN,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
 
     windowGroupInfo.windowsInfo.clear();
     windowInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_BEGIN,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
 
     windowGroupInfo.windowsInfo.clear();
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_BEGIN,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
 
     windowGroupInfo.windowsInfo.clear();
     windowInfo.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_BEGIN,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
 
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_UPDATE,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_UPDATE, windowInfo.id, 0, 0));
 
     windowGroupInfo.windowsInfo.clear();
     windowInfo.flags = 2;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_UPDATE,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_UPDATE, windowInfo.id, 0, 0));
 }
 
 /**
@@ -7879,8 +7879,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintHighZorder_003, T
     windowGroupInfo.windowsInfo.clear();
     windowInfo.zOrder = 0;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo, PointerEvent::POINTER_ACTION_AXIS_UPDATE,
-        windowInfo.id, 0, 0));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_UPDATE, windowInfo.id, 0, 0));
 }
 
 /**
