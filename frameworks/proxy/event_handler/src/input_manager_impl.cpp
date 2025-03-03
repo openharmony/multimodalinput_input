@@ -530,9 +530,6 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    UpdateDisplayXYInOneHandMode(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
@@ -563,29 +560,6 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         pointerEvent->GetPointerId());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-void InputManagerImpl::UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHKPV(pointerEvent);
-    if (pointerEvent->GetFixedMode() != PointerEvent::FixedMode::ONE_HAND) {
-        MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
-            static_cast<int32_t>(pointerEvent->GetFixedMode()), pointerEvent->GetFixedModeStr().c_str());
-        return;
-    }
-    MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
-        static_cast<int32_t>(pointerEvent->GetFixedMode()), pointerEvent->GetFixedModeStr().c_str());
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return;
-    }
-    pointerItem.SetDisplayX(pointerItem.GetFixedDisplayX());
-    pointerItem.SetDisplayY(pointerItem.GetFixedDisplayY());
-    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-}
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
