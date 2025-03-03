@@ -7726,6 +7726,385 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelMouseEvent_002, 
     inputWindowsManager.lastPointerEvent_->pressedButtons_.clear();
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerDrawingManagerWindowInfo_001
+ * @tc.desc: Test if (lastPointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
+        (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP ||
+        lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+        lastPointerEvent_->GetPressedButtons().empty()))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerDrawingManagerWindowInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastPointerEvent_ = pointerEvent;
+    // true false
+    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    inputWindowsManager.lastPointerEvent_->pressedButtons_.insert(0);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerDrawingManagerWindowInfo());
+
+    // true true
+    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerDrawingManagerWindowInfo());
+    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerDrawingManagerWindowInfo());
+    inputWindowsManager.lastPointerEvent_->pressedButtons_.clear();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerDrawingManagerWindowInfo());
+
+    // false true
+    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerDrawingManagerWindowInfo());
+
+    // false false
+    inputWindowsManager.lastPointerEvent_->pressedButtons_.insert(0);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerDrawingManagerWindowInfo());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PrintHighZorder_001
+ * @tc.desc: Test if (!info)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintHighZorder_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    windowInfo.flags = 2;;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.displayId = 0;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.windowsPerDisplay_[0] = windowGroupInfo;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
+
+    inputWindowsManager.windowsPerDisplay_.clear();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PrintHighZorder_002
+ * @tc.desc: Test if (MMI_GNE(windowInfo.zOrder, targetWindow.zOrder) && !windowInfo.flags &&
+            pointerAction == PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+            windowInfo.windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+            windowInfo.windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE &&
+            windowInfo.windowInputType != WindowInputType::TRANSMIT_ALL)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintHighZorder_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    windowInfo.flags = 2;
+    windowInfo.zOrder = 1;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.displayId = 0;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.windowsPerDisplay_[0] = windowGroupInfo;
+
+    windowGroupInfo.windowsInfo.clear();
+    windowInfo.flags = 0;
+    windowInfo.zOrder = 10;
+    windowInfo.windowInputType = WindowInputType::NORMAL;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
+
+    windowGroupInfo.windowsInfo.clear();
+    windowInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
+
+    windowGroupInfo.windowsInfo.clear();
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
+
+    windowGroupInfo.windowsInfo.clear();
+    windowInfo.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN, windowInfo.id, 0, 0));
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_UPDATE, windowInfo.id, 0, 0));
+
+    windowGroupInfo.windowsInfo.clear();
+    windowInfo.flags = 2;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_UPDATE, windowInfo.id, 0, 0));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PrintHighZorder_003
+ * @tc.desc: Test if (MMI_GNE(windowInfo.zOrder, targetWindow.zOrder) && !windowInfo.flags &&
+            pointerAction == PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+            windowInfo.windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+            windowInfo.windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE &&
+            windowInfo.windowInputType != WindowInputType::TRANSMIT_ALL)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintHighZorder_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    windowInfo.flags = 2;
+    windowInfo.zOrder = 1;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.displayId = 0;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.windowsPerDisplay_[0] = windowGroupInfo;
+
+    windowGroupInfo.windowsInfo.clear();
+    windowInfo.zOrder = 0;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintHighZorder(windowGroupInfo.windowsInfo,
+        PointerEvent::POINTER_ACTION_AXIS_UPDATE, windowInfo.id, 0, 0));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateCustomStyle_001
+ * @tc.desc: Test if (pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCustomStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 0;
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    InputWindowsManager inputWindowsManager;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateCustomStyle(windowId, pointerStyle));
+
+    pointerStyle.id = MOUSE_ICON::TRANSPARENT_ICON;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateCustomStyle(windowId, pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateCustomStyle_002
+ * @tc.desc: Test if (innerIt.first != windowId && innerIt.second.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCustomStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 0;
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+
+    std::map<int32_t, PointerStyle> pointerStyles;
+    pointerStyles[1] = pointerStyle;
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.pointerStyle_[0] = pointerStyles;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateCustomStyle(windowId, pointerStyle));
+
+    windowId = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateCustomStyle(windowId, pointerStyle));
+
+    windowId = 0;
+    PointerStyle pointerStyle1;
+    pointerStyle1.id = MOUSE_ICON::TRANSPARENT_ICON;
+    pointerStyles[1] = pointerStyle1;
+    inputWindowsManager.pointerStyle_[0] = pointerStyles;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateCustomStyle(windowId, pointerStyle));
+}
+
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerItemInOneHandMode_001
+ * @tc.desc: Test if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOneHandMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.oneHandY = 10;
+    displayInfo.height = 11;
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(displayInfo, pointerEvent));
+
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(displayInfo, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerItemInOneHandMode_002
+ * @tc.desc: Test if (autoToVirtualScreen)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOneHandMode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.oneHandY = 10;
+    displayInfo.height = 11;
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    pointerEvent->SetAutoToVirtualScreen(true);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(displayInfo, pointerEvent));
+
+    pointerEvent->SetAutoToVirtualScreen(false);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(displayInfo, pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
+/**
+ * @tc.name: InputWindowsManagerTest_ShiftAppMousePointerEvent_001
+ * @tc.desc: Test if (!lastPointerEvent_ || !lastPointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppMousePointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastPointerEvent_ = nullptr;
+    ShiftWindowInfo shiftWindowInfo;
+    bool autoGenDown = false;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown));
+
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    EXPECT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
+    inputWindowsManager.lastPointerEvent_->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelTouch_001
+ * @tc.desc: Test if ((iter != touchItemDownInfos_.end()) && iter->second.flag)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t touch = 0;
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = true;
+    inputWindowsManager.touchItemDownInfos_[0] = windowInfoEX;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch));
+
+    windowInfoEX.flag = false;
+    inputWindowsManager.touchItemDownInfos_[0] = windowInfoEX;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch));
+
+    touch = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelAllTouches_001
+ * @tc.desc: Test if (!item.IsPressed())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelAllTouches_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(false);
+    pointerEvent->AddPointerItem(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelAllTouches(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelAllTouches_002
+ * @tc.desc: Test if (AdjustFingerFlag(pointerEvent))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelAllTouches_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(true);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    inputWindowsManager.touchItemDownInfos_[0] = windowInfoEX;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelAllTouches(pointerEvent));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelAllTouches(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelAllTouches_003
+ * @tc.desc: Test if (winOpt)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelAllTouches_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(true);
+    pointerItem.SetTargetWindowId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetTargetDisplayId(-1);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelAllTouches(pointerEvent));
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
