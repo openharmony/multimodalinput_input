@@ -7933,6 +7933,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCustomStyle_002,
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateCustomStyle(windowId, pointerStyle));
 }
 
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
 /**
  * @tc.name: InputWindowsManagerTest_UpdatePointerItemInOneHandMode_001
  * @tc.desc: Test if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE))
@@ -7986,6 +7987,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOne
     pointerEvent->SetAutoToVirtualScreen(false);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(displayInfo, pointerEvent));
 }
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 /**
  * @tc.name: InputWindowsManagerTest_ShiftAppMousePointerEvent_001
