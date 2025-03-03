@@ -277,6 +277,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
+    UpdateDisplayXY(point);
     std::vector<int32_t> windowIds;
     WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     if (!windowIds.empty()) {
@@ -318,6 +319,34 @@ int32_t EventDispatchHandler::GetClientFd(int32_t pid, std::shared_ptr<PointerEv
         return udsServer->GetClientFd(pid);
     }
     return WIN_MGR->GetClientFd(point);
+}
+
+void EventDispatchHandler::UpdateDisplayXY(const std::shared_ptr<PointerEvent> &point)
+{
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    CHKPV(point);
+    int32_t pointerId = point->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!point->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    int32_t targetDisplayId = point->GetTargetDisplayId();
+    int32_t targetWindowId = pointerItem.GetTargetWindowId();
+    std::optional<WindowInfo> opt = WIN_MGR->GetWindowAndDisplayInfo(targetWindowId, targetDisplayId);
+    if (opt && point->GetFixedMode() == PointerEvent::FixedMode::ONE_HAND) {
+        WindowInputType windowInputType = opt.value().windowInputType;
+        if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+            windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
+            pointerItem.SetDisplayX(pointerItem.GetFixedDisplayX());
+            pointerItem.SetDisplayY(pointerItem.GetFixedDisplayY());
+            point->UpdatePointerItem(pointerId, pointerItem);
+        } else {
+            MMI_HILOGI("targetDisplayId=%{private}d, targetWindowId=%{private}d, windowInputType=%{private}d, "
+                "not need to modify DX", targetDisplayId, targetWindowId, static_cast<int32_t>(windowInputType));
+        }
+    }
+#endif
 }
 
 void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd)
