@@ -33,7 +33,7 @@ constexpr int32_t MAX_POINTER_COLOR{0xFFFFFF};
 constexpr int32_t OTHER_POINTER_COLOR{0x171717};
 constexpr float CALCULATE_IMAGE_MIDDLE{2.0f};
 constexpr uint32_t FOCUS_POINT{256};
-constexpr float CALCULATE_MOUSE_ICON_BIAS{5.0f};
+constexpr float CALCULATE_MOUSE_ICON_BIAS{ 5.0f / 33.0f };
 constexpr float ROTATION_ANGLE90 {90.0f};
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 
@@ -78,7 +78,7 @@ int32_t RenderConfig::GetOffsetX() const
         case ANGLE_CENTER:
             return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
         case ANGLE_NW_RIGHT:
-            return FOCUS_POINT - CALCULATE_MOUSE_ICON_BIAS;
+            return FOCUS_POINT - width * CALCULATE_MOUSE_ICON_BIAS;
         default:
             MMI_HILOGW("No need calculate physicalX offset");
             return FOCUS_POINT;
