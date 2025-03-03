@@ -124,6 +124,7 @@ private:
     int32_t scaleW_ { 0 };
     int32_t scaleH_ { 0 };
     int64_t lastActionTime_ { 0 };
+    uint64_t screenId_ { -1 };
     double xVelocity_ { 0.0 };
     double yVelocity_ { 0.0 };
     double pressure_ { 0.0 };
