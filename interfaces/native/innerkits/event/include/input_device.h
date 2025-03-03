@@ -17,6 +17,7 @@
 #define INPUT_DEVICE_H
 
 #include <bitset>
+#include <vector>
 
 #include "nocopyable.h"
 
