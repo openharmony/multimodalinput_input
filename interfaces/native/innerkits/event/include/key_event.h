@@ -16,6 +16,8 @@
 #ifndef KEY_EVENT_H
 #define KEY_EVENT_H
 
+#include <optional>
+
 #include "input_event.h"
 
 namespace OHOS {
