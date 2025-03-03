@@ -164,7 +164,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_Render_001, TestSize.Level1)
     config.direction = 0;
     config.style = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ret = renderer.Render(addr, width, height, config);
-    EXPECT_EQ(ret, RET_ERR);  
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -191,7 +191,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DynamicRender_001, TestSize.Le
     config.direction = 0;
     config.style = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ret = renderer.DynamicRender(addr, width, height, config);
-    EXPECT_EQ(ret, RET_OK);  
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
