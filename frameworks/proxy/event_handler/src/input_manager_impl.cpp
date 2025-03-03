@@ -1599,8 +1599,11 @@ bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActio
             currentPointerEvent->SetPointerAction(pointerActionEvent);
             OnPointerEvent(currentPointerEvent);
             if (currentPointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-                currentPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-                OnPointerEvent(currentPointerEvent);
+                std::shared_ptr<PointerEvent> leaveWindowEvent = std::make_shared<PointerEvent>(*currentPointerEvent);
+                if (leaveWindowEvent != nullptr) {
+                    leaveWindowEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+                    OnPointerEvent(leaveWindowEvent);
+                }
             }
             return true;
         }
