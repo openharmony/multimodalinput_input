@@ -356,12 +356,16 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(surfaceNode_);
-    if (canvasNode != nullptr) {
+    if (canvasNode != nullptr && screenId_ == static_cast<uint64_t>(displayInfo_.id)) {
         return;
     }
+    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}d", screenId_, displayInfo_.id);
+    screenId_ = static_cast<uint64_t>(displayInfo_.id);
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
+    surfaceNode_->SetBounds(0, 0, scaleW_, scaleH_);
+    surfaceNode_->SetFrame(0, 0, scaleW_, scaleH_);
     if (isNeedRotate) {
         RotationCanvasNode(canvasNode);
     }
@@ -442,14 +446,14 @@ void TouchDrawingManager::CreateTouchWindow()
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
     surfaceNode_->SetRotation(0);
-    uint64_t screenId = static_cast<uint64_t>(displayInfo_.id);
+    screenId_ = static_cast<uint64_t>(displayInfo_.id);
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
-        screenId = FOLD_SCREEN_MAIN_ID;
+        screenId_ = FOLD_SCREEN_MAIN_ID;
     } else if (displayInfo_.displayMode == DisplayMode::FULL) {
-        screenId = FOLD_SCREEN_FULL_ID;
+        screenId_ = FOLD_SCREEN_FULL_ID;
     }
-    surfaceNode_->AttachToDisplay(screenId);
-    MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId, surfaceNode_->GetId());
+    surfaceNode_->AttachToDisplay(screenId_);
+    MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId_, surfaceNode_->GetId());
 }
 
 void TouchDrawingManager::DrawBubbleHandler()
