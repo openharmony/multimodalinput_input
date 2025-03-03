@@ -1527,6 +1527,7 @@ void PointerDrawingManager::AttachToDisplay()
         auto sp = GetScreenPointer(screenId_);
         CHKPV(sp);
         surfaceNode_ = sp->GetSurfaceNode();
+        UpdatePointerVisible();
         if (originSetColor_ != -1 && surfaceNode_ != nullptr) {
             float alphaRatio = (static_cast<uint32_t>(originSetColor_) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
             if (alphaRatio > 1) {
