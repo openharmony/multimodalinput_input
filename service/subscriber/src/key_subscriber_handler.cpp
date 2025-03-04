@@ -176,6 +176,7 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
 int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId, bool isSystem)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
         auto &subscribers = iter->second;
         for (auto it = subscribers.begin(); it != subscribers.end(); it++) {
@@ -381,6 +382,7 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
         return subscriber->shortcutId_;
     }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (auto &iter : subscriberMap_) {
         if (IsEqualKeyOption(option, iter.first)) {
             MMI_HILOGI("Add subscriber Id:%{public}d", subscriber->id_);
@@ -690,18 +692,21 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
-    for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
-        auto &subscribers = iter->second;
-        for (auto it = subscribers.begin(); it != subscribers.end();) {
-            if ((*it)->sess_ == sess) {
-                ClearTimer(*it);
+    {
+        std::lock_guard<std::mutex> lock(subscriberMapMutex_);
+        for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
+            auto &subscribers = iter->second;
+            for (auto it = subscribers.begin(); it != subscribers.end();) {
+                if ((*it)->sess_ == sess) {
+                    ClearTimer(*it);
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
-                DeleteShortcutId(*it);
+                    DeleteShortcutId(*it);
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
-                subscribers.erase(it++);
-                continue;
+                    subscribers.erase(it++);
+                    continue;
+                }
+                ++it;
             }
-            ++it;
         }
     }
     for (auto iter = keyGestures_.begin(); iter != keyGestures_.end();) {
@@ -1028,6 +1033,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
     std::set<int32_t> pids;
     GetForegroundPids(pids);
     MMI_HILOGI("Foreground pid size:%{public}zu", pids.size());
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
@@ -1089,6 +1095,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
     RemoveKeyCode(keyCode, pressedKeys);
     std::set<int32_t> pids;
     GetForegroundPids(pids);
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
@@ -1128,6 +1135,7 @@ bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyE
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
@@ -1143,6 +1151,7 @@ bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyE
 bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trrigerType)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (const auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
@@ -1223,11 +1232,14 @@ bool KeySubscriberHandler::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent
 
 void KeySubscriberHandler::RemoveSubscriberKeyUpTimer(int32_t keyCode)
 {
-    for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
-        auto &subscribers = iter->second;
-        for (auto it = subscribers.begin(); it != subscribers.end(); it++) {
-            if (((*it)->timerId_ >= 0) && ((*it)->keyOption_->GetFinalKey() == keyCode)) {
-                ClearTimer(*it);
+    {
+        std::lock_guard<std::mutex> lock(subscriberMapMutex_);
+        for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
+            auto &subscribers = iter->second;
+            for (auto it = subscribers.begin(); it != subscribers.end(); it++) {
+                if (((*it)->timerId_ >= 0) && ((*it)->keyOption_->GetFinalKey() == keyCode)) {
+                    ClearTimer(*it);
+                }
             }
         }
     }
@@ -1284,7 +1296,10 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
     mprintf(fd, "enableCombineKey: %s | isForegroundExits: %s | needSkipPowerKeyUp: %s \t",
             enableCombineKey_ ? "true" : "false", isForegroundExits_ ? "true" : "false",
             needSkipPowerKeyUp_ ? "true" : "false");
-    DumpSubscribers(fd, subscriberMap_);
+    {
+        std::lock_guard<std::mutex> lock(subscriberMapMutex_);
+        DumpSubscribers(fd, subscriberMap_);
+    }
     DumpSubscribers(fd, keyGestures_);
 }
 
@@ -1345,6 +1360,7 @@ void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEv
     std::set<int32_t> pids;
     GetForegroundPids(pids);
     MMI_HILOGI("Foreground pid size:%{public}zu", pids.size());
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;

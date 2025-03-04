@@ -188,6 +188,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastTouchWindowInfo_.flags = -1;
     lastTouchWindowInfo_.windowType = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    std::lock_guard<std::mutex> lock(tmpInfoMutex_);
     displayGroupInfoTmp_.focusWindowId = -1;
     displayGroupInfoTmp_.width = 0;
     displayGroupInfoTmp_.height = 0;
@@ -855,7 +856,11 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
         return UpdateShellWindow(windowGroupInfo.windowsInfo[0]);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    DisplayGroupInfo displayGroupInfo = displayGroupInfoTmp_;
+    DisplayGroupInfo displayGroupInfo;
+    {
+        std::lock_guard<std::mutex> lock(tmpInfoMutex_);
+        displayGroupInfo = displayGroupInfoTmp_;
+    }
     displayGroupInfo.focusWindowId = windowGroupInfo.focusWindowId;
     for (const auto &item : windowGroupInfo.windowsInfo) {
         UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
@@ -1372,18 +1377,21 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool isDisplayChanged = OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    displayGroupInfoTmp_ = displayGroupInfo;
+    {
+        std::lock_guard<std::mutex> lock(tmpInfoMutex_);
+        displayGroupInfoTmp_ = displayGroupInfo;
+    }
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END) {
-        if ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfoTmp_.currentUserId)) {
+        if ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfo.currentUserId)) {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             if (isDisplayChanged) {
-                ResetPointerPosition(displayGroupInfoTmp_);
+                ResetPointerPosition(displayGroupInfo);
             }
 #endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            PrintChangedWindowBySync(displayGroupInfoTmp_);
+            PrintChangedWindowBySync(displayGroupInfo);
             CleanInvalidPiexMap();
-            HandleValidDisplayChange(displayGroupInfoTmp_);
-            displayGroupInfo_ = displayGroupInfoTmp_;
+            HandleValidDisplayChange(displayGroupInfo);
+            displayGroupInfo_ = displayGroupInfo;
             UpdateWindowsInfoPerDisplay(displayGroupInfo);
             HandleWindowPositionChange();
         }
@@ -2963,6 +2971,7 @@ void InputWindowsManager::UpdatePointerChangeAreas()
 {
     CALL_DEBUG_ENTER;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        std::lock_guard<std::mutex> lock(tmpInfoMutex_);
         UpdatePointerChangeAreas(displayGroupInfoTmp_);
     }
 }
