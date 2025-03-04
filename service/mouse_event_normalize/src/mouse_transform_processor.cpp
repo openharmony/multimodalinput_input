@@ -217,7 +217,7 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
         double displayPpi = static_cast<double>(displayInfo->ppi);
         if (displayInfo->validWidth != static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
             displayInfo->validHeight != static_cast<int32_t>(CONST_DOUBLE_ZERO)  &&
-            (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
+            (displayInfo->validWidth != displayInfo->width || displayInfo->validHeight != displayInfo->height)) {
             displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
             diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
                 + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
