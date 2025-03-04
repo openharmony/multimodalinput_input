@@ -2693,5 +2693,65 @@ HWTEST_F(MultimodalInputConnectStubTest, StubShiftAppPointerEvent_001, TestSize.
     int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(ret, returnCode);
 }
+
+/**
+ * @tc.name: StubAddPreInputHandler_001
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddPreInputHandler_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t handlerId = 0;
+    data.WriteInt32(handlerId);
+    int32_t eventType = 0;
+    data.WriteInt32(eventType);
+    int32_t keysLen = 0;
+    data.WriteInt32(keysLen);
+    EXPECT_NO_FATAL_FAILURE(stub->StubAddPreInputHandler(data, reply));
+}
+
+/**
+ * @tc.name: StubAddPreInputHandler_002
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddPreInputHandler_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t handlerId = 0;
+    data.WriteInt32(handlerId);
+    int32_t eventType = 0;
+    data.WriteInt32(eventType);
+    int32_t keysLen = 6;
+    data.WriteInt32(keysLen);
+    EXPECT_NO_FATAL_FAILURE(stub->StubAddPreInputHandler(data, reply));
+}
+
+/**
+ * @tc.name: StubAddPreInputHandler_003
+ * @tc.desc: Test the function StubShiftAppPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddPreInputHandler_003, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t handlerId = 0;
+    data.WriteInt32(handlerId);
+    int32_t eventType = 0;
+    data.WriteInt32(eventType);
+    int32_t keysLen = 4;
+    data.WriteInt32(keysLen);
+    EXPECT_NO_FATAL_FAILURE(stub->StubAddPreInputHandler(data, reply));
+}
 } // namespace MMI
 } // namespace OHOS
