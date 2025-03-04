@@ -165,6 +165,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
         bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+        bool IsXkey(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_X_KEY
 
         struct ConsumptionState {
             std::set<int32_t> eventIds_;

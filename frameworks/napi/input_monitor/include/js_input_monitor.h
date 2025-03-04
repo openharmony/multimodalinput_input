@@ -125,6 +125,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t TransformFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+    int32_t TransformXKeyEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+#endif // OHOS_BUILD_ENABLE_X_KEY
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     std::optional<int32_t> GetJoystickAction(int32_t action);
     int32_t GetJoystickButton(int32_t button);
@@ -146,6 +149,9 @@ private:
     bool IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+    bool IsXkey(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_X_KEY
     MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
     int32_t TransformKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, napi_value result);
     int32_t GetKeyEventAction(int32_t action) const;

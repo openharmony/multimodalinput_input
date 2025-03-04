@@ -339,6 +339,7 @@ if (input_feature_short_key) {
 
 if (input_feature_fingerprint) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
+  input_default_defines += [ "OHOS_BUILD_ENABLE_X_KEY" ]
 }
 
 if (input_feature_crown) {
