@@ -196,7 +196,7 @@ void XKeyEventProcessor::InterceptXKeyUp()
                 MMI_HILOGI("X-key is single click.");
             }
         }).detach();
-    } else if(pressCount_ == X_KEY_DOUBLE_CLICK_ENABLE_COUNT) {
+    } else if (pressCount_ == X_KEY_DOUBLE_CLICK_ENABLE_COUNT) {
         // 如果按压次数为2次，判定为双击
         HandleQuickAccessMenu(DOUBLE_CLICK);
         MMI_HILOGI("X-key is double click.");

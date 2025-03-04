@@ -234,10 +234,10 @@ ohos_shared_library("libmmi-server") {
     ]
   }
   if (input_feature_fingerprint) {
-      sources += [
-        "fingerprint_event_processor/src/fingerprint_event_processor.cpp",
-        "fingerprint_event_processor/src/x_key_event_processor.cpp",
-      ]
+    sources += [
+      "fingerprint_event_processor/src/fingerprint_event_processor.cpp",
+      "fingerprint_event_processor/src/x_key_event_processor.cpp",
+    ]
   }
   if (input_feature_joystick) {
     sources += [
