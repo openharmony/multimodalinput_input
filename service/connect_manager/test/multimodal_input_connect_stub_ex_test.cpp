@@ -8825,12 +8825,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemovePreInputHandler_005, TestSize
 }
 
 /**
- * @tc.name: StubSubscribeLongPressEvent_001
+ * @tc.name: StubSubscribeLongPressEvent_004
  * @tc.desc: Test if (!PER_HELPER->VerifySystemApp())
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_004, TestSize.Level1)
 {
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
@@ -8847,12 +8847,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_001, TestSi
 }
 
 /**
- * @tc.name: StubSubscribeLongPressEvent_002
+ * @tc.name: StubSubscribeLongPressEvent_005
  * @tc.desc: Test if (!PER_HELPER->VerifySystemApp())
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_002, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_005, TestSize.Level1)
 {
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
@@ -8865,12 +8865,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_002, TestSi
 }
 
 /**
- * @tc.name: StubSubscribeLongPressEvent_003
+ * @tc.name: StubSubscribeLongPressEvent_006
  * @tc.desc: Test if (!IsRunning())
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_003, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_006, TestSize.Level1)
 {
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true)).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
@@ -8890,12 +8890,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeLongPressEvent_003, TestSi
 }
 
 /**
- * @tc.name: StubUnsubscribeLongPressEvent_001
+ * @tc.name: StubUnsubscribeLongPressEvent_004
  * @tc.desc: Test if (!PER_HELPER->VerifySystemApp())
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_004, TestSize.Level1)
 {
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
@@ -8909,12 +8909,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_001, Test
 }
 
 /**
- * @tc.name: StubUnsubscribeLongPressEvent_002
+ * @tc.name: StubUnsubscribeLongPressEvent_005
  * @tc.desc: Test if (!PER_HELPER->VerifySystemApp())
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_002, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_005, TestSize.Level1)
 {
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
@@ -8927,12 +8927,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_002, Test
 }
 
 /**
- * @tc.name: StubUnsubscribeLongPressEvent_003
+ * @tc.name: StubUnsubscribeLongPressEvent_006
  * @tc.desc: Test if (!IsRunning())
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_003, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeLongPressEvent_006, TestSize.Level1)
 {
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true)).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
