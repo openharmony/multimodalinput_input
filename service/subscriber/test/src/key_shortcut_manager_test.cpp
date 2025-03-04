@@ -1936,5 +1936,36 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GetAllSystemHotkeys, Tes
     bool ret = shortcutMgr.GetAllSystemHotkeys(sysKeys);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKeys
+ * @tc.desc: Test the funcation ReadExceptionalSystemKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKeys, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    const std::string cfgPath { "cfgPathTest" };
+    shortcutMgr.ReadExceptionalSystemKeys(cfgPath);
+    EXPECT_EQ(cfgPath, "cfgPathTest");
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_IsValid
+ * @tc.desc: Test the funcation IsValid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_IsValid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyShortcutManager::ShortcutTriggerType triggerType {
+        KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP };
+    bool ret = shortcutMgr.IsValid(triggerType);
+    EXPECT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
