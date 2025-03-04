@@ -1527,7 +1527,6 @@ void PointerDrawingManager::AttachToDisplay()
         auto sp = GetScreenPointer(screenId_);
         CHKPV(sp);
         surfaceNode_ = sp->GetSurfaceNode();
-        UpdatePointerVisible();
         if (originSetColor_ != -1 && surfaceNode_ != nullptr) {
             float alphaRatio = (static_cast<uint32_t>(originSetColor_) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
             if (alphaRatio > 1) {
@@ -3119,9 +3118,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         AttachToDisplay();
  
         // 新屏幕上重新绘制软硬光标
-        if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
-            MMI_HILOGE("Init layer failed");
-        }
+        UpdatePointerVisible();
     }
 
     // 绑定新屏幕 SurfaceNode 到全局 surfaceNode_
