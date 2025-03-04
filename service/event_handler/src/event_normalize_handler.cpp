@@ -49,6 +49,9 @@
 #include "res_sched_client.h"
 #include "res_type.h"
 #endif // OHOS_RSS_CLIENT
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+#include "x_key_event_processor.h"
+#endif // OHOS_BUILD_ENABLE_X_KEY
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -392,6 +395,13 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+    MMI_HILOGI("X-key is defined.");
+    if (XKeyEventHdr->IsXkeyEvent(event)) {
+        MMI_HILOGI("event is x-key event.");
+        return XKeyEventHdr->HandleXkeyEvent(event);
+    }
+#endif // OHOS_BUILD_ENABLE_X_KEY
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     g_lastKeyboardEventTime = GetSysClockTime();
     BytraceAdapter::StartPackageEvent("package keyEvent");
