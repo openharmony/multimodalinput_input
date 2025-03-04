@@ -190,7 +190,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
             if (g_isSwipeInward &&
-                type != LIBINPUT_EVENT_POINTER_BUTTON &&
+                type != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD &&
                 type != LIBINPUT_EVENT_POINTER_AXIS) {
                 break;
             }
