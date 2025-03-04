@@ -35,8 +35,8 @@ namespace MMI {
 namespace {
     const std::string X_KEY_DOUBLE_CLICK_ENABLE_KEY { "double_click_enable_status" };
     const std::string DOUBLE_CLICK_ENABLE_STATUS { "0" };
-    const std::string X_KEY_APP_BUNDLE_NAME { "com.huawei.hmos.hwquickaccessmenu" };
-    const std::string X_KEY_APP_ABILITY_NAME { "XKeyServiceAbility" };
+    const std::string X_KEY_APP_BUNDLE_NAME { "" };
+    const std::string X_KEY_APP_ABILITY_NAME { "" };
     const std::string SETTING_URI_USER_SECURE_PROXY {
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true"
     };
