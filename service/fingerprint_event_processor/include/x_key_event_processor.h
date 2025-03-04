@@ -53,7 +53,7 @@ private:
 
     // 定义时间间隔（单位：毫秒）
     static constexpr int32_t DOUBLE_CLICK_DELAY { 300 }; // 双击时间阈值
-    static constexpr int32_t LONG_PRESS_DELAY { 500 }; // 长安时间阈值
+    static constexpr int32_t LONG_PRESS_DELAY { 700 }; // 长按时间阈值
 
     static constexpr int32_t X_KEY_DOWN { 0 }; // down
     static constexpr int32_t X_KEY_UP { 1 }; // up
