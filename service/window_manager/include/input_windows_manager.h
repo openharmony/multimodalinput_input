@@ -407,6 +407,7 @@ private:
     std::weak_ptr<TouchGestureManager> touchGestureMgr_;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     DisplayGroupInfo displayGroupInfoTmp_;
+    std::mutex tmpInfoMutex_;
     DisplayGroupInfo displayGroupInfo_;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     PointerStyle lastPointerStyle_ {.id = -1};
