@@ -284,8 +284,8 @@ ohos_shared_library("libmmi-server") {
     "cJSON:cjson",
     "c_utils:utils",
     "graphic_surface:surface",
-    "os_account:os_account_innerkits",
     "ipc:ipc_core",
+    "os_account:os_account_innerkits",
     "samgr:samgr_proxy",
   ]
 
