@@ -2504,7 +2504,7 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
     return UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle, isUiExtension);
 }
 
-bool InputWindowsManager::IsMouseSimulate() const
+bool InputWindowsManager::IsMouseSimulate()
 {
     auto lastPointerEventCopy = GetlastPointerEvent();
     CHKPF(lastPointerEventCopy);
@@ -2512,7 +2512,7 @@ bool InputWindowsManager::IsMouseSimulate() const
     lastPointerEventCopy->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
 }
 
-bool InputWindowsManager::HasMouseHideFlag() const
+bool InputWindowsManager::HasMouseHideFlag()
 {
     auto lastPointerEventCopy = GetlastPointerEvent();
     CHKPF(lastPointerEventCopy);
@@ -5801,7 +5801,7 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
 }
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 
-std::shared_ptr<PointerEvent> InputWindowsManager:: GetlastPointerEvent()
+std::shared_ptr<PointerEvent> InputWindowsManager::GetlastPointerEvent()
 {
     std::lock_guard<std::mutex> guard(mtx_);
     return lastPointerEvent_;
