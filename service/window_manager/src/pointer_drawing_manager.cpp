@@ -2068,7 +2068,7 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
 int32_t PointerDrawingManager::ReloadPixelMaps(
     std::map<MOUSE_ICON, PixelMapInfo>& mousePixelMap, int32_t pointerColor)
 {
-    for (auto iter = mousePixelMap.begin(); iter != mousePixelMap.end(), ++iter) {
+    for (auto iter = mousePixelMap.begin(); iter != mousePixelMap.end(); ++iter) {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap = LoadCursorSvgWithColor(iter->first, pointerColor);
         CHKPR(pixelMap, RET_ERR);
         iter->second.pixelMap = pixelMap;
