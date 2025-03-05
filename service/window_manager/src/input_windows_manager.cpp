@@ -1599,10 +1599,7 @@ void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
         return;
     }
     auto lastPointerEventCopy = GetlastPointerEvent();
-    if (lastPointerEventCopy == nullptr) {
-        MMI_HILOGD("lastPointerEvent is null");
-        return;
-    }
+    CHKPV(lastPointerEventCopy);
     std::optional<WindowInfo> windowInfo;
     std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(displayId);
     for (const auto &item : windowInfos) {
@@ -5692,7 +5689,6 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
 int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown)
 {
     auto lastPointerEventCopy = GetlastPointerEvent();
-    CHKPR(lastPointerEventCopy, RET_ERR);
     if (!lastPointerEventCopy || !lastPointerEventCopy->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
         MMI_HILOGE("Failed shift pointerEvent, left mouse button is not pressed");
         return RET_ERR;
