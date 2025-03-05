@@ -1080,7 +1080,6 @@ void InputWindowsManager::ResetPointerPosition(const DisplayGroupInfo &displayGr
     }
 
     auto lastPointerEventCopy = GetlastPointerEvent();
-    CHKPV(lastPointerEventCopy);
     if ((lastPointerEventCopy != nullptr) &&
         (!lastPointerEventCopy->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT))) {
         MMI_HILOGD("Reset pointer position, left mouse button is not pressed");
@@ -1599,6 +1598,11 @@ void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
     if (mouseDownInfo_.id < 0 || (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
         return;
     }
+    auto lastPointerEventCopy = GetlastPointerEvent();
+    if (lastPointerEventCopy == nullptr) {
+        MMI_HILOGD("lastPointerEvent is null");
+        return;
+    }
     std::optional<WindowInfo> windowInfo;
     std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(displayId);
     for (const auto &item : windowInfos) {
@@ -1786,7 +1790,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     auto lastPointerEventCopy = GetlastPointerEvent();
-    CHKPV(lastPointerEventCopy);
+    if (lastPointerEventCopy == nullptr) {
+        SendPointerEvent(pointerAction);
+        return;
+    }
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
     pointerEvent->UpdateId();
@@ -3102,20 +3109,24 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
 {
     CHKPV(pointerEvent);
     MMI_HILOG_DISPATCHD("LastWindowInfo:%{public}d, touchWindow:%{public}d", lastWindowInfo_.id, touchWindow.id);
-    auto lastPointerEventCopy = GetlastPointerEvent();
-    CHKPV(lastPointerEventCopy);
     if (lastWindowInfo_.id != touchWindow.id) {
         DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
         lastLogicX_ = logicalX;
         lastLogicY_ = logicalY;
-        lastPointerEventCopy = pointerEvent;
+        {
+            std::lock_guard<std::mutex> guard(mtx_);
+            lastPointerEvent_ = pointerEvent;
+        }
         lastWindowInfo_ = touchWindow;
         DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
         return;
     }
     lastLogicX_ = logicalX;
     lastLogicY_ = logicalY;
-    lastPointerEventCopy = pointerEvent;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        lastPointerEvent_ = pointerEvent;
+    }
     lastWindowInfo_ = touchWindow;
 }
 
