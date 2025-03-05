@@ -334,23 +334,26 @@ int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
     return RET_OK;
 }
 
-void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+int32_t InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
-    CHKPV(inputEventConsumer);
-    CHKPV(eventHandler);
+    CHKPR(inputEventConsumer, RET_ERR);
+    CHKPR(eventHandler, RET_ERR);
+    {
+        std::lock_guard<std::mutex> guard(resourceMtx_);
+        consumer_ = inputEventConsumer;
+        eventHandler_ = eventHandler;
+    }
     {
         std::lock_guard<std::mutex> guard(mtx_);
         if (!MMIEventHdl.InitClient(eventHandler)) {
             MMI_HILOGE("Client init failed");
-            return;
+            return RET_ERR;
         }
     }
-    std::lock_guard<std::mutex> guard(resourceMtx_);
-    consumer_ = inputEventConsumer;
-    eventHandler_ = eventHandler;
+    return RET_OK;
 }
 
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
