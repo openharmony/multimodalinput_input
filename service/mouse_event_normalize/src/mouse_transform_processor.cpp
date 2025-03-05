@@ -418,6 +418,9 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         MMI_HILOGD("Touch pad is disable");
         return RET_ERR;
     }
+    
+    auto state = libinput_event_pointer_get_button_state(data);
+    HandleTouchPadButton(state, type);
 
     TransTouchpadRightButton(data, type, button);
 
@@ -432,7 +435,6 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         return RET_ERR;
     }
 
-    auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
         GetTouchpadRightClickType(switchTypeData);
@@ -473,6 +475,33 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     }
 #endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
+}
+
+void MouseTransformProcessor::HandleTouchPadButton(enum libinput_button_state state, int32_t type)
+{
+    if (state != LIBINPUT_BUTTON_STATE_PRESSED) {
+        return;
+    }
+    if (type != LIBINPUT_EVENT_POINTER_TAP && type != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        return;
+    }
+    CHKPV(pointerEvent_);
+    auto pressedButtons = pointerEvent_->GetPressedButtons();
+    if (pressedButtons.empty()) {
+        return;
+    }
+    MMI_HILOGW("touchpad button residue size:%{public}zu", pressedButtons.size());
+    for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
+        MMI_HILOGW("touchpad button residue id:%{public}d", *it);
+    }
+    std::shared_ptr<PointerEvent> cancelPointerEvent = std::make_shared<PointerEvent>(*pointerEvent_);
+    pointerEvent_->ClearButtonPressed();
+    CHKPV(cancelPointerEvent);
+    cancelPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    WIN_MGR->UpdateTargetPointer(cancelPointerEvent);
+    auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+    CHKPV(eventDispatchHandler);
+    eventDispatchHandler->HandlePointerEvent(cancelPointerEvent);
 }
 
 void MouseTransformProcessor::DeletePressedButton(uint32_t originButton)
