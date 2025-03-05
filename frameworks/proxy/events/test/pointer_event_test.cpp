@@ -1793,5 +1793,230 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetBlobId, TestSize.Level1)
     item.SetBlobId(32);
     ASSERT_EQ(32, item.blobId_);
 }
+
+/**
+ * @tc.name: PointerEventTest_DumpPointerAction_001
+ * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    double axisValue = 0;
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+}
+
+/**
+ * @tc.name: PointerEventTest_DumpPointerAction_002
+ * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    double axisValue = 0;
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+}
+
+/**
+ * @tc.name: PointerEventTest_DumpPointerAction_003
+ * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    double axisValue = 0;
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, axisValue);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+}
+
+/**
+ * @tc.name: PointerEventTest_DumpPointerAction_004
+ * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DumpPointerAction());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckMouseFunc_001
+ * @tc.desc: Verify if (pointers_.size() != 1)
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckMouseFunc_002
+ * @tc.desc: Verify if (pointers_.size() != 1)
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckMouseFunc_003
+ * @tc.desc: Verify if (pressedButtons_.size() > maxPressedButtons)
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetButtonPressed(0);
+    pointerEvent->SetButtonPressed(1);
+    pointerEvent->SetButtonPressed(2);
+    pointerEvent->SetButtonPressed(3);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckMouseFunc_004
+ * @tc.desc: Verify if (pressedButtons_.size() > maxPressedButtons)
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetButtonPressed(0);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckMouseFunc_005
+ * @tc.desc: Verify if (checkFlag)
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetButtonPressed(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckMouseFunc_006
+ * @tc.desc: Verify if (checkFlag)
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetButtonPressed(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckMouseFunc_007
+ * @tc.desc: Verify if (buttonId != BUTTON_NONE)
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetButtonPressed(-1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
+}
 } // namespace MMI
 } // namespace OHOS
