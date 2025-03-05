@@ -5786,20 +5786,28 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
 {
     CHKPV(event);
     auto pointerEvent = std::make_shared<PointerEvent>(*event);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+    int32_t originAction = pointerEvent->GetPointerAction();
+    pointerEvent->SetOriginPointerAction(originAction);
     auto items = event->GetAllPointerItems();
-
     for (const auto &item : items) {
         if (!item.IsPressed()) {
             continue;
         }
-        pointerEvent->SetPointerId(item.GetPointerId());
+        int32_t pointerId = item.GetPointerId();
+        int32_t action = PointerEvent::POINTER_ACTION_CANCEL;
+        bool isDragging = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+                          (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId);
+        if (isDragging) {
+            action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
+        }
+        pointerEvent->SetPointerAction(action);
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+        pointerEvent->SetPointerId(pointerId);
 
         if (AdjustFingerFlag(pointerEvent)) {
             continue;
         }
-        MMI_HILOGI("Cancel touch(%{public}d)", item.GetPointerId());
+        MMI_HILOGI("Cancel touch, pointerId:%{public}d", pointerId);
         auto now = GetSysClockTime();
         pointerEvent->SetActionTime(now);
         pointerEvent->SetTargetWindowId(item.GetTargetWindowId());
