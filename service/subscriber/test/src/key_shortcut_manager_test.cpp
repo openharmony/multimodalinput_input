@@ -1947,9 +1947,9 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 {
     CALL_TEST_DEBUG;
     KeyShortcutManager shortcutMgr;
-    const std::string cfgPath { "cfgPathTest" };
+    const std::string cfgPath { "ExceptionalSystemKeys" };
     shortcutMgr.ReadExceptionalSystemKeys(cfgPath);
-    EXPECT_EQ(cfgPath, "cfgPathTest");
+    EXPECT_EQ(cfgPath, "ExceptionalSystemKeys");
 }
 
 /**
