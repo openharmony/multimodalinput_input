@@ -164,7 +164,7 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
         canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
     }
     image_ptr_t image = nullptr;
-    if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+    if (cfg.userIconPixelMap == nullptr) {
         image = LoadPointerImage(cfg);
     } else {
         image = UserIconScale(width, height, cfg);
