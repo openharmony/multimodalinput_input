@@ -86,16 +86,16 @@ int32_t InputManager::RemoveInputEventObserver(std::shared_ptr<MMIEventObserver>
     return InputMgrImpl.RemoveInputEventObserver(observer);
 }
 
-void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
+int32_t InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
-    InputMgrImpl.SetWindowInputEventConsumer(inputEventConsumer, nullptr);
+    return InputMgrImpl.SetWindowInputEventConsumer(inputEventConsumer, nullptr);
 }
 
-void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+int32_t InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
-    CHKPV(eventHandler);
-    InputMgrImpl.SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
+    CHKPR(eventHandler, RET_ERR);
+    return InputMgrImpl.SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
 }
 
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
