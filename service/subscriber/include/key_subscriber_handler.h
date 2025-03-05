@@ -125,6 +125,7 @@ private:
 
 private:
     SubscriberCollection subscriberMap_;
+    std::mutex subscriberMapMutex_;
     SubscriberCollection keyGestures_;
     KeyGestureManager keyGestureMgr_;
     bool callbackInitialized_ { false };
