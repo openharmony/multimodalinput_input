@@ -50,7 +50,7 @@ public:
 private:
     bool StartEventRunner();
     void OnReconnect();
-    bool AddFdListener(int32_t fd);
+    bool AddFdListener(int32_t fd, bool selfCreate = false);
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
     const std::string& GetErrorStr(ErrCode code) const;
