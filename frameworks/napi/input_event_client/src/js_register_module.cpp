@@ -529,7 +529,7 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     HandleTouchAttribute(env, pointerEvent, item, touchProperty, true);
 
     bool autoToVirtualScreen = true;
-    int32_t fixedMode = 2;
+    int32_t fixedMode = 1;
     if (GetNamedPropertyInt32(env, touchHandle, "fixedMode", fixedMode, false) == RET_OK) {
         if (fixedMode != static_cast<int32_t>(PointerEvent::FixedMode::ONE_HAND)) {
             autoToVirtualScreen = false;
