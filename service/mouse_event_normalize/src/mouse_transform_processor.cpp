@@ -182,6 +182,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
             static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+        pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
         ret = UpdateMouseMoveLocation(displayInfo, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
             static_cast<int32_t>(deviceType));
     }
@@ -253,6 +254,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
     } else if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
         deviceTypeGlobal_ = DeviceType::DEVICE_FOLD_PC_VIRT;
+        pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, GetTouchpadSpeed(), deviceType);
         return ret;
