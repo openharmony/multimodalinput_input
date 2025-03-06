@@ -205,6 +205,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_THROW ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
         WIN_MGR->ClearTargetWindowId(pointerId);
     }

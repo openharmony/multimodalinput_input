@@ -130,7 +130,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool IsNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-#endif //OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
@@ -389,6 +389,7 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     bool CancelTouch(int32_t touch);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    void ClearEventData(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     UDSServer* udsServer_ { nullptr };
@@ -470,6 +471,8 @@ private:
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
     int32_t lastDpi_ { 0 };
+    bool isPullUpBefore_ { false };
+    bool isInPullThrow_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
