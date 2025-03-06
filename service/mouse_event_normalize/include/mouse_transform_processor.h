@@ -112,6 +112,7 @@ private:
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
+    void HandleTouchPadButton(enum libinput_button_state state, int32_t type);
     int32_t UpdateMouseMoveLocation(const DisplayInfo* displayInfo, Offset &offset,
         double &abs_x, double &abs_y, int32_t deviceType);
     int32_t UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo, struct libinput_event* event,
