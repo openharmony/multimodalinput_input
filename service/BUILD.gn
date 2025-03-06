@@ -2059,6 +2059,7 @@ ohos_unittest("EventHandlerTest") {
     "event_handler/test/input_event_handler_test.cpp",
     "event_handler/test/key_auto_repeat_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
+    "event_handler/test/touchpad_settings_handler_test.cpp",
   ]
 
   deps = [
