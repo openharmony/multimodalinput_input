@@ -565,6 +565,7 @@ ohos_unittest("EventFilterHandlerTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
