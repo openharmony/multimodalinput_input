@@ -1334,7 +1334,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level1
 HWTEST_F(PointerEventTest, PointerEventTest_GetAxisValue_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
     ASSERT_NO_FATAL_FAILURE(pointerEvent->GetAxisValue(axis));
@@ -1353,7 +1353,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetAxisValue_001, TestSize.Level1)
 HWTEST_F(PointerEventTest, PointerEventTest_SetAxisValue_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     double axisValue = 1.0;
     PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
@@ -1373,7 +1373,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetAxisValue_001, TestSize.Level1)
 HWTEST_F(PointerEventTest, PointerEventTest_HasAxis_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     uint32_t axes = 1;
     PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
@@ -1428,7 +1428,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetMoveFlag_001, TestSize.Level1)
 HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     int32_t action = PointerEvent::POINTER_ACTION_PULL_UP;
     auto ret = pointerEvent->ActionToShortStr(action);
@@ -1471,7 +1471,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_003, TestSize.Level
 HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     int32_t action = PointerEvent::POINTER_ACTION_QUADTAP;
     auto ret = pointerEvent->ActionToShortStr(action);
