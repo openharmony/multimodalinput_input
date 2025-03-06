@@ -43,10 +43,10 @@ public:
         return queue_.front();
     }
 
-    T Rear()
+    T Back()
     {
         std::shared_lock<std::shared_mutex> lock(rwMutex_);
-        return queue_.rear();
+        return queue_.back();
     }
 
     bool Empty()
