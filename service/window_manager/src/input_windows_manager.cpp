@@ -4207,11 +4207,19 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         touchItemDownInfos_[pointerId] = windowInfoEX;
         MMI_HILOG_FREEZEI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
-        MMI_HILOG_DISPATCHD("Clear extra data");
-        pointerEvent->ClearBuffer();
-        lastTouchEvent_ = nullptr;
-        lastTouchWindowInfo_.id = -1;
-        ClearExtraData();
+        if (isInPullThrow_) {
+                isInPullThrow_ = false;
+            }
+            isPullUpBefore_ = true;
+            return ERR_OK;
+        }
+        if (isPullUpBefore_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE) {
+            isPullUpBefore_ = false;
+            isInPullThrow_ = true;
+        } else if (isPullUpBefore_ && !isInPullThrow_) {
+            MMI_HILOG_DISPATCHI("++++++ Clear touch event is: %{public}d +++++++++", pointerEvent->GetPointerAction());
+            ClearEventData(pointerEvent);
+            isPullUpBefore_ = false;
     }
     return ERR_OK;
 }
@@ -5806,6 +5814,15 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
         eventDispatchHandler->HandleTouchEvent(pointerEvent);
         CancelTouch(item.GetPointerId());
     }
+}
+
+void InputWindowsManager::ClearEventData(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    MMI_HILOG_DISPATCHI("+++++++++++Clear extra data+++++++++++++++++++++++++++");
+    pointerEvent->ClearBuffer();
+    lastTouchEvent_ = nullptr;
+    lastTouchWindowInfo_.id = -1;
+    ClearExtraData();
 }
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 } // namespace MMI

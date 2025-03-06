@@ -25,6 +25,7 @@
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_command_handler_util.h"
 #include "long_press_subscriber_handler.h"
+#include "pull_throw_subscriber_handler.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -157,6 +158,15 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         isParseConfig_ = true;
     }
+    InitializeLongPressConfigurations();
+    HandleTouchAction(touchEvent);
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    HandleKnuckleGestureEvent(touchEvent);
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+}
+
+void KeyCommandHandler::InitializeLongPressConfigurations()
+{
     if (!isParseLongPressConfig_) {
         if (!ParseLongPressConfig()) {
             MMI_HILOGE("Parse long press configFile failed");
@@ -173,8 +183,17 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
         isDistanceConfig_ = true;
     }
+}
 
+void KeyCommandHandler::HandleTouchAction(const std::shared_ptr<PointerEvent>& touchEvent)
+{
     switch (touchEvent->GetPointerAction()) {
+        case PointerEvent::POINTER_ACTION_PULL_MOVE:
+            PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+            break;
+        case PointerEvent::POINTER_ACTION_PULL_UP:
+            PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent);
+            break;
         case PointerEvent::POINTER_ACTION_CANCEL:
         case PointerEvent::POINTER_ACTION_UP: {
             HandlePointerActionUpEvent(touchEvent);
@@ -183,6 +202,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         case PointerEvent::POINTER_ACTION_MOVE: {
             HandlePointerActionMoveEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
+            PULL_THROW_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
             break;
         }
         case PointerEvent::POINTER_ACTION_DOWN: {
@@ -193,9 +213,6 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
             MMI_HILOGD("Unknown pointer action:%{public}d", touchEvent->GetPointerAction());
             break;
     }
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    HandleKnuckleGestureEvent(touchEvent);
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 }
 
 void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -216,6 +233,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             if (CheckBundleName(touchEvent)) {
                 LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             }
+            PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
@@ -276,6 +294,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureUpEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
+            PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
