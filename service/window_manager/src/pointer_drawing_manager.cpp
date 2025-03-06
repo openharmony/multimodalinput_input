@@ -3196,18 +3196,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             }
         }
     }
-
-    HardwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
-    PostSoftCursorTask([this]() {
-        SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
-    });
-
-    auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
-    if (!SetCursorLocation(displayId_, lastPhysicalX_, lastPhysicalY_, align)) {
-        MMI_HILOGE("SetCursorLocation fail");
-    }
-
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    UpdatePointerVisible();
 }
 
 void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp,
