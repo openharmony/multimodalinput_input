@@ -270,6 +270,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
         if (touchpadPPi < CONST_DOUBLE_ONE || touchpadSize < CONST_DOUBLE_ONE || frequency < CONST_DOUBLE_ONE) {
             return RET_ERR;
         }
+        UpdateTouchpadCDG(touchpadPPi, touchpadSize, frequency);
         ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, GetTouchpadSpeed(), displaySize, touchpadSize, touchpadPPi, frequency);
         return ret;
@@ -1336,11 +1337,12 @@ void MouseTransformProcessor::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
     touchpadCDG = touchpadOption_;
 }
 
-void MouseTransformProcessor::UpdateTouchpadCDG(double touchpadPPi, double touchpadSize)
+void MouseTransformProcessor::UpdateTouchpadCDG(double touchpadPPi, double touchpadSize, int32_t frequency)
 {
     touchpadOption_.ppi = touchpadPPi;
     touchpadOption_.size = touchpadSize;
     touchpadOption_.speed = GetTouchpadSpeed();
+    touchpadOption_.frequency = frequency;
 }
 
 int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)

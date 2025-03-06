@@ -23,6 +23,7 @@ struct TouchpadCDG {
     double size;
     int32_t speed;
     float zOrder;
+    int32_t frequency;
 };
 } // namespace MMI
 } // namespace OHOS

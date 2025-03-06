@@ -1797,15 +1797,18 @@ int32_t MultimodalInputConnectStub::StubInjectTouchPadEvent(MessageParcel& data,
     double ppi = 0.0;
     double size = 0.0;
     int32_t speed = 0;
+    int32_t frequency = 0;
     bool isNativeInject { false };
     READDOUBLE(data, ppi, IPC_PROXY_DEAD_OBJECT_ERR);
     READDOUBLE(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, speed, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, frequency, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
     TouchpadCDG touchpadCDG = {
         .ppi = ppi,
         .size = size,
         .speed = speed,
+        .frequency = frequency,
     };
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
@@ -2324,6 +2327,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadCDG(MessageParcel& data, Mess
     touchpadCDG.ppi = 0.0;
     touchpadCDG.size = 0.0;
     touchpadCDG.speed = 0;
+    touchpadCDG.frequency = 0;
     ret = GetTouchpadCDG(touchpadCDG);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetTouchpadCDG failed ret:%{public}d", ret);
@@ -2332,6 +2336,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadCDG(MessageParcel& data, Mess
     WRITEDOUBLE(reply, touchpadCDG.ppi, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEDOUBLE(reply, touchpadCDG.size, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, touchpadCDG.speed, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, touchpadCDG.frequency, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touchpad option ppi:%{public}lf size:%{public}lf speed:%{public}d, ret:%{public}d",
         touchpadCDG.ppi, touchpadCDG.size, touchpadCDG.speed, ret);
     return RET_OK;

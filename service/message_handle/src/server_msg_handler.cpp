@@ -255,7 +255,7 @@ int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<Pointer
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         int32_t ret = AccelerateMotionTouchpad(pointerEvent, touchpadCDG);
         if (ret != RET_OK) {
@@ -498,15 +498,17 @@ int32_t ServerMsgHandler::AccelerateMotionTouchpad(std::shared_ptr<PointerEvent>
     double touchpadSize = touchpadCDG.size;
     double touchpadPPi = touchpadCDG.ppi;
     int32_t touchpadSpeed = touchpadCDG.speed;
-    if (touchpadSize <= 0 || touchpadPPi <= 0 || touchpadSpeed <= 0) {
+    int32_t frequency = touchpadCDG.frequency;
+    if (touchpadSize <= 0 || touchpadPPi <= 0 || touchpadSpeed <= 0 || frequency <= 0) {
         MMI_HILOGE("touchpadSize, touchpadPPi or touchpadSpeed are invalid,
-            touchpadSize:%{public}lf, touchpadPPi:%{public}lf, touchpadSpeed:%{public}d",
-            touchpadSize, touchpadPPi, touchpadSpeed);
+            touchpadSize:%{public}lf, touchpadPPi:%{public}lf, touchpadSpeed:%{public}d, frequency:%{public}d",
+            touchpadSize, touchpadPPi, touchpadSpeed, frequency);
         return RET_ERR;
     }
-    ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
-        &cursorPos.cursorPos.y, touchpadSpeed, displaySize, touchpadSize, touchpadPPi);
-
+    if (pointerEvent->GetPointerAction() == POINTER_ACTION_MOVE) {
+        ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
+            &cursorPos.cursorPos.y, touchpadSpeed, displaySize, touchpadSize, touchpadPPi, frequency);
+    }
     MMI_HILOGE("DeltaTime after HandleMotionDynamicAccelerateTouchpad: %{public}PRId64 ms", deltaTime);
     MMI_HILOGE("Hidumper after HandleMotionDynamicAccelerateTouchpad");
     preTime = currentTime;
