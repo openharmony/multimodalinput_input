@@ -41,7 +41,7 @@ public:
  */
 HWTEST_F(InputEventTest, InputEventTest_EventTypeToString_001, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;  
+    CALL_TEST_DEBUG;
     auto InputEvent = InputEvent::Create();
     ASSERT_NE(InputEvent, nullptr);
     int32_t eventType = InputEvent::EVENT_TYPE_BASE;
