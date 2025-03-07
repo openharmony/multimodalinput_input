@@ -26,6 +26,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
+#include "key_monitor_manager.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
@@ -637,10 +638,20 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGD("Key gesture recognized");
         return true;
     }
+    if (KEY_MONITOR_MGR->Intercept(keyEvent)) {
+        MMI_HILOGD("Key monitor intercept (KC:%{private}d, KA:%{public}d)",
+            keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        return true;
+    }
     if (IsRepeatedKeyEvent(keyEvent)) {
         MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
     }
+    return ProcessKeyEvent(keyEvent);
+}
+
+bool KeySubscriberHandler::ProcessKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
     keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {

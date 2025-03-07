@@ -827,6 +827,11 @@ void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroup
     }
 }
 
+bool InputWindowsManager::IsFocusedSession(int32_t session) const
+{
+    return ((session >= 0) && (session == GetWindowPid(displayGroupInfo_.focusWindowId)));
+}
+
 void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
     CALL_DEBUG_ENTER;

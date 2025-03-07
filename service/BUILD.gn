@@ -174,6 +174,7 @@ ohos_shared_library("libmmi-server") {
       "key_event_normalize/src/key_unicode_transformation.cpp",
       "monitor/src/event_pre_monitor_handler.cpp",
       "subscriber/src/key_gesture_manager.cpp",
+      "subscriber/src/key_monitor_manager.cpp",
       "subscriber/src/key_subscriber_handler.cpp",
     ]
     if (input_feature_combination_key) {

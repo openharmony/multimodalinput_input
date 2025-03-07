@@ -19,6 +19,7 @@
 #include "app_state_observer.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"
+#include "key_monitor_manager.h"
 #include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -226,19 +227,23 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
     if ((keyEvent->GetKeyCode() == keyCode_) && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
         if (IsActive()) {
             int64_t now = GetSysClockTime();
-            if (now >= (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) {
+            if ((now >= (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) &&
+                !KEY_MONITOR_MGR->Intercept(keyEvent)) {
                 NotifyHandlers(keyEvent);
             }
         } else {
             firstDownTime_ = GetSysClockTime();
             MarkActive(true);
-            TriggerHandlers(keyEvent);
+            if (!KEY_MONITOR_MGR->Intercept(keyEvent, COMBINATION_KEY_TIMEOUT)) {
+                TriggerHandlers(keyEvent);
+            }
         }
         return true;
     }
     if (IsActive()) {
         Reset();
         RunPendingHandlers();
+        KEY_MONITOR_MGR->NotifyPendingMonitors();
     }
     return false;
 }
@@ -253,6 +258,12 @@ void KeyGestureManager::LongPressSingleKey::Dump(std::ostringstream &output) con
         }
     }
     output << "}";
+}
+
+void KeyGestureManager::LongPressSingleKey::Reset()
+{
+    KEY_MONITOR_MGR->ResetAll();
+    KeyGesture::Reset();
 }
 
 void KeyGestureManager::LongPressSingleKey::RunPendingHandlers()

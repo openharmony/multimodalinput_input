@@ -101,6 +101,8 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option) = 0;
     virtual int32_t UnsubscribeHotkey(int32_t subscribeId) = 0;
+    virtual int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption) = 0;
+    virtual int32_t UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption) = 0;
     virtual int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) = 0;
     virtual int32_t UnsubscribeSwitchEvent(int32_t subscribeId) = 0;
     virtual int32_t SubscribeTabletProximity(int32_t subscribeId) = 0;
