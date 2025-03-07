@@ -24,11 +24,6 @@ namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 
-struct DoubleClickSwitch {
-    std::string keyString {""};
-    std::string valueString {"0"};
-};
-
 class XKeyEventProcessor {
     DECLARE_DELAYED_SINGLETON(XKeyEventProcessor);
 public:
@@ -44,8 +39,7 @@ private:
     // 重置计数器
     void ResetCount();
     void StartXkeyIfNeeded();
-    template <class T>
-    void CreateStatusConfigObserver(T& item);
+    bool IsRemoveDelaySingleClick();
     // 按压次数
     std::atomic<int32_t> pressCount_ {0};
     // 时间点记录
@@ -53,7 +47,7 @@ private:
 
     // 定义时间间隔（单位：毫秒）
     static constexpr int32_t DOUBLE_CLICK_DELAY { 300 }; // 双击时间阈值
-    static constexpr int32_t LONG_PRESS_DELAY { 700 }; // 长按时间阈值
+    static constexpr int32_t LONG_PRESS_DELAY { 500 }; // 长按时间阈值
 
     static constexpr int32_t X_KEY_DOWN { 0 }; // down
     static constexpr int32_t X_KEY_UP { 1 }; // up
@@ -62,10 +56,7 @@ private:
     static constexpr int32_t LONG_PRESS { 4 }; // 长按
 
     const std::string X_KEY_SOURCE_KEY { "fkey" };
-    std::atomic_bool isCreatedObserver_ { false };
     std::atomic_bool isStartedXkey_ { false };
-    std::mutex mutex_;
-    struct DoubleClickSwitch doubleClickSwitch_;
 };
 #define XKeyEventHdr ::OHOS::DelayedSingleton<XKeyEventProcessor>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_X_KEY
