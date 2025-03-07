@@ -19,6 +19,7 @@
 #include <map>
 
 #include "oh_input_manager.h"
+#include "pointer_event.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -1350,6 +1351,269 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001
     int32_t state = -1;
     Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
     EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState_002
+ * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 1;
+    int32_t state = -1;
+    Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    EXPECT_EQ(retResult, INPUT_KEYBOARD_DEVICE_NOT_EXIST);
+    keyCode = -5;
+    retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    keyCode = 5;
+    retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_007
+ * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.displayX = 300;
+    inputTouchEvent.displayY = 300;
+    inputTouchEvent.action = TOUCH_ACTION_UP;
+    EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType_005
+ * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = -3;
+    int32_t keyboardType = -1;
+    Input_Result retResult = OH_Input_GetKeyboardType(deviceId, &keyboardType);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDevice_005
+ * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = -5;
+    Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
+    Input_Result retResult = OH_Input_GetDevice(deviceId, &deviceInfo);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds_005
+ * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const int32_t inSize = -5;
+    int32_t outSize = 0;
+    int32_t *deviceIds = nullptr;
+    Input_Result retResult = OH_Input_GetDeviceIds(deviceIds, inSize, &outSize);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    OH_Input_UnregisterDeviceListeners();
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetPreKeys_001
+ * @tc.desc: Test the funcation OH_Input_GetPreKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetPreKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey *hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    int32_t prekeys[2] = { KEYCODE_ALT_LEFT, KEYCODE_ALT_RIGHT };
+    OH_Input_SetPreKeys(hotkey, prekeys, 2);
+    int32_t key = 0;
+    int32_t key1 = 0;
+    int32_t *pressedKeys[2] = { &key, &key1 };
+    int32_t pressedKeyNum = 0;
+    Input_Result result = OH_Input_GetPreKeys(hotkey, pressedKeys, &pressedKeyNum);
+    EXPECT_EQ(result, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetPreKeys_001
+ * @tc.desc: Test the funcation OH_Input_SetPreKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPreKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey *hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    int32_t size = -5;
+    int32_t prekeys[2] = { KEYCODE_ALT_LEFT, KEYCODE_ALT_RIGHT };
+    ASSERT_NO_FATAL_FAILURE(OH_Input_SetPreKeys(hotkey, prekeys, size));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CreateAllSystemHotkeys_001
+ * @tc.desc: Test the funcation OH_Input_CreateAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CreateAllSystemHotkeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = -5;
+    auto ret = OH_Input_CreateAllSystemHotkeys(count);
+    EXPECT_EQ(ret, nullptr);
+}
+
+static void MouseEventCallback(const struct Input_MouseEvent* mouseEvent)
+{
+    EXPECT_NE(mouseEvent, nullptr);
+    int32_t action = OH_Input_GetMouseEventAction(mouseEvent);
+    int32_t displayX = OH_Input_GetMouseEventDisplayX(mouseEvent);
+    int32_t displayY = OH_Input_GetMouseEventDisplayY(mouseEvent);
+    MMI_HILOGI("MouseEventCallback, action:%{public}d, displayX:%{public}d, displayY:%{public}d",
+        action, displayX, displayY);
+}
+
+static void TouchEventCallback(const struct Input_TouchEvent* touchEvent)
+{
+    EXPECT_NE(touchEvent, nullptr);
+    int32_t action = OH_Input_GetTouchEventAction(touchEvent);
+    int32_t id = OH_Input_GetTouchEventFingerId(touchEvent);
+    MMI_HILOGI("TouchEventCallback, action:%{public}d, id:%{public}d", action, id);
+}
+
+static void AxisEventCallback(const struct Input_AxisEvent* axisEvent)
+{
+    EXPECT_NE(axisEvent, nullptr);
+    InputEvent_AxisAction axisAction = AXIS_ACTION_BEGIN;
+    OH_Input_GetAxisEventAction(axisEvent, &axisAction);
+    InputEvent_AxisEventType sourceType = AXIS_EVENT_TYPE_PINCH;
+    OH_Input_GetAxisEventType(axisEvent, &sourceType);
+    InputEvent_SourceType axisEventType = SOURCE_TYPE_MOUSE;
+    OH_Input_GetAxisEventSourceType(axisEvent, &axisEventType);
+    MMI_HILOGI("AxisEventCallback, axisAction:%{public}d, sourceType:%{public}d, axisEventType:%{public}d",
+        axisAction, sourceType, axisEventType);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_001
+ * @tc.desc: Test the funcation OH_Input_AddInputEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventInterceptor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_InterceptorEventCallback callback;
+    callback.mouseCallback = MouseEventCallback;
+    callback.touchCallback = TouchEventCallback;
+    callback.axisCallback = AxisEventCallback;
+    Input_InterceptorOptions *option = nullptr;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(SOURCE_TYPE_TOUCHSCREEN);
+    Input_Result ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetSourceType(SOURCE_TYPE_MOUSE);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_002
+ * @tc.desc: Test the funcation OH_Input_AddInputEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventInterceptor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_InterceptorEventCallback callback;
+    callback.mouseCallback = MouseEventCallback;
+    callback.touchCallback = TouchEventCallback;
+    callback.axisCallback = AxisEventCallback;
+    Input_InterceptorOptions *option = nullptr;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(SOURCE_TYPE_TOUCHSCREEN);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    Input_Result ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_003
+ * @tc.desc: Test the funcation OH_Input_AddInputEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventInterceptor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_InterceptorEventCallback callback;
+    callback.mouseCallback = MouseEventCallback;
+    callback.touchCallback = TouchEventCallback;
+    callback.axisCallback = AxisEventCallback;
+    Input_InterceptorOptions *option = nullptr;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(SOURCE_TYPE_TOUCHPAD);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    Input_Result ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
 }
 } // namespace MMI
 } // namespace OHOS
