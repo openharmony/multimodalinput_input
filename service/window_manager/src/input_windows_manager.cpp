@@ -1172,7 +1172,6 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     int32_t validH = currentDisplay.validHeight;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     MMI_HILOGD("Start checking vtp cursor active area");
     if (IsPointerActiveRectValid(currentDisplay) && !isPhysicalPos) {
@@ -1181,7 +1180,6 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
         MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", validW, validH);
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    
     if (isPhysicalPos) {
         Direction displayDirection = static_cast<Direction>((
         ((currentDisplay.direction - currentDisplay.fixedDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
