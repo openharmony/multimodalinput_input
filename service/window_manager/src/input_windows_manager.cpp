@@ -1130,9 +1130,21 @@ void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const DisplayGro
                 static_cast<int32_t>(cursorPos.cursorPos.y),
                 static_cast<int32_t>(isOut),
                 static_cast<int32_t>(isChange));
-            if (isOut && isChange) {
-                double curX = currentDisplay.validWidth * HALF_RATIO;
-                double curY = currentDisplay.validHeight * HALF_RATIO;
+            int32_t validWidth = currentDisplay.validWidth;
+            int32_t validHeight = currentDisplay.validHeight;
+            bool pointerActiveRectValid = false;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+            MMI_HILOGD("Start checking vtp cursor active area");
+            pointerActiveRectValid = IsPointerActiveRectValid(currentDisplay);
+            if (pointerActiveRectValid) {
+                validWidth = currentDisplay.pointerActiveWidth;
+                validHeight = currentDisplay.pointerActiveHeight;
+                MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", validWidth, validHeight);
+            }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+            if (isOut && (isChange || pointerActiveRectValid)) {
+                double curX = validWidth * HALF_RATIO;
+                double curY = validHeight * HALF_RATIO;
                 UpdateAndAdjustMouseLocation(cursorDisplayId, curX, curY);
                 IPointerDrawingManager::GetInstance()->SetPointerLocation(static_cast<int32_t>(cursorPos_.cursorPos.x),
                     static_cast<int32_t>(cursorPos_.cursorPos.y),
@@ -1160,6 +1172,15 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     int32_t validH = currentDisplay.validHeight;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    MMI_HILOGD("Start checking vtp cursor active area");
+    if (IsPointerActiveRectValid(currentDisplay) && !isPhysicalPos) {
+        validW = currentDisplay.pointerActiveWidth;
+        validH = currentDisplay.pointerActiveHeight;
+        MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", validW, validH);
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     
     if (isPhysicalPos) {
         Direction displayDirection = static_cast<Direction>((
@@ -1232,6 +1253,13 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
 
     return isOut;
 }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+bool InputWindowsManager::IsPointerActiveRectValid(const DisplayInfo &currentDisplay)
+{
+    return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const DisplayGroupInfo &displayGroupInfo)
 {
@@ -2052,7 +2080,8 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
                "XY:{%{private}d %{private}d} offsetXY:{%{private}d %{private}d} "
                "WH:{%{private}d %{private}d} validWH:{%{private}d %{private}d} "
                "direction:%{public}d,displayDirection:%{public}d,fixedDirection:%{public}d} "
-               "oneHandXY:{%{private}d %{private}d}",
+               "oneHandXY:{%{private}d %{private}d}"
+               "pointerActiveWidth:%{private}d,pointerActiveHeight:%{private}d",
         displayInfo.id,
         displayInfo.name.c_str(),
         displayInfo.uniq.c_str(),
@@ -2068,7 +2097,9 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
         displayInfo.displayDirection,
         displayInfo.fixedDirection,
         displayInfo.oneHandX,
-        displayInfo.oneHandY);
+        displayInfo.oneHandY,
+        displayInfo.pointerActiveWidth,
+        displayInfo.pointerActiveHeight);
 }
 
 const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
@@ -4901,6 +4932,14 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     GetWidthAndHeight(displayInfo, width, height, isRealData);
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    MMI_HILOGD("Start checking vtp cursor active area");
+    if (IsPointerActiveRectValid(*displayInfo)) {
+        width = displayInfo->pointerActiveWidth;
+        height = displayInfo->pointerActiveHeight;
+        MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", width, height);
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));

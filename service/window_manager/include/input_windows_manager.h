@@ -389,6 +389,9 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     bool CancelTouch(int32_t touch);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool IsPointerActiveRectValid(const DisplayInfo &currentDisplay);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 private:
     UDSServer* udsServer_ { nullptr };

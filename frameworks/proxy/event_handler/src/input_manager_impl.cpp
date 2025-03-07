@@ -759,7 +759,8 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
             << item.validWidth << item.validHeight << item.fixedDirection
             << item.physicalWidth << item.physicalHeight
-            << item.oneHandX << item.oneHandY;
+            << item.oneHandX << item.oneHandY
+            << item.pointerActiveWidth << item.pointerActiveHeight;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -843,7 +844,7 @@ void InputManagerImpl::PrintDisplayInfo()
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
                    "dpi:%{public}d,name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
                    "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,validWH:{%{private}d %{private}d}"
-                   "fixedDirection:%{public}d,physicalWH:{%{private}d %{private}d}",
+                   "fixedDirection:%{public}d,physicalWH:{%{private}d %{private}d},pActiveWH:{%{private}d %{private}d}",
             item.id,
             item.x,
             item.y,
@@ -861,7 +862,9 @@ void InputManagerImpl::PrintDisplayInfo()
             item.validHeight,
             item.fixedDirection,
             item.physicalWidth,
-            item.physicalHeight);
+            item.physicalHeight,
+            item.pointerActiveWidth,
+            item.pointerActiveHeight);
     }
 }
 
