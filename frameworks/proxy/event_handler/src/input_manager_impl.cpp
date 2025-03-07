@@ -2689,5 +2689,10 @@ int32_t InputManagerImpl::CheckKnuckleEvent(float pointX, float pointY, bool &is
     MMI_HILOGI("CheckKnuckleEvent function does not support");
     return ERROR_UNSUPPORT;
 }
+
+void InputManagerImpl::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    MULTIMODAL_INPUT_CONNECT_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+}
 } // namespace MMI
 } // namespace OHOS

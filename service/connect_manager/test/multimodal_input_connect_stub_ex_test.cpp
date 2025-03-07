@@ -369,6 +369,11 @@ public:
         return touchpadCDG.ppi;
     }
 
+    int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override
+    {
+        return static_cast<int32_t>(screenId);
+    };
+
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;

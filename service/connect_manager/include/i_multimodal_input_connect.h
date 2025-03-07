@@ -177,6 +177,7 @@ public:
     virtual int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) = 0;
     virtual int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) = 0;
     virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
+    virtual int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

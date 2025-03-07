@@ -484,6 +484,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_MOUSE_CURSOR):
             ret = StubSetCustomMouseCursor(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID):
+            ret = StubSetMultiWindowScreenId(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -3314,6 +3317,25 @@ int32_t MultimodalInputConnectStub::StubSetCustomMouseCursor(MessageParcel& data
     int32_t ret = SetCustomCursor(windowId, cursor, options);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMultiWindowScreenId(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    uint64_t screenId = 0;
+    uint64_t displayNodeScreenId = 0;
+    READUINT64(data, screenId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT64(data, displayNodeScreenId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SkipPointerLayer failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

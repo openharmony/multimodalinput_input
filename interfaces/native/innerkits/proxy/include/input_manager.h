@@ -1117,6 +1117,9 @@ public:
      * @since 14
      */
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType);
+
+    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
