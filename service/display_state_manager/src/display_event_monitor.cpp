@@ -89,11 +89,7 @@ public:
             DISPLAY_MONITOR->SetScreenLocked(true);
             DISPLAY_MONITOR->SendCancelEventWhenLock();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-            if (IPointerDrawingManager::GetInstance() != nullptr &&
-                IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-                MMI_HILOGI("SCREEN_LOCKED hides mouse cursor.");
-                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
-            }
+            ScreenLockHideCursor();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
             MMI_HILOGD("Display screen unlocked");
@@ -115,6 +111,17 @@ public:
             MMI_HILOGW("Screen changed receiver event: unknown");
         }
     }
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void ScreenLockHideCursor()
+    {
+        if (IPointerDrawingManager::GetInstance() != nullptr &&
+            IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+            MMI_HILOGI("SCREEN_LOCKED hides mouse cursor.");
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 };
 
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
