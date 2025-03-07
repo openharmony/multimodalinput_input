@@ -61,15 +61,7 @@ bool XKeyEventProcessor::IsXkeyEvent(struct libinput_event* event)
         MMI_HILOGI("Not X-key");
         return false;
     }
-    // 拉起X键进程
     StartXkeyIfNeeded();
-    // 监听settingsdata数据库字段
-    if (!isCreatedObserver_) {
-        MMI_HILOGI("create observer.");
-        doubleClickSwitch_.keyString = X_KEY_DOUBLE_CLICK_ENABLE_KEY;
-        CreateStatusConfigObserver(doubleClickSwitch_);
-        isCreatedObserver_ = true;
-    }
     return true;
 }
 
@@ -85,42 +77,6 @@ void XKeyEventProcessor::StartXkeyIfNeeded()
             MMI_HILOGI("start ability fail.");
         }
     }
-}
-
-template <class T>
-void XKeyEventProcessor::CreateStatusConfigObserver(T& item)
-{
-    CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
-        std::string value = DOUBLE_CLICK_ENABLE_STATUS;
-        MMI_HILOGI("settings data key is:%{public}s", key.c_str());
-        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .GetStringValue(key, value, SETTING_URI_USER_SECURE_PROXY);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get value from settings db failed, ret:%{public}d", ret);
-            return;
-        }
-        MMI_HILOGI("Config changed, key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
-        item.valueString = value;
-    };
-
-    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .CreateObserver(item.keyString, updateFunc);
-    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
-        statusObserver = nullptr;
-    }
-
-    std::string value = DOUBLE_CLICK_ENABLE_STATUS;
-    ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .SettingDataShare::GetStringValue(item.keyString, value, SETTING_URI_USER_SECURE_PROXY);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get value from settings db failed, ret:%{public}d", ret);
-        return;
-    }
-    MMI_HILOGI("Get value success, key:%{public}s, value:%{public}s", item.keyString.c_str(), value.c_str());
-    item.valueString = value;
 }
 
 int32_t XKeyEventProcessor::HandleXkeyEvent(struct libinput_event* event)
@@ -158,49 +114,54 @@ void XKeyEventProcessor::InterceptXKeyDown()
 {
     HandleQuickAccessMenu(X_KEY_DOWN);
     auto currentTime = std::chrono::steady_clock::now();
-    // 记录按下时间
     lastDownTime_ = currentTime;
 
-    //如果是第一次按下，启动长安检测
     if (pressCount_ == 0) {
         std::thread([this, currentTime]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(LONG_PRESS_DELAY));
             if (pressCount_ == 1 && lastDownTime_ == currentTime) {
-                // 如果按下时间超过长按阈值，判定为长按
                 HandleQuickAccessMenu(LONG_PRESS);
                 MMI_HILOGI("X-key is long press.");
             }
         }).detach();
     }
 
-    // 增加按压次数
     pressCount_++;
 }
 
 void XKeyEventProcessor::InterceptXKeyUp()
 {
     HandleQuickAccessMenu(X_KEY_UP);
-    // 如果按压次数为1，启动单击/双击检测
     if (pressCount_ == 1) {
-        if (doubleClickSwitch_.valueString.empty() || doubleClickSwitch_.valueString == DOUBLE_CLICK_ENABLE_STATUS) {
-            // 未设置双击拉起的应用，不做延迟单击处理，直接触发单击
-            HandleQuickAccessMenu(SINGLE_CLICK);
+        if (IsRemoveDelaySingleClick()) {
             MMI_HILOGI("X-key is single click after remove delayed click.");
+            HandleQuickAccessMenu(SINGLE_CLICK);
             return;
         }
         std::thread([this]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(DOUBLE_CLICK_DELAY));
             if (pressCount_ == 1) {
-                // 如果没有第二次按下，判定为单击
                 HandleQuickAccessMenu(SINGLE_CLICK);
                 MMI_HILOGI("X-key is single click.");
             }
         }).detach();
     } else if (pressCount_ == X_KEY_DOUBLE_CLICK_ENABLE_COUNT) {
-        // 如果按压次数为2次，判定为双击
         HandleQuickAccessMenu(DOUBLE_CLICK);
         MMI_HILOGI("X-key is double click.");
     }
+}
+
+bool XKeyEventProcessor::IsRemoveDelaySingleClick()
+{
+    std::string value = DOUBLE_CLICK_ENABLE_STATUS;
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .SettingDataShare::GetStringValue(X_KEY_DOUBLE_CLICK_ENABLE_KEY, value, SETTING_URI_USER_SECURE_PROXY);
+    if (ret != ERR_OK) {
+        MMI_HILOGI("Get value from settings db failed, ret:%{public}d", ret);
+        return false;
+    }
+    MMI_HILOGI("double click enable state:%{public}s", value.c_str());
+    return value == DOUBLE_CLICK_ENABLE_STATUS;
 }
 
 void XKeyEventProcessor::ResetCount()
@@ -211,6 +172,7 @@ void XKeyEventProcessor::ResetCount()
 int32_t XKeyEventProcessor::HandleQuickAccessMenu(int32_t xKeyEventType)
 {
     if (X_KEY_DOWN != xKeyEventType && X_KEY_UP != xKeyEventType) {
+        MMI_HILOGI("reset press count");
         ResetCount();
     }
     auto pointerEvent = PointerEvent::Create();
