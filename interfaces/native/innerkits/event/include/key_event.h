@@ -3134,6 +3134,14 @@ public:
      * @since 14
      */
     static const int32_t KEYCODE_DAGGER_LONG_PRESS;
+
+
+     /**
+     * Aod slide unlock
+     *
+     * @since 16
+     */
+    static const int32_t KEYCODE_AOD_SLIDE_UNLOCK;
 public:
     class KeyItem {
     public:

@@ -623,6 +623,18 @@
             "finalKey": 2067,
             "longPressTime": 0,
             "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 3219,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 3219,
+            "longPressTime": 0,
+            "triggerType": "up"
         }
     ]
 }
