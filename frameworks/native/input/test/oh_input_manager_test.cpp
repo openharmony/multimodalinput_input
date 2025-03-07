@@ -1613,7 +1613,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
     EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
     event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     ret = OH_Input_AddInputEventInterceptor(&callback, option);
-    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);  
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
 }
 } // namespace MMI
 } // namespace OHOS
