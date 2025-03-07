@@ -2080,7 +2080,7 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
                "XY:{%{private}d %{private}d} offsetXY:{%{private}d %{private}d} "
                "WH:{%{private}d %{private}d} validWH:{%{private}d %{private}d} "
                "direction:%{public}d,displayDirection:%{public}d,fixedDirection:%{public}d} "
-               "oneHandXY:{%{private}d %{private}d}"
+               "oneHandXY:{%{private}d %{private}d},"
                "pointerActiveWidth:%{private}d,pointerActiveHeight:%{private}d",
         displayInfo.id,
         displayInfo.name.c_str(),
