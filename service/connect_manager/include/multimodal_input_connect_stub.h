@@ -97,6 +97,8 @@ protected:
     int32_t StubUnsubscribeHotkey(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSubscribeTabletProximity(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnSubscribetabletProximity(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeLongPressEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeLongPressEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);

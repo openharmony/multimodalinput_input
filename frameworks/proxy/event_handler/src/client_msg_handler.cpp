@@ -51,6 +51,8 @@ void ClientMsgHandler::Init()
         { MmiMessageId::ON_SUBSCRIBE_SWITCH, [this] (const UDSClient &client, NetPacket &pkt) {
             return this->OnSubscribeSwitchEventCallback(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_SWITCH
+        { MmiMessageId::ON_SUBSCRIBE_TABLET, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnSubscribeTabletProximityCallback(client, pkt); }},
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         { MmiMessageId::ON_POINTER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->OnPointerEvent(client, pkt); }},
@@ -312,6 +314,25 @@ int32_t ClientMsgHandler::OnSubscribeSwitchEventCallback(const UDSClient &client
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.OnSubscribeSwitchEventCallback(switchEvent, subscribeId);
 }
 #endif
+
+int32_t ClientMsgHandler::OnSubscribeTabletProximityCallback(const UDSClient &client, NetPacket &pkt)
+{
+    auto pointerEvent = PointerEvent::Create();
+    int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointerEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Read net packet failed");
+        return RET_ERR;
+    }
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetAction());
+    int32_t fd = -1;
+    int32_t subscribeId = -1;
+    pkt >> fd >> subscribeId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
+    return TABLET_EVENT_INPUT_SUBSCRIBE_MGR.OnSubscribeTabletProximityCallback(pointerEvent, subscribeId);
+}
 
 int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 {

@@ -456,6 +456,20 @@ int32_t MultimodalInputConnectManager::UnsubscribeSwitchEvent(int32_t subscribeI
     return multimodalInputConnectService_->UnsubscribeSwitchEvent(subscribeId);
 }
 
+int32_t MultimodalInputConnectManager::SubscribeTabletProximity(int32_t subscribeId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SubscribeTabletProximity(subscribeId);
+}
+
+int32_t MultimodalInputConnectManager::UnsubscribetabletProximity(int32_t subscribeId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->UnsubscribetabletProximity(subscribeId);
+}
+
 int32_t MultimodalInputConnectManager::SubscribeLongPressEvent(int32_t subscribeId,
     const LongPressRequest &longPressRequest)
 {

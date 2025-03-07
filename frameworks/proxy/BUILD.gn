@@ -103,6 +103,7 @@ ohos_shared_library("libmmi-client") {
   innerapi_tags = [ "platformsdk" ]
   branch_protector_ret = "pac_ret"
 
+  sources += [ "event_handler/src/tablet_event_input_subscribe_manager.cpp" ]
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
   }
@@ -368,6 +369,7 @@ ohos_unittest("InputManagerImplTest") {
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/pre_monitor_manager.cpp",
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
+    "event_handler/src/tablet_event_input_subscribe_manager.cpp",
     "event_handler/test/input_manager_impl_test.cpp",
     "event_handler/test/pre_monitor_manager_test.cpp",
   ]

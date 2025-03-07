@@ -31,6 +31,8 @@
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "setting_datashare.h"
 #include "util_ex.h"
+#include "want.h"
+#include "tablet_subscriber_handler.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -93,6 +95,7 @@ void KeySubscriberHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent
 void KeySubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    TABLET_SCRIBER_HANDLER->HandleTabletEvent(pointerEvent);
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }

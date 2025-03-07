@@ -19,6 +19,8 @@
 #include "input_manager_impl.h"
 #include "mmi_client.h"
 #include "multimodal_input_connect_manager.h"
+#include "proto.h"
+#include "tablet_event_input_subscribe_manager.h"
 #include "pre_monitor_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -39,6 +41,7 @@ void OnConnected(const IfMMIClient& client)
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.OnConnected();
 #endif // OHOS_BUILD_ENABLE_SWITCH
+    TABLET_EVENT_INPUT_SUBSCRIBE_MGR.OnConnected();
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnConnected();
     PRE_MONITOR_MGR.OnConnected();
@@ -130,6 +133,20 @@ int32_t MultimodalEventHandler::UnsubscribeSwitchEvent(int32_t subscribeId)
     return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeSwitchEvent(subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
+
+int32_t MultimodalEventHandler::SubscribeTabletProximity(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeTabletProximity(subscribeId);
+}
+
+int32_t MultimodalEventHandler::UnsubscribetabletProximity(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribetabletProximity(subscribeId);
+}
 
 int32_t MultimodalEventHandler::SubscribeLongPressEvent(int32_t subscribeId,
     const LongPressRequest &longPressRequest)

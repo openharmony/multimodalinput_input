@@ -165,6 +165,24 @@ public:
      */
     void UnsubscribeSwitchEvent(int32_t subscriberId);
 
+ /**
+     * @brief Subscribes to the switch input event that meets a specific condition. When such an event occurs,
+     * the <b>callback</b> specified is invoked to process the event.
+     * @param callback Indicates the callback.
+     * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
+     * If the value is greater than or equal to <b>0</b>,
+     * the subscription is successful. Otherwise, the subscription fails.
+     * @since 14
+     */
+    int32_t SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback);
+
+    /**
+     * @brief Unsubscribes from a switch input event.
+     * @param subscriberId Indicates the subscription ID, which is the return value of <b>SubscribeKeyEvent</b>.
+     * @return void
+     * @since 14
+     */
+    void UnsubscribetabletProximity(int32_t subscriberId);
     /**
      * @brief Subscribes to the long-press event that meets a specific condition.
      * @param LongPressRequest Long-press event.

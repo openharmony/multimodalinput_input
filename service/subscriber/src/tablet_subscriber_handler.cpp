@@ -13,82 +13,52 @@
  * limitations under the License.
  */
 
-#include "switch_subscriber_handler.h"
-
+#include "tablet_subscriber_handler.h"
 #include <parameters.h>
-
+#include "bytrace_adapter.h"
+#include "define_multimodal.h"
 #include "dfx_hisysevent.h"
+#include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "net_packet.h"
+#include "proto.h"
 #include "util_ex.h"
+
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "SwitchSubscriberHandler"
+#define MMI_LOG_TAG "TabletSubscriberHandler"
 
 namespace OHOS {
 namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void SwitchSubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHKPV(keyEvent);
-    CHKPV(nextHandler_);
-    nextHandler_->HandleKeyEvent(keyEvent);
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+TabletSubscriberHandler::TabletSubscriberHandler() {}
+TabletSubscriberHandler::~TabletSubscriberHandler() {}
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
-void SwitchSubscriberHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void TabletSubscriberHandler::HandleTabletEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    CHKPV(nextHandler_);
-    nextHandler_->HandlePointerEvent(pointerEvent);
-}
-#endif // OHOS_BUILD_ENABLE_POINTER
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-void SwitchSubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHKPV(pointerEvent);
-    CHKPV(nextHandler_);
-    nextHandler_->HandleTouchEvent(pointerEvent);
-}
-#endif // OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_ENABLE_SWITCH
-void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
-{
-    CHKPV(switchEvent);
-    if (OnSubscribeSwitchEvent(switchEvent)) {
-        MMI_HILOGI("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
+    if (OnSubscribeTabletProximity(pointerEvent)) {
         return;
     }
-    CHKPV(nextHandler_);
-    nextHandler_->HandleSwitchEvent(switchEvent);
 }
-#endif // OHOS_BUILD_ENABLE_SWITCH
 
-int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType)
+int32_t TabletSubscriberHandler::SubscribeTabletProximity(SessionPtr sess, int32_t subscribeId)
 {
     CALL_INFO_TRACE;
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribeId");
         return RET_ERR;
     }
-    if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
-        MMI_HILOGE("Invalid switchType");
-        return RET_ERR;
-    }
     CHKPR(sess, ERROR_NULL_POINTER);
-
-    MMI_HILOGD("subscribeId:%{public}d switchType:%{public}d", subscribeId, switchType);
-    auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, switchType);
+    MMI_HILOGD("subscribeId:%{public}d", subscribeId);
+    auto subscriber = std::make_shared<Subscriber>(subscribeId, sess);
     InsertSubScriber(std::move(subscriber));
     InitSessionDeleteCallback();
     return RET_OK;
 }
 
-int32_t SwitchSubscriberHandler::UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId)
+int32_t TabletSubscriberHandler::UnsubscribetabletProximity(SessionPtr sess, int32_t subscribeId)
 {
     CALL_INFO_TRACE;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
@@ -98,42 +68,27 @@ int32_t SwitchSubscriberHandler::UnsubscribeSwitchEvent(SessionPtr sess, int32_t
             return RET_OK;
         }
     }
-    MMI_HILOGE("UnsubscribeSwitchEvent failed with %{public}d", subscribeId);
+    MMI_HILOGE("UnsubscribeTabletEvent failed with %{public}d", subscribeId);
     return RET_ERR;
 }
 
-bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent> switchEvent)
+bool TabletSubscriberHandler::OnSubscribeTabletProximity(std::shared_ptr<PointerEvent> pointerevent)
 {
-    CHKPF(switchEvent);
-    MMI_HILOGI("The switchValue:%{public}d", switchEvent->GetSwitchValue());
-    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
-        DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
-    }
-
+    CHKPF(pointerevent);
     bool handled = false;
     for (const auto &subscriber : subscribers_) {
-        if (subscriber->switchType_ == switchEvent->GetSwitchType() ||
-            (subscriber->switchType_ == SwitchEvent::SwitchType::SWITCH_DEFAULT &&
-                switchEvent->GetSwitchType() != SwitchEvent::SwitchType::SWITCH_PRIVACY)) {
+        if (pointerevent->GetPointerAction() == PointerEvent::POINTER_ACTION_PROXIMITY_IN ||
+            pointerevent->GetPointerAction() == PointerEvent::POINTER_ACTION_PROXIMITY_OUT) {
             MMI_HILOGI("The subscriber:%{public}d", subscriber->sess_->GetPid());
-            NotifySubscriber(switchEvent, subscriber);
+            NotifySubscriber(pointerevent, subscriber);
             handled = true;
         }
     }
-    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_PRIVACY) {
-        std::string value = OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "");
-        if (value.empty() || value == "false") {
-            OHOS::system::SetParameter(SUPER_PRIVACY_SWITCH, "true");
-        } else {
-            OHOS::system::SetParameter(SUPER_PRIVACY_SWITCH, "false");
-        }
-    }
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
-    MMI_HILOGD("SUPER_PRIVACY_SWITCH:%{public}s", OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "").c_str());
     return handled;
 }
 
-void SwitchSubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
+void TabletSubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
 {
     CALL_DEBUG_ENTER;
     CHKPV(subs);
@@ -147,7 +102,7 @@ void SwitchSubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
     subscribers_.push_back(subs);
 }
 
-void SwitchSubscriberHandler::OnSessionDelete(SessionPtr sess)
+void TabletSubscriberHandler::OnSessionDelete(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
@@ -160,24 +115,27 @@ void SwitchSubscriberHandler::OnSessionDelete(SessionPtr sess)
     }
 }
 
-void SwitchSubscriberHandler::NotifySubscriber(std::shared_ptr<SwitchEvent> switchEvent,
+void TabletSubscriberHandler::NotifySubscriber(std::shared_ptr<PointerEvent> pointerEvent,
                                                const std::shared_ptr<Subscriber> &subscriber)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(switchEvent);
+    CHKPV(pointerEvent);
     CHKPV(subscriber);
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
-    NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_SWITCH);
-    InputEventDataTransformation::SwitchEventToNetPacket(switchEvent, pkt);
+    NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_TABLET);
+    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
     if (subscriber->sess_ == nullptr) {
         MMI_HILOGE("Subscriber's sess is null");
         return;
     }
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
-    MMI_HILOGI("Notify subscriber id:%{public}d, switchValue:%{public}d, pid:%{public}d",
-        subscriber->id_, switchEvent->GetSwitchValue(), subscriber->sess_->GetPid());
+    MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d",
+        subscriber->id_, subscriber->sess_->GetPid());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
@@ -187,7 +145,7 @@ void SwitchSubscriberHandler::NotifySubscriber(std::shared_ptr<SwitchEvent> swit
     }
 }
 
-bool SwitchSubscriberHandler::InitSessionDeleteCallback()
+bool TabletSubscriberHandler::InitSessionDeleteCallback()
 {
     CALL_DEBUG_ENTER;
     if (callbackInitialized_) {
@@ -203,7 +161,7 @@ bool SwitchSubscriberHandler::InitSessionDeleteCallback()
     return true;
 }
 
-void SwitchSubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+void TabletSubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
