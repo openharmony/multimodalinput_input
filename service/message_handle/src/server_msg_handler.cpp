@@ -723,7 +723,8 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
             >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
             >> info.validWidth >> info.validHeight >> info.fixedDirection
             >> info.physicalWidth >> info.physicalHeight
-            >> info.oneHandX >> info.oneHandY;
+            >> info.oneHandX >> info.oneHandY
+            >> info.pointerActiveWidth >> info.pointerActiveHeight;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
