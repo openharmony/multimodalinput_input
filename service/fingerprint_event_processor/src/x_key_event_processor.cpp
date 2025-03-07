@@ -112,6 +112,7 @@ int32_t XKeyEventProcessor::AnalyseKeyEvent(struct libinput_event* event)
 
 void XKeyEventProcessor::InterceptXKeyDown()
 {
+    handledLongPress_ = false;
     HandleQuickAccessMenu(X_KEY_DOWN);
     auto currentTime = std::chrono::steady_clock::now();
     lastDownTime_ = currentTime;
@@ -119,7 +120,7 @@ void XKeyEventProcessor::InterceptXKeyDown()
     if (pressCount_ == 0) {
         std::thread([this, currentTime]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(LONG_PRESS_DELAY));
-            if (pressCount_ == 1 && lastDownTime_ == currentTime) {
+            if (pressCount_ == 1 && lastDownTime_ == currentTime && !handledLongPress_) {
                 HandleQuickAccessMenu(LONG_PRESS);
                 MMI_HILOGI("X-key is long press.");
             }
@@ -131,6 +132,7 @@ void XKeyEventProcessor::InterceptXKeyDown()
 
 void XKeyEventProcessor::InterceptXKeyUp()
 {
+    handledLongPress_ = true;
     HandleQuickAccessMenu(X_KEY_UP);
     if (pressCount_ == 1) {
         if (IsRemoveDelaySingleClick()) {
