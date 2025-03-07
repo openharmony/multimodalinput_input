@@ -103,6 +103,8 @@ public:
     virtual int32_t UnsubscribeHotkey(int32_t subscribeId) = 0;
     virtual int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) = 0;
     virtual int32_t UnsubscribeSwitchEvent(int32_t subscribeId) = 0;
+    virtual int32_t SubscribeTabletProximity(int32_t subscribeId) = 0;
+    virtual int32_t UnsubscribetabletProximity(int32_t subscribeId) = 0;
     virtual int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) = 0;
     virtual int32_t UnsubscribeLongPressEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) = 0;

@@ -151,6 +151,8 @@ enum class MultimodalinputConnectInterfaceCode {
 #ifdef OHOS_BUILD_ENABLE_ANCO
     CHECK_KNUCKLE_EVENT = 311,
 #endif // OHOS_BUILD_ENABLE_ANCO
+    SUBSCRIBE_TABLET_EVENT = 312,
+    UNSUBSCRIBE_TABLET_EVENT = 313,
 };
 
 enum class MultimodalinputEventObserverCode {

@@ -28,6 +28,7 @@
 #include "multimodal_input_connect_manager.h"
 #include "oh_input_manager.h"
 #include "pixel_map.h"
+#include "tablet_event_input_subscribe_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImpl"
@@ -416,6 +417,14 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
 #endif // OHOS_BUILD_ENABLE_SWITCH
 }
 
+int32_t InputManagerImpl::SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    CHKPR(callback, RET_ERR);
+    return TABLET_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeTabletProximity(callback);
+}
+
 int32_t InputManagerImpl::SubscribeLongPressEvent(const LongPressRequest &longPressRequest,
     std::function<void(LongPressEvent)> callback)
 {
@@ -441,6 +450,13 @@ void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)
 #else
     MMI_HILOGW("Switch device does not support");
 #endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
+void InputManagerImpl::UnsubscribetabletProximity(int32_t subscriberId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    TABLET_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribetabletProximity(subscriberId);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
