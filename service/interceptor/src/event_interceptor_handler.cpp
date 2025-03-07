@@ -328,6 +328,10 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
 #endif // OHOS_BUILD_EMULATOR
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
             interceptor.SendToClient(pointerEvent);
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+                    MMI_HILOGI("Action:%{public}d event was intercepted", pointerEvent->GetPointerAction());
+            }
             MMI_HILOGD("Pointer event was intercepted");
             isInterceptor = true;
             break;
