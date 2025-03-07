@@ -493,6 +493,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID):
             ret = StubSetMultiWindowScreenId(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_MONITOR):
+            ret = StubSubscribeKeyMonitor(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_MONITOR):
+            ret = StubUnsubscribeKeyMonitor(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -1599,6 +1605,46 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeHotkey(MessageParcel& data, M
     int32_t ret = UnsubscribeHotkey(subscribeId);
     if (ret != RET_OK) {
         MMI_HILOGE("UnsubscribeHotkey failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    KeyMonitorOption keyOption {};
+
+    if (!keyOption.Unmarshalling(data)) {
+        MMI_HILOGE("Read KeyMonitorOption failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    auto ret = SubscribeKeyMonitor(keyOption);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeKeyMonitor failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubUnsubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    KeyMonitorOption keyOption {};
+
+    if (!keyOption.Unmarshalling(data)) {
+        MMI_HILOGE("Read KeyMonitorOption failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    auto ret = UnsubscribeKeyMonitor(keyOption);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnsubscribeKeyMonitor failed, ret:%{public}d", ret);
     }
     return ret;
 }

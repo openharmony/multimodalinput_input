@@ -44,6 +44,8 @@ void ClientMsgHandler::Init()
             return this->OnKeyEvent(client, pkt); }},
         { MmiMessageId::ON_SUBSCRIBE_KEY, [this] (const UDSClient &client, NetPacket &pkt) {
             return this->OnSubscribeKeyEventCallback(client, pkt); }},
+        { MmiMessageId::ON_SUBSCRIBE_KEY_MONITOR, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnSubscribeKeyMonitor(client, pkt); }},
         { MmiMessageId::ON_PRE_KEY_EVENT, [this] (const UDSClient &client, NetPacket &pkt) {
             return this->OnPreKeyEvent(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -78,12 +80,10 @@ void ClientMsgHandler::Init()
         { MmiMessageId::WINDOW_STATE_ERROR_NOTIFY, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->NotifyWindowStateError(client, pkt); }},
         { MmiMessageId::SET_INPUT_DEVICE_ENABLED, [this] (const UDSClient& client, NetPacket& pkt) {
-            return this->OnSetInputDeviceAck(client, pkt); }},
-    };
+            return this->OnSetInputDeviceAck(client, pkt); }} };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
-            continue;
         }
     }
 }
@@ -291,6 +291,21 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
 
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
+}
+
+int32_t ClientMsgHandler::OnSubscribeKeyMonitor(const UDSClient &client, NetPacket &pkt)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Read net packet failed");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Key monitor(No:%{public}d, KC:%{private}d, KA:%{public}d)",
+        keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
+    return KeyEventInputSubscribeMgr.OnSubscribeKeyMonitor(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 

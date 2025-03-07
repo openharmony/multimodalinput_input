@@ -144,6 +144,28 @@ private:
     int32_t finalKeyUpDelay_ { 0 };
     bool isRepeat_ { true };
 };
+
+class KeyMonitorOption final {
+public:
+    KeyMonitorOption() = default;
+    ~KeyMonitorOption() = default;
+
+    int32_t GetKey() const;
+    int32_t GetAction() const;
+    bool IsRepeat() const;
+
+    void SetKey(int32_t key);
+    void SetAction(int32_t action);
+    void SetRepeat(bool repeat);
+
+    bool Marshalling(Parcel &parcel) const;
+    bool Unmarshalling(Parcel &parcel);
+
+private:
+    int32_t key_ {};
+    int32_t action_ {};
+    bool isRepeat_ {};
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_OPTION_H
