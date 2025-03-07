@@ -57,6 +57,7 @@ private:
 
     const std::string X_KEY_SOURCE_KEY { "fkey" };
     std::atomic_bool isStartedXkey_ { false };
+    std::atomic_bool handledLongPress_ { false };
 };
 #define XKeyEventHdr ::OHOS::DelayedSingleton<XKeyEventProcessor>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_X_KEY
