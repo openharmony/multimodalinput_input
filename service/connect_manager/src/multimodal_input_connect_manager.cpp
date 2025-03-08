@@ -1015,5 +1015,12 @@ int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomC
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCustomCursor(windowId, cursor, options);
 }
+
+int32_t MultimodalInputConnectManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+}
 } // namespace MMI
 } // namespace OHOS

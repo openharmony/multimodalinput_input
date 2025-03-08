@@ -79,6 +79,7 @@ public:
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
+    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
