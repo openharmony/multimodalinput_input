@@ -37,9 +37,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t ACCESSIBILITY_UID { 1103 };
-const std::string DEFAULT_KEYEVENT_INTERCEPT_WHITELIST =
-    "KEYCODE_ASSISTANT;KEYCODE_BRIGHTNESS_DOWN;KEYCODE_BRIGHTNESS_UP;KEYCODE_FN;KEYCODE_VOLUME_MUTE;KEYCODE_VOLUME_"
-    "DOWN;KEYCODE_VOLUME_UP;KEYCODE_MUTE;KEYCODE_SWITCHVIDEOMODE;KEYCODE_SEARCH;KEYCODE_MEDIA_RECORD;KEYCODE_INSERT;";
+const std::string DEFAULT_KEYEVENT_INTERCEPT_WHITELIST = "2722;41;40;0;22;17;16;23;2841;9;2089;2083;";
 } // namespace
 
 std::unique_ptr<std::string> EventInterceptorHandler::keyevent_intercept_whitelist = nullptr;
@@ -65,15 +63,13 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
             } else {
                 intercept_whitelist = DEFAULT_KEYEVENT_INTERCEPT_WHITELIST;
             }
-        } else {
-            intercept_whitelist = DEFAULT_KEYEVENT_INTERCEPT_WHITELIST;
         }
 
         keyevent_intercept_whitelist = std::make_unique<std::string>(intercept_whitelist);
         MMI_HILOGD("Initialize interception white list is %{public}s",
             keyevent_intercept_whitelist->c_str());
     }
-    std::string keyString = KeyEvent::KeyCodeToString(keyEvent->GetKeyCode());
+    std::string keyString = std::to_string(keyEvent->GetKeyCode());
     keyString += ";";
     bool isIntercept = keyevent_intercept_whitelist->find(keyString) == std::string::npos;
     MMI_HILOGD("Received key event is %{public}s  isIntercept is %{public}d",
