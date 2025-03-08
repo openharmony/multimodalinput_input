@@ -1080,17 +1080,17 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         std::lock_guard<std::mutex> lock(mtx_);
         screenPointers = screenPointers_;
     }
-    RenderConfig cfg {
-        .style = mouseStyle,
-        .align = MouseIcon2IconType(mouseStyle),
-        .path = mouseIcons_[mouseStyle].iconPath,
-        .color = GetPointerColor(),
-        .size = GetPointerSize(),
-        .direction = displayInfo_.direction,
-        .isHard = false,
-        .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
-    };
     for (auto it : screenPointers) {
+        RenderConfig cfg {
+            .style = mouseStyle,
+            .align = MouseIcon2IconType(mouseStyle),
+            .path = mouseIcons_[mouseStyle].iconPath,
+            .color = GetPointerColor(),
+            .size = GetPointerSize(),
+            .direction = displayInfo_.direction,
+            .isHard = false,
+            .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
+        };
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetRenderDPI();
         MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}u, dpi = %{public}f",
@@ -3211,9 +3211,10 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.isHard = isHard;
     cfg.dpi = sp->GetRenderDPI();
     cfg.direction = sp->IsMirror() ? DIRECTION0 : displayInfo_.direction;
-    float scale = sp->IsMirror() ? sp->GetScale() : 1.0f;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
+        float scale = sp->IsMirror() ? sp->GetScale() : 1.0f;
+        scale = (sp->IsExtend() && sp->GetIsCurrentOffScreenRendering()) ? sp->GetOffRenderScale() : scale;
         cfg.userIconPixelMap = GetUserIconCopy();
         cfg.userIconHotSpotX = userIconHotSpotX_ * scale;
         cfg.userIconHotSpotY = userIconHotSpotY_ * scale;
