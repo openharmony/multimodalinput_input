@@ -42,6 +42,7 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
+    bool CheckCapability(uint32_t deviceTags, std::shared_ptr<PointerEvent> event);
 private:
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
 private:

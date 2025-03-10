@@ -182,6 +182,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
             static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+        pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
         ret = UpdateMouseMoveLocation(displayInfo, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
             static_cast<int32_t>(deviceType));
     }
@@ -253,6 +254,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
     } else if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
         deviceTypeGlobal_ = DeviceType::DEVICE_FOLD_PC_VIRT;
+        pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, GetTouchpadSpeed(), deviceType);
         return ret;
@@ -418,6 +420,9 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         MMI_HILOGD("Touch pad is disable");
         return RET_ERR;
     }
+    
+    auto state = libinput_event_pointer_get_button_state(data);
+    HandleTouchPadButton(state, type);
 
     TransTouchpadRightButton(data, type, button);
 
@@ -432,7 +437,6 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         return RET_ERR;
     }
 
-    auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
         GetTouchpadRightClickType(switchTypeData);
@@ -473,6 +477,33 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     }
 #endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
+}
+
+void MouseTransformProcessor::HandleTouchPadButton(enum libinput_button_state state, int32_t type)
+{
+    if (state != LIBINPUT_BUTTON_STATE_PRESSED) {
+        return;
+    }
+    if (type != LIBINPUT_EVENT_POINTER_TAP && type != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        return;
+    }
+    CHKPV(pointerEvent_);
+    auto pressedButtons = pointerEvent_->GetPressedButtons();
+    if (pressedButtons.empty()) {
+        return;
+    }
+    MMI_HILOGW("touchpad button residue size:%{public}zu", pressedButtons.size());
+    for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
+        MMI_HILOGW("touchpad button residue id:%{public}d", *it);
+    }
+    std::shared_ptr<PointerEvent> cancelPointerEvent = std::make_shared<PointerEvent>(*pointerEvent_);
+    pointerEvent_->ClearButtonPressed();
+    CHKPV(cancelPointerEvent);
+    cancelPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    WIN_MGR->UpdateTargetPointer(cancelPointerEvent);
+    auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+    CHKPV(eventDispatchHandler);
+    eventDispatchHandler->HandlePointerEvent(cancelPointerEvent);
 }
 
 void MouseTransformProcessor::DeletePressedButton(uint32_t originButton)
@@ -1219,9 +1250,14 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         return;
     }
     MMI_HILOGD("Transform right button event, evenType:%d, switchType:%d, button:%d", evenType, switchType, button);
+    uint32_t btn = button;
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         button = pressedButton_;
+        if (button < MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE) {
+            MMI_HILOGE("button release from:%{public}d to :%{public}d, evenType:%{public}d, switchType:%{public}d",
+                button, btn, evenType, switchType);
+        }
         return;
     }
     switch (switchType) {
@@ -1242,6 +1278,10 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     }
     if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pressedButton_ = button;
+        if (button < MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE) {
+            MMI_HILOGE("button press from:%{public}d to :%{public}d, evenType:%{public}d, switchType:%{public}d",
+                button, btn, evenType, switchType);
+        }
     }
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
