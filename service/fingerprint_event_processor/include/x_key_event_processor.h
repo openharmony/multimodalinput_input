@@ -42,8 +42,6 @@ private:
     bool IsRemoveDelaySingleClick();
     // 按压次数
     std::atomic<int32_t> pressCount_ {0};
-    // 时间点记录
-    std::chrono::steady_clock::time_point lastDownTime_;
 
     // 定义时间间隔（单位：毫秒）
     static constexpr int32_t DOUBLE_CLICK_DELAY { 300 }; // 双击时间阈值
