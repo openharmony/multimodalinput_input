@@ -116,13 +116,11 @@ void XKeyEventProcessor::InterceptXKeyDown()
 {
     handledLongPress_ = false;
     HandleQuickAccessMenu(X_KEY_DOWN);
-    auto currentTime = std::chrono::steady_clock::now();
-    lastDownTime_ = currentTime;
 
     if (pressCount_ == 0) {
-        std::thread([this, currentTime]() {
+        std::thread([this]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(LONG_PRESS_DELAY));
-            if (pressCount_ == 1 && lastDownTime_ == currentTime && !handledLongPress_) {
+            if (pressCount_ == 1 && !handledLongPress_) {
                 HandleQuickAccessMenu(LONG_PRESS);
                 MMI_HILOGI("X-key is long press.");
             }
