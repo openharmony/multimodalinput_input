@@ -874,5 +874,10 @@ int32_t InputManager::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuc
 {
     return InputMgrImpl.CheckKnuckleEvent(pointX, pointY, isKnuckleType);
 }
+
+void InputManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    InputMgrImpl.SetMultiWindowScreenId(screenId, displayNodeScreenId);
+}
 } // namespace MMI
 } // namespace OHOS

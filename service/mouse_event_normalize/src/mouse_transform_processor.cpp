@@ -1250,9 +1250,14 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         return;
     }
     MMI_HILOGD("Transform right button event, evenType:%d, switchType:%d, button:%d", evenType, switchType, button);
+    uint32_t btn = button;
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         button = pressedButton_;
+        if (button < MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE) {
+            MMI_HILOGE("button release from:%{public}d to :%{public}d, evenType:%{public}d, switchType:%{public}d",
+                button, btn, evenType, switchType);
+        }
         return;
     }
     switch (switchType) {
@@ -1273,6 +1278,10 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     }
     if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pressedButton_ = button;
+        if (button < MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE) {
+            MMI_HILOGE("button press from:%{public}d to :%{public}d, evenType:%{public}d, switchType:%{public}d",
+                button, btn, evenType, switchType);
+        }
     }
 }
 #endif // OHOS_BUILD_ENABLE_WATCH

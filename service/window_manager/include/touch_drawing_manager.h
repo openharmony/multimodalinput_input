@@ -72,6 +72,11 @@ public:
     }
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
+    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+    {
+        windowScreenId_ = screenId;
+        displayNodeScreenId_ = displayNodeScreenId;
+    };
 
 private:
     void CreateObserver();
@@ -141,6 +146,8 @@ private:
     std::shared_ptr<DelegateInterface> delegateProxy_ {nullptr};
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
     std::mutex mutex_;
+    uint64_t windowScreenId_;
+    uint64_t displayNodeScreenId_;
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI
