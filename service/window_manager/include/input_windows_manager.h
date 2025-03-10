@@ -121,8 +121,8 @@ public:
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
-    bool IsMouseSimulate() const;
-    bool HasMouseHideFlag() const;
+    bool IsMouseSimulate();
+    bool HasMouseHideFlag();
     void UpdatePointerDrawingManagerWindowInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -473,6 +473,8 @@ private:
     int32_t lastDpi_ { 0 };
     bool isPullUpBefore_ { false };
     bool isInPullThrow_ { false };
+    std::shared_ptr<PointerEvent> GetlastPointerEvent();
+    std::mutex mtx_;
 };
 } // namespace MMI
 } // namespace OHOS

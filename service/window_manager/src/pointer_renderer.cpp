@@ -118,20 +118,7 @@ int32_t RenderConfig::GetOffsetY() const
 image_ptr_t PointerRenderer::UserIconScale(uint32_t width, uint32_t height, const RenderConfig &cfg)
 {
     image_ptr_t image = nullptr;
-    if (cfg.userIconFollowSystem) {
-        RenderConfig userIconCfg = cfg;
-        Media::ImageInfo imageInfo;
-        CHKPP(userIconCfg.userIconPixelMap);
-        userIconCfg.userIconPixelMap->GetImageInfo(imageInfo);
-        float xAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.width;
-        float yAxis = (float)userIconCfg.GetImageSize() / (float)imageInfo.size.height;
-        userIconCfg.userIconPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
-        userIconCfg.userIconHotSpotX = static_cast<int32_t>((float)userIconCfg.userIconHotSpotX * xAxis);
-        userIconCfg.userIconHotSpotY = static_cast<int32_t>((float)userIconCfg.userIconHotSpotY * yAxis);
-        image = ExtractDrawingImage(userIconCfg.userIconPixelMap);
-    } else {
-        image = ExtractDrawingImage(cfg.userIconPixelMap);
-    }
+    image = ExtractDrawingImage(cfg.userIconPixelMap);
     return image;
 }
 
@@ -164,7 +151,7 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
         canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
     }
     image_ptr_t image = nullptr;
-    if (cfg.style != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+    if (cfg.userIconPixelMap == nullptr) {
         image = LoadPointerImage(cfg);
     } else {
         image = UserIconScale(width, height, cfg);
