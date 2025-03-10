@@ -4931,7 +4931,6 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    MMI_HILOGD("Start checking vtp cursor active area");
     if (IsPointerActiveRectValid(*displayInfo)) {
         width = displayInfo->pointerActiveWidth;
         height = displayInfo->pointerActiveHeight;
@@ -4961,13 +4960,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
     MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{public}d, %{public}d}, "
                "cursorPosXY: {%{public}.2f, %{public}.2f} -> {%{public}.2f %{public}.2f}",
-        static_cast<int32_t>(isRealData),
-        displayId,
-        mouseLocation_.physicalX,
-        mouseLocation_.physicalY,
-        oldX, oldY,
-        cursorPos_.cursorPos.x,
-        cursorPos_.cursorPos.y);
+        static_cast<int32_t>(isRealData), displayId, mouseLocation_.physicalX, mouseLocation_.physicalY,
+        oldX, oldY, cursorPos_.cursorPos.x, cursorPos_.cursorPos.y);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
