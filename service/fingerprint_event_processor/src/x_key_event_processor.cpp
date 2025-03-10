@@ -16,7 +16,6 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <os_account_manager.h>
 #include "ability_manager_client.h"
 #include "system_ability_definition.h"
 #include "x_key_event_processor.h"
