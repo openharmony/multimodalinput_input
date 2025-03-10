@@ -23,6 +23,7 @@
 #include "input_event_handler.h"
 #include "setting_datashare.h"
 #include "pointer_event.h"
+#include "account_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -37,9 +38,10 @@ namespace {
     const std::string DOUBLE_CLICK_ENABLE_STATUS { "0" };
     const std::string X_KEY_APP_BUNDLE_NAME { "" };
     const std::string X_KEY_APP_ABILITY_NAME { "" };
-    const std::string SETTING_URI_USER_SECURE_PROXY {
-        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true"
+    const std::string SETTINGS_DATA_SECURE_PRE_URI {
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
     };
+    const std::string SETTINGS_DATA_SECURE_POST_URI { "?Proxy=true" };
     const int32_t X_KEY_DOUBLE_CLICK_ENABLE_COUNT { 2 };
 }
 
@@ -156,12 +158,11 @@ void XKeyEventProcessor::InterceptXKeyUp()
 bool XKeyEventProcessor::IsRemoveDelaySingleClick()
 {
     std::string value = DOUBLE_CLICK_ENABLE_STATUS;
-    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .SettingDataShare::GetStringValue(X_KEY_DOUBLE_CLICK_ENABLE_KEY, value, SETTING_URI_USER_SECURE_PROXY);
-    if (ret != ERR_OK) {
-        MMI_HILOGI("Get value from settings db failed, ret:%{public}d", ret);
-        return false;
-    }
+    int32_t userId = ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId();
+    std::string uri = SETTINGS_DATA_SECURE_PRE_URI + std::to_string(userId) + SETTINGS_DATA_SECURE_POST_URI;
+    MMI_HILOGI("settings data uri:%{public}s", uri.c_str());
+    SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .SettingDataShare::GetStringValue(X_KEY_DOUBLE_CLICK_ENABLE_KEY, value, uri);
     MMI_HILOGI("double click enable state:%{public}s", value.c_str());
     return value == DOUBLE_CLICK_ENABLE_STATUS;
 }
