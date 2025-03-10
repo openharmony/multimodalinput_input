@@ -68,6 +68,7 @@
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
 #include "setting_datashare.h"
+#include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "app_mgr_client.h"
 #include "running_process_info.h"
@@ -3681,5 +3682,11 @@ int32_t MMIService::SyncKnuckleStatus()
     return ret;
 }
 #endif
+
+int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
