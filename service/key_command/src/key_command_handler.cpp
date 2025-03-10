@@ -2639,7 +2639,7 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t targetWindowId = item.GetTargetWindowId();
     int32_t targetDisplayId = touchEvent->GetTargetDisplayId();
     auto window = WIN_MGR->GetWindowAndDisplayInfo(targetWindowId, targetDisplayId);
-    if (!window || window->windowType != WINDOW_INPUT_METHOD_TYPE) {
+    if (!window || (window->windowType != WINDOW_INPUT_METHOD_TYPE && window->windowType != WINDOW_SCREENSHOT_TYPE)) {
             return false;
     }
     return true;
