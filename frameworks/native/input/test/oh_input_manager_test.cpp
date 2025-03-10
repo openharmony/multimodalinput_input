@@ -1615,5 +1615,92 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
     ret = OH_Input_AddInputEventInterceptor(&callback, option);
     EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
 }
+
+/**
+ * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_001
+ * @tc.desc: Test the funcation PointerEventMonitorCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEventCallback callback;
+    callback = MouseEventCallback;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(SOURCE_TYPE_TOUCHSCREEN);
+    Input_Result ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetSourceType(SOURCE_TYPE_MOUSE);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_002
+ * @tc.desc: Test the funcation PointerEventMonitorCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEventCallback callback;
+    callback = MouseEventCallback;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(SOURCE_TYPE_TOUCHSCREEN);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    Input_Result ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_003
+ * @tc.desc: Test the funcation PointerEventMonitorCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEventCallback callback;
+    callback = MouseEventCallback;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(SOURCE_TYPE_TOUCHPAD);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    Input_Result ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
 } // namespace MMI
 } // namespace OHOS
