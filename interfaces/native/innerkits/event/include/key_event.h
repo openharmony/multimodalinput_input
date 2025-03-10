@@ -3135,7 +3135,6 @@ public:
      */
     static const int32_t KEYCODE_DAGGER_LONG_PRESS;
 
-
      /**
      * Aod slide unlock
      *
