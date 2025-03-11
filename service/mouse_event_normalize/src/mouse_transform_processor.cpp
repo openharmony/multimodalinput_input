@@ -696,7 +696,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     DeviceType deviceType = DeviceType::DEVICE_PC;
     if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
         deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
-        double speedAdjustCoef = 0.1;
+        double speedAdjustCoef = 1.0;
         axisValue = axisValue * speedAdjustCoef;
     } else {
         if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
