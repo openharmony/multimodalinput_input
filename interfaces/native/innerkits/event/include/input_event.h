@@ -16,11 +16,6 @@
 #ifndef INPUT_EVENT_H
 #define INPUT_EVENT_H
 
-#include <functional>
-#include <memory>
-#include <mutex>
-
-#include "nocopyable.h"
 #include "parcel.h"
 
 namespace OHOS {
@@ -126,6 +121,8 @@ public:
     static constexpr uint32_t EVENT_FLAG_GENERATE_FROM_REAL = 0x00000400;
     
     static constexpr uint32_t EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH = 0x00000600;
+
+    static constexpr uint32_t EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER = 0x00001000;
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
      *

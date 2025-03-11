@@ -16,7 +16,6 @@
 #define INPUT_SCREEN_CAPTURE_MONITOR_LISTENER_H
 
 #include "screen_capture_monitor.h"
-#include "util.h"
 
 namespace OHOS {
 namespace MMI {

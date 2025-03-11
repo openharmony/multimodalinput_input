@@ -16,14 +16,9 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_PROXY_H
 #define MULTIMODAL_INPUT_CONNECT_PROXY_H
 
-#include "iremote_object.h"
 #include "iremote_proxy.h"
-#include "nocopyable.h"
-#include "system_ability.h"
 
 #include "i_multimodal_input_connect.h"
-#include "mmi_event_observer.h"
-#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {
@@ -168,6 +163,7 @@ public:
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
+    int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

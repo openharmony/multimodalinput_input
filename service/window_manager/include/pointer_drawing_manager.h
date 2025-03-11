@@ -16,19 +16,8 @@
 #ifndef POINTER_DRAWING_MANAGER_H
 #define POINTER_DRAWING_MANAGER_H
 
-#include <iostream>
-#include <list>
-
-#include "common/rs_thread_handler.h"
-#include "draw/canvas.h"
-#include "event_handler.h"
-#include "nocopyable.h"
-#include "pixel_map.h"
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
-#include "ui/rs_canvas_node.h"
-#include "ui/rs_surface_node.h"
-#include "window.h"
 
 #include "device_observer.h"
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -38,10 +27,7 @@
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
-#include "pointer_renderer.h"
 #include "screen_pointer.h"
-#include "setting_observer.h"
-#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -74,7 +60,7 @@ public:
     using callback_t = std::function<void(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &)>;
     explicit ScreenModeChangeListener(callback_t func): callback_(func) {}
     virtual ~ScreenModeChangeListener() = default;
-    
+
     void NotifyScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens) override
     {
         return callback_(screens);
@@ -86,9 +72,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 class DelegateInterface;
-class PointerDrawingManager final : public IPointerDrawingManager,
-                                    public IDeviceObserver,
-                                    public std::enable_shared_from_this<PointerDrawingManager> {
+class PointerDrawingManager final : public IPointerDrawingManager, public IDeviceObserver {
 public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
@@ -157,6 +141,12 @@ int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
     int32_t displayId, int32_t physicalX, int32_t physicalY) override;
 
 private:
+    struct PixelMapInfo {
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
+        int32_t imageWidth { 0 };
+        int32_t imageHeight { 0 };
+        int32_t pointerColor { 0 };
+    };
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
     void GetPreferenceKey(std::string &name);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
@@ -201,8 +191,8 @@ private:
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
-    int32_t UpdateLoadingAndLoadingRightPixelMap();
-    void InitLoadingAndLoadingRightPixelMap();
+    int32_t ReloadPixelMaps(std::map<MOUSE_ICON, PixelMapInfo>& mousePixelMap, int32_t pointerColor);
+    void InitPixelMaps();
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -237,6 +227,7 @@ private:
     int32_t DrawHardCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
     std::shared_ptr<ScreenPointer> GetScreenPointer(uint32_t screenId);
+    void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
     void HardwareCursorRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
@@ -256,12 +247,6 @@ private:
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };
-    };
-    struct loadingAndLoadingPixelMapInfo {
-        std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
-        int32_t imageWidth { 0 };
-        int32_t imageHeight { 0 };
-        int32_t pointerColor { 0 };
     };
     bool hasDisplay_ { false };
     DisplayInfo displayInfo_ {};
@@ -322,7 +307,8 @@ private:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
-    std::map<MOUSE_ICON, loadingAndLoadingPixelMapInfo> mousePixelMap_;
+    std::map<MOUSE_ICON, PixelMapInfo> mousePixelMap_;
+    std::mutex mousePixelMapMutex_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
     int releaseFence_ { -1 };
     bool followSystem_ { false };

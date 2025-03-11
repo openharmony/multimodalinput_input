@@ -18,20 +18,12 @@
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 #include "animation/rs_particle_params.h"
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-#include "image/bitmap.h"
-#include "image_source.h"
-#include "image_type.h"
-#include "image_utils.h"
 #ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
 #else
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
-
-#include "define_multimodal.h"
 #include "i_multimodal_input_connect.h"
-#include "mmi_log.h"
-#include "parameters.h"
 #include "setting_datashare.h"
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 #include "timer_manager.h"

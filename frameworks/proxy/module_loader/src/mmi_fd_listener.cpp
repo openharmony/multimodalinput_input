@@ -15,11 +15,6 @@
 
 #include "mmi_fd_listener.h"
 
-#include <cinttypes>
-
-#include "config_multimodal.h"
-#include "mmi_log.h"
-#include "stream_buffer.h"
 #include "uds_socket.h"
 
 #undef MMI_LOG_TAG

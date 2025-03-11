@@ -16,7 +16,6 @@
 #include "input_monitor_manager.h"
 
 #include "multimodal_input_connect_manager.h"
-#include "util.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputMonitorManager"

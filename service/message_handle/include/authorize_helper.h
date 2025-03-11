@@ -16,12 +16,6 @@
 #ifndef AUTHORIZE_HELPER_H
 #define AUTHORIZE_HELPER_H
 
-#include <atomic>
-#include <mutex>
-#include <memory>
-#include <functional>
-
-#include "nocopyable.h"
 #include "client_death_handler.h"
 
 namespace OHOS {

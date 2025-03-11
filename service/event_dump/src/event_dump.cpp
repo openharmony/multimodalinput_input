@@ -17,16 +17,6 @@
 
 #include <getopt.h>
 
-#include <climits>
-#include <cstdarg>
-#include <cstring>
-
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include "event_interceptor_handler.h"
-#include "event_monitor_handler.h"
 #include "event_statistic.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
@@ -38,14 +28,10 @@
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "key_subscriber_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#include "mouse_event_normalize.h"
-#include "switch_subscriber_handler.h"
-#include "securec.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "util_ex.h"
-#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER

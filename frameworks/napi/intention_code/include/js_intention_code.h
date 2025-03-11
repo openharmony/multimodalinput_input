@@ -16,7 +16,6 @@
 #ifndef JS_INTENTION_CODE
 #define JS_INTENTION_CODE
 
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 

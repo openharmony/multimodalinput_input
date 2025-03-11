@@ -17,14 +17,9 @@
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "iremote_stub.h"
-#include "message_parcel.h"
-#include "nocopyable.h"
 
 #include "i_multimodal_input_connect.h"
-#include "mmi_event_observer.h"
-#include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
-#include "multimodal_input_connect_define.h"
 
 namespace OHOS {
 namespace MMI {
@@ -182,6 +177,7 @@ protected:
     int32_t StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply);
     int32_t StubShiftAppPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCustomMouseCursor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetMultiWindowScreenId(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

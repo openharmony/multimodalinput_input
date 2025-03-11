@@ -16,8 +16,6 @@
 #ifndef MMI_TRANSFORM_H
 #define MMI_TRANSFORM_H
 
-#include <vector>
-
 #include "window_info.h"
 
 namespace OHOS {

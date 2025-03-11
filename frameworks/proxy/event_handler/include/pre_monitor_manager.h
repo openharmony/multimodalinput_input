@@ -16,13 +16,9 @@
 #ifndef PRE_MONITOR_MANAGER_H
 #define PRE_MONITOR_MANAGER_H
 
-#include <limits>
 #include <map>
-#include <mutex>
-#include <iterator>
 #include "singleton.h"
 
-#include "input_handler_type.h"
 #include "i_input_event_consumer.h"
 
 namespace OHOS {

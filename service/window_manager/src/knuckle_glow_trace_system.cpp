@@ -15,7 +15,6 @@
 
 #include "knuckle_glow_trace_system.h"
 
-#include "include/core/SkPathMeasure.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG

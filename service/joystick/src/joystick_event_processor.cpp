@@ -20,7 +20,6 @@
 #include "key_map_manager.h"
 #include "key_event_normalize.h"
 #include "key_unicode_transformation.h"
-#include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH

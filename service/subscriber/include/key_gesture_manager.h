@@ -16,12 +16,6 @@
 #ifndef KEY_GESTURE_MANAGER_H
 #define KEY_GESTURE_MANAGER_H
 
-#include <functional>
-#include <set>
-#include <sstream>
-
-#include <nocopyable.h>
-
 #include "key_event.h"
 #include "key_option.h"
 

@@ -16,12 +16,6 @@
 #ifndef EVENT_FILTER_HANDLER_H
 #define EVENT_FILTER_HANDLER_H
 
-#include <memory>
-#include <mutex>
-#include <queue>
-
-#include "nocopyable.h"
-
 #include "event_filter_death_recipient.h"
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
@@ -48,6 +42,7 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
+    bool CheckCapability(uint32_t deviceTags, std::shared_ptr<PointerEvent> event);
 private:
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
 private:

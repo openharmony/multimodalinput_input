@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,15 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
 #include "js_input_monitor.h"
 
-#include <cinttypes>
-
-#include "securec.h"
-
 #include "define_multimodal.h"
-#include "error_multimodal.h"
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
 #include "js_gesture_event.h"
@@ -524,6 +519,7 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 }
 
 MapFun JsInputMonitor::GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent)
+    __attribute__((no_sanitize("cfi")))
 {
     MapFun mapFunc;
     mapFunc["id"] = [inputEvent] { return inputEvent->GetId(); };
@@ -1924,11 +1920,8 @@ void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     }
     CHKPV(monitor_);
     CHKPV(keyEvent);
-    {
-        std::lock_guard<std::mutex> guard(mutex_);
-        preEvQueue_.push(keyEvent);
-    }
-    if (!preEvQueue_.empty()) {
+    preEvQueue_.Push(keyEvent);
+    if (!preEvQueue_.Empty()) {
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
@@ -1984,9 +1977,9 @@ void JsInputMonitor::OnKeyEventInJsThread(const std::string &typeName)
     }
     CHKPV(jsEnv_);
     CHKPV(receiver_);
-    while (!preEvQueue_.empty()) {
-        auto keyEventItem = preEvQueue_.front();
-        preEvQueue_.pop();
+    while (!preEvQueue_.Empty()) {
+        auto keyEventItem = preEvQueue_.Front();
+        preEvQueue_.Pop();
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);

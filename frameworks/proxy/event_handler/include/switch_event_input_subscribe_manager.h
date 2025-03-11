@@ -16,9 +16,7 @@
 #ifndef SWITCH_EVENT_INPUT_SUBSCRIBE_MANAGER_H
 #define SWITCH_EVENT_INPUT_SUBSCRIBE_MANAGER_H
 
-#include <functional>
 #include <map>
-#include <memory>
 
 #include <singleton.h>
 

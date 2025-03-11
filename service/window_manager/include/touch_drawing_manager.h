@@ -72,9 +72,13 @@ public:
     }
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
+    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+    {
+        windowScreenId_ = screenId;
+        displayNodeScreenId_ = displayNodeScreenId;
+    };
 
 private:
-    void PreloadDrawingResources();
     void CreateObserver();
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
         bool isNeedRotate = true);
@@ -125,6 +129,7 @@ private:
     int32_t scaleW_ { 0 };
     int32_t scaleH_ { 0 };
     int64_t lastActionTime_ { 0 };
+    uint64_t screenId_ { -1 };
     double xVelocity_ { 0.0 };
     double yVelocity_ { 0.0 };
     double pressure_ { 0.0 };
@@ -141,6 +146,8 @@ private:
     std::shared_ptr<DelegateInterface> delegateProxy_ {nullptr};
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
     std::mutex mutex_;
+    uint64_t windowScreenId_;
+    uint64_t displayNodeScreenId_;
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI

@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-#include <list>
-
+#include "audio_stream_manager.h"
 #include "define_multimodal.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+#include "error_multimodal.h"
 #include "input_screen_capture_monitor_listener.h"
-#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputScreenCapture"
@@ -47,6 +49,38 @@ extern "C" void RegisterListener(ScreenCaptureCallback callback)
     }
     g_screenCaptureMonitorListener->SetScreenCaptureCallback(callback);
     Media::ScreenCaptureMonitor::GetInstance()->RegisterScreenCaptureMonitorListener(g_screenCaptureMonitorListener);
+}
+
+extern "C" bool IsMusicActivate()
+{
+    CALL_INFO_TRACE;
+    std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    auto begin = std::chrono::high_resolution_clock::now();
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+    auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - begin).count();
+    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_CUR_RENDERER_CHANGE_INFOS, durationMS);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
+        return false;
+    }
+    if (rendererChangeInfo.empty()) {
+        MMI_HILOGI("Music info empty");
+        return false;
+    }
+    for (const auto &info : rendererChangeInfo) {
+        if (info->rendererState == AudioStandard::RENDERER_RUNNING &&
+            (info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
+            info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
+            MMI_HILOGI("Find music activate");
+            return true;
+        }
+    }
+    return false;
 }
 #endif
 }

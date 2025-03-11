@@ -16,16 +16,11 @@
 #ifndef INPUT_WINDOWS_MANAGER_H
 #define INPUT_WINDOWS_MANAGER_H
 
-#include <vector>
-
 #include "mmi_transform.h"
-#include "nocopyable.h"
-#include "pixel_map.h"
 #include "window_manager_lite.h"
 
 #include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
-#include "input_event_data_transformation.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_manager.h"
 #include "knuckle_dynamic_drawing_manager.h"
@@ -126,8 +121,8 @@ public:
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
-    bool IsMouseSimulate() const;
-    bool HasMouseHideFlag() const;
+    bool IsMouseSimulate();
+    bool HasMouseHideFlag();
     void UpdatePointerDrawingManagerWindowInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -326,6 +321,9 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
     void HandleGestureInjection(bool gestureInject);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdateTargetTouchWinIds(const WindowInfo &item, PointerEvent::PointerItem &pointerItem,
+        std::shared_ptr<PointerEvent> pointerEvent, int32_t pointerId, int32_t displayId);
+    void ClearMismatchTypeWinIds(int32_t pointerId, int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -391,6 +389,9 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     bool CancelTouch(int32_t touch);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool IsPointerActiveRectValid(const DisplayInfo &currentDisplay);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 private:
     UDSServer* udsServer_ { nullptr };
@@ -420,6 +421,7 @@ private:
     std::weak_ptr<TouchGestureManager> touchGestureMgr_;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     DisplayGroupInfo displayGroupInfoTmp_;
+    std::mutex tmpInfoMutex_;
     DisplayGroupInfo displayGroupInfo_;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     PointerStyle lastPointerStyle_ {.id = -1};
@@ -471,6 +473,8 @@ private:
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
     int32_t lastDpi_ { 0 };
+    std::shared_ptr<PointerEvent> GetlastPointerEvent();
+    std::mutex mtx_;
 };
 } // namespace MMI
 } // namespace OHOS

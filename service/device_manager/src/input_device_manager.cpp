@@ -16,23 +16,13 @@
 #include "input_device_manager.h"
 
 #include <linux/input.h>
-#include <parameters.h>
 #include <regex>
-#include <unordered_map>
 
-#include "dfx_hisysevent.h"
-#include "event_dispatch_handler.h"
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
 #include "key_auto_repeat.h"
-#include "key_event_normalize.h"
-#include "key_event_value_transformation.h"
-#include "key_map_manager.h"
-#include "net_packet.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
-#include "proto.h"
 #include "util_ex.h"
 #include "dfx_hisysevent_device.h"
 

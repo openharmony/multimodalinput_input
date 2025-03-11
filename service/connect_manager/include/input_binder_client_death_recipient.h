@@ -17,7 +17,6 @@
 #define INPUT_BINDER_CLIENT_DEATH_RECIPIENT_H
 
 #include "iremote_broker.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {

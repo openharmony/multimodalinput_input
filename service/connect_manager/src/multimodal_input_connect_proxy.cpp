@@ -15,18 +15,10 @@
 
 #include "multimodal_input_connect_proxy.h"
 
-#include <unistd.h>
-
-#include "message_option.h"
 #include "pixel_map.h"
-#include "string_ex.h"
 
-#include "infrared_frequency_info.h"
-#include "input_scene_board_judgement.h"
-#include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
 #include "multimodal_input_connect_def_parcel.h"
-#include "multimodal_input_connect_define.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -2869,6 +2861,30 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t windowId, CustomCur
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     } else {
         READINT32(reply, ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEUINT64(data, screenId, ERR_INVALID_VALUE);
+    WRITEUINT64(data, displayNodeScreenId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
     return ret;
 }

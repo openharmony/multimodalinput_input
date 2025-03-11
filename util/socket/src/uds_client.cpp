@@ -15,8 +15,6 @@
  
 #include "uds_client.h"
 
-#include "util.h"
-
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "UDSClient"
 

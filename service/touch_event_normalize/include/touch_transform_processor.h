@@ -16,11 +16,8 @@
 #ifndef TOUCH_TRANSFORM_PROCESSOR_H
 #define TOUCH_TRANSFORM_PROCESSOR_H
 
-#include "nocopyable.h"
-
 #include "aggregator.h"
 #include "fingersense_manager.h"
-#include "struct_multimodal.h"
 #include "timer_manager.h"
 #include "transform_processor.h"
 
@@ -38,6 +35,7 @@ private:
     bool OnEventTouchDown(struct libinput_event *event);
     bool OnEventTouchMotion(struct libinput_event *event);
     bool OnEventTouchUp(struct libinput_event *event);
+    bool OnEventTouchCancel(struct libinput_event *event);
     int32_t GetTouchToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchToolType(struct libinput_device *device);
     void TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem);

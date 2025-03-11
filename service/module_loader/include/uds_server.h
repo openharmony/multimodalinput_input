@@ -16,14 +16,6 @@
 #ifndef UDS_SERVER_H
 #define UDS_SERVER_H
 
-#include <functional>
-#include <list>
-#include <map>
-#include <mutex>
-
-#include "nocopyable.h"
-
-#include "circle_stream_buffer.h"
 #include "uds_socket.h"
 
 #include "i_uds_server.h"

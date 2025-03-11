@@ -15,46 +15,20 @@
 
 #include "key_command_handler.h"
 
-#include <ostream>
-#include <sstream>
-
-#include "cJSON.h"
-#include "config_policy_utils.h"
-#include "file_ex.h"
-#include "system_ability_definition.h"
-
 #include "ability_manager_client.h"
-#include "audio_stream_manager.h"
-#include "bytrace_adapter.h"
-#include "define_multimodal.h"
 #include "device_event_monitor.h"
-#include "dfx_hisysevent.h"
-#include "display_event_monitor.h"
-#include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
-#include "input_event_data_transformation.h"
-#include "input_event_handler.h"
-#include "i_input_windows_manager.h"
-#include "i_preference_manager.h"
+#include "input_screen_capture_agent.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_command_handler_util.h"
 #include "long_press_subscriber_handler.h"
-#include "mmi_log.h"
-#include "nap_process.h"
-#include "net_packet.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
-#include "proto.h"
-#include "setting_datashare.h"
 #include "stylus_key_handler.h"
-#include "table_dump.h"
-#include "timer_manager.h"
-#include "util.h"
-#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -1647,32 +1621,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
 
 bool KeyCommandHandler::IsMusicActivate()
 {
-    CALL_INFO_TRACE;
-    std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
-    auto begin = std::chrono::high_resolution_clock::now();
-    auto ret = AudioStandard::AudioStreamManager::GetInstance()->GetCurrentRendererChangeInfos(rendererChangeInfo);
-    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::high_resolution_clock::now() - begin).count();
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::GET_CUR_RENDERER_CHANGE_INFOS, durationMS);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
-    if (ret != ERR_OK) {
-        MMI_HILOGE("Check music activate failed, errnoCode is %{public}d", ret);
-        return false;
-    }
-    if (rendererChangeInfo.empty()) {
-        MMI_HILOGI("Music info empty");
-        return false;
-    }
-    for (const auto &info : rendererChangeInfo) {
-        if (info->rendererState == AudioStandard::RENDERER_RUNNING &&
-            (info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
-            info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
-            MMI_HILOGI("Find music activate");
-            return true;
-        }
-    }
-    return false;
+    return InputScreenCaptureAgent::GetInstance().IsMusicActivate();
 }
 
 void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)
@@ -2690,7 +2639,7 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t targetWindowId = item.GetTargetWindowId();
     int32_t targetDisplayId = touchEvent->GetTargetDisplayId();
     auto window = WIN_MGR->GetWindowAndDisplayInfo(targetWindowId, targetDisplayId);
-    if (!window || window->windowType != WINDOW_INPUT_METHOD_TYPE) {
+    if (!window || (window->windowType != WINDOW_INPUT_METHOD_TYPE && window->windowType != WINDOW_SCREENSHOT_TYPE)) {
             return false;
     }
     return true;

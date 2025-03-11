@@ -16,8 +16,6 @@
 #include "infrared_emitter_controller.h"
 
 #include <dlfcn.h>
-#include <memory>
-#include <mutex>
 
 #include "mmi_log.h"
 

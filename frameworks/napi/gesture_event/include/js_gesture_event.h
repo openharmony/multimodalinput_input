@@ -15,8 +15,6 @@
 
 #ifndef JS_GESTURE_EVENT
 #define JS_GESTURE_EVENT
-
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 

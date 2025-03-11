@@ -16,8 +16,6 @@
 #include "touch_gesture_adapter.h"
 
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
-#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

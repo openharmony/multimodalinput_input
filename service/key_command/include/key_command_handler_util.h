@@ -18,25 +18,15 @@
 
 #include "cJSON.h"
 #include "config_policy_utils.h"
-#include "file_ex.h"
 #include "system_ability_definition.h"
 
-#include "ability_manager_client.h"
 #include "bytrace_adapter.h"
-#include "define_multimodal.h"
 #include "dfx_hisysevent.h"
 #include "display_event_monitor.h"
-#include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "i_preference_manager.h"
-#include "key_command_handler.h"
-#include "mmi_log.h"
-#include "nap_process.h"
-#include "net_packet.h"
-#include "proto.h"
 #include "setting_datashare.h"
-#include "timer_manager.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_TAG
@@ -78,6 +68,7 @@ constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
 constexpr int32_t LONG_ABILITY_START_DELAY = 2000;
 constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
+constexpr int32_t WINDOW_SCREENSHOT_TYPE = 2123;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";

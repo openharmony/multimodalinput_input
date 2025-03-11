@@ -16,18 +16,11 @@
 #ifndef INPUT_EVENT_HANDLER_H
 #define INPUT_EVENT_HANDLER_H
 
-#include <memory>
-#include <vector>
-
-#include "singleton.h"
-
 #include "event_dispatch_handler.h"
 #include "event_filter_handler.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
 #include "event_normalize_handler.h"
-#include "i_event_filter.h"
-#include "i_input_event_handler.h"
 #include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #ifdef OHOS_BUILD_ENABLE_POINTER

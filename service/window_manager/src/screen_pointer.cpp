@@ -14,11 +14,8 @@
  */
 #include "screen_pointer.h"
 
-#include "i_preference_manager.h"
 #include "define_multimodal.h"
 #include "transaction/rs_transaction.h"
-#include "bytrace_adapter.h"
-#include "dm_common.h"
 #include "transaction/rs_interfaces.h"
 
 #undef MMI_LOG_DOMAIN
@@ -180,6 +177,10 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     mode_ = si->GetSourceMode();
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
+    if (IsExtend()) {
+        surfaceNode_->AttachToDisplay(screenId_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
     MMI_HILOGI("Update with ScreenInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
@@ -255,8 +256,8 @@ void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y)
     // 坐标轴绕原点旋转 再平移
     int32_t tmpX = x;
     int32_t tmpY = y;
-    int32_t width = width_;
-    int32_t height = height_;
+    int32_t width = static_cast<int32_t>(width_);
+    int32_t height = static_cast<int32_t>(height_);
     if (IsMirror()) {
         height -= paddingTop_ * NUM_TWO;
         width -= paddingLeft_ * NUM_TWO;
@@ -329,22 +330,18 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     int32_t px = 0;
     int32_t py = 0;
     if (IsMirror()) {
-        // 镜像屏图层放在左上角
-    } else if (IsExtend()) {
-        px = x - FOCUS_POINT;
-        py = y - FOCUS_POINT;
-    } else {
-        // rotation_代表的是屏幕坐标系 即多模坐标系 逆时针
+        CalculateHwcPositionForMirror(x, y);
+    } else if (!IsExtend()) {
         Rotate(rotation_, x, y);
-        px = x - FOCUS_POINT;
-        py = y - FOCUS_POINT;
     }
+    px = x - FOCUS_POINT;
+    py = y - FOCUS_POINT;
 
     if (!IsMirror()) {
         int64_t nodeId = surfaceNode_->GetId();
         Rosen::RSInterfaces::GetInstance().SetHwcNodeBounds(nodeId, px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     } else {
-        surfaceNode_->SetBounds(px, py, DEFAULT_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
+        surfaceNode_->SetBounds(px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     }
     
     return true;

@@ -16,12 +16,7 @@
 #ifndef KEY_EVENT_H
 #define KEY_EVENT_H
 
-#include <memory>
-#include <vector>
-#include <set>
-
-#include "nocopyable.h"
-#include "parcel.h"
+#include <optional>
 
 #include "input_event.h"
 
@@ -3139,6 +3134,13 @@ public:
      * @since 14
      */
     static const int32_t KEYCODE_DAGGER_LONG_PRESS;
+
+     /**
+     * Aod slide unlock
+     *
+     * @since 16
+     */
+    static const int32_t KEYCODE_AOD_SLIDE_UNLOCK;
 public:
     class KeyItem {
     public:

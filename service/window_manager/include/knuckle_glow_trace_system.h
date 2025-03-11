@@ -16,14 +16,6 @@
 #ifndef KNUCKLE_GLOW_TRACE_SYSTEM_H
 #define KNUCKLE_GLOW_TRACE_SYSTEM_H
 
-#include <vector>
-
-#include "draw/canvas.h"
-#include "image/bitmap.h"
-#include "include/core/SkPath.h"
-#include "pipeline/rs_recording_canvas.h"
-#include "render/rs_pixel_map_util.h"
-
 #include "knuckle_divergent_point.h"
 #include "knuckle_glow_point.h"
 

@@ -16,19 +16,10 @@
 #ifndef INPUT_MANAGER_IMPL_H
 #define INPUT_MANAGER_IMPL_H
 
-#include <list>
-#include <vector>
-
-#include "singleton.h"
-
-#include "net_packet.h"
-
 #include "event_filter_service.h"
-#include "event_handler.h"
 #include "extra_data.h"
 #include "i_anco_channel.h"
 #include "i_anr_observer.h"
-#include "i_input_event_consumer.h"
 #include "i_input_service_watcher.h"
 #include "i_window_checker.h"
 #include "if_mmi_client.h"
@@ -44,11 +35,8 @@
 #include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "nap_process.h"
-#include "pointer_event.h"
 #include "pointer_style.h"
-#include "switch_event.h"
 #include "touchpad_control_display_gain.h"
-#include "window_info.h"
 #include "shift_info.h"
 
 namespace OHOS {
@@ -91,6 +79,7 @@ public:
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
+    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -280,9 +269,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_ANCO
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    void UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;

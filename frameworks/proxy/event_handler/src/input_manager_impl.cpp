@@ -15,27 +15,19 @@
 
 #include "input_manager_impl.h"
 
-#include <cinttypes>
-#include <unistd.h>
-#include <parameters.h>
 #include <regex>
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "anco_channel.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
 #include "anr_handler.h"
 #include "bytrace_adapter.h"
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-#include "event_filter_service.h"
 #include "event_log_helper.h"
-#include "input_scene_board_judgement.h"
 #include "long_press_event_subscribe_manager.h"
-#include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "oh_input_manager.h"
 #include "pixel_map.h"
-#include "switch_event_input_subscribe_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImpl"
@@ -432,7 +424,7 @@ int32_t InputManagerImpl::SubscribeLongPressEvent(const LongPressRequest &longPr
     CHKPR(callback, RET_ERR);
     return LONG_PRESS_EVENT_SUBSCRIBE_MGR.SubscribeLongPressEvent(longPressRequest, callback);
 }
- 
+
 void InputManagerImpl::UnsubscribeLongPressEvent(int32_t subscriberId)
 {
     CALL_INFO_TRACE;
@@ -538,9 +530,6 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    UpdateDisplayXYInOneHandMode(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
@@ -571,29 +560,6 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         pointerEvent->GetPointerId());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-void InputManagerImpl::UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHKPV(pointerEvent);
-    if (pointerEvent->GetFixedMode() != PointerEvent::FixedMode::ONE_HAND) {
-        MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
-            static_cast<int32_t>(pointerEvent->GetFixedMode()), pointerEvent->GetFixedModeStr().c_str());
-        return;
-    }
-    MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
-        static_cast<int32_t>(pointerEvent->GetFixedMode()), pointerEvent->GetFixedModeStr().c_str());
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return;
-    }
-    pointerItem.SetDisplayX(pointerItem.GetFixedDisplayX());
-    pointerItem.SetDisplayY(pointerItem.GetFixedDisplayY());
-    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-}
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
@@ -794,6 +760,9 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.validWidth << item.validHeight << item.fixedDirection
             << item.physicalWidth << item.physicalHeight
             << item.oneHandX << item.oneHandY;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        pkt << item.pointerActiveWidth << item.pointerActiveHeight;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -877,7 +846,7 @@ void InputManagerImpl::PrintDisplayInfo()
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
                    "dpi:%{public}d,name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
                    "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,validWH:{%{private}d %{private}d}"
-                   "fixedDirection:%{public}d,physicalWH:{%{private}d %{private}d}",
+                   "fixedDirection:%{public}d,physicalWH:{%{private}d %{private}d},pActiveWH:{%{private}d %{private}d}",
             item.id,
             item.x,
             item.y,
@@ -895,7 +864,9 @@ void InputManagerImpl::PrintDisplayInfo()
             item.validHeight,
             item.fixedDirection,
             item.physicalWidth,
-            item.physicalHeight);
+            item.physicalHeight,
+            item.pointerActiveWidth,
+            item.pointerActiveHeight);
     }
 }
 
@@ -1607,8 +1578,11 @@ bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActio
             currentPointerEvent->SetPointerAction(pointerActionEvent);
             OnPointerEvent(currentPointerEvent);
             if (currentPointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-                currentPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-                OnPointerEvent(currentPointerEvent);
+                std::shared_ptr<PointerEvent> leaveWindowEvent = std::make_shared<PointerEvent>(*currentPointerEvent);
+                if (leaveWindowEvent != nullptr) {
+                    leaveWindowEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+                    OnPointerEvent(leaveWindowEvent);
+                }
             }
             return true;
         }
@@ -2719,6 +2693,11 @@ int32_t InputManagerImpl::CheckKnuckleEvent(float pointX, float pointY, bool &is
 #endif // OHOS_BUILD_ENABLE_ANCO
     MMI_HILOGI("CheckKnuckleEvent function does not support");
     return ERROR_UNSUPPORT;
+}
+
+void InputManagerImpl::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    MULTIMODAL_INPUT_CONNECT_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -189,9 +189,15 @@ ohos_unittest("KeyEventTest") {
   module_out_path = module_output_path
   include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
+    "events/test/input_event_test.cpp",
     "events/test/key_event_test.cpp",
   ]
 

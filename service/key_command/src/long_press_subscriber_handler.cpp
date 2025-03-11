@@ -14,21 +14,8 @@
  */
 #include "long_press_subscriber_handler.h"
 
-#include <parameters.h>
-
 #include "app_mgr_client.h"
-#include "bytrace_adapter.h"
-#include "define_multimodal.h"
-#include "dfx_hisysevent.h"
-#include "error_multimodal.h"
-#include "input_event_data_transformation.h"
-#include "input_event_handler.h"
-#include "key_command_handler.h"
 #include "key_command_handler_util.h"
-#include "net_packet.h"
-#include "proto.h"
-#include "running_process_info.h"
-#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

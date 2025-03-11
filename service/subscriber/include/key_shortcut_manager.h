@@ -16,16 +16,9 @@
 #ifndef KEY_SHORTCUT_MANAGER_H
 #define KEY_SHORTCUT_MANAGER_H
 
-#include <functional>
-#include <map>
-#include <optional>
-#include <set>
-
 #include <cJSON.h>
-#include <nocopyable.h>
 
 #include "key_command_handler.h"
-#include "key_event.h"
 #include "key_option.h"
 
 namespace OHOS {

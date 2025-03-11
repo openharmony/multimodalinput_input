@@ -16,14 +16,7 @@
 #ifndef KEY_AUTO_REPEAT_H
 #define KEY_AUTO_REPEAT_H
 
-#include <map>
-#include <string>
-
-#include "event_dispatch_handler.h"
-#include "key_event.h"
 #include "key_map_manager.h"
-#include "libinput.h"
-#include "singleton.h"
 #include "util.h"
 
 namespace OHOS {

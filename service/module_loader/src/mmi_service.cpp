@@ -15,29 +15,21 @@
 
 #include "mmi_service.h"
 
-#include <parameters.h>
 #ifdef OHOS_BUILD_PC_PRIORITY
 #include <sched.h>
 #endif // OHOS_BUILD_PC_PRIORITY
 #include <sys/signalfd.h>
-
-#include <cinttypes>
 #include <csignal>
-#include <cstdlib>
-#include "string_ex.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif // OHOS_RSS_CLIENT
 
 #include "ability_manager_client.h"
 #include "anr_manager.h"
-#include "app_debug_listener.h"
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
-#include "dfx_define.h"
 #include "dfx_dump_catcher.h"
 #include "dfx_hisysevent.h"
-#include "dfx_json_formatter.h"
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
@@ -55,32 +47,20 @@
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "infrared_emitter_controller.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
-#include "input_device_manager.h"
 #include "ipc_skeleton.h"
-#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "i_preference_manager.h"
 #include "key_auto_repeat.h"
-#include "key_command_handler.h"
-#include "key_map_manager.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
-#include "mmi_log.h"
-#include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
-#include "timer_manager.h"
-#include "tokenid_kit.h"
 #include "touch_event_normalize.h"
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "touch_gesture_manager.h"
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-#include "util.h"
 #include "util_ex.h"
-#include "watchdog_task.h"
-#include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
-#include "xcollie/xcollie_define.h"
 
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -88,6 +68,7 @@
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
 #include "setting_datashare.h"
+#include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "app_mgr_client.h"
 #include "running_process_info.h"
@@ -173,6 +154,9 @@ typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcK
 VKEYBOARD_ONFUNCKEYEVENT_TYPE vkeyboard_onFuncKeyEvent_ = nullptr;
 typedef void (*VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)();
 VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE vkeyboard_hardwareKeyEventDetected_ = nullptr;
+typedef int32_t (*VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)();
+VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE vkeyboard_getKeyboardActivationState_ = nullptr;
+
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
@@ -3131,13 +3115,17 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
             vkeyboard_hardwareKeyEventDetected_ = (VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)dlsym(
                 g_VKeyboardHandle, "HardwareKeyEventDetected");
+            vkeyboard_getKeyboardActivationState_ = (VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)dlsym(
+                g_VKeyboardHandle, "GetKeyboardActivationState");
+
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
                 statemachineMessageQueue_getLibinputMessage_,
                 trackPadEngine_getAllTouchMessage_,
                 trackPadEngine_clearTouchMessage_,
                 trackPadEngine_getAllKeyMessage_,
                 trackPadEngine_clearKeyMessage_,
-                vkeyboard_hardwareKeyEventDetected_);
+                vkeyboard_hardwareKeyEventDetected_,
+                vkeyboard_getKeyboardActivationState_);
         }
     }
 }
@@ -3665,5 +3653,11 @@ int32_t MMIService::SyncKnuckleStatus()
     return ret;
 }
 #endif
+
+int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
