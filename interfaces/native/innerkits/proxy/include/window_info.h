@@ -504,6 +504,20 @@ struct DisplayInfo {
      * @since 12
      */
     int32_t physicalHeight { 0 };
+
+    /**
+     * The Pointer Active Width
+     *
+     * @since 12
+     */
+    int32_t pointerActiveWidth { 0 };
+
+    /**
+     * The Pointer Active Height
+     *
+     * @since 12
+     */
+    int32_t pointerActiveHeight { 0 };
 };
 
 /**
