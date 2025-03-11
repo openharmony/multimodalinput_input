@@ -35,6 +35,7 @@ private:
     bool OnEventTouchDown(struct libinput_event *event);
     bool OnEventTouchMotion(struct libinput_event *event);
     bool OnEventTouchUp(struct libinput_event *event);
+    bool OnEventTouchCancel(struct libinput_event *event);
     int32_t GetTouchToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchToolType(struct libinput_device *device);
     void TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem);
