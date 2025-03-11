@@ -227,7 +227,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         case LIBINPUT_EVENT_TOUCH_CANCEL:
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
-        case LIBINPUT_EVENT_TOUCH_MOTION: {            
+        case LIBINPUT_EVENT_TOUCH_MOTION: {
             HandleTouchEvent(event, frameTime);
             DfxHisysevent::CalcPointerDispTimes();
             break;
