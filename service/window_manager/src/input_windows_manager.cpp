@@ -3831,6 +3831,11 @@ void InputWindowsManager::HandleGestureInjection(bool gestureInject) {
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        MMI_HILOG_DISPATCHD("Abort UpdateTouchScreenTarget due to POINTER_ACTION_CANCEL");
+        return RET_OK;
+    }
+
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
         MMI_HILOG_DISPATCHE("This display is not existent");

@@ -232,7 +232,8 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     ClearTouchMessage clearTouchMessage,
     GetAllKeyMessage getAllKeyMessage,
     ClearKeyMessage clearKeyMessage,
-    HardwareKeyEventDetected hardwareKeyEventDetected)
+    HardwareKeyEventDetected hardwareKeyEventDetected,
+    GetKeyboardActivationState getKeyboardActivationState)
 {
     handleTouchPoint_ = handleTouchPoint;
     getMessage_ = getMessage;
@@ -241,6 +242,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     getAllKeyMessage_ = getAllKeyMessage;
     clearKeyMessage_ = clearKeyMessage;
     hardwareKeyEventDetected_ = hardwareKeyEventDetected;
+    getKeyboardActivationState_ = getKeyboardActivationState;
 
     deviceId = -1;
 
@@ -1181,6 +1183,7 @@ void LibinputAdapter::OnEventHandler()
         libinput_event_type eventType = libinput_event_get_type(event);
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
+        static int32_t downCount = 0;
 
         bool isCaptureMode = false;
         InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
@@ -1198,6 +1201,7 @@ void LibinputAdapter::OnEventHandler()
         if ((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
+            || eventType == LIBINPUT_EVENT_TOUCH_CANCEL
             || eventType == LIBINPUT_EVENT_TOUCH_FRAME
             ) {
             touch = libinput_event_get_touch_event(event);
@@ -1257,7 +1261,45 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                 MMI_HILOGD("Inside vkeyboard area");
                 HandleVFullKeyboardMessages(event, frameTime, eventType, touch);
             } else {
-                funInputEvent_(event, frameTime);
+                bool bDropEventFlag = false;
+
+                if (getKeyboardActivationState_ != nullptr) {
+                    VKeyboardActivation activateState = (VKeyboardActivation)getKeyboardActivationState_();
+                    switch (activateState) {
+                        case VKeyboardActivation::INACTIVE : {
+                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
+                            break;
+                        }
+                        case VKeyboardActivation::ACTIVATED : {
+                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
+                            break;
+                        }
+                        case VKeyboardActivation::TOUCH_CANCEL : {
+                            MMI_HILOGI("activation state: %{public}d, sending touch cancel event",
+                                static_cast<int32_t>(activateState));
+                            if (eventType == LIBINPUT_EVENT_TOUCH_MOTION || eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
+                                libinput_set_touch_event_type(touch, LIBINPUT_EVENT_TOUCH_CANCEL);
+                            }
+                            break;
+                        }
+                        case VKeyboardActivation::TOUCH_DROP : {
+                            MMI_HILOGI("activation state: %{public}d, dropping event",
+                                static_cast<int32_t>(activateState));
+                            bDropEventFlag = true;
+                            break;
+                        }
+                        case VKeyboardActivation::EIGHT_FINGERS_UP : {
+                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+
+                if (!bDropEventFlag) {
+                    funInputEvent_(event, frameTime);
+                }
                 libinput_event_destroy(event);
             }
         } else if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
