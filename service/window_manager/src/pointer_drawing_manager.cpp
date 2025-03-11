@@ -1757,6 +1757,7 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
         SetPixelMap(userIconCopy);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     } else {
+        surfaceNode_->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
         if (mouseStyle == MOUSE_ICON::RUNNING) {
             pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
         } else {
@@ -3502,12 +3503,12 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
 
 void PointerDrawingManager::SetFaceNodeBounds()
 {
-#ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    canvasWidth_ = cursorWidth_;
-    canvasHeight_ = cursorHeight_;
+    if (canvasWidth_ < cursorWidth_ && canvasHeight_ < cursorHeight_) {
+        canvasWidth_ = cursorWidth_;
+        canvasHeight_ = cursorHeight_;
+    }
     CHKPV(surfaceNode_);
     surfaceNode_->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor,
@@ -3527,7 +3528,6 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
         MMI_HILOGE("UpdateCursorProperty is failed");
         return ret;
     }
-    SetFaceNodeBounds();
     mouseIconUpdate_ = true;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
