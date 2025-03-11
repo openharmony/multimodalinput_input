@@ -16,11 +16,9 @@
 #ifndef ANR_MANAGER_H
 #define ANR_MANAGER_H
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "uds_server.h"
-#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {

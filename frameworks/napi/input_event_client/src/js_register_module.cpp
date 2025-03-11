@@ -15,15 +15,12 @@
 
 #include "js_register_module.h"
 
-#include <cinttypes>
-
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "napi_constants.h"
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 #include "oh_input_manager.h"
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-#include "util_napi.h"
 #include "util_napi_error.h"
 
 #undef MMI_LOG_TAG
@@ -532,7 +529,7 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     HandleTouchAttribute(env, pointerEvent, item, touchProperty, true);
 
     bool autoToVirtualScreen = true;
-    int32_t fixedMode = 2;
+    int32_t fixedMode = 1;
     if (GetNamedPropertyInt32(env, touchHandle, "fixedMode", fixedMode, false) == RET_OK) {
         if (fixedMode != static_cast<int32_t>(PointerEvent::FixedMode::ONE_HAND)) {
             autoToVirtualScreen = false;

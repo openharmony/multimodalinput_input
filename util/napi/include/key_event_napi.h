@@ -17,7 +17,6 @@
 #define KEY_EVENT_NAPI_H
 
 #include "key_event.h"
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
 namespace OHOS {

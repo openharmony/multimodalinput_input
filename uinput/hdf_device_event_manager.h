@@ -16,7 +16,6 @@
 #ifndef HDF_DEVICE_EVENT_MANAGER_H
 #define HDF_DEVICE_EVENT_MANAGER_H
 
-#include <cstdint>
 #include <thread>
 
 #include "inject_thread.h"

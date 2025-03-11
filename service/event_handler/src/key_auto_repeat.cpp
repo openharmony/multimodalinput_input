@@ -15,16 +15,10 @@
 
 #include "key_auto_repeat.h"
 
-#include <array>
-
-#include "define_multimodal.h"
-#include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_preference_manager.h"
-#include "mmi_log.h"
-#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

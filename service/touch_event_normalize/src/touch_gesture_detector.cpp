@@ -14,17 +14,9 @@
  */
 
 #include "touch_gesture_detector.h"
-
-#include <algorithm>
-#include <cfloat>
-#include <cmath>
-#include <cstdint>
-#include <limits>
 #include <numeric>
 
 #include "input_event_handler.h"
-#include "mmi_log.h"
-#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

@@ -16,8 +16,6 @@
 #ifndef JOYSTICK_EVENT_PROCESSOR_H
 #define JOYSTICK_EVENT_PROCESSOR_H
 #include <map>
-#include <memory>
-#include <set>
 
 #include <libinput.h>
 

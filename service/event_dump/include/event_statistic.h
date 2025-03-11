@@ -16,29 +16,12 @@
 #ifndef EVENT_STATISTIC_H
 #define EVENT_STATISTIC_H
 
-#include <atomic>
-#include <chrono>
-#include <condition_variable>
-#include <ctime>
 #include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <list>
-#include <memory>
-#include <mutex>
 #include <queue>
-#include <sstream>
-#include <stdio.h>
-#include <string>
 #include <sys/stat.h>
-#include <thread>
 #include <unistd.h>
-#include <vector>
 
-#include "input_event.h"
-#include "key_event.h"
 #include "pointer_event.h"
-#include "switch_event.h"
 
 namespace OHOS {
 namespace MMI {

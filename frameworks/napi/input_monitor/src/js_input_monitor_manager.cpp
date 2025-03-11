@@ -15,8 +15,6 @@
 
 #include "js_input_monitor_manager.h"
 
-#include <uv.h>
-
 #include "define_multimodal.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"

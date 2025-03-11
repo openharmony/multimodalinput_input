@@ -16,7 +16,6 @@
 #ifndef SHIFT_INFO_H
 #define SHIFT_INFO_H
 
-#include "nocopyable.h"
 #include "window_info.h"
 
 namespace OHOS {

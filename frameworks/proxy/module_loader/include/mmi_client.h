@@ -16,11 +16,8 @@
 #ifndef MMI_CLIENT_H
 #define MMI_CLIENT_H
 
-#include "nocopyable.h"
-
 #include "if_mmi_client.h"
 
-#include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
 
 namespace OHOS {
@@ -53,7 +50,7 @@ public:
 private:
     bool StartEventRunner();
     void OnReconnect();
-    bool AddFdListener(int32_t fd);
+    bool AddFdListener(int32_t fd, bool selfCreate = false);
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
     const std::string& GetErrorStr(ErrCode code) const;

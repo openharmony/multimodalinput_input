@@ -15,11 +15,7 @@
 
 #include "input_manager.h"
 
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-#include "input_handler_type.h"
 #include "input_manager_impl.h"
-#include "multimodal_event_handler.h"
 #include "hitrace_meter.h"
 #include "pre_monitor_manager.h"
 
@@ -248,7 +244,15 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    MMI_HILOGD("isAutoToVirtualScreen=%{public}s", isAutoToVirtualScreen ? "true" : "false");
+    PointerEvent::PointerItem pointerItem;
+    if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGD("isAutoToVirtualScreen=%{public}s, DX=%{private}d, DY=%{private}d, "
+            "FDX=%{private}d, FDY=%{private}d",
+            isAutoToVirtualScreen ? "true" : "false", pointerItem.GetDisplayX(), pointerItem.GetDisplayY(),
+            pointerItem.GetFixedDisplayX(), pointerItem.GetFixedDisplayY());
+    } else {
+        MMI_HILOGD("isAutoToVirtualScreen=%{public}s", isAutoToVirtualScreen ? "true" : "false");
+    }
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
@@ -262,7 +266,16 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     pointerEvent->SetAutoToVirtualScreen(isAutoToVirtualScreen);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s", zOrder, isAutoToVirtualScreen ? "true" : "false");
+    PointerEvent::PointerItem pointerItem;
+    if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s, DX=%{private}d, DY=%{private}d, "
+            "FDX=%{private}d, FDY=%{private}d",
+            zOrder, isAutoToVirtualScreen ? "true" : "false", pointerItem.GetDisplayX(), pointerItem.GetDisplayY(),
+            pointerItem.GetFixedDisplayX(), pointerItem.GetFixedDisplayY());
+    } else {
+        MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s", zOrder,
+            isAutoToVirtualScreen ? "true" : "false");
+    }
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
@@ -850,6 +863,11 @@ int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, Cur
 int32_t InputManager::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
 {
     return InputMgrImpl.CheckKnuckleEvent(pointX, pointY, isKnuckleType);
+}
+
+void InputManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    InputMgrImpl.SetMultiWindowScreenId(screenId, displayNodeScreenId);
 }
 } // namespace MMI
 } // namespace OHOS

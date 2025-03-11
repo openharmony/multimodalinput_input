@@ -18,13 +18,8 @@
 
 #include <array>
 #include <list>
-#include <memory>
 #include <set>
 #include <unordered_map>
-#include <vector>
-
-#include "nocopyable.h"
-#include "parcel.h"
 
 #include "input_event.h"
 #include "input_handler_type.h"
@@ -1169,14 +1164,14 @@ public:
          * @since 12
          */
         void SetRawDisplayX(int32_t rawDisplayX);
- 
+
         /**
          * @brief Obtains the raw X coordinate relative to the upper left corner of the screen.
          * @return Returns the raw X coordinate.
          * @since 12
          */
         int32_t GetRawDisplayX() const;
- 
+
         /**
          * @brief Sets the raw Y coordinate of the tool area's center point relative to the
          * upper left corner of the screen.
@@ -1184,7 +1179,7 @@ public:
          * @return void
          * @since 12
          */
- 
+
         void SetRawDisplayY(int32_t rawDisplayY);
         /**
          * @brief Obtains the raw Y coordinate relative to the upper left corner of the screen..
@@ -1199,7 +1194,7 @@ public:
          * @since 12
          */
         int32_t GetBlobId() const;
-        
+
         /**
          * @brief Sets the blobid in this event.
          * @param blobId Indicates the blobid to set.
@@ -1213,7 +1208,7 @@ public:
          * @return Returns the angle.
          */
         int32_t GetAngle() const;
-        
+
         /**
          * @brief Sets the angle in this event.
          * @param angle Indicates the angle to set.
@@ -1614,7 +1609,7 @@ public:
      * @since 16
      */
     void SetHandOption(int32_t handOption);
-    
+
     /**
      * @brief Obtains the hand option in this event.
      * @return Returns the hand option.

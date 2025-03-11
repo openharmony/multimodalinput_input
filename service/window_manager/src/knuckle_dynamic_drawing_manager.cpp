@@ -14,11 +14,7 @@
  */
 
 #include "knuckle_dynamic_drawing_manager.h"
-
-#include "image/bitmap.h"
 #include "image_source.h"
-#include "image_type.h"
-#include "image_utils.h"
 
 #include "mmi_log.h"
 #ifndef USE_ROSEN_DRAWING
@@ -27,8 +23,6 @@
 #include "recording/recording_canvas.h"
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
-#include "parameters.h"
-#include "render/rs_pixel_map_util.h"
 #include "touch_drawing_manager.h"
 
 #undef MMI_LOG_TAG

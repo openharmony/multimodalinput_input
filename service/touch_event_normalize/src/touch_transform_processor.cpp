@@ -17,14 +17,10 @@
 
 #include <linux/input.h>
 
-#include "aggregator.h"
 #include "bytrace_adapter.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
-#include "i_input_windows_manager.h"
 #include "fingersense_wrapper.h"
-#include "mmi_log.h"
-#include "timer_manager.h"
 #include "input_event_handler.h"
 
 #undef MMI_LOG_DOMAIN
@@ -60,6 +56,61 @@ void TouchTransformProcessor::CancelPointerEvent()
     pointerItem.SetCanceled(true);
     pointerEvent_->UpdatePointerItem(pointerId, pointerItem);
     MMI_HILOGE("Cancel pointer event, pointer:%{public}d", pointerId);
+}
+
+bool TouchTransformProcessor::OnEventTouchCancel(struct libinput_event *event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
+    auto touch = libinput_event_get_touch_event(event);
+    CHKPF(touch);
+    MMI_HILOGI("process Touch Cancel event");
+    uint64_t time = libinput_event_touch_get_time_usec(touch);
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+
+    EventTouch touchInfo;
+    int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
+    if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
+        MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
+        return false;
+    }
+    PointerEvent::PointerItem item;
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+    if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
+        MMI_HILOGE("Get pointer parameter failed");
+        return false;
+    }
+    int32_t blobId = libinput_event_touch_get_blob_id(touch);
+    item.SetBlobId(blobId);
+    double pressure = libinput_event_touch_get_pressure(touch);
+    int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
+    int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
+    if (static_cast<uint32_t>(longAxis) & TOUCH_CANCEL_MASK) {
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        DfxHisysevent::ReportPointerEventExitTimes(PointerEventStatistics::STYLUS_INTERRUPT_TOUCH);
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
+        pointerItemCancelMarks_.emplace(seatSlot, true);
+    }
+    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
+    item.SetMoveFlag(moveFlag);
+    item.SetPressure(pressure);
+    item.SetLongAxis(longAxis);
+    item.SetShortAxis(shortAxis);
+    item.SetDisplayX(touchInfo.point.x);
+    item.SetDisplayY(touchInfo.point.y);
+    item.SetDisplayXPos(touchInfo.point.x);
+    item.SetDisplayYPos(touchInfo.point.y);
+    item.SetRawDisplayX(touchInfo.point.x);
+    item.SetRawDisplayY(touchInfo.point.y);
+    item.SetToolDisplayX(touchInfo.toolRect.point.x);
+    item.SetToolDisplayY(touchInfo.toolRect.point.y);
+    item.SetToolWidth(touchInfo.toolRect.width);
+    item.SetToolHeight(touchInfo.toolRect.height);
+    pointerEvent_->UpdatePointerItem(seatSlot, item);
+    pointerEvent_->SetPointerId(seatSlot);
+    pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    return true;
 }
 
 bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
@@ -319,6 +370,10 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             CHKFR(OnEventTouchMotion(event), nullptr, "Get OnEventTouchMotion failed");
+            break;
+        }
+        case LIBINPUT_EVENT_TOUCH_CANCEL: {
+            CHKFR(OnEventTouchCancel(event), nullptr, "Get OnEventTouchCancel failed");
             break;
         }
         default: {

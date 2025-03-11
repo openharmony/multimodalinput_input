@@ -101,12 +101,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     if (!callback) {
         return NONEXISTENT_ID;
     }
-    int32_t timerId = TakeNextTimerId();
-    if (timerId < 0) {
-        return NONEXISTENT_ID;
-    }
     auto timer = std::make_unique<TimerItem>();
-    timer->id = timerId;
     timer->intervalMs = intervalMs;
     timer->repeatCount = repeatCount;
     timer->callbackCount = 0;
@@ -116,6 +111,12 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
         return NONEXISTENT_ID;
     }
     timer->callback = callback;
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
+    int32_t timerId = TakeNextTimerId();
+    if (timerId < 0) {
+        return NONEXISTENT_ID;
+    }
+    timer->id = timerId;
     InsertTimerInternal(timer);
     return timerId;
 }

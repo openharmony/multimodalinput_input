@@ -15,7 +15,6 @@
 
 #include "input_interceptor_manager.h"
 
-#include "input_handler_manager.h"
 #include "util.h"
 
 #undef MMI_LOG_TAG

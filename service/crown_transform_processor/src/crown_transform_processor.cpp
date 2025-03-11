@@ -15,14 +15,9 @@
 
 #include "crown_transform_processor.h"
 
-#include <cinttypes>
-#include <functional>
-
-#include "define_multimodal.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "timer_manager.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
@@ -102,7 +97,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
             HandleCrownRotateUpdate(rawPointerEvent);
             TimerMgr->ResetTimer(timerId_);
         } else {
-            static constexpr int32_t timeout = 100;
+            static constexpr int32_t timeout = 30;
             std::weak_ptr<CrownTransformProcessor> weakPtr = shared_from_this();
 
             timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {

@@ -15,7 +15,6 @@
 
 #include "joystick_event_normalize.h"
 
-#include "define_multimodal.h"
 #include "input_device_manager.h"
 
 #undef MMI_LOG_DOMAIN

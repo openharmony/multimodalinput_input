@@ -49,6 +49,9 @@
 #include "dfx_hisysevent.h"
 #include "timer_manager.h"
 #include "surface.h"
+#include "common_event_data.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -86,7 +89,7 @@ constexpr int32_t ANIMATION_DURATION { 500 };
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
-constexpr int32_t MOUSE_ICON_BAIS { 5 };
+constexpr float MOUSE_ICON_BIAS_RATIO { 5 / 33.0f };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
 [[ maybe_unused ]] constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 6000 };
 constexpr float ROTATION_ANGLE { 360.f };
@@ -117,7 +120,7 @@ constexpr float CALCULATE_MOUSE_ICON_BAIS { 5.0f };
 constexpr int32_t SYNC_FENCE_WAIT_TIME { 3000 };
 float g_hardwareCanvasSize = { 512.0f };
 float g_focalPoint = { 256.0f };
-constexpr int32_t REPEAT_COOLING_TIME { 10000 };
+constexpr int32_t REPEAT_COOLING_TIME { 1000 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
@@ -132,6 +135,36 @@ std::atomic<bool> g_isRsRestart { false };
 
 namespace OHOS {
 namespace MMI {
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+class DisplyStatusReceiver : public EventFwk::CommonEventSubscriber {
+public:
+    explicit DisplyStatusReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
+        : OHOS::EventFwk::CommonEventSubscriber(subscribeInfo)
+    {
+        MMI_HILOGI("DisplyStatusReceiver register");
+    }
+ 
+    virtual ~DisplyStatusReceiver() = default;
+ 
+    void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
+    {
+        std::string action = eventData.GetWant().GetAction();
+        if (action.empty()) {
+            MMI_HILOGE("action is empty");
+            return;
+        }
+        MMI_HILOGI("Received screen status:%{public}s", action.c_str());
+        PointerStyle curPointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
+        curPointerStyle.id = MOUSE_ICON::TRANSPARENT_ICON;
+        if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+            CursorPosition cursorPos = WIN_MGR->ResetCursorPos();
+            IPointerDrawingManager::GetInstance()->DrawScreenCenterPointer(curPointerStyle);
+        }
+    }
+};
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
 static bool IsSingleDisplayFoldDevice()
 {
     return (!FOLD_SCREEN_FLAG.empty() && (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4'));
@@ -241,6 +274,7 @@ PointerDrawingManager::PointerDrawingManager()
 
 PointerDrawingManager::~PointerDrawingManager()
 {
+    MMI_HILOGI("~PointerDrawingManager enter");
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (runner_ != nullptr) {
         runner_->Stop();
@@ -256,6 +290,7 @@ PointerDrawingManager::~PointerDrawingManager()
         softCursorRenderThread_->join();
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    MMI_HILOGI("~PointerDrawingManager complete");
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -986,6 +1021,7 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         .direction = displayInfo_.direction,
         .isHard = true,
         .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
+        .userIconPixelMap = DecodeImageToPixelMap(mouseStyle),
     };
     for (auto it : screenPointers) {
         cfg.dpi = it.second->GetRenderDPI();
@@ -1044,17 +1080,17 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         std::lock_guard<std::mutex> lock(mtx_);
         screenPointers = screenPointers_;
     }
-    RenderConfig cfg {
-        .style = mouseStyle,
-        .align = MouseIcon2IconType(mouseStyle),
-        .path = mouseIcons_[mouseStyle].iconPath,
-        .color = GetPointerColor(),
-        .size = GetPointerSize(),
-        .direction = displayInfo_.direction,
-        .isHard = false,
-        .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
-    };
     for (auto it : screenPointers) {
+        RenderConfig cfg {
+            .style = mouseStyle,
+            .align = MouseIcon2IconType(mouseStyle),
+            .path = mouseIcons_[mouseStyle].iconPath,
+            .color = GetPointerColor(),
+            .size = GetPointerSize(),
+            .direction = displayInfo_.direction,
+            .isHard = false,
+            .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
+        };
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetRenderDPI();
         MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}u, dpi = %{public}f",
@@ -1270,7 +1306,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX -= MOUSE_ICON_BAIS;
+            physicalX -= width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -1313,7 +1349,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX -= MOUSE_ICON_BAIS;
+            physicalX -= width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -1356,7 +1392,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, i
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX += MOUSE_ICON_BAIS;
+            physicalX += width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -1399,7 +1435,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX += MOUSE_ICON_BAIS;
+            physicalX += width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -1456,16 +1492,30 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = displayInfo_.direction;
     }
-    if (direction == DIRECTION0 || direction == DIRECTION180) {
+    if (displayInfo_.direction == DIRECTION0) {
         if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
             physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
         }
         if (physicalY > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
             physicalY = displayInfo_.validHeight - imageHeight_ / cursorUnit;
         }
-    } else {
+    } else if (displayInfo_.direction == DIRECTION90) {
         if (physicalX > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
             physicalX = displayInfo_.validHeight - imageHeight_ / cursorUnit;
+        }
+        if (physicalY < imageWidth_ / cursorUnit) {
+            physicalY = imageWidth_ / cursorUnit;
+        }
+    } else if (displayInfo_.direction == DIRECTION180) {
+        if (physicalX < imageHeight_ / cursorUnit) {
+            physicalX = imageHeight_ / cursorUnit;
+        }
+        if (physicalY < imageWidth_ / cursorUnit) {
+            physicalY = imageWidth_ / cursorUnit;
+        }
+    } else if (displayInfo_.direction == DIRECTION270) {
+        if (physicalX < imageHeight_ / cursorUnit) {
+            physicalX = imageHeight_ / cursorUnit;
         }
         if (physicalY > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
             physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
@@ -2000,22 +2050,20 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
 std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(MOUSE_ICON type)
 {
     CALL_DEBUG_ENTER;
-    for (auto item = mousePixelMap_.begin(); item != mousePixelMap_.end(); ++item) {
-        if (item->first != type) {
-            continue;
-        }
-        if (item->second.imageWidth != imageWidth_ || item->second.imageHeight != imageHeight_
-            || item->second.pointerColor != GetPointerColor()) {
-            if (!UpdateLoadingAndLoadingRightPixelMap()) {
-                MMI_HILOGI("Update Loading And Loading Right Pointer success");
-            }
-            return mousePixelMap_[type].pixelMap;
-        } else {
-            return item->second.pixelMap;
-        }
+    auto pointerColor = GetPointerColor();
+    std::lock_guard<std::mutex> guard(mousePixelMapMutex_);
+    auto pixelInfo = mousePixelMap_.find(type);
+    // 目前只缓存了两个光标
+    if (pixelInfo == mousePixelMap_.end()) {
+        return LoadCursorSvgWithColor(type, pointerColor);
     }
-
-    return LoadCursorSvgWithColor(type, GetPointerColor());
+    if (pixelInfo->second.imageWidth != imageWidth_ || pixelInfo->second.imageHeight != imageHeight_ ||
+        pixelInfo->second.pointerColor != pointerColor) {
+        ReloadPixelMaps(mousePixelMap_, pointerColor);
+        return mousePixelMap_[type].pixelMap;
+    } else {
+        return pixelInfo->second.pixelMap;
+    }
 }
 
 void PointerDrawingManager::GetPreferenceKey(std::string &name)
@@ -2031,10 +2079,10 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-int32_t PointerDrawingManager::UpdateLoadingAndLoadingRightPixelMap()
+int32_t PointerDrawingManager::ReloadPixelMaps(
+    std::map<MOUSE_ICON, PixelMapInfo>& mousePixelMap, int32_t pointerColor)
 {
-    for (auto iter = mousePixelMap_.begin(); iter != mousePixelMap_.end();) {
-        int32_t pointerColor = GetPointerColor();
+    for (auto iter = mousePixelMap.begin(); iter != mousePixelMap.end(); ++iter) {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap = LoadCursorSvgWithColor(iter->first, pointerColor);
         CHKPR(pixelMap, RET_ERR);
         iter->second.pixelMap = pixelMap;
@@ -2045,7 +2093,6 @@ int32_t PointerDrawingManager::UpdateLoadingAndLoadingRightPixelMap()
         int32_t height = pixelMap->GetHeight();
         MMI_HILOGI("Pixelmap width:%{public}d, height:%{public}d, %{public}d update success",
             width, height, iter->first);
-        ++iter;
     }
     return RET_OK;
 }
@@ -2336,38 +2383,34 @@ void PointerDrawingManager::DrawManager()
     }
 }
 
-void PointerDrawingManager::InitLoadingAndLoadingRightPixelMap()
+void PointerDrawingManager::InitPixelMaps()
 {
     auto pointerColor = GetPointerColor();
-    for (auto iter = mousePixelMap_.begin(); iter != mousePixelMap_.end(); ++iter) {
-        std::shared_ptr<OHOS::Media::PixelMap> pixelMap = LoadCursorSvgWithColor(iter->first, pointerColor);
-        CHKPV(pixelMap);
-        iter->second.pixelMap = pixelMap;
-        iter->second.imageWidth = imageWidth_;
-        iter->second.imageHeight = imageHeight_;
-        iter->second.pointerColor = pointerColor;
-        MMI_HILOGI("%{public}s init success", mouseIcons_[iter->first].iconPath.data());
-    }
+    std::lock_guard<std::mutex> guard(mousePixelMapMutex_);
+    mousePixelMap_[MOUSE_ICON::LOADING];
+    mousePixelMap_[MOUSE_ICON::RUNNING];
+    ReloadPixelMaps(mousePixelMap_, pointerColor);
 }
 
 bool PointerDrawingManager::Init()
 {
     CALL_DEBUG_ENTER;
-    INPUT_DEV_MGR->Attach(shared_from_this());
+    auto self = std::shared_ptr<PointerDrawingManager>(this, [](PointerDrawingManager*) {});
+    INPUT_DEV_MGR->Attach(self);
     pidInfos_.clear();
     hapPidInfos_.clear();
-    mousePixelMap_[MOUSE_ICON::LOADING];
-    mousePixelMap_[MOUSE_ICON::RUNNING];
-    InitLoadingAndLoadingRightPixelMap();
+    {
+        std::lock_guard<std::mutex> guard(mousePixelMapMutex_);
+        mousePixelMap_.clear();
+    }
+    InitPixelMaps();
     return true;
 }
 
-std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
+IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 {
-    if (iPointDrawMgr_ == nullptr) {
-        iPointDrawMgr_ = std::make_shared<PointerDrawingManager>();
-    }
-    return iPointDrawMgr_;
+    static PointerDrawingManager instance;
+    return &instance;
 }
 
 void PointerDrawingManager::UpdatePointerVisible()
@@ -2891,6 +2934,13 @@ void PointerDrawingManager::SubscribeScreenModeChange()
         return;
     }
     MMI_HILOGI("SubscribeScreenModeChange success");
+
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
+    OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
+        std::make_shared<DisplyStatusReceiver>(commonEventSubscribeInfo));
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
@@ -3077,9 +3127,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         AttachToDisplay();
  
         // 新屏幕上重新绘制软硬光标
-        if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
-            MMI_HILOGE("Init layer failed");
-        }
+        UpdatePointerVisible();
     }
 
     // 绑定新屏幕 SurfaceNode 到全局 surfaceNode_
@@ -3162,18 +3210,31 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             }
         }
     }
+    UpdatePointerVisible();
+}
 
-    HardwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
-    PostSoftCursorTask([this]() {
-        SoftwareCursorRender(MOUSE_ICON(lastMouseStyle_.id));
-    });
-
-    auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
-    if (!SetCursorLocation(displayId_, lastPhysicalX_, lastPhysicalY_, align)) {
-        MMI_HILOGE("SetCursorLocation fail");
+void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp,
+    MOUSE_ICON mouseStyle, bool isHard)
+{
+    CHKPV(sp);
+    cfg.style = mouseStyle;
+    cfg.align = MouseIcon2IconType(mouseStyle);
+    cfg.path = mouseIcons_[mouseStyle].iconPath;
+    cfg.color = GetPointerColor();
+    cfg.size = GetPointerSize();
+    cfg.isHard = isHard;
+    cfg.dpi = sp->GetRenderDPI();
+    cfg.direction = sp->IsMirror() ? DIRECTION0 : displayInfo_.direction;
+    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        MMI_HILOGD("Set mouseIcon by userIcon_");
+        float scale = sp->IsMirror() ? sp->GetScale() : 1.0f;
+        scale = (sp->IsExtend() && sp->GetIsCurrentOffScreenRendering()) ? sp->GetOffRenderScale() : scale;
+        cfg.userIconPixelMap = GetUserIconCopy();
+        cfg.userIconHotSpotX = userIconHotSpotX_ * scale;
+        cfg.userIconHotSpotY = userIconHotSpotY_ * scale;
+        cfg.userIconFollowSystem = userIconFollowSystem_;
+        cfg.userIconPixelMap->scale(scale, scale, Media::AntiAliasingOption::LOW);
     }
-
-    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
@@ -3184,30 +3245,11 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         screenPointers = screenPointers_;
     }
 
-    RenderConfig cfg {
-        .style = mouseStyle,
-        .align = MouseIcon2IconType(mouseStyle),
-        .path = mouseIcons_[mouseStyle].iconPath,
-        .color = GetPointerColor(),
-        .size = GetPointerSize(),
-        .direction = displayInfo_.direction,
-        .isHard = true,
-    };
-
-    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-        MMI_HILOGD("Set mouseIcon by userIcon_");
-        cfg.userIconPixelMap = GetUserIconCopy();
-        cfg.userIconHotSpotX = userIconHotSpotX_;
-        cfg.userIconHotSpotY = userIconHotSpotY_;
-        cfg.userIconFollowSystem = userIconFollowSystem_;
-    }
-
     for (auto it : screenPointers) {
         CHKPV(it.second);
-        cfg.dpi = it.second->GetRenderDPI();
-        cfg.direction = it.second->IsMirror() ? DIRECTION0 : displayInfo_.direction;
+        RenderConfig cfg;
+        CreateRenderConfig(cfg, it.second, mouseStyle, true);
         MMI_HILOGD("HardwareCursorRender, screen=%{public}u, dpi=%{public}f", it.first, cfg.dpi);
-        cfg.direction = it.second->IsMirror() ? DIRECTION0 : displayInfo_.direction;
         if (it.second->IsMirror() || it.first == screenId_) {
             DrawHardCursor(it.second, cfg);
         } else {
@@ -3225,37 +3267,18 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         screenPointers = screenPointers_;
     }
 
-    RenderConfig cfg {
-        .style = mouseStyle,
-        .align = MouseIcon2IconType(mouseStyle),
-        .path = mouseIcons_[mouseStyle].iconPath,
-        .color = GetPointerColor(),
-        .size = GetPointerSize(),
-        .direction = displayInfo_.direction,
-        .isHard = false,
-    };
-
-    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-        MMI_HILOGD("Set mouseIcon by userIcon_");
-        cfg.userIconPixelMap = GetUserIconCopy();
-        cfg.userIconHotSpotX = userIconHotSpotX_;
-        cfg.userIconHotSpotY = userIconHotSpotY_;
-        cfg.userIconFollowSystem = userIconFollowSystem_;
-    }
-
     for (auto it : screenPointers) {
         CHKPV(it.second);
-        cfg.dpi = it.second->GetRenderDPI();
+        RenderConfig cfg;
+        CreateRenderConfig(cfg, it.second, mouseStyle, false);
         MMI_HILOGD("SoftwareCursorRender, screen = %{public}u, dpi = %{public}f,direction = %{public}d",
             it.first, cfg.dpi, cfg.direction);
-        if (it.second->IsMirror() || it.first == screenId_) {
-            DrawSoftCursor(it.second->GetSurfaceNode(), cfg);
-        } else {
+        if (!it.second->IsMirror() && it.first != screenId_) {
             cfg.style = MOUSE_ICON::TRANSPARENT_ICON;
             cfg.align = MouseIcon2IconType(cfg.style);
             cfg.path = mouseIcons_[cfg.style].iconPath;
-            DrawSoftCursor(it.second->GetSurfaceNode(), cfg);
         }
+        DrawSoftCursor(it.second->GetSurfaceNode(), cfg);
     }
     MMI_HILOGD("SoftwareCursorRender success");
 }
@@ -3275,10 +3298,7 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
     CHKPR(buffer->GetVirAddr(), RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
-    }
+    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
 
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -3304,12 +3324,10 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
     CHKPR(buffer, RET_ERR);
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
-    }
+    CHKPR(addr, RET_ERR);
+    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
 
-    MMI_HILOGD("DrawHardCursor on ScreenPointer success, screenId=%{public}u", sp->GetScreenId());
+    MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u", sp->GetScreenId());
     return RET_OK;
 }
 
@@ -3421,8 +3439,21 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
         }
         Direction direction = static_cast<Direction>((
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (IsSupported()) {
+            direction = displayInfo_.direction;
+            int32_t x = displayInfo_.width / CALCULATE_MIDDLE;
+            int32_t y = displayInfo_.height / CALCULATE_MIDDLE;
+            if (direction == DIRECTION90 || direction == DIRECTION270) {
+                std::swap(x, y);
+            }
+            MMI_HILOGD("DrawScreenCenterPointer, x=%{public}d, y=%{public}d", x, y);
+            DrawPointer(displayInfo_.id, x, y, pointerStyle, direction);
+        }
+#else
         DrawPointer(displayInfo_.id, displayInfo_.validWidth / CALCULATE_MIDDLE,
             displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
 }
 
@@ -3433,14 +3464,14 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
         MMI_HILOGI("userIcon_ is nullptr");
         return nullptr;
     }
+    Parcel data;
+    userIcon_->Marshalling(data);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr(OHOS::Media::PixelMap::Unmarshalling(data));
+    if (pixelMapPtr == nullptr) {
+        MMI_HILOGE("pixelMapPtr is nullptr");
+        return nullptr;
+    }
     if (followSystem_) {
-        Parcel data;
-        userIcon_->Marshalling(data);
-        std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr(OHOS::Media::PixelMap::Unmarshalling(data));
-        if (pixelMapPtr == nullptr) {
-            MMI_HILOGE("pixelMapPtr is nullptr");
-            return nullptr;
-        }
         Media::ImageInfo imageInfo;
         pixelMapPtr->GetImageInfo(imageInfo);
         int32_t cursorSize = GetPointerSize();
@@ -3459,16 +3490,14 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
         cursorHeight_ = static_cast<int32_t>((float)imageInfo.size.height * axis);
         userIconHotSpotX_ = static_cast<int32_t>((float)focusX_ * axis);
         userIconHotSpotY_ = static_cast<int32_t>((float)focusY_ * axis);
-        SetFaceNodeBounds();
         MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d,"
             "imageHeight:%{public}d, focusX:%{public}d, focusY:%{public}d, axis:%{public}f,"
             "userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
             cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
             focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
-        return pixelMapPtr;
     }
     SetFaceNodeBounds();
-    return userIcon_;
+    return pixelMapPtr;
 }
 
 void PointerDrawingManager::SetFaceNodeBounds()

@@ -16,8 +16,6 @@
 #ifndef AUTHORIZATION_DIALOG_H
 #define AUTHORIZATION_DIALOG_H
 
-#include <mutex>
-
 #include "ability_connect_callback_stub.h"
 #include "ffrt_inner.h"
 #include "singleton.h"

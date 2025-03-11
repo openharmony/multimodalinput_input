@@ -15,8 +15,6 @@
 
 #ifndef FINGERSENSE_WRAPPER_H
 #define FINGERSENSE_WRAPPER_H
-
-#include "nocopyable.h"
 #include "singleton.h"
 
 namespace OHOS {

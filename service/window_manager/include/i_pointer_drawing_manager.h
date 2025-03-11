@@ -16,14 +16,8 @@
 #ifndef I_POINTER_DRAWING_MANAGER_H
 #define I_POINTER_DRAWING_MANAGER_H
 
-#include <map>
-#include <memory>
-
-#include <pixel_map.h>
-
 #include "pointer_style.h"
 #include "window_info.h"
-#include "struct_multimodal.h"
 #include "delegate_interface.h"
 
 namespace OHOS {
@@ -33,7 +27,7 @@ public:
     IPointerDrawingManager() = default;
     virtual ~IPointerDrawingManager() = default;
 
-    static std::shared_ptr<IPointerDrawingManager> GetInstance();
+    static IPointerDrawingManager* GetInstance();
     virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) {}
     virtual void UpdateDisplayInfo(const DisplayInfo& displayInfo) {}
@@ -177,8 +171,6 @@ public:
         return false;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-public:
-    static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

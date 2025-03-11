@@ -15,15 +15,12 @@
 
 #include "js_input_monitor_module.h"
 
-#include <cinttypes>
-#include <string>
 #include <unordered_set>
-#include <uv.h>
 
 #include "define_multimodal.h"
+#include "permission_helper.h"
 #include "js_input_monitor_manager.h"
 #include "napi_constants.h"
-#include "proto.h"
 #include "util_napi_error.h"
 
 #undef MMI_LOG_TAG
@@ -196,6 +193,10 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "", "");
+        return nullptr;
+    }
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -309,6 +310,10 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "", "");
+        return nullptr;
+    }
     size_t argc = 2;
     napi_value argv[2] = { 0 };
 

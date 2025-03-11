@@ -16,8 +16,6 @@
 #ifndef IF_MMI_CLIENT_H
 #define IF_MMI_CLIENT_H
 
-#include <functional>
-
 #include "event_handler.h"
 
 namespace OHOS {

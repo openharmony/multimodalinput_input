@@ -16,8 +16,6 @@
 #ifndef I_ANCO_CHANNEL_H
 #define I_ANCO_CHANNEL_H
 
-#include "iremote_broker.h"
-
 #include "i_anco_consumer.h"
 
 namespace OHOS {

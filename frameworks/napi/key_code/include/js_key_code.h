@@ -16,7 +16,6 @@
 #ifndef JS_KEY_CODE
 #define JS_KEY_CODE
 
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 

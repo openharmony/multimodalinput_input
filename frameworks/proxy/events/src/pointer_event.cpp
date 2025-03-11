@@ -15,8 +15,6 @@
 
 #include "pointer_event.h"
 
-#include <iomanip>
-
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -1448,11 +1446,11 @@ std::string PointerEvent::GetFixedModeStr() const
 {
     switch (fixedMode_) {
         case PointerEvent::FixedMode::NORMAL:
-            return std::move("normal");
+            return "normal";
         case PointerEvent::FixedMode::ONE_HAND:
-            return std::move("one-hand");
+            return "one-hand";
         default:
-            return std::move("unknown");
+            return "unknown";
     }
 }
 

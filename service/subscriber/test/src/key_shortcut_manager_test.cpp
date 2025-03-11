@@ -1860,5 +1860,112 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
     EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
     cJSON_Delete(jsonSysKey);
 }
+
+/**
+ * @tc.name: KeyShortcutManagerTest_IsReservedSystemKey
+ * @tc.desc: Test the funcation IsReservedSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_IsReservedSystemKey, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyShortcutManager::KeyShortcut shortcut;
+    bool ret = shortcutMgr.IsReservedSystemKey(shortcut) ;
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HaveRegisteredGlobalKey
+ * @tc.desc: Test the funcation HaveRegisteredGlobalKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HaveRegisteredGlobalKey, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyShortcutManager::KeyShortcut shortcut;
+    bool ret = shortcutMgr.HaveRegisteredGlobalKey(shortcut) ;
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyCancel
+ * @tc.desc: Test the funcation HandleKeyCancel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyCancel, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    bool ret = shortcutMgr.HandleKeyCancel(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckCombination
+ * @tc.desc: Test the funcation CheckCombination
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckCombination, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    bool ret = shortcutMgr.CheckCombination(keyEvent, shortcut);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_GetAllSystemHotkeys
+ * @tc.desc: Test the funcation GetAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GetAllSystemHotkeys, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::vector<std::unique_ptr<KeyOption>> sysKeys;
+    bool ret = shortcutMgr.GetAllSystemHotkeys(sysKeys);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKeys
+ * @tc.desc: Test the funcation ReadExceptionalSystemKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKeys, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    const std::string cfgPath { "ExceptionalSystemKeys" };
+    shortcutMgr.ReadExceptionalSystemKeys(cfgPath);
+    EXPECT_EQ(cfgPath, "ExceptionalSystemKeys");
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_IsValid
+ * @tc.desc: Test the funcation IsValid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_IsValid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyShortcutManager::ShortcutTriggerType triggerType {
+        KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP };
+    bool ret = shortcutMgr.IsValid(triggerType);
+    EXPECT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS

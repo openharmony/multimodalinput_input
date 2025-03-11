@@ -15,11 +15,6 @@
 
 #include "inject_notice_manager.h"
 
-#include <atomic>
-
-#include "ffrt_inner.h"
-#include "message_parcel.h"
-
 #include "ability_manager_client.h"
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"

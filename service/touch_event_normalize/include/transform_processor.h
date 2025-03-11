@@ -17,7 +17,6 @@
 #define TRANSFORM_PROCESSOR_H
 
 #include <libinput.h>
-#include <memory>
 
 #include "pointer_event.h"
 

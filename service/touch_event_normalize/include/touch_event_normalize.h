@@ -17,11 +17,9 @@
 #define TOUCH_EVENT_NORMALIZE_H
 
 #include <map>
-#include <memory>
 
 #include "singleton.h"
 
-#include "proto.h"
 #include "transform_processor.h"
 
 namespace OHOS {

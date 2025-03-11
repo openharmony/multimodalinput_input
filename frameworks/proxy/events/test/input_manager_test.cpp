@@ -222,6 +222,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
     EXPECT_EQ(ret, RET_OK);
+    pixelMap = nullptr;
 }
 
 /**
@@ -2091,6 +2092,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, (void *)pixelMap.get(), 32, 32) == RET_ERR);
+    pixelMap = nullptr;
 }
 
 /**
@@ -2109,6 +2111,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ASSERT_TRUE(InputManager::GetInstance()->SetMouseIcon(fakeWindoId, (void *)pixelMap.get()) == RET_ERR);
+    pixelMap = nullptr;
 }
 
 /**
@@ -4878,6 +4881,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_001, TestSize.Leve
     CursorOptions options;
     options.followSystem = true;
     ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) != RET_ERR);
+    pixelMap = nullptr;
 }
 
 /**
@@ -4900,6 +4904,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_002, TestSize.Leve
     CursorOptions options;
     options.followSystem = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) != RET_ERR);
+    pixelMap = nullptr;
 }
 
 /**
@@ -4922,6 +4927,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_003, TestSize.Leve
     CursorOptions options;
     options.followSystem = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) != RET_ERR);
+    pixelMap = nullptr;
 }
 
 /**
@@ -4948,6 +4954,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_004, TestSize.Leve
     CursorOptions options;
     options.followSystem = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, cursor, options) != RET_ERR);
+    pixelMap = nullptr;
 }
 
 std::shared_ptr<PointerEvent> CreatePointerEventTest()
@@ -5309,6 +5316,21 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_019, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/*
+ * @tc.name: InputManagerTest_CreateVKeyboardDevice_001
+ * @tc.desc: CreateVKeyboardDevice test.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_CreateVKeyboardDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t ret = InputManager::GetInstance()->CreateVKeyboardDevice(nullptr);
+    ASSERT_EQ(ret, INVALID_HANDLER_ID);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 } // namespace MMI
 } // namespace OHOS

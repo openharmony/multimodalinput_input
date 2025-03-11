@@ -15,17 +15,10 @@
 
 #include "input_handler_manager.h"
 
-#include <cinttypes>
-
 #include "anr_handler.h"
 #include "bytrace_adapter.h"
-#include "input_handler_type.h"
-#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
-#include "napi_constants.h"
-#include "net_packet.h"
-#include "proto.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputHandlerManager"

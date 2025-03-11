@@ -16,14 +16,9 @@
 #ifndef MOUSE_TRANSFORM_PROCESSOR_H
 #define MOUSE_TRANSFORM_PROCESSOR_H
 
-#include <map>
-#include <memory>
-
 #include "libinput.h"
-#include "singleton.h"
 
 #include "aggregator.h"
-#include "define_multimodal.h"
 #include "timer_manager.h"
 #include "pointer_event.h"
 #include "touchpad_control_display_gain.h"
@@ -117,6 +112,7 @@ private:
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
+    void HandleTouchPadButton(enum libinput_button_state state, int32_t type);
     int32_t UpdateMouseMoveLocation(const DisplayInfo* displayInfo, Offset &offset,
         double &abs_x, double &abs_y, int32_t deviceType);
     int32_t UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo, struct libinput_event* event,

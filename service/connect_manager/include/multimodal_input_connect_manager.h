@@ -16,17 +16,8 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_MANAGER_H
 #define MULTIMODAL_INPUT_CONNECT_MANAGER_H
 
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-
-#include "nocopyable.h"
-
 #include "i_input_service_watcher.h"
 #include "i_multimodal_input_connect.h"
-#include "infrared_frequency_info.h"
-#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {
@@ -174,6 +165,7 @@ public:
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
+    int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
 private:
     MultimodalInputConnectManager() = default;

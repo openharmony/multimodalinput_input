@@ -15,14 +15,10 @@
 
 #include "delegate_interface.h"
 
-#include <algorithm>
-
 #include "display_event_monitor.h"
-#include "error_multimodal.h"
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
 #include "property_reader.h"
-#include "mmi_log.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING

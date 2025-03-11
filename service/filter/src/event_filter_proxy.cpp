@@ -15,9 +15,6 @@
 
 #include "event_filter_proxy.h"
 
-#include "message_option.h"
-#include "string_ex.h"
-
 #include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
 

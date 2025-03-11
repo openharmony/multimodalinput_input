@@ -17,7 +17,6 @@
 #define PERMISSION_HELPER_H
 
 #include "accesstoken_kit.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {

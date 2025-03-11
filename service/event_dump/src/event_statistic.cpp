@@ -14,7 +14,6 @@
  */
 
 #include "event_statistic.h"
-#include "mmi_log.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN

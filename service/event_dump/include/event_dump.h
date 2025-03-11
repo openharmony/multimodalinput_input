@@ -18,9 +18,6 @@
 
 #include "singleton.h"
 
-#include "define_multimodal.h"
-#include "uds_server.h"
-
 namespace OHOS {
 namespace MMI {
 class EventDump final {

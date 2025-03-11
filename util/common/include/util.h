@@ -12,14 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef UTIL_H
 #define UTIL_H
 
 #include <map>
 #include <set>
-#include <string>
-#include <vector>
 
 #include "mmi_log.h"
 #include "define_multimodal.h"
@@ -42,7 +40,7 @@ struct DeviceConfig {
 typedef void (*ScreenCaptureCallback)(int32_t pid, bool isStart);
 
 int64_t GetSysClockTime();
- 
+
 int64_t GetMillisTime();
 
 uint64_t GetThisThreadId();

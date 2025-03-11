@@ -16,7 +16,6 @@
 #ifndef JS_TOUCH_EVENT
 #define JS_TOUCH_EVENT
 
-#include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 
@@ -52,8 +51,8 @@ public:
     };
 
     enum class FixedMode : int32_t {
-        NORMAL = 1,
-        ONE_HAND = 2,
+        NONE = 0,
+        ONE_HAND = 1,
     };
     JsTouchEvent() = default;
     ~JsTouchEvent() = default;

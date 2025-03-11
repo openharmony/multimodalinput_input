@@ -15,7 +15,6 @@
 
 #include "input_event_data_transformation.h"
 
-#include "define_multimodal.h"
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "sec_comp_enhance_kit.h"

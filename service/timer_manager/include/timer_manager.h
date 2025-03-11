@@ -16,14 +16,10 @@
 #ifndef TIMER_MANAGER_H
 #define TIMER_MANAGER_H
 
-#include <functional>
 #include <list>
-#include <memory>
 
 #include "singleton.h"
 
-#include "define_multimodal.h"
-#include "mmi_log.h"
 #include "util.h"
 
 namespace OHOS {

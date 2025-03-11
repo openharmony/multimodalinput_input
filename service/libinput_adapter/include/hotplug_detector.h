@@ -16,7 +16,6 @@
 #ifndef MMI_HOT_PLUG_DETECTOR_H
 #define MMI_HOT_PLUG_DETECTOR_H
 
-#include <functional>
 #include <string>
 
 #include "nocopyable.h"

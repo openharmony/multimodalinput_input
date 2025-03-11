@@ -15,8 +15,6 @@
 
 #include "js_short_key_manager.h"
 
-#include "napi_constants.h"
-
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsShortKeyManager"
 
