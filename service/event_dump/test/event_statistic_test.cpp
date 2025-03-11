@@ -128,7 +128,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_Dump, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventStatistic eventStatistic;
-    int32_t fd = 18;
+    int32_t fd = 0;
     std::vector<std::string> dumpStr;
     for (auto i = 0; i < 5; i++) {
         std::string str = "EventStatistic Test Dump ";
