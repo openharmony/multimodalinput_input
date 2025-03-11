@@ -447,7 +447,7 @@ void TouchDrawingManager::CreateTouchWindow()
 #endif
     surfaceNode_->SetRotation(0);
     screenId_ = static_cast<uint64_t>(displayInfo_.id);
-    if (windowScreenId_ == displayInfo_.id) {
+    if (windowScreenId_ == screenId_) {
         screenId_ = displayNodeScreenId_;
     }
     surfaceNode_->AttachToDisplay(screenId_);
