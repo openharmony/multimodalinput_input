@@ -101,6 +101,7 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_GESTURE_PINCH_END),
     static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_DOWN),
     static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_UP),
+    static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_CANCEL),
     static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_MOTION),
     static_cast<int32_t>(LIBINPUT_EVENT_TABLET_TOOL_AXIS),
     static_cast<int32_t>(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY),
@@ -148,8 +149,8 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
     
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
-    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_HILOGD("This touch event is canceled type:%{public}d", type);
+    if (type == LIBINPUT_EVENT_TOUCH_FRAME) {
+        MMI_HILOGD("This touch event is LIBINPUT_EVENT_TOUCH_FRAME type:%{public}d", type);
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -223,6 +224,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
 #endif // OHOS_BUILD_ENABLE_WATCH
+        case LIBINPUT_EVENT_TOUCH_CANCEL:
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
