@@ -1265,10 +1265,9 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
 
                 if (getKeyboardActivationState_ != nullptr) {
                     VKeyboardActivation activateState = (VKeyboardActivation)getKeyboardActivationState_();
-                    switch(activateState)
-                    {
+                    switch (activateState) {
                         case VKeyboardActivation::INACTIVE : {
-                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));                            
+                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
                             break;
                         }
                         case VKeyboardActivation::ACTIVATED : {
@@ -1285,18 +1284,17 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                         }
                         case VKeyboardActivation::TOUCH_DROP : {
                             MMI_HILOGI("activation state: %{public}d, dropping event",
-                                static_cast<int32_t>(activateState));                            
+                                static_cast<int32_t>(activateState));
                             bDropEventFlag = true;
                             break;
                         }
                         case VKeyboardActivation::EIGHT_FINGERS_UP : {
-                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));                            
+                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
                             break;
                         }
                         default:
-                            break; 
+                            break;
                     }
-
                 }
 
                 if (!bDropEventFlag) {
