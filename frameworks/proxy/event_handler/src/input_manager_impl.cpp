@@ -759,8 +759,10 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
             << item.validWidth << item.validHeight << item.fixedDirection
             << item.physicalWidth << item.physicalHeight
-            << item.oneHandX << item.oneHandY
-            << item.pointerActiveWidth << item.pointerActiveHeight;
+            << item.oneHandX << item.oneHandY;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        pkt << item.pointerActiveWidth << item.pointerActiveHeight;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
