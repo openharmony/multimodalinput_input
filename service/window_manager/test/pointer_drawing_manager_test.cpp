@@ -2407,5 +2407,56 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
     ret = pointerDrawingManager.SetPointerVisible(pid, visible, priority, isHap);
     ASSERT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawMovePointer_002
+ * @tc.desc: Test the funcation DrawMovePointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t physicalX = 1;
+    int32_t physicalY = 2;
+    int32_t displayId = 3;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle_002
+ * @tc.desc: Test SetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerStyle pointerStyle;
+    int32_t pid = 1;
+    int32_t windowId = -2;
+    int32_t ret = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle);
+    ASSERT_EQ(ret, RET_ERR);
+    windowId = -1;
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ret = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle);
+    ASSERT_EQ(ret, RET_OK);
+    windowId = 1;
+    ret = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle);
+    ASSERT_EQ(ret, RET_ERR);
+    IconStyle iconStyle;
+    iconStyle.alignmentWay = 0;
+    iconStyle.iconPath = "testpath";
+    pointerDrawingManager.mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id), iconStyle));
+    ret = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle);
+    ASSERT_EQ(ret, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
