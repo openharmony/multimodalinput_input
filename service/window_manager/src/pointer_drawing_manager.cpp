@@ -2336,18 +2336,59 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
             pointerVisible = (pointerVisible && IsPointerVisible());
         }
         SetPointerVisible(getpid(), pointerVisible, 0, false);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        AttachAllSurfaceNode();
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     } else {
         DeletePointerVisible(getpid());
     }
     DrawManager();
-    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
+    if (!hasPointerDevice_) {
         MMI_HILOGD("Pointer window destroy start");
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        DetachAllSurfaceNode();
+#else
+        if (surfaceNode_ != nullptr) {
+            surfaceNode_->DetachToDisplay(screenId_);
+            surfaceNode_ = nullptr;
+        }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void PointerDrawingManager::AttachAllSurfaceNode()
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    for (auto sp : screenPointers_) {
+        if (sp.second != nullptr) {
+            auto surfaceNode = sp.second->GetSurfaceNode();
+            if (surfaceNode != nullptr) {
+                auto screenId = sp.second->GetScreenId();
+                MMI_HILOGI("Attach screenId:%{public}u", screenId);
+                surfaceNode->AttachToDisplay(screenId);
+            }
+        }
+    }
+}
+
+void PointerDrawingManager::DetachAllSurfaceNode()
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    for (auto sp : screenPointers_) {
+        if (sp.second != nullptr) {
+            auto surfaceNode = sp.second->GetSurfaceNode();
+            if (surfaceNode != nullptr) {
+                auto screenId = sp.second->GetScreenId();
+                MMI_HILOGI("Detach screenId:%{public}u", screenId);
+                surfaceNode->DetachToDisplay(screenId);
+            }
+        }
+    }
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 void PointerDrawingManager::DrawManager()
 {

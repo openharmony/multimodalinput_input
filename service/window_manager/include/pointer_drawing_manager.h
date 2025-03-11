@@ -241,6 +241,8 @@ private:
     void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle);
     void UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, DisplayInfo displayInfo);
+    void AttachAllSurfaceNode();
+    void DetachAllSurfaceNode();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
