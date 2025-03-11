@@ -73,7 +73,17 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
         }
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         DfxHisysevent::ReportKeyEvent("subcriber");
-        return;
+
+        if ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) ||
+            (pendingKeys_.find(keyEvent->GetKeyCode()) == pendingKeys_.cend())) {
+            return;
+        }
+        pendingKeys_.erase(keyEvent->GetKeyCode());
+        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+        }
+    } else if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        pendingKeys_.emplace(keyEvent->GetKeyCode());
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
