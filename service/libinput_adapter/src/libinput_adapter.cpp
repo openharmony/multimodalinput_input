@@ -1195,18 +1195,14 @@ void LibinputAdapter::OnEventHandler()
 
             for (auto &windowInfo : displayGroupInfo.windowsInfo) {
                 if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
-                    isCaptureMode = true;
-                    // screen recorder scenario will be an exception
-                    if ((windowInfo.area.width <= SCREEN_RECORD_WINDOW_WIDTH) &&
-                        (windowInfo.area.height <= SCREEN_RECORD_WINDOW_HEIGHT)) {
-                        isCaptureMode = false;
-                    }
+                    // screen recorder scenario will be an exception to true
+                    isCaptureMode = ((windowInfo.area.width <= SCREEN_RECORD_WINDOW_WIDTH) \
+                        && (windowInfo.area.height <= SCREEN_RECORD_WINDOW_HEIGHT)) ? false : true;
                     MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
                     break;
                 }
             }
         }
-
 
         if ((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
             || eventType == LIBINPUT_EVENT_TOUCH_UP
