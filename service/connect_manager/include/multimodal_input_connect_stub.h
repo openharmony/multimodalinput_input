@@ -95,6 +95,8 @@ protected:
     int32_t StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeHotkey(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeHotkey(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnsubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeTabletProximity(MessageParcel& data, MessageParcel& reply);

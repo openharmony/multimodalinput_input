@@ -82,7 +82,7 @@ private:
         virtual int32_t AddHandler(int32_t pid, int32_t longPressTime,
             std::function<void(std::shared_ptr<KeyEvent>)> callback);
         bool RemoveHandler(int32_t id);
-        void Reset();
+        virtual void Reset();
         bool IsActive() const;
         void MarkActive(bool active);
 
@@ -108,6 +108,7 @@ private:
         bool ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const override;
         bool Intercept(std::shared_ptr<KeyEvent> KeyEvent) override;
         void Dump(std::ostringstream &output) const override;
+        void Reset() override;
 
     private:
         void RunPendingHandlers();

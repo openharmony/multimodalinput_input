@@ -73,6 +73,7 @@ public:
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId) = 0;
     virtual bool AdjustFingerFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    virtual bool IsFocusedSession(int32_t session) const = 0;
     virtual void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo) = 0;
     virtual void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;

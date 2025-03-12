@@ -28,6 +28,9 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#include "key_monitor_manager.h"
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "time_cost_chk.h"
@@ -1023,6 +1026,29 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
     MMI_HILOGI("OnUnsubscribeHotkey function does not support");
     return ERROR_UNSUPPORT;
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
+}
+
+int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
+{
+    KeyMonitorManager::Monitor monitor {
+        .session_ = session,
+        .key_ = keyOption.GetKey(),
+        .action_ = keyOption.GetAction(),
+        .isRepeat_ = keyOption.IsRepeat(),
+    };
+    return KEY_MONITOR_MGR->AddMonitor(monitor);
+}
+
+int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
+{
+    KeyMonitorManager::Monitor monitor {
+        .session_ = session,
+        .key_ = keyOption.GetKey(),
+        .action_ = keyOption.GetAction(),
+        .isRepeat_ = keyOption.IsRepeat(),
+    };
+    KEY_MONITOR_MGR->RemoveMonitor(monitor);
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
