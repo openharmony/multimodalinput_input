@@ -141,6 +141,16 @@ void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeSwitchEvent(subscriberId);
 }
 
+int32_t InputManager::SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback)
+{
+    return InputMgrImpl.SubscribeTabletProximity(callback);
+}
+
+void InputManager::UnsubscribetabletProximity(int32_t subscriberId)
+{
+    InputMgrImpl.UnsubscribetabletProximity(subscriberId);
+}
+
 int32_t InputManager::SubscribeLongPressEvent(const LongPressRequest &longPressRequest,
     std::function<void(LongPressEvent)> callback)
 {

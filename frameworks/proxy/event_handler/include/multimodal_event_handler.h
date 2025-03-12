@@ -20,6 +20,7 @@
 #include "long_press_event.h"
 #include "pointer_event.h"
 #include "switch_event_input_subscribe_manager.h"
+#include "tablet_event_input_subscribe_manager.h"
 #include "touchpad_control_display_gain.h"
 
 namespace OHOS {
@@ -48,6 +49,8 @@ public:
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_SWITCH
+    int32_t SubscribeTabletProximity(int32_t subscribeId);
+    int32_t UnsubscribetabletProximity(int32_t subscribeId);
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest);
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
