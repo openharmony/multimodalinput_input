@@ -2265,7 +2265,7 @@ void InputWindowsManager::RotateDisplayScreen(const DisplayInfo& info, PhysicalC
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
-    const DisplayInfo& info, EventTouch& touchInfo)
+    const DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear)
 {
     PrintDisplayInfo(info);
     auto width = info.width;
@@ -2285,6 +2285,10 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     Coordinate2D pos = { .x = coord.x, .y = coord.y };
     if (IsPositionOutValidDisplay(pos, info, true)) {
         MMI_HILOGD("The position is out of the valid display");
+        if (isNeedClear) {
+            int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+            TriggerTouchUpOnInvalidAreaEntry(seatSlot);
+        }
         return false;
     }
     MMI_HILOGD("IsPositionOutValidDisplay physicalXY:{%{private}f %{private}f}->{%{private}f %{private}f}",
@@ -2303,6 +2307,50 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     return true;
 }
 
+// When the finger moves out of the active area, the touch up event is triggered
+void InputWindowsManager::TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId)
+{
+    if (lastPointerEventforGesture_ == nullptr) {
+        MMI_HILOGE("lastPointerEventforGesture_ is null");
+        return;
+    }
+    PointerEvent::PointerItem item;
+    if (!(lastPointerEventforGesture_->GetPointerItem(pointerId, item))) {
+        MMI_HILOGE("Get pointer item failed, pointerId:%{public}d", pointerId);
+        return;
+    }
+    // Make sure to trigger touch up the first time out of the valid area
+    if ((!item.IsCanceled()) && item.IsPressed()) {
+        auto pointerEvent = std::make_shared<PointerEvent>(*lastPointerEventforGesture_);
+        int32_t originAction = pointerEvent->GetPointerAction();
+        pointerEvent->SetOriginPointerAction(originAction);
+        int32_t action = PointerEvent::POINTER_ACTION_UP;
+        bool isDragging = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+                          (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId);
+        if (isDragging) {
+            action = PointerEvent::POINTER_ACTION_PULL_UP;
+        }
+        pointerEvent->SetPointerAction(action);
+        pointerEvent->SetPointerId(pointerId);
+        auto now = GetSysClockTime();
+        pointerEvent->SetActionTime(now);
+        pointerEvent->SetTargetWindowId(item.GetTargetWindowId());
+        auto winOpt = GetWindowAndDisplayInfo(item.GetTargetWindowId(), pointerEvent->GetTargetDisplayId());
+        if (winOpt) {
+            pointerEvent->SetAgentWindowId(winOpt->agentWindowId);
+        }
+        pointerEvent->UpdateId();
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        CHKPV(eventDispatchHandler);
+        eventDispatchHandler->HandleTouchEvent(pointerEvent);
+        MMI_HILOGI("Trigger touch up, pointerId:%{public}d, pointerAction:%{public}d", pointerId, action);
+
+        // Flag event have been cleaned up
+        item.SetCanceled(true);
+        lastPointerEventforGesture_->UpdatePointerItem(pointerId, item);
+    }
+}
+
 void InputWindowsManager::SetAntiMisTake(bool state)
 {
     antiMistake_.isOpen = state;
@@ -2314,7 +2362,7 @@ void InputWindowsManager::SetAntiMisTakeStatus(bool state)
 }
 
 bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-    EventTouch& touchInfo, int32_t& physicalDisplayId)
+    EventTouch& touchInfo, int32_t& physicalDisplayId, bool isNeedClear)
 {
     CHKPF(touch);
     std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
@@ -2328,7 +2376,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
-    return GetPhysicalDisplayCoord(touch, *info, touchInfo);
+    return GetPhysicalDisplayCoord(touch, *info, touchInfo, isNeedClear);
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
