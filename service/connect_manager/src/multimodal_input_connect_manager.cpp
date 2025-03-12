@@ -442,6 +442,20 @@ int32_t MultimodalInputConnectManager::UnsubscribeHotkey(int32_t subscribeId)
     return multimodalInputConnectService_->UnsubscribeHotkey(subscribeId);
 }
 
+int32_t MultimodalInputConnectManager::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SubscribeKeyMonitor(keyOption);
+}
+
+int32_t MultimodalInputConnectManager::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->UnsubscribeKeyMonitor(keyOption);
+}
+
 int32_t MultimodalInputConnectManager::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     std::lock_guard<std::mutex> guard(lock_);

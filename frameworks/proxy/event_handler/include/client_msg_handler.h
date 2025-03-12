@@ -45,6 +45,7 @@ protected:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt);
+    int32_t OnSubscribeKeyMonitor(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     int32_t OnSubscribeSwitchEventCallback(const UDSClient &client, NetPacket &pkt);

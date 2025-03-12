@@ -95,6 +95,18 @@ int32_t MultimodalEventHandler::UnsubscribeHotkey(int32_t subscribeId)
     return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeHotkey(subscribeId);
 }
 
+int32_t MultimodalEventHandler::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeKeyMonitor(keyOption);
+}
+
+int32_t MultimodalEventHandler::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeKeyMonitor(keyOption);
+}
+
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;

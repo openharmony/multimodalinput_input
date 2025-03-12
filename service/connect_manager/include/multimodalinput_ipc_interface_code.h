@@ -154,6 +154,8 @@ enum class MultimodalinputConnectInterfaceCode {
 #endif // OHOS_BUILD_ENABLE_ANCO
     SUBSCRIBE_TABLET_EVENT = 312,
     UNSUBSCRIBE_TABLET_EVENT = 313,
+    SUBSCRIBE_KEY_MONITOR = 351,
+    UNSUBSCRIBE_KEY_MONITOR = 352,
 };
 
 enum class MultimodalinputEventObserverCode {

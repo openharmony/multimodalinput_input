@@ -73,6 +73,8 @@ public:
     int32_t OnSubscribeHotkey(IUdsServer *server, int32_t pid,
         int32_t subscribeId, const std::shared_ptr<KeyOption> option);
     int32_t OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, int32_t subscribeId);
+    int32_t SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption);
+    int32_t UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
