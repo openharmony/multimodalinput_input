@@ -1131,6 +1131,7 @@ ohos_unittest("TouchDrawingManagerTest") {
 
   sources = [
     "window_manager/test/pointer_renderer_test.cpp",
+    "window_manager/test/screen_pointer_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
 
