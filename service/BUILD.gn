@@ -166,7 +166,7 @@ ohos_shared_library("libmmi-server") {
   include_dirs = [ "${mmi_path}/frameworks/proxy/events/include" ]
 
   sources += [ "account_manager/src/account_manager.cpp" ]
-
+  sources += [ "subscriber/src/tablet_subscriber_handler.cpp" ]
   if (input_feature_keyboard) {
     sources += [
       "display_state_manager/src/display_event_monitor.cpp",

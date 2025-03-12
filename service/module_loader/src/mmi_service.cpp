@@ -77,7 +77,7 @@
 #ifdef PLAYER_FRAMEWORK_EXISTS
 #include "input_screen_capture_agent.h"
 #endif // PLAYER_FRAMEWORK_EXISTS
-
+#include "tablet_subscriber_handler.h"
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -2023,6 +2023,42 @@ int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_SWITCH
+    return RET_OK;
+}
+
+int32_t MMIService::SubscribeTabletProximity(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId] {
+            auto sess = this->GetSessionByPid(pid);
+            CHKPR(sess, RET_ERR);
+            return TABLET_SCRIBER_HANDLER->SubscribeTabletProximity(sess, subscribeId);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The subscribe tablet event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribetabletProximity(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId] {
+            auto sess = this->GetSessionByPid(pid);
+            CHKPR(sess, RET_ERR);
+            return TABLET_SCRIBER_HANDLER->UnsubscribetabletProximity(sess, subscribeId);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The unsubscribe tablet event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 

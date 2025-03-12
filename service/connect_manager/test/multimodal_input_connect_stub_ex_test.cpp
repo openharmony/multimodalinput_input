@@ -368,7 +368,8 @@ public:
     {
         return touchpadCDG.ppi;
     }
-
+    int32_t SubscribeTabletProximity(int32_t subscribeId) override { return RET_OK; }
+    int32_t UnsubscribetabletProximity(int32_t subscribeId) override { return RET_OK; }
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override
     {
         return static_cast<int32_t>(screenId);
