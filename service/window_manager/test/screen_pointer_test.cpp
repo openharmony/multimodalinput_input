@@ -97,8 +97,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_001, TestSize.Level1)
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    const char* RS_SURFACE_NODE_NAME{"pointer window"};
-    surfaceNodeConfig.SurfaceNodeName = RS_SURFACE_NODE_NAME;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
     screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig,
         Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE);
     ASSERT_NE(screenpointer->surfaceNode_, nullptr);
