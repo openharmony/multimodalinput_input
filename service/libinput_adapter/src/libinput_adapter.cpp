@@ -67,6 +67,8 @@ enum class VKeyboardTouchEventType : int32_t {
     TOUCH_MOVE = 2,
     TOUCH_FRAME = 3,
 };
+#define SCREEN_RECORD_WINDOW_WIDTH 400
+#define SCREEN_RECORD_WINDOW_HEIGHT 200
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t KEY_CAPSLOCK { 58 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1185,6 +1187,7 @@ void LibinputAdapter::OnEventHandler()
         libinput_event_touch* touch = nullptr;
         static int32_t downCount = 0;
 
+        // add the logic of screen capture window conuming touch point in high priority
         bool isCaptureMode = false;
         InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
         if (inputWindowsManager != nullptr) {
@@ -1193,10 +1196,17 @@ void LibinputAdapter::OnEventHandler()
             for (auto &windowInfo : displayGroupInfo.windowsInfo) {
                 if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
                     isCaptureMode = true;
+                    // screen recorder scenario will be an exception
+                    if ((windowInfo.area.width <= SCREEN_RECORD_WINDOW_WIDTH) &&
+                        (windowInfo.area.height <= SCREEN_RECORD_WINDOW_HEIGHT)) {
+                        isCaptureMode = false;
+                    }
+                    MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
                     break;
                 }
             }
         }
+
 
         if ((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
             || eventType == LIBINPUT_EVENT_TOUCH_UP
