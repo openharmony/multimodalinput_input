@@ -442,6 +442,7 @@ int32_t MultimodalInputConnectManager::UnsubscribeHotkey(int32_t subscribeId)
     return multimodalInputConnectService_->UnsubscribeHotkey(subscribeId);
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 int32_t MultimodalInputConnectManager::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -455,6 +456,7 @@ int32_t MultimodalInputConnectManager::UnsubscribeKeyMonitor(const KeyMonitorOpt
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->UnsubscribeKeyMonitor(keyOption);
 }
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 int32_t MultimodalInputConnectManager::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {

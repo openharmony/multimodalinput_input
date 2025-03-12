@@ -95,18 +95,6 @@ int32_t MultimodalEventHandler::UnsubscribeHotkey(int32_t subscribeId)
     return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeHotkey(subscribeId);
 }
 
-int32_t MultimodalEventHandler::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
-{
-    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
-    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeKeyMonitor(keyOption);
-}
-
-int32_t MultimodalEventHandler::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
-{
-    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
-    return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeKeyMonitor(keyOption);
-}
-
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
@@ -129,6 +117,20 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+int32_t MultimodalEventHandler::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeKeyMonitor(keyOption);
+}
+
+int32_t MultimodalEventHandler::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeKeyMonitor(keyOption);
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
 int32_t MultimodalEventHandler::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)

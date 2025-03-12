@@ -305,7 +305,11 @@ int32_t ClientMsgHandler::OnSubscribeKeyMonitor(const UDSClient &client, NetPack
     MMI_HILOGD("Key monitor(No:%{public}d, KC:%{private}d, KA:%{public}d)",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     return KeyEventInputSubscribeMgr.OnSubscribeKeyMonitor(keyEvent);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 

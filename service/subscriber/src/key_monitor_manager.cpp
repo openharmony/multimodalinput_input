@@ -33,9 +33,6 @@ namespace {
 constexpr int32_t REPEAT_ONCE { 1 };
 }
 
-std::mutex KeyMonitorManager::mutex_;
-std::shared_ptr<KeyMonitorManager> KeyMonitorManager::instance_;
-
 const std::set<int32_t> KeyMonitorManager::allowedKeys_ {
     KeyEvent::KEYCODE_VOLUME_DOWN,
     KeyEvent::KEYCODE_VOLUME_UP,
@@ -43,12 +40,12 @@ const std::set<int32_t> KeyMonitorManager::allowedKeys_ {
 
 std::shared_ptr<KeyMonitorManager> KeyMonitorManager::GetInstance()
 {
-    if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> guard(mutex_);
-        if (instance_ == nullptr) {
-            instance_ = std::make_shared<KeyMonitorManager>();
-        }
-    }
+    static std::once_flag flag;
+    static std::shared_ptr<KeyMonitorManager> instance_;
+
+    std::call_once(flag, []() {
+        instance_ = std::make_shared<KeyMonitorManager>();
+    });
     return instance_;
 }
 
@@ -104,7 +101,7 @@ int32_t KeyMonitorManager::AddMonitor(const Monitor &monitor)
     MMI_HILOGI("Add key monitor(%{public}s)", monitor.Dump().c_str());
     if (!CheckMonitor(monitor)) {
         MMI_HILOGE("Invalid monitor(%{public}s)", monitor.Dump().c_str());
-        return KEY_MONITOR_ERROR_INVALID_MONITOR;
+        return -PARAM_INPUT_INVALID;
     }
     auto [_, isNew] = monitors_.emplace(monitor);
     if (!isNew) {
@@ -193,12 +190,16 @@ void KeyMonitorManager::NotifyPendingMonitors()
     pending_.clear();
 }
 
-void KeyMonitorManager::ResetAll()
+void KeyMonitorManager::ResetAll(int32_t keyCode)
 {
-    std::for_each(pending_.cbegin(), pending_.cbegin(), [](const auto &item) {
-        TimerMgr->RemoveTimer(item.second.timerId_);
-    });
-    pending_.clear();
+    for (auto iter = pending_.cbegin(); iter != pending_.cend();) {
+        if (iter->first.key_ != keyCode) {
+            ++iter;
+        } else {
+            TimerMgr->RemoveTimer(iter->second.timerId_);
+            iter = pending_.erase(iter);
+        }
+    }
 }
 
 void KeyMonitorManager::OnSessionLost(int32_t session)
@@ -215,7 +216,8 @@ void KeyMonitorManager::OnSessionLost(int32_t session)
 
 bool KeyMonitorManager::CheckMonitor(const Monitor &monitor)
 {
-    return (allowedKeys_.find(monitor.key_) != allowedKeys_.cend());
+    return ((allowedKeys_.find(monitor.key_) != allowedKeys_.cend()) &&
+            (monitor.action_ == KeyEvent::KEY_ACTION_DOWN));
 }
 
 void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int32_t session)
@@ -231,7 +233,7 @@ void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int
     CHKPV(udsServer);
     auto fd = udsServer->GetClientFd(session);
     if (!udsServer->SendMsg(fd, pkt)) {
-        MMI_HILOGE("Failed to nitofy key monitor");
+        MMI_HILOGE("Failed to notify key monitor");
         return;
     }
     if (!EventLogHelper::IsBetaVersion()) {

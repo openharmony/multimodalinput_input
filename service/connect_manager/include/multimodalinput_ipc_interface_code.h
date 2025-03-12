@@ -154,8 +154,10 @@ enum class MultimodalinputConnectInterfaceCode {
 #endif // OHOS_BUILD_ENABLE_ANCO
     SUBSCRIBE_TABLET_EVENT = 312,
     UNSUBSCRIBE_TABLET_EVENT = 313,
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     SUBSCRIBE_KEY_MONITOR = 351,
     UNSUBSCRIBE_KEY_MONITOR = 352,
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 };
 
 enum class MultimodalinputEventObserverCode {
