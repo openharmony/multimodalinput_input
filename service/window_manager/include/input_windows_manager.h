@@ -135,7 +135,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId);
+        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void ReverseRotateScreen(const DisplayInfo& info, const double x, const double y, Coordinate2D& cursorPos) const;
@@ -338,7 +338,8 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     void DispatchTouch(int32_t pointerAction);
     const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
-        const DisplayInfo& info, EventTouch& touchInfo);
+        const DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
+    void TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId);
     void SetAntiMisTake(bool state);
     void SetAntiMisTakeStatus(bool state);
     void CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t, int32_t> logicalXY, bool isHotArea,
