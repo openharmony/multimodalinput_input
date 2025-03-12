@@ -44,20 +44,6 @@ TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
     InitToolTypes();
 }
 
-void TouchTransformProcessor::CancelPointerEvent()
-{
-    CHKPV(pointerEvent_);
-    int32_t pointerId = pointerEvent_->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent_->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return;
-    }
-    pointerItem.SetCanceled(true);
-    pointerEvent_->UpdatePointerItem(pointerId, pointerItem);
-    MMI_HILOGE("Cancel pointer event, pointer:%{public}d", pointerId);
-}
-
 bool TouchTransformProcessor::OnEventTouchCancel(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
@@ -124,7 +110,6 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
     if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
-        CancelPointerEvent();
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -234,8 +219,7 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
-        CancelPointerEvent();
+    if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId, true)) {
         processedCount_++;
         if (processedCount_ == PRINT_INTERVAL_COUNT) {
             MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
