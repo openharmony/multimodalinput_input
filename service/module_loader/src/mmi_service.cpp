@@ -2000,10 +2000,10 @@ int32_t MMIService::UnsubscribeHotkey(int32_t subscribeId)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 int32_t MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, keyOption] {
@@ -2011,15 +2011,12 @@ int32_t MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
         });
     if (ret != RET_OK) {
         MMI_HILOGE("ServerMsgHandler::SubscribeKeyMonitor fail, error:%{public}d", ret);
-        return ret;
     }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-    return RET_OK;
+    return ret;
 }
 
 int32_t MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, keyOption] {
@@ -2027,11 +2024,10 @@ int32_t MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
         });
     if (ret != RET_OK) {
         MMI_HILOGE("ServerMsgHandler::UnsubscribeKeyMonitor fail, error:%{public}d", ret);
-        return ret;
     }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-    return RET_OK;
+    return ret;
 }
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {

@@ -136,9 +136,9 @@ int32_t InputManager::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
     return InputMgrImpl.SubscribeKeyMonitor(keyOption, callback);
 }
 
-void InputManager::UnsubscribeKeyMonitor(int32_t subscriberId)
+int32_t InputManager::UnsubscribeKeyMonitor(int32_t subscriberId)
 {
-    InputMgrImpl.UnsubscribeKeyMonitor(subscriberId);
+    return InputMgrImpl.UnsubscribeKeyMonitor(subscriberId);
 }
 
 int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
