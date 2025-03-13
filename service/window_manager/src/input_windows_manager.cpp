@@ -2924,6 +2924,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
                     (action == PointerEvent::POINTER_ACTION_AXIS_END)||
                     (PointerEvent::MOUSE_BUTTON_LEFT != pointerEvent->GetButtonId()))) {
+                    MMI_HILOG_DISPATCHD("Mouse event transparent, action:%{public}d, ButtonId:%{public}d",
+                        action, pointerEvent->GetButtonId());
                     continue;
                 }
                 firstBtnDownWindowInfo_.first = item.id;
