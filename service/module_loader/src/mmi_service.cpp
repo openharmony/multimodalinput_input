@@ -674,8 +674,13 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t fo
 {
     CALL_INFO_TRACE;
     int32_t pid = GetCallingPid();
-    if (windowId < 0 || WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
-        MMI_HILOGE("The windowId not in right pid");
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+        [pid, windowId] {
+            return WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid);
+        })
+        );
+    if (windowId < 0 || ret != RET_OK) {
+        MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
@@ -693,7 +698,7 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t fo
             return ret;
         }
     }
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+    ret = delegateTasks_.PostSyncTask(std::bind(
         [pixelMap, pid, windowId, focusX, focusY] {
             return IPointerDrawingManager::GetInstance()->SetCustomCursor(pixelMap, pid, windowId, focusX, focusY);
         }
@@ -3677,12 +3682,17 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, Curso
 {
     CALL_INFO_TRACE;
     int32_t pid = GetCallingPid();
-    if (windowId < 0 || WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
-        MMI_HILOGE("The windowId not in right pid");
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+        [pid, windowId] {
+            return WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid);
+        })
+        );
+    if (windowId < 0 || ret != RET_OK) {
+        MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+    ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, cursor, options] {
             return IPointerDrawingManager::GetInstance()->SetCustomCursor(pid, windowId, cursor, options);
         }
