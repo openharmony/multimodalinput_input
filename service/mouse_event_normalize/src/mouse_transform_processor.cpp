@@ -420,7 +420,12 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         MMI_HILOGD("Touch pad is disable");
         return RET_ERR;
     }
-    
+    PointerEvent::PointerItem pointerItem;
+    auto isItemExist = pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), pointerItem);
+    if (isItemExist) {
+        pointerItem.SetCanceled(false);
+        pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
+    }
     auto state = libinput_event_pointer_get_button_state(data);
     HandleTouchPadButton(state, type);
 
@@ -912,6 +917,7 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         return result;
     }
     PointerEvent::PointerItem pointerItem;
+    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), pointerItem);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     } else if (type == LIBINPUT_EVENT_POINTER_MOTION || type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE) {

@@ -1211,7 +1211,7 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
         offsetY = currentDisplay.offsetY;
     }
     bool isOut = (rotateX < offsetX) || (rotateX > offsetX + validW) ||
-                 (rotateY < offsetY) || (rotateY > offsetX + validH);
+                 (rotateY < offsetY) || (rotateY > offsetY + validH);
     PrintDisplayInfo(currentDisplay);
     MMI_HILOGD("isOut=%{public}d,isPhysicalPos=%{public}d Position={%{private}d %{private}d}"
                "->{%{private}d %{private}d} RealValidWH={w:%{private}d h:%{private}d}",
@@ -1271,11 +1271,12 @@ void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const Displ
         return;
     }
     if (lastPointerEventforGesture_->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGD("lastPointerEventforGesture_ is not touchscreen");
+        MMI_HILOGD("source type:[%{public}d] is not touchscreen", lastPointerEventforGesture_->GetSourceType());
         return;
     }
     int32_t touchDisplayId = lastPointerEventforGesture_->GetTargetDisplayId();
     for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
+        MMI_HILOGD("touchDisplayId=%{public}d currentDisplay.id=%{public}d", touchDisplayId, currentDisplay.id);
         if (touchDisplayId == currentDisplay.id && IsValidDisplayChange(currentDisplay)) {
             CancelAllTouches(lastPointerEventforGesture_);
             return;
@@ -1295,17 +1296,25 @@ void InputWindowsManager::CancelMouseEvent()
         !lastPointerEventCopy->GetPressedButtons().empty()) {
         int32_t pointerId = lastPointerEventCopy->GetPointerId();
         int32_t originAction = lastPointerEventCopy->GetPointerAction();
-        MMI_HILOGD("Cancel mouse event for valid display change,pointerId:%{private}d action:%{private}d->%{private}d",
+        PointerEvent::PointerItem item;
+        auto isItemExist = lastPointerEventCopy->GetPointerItem(pointerId, item);
+        if (isItemExist) {
+            item.SetCanceled(true);
+            lastPointerEventCopy->UpdatePointerItem(pointerId, item);
+        }
+        MMI_HILOGI("Cancel mouse event for valid display change,pointerId:%{public}d action:%{public}d->%{public}d "
+                   "isItemExist=%{public}d",
             pointerId,
             originAction,
-            action);
+            action,
+            static_cast<uint32_t>(isItemExist));
         auto lastPointerEvent = std::make_shared<PointerEvent>(*lastPointerEventCopy);
         lastPointerEvent->SetPointerAction(action);
         lastPointerEvent->SetOriginPointerAction(originAction);
         lastPointerEvent->SetPointerId(pointerId);
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        CHKPV(eventDispatchHandler);
-        eventDispatchHandler->HandlePointerEvent(lastPointerEvent);
+        auto filter = InputHandler->GetFilterHandler();
+        CHKPV(filter);
+        filter->HandlePointerEvent(lastPointerEvent);
     }
 }
 
@@ -5897,13 +5906,13 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
             action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
         }
         pointerEvent->SetPointerAction(action);
-        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
         pointerEvent->SetPointerId(pointerId);
 
         if (AdjustFingerFlag(pointerEvent)) {
             continue;
         }
-        MMI_HILOGI("Cancel touch, pointerId:%{public}d", pointerId);
+        MMI_HILOGI("Cancel touch, pointerId:%{public}d, action:%{public}d", pointerId, action);
         auto now = GetSysClockTime();
         pointerEvent->SetActionTime(now);
         pointerEvent->SetTargetWindowId(item.GetTargetWindowId());
@@ -5912,11 +5921,9 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
             pointerEvent->SetAgentWindowId(winOpt->agentWindowId);
         }
         pointerEvent->UpdateId();
-
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        CHKPV(eventDispatchHandler);
-        eventDispatchHandler->HandleTouchEvent(pointerEvent);
-        CancelTouch(item.GetPointerId());
+        auto filter = InputHandler->GetFilterHandler();
+        CHKPV(filter);
+        filter->HandleTouchEvent(pointerEvent);
     }
 }
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
