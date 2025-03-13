@@ -38,6 +38,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MT_TOOL_PALM { 2 };
+constexpr int32_t TimeoutMs { 1500 };
 constexpr uint32_t KEY_ESC { 1 };
 constexpr uint32_t KEY_KPASTERISK { 55 };
 constexpr uint32_t KEY_F1 { 59 };
@@ -101,6 +102,10 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
     eventNormalizeHandler_->HandleEvent(lpEvent, frameTime);
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;
+    if (lostTime >= TimeoutMs) {
+        MMI_HILOGE("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
+               ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
+    }
     MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
