@@ -40,6 +40,9 @@ private:
     void ResetCount();
     void StartXkeyIfNeeded();
     bool IsRemoveDelaySingleClick();
+    void StartLongPressTimer();
+    void StartSingleClickTimer();
+
     // 按压次数
     std::atomic<int32_t> pressCount_ {0};
 
