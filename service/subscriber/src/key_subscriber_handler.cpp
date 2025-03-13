@@ -376,7 +376,7 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
     std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (auto &iter : subscriberMap_) {
         if (IsEqualKeyOption(option, iter.first)) {
-            MMI_HILOGI("Add subscriber Id:%{public}d", subscriber->id_);
+            MMI_HILOGI("Add subscriber Id:%{public}d, pid:%{public}d", subscriber->id_, subscriber->sess_->GetPid());
             iter.second.push_back(std::move(subscriber));
             MMI_HILOGD("Subscriber size:%{public}zu", iter.second.size());
             return RET_OK;
