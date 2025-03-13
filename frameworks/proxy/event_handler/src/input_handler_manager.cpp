@@ -540,7 +540,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
     }
 
     if (consumerCount == 0) {
-        MMI_HILOGE("All task post failed");
+        MMI_HILOGD("All task post failed");
         return;
     }
     int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
@@ -934,7 +934,7 @@ bool InputHandlerManager::IsMatchGesture(const Handler &handler, int32_t action,
             return true;
         }
         default: {
-            MMI_HILOGW("Unknown action:%{public}d", action);
+            MMI_HILOGD("Unknown action:%{public}d", action);
             return false;
         }
     }
