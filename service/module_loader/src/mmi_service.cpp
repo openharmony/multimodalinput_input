@@ -107,6 +107,7 @@ constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 constexpr int32_t RETRY_CHECK_TIMES { 5 };
 constexpr int32_t CHECK_EEVENT_INTERVAL_TIME { 4000 };
+const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 const std::set<int32_t> g_keyCodeValueSet = {
 #ifndef OHOS_BUILD_ENABLE_WATCH
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
@@ -672,8 +673,12 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
 int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
     int32_t pid = GetCallingPid();
+    if (windowId < 0 || WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+        MMI_HILOGE("The windowId not in right pid");
+        return ERROR_WINDOW_ID_PERMISSION_DENIED;
+    }
+#if defined OHOS_BUILD_ENABLE_POINTER
     auto type = PER_HELPER->GetTokenType();
     if (windowId < 0 && (type == OHOS::Security::AccessToken::TOKEN_HAP ||
         type == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
@@ -3671,8 +3676,12 @@ int32_t MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool aut
 int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
     int32_t pid = GetCallingPid();
+    if (windowId < 0 || WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+        MMI_HILOGE("The windowId not in right pid");
+        return ERROR_WINDOW_ID_PERMISSION_DENIED;
+    }
+#if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, cursor, options] {
             return IPointerDrawingManager::GetInstance()->SetCustomCursor(pid, windowId, cursor, options);
