@@ -1514,7 +1514,41 @@ void InputWindowsManager::AdjustDisplayRotation()
         IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*displayInfo);
         IPointerDrawingManager::GetInstance()->SetPointerLocation(
             static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y), cursorPos_.displayId);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (IsSupported() && extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
+        AdjustDragPosition();
     }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    }
+}
+
+void InputWindowsManager::AdjustDragPosition()
+{
+    auto lastPointerEvent = GetlastPointerEvent();
+    CHKPV(lastPointerEvent);
+    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent);
+    pointerEvent->SetTargetDisplayId(mouseLocation_.displayId);
+    auto touchWindow = SelectWindowInfo(mouseLocation_.physicalX, mouseLocation_.physicalY, pointerEvent);
+    if (touchWindow == std::nullopt) {
+        MMI_HILOGE("SelectWindowInfo failed");
+        return;
+    }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(pointerId, item);
+    item.SetDisplayX(mouseLocation_.physicalX);
+    item.SetDisplayY(mouseLocation_.physicalY);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    pointerEvent->SetTargetWindowId(touchWindow->id);
+    pointerEvent->SetAgentWindowId(touchWindow->id);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    auto now = GetSysClockTime();
+    pointerEvent->SetActionTime(now);
+    pointerEvent->UpdateId();
+    auto filterHandler = InputHandler->GetFilterHandler();
+    CHKPV(filterHandler);
+    filterHandler->HandlePointerEvent(pointerEvent);
+    MMI_HILOGI("pointerEvent: %{public}s", pointerEvent->ToString().c_str());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
