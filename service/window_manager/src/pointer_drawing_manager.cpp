@@ -126,7 +126,6 @@ constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t MAX_CUSTOM_CURSOR_SIZE { 256 };
 constexpr float MAX_CUSTOM_CURSOR_DIMENSION { 256.0f };
-const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 constexpr int32_t CURSOR_STRIDE { 4 };
 std::atomic<bool> g_isRsRestart { false };
 } // namespace
@@ -3556,10 +3555,6 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
     CursorOptions options)
 {
     CALL_DEBUG_ENTER;
-    if (windowId < 0 || WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
-        MMI_HILOGE("The windowId not in right pid");
-        return ERROR_WINDOW_ID_PERMISSION_DENIED;
-    }
     followSystem_ = options.followSystem;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     userIconFollowSystem_ = false;
