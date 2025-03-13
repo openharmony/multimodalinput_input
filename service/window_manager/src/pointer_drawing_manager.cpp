@@ -3464,7 +3464,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
         MMI_HILOGI("userIcon_ is nullptr");
         return nullptr;
     }
-    Parcel data;
+    MessageParcel data;
     userIcon_->Marshalling(data);
     std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr(OHOS::Media::PixelMap::Unmarshalling(data));
     if (pixelMapPtr == nullptr) {
