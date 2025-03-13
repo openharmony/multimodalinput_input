@@ -23,6 +23,7 @@
 #include "setting_datashare.h"
 #include "pointer_event.h"
 #include "account_manager.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -117,16 +118,21 @@ void XKeyEventProcessor::InterceptXKeyDown()
     HandleQuickAccessMenu(X_KEY_DOWN);
 
     if (pressCount_ == 0) {
-        std::thread([this]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(LONG_PRESS_DELAY));
-            if (pressCount_ == 1 && !handledLongPress_) {
-                HandleQuickAccessMenu(LONG_PRESS);
-                MMI_HILOGI("X-key is long press.");
-            }
-        }).detach();
+        StartLongPressTimer();
     }
 
     pressCount_++;
+}
+
+void XKeyEventProcessor::StartLongPressTimer()
+{
+    MMI_HILOGI("start long press timer.");
+    TimerMgr->AddTimer(LONG_PRESS_DELAY, 1, [this] () {
+        if (this->pressCount_ == 1 && !this->handledLongPress_) {
+            HandleQuickAccessMenu(LONG_PRESS);
+            MMI_HILOGI("X-key is long press.");
+        }
+    });
 }
 
 void XKeyEventProcessor::InterceptXKeyUp()
@@ -139,13 +145,7 @@ void XKeyEventProcessor::InterceptXKeyUp()
             HandleQuickAccessMenu(SINGLE_CLICK);
             return;
         }
-        std::thread([this]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(DOUBLE_CLICK_DELAY));
-            if (pressCount_ == 1) {
-                HandleQuickAccessMenu(SINGLE_CLICK);
-                MMI_HILOGI("X-key is single click.");
-            }
-        }).detach();
+        StartSingleClickTimer();
     } else if (pressCount_ == X_KEY_DOUBLE_CLICK_ENABLE_COUNT) {
         HandleQuickAccessMenu(DOUBLE_CLICK);
         MMI_HILOGI("X-key is double click.");
@@ -162,6 +162,17 @@ bool XKeyEventProcessor::IsRemoveDelaySingleClick()
         .SettingDataShare::GetStringValue(X_KEY_DOUBLE_CLICK_ENABLE_KEY, value, uri);
     MMI_HILOGI("double click enable state:%{public}s", value.c_str());
     return value == DOUBLE_CLICK_ENABLE_STATUS;
+}
+
+void XKeyEventProcessor::StartSingleClickTimer()
+{
+    MMI_HILOGI("start single click timer.");
+    TimerMgr->AddTimer(DOUBLE_CLICK_DELAY, 1, [this] () {
+        if (this->pressCount_ == 1) {
+            HandleQuickAccessMenu(SINGLE_CLICK);
+            MMI_HILOGI("X-key is single click.");
+        }
+    });
 }
 
 void XKeyEventProcessor::ResetCount()
