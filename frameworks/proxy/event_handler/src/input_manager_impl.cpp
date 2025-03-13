@@ -799,7 +799,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
             << item.validWidth << item.validHeight << item.fixedDirection
-            << item.physicalWidth << item.physicalHeight
+            << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight
             << item.oneHandX << item.oneHandY;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt << item.pointerActiveWidth << item.pointerActiveHeight;
@@ -886,8 +886,9 @@ void InputManagerImpl::PrintDisplayInfo()
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
                    "dpi:%{public}d,name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
-                   "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,validWH:{%{private}d %{private}d}"
-                   "fixedDirection:%{public}d,physicalWH:{%{private}d %{private}d},pActiveWH:{%{private}d %{private}d}",
+                   "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,scalePercent:%{public}d,"
+                   "expandHeight:%{public}d,validWH:{%{private}d %{private}d},fixedDirection:%{public}d,"
+                   "physicalWH:{%{private}d %{private}d},pActiveWH:{%{private}d %{private}d}",
             item.id,
             item.x,
             item.y,
@@ -901,6 +902,8 @@ void InputManagerImpl::PrintDisplayInfo()
             item.displayMode,
             item.oneHandX,
             item.oneHandY,
+            item.scalePercent,
+            item.expandHeight,
             item.validWidth,
             item.validHeight,
             item.fixedDirection,
