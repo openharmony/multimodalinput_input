@@ -1211,7 +1211,7 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
         offsetY = currentDisplay.offsetY;
     }
     bool isOut = (rotateX < offsetX) || (rotateX > offsetX + validW) ||
-                 (rotateY < offsetY) || (rotateY > offsetX + validH);
+                 (rotateY < offsetY) || (rotateY > offsetY + validH);
     PrintDisplayInfo(currentDisplay);
     MMI_HILOGD("isOut=%{public}d,isPhysicalPos=%{public}d Position={%{private}d %{private}d}"
                "->{%{private}d %{private}d} RealValidWH={w:%{private}d h:%{private}d}",
@@ -2283,7 +2283,7 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     }
     PhysicalCoordinate coord {
         .x = libinput_event_touch_get_x_transformed(touch, width),
-        .y = libinput_event_touch_get_y_transformed(touch, height),
+        .y = libinput_event_touch_get_y_transformed(touch, height - info.expandHeight),
     };
     MMI_HILOGD("width:%{private}d, height:%{private}d, physicalX:%{private}f, physicalY:%{private}f",
         width, height, coord.x, coord.y);
@@ -2304,7 +2304,8 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     touchInfo.point.x = static_cast<int32_t>(coord.x);
     touchInfo.point.y = static_cast<int32_t>(coord.y);
     touchInfo.toolRect.point.x = static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, width));
-    touchInfo.toolRect.point.y = static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, height));
+    touchInfo.toolRect.point.y =
+        static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, height - info.expandHeight));
     touchInfo.toolRect.width = static_cast<int32_t>(
         libinput_event_touch_get_tool_width_transformed(touch, width));
     touchInfo.toolRect.height = static_cast<int32_t>(
@@ -3678,13 +3679,16 @@ bool InputWindowsManager::IsNavigationWindowInjectEvent(std::shared_ptr<PointerE
 }
 
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-void InputWindowsManager::UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY,
+void InputWindowsManager::UpdateDisplayXYInOneHandMode(double &physicalX, double &physicalY,
     const DisplayInfo &displayInfo, float oneHandScale)
 {
-    double virtualY = physicalY - displayInfo.oneHandY;
-    double virtualX = physicalX - displayInfo.oneHandX;
-    physicalX = virtualX / oneHandScale;
-    physicalY = virtualY / oneHandScale;
+    int32_t oneHandXMax = displayInfo.oneHandX + displayInfo.width * oneHandScale;
+    if ((physicalY >= displayInfo.oneHandY) && (physicalX >= displayInfo.oneHandX) && (physicalX <= oneHandXMax)) {
+        double virtualY = physicalY - displayInfo.oneHandY;
+        double virtualX = physicalX - displayInfo.oneHandX;
+        physicalX = virtualX / oneHandScale;
+        physicalY = virtualY / oneHandScale;
+    }
 }
 
 void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo,
@@ -3708,10 +3712,11 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
         return;
     }
     bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
-    bool isOneHandMode = displayInfo.oneHandY > 0;
-    if (isOneHandMode) {
+    if (displayInfo.expandHeight < 100) {
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
-        MMI_HILOG_DISPATCHD("displayInfo.oneHandY=%{private}d, fixedModeStr=%{public}s", displayInfo.oneHandY,
+        MMI_HILOG_DISPATCHI("displayInfo.oneHandX=%{public}d, displayInfo.oneHandY=%{public}d, "
+                            "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
+            displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight, displayInfo.scalePercent,
             pointerEvent->GetFixedModeStr().c_str());
         double fixedDisplayX = physicalX;
         double fixedDisplayY = physicalY;
