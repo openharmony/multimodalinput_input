@@ -70,7 +70,7 @@ HWTEST_F(InputEventTest, InputEventTest_EventTypeToString_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventTest, InputEventTest_MarkProcessed_001, TestSize.Level1)
+HWTEST_F(InputEventTest, InputEventTest_MarkProcessed_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto InputEvent = InputEvent::Create();
@@ -91,7 +91,7 @@ HWTEST_F(InputEventTest, InputEventTest_MarkProcessed_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventTest, InputEventTest_SetExtraData_001, TestSize.Level1)
+HWTEST_F(InputEventTest, InputEventTest_SetExtraData_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto InputEvent = InputEvent::Create();
