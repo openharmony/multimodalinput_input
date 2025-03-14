@@ -1949,11 +1949,25 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     if (pointerAction == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
         pointerEvent->SetAgentWindowId(lastWindowInfo_.id);
     }
+    PrintEnterEventInfo(pointerEvent);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     auto filter = InputHandler->GetFilterHandler();
     filter->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+void InputWindowsManager::PrintEnterEventInfo(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc == PointerEvent::POINTER_ACTION_LEAVE_WINDOW &&
+        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent->GetDeviceId());
+        CHKPV(device);
+        MMI_HILOGE("leave-window type:%{public}d,id:%{public}d,pointerid:%{public}d,action:%{public}d by:%{public}s",
+            pointerEvent->GetSourceType(), pointerEvent->GetId(), pointerEvent->GetPointerId(),
+            pointerAc, device->GetName().c_str());
+    }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 

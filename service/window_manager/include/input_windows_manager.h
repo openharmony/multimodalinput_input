@@ -64,6 +64,7 @@ public:
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
     bool AdjustFingerFlag(std::shared_ptr<PointerEvent> pointerEvent);
+    void PrintEnterEventInfo(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo);

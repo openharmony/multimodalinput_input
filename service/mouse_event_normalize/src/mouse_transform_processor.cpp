@@ -152,14 +152,6 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
 
-    if (MouseState->IsLeftBtnPressed()) {
-        if (!pointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
-            pointerEvent_->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
-        }
-    } else {
-        pointerEvent_->DeleteReleaseButton(PointerEvent::MOUSE_BUTTON_LEFT);
-    }
-
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
@@ -838,8 +830,13 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
     pointerItem.SetDeviceId(deviceId_);
-    pointerItem.SetRawDx(static_cast<int32_t>(unaccelerated_.dx));
-    pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
+    if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+        pointerItem.SetRawDx(0);
+        pointerItem.SetRawDy(0);
+    } else {
+        pointerItem.SetRawDx(static_cast<int32_t>(unaccelerated_.dx));
+        pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
+    }
 
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
