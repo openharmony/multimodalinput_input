@@ -2218,5 +2218,41 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_007, TestSize.
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
 }
+
+/**
+ * @tc.name: PointerEventTest_SetAngle_001
+ * @tc.desc: SetAngle
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetAngle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    int32_t angle = 3;
+    ASSERT_NO_FATAL_FAILURE(item.SetAngle(angle));
+}
+
+/**
+ * @tc.name: PointerEventTest_GetAngle_001
+ * @tc.desc: GetAngle
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetAngle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    int32_t angle = 3;
+    ASSERT_NO_FATAL_FAILURE(item.SetAngle(angle));
+    int32_t ret = item.GetAngle();
+    ASSERT_EQ(ret, angle);
+}
 } // namespace MMI
 } // namespace OHOS
