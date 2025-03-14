@@ -5332,5 +5332,47 @@ HWTEST_F(InputManagerTest, InputManagerTest_CreateVKeyboardDevice_001, TestSize.
     ASSERT_EQ(ret, INVALID_HANDLER_ID);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
+
+/*
+ * @tc.name: InputManagerTest_AddPreMonitor_001
+ * @tc.desc: AddPreMonitor.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddPreMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> keys;
+    keys.push_back(3);
+    uint32_t handleEventType = 0;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AddPreMonitor(nullptr, handleEventType, keys));
+}
+
+/*
+ * @tc.name: InputManagerTest_RemovePreMonitor_001
+ * @tc.desc: RemovePreMonitor.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemovePreMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t monitorId = 0;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->RemovePreMonitor(monitorId));
+}
+
+/*
+ * @tc.name: InputManagerTest_SetMultiWindowScreenId_001
+ * @tc.desc: SetMultiWindowScreenId.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMultiWindowScreenId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint64_t screenId = 1;
+    uint64_t displayNodeScreenId = 2;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetMultiWindowScreenId(screenId, displayNodeScreenId));
+}
 } // namespace MMI
 } // namespace OHOS
