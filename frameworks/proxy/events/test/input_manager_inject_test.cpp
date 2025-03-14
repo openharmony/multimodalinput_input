@@ -128,7 +128,7 @@ void InputManagerInjectTest::SetItemPointerEvent(int32_t id, int32_t pressed, in
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_004, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_004, 2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -159,7 +159,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_004, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_005, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_005, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -191,7 +191,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_005, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_006, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_006, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -246,7 +246,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_006, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_007, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_007, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -277,7 +277,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_007, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_008, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_008, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -308,7 +308,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_008, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_009, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_009, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -363,7 +363,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_009, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_010, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_010, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -385,7 +385,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_010, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_011, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_011, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -407,7 +407,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_011, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_012, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_012, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -429,7 +429,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_012, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_013, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_013, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -451,7 +451,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_013, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_014, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_014, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -473,7 +473,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_014, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_015, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_015, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -495,7 +495,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_015, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_016, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_016, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -517,7 +517,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_016, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_017, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_017, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -539,7 +539,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_017, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_018, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_018, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -561,7 +561,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_018, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_019, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_019, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool ret = true;
@@ -975,7 +975,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_019, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_001, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1004,7 +1004,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_001, TestSize.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_002, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1033,7 +1033,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_002, TestSize.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_003, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1062,7 +1062,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_003, TestSize.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_004, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1091,7 +1091,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_004, TestSize.
  * @tc.type: FUNC
  * @tc.require:AR000GJG6G
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_005, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_005, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1120,7 +1120,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_005, TestSize.
  * @tc.type: FUNC
  * @tc.require:AR000GJG6G
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_006, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchpadEvent_006, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1501,7 +1501,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchscreenEvent_012, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_002, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_002, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1534,7 +1534,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_002, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_003, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_003, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1567,7 +1567,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_003, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_004, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_004, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1600,7 +1600,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_004, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_005, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_005, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1632,7 +1632,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_005, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_006, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_006, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1664,7 +1664,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_006, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_007, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_007, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
@@ -1696,7 +1696,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_007, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_008, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_008, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {

@@ -57,7 +57,7 @@ HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_FindHandler_001, TestSize.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_FindHandler_002, TestSize.Level1)
+HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_FindHandler_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     PreMonitorManager manager;
@@ -93,7 +93,7 @@ HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_AddHandler_001, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_RemoveHandler_001, TestSize.Level1)
+HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_RemoveHandler_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     PreMonitorManager manager;
@@ -113,7 +113,7 @@ HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_RemoveHandler_001, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_AddLocal_001, TestSize.Level1)
+HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_AddLocal_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     PreMonitorManager manager;
@@ -170,7 +170,7 @@ HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_AddToServer_001, TestSize.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_RemoveFromServer_001, TestSize.Level1)
+HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_RemoveFromServer_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     PreMonitorManager manager;

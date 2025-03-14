@@ -276,7 +276,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) { MMI_HILOGD("Add monitor success"); };
@@ -295,7 +295,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_001, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_002, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto keyEventFun = [](std::shared_ptr<KeyEvent> event) { MMI_HILOGD("Add monitor success"); };
@@ -314,7 +314,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_002, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = InputManagerUtil::SetupPointerEvent001();
@@ -340,7 +340,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_001
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
@@ -388,7 +388,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_003, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = InputManagerUtil::SetupPointerEvent003();
@@ -421,7 +421,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_003
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -458,7 +458,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_002, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -495,7 +495,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_003, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -532,7 +532,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_004, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
@@ -591,7 +591,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_005, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_005, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -628,7 +628,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
@@ -652,7 +652,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_001, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_003, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
@@ -1417,7 +1417,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerStyle_002, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = false;
@@ -1430,7 +1430,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollSwitc
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = true;
@@ -1446,7 +1446,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollSwitc
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollDirection_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollDirection_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool state = false;
@@ -1459,7 +1459,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollDirec
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollDirection_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollDirection_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool state = true;
@@ -1475,7 +1475,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollDirec
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadTapSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadTapSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = false;
@@ -1488,7 +1488,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadTapSwitch_0
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadTapSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadTapSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = true;
@@ -1504,7 +1504,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadTapSwitch_0
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadDoubleTapAndDragState_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = false;
@@ -1517,7 +1517,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadDoubleTapAn
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadDoubleTapAndDragState_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = true;
@@ -1533,7 +1533,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadDoubleTapAn
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPointerSpeed_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPointerSpeed_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     int32_t speed = POINTER_SPEED_ONE;
@@ -1546,7 +1546,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPointerSpee
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPointerSpeed_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPointerSpeed_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     int32_t speed = POINTER_SPEED_TWO;
@@ -1562,7 +1562,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPointerSpee
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPinchSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPinchSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = false;
@@ -1575,7 +1575,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPinchSwitch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPinchSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPinchSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = true;
@@ -1591,7 +1591,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPinchSwitch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadSwipeSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadSwipeSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = false;
@@ -1604,7 +1604,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadSwipeSwitch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadSwipeSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadSwipeSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool flag = true;
@@ -1633,7 +1633,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRightClickT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickType_001, TestSize.Level1)
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickType_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     int32_t type = RIGHT_CLICK_TYPE;
