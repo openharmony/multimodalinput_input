@@ -260,6 +260,7 @@ void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCod
                                      libinput_key_state state, int64_t frameTime)
 {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    // Note: during caps lock down, the vkeyboardData.capsLock inside libinput is toggled.
     libinput_event_keyboard* key_event_pressed =
             libinput_create_keyboard_event(touch, keyCode, state);
 
