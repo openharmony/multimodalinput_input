@@ -161,6 +161,7 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void UpdateWindowInfoExt(const WindowGroupInfo &windowGroupInfo, const DisplayGroupInfo &displayGroupInfo);
+    void UpdateOneHandDataExt(const DisplayInfo &displayInfo);
     void UpdateShellWindow(const WindowInfo &window);
     void UpdateDisplayInfoExt(const DisplayGroupInfo &displayGroupInfo);
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
