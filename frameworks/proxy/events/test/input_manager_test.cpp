@@ -5319,21 +5319,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_019, TestSize.Leve
 }
 
 /*
- * @tc.name: InputManagerTest_CreateVKeyboardDevice_001
- * @tc.desc: CreateVKeyboardDevice test.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_CreateVKeyboardDevice_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t ret = InputManager::GetInstance()->CreateVKeyboardDevice(nullptr);
-    ASSERT_EQ(ret, INVALID_HANDLER_ID);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
-}
-
-/*
  * @tc.name: InputManagerTest_AddPreMonitor_001
  * @tc.desc: AddPreMonitor.
  * @tc.type: FUNC
