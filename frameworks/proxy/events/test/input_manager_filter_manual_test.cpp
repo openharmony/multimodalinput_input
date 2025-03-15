@@ -399,7 +399,7 @@ void SimulateKeyEvent(bool &resultA, bool &resultB, const int32_t KEYCODE, bool 
         ASSERT_EQ(resultB, true);
     }
 }
-HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1)
+HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level3)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Enter HandlePointerEventFilter_002");

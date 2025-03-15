@@ -53,7 +53,7 @@ HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_IsSceneBoardEnabled_00
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_IsResampleEnabled_001, TestSize.Level1)
+HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_IsResampleEnabled_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     MMISceneBoardJudgement judgement;
