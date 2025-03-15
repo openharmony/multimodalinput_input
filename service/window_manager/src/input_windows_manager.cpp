@@ -4898,13 +4898,13 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
         integerX = 0;
     }
     if (integerX >= width) {
-        integerX = width;
+        integerX = width - 1;
     }
     if (integerY < 0) {
         integerY = 0;
     }
     if (integerY >= height) {
-        integerY = height;
+        integerY = height - 1;
     }
 }
 
@@ -5070,8 +5070,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     CoordinateCorrection(width, height, integerX, integerY);
-    x = static_cast<double>(integerX) + ((integerX == width) ? 0.0f : (x - floor(x)));
-    y = static_cast<double>(integerY) + ((integerY == height) ? 0.0f : (y - floor(y)));
+    x = static_cast<double>(integerX) + (x - floor(x));
+    y = static_cast<double>(integerY) + (y - floor(y));
 
     mouseLocation_.displayId = displayId;
     cursorPos_.displayId = displayId;
