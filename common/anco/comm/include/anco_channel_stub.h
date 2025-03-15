@@ -40,6 +40,7 @@ private:
     int32_t StubSyncKeyEvent(MessageParcel &data, MessageParcel &reply);
     int32_t StubUpdateWindowInfo(MessageParcel &data, MessageParcel &reply);
     int32_t StubSyncKnuckleStatus(MessageParcel &data, MessageParcel &reply);
+    int32_t StubUpdateOneHandData(MessageParcel &data, MessageParcel &reply);
 
     std::map<AncoRequestId, int32_t (AncoChannelStub::*)(MessageParcel&, MessageParcel&)> handlers_;
 };
