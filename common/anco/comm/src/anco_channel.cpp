@@ -47,6 +47,12 @@ int32_t AncoChannel::UpdateWindowInfo(std::shared_ptr<AncoWindows> windows)
     return consumer_->UpdateWindowInfo(windows);
 }
 
+int32_t AncoChannel::UpdateOneHandData(const AncoOneHandData &oneHandData)
+{
+    CHKPR(consumer_, RET_ERR);
+    return consumer_->UpdateOneHandData(oneHandData);
+}
+
 int32_t AncoChannel::SyncKnuckleStatus(bool isKnuckleEnable)
 {
     CHKPR(consumer_, RET_ERR);
