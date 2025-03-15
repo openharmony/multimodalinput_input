@@ -84,7 +84,7 @@ void AncoChannelStubExTest::TearDownTestCase()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncPointerEvent, TestSize.Level1)
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncPointerEvent, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadFromParcel(_)).WillRepeatedly(Return(false));
@@ -135,7 +135,7 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKeyEvent, TestSize
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKeyEvent_001, TestSize.Level1)
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKeyEvent_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadFromParcel(_)).WillRepeatedly(Return(true));
@@ -168,7 +168,7 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubUpdateWindowInfo, Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKnuckleStatus, TestSize.Level1)
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKnuckleStatus, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<AncoChannelStub> ancoChannel = std::make_shared<AncoChannelTest>();
