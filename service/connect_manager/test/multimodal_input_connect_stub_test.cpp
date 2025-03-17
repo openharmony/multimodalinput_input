@@ -2836,5 +2836,41 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_014, TestSize.Level1)
     temp = stub->StubUnsubscribeKeyMonitor(data, reply);
     EXPECT_EQ(ret, temp);
 }
+
+/**
+ * @tc.name: StubSubscribeHotkey_001
+ * @tc.desc: Test the function StubSubscribeHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeHotkey_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 201;
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t ret = stub->StubSubscribeHotkey(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetClientInfo_001
+ * @tc.desc: Test the function StubSetClientInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetClientInfo_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 201;
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t ret = stub->StubSetClientInfo(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
 } // namespace MMI
 } // namespace OHOS
