@@ -3774,7 +3774,7 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
         return;
     }
     bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
-    if (displayInfo.scalePercent < 100) {
+    if (displayInfo.scalePercent > 0 && displayInfo.scalePercent < 100) {
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
         MMI_HILOG_DISPATCHI("displayInfo.oneHandX=%{public}d, displayInfo.oneHandY=%{public}d, "
                             "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
