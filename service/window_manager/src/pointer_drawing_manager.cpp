@@ -126,7 +126,7 @@ constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t MAX_CUSTOM_CURSOR_SIZE { 256 };
 constexpr float MAX_CUSTOM_CURSOR_DIMENSION { 256.0f };
-constexpr int32_t CURSOR_STRIDE { 4 };
+constexpr uint32_t CURSOR_STRIDE { 4 };
 std::atomic<bool> g_isRsRestart { false };
 } // namespace
 } // namespace MMI
@@ -971,7 +971,8 @@ void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rose
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPV(addr);
 
-    uint32_t addrSize = buffer->GetWidth() * buffer->GetHeight() * CURSOR_STRIDE;
+    uint32_t addrSize = static_cast<uint32_t>(buffer->GetWidth()) *
+        static_cast<uint32_t>(buffer->GetHeight()) * CURSOR_STRIDE;
     auto ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), addrSize);
     if (ret != EOK) {
         MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
@@ -3286,8 +3287,8 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.style = mouseStyle;
     cfg.align = MouseIcon2IconType(mouseStyle);
     cfg.path = mouseIcons_[mouseStyle].iconPath;
-    cfg.color = GetPointerColor();
-    cfg.size = GetPointerSize();
+    cfg.color = static_cast<uint32_t>(GetPointerColor());
+    cfg.size = static_cast<uint32_t>(GetPointerSize());
     cfg.isHard = isHard;
     cfg.dpi = sp->GetRenderDPI();
     cfg.direction = sp->IsMirror() ? DIRECTION0 : displayInfo_.direction;
