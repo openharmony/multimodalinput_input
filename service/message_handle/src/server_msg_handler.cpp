@@ -147,9 +147,13 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
+    bool hasVirtualKeyboard = false;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    hasVirtualKeyboard = INPUT_DEV_MGR->HasVirtualKeyboardDevice();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     std::vector<struct libinput_device*> input_device;
     INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
-    if (input_device.size() == 0) {
+    if (input_device.size() == 0 && !hasVirtualKeyboard) {
         MMI_HILOGW("No keyboard device is currently available");
         return ERR_DEVICE_NOT_EXIST;
     }
@@ -177,10 +181,14 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
         MMI_HILOGW("It is prohibited for non-input applications");
         return ERR_NON_INPUT_APPLICATION;
     }
+    bool hasVirtualKeyboard = false;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    hasVirtualKeyboard = INPUT_DEV_MGR->HasVirtualKeyboardDevice();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     std::vector<struct libinput_device*> input_device;
     int32_t DeviceId = -1;
     INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
-    if (input_device.size() == 0) {
+    if (input_device.size() == 0 && !hasVirtualKeyboard) {
         MMI_HILOGW("No keyboard device is currently available");
         return ERR_DEVICE_NOT_EXIST;
     }
@@ -191,6 +199,13 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
         MMI_HILOGE("Current device no need to set up");
         return RET_OK;
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (hasVirtualKeyboard && funcKey == KeyEvent::CAPS_LOCK_FUNCTION_KEY) {
+        // set vkeyboard caps state with separate API.
+        MMI_HILOGD("Set vkb func state old=%{private}d, new=%{private}d", checkState, enable);
+        libinput_toggle_caps_key();
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     for (auto it = input_device.begin(); it != input_device.end(); ++it) {
         auto device = (*it);
         DeviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
