@@ -3753,6 +3753,33 @@ void InputWindowsManager::UpdateDisplayXYInOneHandMode(double &physicalX, double
 #endif // OHOS_BUILD_ENABLE_ANCO
 }
 
+void InputWindowsManager::HandleOneHandMode(const DisplayInfo &displayInfo,
+    std::shared_ptr<PointerEvent> &pointerEvent, PointerEvent::PointerItem &pointerItem)
+{
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    SendOneHandData(true, displayInfo);
+#endif // OHOS_BUILD_ENABLE_ANCO
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    MMI_HILOG_DISPATCHD("displayInfo.oneHandX=%{private}d, displayInfo.oneHandY=%{private}d, "
+                        "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
+        displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight, displayInfo.scalePercent,
+        pointerEvent->GetFixedModeStr().c_str());
+    double fixedDisplayX = pointerItem.GetDisplayXPos();
+    double fixedDisplayY = pointerItem.GetDisplayYPos();
+    float oneHandScale = displayInfo.scalePercent * 1.0 / 100;
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
+        MMI_HILOG_DISPATCHD("autoToVirtualScreen=%{public}s", autoToVirtualScreen ? "true" : "false");
+        if (autoToVirtualScreen) {
+            UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
+        }
+    } else {
+        UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
+    }
+    pointerItem.SetFixedDisplayX(static_cast<int32_t>(fixedDisplayX));
+    pointerItem.SetFixedDisplayY(static_cast<int32_t>(fixedDisplayY));
+}
+
 void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo,
     std::shared_ptr<PointerEvent> &pointerEvent)
 {
@@ -3775,25 +3802,11 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
     }
     bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
     if (displayInfo.scalePercent > 0 && displayInfo.scalePercent < 100) {
-        pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
-        MMI_HILOG_DISPATCHI("displayInfo.oneHandX=%{public}d, displayInfo.oneHandY=%{public}d, "
-                            "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
-            displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight, displayInfo.scalePercent,
-            pointerEvent->GetFixedModeStr().c_str());
-        double fixedDisplayX = physicalX;
-        double fixedDisplayY = physicalY;
-        float oneHandScale = displayInfo.scalePercent * 1.0 / 100;
-        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
-            MMI_HILOG_DISPATCHD("autoToVirtualScreen=%{public}s", autoToVirtualScreen ? "true" : "false");
-            if (autoToVirtualScreen) {
-                UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
-            }
-        } else {
-            UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
-        }
-        pointerItem.SetFixedDisplayX(static_cast<int32_t>(fixedDisplayX));
-        pointerItem.SetFixedDisplayY(static_cast<int32_t>(fixedDisplayY));
+        HandleOneHandMode(displayInfo, pointerEvent, pointerItem);
     } else {
+#ifdef OHOS_BUILD_ENABLE_ANCO
+        SendOneHandData(false, displayInfo);
+#endif // OHOS_BUILD_ENABLE_ANCO
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
         pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
         pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
@@ -3831,7 +3844,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     bool isNavigationWindow = false;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
-    
+
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
@@ -5762,6 +5775,19 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
     }
 
     return IsAncoWindowFocus(*windowInfo);
+}
+
+void InputWindowsManager::SendOneHandData(bool inOneHand, const DisplayInfo &displayInfo)
+{
+    std::lock_guard<std::mutex> lock(oneHandMtx_);
+    if (inOneHandMode_ != inOneHand) {
+        UpdateOneHandDataExt(displayInfo);
+        inOneHandMode_ = inOneHand;
+        MMI_HILOG_DISPATCHI("one hand mode %{public}s, displayInfo.oneHandX=%{private}d, "
+                            "displayInfo.oneHandY=%{private}d, expandHeight=%{public}d, scalePercent=%{public}d",
+            inOneHand ? "in" : "out", displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight,
+            displayInfo.scalePercent);
+    }
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 

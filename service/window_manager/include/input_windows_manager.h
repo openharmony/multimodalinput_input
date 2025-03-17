@@ -171,6 +171,7 @@ public:
     void DumpAncoWindows(std::string& out) const;
     void CleanShellWindowIds();
     bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent);
+    void SendOneHandData(bool inOneHand, const DisplayInfo &displayInfo);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -318,6 +319,8 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 void UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
 void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const DisplayInfo &displayInfo,
     float oneHandScale);
+void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent,
+    PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -480,6 +483,8 @@ private:
     int32_t lastDpi_ { 0 };
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
     std::mutex mtx_;
+    std::mutex oneHandMtx_;
+    bool inOneHandMode_ = false;
 };
 } // namespace MMI
 } // namespace OHOS
