@@ -61,6 +61,8 @@ constexpr uint32_t LIBINPUT_KEY_VOLUME_UP { 115 };
 constexpr uint32_t LIBINPUT_KEY_POWER { 116 };
 constexpr uint32_t LIBINPUT_KEY_FN { 240 };
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
+constexpr double VTP_LEFT_BUTTON_DELTA_X { 0.0 };
+constexpr double VTP_LEFT_BUTTON_DELTA_Y { -1.0 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
@@ -522,6 +524,10 @@ bool LibinputAdapter::HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
     pEvent.button = VKEY_TP_LB_ID;
     pEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_ONE;
     pEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_PRESSED;
+    pEvent.delta_x = VTP_LEFT_BUTTON_DELTA_X;
+    pEvent.delta_y = VTP_LEFT_BUTTON_DELTA_Y;
+    pEvent.delta_raw_x = VTP_LEFT_BUTTON_DELTA_X;
+    pEvent.delta_raw_y = VTP_LEFT_BUTTON_DELTA_Y;
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
@@ -546,6 +552,10 @@ bool LibinputAdapter::HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
     pEvent.button = VKEY_TP_LB_ID;
     pEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_NONE;
     pEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_RELEASED;
+    pEvent.delta_x = VTP_LEFT_BUTTON_DELTA_X;
+    pEvent.delta_y = VTP_LEFT_BUTTON_DELTA_Y;
+    pEvent.delta_raw_x = VTP_LEFT_BUTTON_DELTA_X;
+    pEvent.delta_raw_y = VTP_LEFT_BUTTON_DELTA_Y;
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
