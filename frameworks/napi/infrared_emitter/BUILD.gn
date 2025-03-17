@@ -54,7 +54,6 @@ ohos_shared_library("infraredemitter") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
-    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 

@@ -43,12 +43,6 @@ ohos_shared_library("intention_drag") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
 
-  external_deps = [
-    "hilog:libhilog",
-    "input:libmmi-client",
-    "ipc:ipc_single",
-  ]
-
   subsystem_name = "${device_status_subsystem_name}"
   part_name = "${device_status_part_name}"
 }
