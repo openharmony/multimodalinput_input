@@ -150,7 +150,7 @@ int32_t AncoChannelProxy::UpdateOneHandData(const AncoOneHandData &oneHandData)
         return RET_ERR;
     }
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(
