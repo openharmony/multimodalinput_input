@@ -274,7 +274,7 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
 {
     struct libinput_device *dev = libinput_event_get_device(event);
     const std::string mouseName = libinput_device_get_name(dev);
-    const int32_t devType = libinput_device_get_id_bustype(dev);
+    const int32_t devType = static_cast<int32_t>(libinput_device_get_id_bustype(dev));
     MMI_HILOGD("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
     if (devType != BUS_USB && devType != BUS_BLUETOOTH) {
         return;
