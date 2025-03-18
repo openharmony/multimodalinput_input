@@ -275,15 +275,15 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
     struct libinput_device *dev = libinput_event_get_device(event);
     const std::string mouseName = libinput_device_get_name(dev);
     const int32_t devType = libinput_device_get_id_bustype(dev);
-    MMI_HILOGD("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
+    MMI_HILOGI("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
     if (devType != BUS_USB && devType != BUS_BLUETOOTH) {
         return;
     }
     std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
-    MMI_HILOGD("connectType:%{public}s", connectType.c_str());
+    MMI_HILOGI("connectType:%{public}s", connectType.c_str());
     auto curMouseTimeMap = mouseMap.find(mouseName);
     if (curMouseTimeMap == mouseMap.end()) {
-        MMI_HILOGD("start to collect");
+        MMI_HILOGI("start to collect");
         mouseMap[mouseName] = std::chrono::steady_clock::now();
         mouseResponseMap[mouseName] = {};
     } else {
@@ -291,7 +291,7 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
         long long gap =
             std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
         mouseMap[mouseName] = curTime;
-        MMI_HILOGD("current time difference:%{public}lld", gap);
+        MMI_HILOGI("current time difference:%{public}lld", gap);
         std::map<long long, int32_t> &curMap = mouseResponseMap.find(mouseName)->second;
 
         if (gap < FINE_CALCULATE) {
@@ -321,12 +321,16 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
 void MouseTransformProcessor::HandleReportMouseResponseTime(
     std::string &connectType, std::map<long long, int32_t> &curMap)
 {
-    MMI_HILOGD("Start to report");
+    MMI_HILOGI("Start to report");
     long total = 0;
     for (const auto &[key, value] : curMap) {
         total += value;
     }
-    MMI_HILOGD("Total mouse movements: %{public}ld", total);
+    if (total <= 0) {
+        MMI_HILOGD("mouse not move");
+        return;
+    }
+    MMI_HILOGI("Total mouse movements: %{public}ld", total);
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
         "COLLECT_MOUSE_RESPONSE_TIME",
@@ -361,7 +365,7 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(
     if (ret != RET_OK) {
         MMI_HILOGE("Mouse write failed , ret:%{public}d", ret);
     }
-    MMI_HILOGD("Mouse write end , ret:%{public}d", ret);
+    MMI_HILOGI("Mouse write end , ret:%{public}d", ret);
 }
 
 void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
