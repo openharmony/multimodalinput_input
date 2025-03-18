@@ -198,6 +198,7 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
+    int32_t SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId);
 
 protected:
     void OnConnected(SessionPtr s) override;

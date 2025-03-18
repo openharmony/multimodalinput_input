@@ -3732,9 +3732,23 @@ int32_t MMIService::SyncKnuckleStatus()
 }
 #endif
 
-int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+int32_t MMIService::SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId)
 {
     TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    return RET_OK;
+}
+
+int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &screenId, &displayNodeScreenId] {
+            return this->SetMultiWindowScreenIdInner(screenId, displayNodeScreenId);
+        }
+    );
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetMultiWindowScreenId failed, return:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 } // namespace MMI
