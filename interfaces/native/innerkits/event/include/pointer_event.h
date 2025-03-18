@@ -1344,28 +1344,28 @@ public:
     /**
      * @brief Get throw Angle
      * @return Return the pull throw angle
-     * @since 12
+     * @since 9
      */
     double GetThrowAngle() const;
 
     /**
      * @brief Set throw Angle
      * @return void
-     * @since 12
+     * @since 9
      */
     void SetThrowAngle(double throwAngle);
 
     /**
      * @brief Get throw Speed
      * @return Return the pull throw speed
-     * @since 13
+     * @since 9
      */
     double GetThrowSpeed() const;
 
     /**
      * @brief Set throw Speed
      * @return void
-     * @since 13
+     * @since 9
      */
     void SetThrowSpeed(double throwSpeed);
 
@@ -1859,8 +1859,8 @@ private:
     bool ancoDeal_ { false };
 #endif // OHOS_BUILD_ENABLE_ANCO
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
-    double throwAngle_ {};
-    double throwSpeed_ {0.0};
+    double throwAngle_ { 0.0 };
+    double throwSpeed_ { 0.0 };
     Settings settings_ {};
     bool autoToVirtualScreen_ { true };
     // Left and right hand steady-state reporting status

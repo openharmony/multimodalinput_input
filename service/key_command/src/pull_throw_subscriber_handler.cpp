@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,46 +51,42 @@ PullThrowSubscriberHandler::PullThrowSubscriberHandler() {}
 
 PullThrowSubscriberHandler::~PullThrowSubscriberHandler() {}
 
-void PullThrowSubscriberHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
+void PullThrowSubscriberHandler::HandleFingerGestureDownEvent(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     if (CheckFingerGestureCancelEvent(touchEvent)) {
-        MMI_HILOGI("Cancle On DownEvent");
         return;
     }
     UpdateFingerPoisition(touchEvent);
-    MMI_HILOGI("++++++++++++++++++++++++++ On Finger Down Event ++++++++++++++++++++++++++");
-    alreadyTouchDown = true;
+    MMI_HILOGI("PullThrow Check On Finger Down Event");
+    alreadyTouchDown_ = true;
     StartFingerGesture();
 }
 
-void PullThrowSubscriberHandler::HandleFingerGestureMoveEvent(const std::shared_ptr<PointerEvent> touchEvent)
+void PullThrowSubscriberHandler::HandleFingerGestureMoveEvent(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (gestureInProgress && CheckFingerGestureCancelEvent(touchEvent)) {
-        MMI_HILOGI("Cancle On MoveEvent");
-        StopFingerGesture(touchEvent);
+    if (CheckAndStopGestureIfNeeded(touchEvent)) {
+        return;
     }
 }
 
-void PullThrowSubscriberHandler::HandleFingerGesturePullMoveEvent(const std::shared_ptr<PointerEvent> touchEvent)
+void PullThrowSubscriberHandler::HandleFingerGesturePullMoveEvent(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (gestureInProgress && CheckFingerGestureCancelEvent(touchEvent)) {
-        MMI_HILOGI("Cancle On PullMoveEvent:");
-        StopFingerGesture(touchEvent);
+    if (CheckAndStopGestureIfNeeded(touchEvent)) {
         return;
     }
-    if (gestureInProgress && alreadyTouchDown) {
-        triggerTime = touchEvent->GetActionTime();
-        alreadyTouchDown = false;
+    if (gestureInProgress_ && alreadyTouchDown_) {
+        triggerTime_ = touchEvent->GetActionTime();
+        alreadyTouchDown_ = false;
         UpdateFingerPoisition(touchEvent);
     }
-    if (gestureInProgress && (touchEvent->GetActionTime() - triggerTime > WINDOW_TIME_INTERVAL)) {
-        triggerTime = touchEvent->GetActionTime();
+    if (gestureInProgress_ && (touchEvent->GetActionTime() - triggerTime_ > WINDOW_TIME_INTERVAL)) {
+        triggerTime_ = touchEvent->GetActionTime();
         UpdateFingerPoisition(touchEvent);
     }
 }
@@ -100,14 +96,13 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    MMI_HILOGI("++++++++++++++++++++++++++ PullThrow On PullUp Event ++++++++++++++++++++++++++++++++");
-    if (CheckFingerGestureCancelEvent(touchEvent)) {
-        MMI_HILOGI("PullThrow cancle On HandleFingerGesturePullMoveEvent:");
-        StopFingerGesture(touchEvent);
+    MMI_HILOGI("PullThrow On PullUp Event");
+    if (CheckAndStopGestureIfNeeded(touchEvent)) {
+        return;
     }
-    if (gestureInProgress) {
+    if (gestureInProgress_) {
         auto fingerCount = touchEvent->GetPointerIds().size();
-        MMI_HILOGI("++++++++++++++++++++++++++ PullThrow On gestureInProgress ++++++++++++++++++++++++++++++++");
+        MMI_HILOGI("PullThrow On gestureInProgress");
         double endTime = touchEvent->GetActionTime();
         // 计算距离
         int32_t id = touchEvent->GetPointerId();
@@ -117,7 +112,7 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
         double dy = item.GetDisplayY() - fingerGesture_.touches[fingerCount - 1].y;
         double distance = std::sqrt(dx * dx + dy * dy);
         // 计算时间差，转换为秒
-        double deltaTime = (endTime - triggerTime) / 1e3; // 如果时间戳是毫秒
+        double deltaTime = (endTime - triggerTime_) / 1e3; // 如果时间戳是毫秒
         if (deltaTime <= 0) {
             deltaTime = 1.0 / 1e3; // 设置最小时间差，防止除以0
         }
@@ -130,23 +125,23 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
             touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_THROW);
             touchEvent->SetThrowAngle(atan2(dy, dx) * 180 / M_PI); // 180:弧度转化为角度
             touchEvent->SetThrowSpeed(speed);
-            MMI_HILOGI("++++PullThrow SUCCESS match gesture result");
+            MMI_HILOGI("PullThrow SUCCESS match gesture result");
         } else {
-            MMI_HILOGI("++++PullThrow NO match gesture result");
+            MMI_HILOGI("PullThrow NO match gesture result");
         }
     }
     StopFingerGesture(touchEvent);
 }
 
-void PullThrowSubscriberHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
+void PullThrowSubscriberHandler::HandleFingerGestureUpEvent(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    MMI_HILOGI("+++++++++++++++++++++++++ On Gesture Up Event ++++++++++++++++++++++++++++++++");
+    MMI_HILOGI("PullThrow Stop On Gesture Up Event");
     StopFingerGesture(touchEvent);
 }
 
-void PullThrowSubscriberHandler::UpdateFingerPoisition(const std::shared_ptr<PointerEvent> touchEvent)
+void PullThrowSubscriberHandler::UpdateFingerPoisition(std::shared_ptr<PointerEvent> touchEvent)
 {
     CHKPV(touchEvent);
     auto fingerCount = touchEvent->GetPointerIds().size();
@@ -158,11 +153,20 @@ void PullThrowSubscriberHandler::UpdateFingerPoisition(const std::shared_ptr<Poi
     fingerGesture_.touches[fingerCount - 1].y = item.GetDisplayY();
 }
 
-bool PullThrowSubscriberHandler::CheckFingerGestureCancelEvent(const std::shared_ptr<PointerEvent> touchEvent) const
+bool PullThrowSubscriberHandler::CheckFingerGestureCancelEvent(std::shared_ptr<PointerEvent> touchEvent) const
 {
     auto fingerCount = touchEvent->GetPointerIds().size();
     if (fingerCount != static_cast<size_t>(ONE_FINGER)) {
-        MMI_HILOGD("PullThrow check cancle: The number of finger count is not 1");
+        MMI_HILOGD("PullThrow check cancel: The number of finger count is not 1");
+        return true;
+    }
+    return false;
+}
+
+bool PullThrowSubscriberHandler::CheckAndStopGestureIfNeeded(std::shared_ptr<PointerEvent> touchEvent)
+{
+    if (gestureInProgress_ && CheckFingerGestureCancelEvent(touchEvent)) {
+        StopFingerGesture(touchEvent);
         return true;
     }
     return false;
@@ -171,16 +175,15 @@ bool PullThrowSubscriberHandler::CheckFingerGestureCancelEvent(const std::shared
 void PullThrowSubscriberHandler::StartFingerGesture()
 {
     CALL_DEBUG_ENTER;
-    gestureInProgress = true;
+    gestureInProgress_ = true;
 }
 
-void PullThrowSubscriberHandler::StopFingerGesture(const std::shared_ptr<PointerEvent> touchEvent)
+void PullThrowSubscriberHandler::StopFingerGesture(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("++++++++++++++++++++++++++ Stop Finger Gesture Process ++++++++++++++++++++++++++++++++");
-    gestureInProgress = false;
-    alreadyTouchDown = false;
-    triggerTime = touchEvent->GetActionTime();
+    gestureInProgress_ = false;
+    alreadyTouchDown_ = false;
+    triggerTime_ = touchEvent->GetActionTime();
 }
 } // namespace MMI
 } // namespace OHOS
