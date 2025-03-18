@@ -5397,7 +5397,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_009, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_010, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
@@ -5430,7 +5430,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_011, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
