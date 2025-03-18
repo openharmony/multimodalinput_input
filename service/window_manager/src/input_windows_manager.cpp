@@ -4253,7 +4253,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             isPullUpBefore_ = false;
             isInPullThrow_ = true;
         } else if (isPullUpBefore_ && !isInPullThrow_) {
-            MMI_HILOG_DISPATCHI("++++++ Clear touch event is: %{public}d +++++++++", pointerEvent->GetPointerAction());
+            MMI_HILOG_DISPATCHI("Clear touch event is: %{public}d", pointerEvent->GetPointerAction());
             ClearEventData(pointerEvent);
             isPullUpBefore_ = false;
     }
@@ -5865,7 +5865,7 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
 
 void InputWindowsManager::ClearEventData(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOG_DISPATCHI("+++++++++++Clear extra data+++++++++++++++++++++++++++");
+    MMI_HILOG_DISPATCHI("Clear extra data");
     pointerEvent->ClearBuffer();
     lastTouchEvent_ = nullptr;
     lastTouchWindowInfo_.id = -1;
