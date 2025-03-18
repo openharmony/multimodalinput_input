@@ -3748,9 +3748,6 @@ void InputWindowsManager::UpdateDisplayXYInOneHandMode(double &physicalX, double
         physicalX = virtualX / oneHandScale;
         physicalY = virtualY / oneHandScale;
     }
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    UpdateOneHandDataExt(displayInfo);
-#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 void InputWindowsManager::HandleOneHandMode(const DisplayInfo &displayInfo,
