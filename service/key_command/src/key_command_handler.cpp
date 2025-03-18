@@ -2944,7 +2944,7 @@ void KeyCommandHandler::SendSaveEvent(std::shared_ptr<KeyEvent> keyEvent)
 }
 
 void KeyCommandHandler::MenuClickProcess(const std::string bundleName,
-                                            const std::string abilityName, const std::string action)
+                                         const std::string abilityName, const std::string action)
 {
     CALL_DEBUG_ENTER;
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
