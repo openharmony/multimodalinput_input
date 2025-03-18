@@ -700,5 +700,71 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnsubscribeLongPressEvent, T
     int32_t subscriberId = 0;
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UnsubscribeLongPressEvent(subscriberId));
 }
+
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_001
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_002
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_001
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = pointerId;
+    pointerEvent->pointers_.push_back(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_001
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = 4;
+    pointerEvent->pointers_.push_back(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 } // namespace MMI
 } // namespace OHOS
