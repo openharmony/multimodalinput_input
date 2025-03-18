@@ -1280,7 +1280,7 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                             if (eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
                                 libinput_set_touch_event_type(touch, LIBINPUT_EVENT_TOUCH_CANCEL);
                             }
-							if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
+							if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
 								bDropEventFlag = true;
 							}
                             break;
