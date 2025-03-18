@@ -8106,5 +8106,196 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelAllTouches_003, 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelAllTouches(pointerEvent));
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayXYInOneHandMode_002
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayXYInOneHandMode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo disPlayInfo = {
+        .id = 2,
+        .oneHandX = 100,
+        .oneHandY = 150,
+        .width = 200,
+        .name = "test",
+    };
+    float oneHandScale = 0.8;
+    double physicalX = 200;
+    double physicalY = 250;
+    inputWindowsManager.UpdateDisplayXYInOneHandMode(physicalX, physicalY, disPlayInfo, oneHandScale);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerItemInOneHandMode_003
+ * @tc.desc: Test UpdatePointerItemInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOneHandMode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo disPlayInfo = {
+        .id = 2,
+        .oneHandX = 100,
+        .oneHandY = 150,
+        .width = 200,
+        .name = "test",
+        .height = 250,
+        .scalePercent = 150,
+    };
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = pointerId;
+    double physicalX = 20.3;
+    double physicalY = 30.6;
+    pointerItem.SetDisplayXPos(physicalX);
+    pointerItem.SetDisplayYPos(physicalY);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(disPlayInfo, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerItemInOneHandMode_004
+ * @tc.desc: Test UpdatePointerItemInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOneHandMode_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo disPlayInfo = {
+        .id = 2,
+        .oneHandX = 100,
+        .oneHandY = 150,
+        .width = 200,
+        .name = "test",
+        .height = 150,
+        .scalePercent = 150,
+    };
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = pointerId;
+    double physicalX = 20.3;
+    double physicalY = 30.6;
+    pointerItem.SetDisplayXPos(physicalX);
+    pointerItem.SetDisplayYPos(physicalY);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(disPlayInfo, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerItemInOneHandMode_005
+ * @tc.desc: Test UpdatePointerItemInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOneHandMode_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo disPlayInfo = {
+        .id = 2,
+        .oneHandX = 100,
+        .oneHandY = 150,
+        .width = 200,
+        .name = "test",
+        .height = 250,
+        .scalePercent = 50,
+    };
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = pointerId;
+    double physicalX = 20.3;
+    double physicalY = 30.6;
+    pointerItem.SetDisplayXPos(physicalX);
+    pointerItem.SetDisplayYPos(physicalY);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
+    pointerEvent->SetAutoToVirtualScreen(true);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(disPlayInfo, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerItemInOneHandMode_006
+ * @tc.desc: Test UpdatePointerItemInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOneHandMode_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo disPlayInfo = {
+        .id = 2,
+        .oneHandX = 100,
+        .oneHandY = 150,
+        .width = 200,
+        .name = "test",
+        .height = 250,
+        .scalePercent = 50,
+    };
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = pointerId;
+    double physicalX = 20.3;
+    double physicalY = 30.6;
+    pointerItem.SetDisplayXPos(physicalX);
+    pointerItem.SetDisplayYPos(physicalY);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_NONE;
+    pointerEvent->SetAutoToVirtualScreen(true);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(disPlayInfo, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerItemInOneHandMode_007
+ * @tc.desc: Test UpdatePointerItemInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOneHandMode_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo disPlayInfo = {
+        .id = 2,
+        .oneHandX = 100,
+        .oneHandY = 150,
+        .width = 200,
+        .name = "test",
+        .height = 250,
+        .scalePercent = 50,
+    };
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = pointerId;
+    double physicalX = 20.3;
+    double physicalY = 30.6;
+    pointerItem.SetDisplayXPos(physicalX);
+    pointerItem.SetDisplayYPos(physicalY);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
+    pointerEvent->SetAutoToVirtualScreen(false);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(disPlayInfo, pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 } // namespace MMI
 } // namespace OHOS
