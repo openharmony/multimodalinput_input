@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,37 +41,37 @@ public:
     DISALLOW_COPY_AND_MOVE(PullThrowSubscriberHandler);
 
     struct FingerGesture {
-        inline static constexpr auto MAX_TOUCH_NUM = 2;
         struct {
             int32_t id { 0 };
             int32_t x { 0 };
             int32_t y { 0 };
             int64_t downTime { 0 };
-        } touches[MAX_TOUCH_NUM];
+        } touches[2];
     };
     
-    void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
-    void HandleFingerGestureMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
-    void HandleFingerGesturePullMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleFingerGestureDownEvent(std::shared_ptr<PointerEvent> touchEvent);
+    void HandleFingerGestureMoveEvent(std::shared_ptr<PointerEvent> touchEvent);
+    void HandleFingerGesturePullMoveEvent(std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGesturePullUpEvent(std::shared_ptr<PointerEvent> touchEvent);
-    void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleFingerGestureUpEvent(std::shared_ptr<PointerEvent> touchEvent);
     int SetHotZoneArea(double locationX, double locationY, double width, double height);
 
 private:
-    void StopFingerGesture(const std::shared_ptr<PointerEvent> touchEvent);
+    void StopFingerGesture(std::shared_ptr<PointerEvent> touchEvent);
     void StartFingerGesture();
-    bool CheckFingerGestureCancelEvent(const std::shared_ptr<PointerEvent> touchEvent) const;
-    void UpdateFingerPoisition(const std::shared_ptr<PointerEvent> touchEvent);
+    bool CheckFingerGestureCancelEvent(std::shared_ptr<PointerEvent> touchEvent) const;
+    bool CheckAndStopGestureIfNeeded(std::shared_ptr<PointerEvent> touchEvent);
+    void UpdateFingerPoisition(std::shared_ptr<PointerEvent> touchEvent);
  
 private:
     FingerGesture fingerGesture_;
     std::shared_ptr<PointerEvent> touchEvent_ { nullptr };
-    bool gestureInProgress = false;
-    const double THRES_SPEED = 0.6; // 阈值，单位像素/秒
-    const double MIN_THRES_DIST = 100; // 阈值，单位像素
+    bool gestureInProgress_ = false;
+    double triggerTime_ = 0.0; // 触发时间，单位毫秒
+    bool alreadyTouchDown_ = false;
+    static constexpr double THRES_SPEED = 0.6; // 阈值，单位像素/秒
+    static constexpr int64_t MIN_THRES_DIST = 100; // 阈值，单位像素
     const int64_t WINDOW_TIME_INTERVAL = 0.5e6; // 采样窗口，单位u秒
-    double triggerTime = 0.0; // 触发时间，单位毫秒
-    bool alreadyTouchDown = false;
 };
 #define PULL_THROW_EVENT_HANDLER ::OHOS::DelayedSingleton<PullThrowSubscriberHandler>::GetInstance()
 } // namespace MMI

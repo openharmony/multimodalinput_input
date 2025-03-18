@@ -270,7 +270,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void InitializeLongPressConfigurations();
-    void HandleTouchAction(const std::shared_ptr<PointerEvent>& touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void StartTwoFingerGesture();
