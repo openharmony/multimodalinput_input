@@ -5361,7 +5361,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMultiWindowScreenId_001, TestSize
 }
 
 /**
- * @tc.name: InputManager_SimulateEvent_009
+ * @tc.name: InputManagerTest_SimulateEvent_009
  * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
  * @tc.type: FUNC
  * @tc.require:
@@ -5392,7 +5392,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_009, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManager_SimulateEvent_010
+ * @tc.name: InputManagerTest_SimulateEvent_010
  * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
  * @tc.type: FUNC
  * @tc.require:
@@ -5425,7 +5425,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_010, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManager_SimulateEvent_011
+ * @tc.name: InputManagerTest_SimulateEvent_011
  * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
  * @tc.type: FUNC
  * @tc.require:
