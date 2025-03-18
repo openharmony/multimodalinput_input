@@ -159,34 +159,6 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         isParseConfig_ = true;
     }
     InitializeLongPressConfigurations();
-    HandleTouchAction(touchEvent);
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    HandleKnuckleGestureEvent(touchEvent);
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-}
-
-void KeyCommandHandler::InitializeLongPressConfigurations()
-{
-    if (!isParseLongPressConfig_) {
-        if (!ParseLongPressConfig()) {
-            MMI_HILOGE("Parse long press configFile failed");
-        }
-        isParseLongPressConfig_ = true;
-    }
-    if (!isTimeConfig_) {
-        SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-        isTimeConfig_ = true;
-    }
-    if (!isDistanceConfig_) {
-        distanceDefaultConfig_ = DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG * VPR_CONFIG;
-        distanceLongConfig_ = DOUBLE_CLICK_DISTANCE_LONG_CONFIG * VPR_CONFIG;
-        SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
-        isDistanceConfig_ = true;
-    }
-}
-
-void KeyCommandHandler::HandleTouchAction(const std::shared_ptr<PointerEvent>& touchEvent)
-{
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_PULL_MOVE:
             PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
@@ -212,6 +184,29 @@ void KeyCommandHandler::HandleTouchAction(const std::shared_ptr<PointerEvent>& t
         default:
             MMI_HILOGD("Unknown pointer action:%{public}d", touchEvent->GetPointerAction());
             break;
+    }
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    HandleKnuckleGestureEvent(touchEvent);
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+}
+
+void KeyCommandHandler::InitializeLongPressConfigurations()
+{
+    if (!isParseLongPressConfig_) {
+        if (!ParseLongPressConfig()) {
+            MMI_HILOGE("Parse long press configFile failed");
+        }
+        isParseLongPressConfig_ = true;
+    }
+    if (!isTimeConfig_) {
+        SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+        isTimeConfig_ = true;
+    }
+    if (!isDistanceConfig_) {
+        distanceDefaultConfig_ = DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG * VPR_CONFIG;
+        distanceLongConfig_ = DOUBLE_CLICK_DISTANCE_LONG_CONFIG * VPR_CONFIG;
+        SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
+        isDistanceConfig_ = true;
     }
 }
 

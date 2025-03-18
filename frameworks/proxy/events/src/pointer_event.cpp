@@ -625,7 +625,7 @@ void PointerEvent::SetThrowAngle(double throwAngle)
 
 double PointerEvent::GetThrowSpeed() const
 {
-    return throwSpeed_ ;
+    return throwSpeed_;
 }
 
 void PointerEvent::SetThrowSpeed(double throwSpeed)
