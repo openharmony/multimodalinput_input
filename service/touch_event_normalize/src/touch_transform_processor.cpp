@@ -66,6 +66,7 @@ bool TouchTransformProcessor::OnEventTouchCancel(struct libinput_event *event)
     CHKPF(touch);
     MMI_HILOGI("process Touch Cancel event");
     uint64_t time = libinput_event_touch_get_time_usec(touch);
+	CHKPF(pointerEvent_);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
 
@@ -372,10 +373,12 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
             CHKFR(OnEventTouchMotion(event), nullptr, "Get OnEventTouchMotion failed");
             break;
         }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         case LIBINPUT_EVENT_TOUCH_CANCEL: {
             CHKFR(OnEventTouchCancel(event), nullptr, "Get OnEventTouchCancel failed");
             break;
         }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         default: {
             MMI_HILOGE("Unknown event type, touchType:%{public}d", type);
             return nullptr;

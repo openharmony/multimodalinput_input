@@ -224,7 +224,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
 #endif // OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         case LIBINPUT_EVENT_TOUCH_CANCEL:
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
@@ -719,6 +721,11 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         } else {
             nextHandler_->HandleTouchEvent(pointerEvent);
         }
+    }
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_TOUCH_CANCEL) {
+	item.SetCanceled(true);
+	pointerEvent->UpdatePointeritem(pointerEvent->GetPointerId(), item);
     }
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
