@@ -66,7 +66,7 @@ bool TouchTransformProcessor::OnEventTouchCancel(struct libinput_event *event)
     CHKPF(touch);
     MMI_HILOGI("process Touch Cancel event");
     uint64_t time = libinput_event_touch_get_time_usec(touch);
-	CHKPF(pointerEvent_);
+    CHKPF(pointerEvent_);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
 
