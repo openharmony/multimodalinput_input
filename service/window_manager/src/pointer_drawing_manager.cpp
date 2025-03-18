@@ -127,6 +127,8 @@ constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t MAX_CUSTOM_CURSOR_SIZE { 256 };
 constexpr float MAX_CUSTOM_CURSOR_DIMENSION { 256.0f };
 constexpr uint32_t CURSOR_STRIDE { 4 };
+constexpr int32_t MAX_FAIL_COUNT { 40 };
+constexpr int32_t CHECK_HWC_SLEEP_TIME { 10 };
 std::atomic<bool> g_isRsRestart { false };
 } // namespace
 } // namespace MMI
@@ -154,11 +156,17 @@ public:
         }
         MMI_HILOGI("Received screen status:%{public}s", action.c_str());
         PointerStyle curPointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
-        curPointerStyle.id = MOUSE_ICON::TRANSPARENT_ICON;
-        if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-        } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-            CursorPosition cursorPos = WIN_MGR->ResetCursorPos();
-            IPointerDrawingManager::GetInstance()->DrawScreenCenterPointer(curPointerStyle);
+        if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+            IPointerDrawingManager::GetInstance()->DetachAllSurfaceNode();
+        } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+            PointerStyle curPointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
+            curPointerStyle.id = MOUSE_ICON::DEFAULT;
+            int32_t ret = IPointerDrawingManager::GetInstance()->CheckHwcReady();
+            if (ret != RET_OK) {
+                MMI_HILOGE("CheckHwcReady failed");
+            }
+            IPointerDrawingManager::GetInstance()->DrawPointerStyle(curPointerStyle);
+            IPointerDrawingManager::GetInstance()->AttachAllSurfaceNode();
         }
     }
 };
@@ -2398,6 +2406,7 @@ void PointerDrawingManager::AttachAllSurfaceNode()
             }
         }
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void PointerDrawingManager::DetachAllSurfaceNode()
@@ -2413,6 +2422,7 @@ void PointerDrawingManager::DetachAllSurfaceNode()
             }
         }
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
@@ -3458,6 +3468,24 @@ void PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
             }
         }
     }
+}
+
+int32_t PointerDrawingManager::CheckHwcReady()
+{
+    auto sp = GetScreenPointer(displayId_);
+    CHKPR(sp, RET_ERR);
+    int32_t failCount = 0;
+    while (!(sp->Move(lastPhysicalX_, lastPhysicalY_, ICON_TYPE::ANGLE_NW) &&
+            failCount >= MAX_FAIL_COUNT / CALCULATE_MIDDLE)) {
+        failCount++;
+        if (failCount > MAX_FAIL_COUNT) {
+            MMI_HILOGE("CheckHwcReady failed, screenId: %{public}u", displayId_);
+            return RET_ERR;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(CHECK_HWC_SLEEP_TIME));
+    }
+    MMI_HILOGI("heckHwcReady success, screenId: %{public}u, check counts: %{public}d", displayId_, failCount);
+    return RET_OK;
 }
 
 void PointerDrawingManager::SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align)
