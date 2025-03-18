@@ -724,8 +724,8 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     }
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL) {
-	item.SetCanceled(true);
-	pointerEvent->UpdatePointeritem(pointerEvent->GetPointerId(), item);
+    item.SetCanceled(true);
+    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
     }
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
