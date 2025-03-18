@@ -128,7 +128,7 @@ constexpr int32_t MAX_CUSTOM_CURSOR_SIZE { 256 };
 constexpr float MAX_CUSTOM_CURSOR_DIMENSION { 256.0f };
 constexpr uint32_t CURSOR_STRIDE { 4 };
 constexpr int32_t MAX_FAIL_COUNT { 40 };
-constexpr int32_t CHECK_HWC_SLEEP_TIME { 10 };
+constexpr int32_t CHECK_SLEEP_TIME { 10 };
 std::atomic<bool> g_isRsRestart { false };
 } // namespace
 } // namespace MMI
@@ -3482,7 +3482,7 @@ int32_t PointerDrawingManager::CheckHwcReady()
             MMI_HILOGE("CheckHwcReady failed, screenId: %{public}u", displayId_);
             return RET_ERR;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(CHECK_HWC_SLEEP_TIME));
+        std::this_thread::sleep_for(std::chrono::milliseconds(CHECK_SLEEP_TIME));
     }
     MMI_HILOGI("heckHwcReady success, screenId: %{public}u, check counts: %{public}d", displayId_, failCount);
     return RET_OK;
