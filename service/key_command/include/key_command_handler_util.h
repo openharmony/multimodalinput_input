@@ -76,6 +76,7 @@ const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
 const std::string SETTING_KNUCKLE_SWITCH = "settings.game.forbid_finger_knuckle";
 const std::string RECORD_KNUCKLE_SWITCH = "fingersense_screen_recording_enabled";
 const std::string SNAPSHOT_KNUCKLE_SWITCH = "fingersense_smartshot_enabled";
+constexpr int32_t MENU_KEY_DOWN_DELAY = 800;
 
 enum SpecialType {
     SPECIAL_ALL = 0,
