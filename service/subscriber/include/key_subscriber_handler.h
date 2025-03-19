@@ -139,6 +139,7 @@ private:
     bool isForegroundExits_ { false };
     bool needSkipPowerKeyUp_ { false };
     bool callBahaviorState_ { false };
+    std::set<int32_t> pendingKeys_;
 };
 } // namespace MMI
 } // namespace OHOS
