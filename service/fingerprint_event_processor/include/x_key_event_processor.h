@@ -30,15 +30,15 @@ public:
     DISALLOW_COPY_AND_MOVE(XKeyEventProcessor);
     void InterceptXKeyDown();
     void InterceptXKeyUp();
-    bool IsXkeyEvent(struct libinput_event* event);
-    int32_t HandleXkeyEvent(struct libinput_event* event);
+    bool IsXKeyEvent(struct libinput_event* event);
+    int32_t HandleXKeyEvent(struct libinput_event* event);
 
 private:
     int32_t AnalyseKeyEvent(struct libinput_event* event);
     int32_t HandleQuickAccessMenu(int32_t xKeyEventType);
     // 重置计数器
     void ResetCount();
-    void StartXkeyIfNeeded();
+    void StartXKeyIfNeeded();
     bool IsRemoveDelaySingleClick();
     void StartLongPressTimer();
     void StartSingleClickTimer();
@@ -46,18 +46,8 @@ private:
     // 按压次数
     std::atomic<int32_t> pressCount_ {0};
 
-    // 定义时间间隔（单位：毫秒）
-    static constexpr int32_t DOUBLE_CLICK_DELAY { 300 }; // 双击时间阈值
-    static constexpr int32_t LONG_PRESS_DELAY { 500 }; // 长按时间阈值
-
-    static constexpr int32_t X_KEY_DOWN { 0 }; // down
-    static constexpr int32_t X_KEY_UP { 1 }; // up
-    static constexpr int32_t SINGLE_CLICK { 2 }; // 单击
-    static constexpr int32_t DOUBLE_CLICK { 3 }; // 双击
-    static constexpr int32_t LONG_PRESS { 4 }; // 长按
-
     const std::string X_KEY_SOURCE_KEY { "fkey" };
-    std::atomic_bool isStartedXkey_ { false };
+    std::atomic_bool isStartedXKey_ { false };
     std::atomic_bool handledLongPress_ { false };
 };
 #define XKeyEventHdr ::OHOS::DelayedSingleton<XKeyEventProcessor>::GetInstance()

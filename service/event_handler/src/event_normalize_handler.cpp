@@ -397,9 +397,9 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_X_KEY
     MMI_HILOGI("X-key is defined.");
-    if (XKeyEventHdr->IsXkeyEvent(event)) {
+    if (XKeyEventHdr->IsXKeyEvent(event)) {
         MMI_HILOGI("event is x-key event.");
-        return XKeyEventHdr->HandleXkeyEvent(event);
+        return XKeyEventHdr->HandleXKeyEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_X_KEY
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

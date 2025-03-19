@@ -43,6 +43,14 @@ namespace {
     };
     const std::string SETTINGS_DATA_SECURE_POST_URI { "?Proxy=true" };
     const int32_t X_KEY_DOUBLE_CLICK_ENABLE_COUNT { 2 };
+    constexpr int32_t DOUBLE_CLICK_DELAY { 300 };
+    constexpr int32_t LONG_PRESS_DELAY { 500 };
+
+    constexpr int32_t X_KEY_DOWN { 0 };
+    constexpr int32_t X_KEY_UP { 1 };
+    constexpr int32_t SINGLE_CLICK { 2 };
+    constexpr int32_t DOUBLE_CLICK { 3 };
+    constexpr int32_t LONG_PRESS { 4 };
 }
 
 XKeyEventProcessor::XKeyEventProcessor()
@@ -51,7 +59,7 @@ XKeyEventProcessor::XKeyEventProcessor()
 XKeyEventProcessor::~XKeyEventProcessor()
 {}
 
-bool XKeyEventProcessor::IsXkeyEvent(struct libinput_event* event)
+bool XKeyEventProcessor::IsXKeyEvent(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, false);
@@ -63,14 +71,14 @@ bool XKeyEventProcessor::IsXkeyEvent(struct libinput_event* event)
         MMI_HILOGI("Not X-key");
         return false;
     }
-    StartXkeyIfNeeded();
+    StartXKeyIfNeeded();
     return true;
 }
 
-void XKeyEventProcessor::StartXkeyIfNeeded()
+void XKeyEventProcessor::StartXKeyIfNeeded()
 {
-    if (!isStartedXkey_) {
-        isStartedXkey_ = true;
+    if (!isStartedXKey_) {
+        isStartedXKey_ = true;
         MMI_HILOGI("start nine-square grid panel.");
         AAFwk::Want want;
         want.SetElementName(X_KEY_APP_BUNDLE_NAME, X_KEY_APP_ABILITY_NAME);
@@ -81,7 +89,7 @@ void XKeyEventProcessor::StartXkeyIfNeeded()
     }
 }
 
-int32_t XKeyEventProcessor::HandleXkeyEvent(struct libinput_event* event)
+int32_t XKeyEventProcessor::HandleXKeyEvent(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
