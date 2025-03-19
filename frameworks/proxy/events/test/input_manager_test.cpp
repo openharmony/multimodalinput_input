@@ -5445,5 +5445,65 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_011, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
 }
+
+/*
+ * @tc.name: InputManagerTest_SubscribeKeyMonitor_001
+ * @tc.desc: SubscribeKeyMonitor.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorOption keyOption;
+    std::function<void(std::shared_ptr<KeyEvent>)> callback;
+    int32_t ret = InputManager::GetInstance()->SubscribeKeyMonitor(keyOption, callback);
+    EXPECT_EQ(ret, INVAID_VALUE);
+}
+
+/*
+ * @tc.name: InputManagerTest_UnsubscribeKeyMonitor_001
+ * @tc.desc: UnsubscribeKeyMonitor.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeKeyMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscriberId = 1;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeKeyMonitor(subscriberId));
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/*
+ * @tc.name: InputManagerTest_CreateVKeyboardDevice_001
+ * @tc.desc: CreateVKeyboardDevice.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_CreateVKeyboardDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    sptr<IRemoteObject> vkeyboardDevice;
+    int32_t ret = InputManager::GetInstance()->CreateVKeyboardDevice(vkeyboardDevice);
+    EXPECT_EQ(ret, INVALID_HANDLER_ID);
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
+/*
+ * @tc.name: InputManagerTest_CheckKnuckleEvent_001
+ * @tc.desc: CheckKnuckleEvent.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_CheckKnuckleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    float pointX = 1.0;
+    float pointY = 1.0;
+    bool isKnuckleType = true;
+    int32_t ret = InputManager::GetInstance()->CheckKnuckleEvent(pointX, pointY, isKnuckleType);
+    EXPECT_EQ(ret, -2);
+}
 } // namespace MMI
 } // namespace OHOS
