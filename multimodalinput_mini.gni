@@ -72,6 +72,10 @@ declare_args() {
     input_feature_pointer_drawing = false
   }
 
+  if (factory) {
+    cflags_cc += [ "-DCONFIG_FACTORY_VERSION" ]
+  }
+
   uinput_inject_sources = [
     "uinput/hdf_device_event_dispatch.cpp",
     "uinput/hdf_device_event_manager.cpp",
