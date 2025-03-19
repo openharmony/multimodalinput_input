@@ -5927,6 +5927,8 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
         InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
     }
     firstBtnDownWindowInfo_.first = targetWindowInfo.id;
+    firstBtnDownWindowInfo_.second = targetWindowInfo.displayId;
+    mouseDownInfo_ = targetWindowInfo;
     MMI_HILOGI("shift pointer event success for mouse");
     return RET_OK;
 }
