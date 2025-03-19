@@ -28,6 +28,7 @@
 #include "multimodal_input_connect_manager.h"
 #include "oh_input_manager.h"
 #include "pixel_map.h"
+#include "tablet_event_input_subscribe_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImpl"
@@ -398,6 +399,31 @@ void InputManagerImpl::UnsubscribeHotkey(int32_t subscriberId)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
+int32_t InputManagerImpl::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CHKPR(callback, RET_ERR);
+    return KeyEventInputSubscribeMgr.SubscribeKeyMonitor(keyOption, callback);
+#else
+    MMI_HILOGW("Keyboard device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+void InputManagerImpl::UnsubscribeKeyMonitor(int32_t subscriberId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    KeyEventInputSubscribeMgr.UnsubscribeKeyMonitor(subscriberId);
+#else
+    MMI_HILOGW("Keyboard device does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
 int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
     std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
@@ -414,6 +440,14 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
     MMI_HILOGW("Switch device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
+int32_t InputManagerImpl::SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    CHKPR(callback, RET_ERR);
+    return TABLET_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeTabletProximity(callback);
 }
 
 int32_t InputManagerImpl::SubscribeLongPressEvent(const LongPressRequest &longPressRequest,
@@ -441,6 +475,13 @@ void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)
 #else
     MMI_HILOGW("Switch device does not support");
 #endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
+void InputManagerImpl::UnsubscribetabletProximity(int32_t subscriberId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    TABLET_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribetabletProximity(subscriberId);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -758,8 +799,11 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
             << item.validWidth << item.validHeight << item.fixedDirection
-            << item.physicalWidth << item.physicalHeight
+            << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight
             << item.oneHandX << item.oneHandY;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        pkt << item.pointerActiveWidth << item.pointerActiveHeight;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -842,8 +886,9 @@ void InputManagerImpl::PrintDisplayInfo()
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
                    "dpi:%{public}d,name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
-                   "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,validWH:{%{private}d %{private}d}"
-                   "fixedDirection:%{public}d,physicalWH:{%{private}d %{private}d}",
+                   "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,scalePercent:%{public}d,"
+                   "expandHeight:%{public}d,validWH:{%{private}d %{private}d},fixedDirection:%{public}d,"
+                   "physicalWH:{%{private}d %{private}d},pActiveWH:{%{private}d %{private}d}",
             item.id,
             item.x,
             item.y,
@@ -857,11 +902,15 @@ void InputManagerImpl::PrintDisplayInfo()
             item.displayMode,
             item.oneHandX,
             item.oneHandY,
+            item.scalePercent,
+            item.expandHeight,
             item.validWidth,
             item.validHeight,
             item.fixedDirection,
             item.physicalWidth,
-            item.physicalHeight);
+            item.physicalHeight,
+            item.pointerActiveWidth,
+            item.pointerActiveHeight);
     }
 }
 
@@ -2688,6 +2737,11 @@ int32_t InputManagerImpl::CheckKnuckleEvent(float pointX, float pointY, bool &is
 #endif // OHOS_BUILD_ENABLE_ANCO
     MMI_HILOGI("CheckKnuckleEvent function does not support");
     return ERROR_UNSUPPORT;
+}
+
+void InputManagerImpl::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    MULTIMODAL_INPUT_CONNECT_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
 }
 } // namespace MMI
 } // namespace OHOS

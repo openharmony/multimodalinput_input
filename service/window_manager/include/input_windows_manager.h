@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr uint32_t SCREEN_CONTROL_WINDOW_TYPE = 2137;
+constexpr uint32_t SCREEN_CONTROL_WINDOW_TYPE = 2138;
 struct WindowInfoEX {
     WindowInfo window;
     bool flag { false };
@@ -64,9 +64,11 @@ public:
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
     bool AdjustFingerFlag(std::shared_ptr<PointerEvent> pointerEvent);
+    void PrintEnterEventInfo(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo);
+    bool IsFocusedSession(int32_t session) const;
     void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
     void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
@@ -135,7 +137,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId);
+        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void ReverseRotateScreen(const DisplayInfo& info, const double x, const double y, Coordinate2D& cursorPos) const;
@@ -159,6 +161,7 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void UpdateWindowInfoExt(const WindowGroupInfo &windowGroupInfo, const DisplayGroupInfo &displayGroupInfo);
+    void UpdateOneHandDataExt(const DisplayInfo &displayInfo);
     void UpdateShellWindow(const WindowInfo &window);
     void UpdateDisplayInfoExt(const DisplayGroupInfo &displayGroupInfo);
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
@@ -168,6 +171,7 @@ public:
     void DumpAncoWindows(std::string& out) const;
     void CleanShellWindowIds();
     bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent);
+    void SendOneHandData(bool inOneHand, const DisplayInfo &displayInfo);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -300,6 +304,7 @@ private:
     void AdjustDisplayRotation();
     void SetPointerEvent(int32_t pointerAction, std::shared_ptr<PointerEvent> pointerEvent);
     void DispatchPointerCancel(int32_t displayId);
+    void AdjustDragPosition();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -314,6 +319,8 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 void UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
 void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const DisplayInfo &displayInfo,
     float oneHandScale);
+void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent,
+    PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -338,7 +345,8 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
     void DispatchTouch(int32_t pointerAction);
     const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
-        const DisplayInfo& info, EventTouch& touchInfo);
+        const DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
+    void TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId);
     void SetAntiMisTake(bool state);
     void SetAntiMisTakeStatus(bool state);
     void CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t, int32_t> logicalXY, bool isHotArea,
@@ -389,6 +397,9 @@ void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const Di
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     bool CancelTouch(int32_t touch);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool IsPointerActiveRectValid(const DisplayInfo &currentDisplay);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 private:
     UDSServer* udsServer_ { nullptr };
@@ -472,6 +483,8 @@ private:
     int32_t lastDpi_ { 0 };
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
     std::mutex mtx_;
+    std::mutex oneHandMtx_;
+    bool inOneHandMode_ = false;
 };
 } // namespace MMI
 } // namespace OHOS

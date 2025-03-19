@@ -103,6 +103,7 @@ ohos_shared_library("libmmi-client") {
   innerapi_tags = [ "platformsdk" ]
   branch_protector_ret = "pac_ret"
 
+  sources += [ "event_handler/src/tablet_event_input_subscribe_manager.cpp" ]
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
   }
@@ -150,7 +151,6 @@ ohos_shared_library("libmmi-client") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
-    "ipc:ipc_single",
     "qos_manager:qos",
     "samgr:samgr_proxy",
   ]
@@ -189,9 +189,15 @@ ohos_unittest("KeyEventTest") {
   module_out_path = module_output_path
   include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
+    "events/test/input_event_test.cpp",
     "events/test/key_event_test.cpp",
   ]
 
@@ -362,6 +368,7 @@ ohos_unittest("InputManagerImplTest") {
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/pre_monitor_manager.cpp",
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
+    "event_handler/src/tablet_event_input_subscribe_manager.cpp",
     "event_handler/test/input_manager_impl_test.cpp",
     "event_handler/test/pre_monitor_manager_test.cpp",
   ]

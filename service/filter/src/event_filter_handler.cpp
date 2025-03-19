@@ -192,9 +192,11 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
         return false;
     }
     std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(event->GetDeviceId());
-    CHKPF(inputDevice);
     for (auto &i: filters_) {
-        if (!inputDevice->HasCapability(i.deviceTags)) {
+        if (inputDevice != nullptr && !inputDevice->HasCapability(i.deviceTags)) {
+            continue;
+            }
+        if (inputDevice == nullptr && !CheckCapability(i.deviceTags, event)) {
             continue;
         }
         if (i.filter->HandlePointerEvent(event)) {
@@ -210,6 +212,26 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
                 MMI_HILOGW("Call HandlePointerEvent return true");
             }
             return true;
+        }
+    }
+    return false;
+}
+
+bool EventFilterHandler::CheckCapability(uint32_t deviceTags, std::shared_ptr<PointerEvent> event)
+{
+    CALL_DEBUG_ENTER;
+    int32_t min = static_cast<int32_t>(INPUT_DEV_CAP_KEYBOARD);
+    int32_t max = static_cast<int32_t>(INPUT_DEV_CAP_MAX);
+    for (int32_t cap = min; cap < max; ++cap) {
+        InputDeviceCapability capability = static_cast<InputDeviceCapability>(cap);
+        uint32_t tags = CapabilityToTags(capability);
+        if ((tags & deviceTags) == tags) {
+            if (capability == INPUT_DEV_CAP_POINTER && event->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+                return true;
+            } else if (capability == INPUT_DEV_CAP_TOUCH &&
+                       event->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+                return true;
+            }
         }
     }
     return false;

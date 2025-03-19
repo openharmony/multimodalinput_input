@@ -95,8 +95,12 @@ protected:
     int32_t StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeHotkey(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeHotkey(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnsubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSubscribeTabletProximity(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnSubscribetabletProximity(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeLongPressEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeLongPressEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
@@ -177,6 +181,7 @@ protected:
     int32_t StubSetInputDeviceInputEnable(MessageParcel& data, MessageParcel& reply);
     int32_t StubShiftAppPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCustomMouseCursor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetMultiWindowScreenId(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

@@ -827,6 +827,11 @@ void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroup
     }
 }
 
+bool InputWindowsManager::IsFocusedSession(int32_t session) const
+{
+    return ((session >= 0) && (session == GetWindowPid(displayGroupInfo_.focusWindowId)));
+}
+
 void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
     CALL_DEBUG_ENTER;
@@ -1130,9 +1135,21 @@ void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const DisplayGro
                 static_cast<int32_t>(cursorPos.cursorPos.y),
                 static_cast<int32_t>(isOut),
                 static_cast<int32_t>(isChange));
-            if (isOut && isChange) {
-                double curX = currentDisplay.validWidth * HALF_RATIO;
-                double curY = currentDisplay.validHeight * HALF_RATIO;
+            int32_t validWidth = currentDisplay.validWidth;
+            int32_t validHeight = currentDisplay.validHeight;
+            bool pointerActiveRectValid = false;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+            MMI_HILOGD("Start checking vtp cursor active area");
+            pointerActiveRectValid = IsPointerActiveRectValid(currentDisplay);
+            if (pointerActiveRectValid) {
+                validWidth = currentDisplay.pointerActiveWidth;
+                validHeight = currentDisplay.pointerActiveHeight;
+                MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", validWidth, validHeight);
+            }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+            if (isOut && (isChange || pointerActiveRectValid)) {
+                double curX = validWidth * HALF_RATIO;
+                double curY = validHeight * HALF_RATIO;
                 UpdateAndAdjustMouseLocation(cursorDisplayId, curX, curY);
                 IPointerDrawingManager::GetInstance()->SetPointerLocation(static_cast<int32_t>(cursorPos_.cursorPos.x),
                     static_cast<int32_t>(cursorPos_.cursorPos.y),
@@ -1160,7 +1177,14 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     int32_t validH = currentDisplay.validHeight;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-    
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    MMI_HILOGD("Start checking vtp cursor active area");
+    if (IsPointerActiveRectValid(currentDisplay) && !isPhysicalPos) {
+        validW = currentDisplay.pointerActiveWidth;
+        validH = currentDisplay.pointerActiveHeight;
+        MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", validW, validH);
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     if (isPhysicalPos) {
         Direction displayDirection = static_cast<Direction>((
         ((currentDisplay.direction - currentDisplay.fixedDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
@@ -1187,7 +1211,7 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
         offsetY = currentDisplay.offsetY;
     }
     bool isOut = (rotateX < offsetX) || (rotateX > offsetX + validW) ||
-                 (rotateY < offsetY) || (rotateY > offsetX + validH);
+                 (rotateY < offsetY) || (rotateY > offsetY + validH);
     PrintDisplayInfo(currentDisplay);
     MMI_HILOGD("isOut=%{public}d,isPhysicalPos=%{public}d Position={%{private}d %{private}d}"
                "->{%{private}d %{private}d} RealValidWH={w:%{private}d h:%{private}d}",
@@ -1233,6 +1257,13 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     return isOut;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+bool InputWindowsManager::IsPointerActiveRectValid(const DisplayInfo &currentDisplay)
+{
+    return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const DisplayGroupInfo &displayGroupInfo)
 {
     if (lastPointerEventforGesture_ == nullptr) {
@@ -1240,11 +1271,12 @@ void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const Displ
         return;
     }
     if (lastPointerEventforGesture_->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGD("lastPointerEventforGesture_ is not touchscreen");
+        MMI_HILOGD("source type:[%{public}d] is not touchscreen", lastPointerEventforGesture_->GetSourceType());
         return;
     }
     int32_t touchDisplayId = lastPointerEventforGesture_->GetTargetDisplayId();
     for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
+        MMI_HILOGD("touchDisplayId=%{public}d currentDisplay.id=%{public}d", touchDisplayId, currentDisplay.id);
         if (touchDisplayId == currentDisplay.id && IsValidDisplayChange(currentDisplay)) {
             CancelAllTouches(lastPointerEventforGesture_);
             return;
@@ -1264,17 +1296,25 @@ void InputWindowsManager::CancelMouseEvent()
         !lastPointerEventCopy->GetPressedButtons().empty()) {
         int32_t pointerId = lastPointerEventCopy->GetPointerId();
         int32_t originAction = lastPointerEventCopy->GetPointerAction();
-        MMI_HILOGD("Cancel mouse event for valid display change,pointerId:%{private}d action:%{private}d->%{private}d",
+        PointerEvent::PointerItem item;
+        auto isItemExist = lastPointerEventCopy->GetPointerItem(pointerId, item);
+        if (isItemExist) {
+            item.SetCanceled(true);
+            lastPointerEventCopy->UpdatePointerItem(pointerId, item);
+        }
+        MMI_HILOGI("Cancel mouse event for valid display change,pointerId:%{public}d action:%{public}d->%{public}d "
+                   "isItemExist=%{public}d",
             pointerId,
             originAction,
-            action);
+            action,
+            static_cast<uint32_t>(isItemExist));
         auto lastPointerEvent = std::make_shared<PointerEvent>(*lastPointerEventCopy);
         lastPointerEvent->SetPointerAction(action);
         lastPointerEvent->SetOriginPointerAction(originAction);
         lastPointerEvent->SetPointerId(pointerId);
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        CHKPV(eventDispatchHandler);
-        eventDispatchHandler->HandlePointerEvent(lastPointerEvent);
+        auto filter = InputHandler->GetFilterHandler();
+        CHKPV(filter);
+        filter->HandlePointerEvent(lastPointerEvent);
     }
 }
 
@@ -1467,6 +1507,13 @@ void InputWindowsManager::AdjustDisplayRotation()
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos_.displayId);
     CHKPV(displayInfo);
     if (cursorPos_.displayDirection != displayInfo->displayDirection) {
+        MMI_HILOGI("displayId:%{public}d, cursorPosX:%{private}.2f, cursorPosY:%{private}.2f, direction:%{public}d, "
+        "physicalDisplay id:%{public}d, x:%{private}d, y:%{private}d, width:%{public}d, height:%{public}d, "
+        "dpi:%{public}d, name:%{public}s, uniq:%{public}s, direction:%{public}d, displayDirection:%{public}d",
+            cursorPos_.displayId, cursorPos_.cursorPos.x, cursorPos_.cursorPos.y, cursorPos_.direction,
+            displayInfo->id, displayInfo->x, displayInfo->y, displayInfo->width, displayInfo->height,
+            displayInfo->dpi, displayInfo->name.c_str(), displayInfo->uniq.c_str(), displayInfo->direction,
+            displayInfo->displayDirection);
         if (cursorPos_.direction == displayInfo->direction) {
             ScreenRotateAdjustDisplayXY(*displayInfo, coord);
         }
@@ -1476,7 +1523,41 @@ void InputWindowsManager::AdjustDisplayRotation()
         IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*displayInfo);
         IPointerDrawingManager::GetInstance()->SetPointerLocation(
             static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y), cursorPos_.displayId);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (IsSupported() && extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
+        AdjustDragPosition();
     }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    }
+}
+
+void InputWindowsManager::AdjustDragPosition()
+{
+    auto lastPointerEvent = GetlastPointerEvent();
+    CHKPV(lastPointerEvent);
+    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent);
+    pointerEvent->SetTargetDisplayId(mouseLocation_.displayId);
+    auto touchWindow = SelectWindowInfo(mouseLocation_.physicalX, mouseLocation_.physicalY, pointerEvent);
+    if (touchWindow == std::nullopt) {
+        MMI_HILOGE("SelectWindowInfo failed");
+        return;
+    }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(pointerId, item);
+    item.SetDisplayX(mouseLocation_.physicalX);
+    item.SetDisplayY(mouseLocation_.physicalY);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    pointerEvent->SetTargetWindowId(touchWindow->id);
+    pointerEvent->SetAgentWindowId(touchWindow->id);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    auto now = GetSysClockTime();
+    pointerEvent->SetActionTime(now);
+    pointerEvent->UpdateId();
+    auto filterHandler = InputHandler->GetFilterHandler();
+    CHKPV(filterHandler);
+    filterHandler->HandlePointerEvent(pointerEvent);
+    MMI_HILOGI("pointerEvent: %{public}s", pointerEvent->ToString().c_str());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -1868,11 +1949,25 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     if (pointerAction == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
         pointerEvent->SetAgentWindowId(lastWindowInfo_.id);
     }
+    PrintEnterEventInfo(pointerEvent);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     auto filter = InputHandler->GetFilterHandler();
     filter->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+void InputWindowsManager::PrintEnterEventInfo(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc == PointerEvent::POINTER_ACTION_LEAVE_WINDOW &&
+        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent->GetDeviceId());
+        CHKPV(device);
+        MMI_HILOGE("leave-window type:%{public}d,id:%{public}d,pointerid:%{public}d,action:%{public}d by:%{public}s",
+            pointerEvent->GetSourceType(), pointerEvent->GetId(), pointerEvent->GetPointerId(),
+            pointerAc, device->GetName().c_str());
+    }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -2052,7 +2147,8 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
                "XY:{%{private}d %{private}d} offsetXY:{%{private}d %{private}d} "
                "WH:{%{private}d %{private}d} validWH:{%{private}d %{private}d} "
                "direction:%{public}d,displayDirection:%{public}d,fixedDirection:%{public}d} "
-               "oneHandXY:{%{private}d %{private}d}",
+               "oneHandXY:{%{private}d %{private}d},"
+               "pointerActiveWidth:%{private}d,pointerActiveHeight:%{private}d",
         displayInfo.id,
         displayInfo.name.c_str(),
         displayInfo.uniq.c_str(),
@@ -2068,7 +2164,9 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
         displayInfo.displayDirection,
         displayInfo.fixedDirection,
         displayInfo.oneHandX,
-        displayInfo.oneHandY);
+        displayInfo.oneHandY,
+        displayInfo.pointerActiveWidth,
+        displayInfo.pointerActiveHeight);
 }
 
 const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
@@ -2229,7 +2327,7 @@ void InputWindowsManager::RotateDisplayScreen(const DisplayInfo& info, PhysicalC
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
-    const DisplayInfo& info, EventTouch& touchInfo)
+    const DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear)
 {
     PrintDisplayInfo(info);
     auto width = info.width;
@@ -2242,13 +2340,17 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     }
     PhysicalCoordinate coord {
         .x = libinput_event_touch_get_x_transformed(touch, width),
-        .y = libinput_event_touch_get_y_transformed(touch, height),
+        .y = libinput_event_touch_get_y_transformed(touch, height - info.expandHeight),
     };
     MMI_HILOGD("width:%{private}d, height:%{private}d, physicalX:%{private}f, physicalY:%{private}f",
         width, height, coord.x, coord.y);
     Coordinate2D pos = { .x = coord.x, .y = coord.y };
     if (IsPositionOutValidDisplay(pos, info, true)) {
         MMI_HILOGD("The position is out of the valid display");
+        if (isNeedClear) {
+            int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+            TriggerTouchUpOnInvalidAreaEntry(seatSlot);
+        }
         return false;
     }
     MMI_HILOGD("IsPositionOutValidDisplay physicalXY:{%{private}f %{private}f}->{%{private}f %{private}f}",
@@ -2259,12 +2361,57 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     touchInfo.point.x = static_cast<int32_t>(coord.x);
     touchInfo.point.y = static_cast<int32_t>(coord.y);
     touchInfo.toolRect.point.x = static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, width));
-    touchInfo.toolRect.point.y = static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, height));
+    touchInfo.toolRect.point.y =
+        static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, height - info.expandHeight));
     touchInfo.toolRect.width = static_cast<int32_t>(
         libinput_event_touch_get_tool_width_transformed(touch, width));
     touchInfo.toolRect.height = static_cast<int32_t>(
         libinput_event_touch_get_tool_height_transformed(touch, height));
     return true;
+}
+
+// When the finger moves out of the active area, the touch up event is triggered
+void InputWindowsManager::TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId)
+{
+    if (lastPointerEventforGesture_ == nullptr) {
+        MMI_HILOGE("lastPointerEventforGesture_ is null");
+        return;
+    }
+    PointerEvent::PointerItem item;
+    if (!(lastPointerEventforGesture_->GetPointerItem(pointerId, item))) {
+        MMI_HILOGE("Get pointer item failed, pointerId:%{public}d", pointerId);
+        return;
+    }
+    // Make sure to trigger touch up the first time out of the valid area
+    if ((!item.IsCanceled()) && item.IsPressed()) {
+        auto pointerEvent = std::make_shared<PointerEvent>(*lastPointerEventforGesture_);
+        int32_t originAction = pointerEvent->GetPointerAction();
+        pointerEvent->SetOriginPointerAction(originAction);
+        int32_t action = PointerEvent::POINTER_ACTION_UP;
+        bool isDragging = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+                          (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId);
+        if (isDragging) {
+            action = PointerEvent::POINTER_ACTION_PULL_UP;
+        }
+        pointerEvent->SetPointerAction(action);
+        pointerEvent->SetPointerId(pointerId);
+        auto now = GetSysClockTime();
+        pointerEvent->SetActionTime(now);
+        pointerEvent->SetTargetWindowId(item.GetTargetWindowId());
+        auto winOpt = GetWindowAndDisplayInfo(item.GetTargetWindowId(), pointerEvent->GetTargetDisplayId());
+        if (winOpt) {
+            pointerEvent->SetAgentWindowId(winOpt->agentWindowId);
+        }
+        pointerEvent->UpdateId();
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        CHKPV(eventDispatchHandler);
+        eventDispatchHandler->HandleTouchEvent(pointerEvent);
+        MMI_HILOGI("Trigger touch up, pointerId:%{public}d, pointerAction:%{public}d", pointerId, action);
+
+        // Flag event have been cleaned up
+        item.SetCanceled(true);
+        lastPointerEventforGesture_->UpdatePointerItem(pointerId, item);
+    }
 }
 
 void InputWindowsManager::SetAntiMisTake(bool state)
@@ -2278,7 +2425,7 @@ void InputWindowsManager::SetAntiMisTakeStatus(bool state)
 }
 
 bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-    EventTouch& touchInfo, int32_t& physicalDisplayId)
+    EventTouch& touchInfo, int32_t& physicalDisplayId, bool isNeedClear)
 {
     CHKPF(touch);
     std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
@@ -2292,7 +2439,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
-    return GetPhysicalDisplayCoord(touch, *info, touchInfo);
+    return GetPhysicalDisplayCoord(touch, *info, touchInfo, isNeedClear);
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
@@ -2835,6 +2982,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
                     (action == PointerEvent::POINTER_ACTION_AXIS_END)||
                     (PointerEvent::MOUSE_BUTTON_LEFT != pointerEvent->GetButtonId()))) {
+                    MMI_HILOG_DISPATCHD("Mouse event transparent, action:%{public}d, ButtonId:%{public}d",
+                        action, pointerEvent->GetButtonId());
                     continue;
                 }
                 firstBtnDownWindowInfo_.first = item.id;
@@ -3589,13 +3738,43 @@ bool InputWindowsManager::IsNavigationWindowInjectEvent(std::shared_ptr<PointerE
 }
 
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-void InputWindowsManager::UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY,
+void InputWindowsManager::UpdateDisplayXYInOneHandMode(double &physicalX, double &physicalY,
     const DisplayInfo &displayInfo, float oneHandScale)
 {
-    double virtualY = physicalY - displayInfo.oneHandY;
-    double virtualX = physicalX - displayInfo.oneHandX;
-    physicalX = virtualX / oneHandScale;
-    physicalY = virtualY / oneHandScale;
+    int32_t oneHandXMax = displayInfo.oneHandX + displayInfo.width * oneHandScale;
+    if ((physicalY >= displayInfo.oneHandY) && (physicalX >= displayInfo.oneHandX) && (physicalX <= oneHandXMax)) {
+        double virtualY = physicalY - displayInfo.oneHandY;
+        double virtualX = physicalX - displayInfo.oneHandX;
+        physicalX = virtualX / oneHandScale;
+        physicalY = virtualY / oneHandScale;
+    }
+}
+
+void InputWindowsManager::HandleOneHandMode(const DisplayInfo &displayInfo,
+    std::shared_ptr<PointerEvent> &pointerEvent, PointerEvent::PointerItem &pointerItem)
+{
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    SendOneHandData(true, displayInfo);
+#endif // OHOS_BUILD_ENABLE_ANCO
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    MMI_HILOG_DISPATCHD("displayInfo.oneHandX=%{private}d, displayInfo.oneHandY=%{private}d, "
+                        "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
+        displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight, displayInfo.scalePercent,
+        pointerEvent->GetFixedModeStr().c_str());
+    double fixedDisplayX = pointerItem.GetDisplayXPos();
+    double fixedDisplayY = pointerItem.GetDisplayYPos();
+    float oneHandScale = displayInfo.scalePercent * 1.0 / 100;
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
+        MMI_HILOG_DISPATCHD("autoToVirtualScreen=%{public}s", autoToVirtualScreen ? "true" : "false");
+        if (autoToVirtualScreen) {
+            UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
+        }
+    } else {
+        UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
+    }
+    pointerItem.SetFixedDisplayX(static_cast<int32_t>(fixedDisplayX));
+    pointerItem.SetFixedDisplayY(static_cast<int32_t>(fixedDisplayY));
 }
 
 void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo,
@@ -3619,25 +3798,12 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
         return;
     }
     bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
-    bool isOneHandMode = displayInfo.oneHandY > 0;
-    if (isOneHandMode) {
-        pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
-        MMI_HILOG_DISPATCHD("displayInfo.oneHandY=%{private}d, fixedModeStr=%{public}s", displayInfo.oneHandY,
-            pointerEvent->GetFixedModeStr().c_str());
-        double fixedDisplayX = physicalX;
-        double fixedDisplayY = physicalY;
-        float oneHandScale = (displayInfo.height - displayInfo.oneHandY) * 1.0 / displayInfo.height;
-        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
-            MMI_HILOG_DISPATCHD("autoToVirtualScreen=%{public}s", autoToVirtualScreen ? "true" : "false");
-            if (autoToVirtualScreen) {
-                UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
-            }
-        } else {
-            UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
-        }
-        pointerItem.SetFixedDisplayX(static_cast<int32_t>(fixedDisplayX));
-        pointerItem.SetFixedDisplayY(static_cast<int32_t>(fixedDisplayY));
+    if (displayInfo.scalePercent > 0 && displayInfo.scalePercent < 100) {
+        HandleOneHandMode(displayInfo, pointerEvent, pointerItem);
     } else {
+#ifdef OHOS_BUILD_ENABLE_ANCO
+        SendOneHandData(false, displayInfo);
+#endif // OHOS_BUILD_ENABLE_ANCO
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
         pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
         pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
@@ -3675,7 +3841,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     bool isNavigationWindow = false;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
-    
+
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
@@ -3795,6 +3961,11 @@ void InputWindowsManager::HandleGestureInjection(bool gestureInject) {
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        MMI_HILOG_DISPATCHD("Abort UpdateTouchScreenTarget due to POINTER_ACTION_CANCEL");
+        return RET_OK;
+    }
+
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
         MMI_HILOG_DISPATCHE("This display is not existent");
@@ -4901,6 +5072,13 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     GetWidthAndHeight(displayInfo, width, height, isRealData);
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (IsPointerActiveRectValid(*displayInfo)) {
+        width = displayInfo->pointerActiveWidth;
+        height = displayInfo->pointerActiveHeight;
+        MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", width, height);
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
@@ -4924,13 +5102,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
     MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{public}d, %{public}d}, "
                "cursorPosXY: {%{public}.2f, %{public}.2f} -> {%{public}.2f %{public}.2f}",
-        static_cast<int32_t>(isRealData),
-        displayId,
-        mouseLocation_.physicalX,
-        mouseLocation_.physicalY,
-        oldX, oldY,
-        cursorPos_.cursorPos.x,
-        cursorPos_.cursorPos.y);
+        static_cast<int32_t>(isRealData), displayId, mouseLocation_.physicalX, mouseLocation_.physicalY,
+        oldX, oldY, cursorPos_.cursorPos.x, cursorPos_.cursorPos.y);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
@@ -5600,6 +5773,19 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
 
     return IsAncoWindowFocus(*windowInfo);
 }
+
+void InputWindowsManager::SendOneHandData(bool inOneHand, const DisplayInfo &displayInfo)
+{
+    std::lock_guard<std::mutex> lock(oneHandMtx_);
+    if (inOneHandMode_ != inOneHand) {
+        UpdateOneHandDataExt(displayInfo);
+        inOneHandMode_ = inOneHand;
+        MMI_HILOG_DISPATCHI("one hand mode %{public}s, displayInfo.oneHandX=%{private}d, "
+                            "displayInfo.oneHandY=%{private}d, expandHeight=%{public}d, scalePercent=%{public}d",
+            inOneHand ? "in" : "out", displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight,
+            displayInfo.scalePercent);
+    }
+}
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -5801,13 +5987,13 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
             action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
         }
         pointerEvent->SetPointerAction(action);
-        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
         pointerEvent->SetPointerId(pointerId);
 
         if (AdjustFingerFlag(pointerEvent)) {
             continue;
         }
-        MMI_HILOGI("Cancel touch, pointerId:%{public}d", pointerId);
+        MMI_HILOGI("Cancel touch, pointerId:%{public}d, action:%{public}d", pointerId, action);
         auto now = GetSysClockTime();
         pointerEvent->SetActionTime(now);
         pointerEvent->SetTargetWindowId(item.GetTargetWindowId());
@@ -5816,11 +6002,9 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
             pointerEvent->SetAgentWindowId(winOpt->agentWindowId);
         }
         pointerEvent->UpdateId();
-
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        CHKPV(eventDispatchHandler);
-        eventDispatchHandler->HandleTouchEvent(pointerEvent);
-        CancelTouch(item.GetPointerId());
+        auto filter = InputHandler->GetFilterHandler();
+        CHKPV(filter);
+        filter->HandleTouchEvent(pointerEvent);
     }
 }
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)

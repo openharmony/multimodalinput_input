@@ -229,6 +229,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_SWITCH_EVENT):
             ret = StubUnsubscribeSwitchEvent(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_TABLET_EVENT):
+            ret = StubSubscribeTabletProximity(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_TABLET_EVENT):
+            ret = StubUnSubscribetabletProximity(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_PROCESSED):
             ret = StubMarkProcessed(data, reply);
             break;
@@ -483,6 +489,15 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_MOUSE_CURSOR):
             ret = StubSetCustomMouseCursor(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID):
+            ret = StubSetMultiWindowScreenId(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_MONITOR):
+            ret = StubSubscribeKeyMonitor(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_MONITOR):
+            ret = StubUnsubscribeKeyMonitor(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
@@ -1594,6 +1609,46 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeHotkey(MessageParcel& data, M
     return ret;
 }
 
+int32_t MultimodalInputConnectStub::StubSubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    KeyMonitorOption keyOption {};
+
+    if (!keyOption.Unmarshalling(data)) {
+        MMI_HILOGE("Read KeyMonitorOption failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    auto ret = SubscribeKeyMonitor(keyOption);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeKeyMonitor failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubUnsubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    KeyMonitorOption keyOption {};
+
+    if (!keyOption.Unmarshalling(data)) {
+        MMI_HILOGE("Read KeyMonitorOption failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    auto ret = UnsubscribeKeyMonitor(keyOption);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnsubscribeKeyMonitor failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -1641,6 +1696,56 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& da
     int32_t ret = UnsubscribeSwitchEvent(subscribeId);
     if (ret != RET_OK) {
         MMI_HILOGE("UnsubscribeSwitchEvent failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+
+int32_t MultimodalInputConnectStub::StubSubscribeTabletProximity(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t subscribeId = 0;
+    READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SubscribeTabletProximity(subscribeId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeTabletProximity failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubUnSubscribetabletProximity(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t subscribeId = 0;
+    READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribeId");
+        return RET_ERR;
+    }
+    int32_t ret = UnsubscribetabletProximity(subscribeId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnsubscribeTabletProximity failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -3314,6 +3419,25 @@ int32_t MultimodalInputConnectStub::StubSetCustomMouseCursor(MessageParcel& data
     int32_t ret = SetCustomCursor(windowId, cursor, options);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMultiWindowScreenId(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    uint64_t screenId = 0;
+    uint64_t displayNodeScreenId = 0;
+    READUINT64(data, screenId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT64(data, displayNodeScreenId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SkipPointerLayer failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

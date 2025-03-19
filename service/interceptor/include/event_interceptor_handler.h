@@ -55,6 +55,7 @@ private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    bool KeyInterceptByHostOSWhiteList(int32_t keyCode);
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 private:
@@ -91,7 +92,9 @@ private:
 private:
     bool sessionLostCallbackInitialized_ { false };
     InterceptorCollection interceptors_;
-    static std::unique_ptr<std::string> keyevent_intercept_whitelist;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    std::unique_ptr<std::string> keyevent_intercept_whitelist{nullptr};
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 };
 } // namespace MMI
 } // namespace OHOS

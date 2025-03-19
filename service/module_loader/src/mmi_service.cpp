@@ -68,6 +68,7 @@
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
 #include "setting_datashare.h"
+#include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "app_mgr_client.h"
 #include "running_process_info.h"
@@ -76,7 +77,7 @@
 #ifdef PLAYER_FRAMEWORK_EXISTS
 #include "input_screen_capture_agent.h"
 #endif // PLAYER_FRAMEWORK_EXISTS
-
+#include "tablet_subscriber_handler.h"
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -106,6 +107,7 @@ constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 constexpr int32_t RETRY_CHECK_TIMES { 5 };
 constexpr int32_t CHECK_EEVENT_INTERVAL_TIME { 4000 };
+const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 const std::set<int32_t> g_keyCodeValueSet = {
 #ifndef OHOS_BUILD_ENABLE_WATCH
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
@@ -153,6 +155,9 @@ typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcK
 VKEYBOARD_ONFUNCKEYEVENT_TYPE vkeyboard_onFuncKeyEvent_ = nullptr;
 typedef void (*VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)();
 VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE vkeyboard_hardwareKeyEventDetected_ = nullptr;
+typedef int32_t (*VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)();
+VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE vkeyboard_getKeyboardActivationState_ = nullptr;
+
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
@@ -668,8 +673,17 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
 int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
     int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+        [pid, windowId] {
+            return WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid);
+        })
+        );
+    if (windowId > 0 && ret != RET_OK) {
+        MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
+        return ERROR_WINDOW_ID_PERMISSION_DENIED;
+    }
+#if defined OHOS_BUILD_ENABLE_POINTER
     auto type = PER_HELPER->GetTokenType();
     if (windowId < 0 && (type == OHOS::Security::AccessToken::TOKEN_HAP ||
         type == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
@@ -684,7 +698,7 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t fo
             return ret;
         }
     }
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+    ret = delegateTasks_.PostSyncTask(std::bind(
         [pixelMap, pid, windowId, focusX, focusY] {
             return IPointerDrawingManager::GetInstance()->SetCustomCursor(pixelMap, pid, windowId, focusX, focusY);
         }
@@ -1986,6 +2000,39 @@ int32_t MMIService::UnsubscribeHotkey(int32_t subscribeId)
     return RET_OK;
 }
 
+int32_t MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, keyOption] {
+            return sMsgHandler_.SubscribeKeyMonitor(pid, keyOption);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("ServerMsgHandler::SubscribeKeyMonitor fail, error:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, keyOption] {
+            return sMsgHandler_.UnsubscribeKeyMonitor(pid, keyOption);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("ServerMsgHandler::UnsubscribeKeyMonitor fail, error:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
 int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CALL_INFO_TRACE;
@@ -2019,6 +2066,42 @@ int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_SWITCH
+    return RET_OK;
+}
+
+int32_t MMIService::SubscribeTabletProximity(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId] {
+            auto sess = this->GetSessionByPid(pid);
+            CHKPR(sess, RET_ERR);
+            return TABLET_SCRIBER_HANDLER->SubscribeTabletProximity(sess, subscribeId);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The subscribe tablet event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribetabletProximity(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId] {
+            auto sess = this->GetSessionByPid(pid);
+            CHKPR(sess, RET_ERR);
+            return TABLET_SCRIBER_HANDLER->UnsubscribetabletProximity(sess, subscribeId);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The unsubscribe tablet event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 
@@ -3111,13 +3194,17 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
             vkeyboard_hardwareKeyEventDetected_ = (VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)dlsym(
                 g_VKeyboardHandle, "HardwareKeyEventDetected");
+            vkeyboard_getKeyboardActivationState_ = (VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)dlsym(
+                g_VKeyboardHandle, "GetKeyboardActivationState");
+
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
                 statemachineMessageQueue_getLibinputMessage_,
                 trackPadEngine_getAllTouchMessage_,
                 trackPadEngine_clearTouchMessage_,
                 trackPadEngine_getAllKeyMessage_,
                 trackPadEngine_clearKeyMessage_,
-                vkeyboard_hardwareKeyEventDetected_);
+                vkeyboard_hardwareKeyEventDetected_,
+                vkeyboard_getKeyboardActivationState_);
         }
     }
 }
@@ -3594,9 +3681,18 @@ int32_t MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool aut
 int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+        [pid, windowId] {
+            return WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid);
+        })
+        );
+    if (windowId > 0 && ret != RET_OK) {
+        MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
+        return ERROR_WINDOW_ID_PERMISSION_DENIED;
+    }
+#if defined OHOS_BUILD_ENABLE_POINTER
+    ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, cursor, options] {
             return IPointerDrawingManager::GetInstance()->SetCustomCursor(pid, windowId, cursor, options);
         }
@@ -3645,5 +3741,11 @@ int32_t MMIService::SyncKnuckleStatus()
     return ret;
 }
 #endif
+
+int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

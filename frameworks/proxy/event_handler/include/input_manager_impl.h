@@ -62,8 +62,13 @@ public:
     int32_t SubscribeHotkey(std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
     void UnsubscribeHotkey(int32_t subscriberId);
+    int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    void UnsubscribeKeyMonitor(int32_t subscriberId);
     int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
+    int32_t SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback);
+    void UnsubscribetabletProximity(int32_t subscriberId);
     int32_t SubscribeLongPressEvent(const LongPressRequest &LongPressRequest,
         std::function<void(LongPressEvent)> callback);
     void UnsubscribeLongPressEvent(int32_t subscriberId);
@@ -79,6 +84,7 @@ public:
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
+    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);

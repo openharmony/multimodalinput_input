@@ -50,6 +50,7 @@
             OHOS::MMI::InputDevice::*;
             OHOS::MMI::InputDeviceManager::*;
             OHOS::MMI::InputEvent::*;
+            OHOS::MMI::KeyMonitorOption::*;
             OHOS::MMI::KeyOption::*;
             OHOS::MMI::EndLogTraceId*;
             OHOS::MMI::PointerEvent::*;
