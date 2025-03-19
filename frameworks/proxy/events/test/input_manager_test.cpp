@@ -5359,5 +5359,91 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMultiWindowScreenId_001, TestSize
     uint64_t displayNodeScreenId = 2;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetMultiWindowScreenId(screenId, displayNodeScreenId));
 }
+
+/**
+ * @tc.name: InputManagerTest_SimulateEvent_009
+ * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateEvent_010
+ * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateEvent_011
+ * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+}
 } // namespace MMI
 } // namespace OHOS
