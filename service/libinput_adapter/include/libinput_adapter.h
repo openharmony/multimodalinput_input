@@ -88,6 +88,9 @@ public:
     void Stop();
     void ProcessPendingEvents();
     void ReloadDevice();
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+	void RegisterBootStatusReceiver();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     auto GetInputFds() const
     {
