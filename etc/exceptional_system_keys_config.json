@@ -665,6 +665,12 @@
             "finalKey": 20,
             "longPressTime": 200,
             "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2077,
+            "longPressTime": 0,
+            "triggerType": "up"
         }
     ]
 }
