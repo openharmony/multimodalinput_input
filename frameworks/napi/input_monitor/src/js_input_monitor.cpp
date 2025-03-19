@@ -99,7 +99,7 @@ std::map<std::string, int32_t> TO_MONITOR_TYPE = {
     { TOUCH_SWIPE_GESTURE, TOUCH_GESTURE },
     { TOUCH_PINCH_GESTURE, TOUCH_GESTURE },
     { TOUCH_ALL_GESTURE, TOUCH_GESTURE },
-    { "x_key", X_KEY }
+    { "xKey", X_KEY }
 };
 
 std::map<std::string, int32_t> TO_PRE_MONITOR_TYPE = {
@@ -186,7 +186,7 @@ std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
     { "rotate", HANDLE_EVENT_TYPE_ROTATE },
     { "threeFingersTap", HANDLE_EVENT_TYPE_THREEFINGERSTAP },
     { "fingerprint", HANDLE_EVENT_TYPE_FINGERPRINT },
-    { "x_key", HANDLE_EVENT_TYPE_X_KEY },
+    { "xKey", HANDLE_EVENT_TYPE_X_KEY },
 };
 
 std::map<std::string, int32_t> TO_HANDLE_PRE_EVENT_TYPE = {
@@ -1746,7 +1746,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_X_KEY
             case TypeName::X_KEY: {
-                if (!IsXkey(pointerEventItem)) {
+                if (!IsXKey(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1781,7 +1781,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
             typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward" ||
             typeName == TOUCH_SWIPE_GESTURE || typeName == TOUCH_PINCH_GESTURE || typeName == TOUCH_ALL_GESTURE ||
-            typeName == "x_key";
+            typeName == "xKey";
         if (typeNameFlag) {
             if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
                 pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
@@ -1945,13 +1945,13 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
 }
 
 #ifdef OHOS_BUILD_ENABLE_X_KEY
-bool JsInputMonitor::IsXkey(std::shared_ptr<PointerEvent> pointerEvent)
+bool JsInputMonitor::IsXKey(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_X_KEY) {
         return true;
     }
-    MMI_HILOGI("Not X-key event.");
+    MMI_HILOGD("Not X-key event.");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_X_KEY

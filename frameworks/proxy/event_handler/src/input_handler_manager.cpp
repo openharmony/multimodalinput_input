@@ -637,13 +637,13 @@ bool InputHandlerManager::IsFingerprintType(std::shared_ptr<PointerEvent> pointe
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 #ifdef OHOS_BUILD_ENABLE_X_KEY
-bool InputHandlerManager::IsXkeyType(std::shared_ptr<PointerEvent> pointerEvent)
+bool InputHandlerManager::IsXKeyType(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_X_KEY) {
         return true;
     }
-    MMI_HILOGI("Not X-key event");
+    MMI_HILOGD("Not X-key event");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_X_KEY
@@ -660,7 +660,7 @@ bool InputHandlerManager::CheckIfNeedAddToConsumerInfos(const Handler &monitor,
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_X_KEY
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_X_KEY) == HANDLE_EVENT_TYPE_X_KEY &&
-        IsXkeyType(pointerEvent)) {
+        IsXKeyType(pointerEvent)) {
         return true;
     }
 #endif // OHOS_BUILD_ENABLE_X_KEY
