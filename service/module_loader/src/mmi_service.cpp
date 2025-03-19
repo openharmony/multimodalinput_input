@@ -679,7 +679,7 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t fo
             return WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid);
         })
         );
-    if (windowId < 0 && ret != RET_OK) {
+    if (windowId > 0 && ret != RET_OK) {
         MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
@@ -3687,7 +3687,7 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, Curso
             return WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid);
         })
         );
-    if (windowId < 0 && ret != RET_OK) {
+    if (windowId > 0 && ret != RET_OK) {
         MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
