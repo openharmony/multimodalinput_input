@@ -78,8 +78,6 @@ ohos_shared_library("oh_input_manager") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_core",
-    "napi:ace_napi",
   ]
 
   if (enable_player_framework) {

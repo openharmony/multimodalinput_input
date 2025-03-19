@@ -72,7 +72,9 @@ public:
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId) = 0;
     virtual bool AdjustFingerFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual void PrintEnterEventInfo(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    virtual bool IsFocusedSession(int32_t session) const = 0;
     virtual void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo) = 0;
     virtual void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
@@ -131,7 +133,7 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId) = 0;
+        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
     virtual const DisplayInfo *GetDefaultDisplayInfo() const = 0;

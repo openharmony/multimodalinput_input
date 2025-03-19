@@ -90,8 +90,12 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     int32_t SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option);
     int32_t UnsubscribeHotkey(int32_t subscribeId);
+    int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption);
+    int32_t UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption);
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
+    int32_t SubscribeTabletProximity(int32_t subscribeId);
+    int32_t UnsubscribetabletProximity(int32_t subscribeId);
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest);
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
@@ -165,6 +169,7 @@ public:
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
+    int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
 private:
     MultimodalInputConnectManager() = default;

@@ -67,6 +67,7 @@ private:
     void DumpSubscriber(int32_t fd, std::shared_ptr<Subscriber> subscriber) const;
     void InsertSubScriber(std::shared_ptr<Subscriber> subs);
     bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool ProcessKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
@@ -138,6 +139,7 @@ private:
     bool isForegroundExits_ { false };
     bool needSkipPowerKeyUp_ { false };
     bool callBahaviorState_ { false };
+    std::set<int32_t> pendingKeys_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -331,6 +331,18 @@ bool InputDeviceManager::HasVirtualPointerDevice()
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+bool InputDeviceManager::HasVirtualKeyboardDevice()
+{
+    for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
+        if (it->second->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD)) {
+            return true;
+        }
+    }
+    return false;
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 bool InputDeviceManager::HasTouchDevice()
 {
     CALL_DEBUG_ENTER;

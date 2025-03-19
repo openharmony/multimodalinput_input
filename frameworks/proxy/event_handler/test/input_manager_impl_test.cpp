@@ -66,7 +66,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsValiadWindowAreas, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_PrintWindowInfo, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_PrintWindowInfo, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     WindowInfo windowInfo;
@@ -103,7 +103,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_PrintWindowInfo, TestSize.Le
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_RecoverPointerEvent, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_RecoverPointerEvent, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     InputMgrImpl.lastPointerEvent_ = PointerEvent::Create();
@@ -177,7 +177,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnKeyEvent_01, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsValiadWindowAreas_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsValiadWindowAreas_01, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     std::vector<WindowInfo> windows;
@@ -211,7 +211,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsValiadWindowAreas_02, Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCustomCursor_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCustomCursor_01, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t windowId = 2;
@@ -230,7 +230,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCustomCursor_01, TestSize
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_01, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t windowId = 2;
@@ -249,7 +249,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_01, TestSize
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_02, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_02, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t windowId = -5;
@@ -268,7 +268,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_02, TestSize
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_ReAddInputEventFilter_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_ReAddInputEventFilter_01, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     EXPECT_FALSE(InputMgrImpl.eventFilterServices_.size() > 4);
@@ -281,7 +281,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_ReAddInputEventFilter_01, Te
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_01, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool ret = InputMgrImpl.IsPointerVisible();
@@ -294,7 +294,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_01, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_02, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_02, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool ret = InputMgrImpl.IsPointerVisible();
@@ -363,7 +363,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableCombineKey_01, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableCombineKey_02, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableCombineKey_02, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     bool enable = false;
@@ -377,7 +377,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableCombineKey_02, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_01, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     EXPECT_TRUE(InputMgrImpl.displayGroupInfo_.windowsInfo.empty());
@@ -391,7 +391,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_01, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_02, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_02, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     InputMgrImpl.displayGroupInfo_.width = 50;
@@ -435,7 +435,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_03, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_04, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_04, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     InputMgrImpl.displayGroupInfo_.width = 50;
@@ -454,7 +454,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_04, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPixelMapData_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPixelMapData_01, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t infoId = -1;
@@ -473,7 +473,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPixelMapData_01, TestSize
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendEnhanceConfig_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendEnhanceConfig_01, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     MmiMessageId idMsg = MmiMessageId::SCINFO_CONFIG;
@@ -503,7 +503,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendEnhanceConfig_02, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerColor_01, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerColor_01, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     int32_t color = 5;
@@ -608,7 +608,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_ConvertToCapiKeyAction_001, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadThreeFingersTapSwitch_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     bool switchFlag = true;
@@ -642,7 +642,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadThreeFingersTapSw
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCurrentUser_001, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCurrentUser_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     int32_t userId = 1;
@@ -857,5 +857,70 @@ HWTEST_F(InputManagerImplTest, SetMouseHotSpot_Test001, TestSize.Level1)
     EXPECT_EQ(ret, RET_ERR);
 }
 
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_001
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_002
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_001
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = pointerId;
+    pointerEvent->pointers_.push_back(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_001
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = 4;
+    pointerEvent->pointers_.push_back(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 } // namespace MMI
 } // namespace OHOS

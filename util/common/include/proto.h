@@ -25,6 +25,7 @@ enum class MmiMessageId : int32_t {
     NOTICE_ANR,
     MARK_PROCESS,
     ON_SUBSCRIBE_KEY,
+    ON_SUBSCRIBE_KEY_MONITOR,
     ON_SUBSCRIBE_SWITCH,
     ON_KEY_EVENT,
     ON_POINTER_EVENT,
@@ -41,6 +42,7 @@ enum class MmiMessageId : int32_t {
     ON_SUBSCRIBE_LONG_PRESS,
     SET_INPUT_DEVICE_ENABLED,
     ON_PRE_KEY_EVENT,
+    ON_SUBSCRIBE_TABLET,
 };
 
 enum TokenType : int32_t {

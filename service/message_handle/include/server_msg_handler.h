@@ -73,12 +73,16 @@ public:
     int32_t OnSubscribeHotkey(IUdsServer *server, int32_t pid,
         int32_t subscribeId, const std::shared_ptr<KeyOption> option);
     int32_t OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, int32_t subscribeId);
+    int32_t SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption);
+    int32_t UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     int32_t OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType);
     int32_t OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_SWITCH
+    int32_t OnSubscribetabletProximity(IUdsServer *server, int32_t pid, int32_t subscribeId);
+    int32_t OnUnsubscribetabletProximity(IUdsServer *server, int32_t pid, int32_t subscribeId);
     int32_t OnSubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,
         const LongPressRequest &longPressRequest);
     int32_t OnUnsubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
