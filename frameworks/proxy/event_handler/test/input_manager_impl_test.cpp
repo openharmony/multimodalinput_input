@@ -700,5 +700,162 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnsubscribeLongPressEvent, T
     int32_t subscriberId = 0;
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UnsubscribeLongPressEvent(subscriberId));
 }
+
+/**
+ * @tc.name  : PrintForemostThreeWindowInfo_WhenMoreThanThreeWindowsExist
+ * @tc.desc  : Test PrintForemostThreeWindowInfo method when there are more than three windows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, PrintForemostThreeWindowInfo_WhenMoreThanThreeWindowsExist, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<WindowInfo> windowsInfo;
+    for (int i = 0; i < 5; i++) {
+        WindowInfo windowInfo;
+        windowInfo.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+        windowsInfo.push_back(windowInfo);
+    }
+    InputMgrImpl.PrintForemostThreeWindowInfo(windowsInfo);
+}
+
+/**
+ * @tc.name  : ConvertToCapiKeyAction_ShouldReturnInvalidValue_WhenKeyActionIsInvalid
+ * @tc.desc  : Test ConvertToCapiKeyAction function when keyAction is invalid.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+
+HWTEST_F(InputManagerImplTest, ConvertToCapiKeyAction_ShouldReturnInvalidValue_WhenKeyActionIsInvalid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyAction = -1;
+    int32_t expected = -1;
+    int32_t result = InputMgrImpl.ConvertToCapiKeyAction(keyAction);
+    EXPECT_EQ(result, expected);
+}
+/**
+ * @tc.name  : OnWindowStateError_WhenWindowStateCallbackIsNull
+ * @tc.desc  : OnWindowState Error Should Not Call Window State Callback When Window State Callback Is Null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, OnWindowStateError_WhenWindowStateCallbackIsNull, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = 123;
+    int32_t windowId = 456;
+    InputMgrImpl.OnWindowStateError(pid, windowId);
+}
+
+/**
+ * @tc.name  : SetCurrentUser_Test_001
+ * @tc.desc  : Test SetCurrentUser function when userId is less than 0.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, SetCurrentUser_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t userId = -1;
+    int32_t ret = InputMgrImpl.SetCurrentUser(userId);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name  : SetPixelMapData_InvalidInput_Test
+ * @tc.desc  : Test SetPixelMapData function with invalid input.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, SetPixelMapData_InvalidInput_Test, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t infoId = -1;
+    int32_t ret = InputMgrImpl.SetPixelMapData(infoId, nullptr);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name  : CancelInjection_Success
+ * @tc.desc  : Test CancelInjection function when CancelInjection is successful.
+ * @tc.type: FUNC
+ * @tc.require:
+  */
+HWTEST_F(InputManagerImplTest, CancelInjection_Success, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t result = InputMgrImpl.CancelInjection();
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name  : GetKeyState_ReturnsOk_WhenInputValid
+ * @tc.desc  : Test GetKeyState function when input is valid.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, GetKeyState_ReturnsOk_WhenInputValid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> pressedKeys = {1, 2, 3};
+    std::map<int32_t, int32_t> specialKeysState = {{1, 1}, {2, 2}, {3, 3}};
+    int32_t result = InputMgrImpl.GetKeyState(pressedKeys, specialKeysState);
+    EXPECT_EQ(result, RET_OK);
+}
+
+
+/**
+ * @tc.name  : ReAddInputEventFilter_Test_001
+ * @tc.desc  : Test when eventFilterServices_ size is greater than MAX_FILTER_NUM, ReAddInputEventFilter should return
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, ReAddInputEventFilter_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputMgrImpl.eventFilterServices_.insert(std::make_pair(1, std::make_tuple(nullptr, 1, 1)));
+    InputMgrImpl.eventFilterServices_.insert(std::make_pair(2, std::make_tuple(nullptr, 2, 2)));
+    InputMgrImpl.eventFilterServices_.insert(std::make_pair(3, std::make_tuple(nullptr, 3, 3)));
+    InputMgrImpl.eventFilterServices_.insert(std::make_pair(4, std::make_tuple(nullptr, 4, 4)));
+    InputMgrImpl.eventFilterServices_.insert(std::make_pair(5, std::make_tuple(nullptr, 5, 5)));
+    InputMgrImpl.ReAddInputEventFilter();
+    ASSERT_EQ(InputMgrImpl.eventFilterServices_.size(), 5);
+}
+
+
+/**
+ * @tc.name  : SetPointerStyle_InvalidParam_Test
+ * @tc.desc  : Test SetPointerStyle function with invalid parameter.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, SetPointerStyle_InvalidParam_Test, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerStyle pointerStyle;
+    pointerStyle.id = -1;
+    int32_t windowId = 1;
+    bool isUiExtension = false;
+    int32_t ret = InputMgrImpl.SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name  : SetMouseHotSpot_Test001
+ * @tc.desc  : Test SetMouseHotSpot function when windowId is invalid.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, SetMouseHotSpot_Test001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = -1;
+    int32_t hotSpotX = 100;
+    int32_t hotSpotY = 200;
+    int32_t ret = InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
 } // namespace MMI
 } // namespace OHOS
