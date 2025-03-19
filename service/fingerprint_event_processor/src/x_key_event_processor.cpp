@@ -34,15 +34,13 @@ namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 namespace {
-    const std::string X_KEY_DOUBLE_CLICK_ENABLE_KEY { "double_click_enable_status" };
-    const std::string DOUBLE_CLICK_ENABLE_STATUS { "0" };
-    const std::string X_KEY_APP_BUNDLE_NAME { "" };
-    const std::string X_KEY_APP_ABILITY_NAME { "" };
-    const std::string SETTINGS_DATA_SECURE_PRE_URI {
-        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
-    };
-    const std::string SETTINGS_DATA_SECURE_POST_URI { "?Proxy=true" };
-    const int32_t X_KEY_DOUBLE_CLICK_ENABLE_COUNT { 2 };
+    const std::string X_KEY_DOUBLE_CLICK_ENABLE_KEY = "double_click_enable_status";
+    const std::string DOUBLE_CLICK_ENABLE_STATUS = "0";
+    const std::string X_KEY_APP_BUNDLE_NAME = "";
+    const std::string X_KEY_APP_ABILITY_NAME = "";
+    const std::string SETTINGS_DATA_SECURE_PRE_URI = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_";
+    const std::string SETTINGS_DATA_SECURE_POST_URI = "?Proxy=true";
+    const int32_t X_KEY_DOUBLE_CLICK_ENABLE_COUNT = 2;
     constexpr int32_t DOUBLE_CLICK_DELAY { 300 };
     constexpr int32_t LONG_PRESS_DELAY { 500 };
 
