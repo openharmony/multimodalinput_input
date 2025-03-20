@@ -163,9 +163,6 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         case PointerEvent::POINTER_ACTION_PULL_MOVE:
             PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
             break;
-        case PointerEvent::POINTER_ACTION_PULL_UP:
-            PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent);
-            break;
         case PointerEvent::POINTER_ACTION_CANCEL:
         case PointerEvent::POINTER_ACTION_UP: {
             HandlePointerActionUpEvent(touchEvent);

@@ -59,8 +59,8 @@ public:
 private:
     void StopFingerGesture(std::shared_ptr<PointerEvent> touchEvent);
     void StartFingerGesture();
-    bool CheckFingerGestureCancelEvent(std::shared_ptr<PointerEvent> touchEvent) const;
-    bool CheckAndStopGestureIfNeeded(std::shared_ptr<PointerEvent> touchEvent);
+    bool CheckFingerValidation(std::shared_ptr<PointerEvent> touchEvent) const;
+    bool CheckProgressValid(std::shared_ptr<PointerEvent> touchEvent);
     void UpdateFingerPoisition(std::shared_ptr<PointerEvent> touchEvent);
  
 private:

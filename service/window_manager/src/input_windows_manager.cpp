@@ -31,6 +31,7 @@
 #include "magic_pointer_velocity_tracker.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "hitrace_meter.h"
+#include "pull_throw_subscriber_handler.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
@@ -71,6 +72,8 @@ const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
+const std::string DEVICE_TYPE_HPR { "HPR" };
+const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 constexpr int32_t REPEAT_COOLING_TIME { 100 };
 constexpr int32_t REPEAT_ONCE { 1 };
@@ -4154,6 +4157,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
+    isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
+    if (isHPR_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent);
+    }
     // pointerAction:PA, targetWindowId:TWI, foucsWindowId:FWI, eventId:EID,
     // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
     // width:W, height:H, area.x:AX, area.y:AY, displayId:DID, AgentWindowId: AWI
@@ -4243,19 +4250,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         touchItemDownInfos_[pointerId] = windowInfoEX;
         MMI_HILOG_FREEZEI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
-        if (isInPullThrow_) {
-                isInPullThrow_ = false;
-            }
-            isPullUpBefore_ = true;
-            return ERR_OK;
-        }
-        if (isPullUpBefore_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE) {
-            isPullUpBefore_ = false;
-            isInPullThrow_ = true;
-        } else if (isPullUpBefore_ && !isInPullThrow_) {
-            MMI_HILOG_DISPATCHI("Clear touch event is: %{public}d", pointerEvent->GetPointerAction());
-            ClearEventData(pointerEvent);
-            isPullUpBefore_ = false;
+        MMI_HILOG_DISPATCHD("Clear extra data");
+        pointerEvent->ClearBuffer();
+        lastTouchEvent_ = nullptr;
+        lastTouchWindowInfo_.id = -1;
+        ClearExtraData();
     }
     return ERR_OK;
 }
