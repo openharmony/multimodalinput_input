@@ -55,7 +55,7 @@ void PullThrowSubscriberHandler::HandleFingerGestureDownEvent(std::shared_ptr<Po
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (CheckFingerGestureCancelEvent(touchEvent)) {
+    if (CheckFingerValidation(touchEvent)) {
         return;
     }
     UpdateFingerPoisition(touchEvent);
@@ -68,7 +68,7 @@ void PullThrowSubscriberHandler::HandleFingerGestureMoveEvent(std::shared_ptr<Po
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (CheckAndStopGestureIfNeeded(touchEvent)) {
+    if (CheckProgressValid(touchEvent)) {
         return;
     }
 }
@@ -77,7 +77,7 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullMoveEvent(std::shared_pt
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (CheckAndStopGestureIfNeeded(touchEvent)) {
+    if (CheckProgressValid(touchEvent)) {
         return;
     }
     if (gestureInProgress_ && alreadyTouchDown_) {
@@ -97,7 +97,7 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     MMI_HILOGI("PullThrow On PullUp Event");
-    if (CheckAndStopGestureIfNeeded(touchEvent)) {
+    if (CheckProgressValid(touchEvent)) {
         return;
     }
     if (gestureInProgress_) {
@@ -153,7 +153,7 @@ void PullThrowSubscriberHandler::UpdateFingerPoisition(std::shared_ptr<PointerEv
     fingerGesture_.touches[fingerCount - 1].y = item.GetDisplayY();
 }
 
-bool PullThrowSubscriberHandler::CheckFingerGestureCancelEvent(std::shared_ptr<PointerEvent> touchEvent) const
+bool PullThrowSubscriberHandler::CheckFingerValidation(std::shared_ptr<PointerEvent> touchEvent) const
 {
     auto fingerCount = touchEvent->GetPointerIds().size();
     if (fingerCount != static_cast<size_t>(ONE_FINGER)) {
@@ -163,9 +163,9 @@ bool PullThrowSubscriberHandler::CheckFingerGestureCancelEvent(std::shared_ptr<P
     return false;
 }
 
-bool PullThrowSubscriberHandler::CheckAndStopGestureIfNeeded(std::shared_ptr<PointerEvent> touchEvent)
+bool PullThrowSubscriberHandler::CheckProgressValid(std::shared_ptr<PointerEvent> touchEvent)
 {
-    if (gestureInProgress_ && CheckFingerGestureCancelEvent(touchEvent)) {
+    if (gestureInProgress_ && CheckFingerValidation(touchEvent)) {
         StopFingerGesture(touchEvent);
         return true;
     }

@@ -1344,28 +1344,28 @@ public:
     /**
      * @brief Get throw Angle
      * @return Return the pull throw angle
-     * @since 9
+     * @since 18
      */
     double GetThrowAngle() const;
 
     /**
      * @brief Set throw Angle
      * @return void
-     * @since 9
+     * @since 18
      */
     void SetThrowAngle(double throwAngle);
 
     /**
      * @brief Get throw Speed
      * @return Return the pull throw speed
-     * @since 9
+     * @since 18
      */
     double GetThrowSpeed() const;
 
     /**
      * @brief Set throw Speed
      * @return void
-     * @since 9
+     * @since 18
      */
     void SetThrowSpeed(double throwSpeed);
 

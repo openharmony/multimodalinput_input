@@ -474,10 +474,9 @@ private:
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
     int32_t lastDpi_ { 0 };
-    bool isPullUpBefore_ { false };
-    bool isInPullThrow_ { false };
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
     std::mutex mtx_;
+    std::atomic_bool isHPR_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
