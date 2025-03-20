@@ -1377,6 +1377,7 @@ int32_t MultimodalInputConnectProxy::UnsubscribetabletProximity(int32_t subscrib
     return ret;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 int32_t MultimodalInputConnectProxy::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -1426,6 +1427,7 @@ int32_t MultimodalInputConnectProxy::UnsubscribeKeyMonitor(const KeyMonitorOptio
     }
     return ret;
 }
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 int32_t MultimodalInputConnectProxy::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {

@@ -78,6 +78,7 @@ class JsInputConsumer final {
     struct Work {
         size_t keyMonitorId_ {};
         uv_work_t work_ {};
+        std::shared_ptr<KeyEvent> keyEvent_ {};
     };
 
 public:
@@ -100,9 +101,11 @@ private:
     void UnsubscribeKeyMonitors(napi_env env);
     void OnSubscribeKeyMonitor(size_t keyMonitorId, std::shared_ptr<KeyEvent> keyEvent);
     void NotifyKeyMonitor(uv_work_t *work, int32_t status);
-    void NotifyKeyMonitor(const KeyMonitor &keyMonitor);
-    void NotifyKeyMonitorScoped(const KeyMonitor &keyMonitor);
-    napi_value ConstructKeyMonitorOption(napi_env env, const KeyMonitorOption &keyOption);
+    void NotifyKeyMonitor(const KeyMonitor &keyMonitor, std::shared_ptr<KeyEvent> keyEvent);
+    void NotifyKeyMonitorScoped(const KeyMonitor &keyMonitor, std::shared_ptr<KeyEvent> keyEvent);
+    static bool CheckKeyMonitorOption(const KeyMonitorOption &keyOption);
+    static napi_value KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent);
+    static napi_value KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem &keyItem);
     static void HandleKeyMonitor(uv_work_t *work, int32_t status);
     static int32_t JsKeyAction2KeyAction(int32_t action);
     static int32_t KeyAction2JsKeyAction(int32_t action);
@@ -111,8 +114,7 @@ private:
     size_t baseId_ { 0 };
     std::map<size_t, KeyMonitor> monitors_;
     std::map<uv_work_t*, std::shared_ptr<Work>> pendingWorks_;
-    static std::mutex clsMutex_;
-    static std::shared_ptr<JsInputConsumer> instance_;
+    static const std::set<int32_t> allowedKeys_;
 };
 } // namespace MMI
 } // namespace OHOS

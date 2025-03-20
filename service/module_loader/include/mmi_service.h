@@ -98,8 +98,10 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     int32_t SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     int32_t UnsubscribeHotkey(int32_t subscribeId) override;
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption) override;
     int32_t UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption) override;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
     int32_t SubscribeTabletProximity(int32_t subscribeId) override;

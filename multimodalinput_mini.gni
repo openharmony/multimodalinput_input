@@ -57,6 +57,7 @@ declare_args() {
   input_feature_dfx_radar_enable = false
   input_feature_one_hand_mode_enable = false
   input_feature_touch_drawing = true
+  input_feature_key_pressed_handler = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -470,4 +471,12 @@ if (input_feature_dfx_radar_enable) {
 
 if (input_feature_touch_drawing) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCH_DRAWING" ]
+}
+
+if (!input_feature_keyboard) {
+  input_feature_key_pressed_handler = false
+}
+
+if (input_feature_key_pressed_handler) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER" ]
 }

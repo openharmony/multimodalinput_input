@@ -196,8 +196,10 @@ public:
         return subscribeId;
     }
     int32_t UnsubscribeHotkey(int32_t subscribeId) override { return subscribeId; }
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption) { return RET_ERR; }
     int32_t UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption) { return RET_ERR; }
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override { return subscribeId; }
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override { return subscribeId; }
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override
