@@ -1226,6 +1226,11 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
 void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
+    // skip button remapping for virtual trackpad
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        return;
+    }
+
     // touchpad two finger button -> 273
     uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
     if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
@@ -1355,6 +1360,12 @@ int32_t MouseTransformProcessor::SetTouchpadTapSwitch(bool switchFlag)
 
 void MouseTransformProcessor::GetTouchpadTapSwitch(bool &switchFlag)
 {
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        // always allow touchpad tap for virtual trackpad regardless of the settings.
+        switchFlag = true;
+        return;
+    }
+
     std::string name = "touchpadTap";
     GetConfigDataFromDatabase(name, switchFlag);
 }
@@ -1408,6 +1419,12 @@ int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
 
 void MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
 {
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        // always allow two finger tap to open menu for virtual trackpad regardless of the settings.
+        type = static_cast<int32_t>(RightClickType::TP_TWO_FINGER_TAP);
+        return;
+    }
+
     std::string name = "rightMenuSwitch";
     GetConfigDataFromDatabase(name, type);
 
