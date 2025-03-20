@@ -67,6 +67,7 @@ enum class VTPStateMachineMessageType : int32_t {
     ROT_END = 17,
     LEFT_TOUCH_DOWN = 18,
     LEFT_TOUCH_UP = 19,
+    TWO_FINGER_TAP = 20,
 };
 
 enum class VKeyboardActivation : int32_t {
@@ -130,6 +131,8 @@ private:
     bool HandleVKeyTrackPadRightBtnDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRightBtnUp(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadTwoFingerTap(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadScrollBegin(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
