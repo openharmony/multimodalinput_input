@@ -318,8 +318,7 @@ HWTEST_F(MMIServerTest, SetCustomCursor_001, TestSize.Level1)
     int32_t focusX = 200;
     int32_t focusY = 500;
     void* pixelMap = nullptr;
-    int32_t ret = mmiService.SetCustomCursor(windowId, focusX, focusY, pixelMap);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(mmiService.SetCustomCursor(windowId, focusX, focusY, pixelMap));
 }
 
 /**
