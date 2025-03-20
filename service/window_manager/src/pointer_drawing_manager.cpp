@@ -3271,6 +3271,7 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
         float scale = sp->IsMirror() ? sp->GetScale() : 1.0f;
         scale = (sp->IsExtend() && sp->GetIsCurrentOffScreenRendering()) ? sp->GetOffRenderScale() : scale;
         cfg.userIconPixelMap = GetUserIconCopy();
+        CHKPV(cfg.userIconPixelMap);
         cfg.userIconHotSpotX = userIconHotSpotX_ * scale;
         cfg.userIconHotSpotY = userIconHotSpotY_ * scale;
         cfg.userIconFollowSystem = userIconFollowSystem_;
