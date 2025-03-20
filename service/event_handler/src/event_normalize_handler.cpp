@@ -722,11 +722,13 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             nextHandler_->HandleTouchEvent(pointerEvent);
         }
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL) {
         item.SetCanceled(true);
         pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
     }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
     }
