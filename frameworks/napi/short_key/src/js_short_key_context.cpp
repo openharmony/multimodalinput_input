@@ -34,6 +34,14 @@ enum class FingerprintAction : int32_t {
     CLICK = 4,
     CANCEL = 5,
 };
+
+enum class XKeyAction : int32_t {
+    X_KEY_DOWN = 0,
+    X_KEY_UP = 1,
+    SINGLE_CLICK = 2,
+    DOUBLE_CLICK = 3,
+    LONG_PRESS = 4,
+};
 } // namespace
 
 JsShortKeyContext::JsShortKeyContext() : mgr_(std::make_shared<JsShortKeyManager>()) {}
@@ -225,6 +233,19 @@ napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
         sizeof(fingerprintActionArr) / sizeof(*fingerprintActionArr), fingerprintActionArr, &fingerprintAction),
         DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "FingerprintAction", fingerprintAction), SET_NAMED_PROPERTY);
+
+    napi_property_descriptor xKeyActionArr[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("X_KEY_DOWN", GetNapiInt32(env, static_cast<int32_t>(XKeyAction::X_KEY_DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("X_KEY_UP", GetNapiInt32(env, static_cast<int32_t>(XKeyAction::X_KEY_UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("SINGLE_CLICK", GetNapiInt32(env, static_cast<int32_t>(XKeyAction::SINGLE_CLICK))),
+        DECLARE_NAPI_STATIC_PROPERTY("DOUBLE_CLICK", GetNapiInt32(env, static_cast<int32_t>(XKeyAction::DOUBLE_CLICK))),
+        DECLARE_NAPI_STATIC_PROPERTY("LONG_PRESS", GetNapiInt32(env, static_cast<int32_t>(XKeyAction::LONG_PRESS))),
+    };
+    napi_value xKeyAction = nullptr;
+    CHKRP(napi_define_class(env, "XKeyAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(xKeyActionArr) / sizeof(*xKeyActionArr), xKeyActionArr, &xKeyAction),
+        DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "XKeyAction", xKeyAction), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI
