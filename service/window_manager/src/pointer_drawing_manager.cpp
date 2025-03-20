@@ -2376,9 +2376,12 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     DrawManager();
     if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        for (auto sp : screenPointers_) {
-            if (sp.second != nullptr && sp.second->IsMirror()) {
-                sp.second->SetInvisible();
+        {
+            std::lock_guard<std::mutex> lock(mtx_);
+            for (auto sp : screenPointers_) {
+                if (sp.second != nullptr && sp.second->IsMirror()) {
+                    sp.second->SetInvisible();
+                }
             }
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
