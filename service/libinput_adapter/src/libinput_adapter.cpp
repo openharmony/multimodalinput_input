@@ -1267,7 +1267,6 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                     VKeyboardActivation activateState = (VKeyboardActivation)getKeyboardActivationState_();
                     switch (activateState) {
                         case VKeyboardActivation::INACTIVE : {
-                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
                             break;
                         }
                         case VKeyboardActivation::ACTIVATED : {
