@@ -8989,7 +8989,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomMouseCursor_001, TestSize.
         .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
         .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
         .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(Return(true));
     Media::PixelMap *pixelMap = new (std::nothrow) Media::PixelMap();
     EXPECT_CALL(*messageParcelMock_, Unmarshalling(_)).WillOnce(Return(pixelMap));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
