@@ -115,6 +115,7 @@ public:
     virtual double TabletToolGetTiltY(struct libinput_event_tablet_tool *event) = 0;
     virtual uint64_t TabletToolGetTimeUsec(struct libinput_event_tablet_tool *event) = 0;
     virtual double TabletToolGetPressure(struct libinput_event_tablet_tool *event) = 0;
+    virtual int32_t TabletToolGetAngle(struct libinput_event_tablet_tool *event) = 0;
     virtual uint64_t TouchEventGetTime(struct libinput_event_touch *event) = 0;
     virtual int32_t TouchEventGetSeatSlot(struct libinput_event_touch *event) = 0;
     virtual double TouchEventGetPressure(struct libinput_event_touch* event) = 0;
