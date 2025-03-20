@@ -1284,7 +1284,6 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                     VKeyboardActivation activateState = (VKeyboardActivation)getKeyboardActivationState_();
                     switch (activateState) {
                         case VKeyboardActivation::INACTIVE : {
-                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
                             break;
                         }
                         case VKeyboardActivation::ACTIVATED : {
@@ -1294,15 +1293,20 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                         case VKeyboardActivation::TOUCH_CANCEL : {
                             MMI_HILOGI("activation state: %{public}d, sending touch cancel event",
                                 static_cast<int32_t>(activateState));
-                            if (eventType == LIBINPUT_EVENT_TOUCH_MOTION || eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
+                            if (eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
                                 libinput_set_touch_event_type(touch, LIBINPUT_EVENT_TOUCH_CANCEL);
+                            }
+                            if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
+                                bDropEventFlag = true;
                             }
                             break;
                         }
                         case VKeyboardActivation::TOUCH_DROP : {
                             MMI_HILOGI("activation state: %{public}d, dropping event",
                                 static_cast<int32_t>(activateState));
-                            bDropEventFlag = true;
+                            if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
+                                bDropEventFlag = true;
+                            }
                             break;
                         }
                         case VKeyboardActivation::EIGHT_FINGERS_UP : {
