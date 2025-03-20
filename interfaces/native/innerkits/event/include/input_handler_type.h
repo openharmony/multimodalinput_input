@@ -68,6 +68,7 @@ inline constexpr HandleEventType HANDLE_EVENT_TYPE_ALL {
 };
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_KP {HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER};
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_FINGERPRINT {HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_X_KEY {HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER};
 
 inline bool IsValidHandlerType(InputHandlerType handlerType)
 {
