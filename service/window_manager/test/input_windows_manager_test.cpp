@@ -8297,5 +8297,217 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerItemInOne
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerItemInOneHandMode(disPlayInfo, pointerEvent));
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelMouseEvent_003
+ * @tc.desc: Test CancelMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelMouseEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastPointerEvent_ = pointerEvent;
+    inputWindowsManager.extraData_.appended = true;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+    inputWindowsManager.extraData_.appended = true;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
+}
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDragPosition_001
+ * @tc.desc: Test AdjustDragPosition
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDragPosition_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastPointerEvent_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.AdjustDragPosition());
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+/**
+ * @tc.name: InputWindowsManagerTest_PrintEnterEventInfo_001
+ * @tc.desc: Test PrintEnterEventInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintEnterEventInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    InputWindowsManager inputWindowsManager;
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_LEAVE_WINDOW;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintEnterEventInfo(pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+/**
+ * @tc.name: InputWindowsManagerTest_TriggerTouchUpOnInvalidAreaEntry_001
+ * @tc.desc: Test TriggerTouchUpOnInvalidAreaEntry
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TriggerTouchUpOnInvalidAreaEntry_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastPointerEventforGesture_ = nullptr;
+    int32_t pointerId = -5;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TriggerTouchUpOnInvalidAreaEntry(pointerId));
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    inputWindowsManager.lastPointerEventforGesture_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TriggerTouchUpOnInvalidAreaEntry(pointerId));
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = pointerId;
+    pointerItem.canceled_ = true;
+    pointerItem.pressed_ = true;
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TriggerTouchUpOnInvalidAreaEntry(pointerId));
+    pointerItem.canceled_ = true;
+    pointerItem.pressed_ = false;
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TriggerTouchUpOnInvalidAreaEntry(pointerId));
+    pointerItem.canceled_ = false;
+    pointerItem.pressed_ = true;
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TriggerTouchUpOnInvalidAreaEntry(pointerId));
+    pointerItem.canceled_ = false;
+    pointerItem.pressed_ = false;
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TriggerTouchUpOnInvalidAreaEntry(pointerId));
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayXYInOneHandMode_001
+ * @tc.desc: Test UpdateDisplayXYInOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayXYInOneHandMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    double physicalX = 6;
+    double physicalY = 6;
+    float oneHandScale =  1.0;
+    DisplayInfo displayInfo;
+    displayInfo.oneHandY = 5;
+    displayInfo.oneHandX = 5;
+    displayInfo.width = 5;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayXYInOneHandMode(
+        physicalX, physicalY, displayInfo, oneHandScale));
+    physicalX = 11;
+    physicalY = 6;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayXYInOneHandMode(
+        physicalX, physicalY, displayInfo, oneHandScale));
+    physicalX = 4;
+    physicalY = 6;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayXYInOneHandMode(
+        physicalX, physicalY, displayInfo, oneHandScale));
+    physicalX = 4;
+    physicalY = 4;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayXYInOneHandMode(
+        physicalX, physicalY, displayInfo, oneHandScale));
+    physicalX = 11;
+    physicalY = 4;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayXYInOneHandMode(
+        physicalX, physicalY, displayInfo, oneHandScale));
+    physicalX = 6;
+    physicalY = 4;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayXYInOneHandMode(
+        physicalX, physicalY, displayInfo, oneHandScale));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleOneHandMode_001
+ * @tc.desc: Test HandleOneHandMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleOneHandMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.pointerId_ = 2;
+    pointerItem.canceled_ = true;
+    pointerItem.pressed_ = true;
+    DisplayInfo displayInfo;
+    displayInfo.oneHandY = 5;
+    displayInfo.oneHandX = 5;
+    displayInfo.width = 5;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleOneHandMode(displayInfo, pointerEvent, pointerItem));
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+/**
+ * @tc.name: InputWindowsManagerTest_CalculateAcrossDirection_001
+ * @tc.desc: Test CalculateAcrossDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CalculateAcrossDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    Vector2D<double> layout;
+    DisplayInfo displayInfo;
+    displayInfo.x = 100;
+    displayInfo.validWidth = 2147483600;
+    auto ret = inputWindowsManager.CalculateAcrossDirection(displayInfo, layout);
+    EXPECT_EQ(ret, AcrossDirection::ACROSS_ERROR);
+    displayInfo.x = 100;
+    displayInfo.validWidth = 100;
+    displayInfo.y = 100;
+    displayInfo.validHeight = 2147483600;
+    ret = inputWindowsManager.CalculateAcrossDirection(displayInfo, layout);
+    EXPECT_EQ(ret, AcrossDirection::ACROSS_ERROR);
+    displayInfo.x = 100;
+    displayInfo.validWidth = 100;
+    displayInfo.y = 100;
+    displayInfo.validHeight = 100;
+    layout.x = 50;
+    ret = inputWindowsManager.CalculateAcrossDirection(displayInfo, layout);
+    EXPECT_EQ(ret, AcrossDirection::LEFTWARDS);
+    displayInfo.x = -2147483648;
+    layout.x = -2147483600;
+    displayInfo.y = 100;
+    layout.y = 50;
+    ret = inputWindowsManager.CalculateAcrossDirection(displayInfo, layout);
+    EXPECT_EQ(ret, AcrossDirection::UPWARDS);
+    displayInfo.y = -2147483648;
+    layout.y = -2147483600;
+    ret = inputWindowsManager.CalculateAcrossDirection(displayInfo, layout);
+    EXPECT_EQ(ret, AcrossDirection::ACROSS_ERROR);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
