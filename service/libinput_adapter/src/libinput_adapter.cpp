@@ -399,6 +399,11 @@ void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
                     MMI_HILOGE("Virtual TrackPad right button up event cannot be handled");
                 }
                 break;
+            case VTPStateMachineMessageType::TWO_FINGER_TAP:
+                if (!HandleVKeyTrackPadTwoFingerTap(touch, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad two finger tap event cannot be handled");
+                }
+                break;
             default:
                 OnVKeyTrackPadGestureMessage(touch, msgType, msgItem);
                 break;
@@ -609,6 +614,40 @@ bool LibinputAdapter::HandleVKeyTrackPadRightBtnUp(libinput_event_touch* touch,
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lpEvent, frameTime);
     free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadTwoFingerTap(libinput_event_touch* touch, const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int64_t frameTime = GetSysClockTime();
+    // tap down
+    event_pointer pDownEvent;
+    pDownEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_TAP;
+    pDownEvent.button = VKEY_TP_RB_ID;
+    pDownEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_NONE;
+    pDownEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_PRESSED;
+    libinput_event_pointer* lpDownEvent = libinput_create_pointer_event(touch, pDownEvent);
+    CHKPF(lpDownEvent);
+    PrintVKeyTPPointerLog(pDownEvent);
+    funInputEvent_((libinput_event*)lpDownEvent, frameTime);
+    free(lpDownEvent);
+
+    // tap up
+    event_pointer pUpEvent;
+    pUpEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_TAP;
+    pUpEvent.button = VKEY_TP_RB_ID;
+    pUpEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_NONE;
+    pUpEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_RELEASED;
+    libinput_event_pointer* lpUpEvent = libinput_create_pointer_event(touch, pUpEvent);
+    CHKPF(lpUpEvent);
+    PrintVKeyTPPointerLog(pUpEvent);
+    funInputEvent_((libinput_event*)lpUpEvent, frameTime);
+    free(lpUpEvent);
     return true;
 }
 
