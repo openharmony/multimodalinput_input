@@ -146,7 +146,7 @@ public:
 
     int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
-    void UnsubscribeKeyMonitor(int32_t subscriberId);
+    int32_t UnsubscribeKeyMonitor(int32_t subscriberId);
 
     /**
      * @brief Subscribes to the switch input event that meets a specific condition. When such an event occurs,

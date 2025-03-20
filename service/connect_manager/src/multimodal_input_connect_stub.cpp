@@ -493,12 +493,14 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID):
             ret = StubSetMultiWindowScreenId(data, reply);
             break;
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_MONITOR):
             ret = StubSubscribeKeyMonitor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_MONITOR):
             ret = StubUnsubscribeKeyMonitor(data, reply);
             break;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -1609,6 +1611,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeHotkey(MessageParcel& data, M
     return ret;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 int32_t MultimodalInputConnectStub::StubSubscribeKeyMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -1648,6 +1651,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyMonitor(MessageParcel& dat
     }
     return ret;
 }
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply)
 {

@@ -28,9 +28,9 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "key_monitor_manager.h"
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "time_cost_chk.h"
@@ -1042,9 +1042,15 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
     return ERROR_UNSUPPORT;
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
 {
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
+        return -CAPABILITY_NOT_SUPPORTED;
+    }
     KeyMonitorManager::Monitor monitor {
         .session_ = session,
         .key_ = keyOption.GetKey(),
@@ -1056,6 +1062,10 @@ int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorO
 
 int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
 {
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
+        return -CAPABILITY_NOT_SUPPORTED;
+    }
     KeyMonitorManager::Monitor monitor {
         .session_ = session,
         .key_ = keyOption.GetKey(),
@@ -1065,7 +1075,7 @@ int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonito
     KEY_MONITOR_MGR->RemoveMonitor(monitor);
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
 int32_t ServerMsgHandler::OnSubscribeSwitchEvent(

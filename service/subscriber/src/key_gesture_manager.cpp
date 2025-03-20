@@ -19,7 +19,9 @@
 #include "app_state_observer.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "key_monitor_manager.h"
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -228,22 +230,24 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
         if (IsActive()) {
             int64_t now = GetSysClockTime();
             if ((now >= (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) &&
-                !KEY_MONITOR_MGR->Intercept(keyEvent)) {
+                !KeyMonitorIntercept(keyEvent)) {
                 NotifyHandlers(keyEvent);
             }
         } else {
             firstDownTime_ = GetSysClockTime();
             MarkActive(true);
-            if (!KEY_MONITOR_MGR->Intercept(keyEvent, COMBINATION_KEY_TIMEOUT)) {
+            if (!KeyMonitorIntercept(keyEvent, COMBINATION_KEY_TIMEOUT)) {
                 TriggerHandlers(keyEvent);
             }
         }
         return true;
     }
     if (IsActive()) {
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+        KEY_MONITOR_MGR->NotifyPendingMonitors();
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         Reset();
         RunPendingHandlers();
-        KEY_MONITOR_MGR->NotifyPendingMonitors();
     }
     return false;
 }
@@ -262,7 +266,9 @@ void KeyGestureManager::LongPressSingleKey::Dump(std::ostringstream &output) con
 
 void KeyGestureManager::LongPressSingleKey::Reset()
 {
-    KEY_MONITOR_MGR->ResetAll();
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    KEY_MONITOR_MGR->ResetAll(keyCode_);
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     KeyGesture::Reset();
 }
 
@@ -483,6 +489,24 @@ void KeyGestureManager::Dump() const
         keyGesture->Dump(output);
         MMI_HILOGI("%s", output.str().c_str());
     }
+}
+
+bool KeyGestureManager::KeyMonitorIntercept(std::shared_ptr<KeyEvent> keyEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    return KEY_MONITOR_MGR->Intercept(keyEvent);
+#else
+    return false;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+}
+
+bool KeyGestureManager::KeyMonitorIntercept(std::shared_ptr<KeyEvent> keyEvent, int32_t delay)
+{
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    return KEY_MONITOR_MGR->Intercept(keyEvent, delay);
+#else
+    return false;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 }
 } // namespace MMI
 } // namespace OHOS

@@ -162,6 +162,9 @@ public:
     void Dump() const;
 
 private:
+    static bool KeyMonitorIntercept(std::shared_ptr<KeyEvent> keyEvent);
+    static bool KeyMonitorIntercept(std::shared_ptr<KeyEvent> keyEvent, int32_t delay);
+
     std::vector<std::unique_ptr<KeyGesture>> keyGestures_;
 };
 

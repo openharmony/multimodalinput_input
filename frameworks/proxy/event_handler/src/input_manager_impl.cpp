@@ -56,6 +56,7 @@ const std::map<int32_t, int32_t> g_keyActionMap = {
     {KeyEvent::KEY_ACTION_CANCEL, KEY_ACTION_CANCEL}
 };
 static const std::string g_foldScreenType = system::GetParameter("const.window.foldscreen.type", "0,0,0,0");
+const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -404,24 +405,33 @@ int32_t InputManagerImpl::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
+        return -CAPABILITY_NOT_SUPPORTED;
+    }
     CHKPR(callback, RET_ERR);
     return KeyEventInputSubscribeMgr.SubscribeKeyMonitor(keyOption, callback);
 #else
-    MMI_HILOGW("Keyboard device does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    MMI_HILOGW("Does not support subscription of key monitor");
+    return -CAPABILITY_NOT_SUPPORTED;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 }
 
-void InputManagerImpl::UnsubscribeKeyMonitor(int32_t subscriberId)
+int32_t InputManagerImpl::UnsubscribeKeyMonitor(int32_t subscriberId)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    KeyEventInputSubscribeMgr.UnsubscribeKeyMonitor(subscriberId);
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
+        return -CAPABILITY_NOT_SUPPORTED;
+    }
+    return KeyEventInputSubscribeMgr.UnsubscribeKeyMonitor(subscriberId);
 #else
-    MMI_HILOGW("Keyboard device does not support");
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    MMI_HILOGW("Does not support subscription of key monitor");
+    return -CAPABILITY_NOT_SUPPORTED;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 }
 
 int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,

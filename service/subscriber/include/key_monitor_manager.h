@@ -24,11 +24,6 @@
 
 namespace OHOS {
 namespace MMI {
-enum KeyMonitorError : int32_t {
-    KEY_MONITOR_ERROR_BASE = -1,
-    KEY_MONITOR_ERROR_INVALID_MONITOR = (KEY_MONITOR_ERROR_BASE - 1),
-};
-
 class KeyMonitorManager final {
     struct PendingMonitor {
         int32_t timerId_ { -1 };
@@ -57,7 +52,7 @@ public:
     bool Intercept(std::shared_ptr<KeyEvent> keyEvent);
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent, int32_t delay);
     void NotifyPendingMonitors();
-    void ResetAll();
+    void ResetAll(int32_t keyCode);
 
     static std::shared_ptr<KeyMonitorManager> GetInstance();
 
@@ -68,8 +63,6 @@ private:
 
     std::set<Monitor> monitors_;
     std::map<Monitor, PendingMonitor> pending_;
-    static std::mutex mutex_;
-    static std::shared_ptr<KeyMonitorManager> instance_;
     static const std::set<int32_t> allowedKeys_;
 };
 

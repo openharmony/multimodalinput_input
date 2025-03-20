@@ -26,7 +26,9 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "key_monitor_manager.h"
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
@@ -648,11 +650,13 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGD("Key gesture recognized");
         return true;
     }
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     if (KEY_MONITOR_MGR->Intercept(keyEvent)) {
         MMI_HILOGD("Key monitor intercept (KC:%{private}d, KA:%{public}d)",
             keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         return true;
     }
+#endif // #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     if (IsRepeatedKeyEvent(keyEvent)) {
         MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
