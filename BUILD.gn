@@ -111,6 +111,7 @@ group("input_jsapi_group") {
     }
     if (input_feature_keyboard) {
       deps += [
+        "frameworks/ani/input_consumer:input_consumer_package",
         "frameworks/napi/input_consumer:inputconsumer",
         "frameworks/napi/input_event_client:inputeventclient",
       ]
