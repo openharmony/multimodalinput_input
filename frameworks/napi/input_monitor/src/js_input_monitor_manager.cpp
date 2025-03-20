@@ -31,7 +31,8 @@ static const std::vector<int32_t> supportedKeyCodes = {
     KeyEvent::KEYCODE_POWER,
     KeyEvent::KEYCODE_META_LEFT,
     KeyEvent::KEYCODE_VOLUME_UP,
-    KeyEvent::KEYCODE_VOLUME_DOWN
+    KeyEvent::KEYCODE_VOLUME_DOWN,
+    KeyEvent::KEYCODE_META_RIGHT
 };
 
 JsInputMonitorManager& JsInputMonitorManager::GetInstance()
