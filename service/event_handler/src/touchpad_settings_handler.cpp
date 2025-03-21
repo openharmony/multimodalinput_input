@@ -79,7 +79,7 @@ void TouchpadSettingsObserver::RegisterUpdateFunc()
 
     SettingObserver::UpdateFunc UpdateFunc =
         [datashareUri, libthpPath, keyToCmd, defaultValue](const std::string& key) {
-        MMI_HILOGI("Touchpad settings change:%{public}s", key.c_str());
+        MMI_HILOGI("Touchpad settings change: %{public}s", key.c_str());
         typedef const char* (*ThpExtraRunCommandFunc)(const char* command, const char* parameters);
         const char* (*ThpExtraRunCommand)(const char* command, const char* parameters) {};
         std::string value;
