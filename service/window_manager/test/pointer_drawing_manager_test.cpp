@@ -1590,6 +1590,27 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_002,
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_SetCustomCursor_006
+ * @tc.desc: Test SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    int32_t pid = 2;
+    int32_t windowId = 2;
+    CustomCursor cursor;
+    CursorOptions options;
+    int32_t ret = pointerDrawingManager.SetCustomCursor(pid, windowId, cursor, options);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SetMouseIcon_002
  * @tc.desc: Test SetMouseIcon
  * @tc.type: FUNC
@@ -2457,6 +2478,34 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_002,
     pointerDrawingManager.mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id), iconStyle));
     ret = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle);
     ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_branchCoverage
+ * @tc.desc: Test SetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_branchCoverage, TestSize.Level1)
+{
+    PointerDrawingManager pointerDrawingManager;
+    MOUSE_ICON mouseStyle = EAST;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerDrawingManager.UpdateIconPath(mouseStyle, iconPath);
+
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    auto ret = pointerDrawingManager.SkipPointerLayer(false);
+    ASSERT_EQ(ret, RET_OK);
+
+    pointerDrawingManager.canvasWidth_ = 0;
+    pointerDrawingManager.cursorWidth_ = 1;
+    pointerDrawingManager.canvasHeight_ = 0;
+    pointerDrawingManager.cursorHeight_ = 1;
+    pointerDrawingManager.SetFaceNodeBounds();
+    ret = pointerDrawingManager.DrawNewDpiPointer();
+    ASSERT_NE(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
