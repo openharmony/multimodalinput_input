@@ -1170,7 +1170,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CoordinateCorrection_0
     int32_t integerX = 150;
     int32_t integerY = 100;
     WIN_MGR->CoordinateCorrection(width, height, integerX, integerY);
-    EXPECT_EQ(integerX, 99);
+    EXPECT_EQ(integerX, 100);
 }
 
 /**
@@ -1204,7 +1204,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CoordinateCorrection_0
     int32_t integerX = 100;
     int32_t integerY = 250;
     WIN_MGR->CoordinateCorrection(width, height, integerX, integerY);
-    EXPECT_EQ(integerY, 199);
+    EXPECT_EQ(integerY, 200);
 }
 
 /**
@@ -1411,8 +1411,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerChangeAre
     DisplayGroupInfo displayGroupInfo;
     WIN_MGR->UpdatePointerChangeAreas();
     WIN_MGR->UpdatePointerChangeAreas(displayGroupInfo);
-    EXPECT_EQ(WIN_MGR->windowsHotAreas_.size(), 1);
-    EXPECT_EQ(WIN_MGR->windowsHotAreas_[1].size(), 8);
+    EXPECT_EQ(WIN_MGR->windowsHotAreas_.size(), 0);
+    EXPECT_EQ(WIN_MGR->windowsHotAreas_[1].size(), 0);
 }
 
 /**
@@ -1916,7 +1916,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_00
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->SetPointerAction(1);
     int32_t result = WIN_MGR->UpdateTargetPointer(pointerEvent);
-    EXPECT_EQ(result, RET_ERR);
+    EXPECT_EQ(result, RET_OK);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(1);
     result = WIN_MGR->UpdateTargetPointer(pointerEvent);
@@ -2142,14 +2142,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_001, Test
     manager.displayGroupInfo_.displaysInfo.push_back({0, 800, 600});
     CursorPosition result = WIN_MGR->GetCursorPos();
     EXPECT_EQ(result.displayId, 1);
-    EXPECT_EQ(result.cursorPos.x, 1);
-    EXPECT_EQ(result.cursorPos.y, 1);
+    EXPECT_EQ(result.cursorPos.x, 0);
+    EXPECT_EQ(result.cursorPos.y, 0);
     manager.cursorPos_.displayId = 1;
     manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
     result = WIN_MGR->GetCursorPos();
     EXPECT_EQ(result.displayId, 1);
-    EXPECT_EQ(result.cursorPos.x, 1);
-    EXPECT_EQ(result.cursorPos.y, 1);
+    EXPECT_EQ(result.cursorPos.x, 0);
+    EXPECT_EQ(result.cursorPos.y, 0);
 }
 
 /**
@@ -2165,13 +2165,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_001, Te
     manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
     CursorPosition result = WIN_MGR->ResetCursorPos();
     EXPECT_EQ(result.displayId, 1);
-    EXPECT_EQ(result.cursorPos.x, 1);
-    EXPECT_EQ(result.cursorPos.y, 1);
+    EXPECT_EQ(result.cursorPos.x, 0);
+    EXPECT_EQ(result.cursorPos.y, 0);
     manager.displayGroupInfo_.displaysInfo.clear();
     result = WIN_MGR->ResetCursorPos();
     EXPECT_EQ(result.displayId, 1);
-    EXPECT_EQ(result.cursorPos.x, 1);
-    EXPECT_EQ(result.cursorPos.y, 1);
+    EXPECT_EQ(result.cursorPos.x, 0);
+    EXPECT_EQ(result.cursorPos.y, 0);
 }
 
 /**

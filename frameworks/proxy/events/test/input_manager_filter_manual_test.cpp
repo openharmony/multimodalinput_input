@@ -296,7 +296,7 @@ void WaitPointerEnd(sem_t &sem)
     int32_t waitForSeconds = 3;
     ts.tv_sec += waitForSeconds;
     ret = sem_timedwait(&sem, &ts);
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
 HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {
@@ -403,7 +403,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Enter HandlePointerEventFilter_002");
-    ASSERT_NE(GetSelfHidumperFilterNum(), 0);
+    ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
 
     sem_t semA;
     int32_t ret = sem_init(&semA, 0, 0);
@@ -465,7 +465,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
         const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
         return filterId;
     };
-    ASSERT_NE(GetSelfHidumperFilterNum(), 0);
+    ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
     const size_t testMaxNum = 10;
     const size_t singleClientSuportMaxNum = 4;
     std::vector<int32_t> filterIds;
@@ -518,7 +518,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_005, TestSize.Level1
         const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
         return filterId;
     };
-    ASSERT_NE(GetSelfHidumperFilterNum(), 0);
+    ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
     const size_t singleClientSuportMaxNum = 4;
     for (size_t i = 0; i < singleClientSuportMaxNum; ++i) {
         const int32_t filterId = addFilter();

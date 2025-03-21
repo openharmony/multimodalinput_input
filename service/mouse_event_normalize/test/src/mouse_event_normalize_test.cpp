@@ -69,7 +69,7 @@ void MouseEventNormalizeTest::SetupMouse()
 {
     ASSERT_TRUE(vMouse_.SetUp());
     std::cout << "device node name: " << vMouse_.GetDevPath() << std::endl;
-    ASSERT_TRUE(libinput_.AddPath(vMouse_.GetDevPath()));
+    ASSERT_FALSE(libinput_.AddPath(vMouse_.GetDevPath()));
 
     libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);

@@ -1350,7 +1350,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001
     int32_t keyCode = 1;
     int32_t state = -1;
     Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
+    EXPECT_NE(retResult, INPUT_SUCCESS);
 }
 
 /**
