@@ -32,6 +32,8 @@ constexpr int32_t MODULE_TYPE = 1;
 constexpr int32_t UDS_FD = 1;
 constexpr int32_t UDS_UID = 100;
 constexpr int32_t UDS_PID = 100;
+constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
+constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 } // namespace
 
 class InputWindowsManagerTest : public testing::Test {

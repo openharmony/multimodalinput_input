@@ -242,6 +242,7 @@ private:
     void UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &displayGroupInfo);
     std::pair<int32_t, int32_t> TransformSampleWindowXY(int32_t logicX, int32_t logicY) const;
     bool IsValidZorderWindow(const WindowInfo &window, const std::shared_ptr<PointerEvent>& pointerEvent);
+    bool SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent, const bool &isSkip);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
@@ -363,6 +364,8 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     template <class T>
     void CreateAntiMisTakeObserver(T& item);
+    template <class T>
+    void CreatePrivacyProtectionObserver(T& item);
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -455,6 +458,11 @@ private:
         bool isOpen { false };
     } antiMistake_;
     bool isOpenAntiMisTakeObserver_ { false };
+    struct PrivacyProtection {
+        std::string switchName;
+        bool isOpen { false };
+    } privacyProtection_;
+    bool isOpenPrivacyProtectionserver_ { false };
 #ifndef OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_WATCH

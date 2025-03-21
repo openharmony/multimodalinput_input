@@ -71,6 +71,7 @@ const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
+const std::string PRIVACY_SWITCH_NAME {"huaweicast.data.privacy_projection_state"};
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 constexpr int32_t REPEAT_COOLING_TIME { 100 };
 constexpr int32_t REPEAT_ONCE { 1 };
@@ -79,6 +80,8 @@ constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
 constexpr size_t POINTER_STYLE_WINDOW_NUM = { 10 };
+constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
+constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr int32_t DEFAULT_DPI { 0 };
 } // namespace
 
@@ -2951,6 +2954,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             }
+            if (SkipPrivacyProtectionWindow(pointerEvent, item.isSkipSelfWhenShowOnVirtualScreen)) {
+                winId2ZorderMap.insert({item.id, item.zOrder});
+                continue;
+            }
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
                 winId2ZorderMap.insert({item.id, item.zOrder});
@@ -3680,6 +3687,27 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
     return false;
 }
 
+bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent,
+    const bool &isSkip)
+{
+    if (pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID ||
+        pointerEvent->GetDeviceId() == CAST_SCREEN_DEVICEID) {
+        if (!isOpenPrivacyProtectionserver_) {
+            privacyProtection_.switchName = PRIVACY_SWITCH_NAME;
+            CreatePrivacyProtectionObserver(privacyProtection_);
+            isOpenPrivacyProtectionserver_ = true;
+            SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
+                antiMistake_.isOpen);
+            MMI_HILOGD("Get privacy protection switch end");
+        }
+        if (privacyProtection_.isOpen && isSkip) {
+            MMI_HILOGD("It's a Privacy protection window and pointer find the next window");
+            return true;
+        }
+    }
+    return false;
+}
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
 {
@@ -4023,6 +4051,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (checkWindow) {
             MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
                 "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            winMap.insert({item.id, item});
+            continue;
+        }
+        if (SkipPrivacyProtectionWindow(pointerEvent, item.isSkipSelfWhenShowOnVirtualScreen)) {
             winMap.insert({item.id, item});
             continue;
         }
@@ -4688,6 +4720,26 @@ void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
             MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());
         }
         MMI_HILOGI("Anti mistake observer key:%{public}s, statusValue:%{public}d", key.c_str(), item.isOpen);
+    };
+    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .CreateObserver(item.switchName, updateFunc);
+    CHKPV(statusObserver);
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
+        statusObserver = nullptr;
+    }
+}
+
+template <class T>
+void InputWindowsManager::CreatePrivacyProtectionObserver(T& item)
+{
+    CALL_INFO_TRACE;
+    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+        if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
+            MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());
+        }
+        MMI_HILOGI("privacy protection key:%{public}s, statusValue:%{public}d", key.c_str(), item.isOpen);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.switchName, updateFunc);
