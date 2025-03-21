@@ -2793,6 +2793,7 @@ ohos_unittest("KeymapMgrTest") {
     "googletest:gmock_main",
     "hilog:libhilog",
     "hilog:libhilog_base",
+    "hisysevent:libhisysevent",
   ]
 }
 
