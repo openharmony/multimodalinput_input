@@ -1821,6 +1821,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
         DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        libinputAdapter_.RegisterBootStatusReceiver();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
