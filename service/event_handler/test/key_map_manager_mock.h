@@ -24,10 +24,6 @@ namespace MMI {
 class KeyMgrInterface {
 public:
     virtual char* GetProFileAbsPath(const char* fileName, char* buf, int32_t length) = 0;
-    virtual unsigned int libinput_device_get_id_vendor(struct libinput_device *device) = 0;
-    virtual unsigned int libinput_device_get_id_product(struct libinput_device *device) = 0;
-    virtual unsigned int libinput_device_get_id_version(struct libinput_device *device) = 0;
-    virtual const char* libinput_device_get_name(struct libinput_device *device) = 0;
 };
 
 class KeyMgrMock : public KeyMgrInterface {
@@ -46,10 +42,6 @@ public:
     }
 
     MOCK_METHOD(char*, GetProFileAbsPath, (const char* fileName, char* buf, int32_t length), (override));
-    MOCK_METHOD(unsigned int, libinput_device_get_id_vendor, (struct libinput_device *device), (override));
-    MOCK_METHOD(unsigned int, libinput_device_get_id_product, (struct libinput_device *device), (override));
-    MOCK_METHOD(unsigned int, libinput_device_get_id_version, (struct libinput_device *device), (override));
-    MOCK_METHOD(const char*, libinput_device_get_name, (struct libinput_device *device), (override));
 private:
     static inline KeyMgrMock* mock = nullptr;
 };
