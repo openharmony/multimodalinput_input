@@ -1281,7 +1281,7 @@ void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const Displ
     for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
         MMI_HILOGD("touchDisplayId=%{public}d currentDisplay.id=%{public}d", touchDisplayId, currentDisplay.id);
         if (touchDisplayId == currentDisplay.id && IsValidDisplayChange(currentDisplay)) {
-            CancelAllTouches(lastPointerEventforGesture_);
+            CancelAllTouches(lastPointerEventforGesture_, true);
             return;
         }
     }
@@ -6023,7 +6023,7 @@ void InputWindowsManager::AttachTouchGestureMgr(std::shared_ptr<TouchGestureMana
     touchGestureMgr_ = touchGestureMgr;
 }
 
-void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
+void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged)
 {
     CHKPV(event);
     auto pointerEvent = std::make_shared<PointerEvent>(*event);
@@ -6042,7 +6042,11 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
             action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
         }
         pointerEvent->SetPointerAction(action);
-        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+        if (isDisplayChanged) {
+            pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+        } else {
+            pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+        }
         pointerEvent->SetPointerId(pointerId);
 
         if (AdjustFingerFlag(pointerEvent)) {
@@ -6060,6 +6064,7 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event)
         auto filter = InputHandler->GetFilterHandler();
         CHKPV(filter);
         filter->HandleTouchEvent(pointerEvent);
+        CancelTouch(item.GetPointerId());
     }
 }
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
