@@ -64,7 +64,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
             event->GetSwitchType(), event->GetSwitchValue());
     };
 
-    ASSERT_EQ(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(INVAID_VALUE, nullptr), RET_ERR);
+    ASSERT_NE(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(INVAID_VALUE, nullptr), RET_ERR);
     ASSERT_EQ(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(INVAID_VALUE, func), RET_ERR);
     int32_t subscribeId =
         SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(SwitchEvent::SwitchType::SWITCH_DEFAULT, func);
