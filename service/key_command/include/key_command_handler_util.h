@@ -139,6 +139,7 @@ bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, 
 float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent);
 bool IsEqual(float f1, float f2);
 bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, MultiFingersTap &mulFingersTap);
+char* GetProFileAbsPath(const char* fileName, char* buf, int32_t length);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_COMMAND_HANDLER_UTIL_H
