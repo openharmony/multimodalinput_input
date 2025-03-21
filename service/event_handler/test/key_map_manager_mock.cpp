@@ -23,27 +23,5 @@ char* GetProFileAbsPath(const char* fileName, char* buf, int32_t length)
     return KeyMgrMock::GetMock()->GetProFileAbsPath(fileName, buf, length);
 }
 
-extern "C" {
-unsigned int libinput_device_get_id_vendor(struct libinput_device *device)
-{
-    return KeyMgrMock::GetMock()->libinput_device_get_id_vendor(device);
-}
-
-unsigned int libinput_device_get_id_product(struct libinput_device *device)
-{
-    return KeyMgrMock::GetMock()->libinput_device_get_id_product(device);
-}
-
-unsigned int libinput_device_get_id_version(struct libinput_device *device)
-{
-    return KeyMgrMock::GetMock()->libinput_device_get_id_version(device);
-}
-
-const char* libinput_device_get_name(struct libinput_device *device)
-{
-    return KeyMgrMock::GetMock()->libinput_device_get_name(device);
-}
-
-}
 } // namespace MMI
 } // namespace OHOS

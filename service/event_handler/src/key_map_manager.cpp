@@ -40,12 +40,12 @@ void KeyMapManager::GetConfigKeyValue(const std::string &fileName, int32_t devic
     ReadProFile(filePath, deviceId, configKeyValue_);
     MMI_HILOGD("Number of loaded config files:%{public}zu, LogLever: %{public}d",
         configKeyValue_.size(), ++bDebugLever);
-    if (bDebugLever) {
-        for (auto it = configKeyValue_[deviceId].begin(); it != configKeyValue_[deviceId].end(); ++it){
+    if (bDebugLever && configKeyValue_.count(deviceId)) {
+        for (auto it = configKeyValue_[deviceId].begin(); it != configKeyValue_[deviceId].end(); ++it) {
         MMI_HILOGD("configKeyValue_.key:%{public}d, configKeyValue_.value.key:%{public}d,\
             configKeyValue_.value.value:%{public}d", deviceId, it->first, it->second);
         }
-    } 
+    }
 }
 
 void KeyMapManager::ParseDeviceConfigFile(struct libinput_device *device)

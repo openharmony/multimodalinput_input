@@ -85,8 +85,10 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_GetProFilePath_002, TestSize.Level
     static char testFile[] = "example.pro";
     char testFile1[MAX_PATH_LEN] = { };
     char * testFile2 = nullptr;
-    char testFile3[MAX_PATH_LEN+2] = { };
-    memset(testFile3, '1', MAX_PATH_LEN+1);
+    char testFile3[MAX_PATH_LEN + 2] = { };
+    for (int i = 0; i < MAX_PATH_LEN + 1; ++i) {
+        testFile3[i] = 'A';
+    }
     EXPECT_CALL(mocker, GetProFileAbsPath)
         .WillOnce(Return(testFile1))
         .WillOnce(Return(testFile2))
