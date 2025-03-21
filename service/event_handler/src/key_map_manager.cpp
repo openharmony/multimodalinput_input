@@ -16,6 +16,7 @@
 #include "key_map_manager.h"
 
 #include "input_device_manager.h"
+#include "key_command_handler_util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -30,13 +31,21 @@ KeyMapManager::~KeyMapManager() {}
 void KeyMapManager::GetConfigKeyValue(const std::string &fileName, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
+    int32_t bDebugLever = 0;
     if (fileName.empty()) {
         MMI_HILOGE("THe fileName is empty");
         return;
     }
     std::string filePath = GetProFilePath(fileName);
     ReadProFile(filePath, deviceId, configKeyValue_);
-    MMI_HILOGD("Number of loaded config files:%{public}zu", configKeyValue_.size());
+    MMI_HILOGD("Number of loaded config files:%{public}zu, LogLever: %{public}d",
+        configKeyValue_.size(), ++bDebugLever);
+    if (bDebugLever) {
+        for (auto it = configKeyValue_[deviceId].begin(); it != configKeyValue_[deviceId].end(); ++it){
+        MMI_HILOGD("configKeyValue_.key:%{public}d, configKeyValue_.value.key:%{public}d,\
+            configKeyValue_.value.value:%{public}d", deviceId, it->first, it->second);
+        }
+    } 
 }
 
 void KeyMapManager::ParseDeviceConfigFile(struct libinput_device *device)
@@ -71,7 +80,17 @@ int32_t KeyMapManager::GetDefaultKeyId()
 
 std::string KeyMapManager::GetProFilePath(const std::string &fileName) const
 {
-    return "/vendor/etc/keymap/" + fileName + ".pro";
+    std::string cfgName = "etc/input/keymap/" + fileName + ".pro";
+    char buf[MAX_PATH_LEN] = { 0 };
+    char *filePath = GetProFileAbsPath(cfgName.c_str(), buf, MAX_PATH_LEN);
+    if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
+        std::string customConfig = "/vendor/etc/keymap/" + fileName + ".pro";
+        MMI_HILOGD("Can not get customization config file");
+        return customConfig;
+    }
+    std::string customConfig = filePath;
+    MMI_HILOGD("The configuration file path:%{private}s", customConfig.c_str());
+    return customConfig;
 }
 
 std::string KeyMapManager::GetKeyEventFileName(struct libinput_device *device)

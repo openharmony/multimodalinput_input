@@ -829,5 +829,10 @@ bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, M
     }
     return true;
 }
+
+char* GetProFileAbsPath(const char* fileName, char* buf, int32_t length)
+{
+    return ::GetOneCfgFile(fileName, buf, length);
+}
 } // namespace MMI
 } // namespace OHOS
