@@ -16,6 +16,9 @@
 #include "libinput_adapter.h"
 
 #include <regex>
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+#include <common_event_manager.h>
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 #include "param_wrapper.h"
 #include "property_reader.h"
@@ -172,6 +175,34 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         close(fd);
     },
 };
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+bool isBooted = false;
+
+class BootStatusReceiver : public EventFwk::CommonEventSubscriber {
+public:
+    explicit BootStatusReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
+        : OHOS::EventFwk::CommonEventSubscriber(subscribeInfo)
+    {
+    }
+ 
+    virtual ~BootStatusReceiver() = default;
+ 
+    void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
+    {
+        isBooted = true;
+    }
+};
+
+void LibinputAdapter::RegisterBootStatusReceiver()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("common.event.SCREENLOCK_BOOT_COMPLETED");
+    EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
+    OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
+        std::make_shared<BootStatusReceiver>(commonEventSubscribeInfo));
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 bool LibinputAdapter::Init(FunInputEvent funInputEvent)
 {
@@ -1254,11 +1285,11 @@ void LibinputAdapter::OnEventHandler()
             }
         }
 
-        if ((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
+        if (((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
             || eventType == LIBINPUT_EVENT_TOUCH_CANCEL
-            || eventType == LIBINPUT_EVENT_TOUCH_FRAME
+            || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBooted
             ) {
             touch = libinput_event_get_touch_event(event);
             double touchPressure = 0.0;
