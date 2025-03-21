@@ -2774,6 +2774,7 @@ ohos_unittest("KeymapMgrTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
