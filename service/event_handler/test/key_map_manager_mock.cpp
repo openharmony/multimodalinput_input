@@ -19,7 +19,6 @@ namespace OHOS {
 namespace MMI {
 char* GetProFileAbsPath(const char* fileName, char* buf, int32_t length)
 {
-    std::cout<< "In here GetProFileAbsPath" <<std::endl;
     return KeyMgrMock::GetMock()->GetProFileAbsPath(fileName, buf, length);
 }
 
