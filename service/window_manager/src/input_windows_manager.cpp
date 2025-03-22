@@ -2545,7 +2545,7 @@ int32_t InputWindowsManager::GetFocusWindowId() const
     return displayGroupInfo_.focusWindowId;
 }
 
-int32_t InputWindowsManager::GetLogicalPositionX() const
+int32_t InputWindowsManager::GetLogicalPositionX(int32_t id)
 {
     auto displaysInfo = GetDisplayInfoVector();
     for (auto &it : displaysInfo) {
@@ -2557,12 +2557,12 @@ int32_t InputWindowsManager::GetLogicalPositionX() const
     return DEFAULT_POSITION;
 }
 
-int32_t InputWindowsManager::GetLogicalPositionY() const
+int32_t InputWindowsManager::GetLogicalPositionY(int32_t id)
 {
     auto displaysInfo = GetDisplayInfoVector();
     for (auto &it : displaysInfo) {
         if (it.id == id) {
-            return it.x;
+            return it.y;
         }
     }
     MMI_HILOGW("Failed to LogicalPosition");
