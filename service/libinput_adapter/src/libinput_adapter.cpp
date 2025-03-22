@@ -303,7 +303,6 @@ std::condition_variable vkbCv_;
 bool vkbWorkerReady_ = false;
 bool isVKBWorkerRunningThread_ = false;
 FunInputEvent funInputEventTemp_ = nullptr;
-// list of pair: key: libinput_event, value: delayed msg struct.
 VKBDelayedMessage vkbDelayedMessage_;
 
 void DelayInjectKeyEvent(libinput_event_touch* touch, int32_t keyCode, libinput_key_state state, int64_t frameTime)
@@ -348,7 +347,6 @@ void LibinputAdapter::StartVKBWorkerThread()
     }
     if (!isVKBWorkerRunningThread_) {
         // create working thread, for once.
-        // vkbCv_ = new std::condition_variable();
         std::thread t1(VKBWorkerThread);
         t1.detach();
         isVKBWorkerRunningThread_ = true;
