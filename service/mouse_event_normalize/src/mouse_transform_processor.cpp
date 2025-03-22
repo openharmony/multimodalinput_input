@@ -171,12 +171,12 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     deviceTypeGlobal_ = deviceType;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        ret = UpdateTouchpadMoveLocation(displayInfo, event, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
+        ret = UpdateTouchpadMoveLocation(displayInfo.get(), event, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
             static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
-        ret = UpdateMouseMoveLocation(displayInfo, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
+        ret = UpdateMouseMoveLocation(displayInfo.get(), offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
             static_cast<int32_t>(deviceType));
     }
     if (ret != RET_OK) {
