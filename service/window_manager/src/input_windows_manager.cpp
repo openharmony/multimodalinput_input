@@ -83,6 +83,7 @@ constexpr size_t POINTER_STYLE_WINDOW_NUM = { 10 };
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr int32_t DEFAULT_DPI { 0 };
+constexpr int32_t DEFAULT_POSITION { 0 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -305,16 +306,16 @@ const std::vector<WindowInfo> InputWindowsManager::GetWindowGroupInfoByDisplayId
 {
     CALL_DEBUG_ENTER;
     if (displayId < 0) {
-        return displayGroupInfo_.windowsInfo;
+        return GetWindowInfoVector();
     }
     auto iter = windowsPerDisplay_.find(displayId);
     if (iter == windowsPerDisplay_.end()) {
         MMI_HILOGD("GetWindowInfo displayId:%{public}d is null from windowGroupInfo_", displayId);
-        return displayGroupInfo_.windowsInfo;
+        return GetWindowInfoVector();
     }
     if (iter->second.windowsInfo.empty()) {
         MMI_HILOGW("GetWindowInfo displayId:%{public}d is empty", displayId);
-        return displayGroupInfo_.windowsInfo;
+        return GetWindowInfoVector();
     }
     return iter->second.windowsInfo;
 }
@@ -487,7 +488,7 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
         }
     }
     auto displayId = pointerEvent->GetTargetDisplayId();
-    auto physicDisplayInfoDirection = GetLogicalPositionDirection(displayId);
+    Direction physicDisplayInfoDirection = GetLogicalPositionDirection(displayId);
     if (lastDirection_.first != displayId || lastDirection_.second == static_cast<Direction>(-1)) {
         lastDirection_ = std::make_pair(displayId, physicDisplayInfoDirection);
         return;
@@ -677,8 +678,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
         MMI_HILOG_DISPATCHE("keyEvent is nullptr");
         return secSubWindows;
     }
-    int32_t focusWindowId = GetFocusWindowId();
-    const int32_t focusWindowId = focusWindowId;
+    const int32_t focusWindowId = GetFocusWindowId();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     UpdateKeyEventDisplayId(keyEvent, focusWindowId);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -757,7 +757,6 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId, const std::vector<Wi
 
 void InputWindowsManager::CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo)
 {
-    auto DisplayGroup = GetDisplayGroupInfo();
     const int32_t oldFocusWindowId = GetFocusWindowId();
     const int32_t newFocusWindowId = displayGroupInfo.focusWindowId;
     if (oldFocusWindowId == newFocusWindowId) {
@@ -833,11 +832,11 @@ int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId,
 
 void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo)
 {
-    auto WindowsInfo = GetWindowInfoVector();
+    auto WindowInfo = GetWindowInfoVector();
     int32_t focusWindowId = GetFocusWindowId();
-    if (captureModeInfo_.isCaptureMode && (!WindowsInfo.empty()) &&
+    if (captureModeInfo_.isCaptureMode && (!WindowInfo.empty()) &&
         ((focusWindowId != displayGroupInfo.focusWindowId) ||
-        (WindowsInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
+        (WindowInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
         captureModeInfo_.isCaptureMode = false;
     }
 }
@@ -1037,7 +1036,7 @@ int32_t InputWindowsManager::GetMainScreenDisplayInfo(const std::vector<DisplayI
 {
     CALL_DEBUG_ENTER;
     if (displaysInfo.empty()) {
-        MMI_HILOGE("displayGroupInfo doesn't contain displayInfo");
+        MMI_HILOGE("displaysInfo doesn't contain displayInfo");
         return RET_ERR;
     }
     for (const DisplayInfo& display : displaysInfo) {
@@ -1059,8 +1058,8 @@ void InputWindowsManager::SendBackCenterPointerEevent(const CursorPosition &curs
     int32_t lastPointerAction = lastPointerEventCopy->GetPointerAction();
     std::shared_ptr<PointerEvent> pointerBackCenterEvent = std::make_shared<PointerEvent>(*lastPointerEventCopy);
     pointerBackCenterEvent->SetTargetDisplayId(cursorPos.displayId);
-    auto mainDisplayInfoX = GetLogicalPositionX(cursorPos.displayId);
-    auto mainDisplayInfoY = GetLogicalPositionY(cursorPos.displayId);
+    int32_t mainDisplayInfoX = GetLogicalPositionX(cursorPos.displayId);
+    int32_t mainDisplayInfoY = GetLogicalPositionY(cursorPos.displayId);
     int32_t logicalX = cursorPos.cursorPos.x + mainDisplayInfoX;
     int32_t logicalY = cursorPos.cursorPos.y + mainDisplayInfoY;
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerBackCenterEvent);
@@ -1387,15 +1386,15 @@ void InputWindowsManager::HandleWindowPositionChange()
 {
     CALL_DEBUG_ENTER;
     PrintWindowNavbar();
-    auto WindowsInfo = GetWindowInfoVector();
+    auto WindowInfo = GetWindowInfoVector();
     for (auto it = touchItemDownInfos_.begin(); it != touchItemDownInfos_.end(); ++it) {
         int32_t pointerId = it->first;
         int32_t windowId = it->second.window.id;
-        auto iter = std::find_if(WindowsInfo.begin(), WindowsInfo.end(),
+        auto iter = std::find_if(WindowInfo.begin(), WindowInfo.end(),
             [windowId](const auto& windowInfo) {
             return windowId == windowInfo.id && windowInfo.rectChangeBySystem;
         });
-        if (iter != WindowsInfo.end()) {
+        if (iter != WindowInfo.end()) {
             MMI_HILOGI("Dispatch cancel event pointerId:%{public}d", pointerId);
             CHKPV(lastPointerEventforWindowChange_);
             PointerEvent::PointerItem pointerItem;
@@ -1654,9 +1653,13 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         displayId = displayId < 0 ? DisplaysInfo[0].id : displayId;
         auto displayInfo = GetPhysicalDisplay(displayId);
         CHKPV(displayInfo);
+        int32_t DisplayInfoX = GetLogicalPositionX(displayId);
+        int32_t DisplayInfoY = GetLogicalPositionY(displayId);
+        Direction DirectionCopy = GetLogicalPositionDirection(displayId);
+        Direction DisplayDirection = GetPositionDisplayDirection(displayId);
         DispatchPointerCancel(displayId);
-        int32_t logicX = mouseLocation.physicalX + displayInfo->x;
-        int32_t logicY = mouseLocation.physicalY + displayInfo->y;
+        int32_t logicX = mouseLocation.physicalX + DisplayInfoX;
+        int32_t logicY = mouseLocation.physicalY + DisplayInfoY;
         lastLogicX_ = logicX;
         lastLogicY_ = logicY;
         std::optional<WindowInfo> windowInfo;
@@ -1666,8 +1669,8 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
                 .x = logicX,
                 .y = logicY,
             };
-            if (cursorPos_.direction != displayInfo->direction &&
-                cursorPos_.displayDirection == displayInfo->displayDirection) {
+            if (cursorPos_.direction != DirectionCopy &&
+                cursorPos_.displayDirection == DisplayDirection) {
                 coord.x = cursorPos_.cursorPos.x;
                 coord.y = cursorPos_.cursorPos.y;
                 RotateDisplayScreen(*displayInfo, coord);
@@ -1703,8 +1706,8 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragFlag_ = false;
             isDragBorder_ = false;
         }
-        auto DisplayGroup = GetDisplayGroupInfo();
-        if (firstBtnDownWindowInfo_.first != DisplayGroup.focusWindowId && !extraData_.appended) {
+        int32_t focusWindowId = GetFocusWindowId();
+        if (firstBtnDownWindowInfo_.first != focusWindowId && !extraData_.appended) {
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGI("Window is changed, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
@@ -2205,10 +2208,10 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
         displayInfo.pointerActiveHeight);
 }
 
-const shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id) const
+const std::shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
     auto displayInfo = GetDisplayInfoVector();
-    for (const auto &it : displayInfo) {
+    for (auto &it : displayInfo) {
         if (it.id == id) {
             return std::make_shared<DisplayInfo>(it);
         }
@@ -2218,7 +2221,7 @@ const shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-const shared_ptr<DisplayInfo> InputWindowsManager::FindPhysicalDisplayInfo(const std::string& uniq) const
+const std::shared_ptr<DisplayInfo> InputWindowsManager::FindPhysicalDisplayInfo(const std::string& uniq) const
 {
     auto displaysInfo = GetDisplayInfoVector();
     for (const auto &it : displaysInfo) {
@@ -2233,7 +2236,7 @@ const shared_ptr<DisplayInfo> InputWindowsManager::FindPhysicalDisplayInfo(const
     return nullptr;
 }
 
-const shared_ptr<DisplayInfo> InputWindowsManager::GetDefaultDisplayInfo() const
+const std::shared_ptr<DisplayInfo> InputWindowsManager::GetDefaultDisplayInfo() const
 {
     return FindPhysicalDisplayInfo("default0");
 }
@@ -2539,13 +2542,37 @@ const std::vector<WindowInfo> InputWindowsManager::GetWindowInfoVector() const
 int32_t InputWindowsManager::GetFocusWindowId() const
 {
     std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-    retrun displayGroupInfo_.focusWindowId;
+    return displayGroupInfo_.focusWindowId;
+}
+
+int32_t InputWindowsManager::GetLogicalPositionX() const
+{
+    auto displaysInfo = GetDisplayInfoVector();
+    for (auto &it : displaysInfo) {
+        if (it.id == id) {
+            return it.x;
+        }
+    }
+    MMI_HILOGW("Failed to LogicalPosition");
+    return DEFAULT_POSITION;
+}
+
+int32_t InputWindowsManager::GetLogicalPositionY() const
+{
+    auto displaysInfo = GetDisplayInfoVector();
+    for (auto &it : displaysInfo) {
+        if (it.id == id) {
+            return it.x;
+        }
+    }
+    MMI_HILOGW("Failed to LogicalPosition");
+    return DEFAULT_POSITION;
 }
 
 Direction InputWindowsManager::GetLogicalPositionDirection(int32_t id)
 {
     auto displaysInfo = GetDisplayInfoVector();
-    for (auto &it : displayInfo) {
+    for (auto &it : displaysInfo) {
         if (it.id == id) {
             return it.direction;
         }
@@ -2557,7 +2584,7 @@ Direction InputWindowsManager::GetLogicalPositionDirection(int32_t id)
 Direction InputWindowsManager::GetPositionDisplayDirection(int32_t id)
 {
     auto displaysInfo = GetDisplayInfoVector();
-    for (auto &it : displayInfo) {
+    for (auto &it : displaysInfo) {
         if (it.id == id) {
             return it.displayDirection;
         }
@@ -2577,14 +2604,14 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
     int32_t displayId = MouseEventHdr->GetDisplayId();
     auto DisplaysInfo = GetDisplayInfoVector();
     if (DisplaysInfo.empty) {
-        MMI_HILOGW(DisplaysInfo is empty());
+        MMI_HILOGW("DisplaysInfo is empty");
         return false;
     }
     if (displayId < 0) {
         displayId = DisplaysInfo[0].id;
     }
-    int32_t DisplayInfoX = GetLogicalPositionX();
-    int32_t DisplayInfoY = GetLogicalPositionY();
+    int32_t DisplayInfoX = GetLogicalPositionX(displayId);
+    int32_t DisplayInfoY = GetLogicalPositionY(displayId);
     int32_t logicX = mouseLocation.physicalX + DisplayInfoX;
     int32_t logicY = mouseLocation.physicalY + DisplayInfoY;
     std::optional<WindowInfo> touchWindow = GetWindowInfo(logicX, logicY);
@@ -3482,7 +3509,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END;
     if (checkFlag) {
-        auto focusWindowId = GetFocusWindowId();
+        int32_t focusWindowId = GetFocusWindowId();
         if ((!GetHoverScrollState()) && (focusWindowId != touchWindow->id)) {
             MMI_HILOGD("disable mouse hover scroll in inactive window, targetWindowId:%{public}d", touchWindow->id);
             return RET_OK;
@@ -4714,8 +4741,7 @@ int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto DisplayGroup = GetDisplayGroupInfo();
-    int32_t focusWindowId = DisplayGroup.focusWindowId;
+    int32_t focusWindowId = GetFocusWindowId();
     const WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowsInfo) {
@@ -5013,8 +5039,8 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
     if (!CalculateLayout(displayInfo, physical, layout)) {
         return;
     }
-    auto DisplaysInfo = GetDisplayInfoVector();
-    for (const auto &item : DisplaysInfo) {
+    auto displaysInfoVector = GetDisplayInfoVector();
+    for (const auto &item : displaysInfoVector) {
         if (item.id == displayInfo.id) {
             continue;
         }
@@ -5271,12 +5297,11 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 
 CursorPosition InputWindowsManager::GetCursorPos()
 {
-    auto DisplaysInfo = GetDisplayInfoVector();
-    if ((cursorPos_.displayId < 0) && !DisplaysInfo.empty()) {
-        DisplayInfo displayInfo = DisplaysInfo[0];
+    auto displaysInfoVector = GetDisplayInfoVector();
+    if ((cursorPos_.displayId < 0) && !displaysInfoVector.empty()) {
+        DisplayInfo displayInfo = displaysInfoVector[0];
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        auto DisplayGroup = GetDisplayGroupInfo();
-        (void)GetMainScreenDisplayInfo(DisplayGroup, displayInfo);
+        (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         cursorPos_.displayId = displayInfo.id;
         cursorPos_.cursorPos.x = displayInfo.validWidth * HALF_RATIO;
@@ -5287,12 +5312,11 @@ CursorPosition InputWindowsManager::GetCursorPos()
 
 CursorPosition InputWindowsManager::ResetCursorPos()
 {
-    auto DisplaysInfo = GetDisplayInfoVector();
-    if (!DisplaysInfo.empty()) {
+    auto displaysInfoVector = GetDisplayInfoVector();
+    if (!GetDisplayInfoVector.empty()) {
         DisplayInfo displayInfo = DisplaysInfo[0];
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        auto DisplayGroup = GetDisplayGroupInfo();
-        (void)GetMainScreenDisplayInfo(DisplayGroup, displayInfo);
+        (void)GetMainScreenDisplayInfo(GetDisplayInfoVector, displayInfo);
         if (IsSupported()) {
             int32_t x = displayInfo.width * HALF_RATIO;
             int32_t y = displayInfo.height * HALF_RATIO;
@@ -5886,14 +5910,14 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
 
 void InputWindowsManager::CleanInvalidPiexMap()
 {
-    auto WindowsInfo = GetWindowInfoVector();
+    auto WindowInfo = GetWindowInfoVector();
     for (auto it = transparentWins_.begin(); it != transparentWins_.end();) {
         int32_t windowId = it->first;
-        auto iter = std::find_if(WindowsInfo.begin(), WindowsInfo.end(),
+        auto iter = std::find_if(WindowInfo.begin(), WindowInfo.end(),
             [windowId](const auto &window) {
                 return window.id == windowId;
         });
-        if (iter == WindowsInfo.end()) {
+        if (iter == WindowInfo.end()) {
             it = transparentWins_.erase(it);
         } else {
             ++it;
@@ -5968,10 +5992,10 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
 bool InputWindowsManager::OnDisplayRemovedOrCombiantionChanged(const DisplayGroupInfo &displayGroupInfo)
 {
     auto displaysInfoVector = GetDisplayInfoVector();
-    if (displayGroupInfo.displaysInfoVector.empty() || displaysInfoVector.empty()) {
+    if (displayGroupInfo.displaysInfo.empty() || displaysInfoVector.empty()) {
         return false;
     }
-    if (displayGroupInfo.displaysInfoVector.size() < displaysInfoVector.size()) {
+    if (displayGroupInfo.displaysInfo.size() < displaysInfoVector.size()) {
         MMI_HILOGD("display has been removed");
         return true;
     }
@@ -6011,7 +6035,7 @@ void InputWindowsManager::SetFoldState()
     BytraceAdapter::StopFoldState();
 }
 
-const shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id,
+const std::shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id,
     const DisplayGroupInfo &displayGroupInfo) const
 {
     auto displayInfo = GetDisplayInfoVector();
