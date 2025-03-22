@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
 #include "js_input_monitor.h"
 
 #include "define_multimodal.h"
@@ -58,6 +57,8 @@ constexpr int32_t FINGERPRINT_SLIDE { 2 };
 constexpr int32_t FINGERPRINT_RETOUCH { 3 };
 constexpr int32_t FINGERPRINT_CLICK { 4 };
 constexpr int32_t FINGERPRINT_CANCEL { 5 };
+constexpr int32_t FINGERPRINT_HOLD { 6 };
+constexpr int32_t FINGERPRINT_TOUCH { 7 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
@@ -72,7 +73,8 @@ enum TypeName : int32_t {
     FINGERPRINT = 8,
     SWIPE_INWARD = 9,
     TOUCH_GESTURE = 10,
-    PRE_KEY = 11
+    PRE_KEY = 11,
+    X_KEY = 12
 };
 
 enum InputKeyEventAction {
@@ -98,6 +100,7 @@ std::map<std::string, int32_t> TO_MONITOR_TYPE = {
     { TOUCH_SWIPE_GESTURE, TOUCH_GESTURE },
     { TOUCH_PINCH_GESTURE, TOUCH_GESTURE },
     { TOUCH_ALL_GESTURE, TOUCH_GESTURE },
+    { "xKey", X_KEY }
 };
 
 std::map<std::string, int32_t> TO_PRE_MONITOR_TYPE = {
@@ -184,6 +187,7 @@ std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
     { "rotate", HANDLE_EVENT_TYPE_ROTATE },
     { "threeFingersTap", HANDLE_EVENT_TYPE_THREEFINGERSTAP },
     { "fingerprint", HANDLE_EVENT_TYPE_FINGERPRINT },
+    { "xKey", HANDLE_EVENT_TYPE_X_KEY },
 };
 
 std::map<std::string, int32_t> TO_HANDLE_PRE_EVENT_TYPE = {
@@ -920,6 +924,12 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL: {
             return FINGERPRINT_CANCEL;
         }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD: {
+            return FINGERPRINT_HOLD;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH: {
+            return FINGERPRINT_TOUCH;
+        }
         default: {
             MMI_HILOGE("Wrong action is %{public}d", action);
             return RET_ERR;
@@ -1436,6 +1446,25 @@ int32_t JsInputMonitor::TransformFingerprintEvent(const std::shared_ptr<PointerE
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+int32_t JsInputMonitor::TransformXKeyEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t actionValue = pointerEvent->GetPointerAction();
+    if (actionValue == RET_ERR) {
+        MMI_HILOGW("Get action value failed");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {
+        MMI_HILOGW("Set name property failed");
+        return RET_ERR;
+    }
+    MMI_HILOGD("js x_key action:%{public}d", actionValue);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_X_KEY
+
 int32_t JsInputMonitor::TransformGestureEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -1722,6 +1751,16 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+            case TypeName::X_KEY: {
+                if (!IsXKey(pointerEventItem)) {
+                    napi_close_handle_scope(jsEnv_, scope);
+                    continue;
+                }
+                ret = TransformXKeyEvent(pointerEventItem, napiPointer);
+                break;
+            }
+#endif // OHOS_BUILD_ENABLE_X_KEY
             case TypeName::TOUCH_GESTURE:
                 ret = TransformGestureEvent(pointerEventItem, napiPointer);
                 break;
@@ -1748,7 +1787,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
             typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward" ||
-            typeName == TOUCH_SWIPE_GESTURE || typeName == TOUCH_PINCH_GESTURE || typeName == TOUCH_ALL_GESTURE;
+            typeName == TOUCH_SWIPE_GESTURE || typeName == TOUCH_PINCH_GESTURE || typeName == TOUCH_ALL_GESTURE ||
+            typeName == "xKey";
         if (typeNameFlag) {
             if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
                 pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
@@ -1904,12 +1944,26 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
         ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
         pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL)) {
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH)) {
         return true;
     }
     MMI_HILOGD("Not fingerprint event");
     return false;
 }
+
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+bool JsInputMonitor::IsXKey(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_X_KEY) {
+        return true;
+    }
+    MMI_HILOGD("Not X-key event.");
+    return false;
+}
+#endif // OHOS_BUILD_ENABLE_X_KEY
 
 void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {

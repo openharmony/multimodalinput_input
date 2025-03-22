@@ -146,8 +146,8 @@ private:
     std::shared_ptr<DelegateInterface> delegateProxy_ {nullptr};
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
     std::mutex mutex_;
-    uint64_t windowScreenId_;
-    uint64_t displayNodeScreenId_;
+    uint64_t windowScreenId_ { 0 };
+    uint64_t displayNodeScreenId_ { 0 };
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI

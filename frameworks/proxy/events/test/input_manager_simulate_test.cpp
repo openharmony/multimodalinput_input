@@ -547,7 +547,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_016, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_001, TestSize.Level1)
+HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_001, 2)
 {
     CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
@@ -585,7 +585,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_001, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_002, TestSize.Level1)
+HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
@@ -621,7 +621,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_002, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_003, TestSize.Level1)
+HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
@@ -659,7 +659,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_003, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_004, TestSize.Level1)
+HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();

@@ -28,6 +28,9 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+#include "key_monitor_manager.h"
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "time_cost_chk.h"
@@ -144,9 +147,13 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
+    bool hasVirtualKeyboard = false;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    hasVirtualKeyboard = INPUT_DEV_MGR->HasVirtualKeyboardDevice();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     std::vector<struct libinput_device*> input_device;
     INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
-    if (input_device.size() == 0) {
+    if (input_device.size() == 0 && !hasVirtualKeyboard) {
         MMI_HILOGW("No keyboard device is currently available");
         return ERR_DEVICE_NOT_EXIST;
     }
@@ -174,10 +181,14 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
         MMI_HILOGW("It is prohibited for non-input applications");
         return ERR_NON_INPUT_APPLICATION;
     }
+    bool hasVirtualKeyboard = false;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    hasVirtualKeyboard = INPUT_DEV_MGR->HasVirtualKeyboardDevice();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     std::vector<struct libinput_device*> input_device;
     int32_t DeviceId = -1;
     INPUT_DEV_MGR->GetMultiKeyboardDevice(input_device);
-    if (input_device.size() == 0) {
+    if (input_device.size() == 0 && !hasVirtualKeyboard) {
         MMI_HILOGW("No keyboard device is currently available");
         return ERR_DEVICE_NOT_EXIST;
     }
@@ -188,6 +199,13 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
         MMI_HILOGE("Current device no need to set up");
         return RET_OK;
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (hasVirtualKeyboard && funcKey == KeyEvent::CAPS_LOCK_FUNCTION_KEY) {
+        // set vkeyboard caps state with separate API.
+        MMI_HILOGD("Set vkb func state old=%{private}d, new=%{private}d", checkState, enable);
+        libinput_toggle_caps_key();
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     for (auto it = input_device.begin(); it != input_device.end(); ++it) {
         auto device = (*it);
         DeviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
@@ -701,7 +719,7 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.flags >> extensionInfo.action >> extensionInfo.displayId >> extensionInfo.zOrder
             >> extensionInfo.pointerChangeAreas >> extensionInfo.transform >> extensionInfo.windowInputType
             >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag
-            >> extensionInfo.rectChangeBySystem;
+            >> extensionInfo.rectChangeBySystem >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen;
         info.uiExtentionWindowInfo.push_back(extensionInfo);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read extention window info failed");
@@ -722,7 +740,7 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
             >> info.offsetX >> info.offsetY >> info.isCurrentOffScreenRendering >> info.screenRealWidth
             >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
             >> info.validWidth >> info.validHeight >> info.fixedDirection
-            >> info.physicalWidth >> info.physicalHeight
+            >> info.physicalWidth >> info.physicalHeight >> info.scalePercent >> info.expandHeight
             >> info.oneHandX >> info.oneHandY;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt >> info.pointerActiveWidth >> info.pointerActiveHeight;
@@ -770,7 +788,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType >> info.privacyMode >> info.windowType >> byteCount;
+            >> info.windowInputType >> info.privacyMode >> info.windowType
+            >> info.isSkipSelfWhenShowOnVirtualScreen >> byteCount;
 
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
@@ -810,7 +829,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType >> info.privacyMode >> info.windowType;
+            >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen;
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
         windowGroupInfo.windowsInfo.push_back(info);
@@ -1025,6 +1044,39 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
+{
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
+        return -CAPABILITY_NOT_SUPPORTED;
+    }
+    KeyMonitorManager::Monitor monitor {
+        .session_ = session,
+        .key_ = keyOption.GetKey(),
+        .action_ = keyOption.GetAction(),
+        .isRepeat_ = keyOption.IsRepeat(),
+    };
+    return KEY_MONITOR_MGR->AddMonitor(monitor);
+}
+
+int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
+{
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
+        return -CAPABILITY_NOT_SUPPORTED;
+    }
+    KeyMonitorManager::Monitor monitor {
+        .session_ = session,
+        .key_ = keyOption.GetKey(),
+        .action_ = keyOption.GetAction(),
+        .isRepeat_ = keyOption.IsRepeat(),
+    };
+    KEY_MONITOR_MGR->RemoveMonitor(monitor);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
 int32_t ServerMsgHandler::OnSubscribeSwitchEvent(

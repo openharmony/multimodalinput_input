@@ -60,7 +60,6 @@ ohos_shared_library("inputeventclient") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 

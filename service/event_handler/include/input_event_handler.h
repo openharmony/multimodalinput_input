@@ -54,7 +54,6 @@ public:
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
     std::shared_ptr<EventDispatchHandler> GetEventDispatchHandler() const;
     std::shared_ptr<EventPreMonitorHandler> GetEventPreMonitorHandler() const;
-
 private:
     int32_t BuildInputHandlerChain();
 

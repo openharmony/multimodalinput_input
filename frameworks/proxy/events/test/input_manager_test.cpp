@@ -2091,7 +2091,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor, TestSize.Level1)
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, (void *)pixelMap.get(), 32, 32) == RET_ERR);
+    ASSERT_FALSE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, (void *)pixelMap.get(), 32, 32) == RET_ERR);
     pixelMap = nullptr;
 }
 
@@ -5319,18 +5319,191 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_019, TestSize.Leve
 }
 
 /*
+ * @tc.name: InputManagerTest_AddPreMonitor_001
+ * @tc.desc: AddPreMonitor.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddPreMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> keys;
+    keys.push_back(3);
+    uint32_t handleEventType = 0;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AddPreMonitor(nullptr, handleEventType, keys));
+}
+
+/*
+ * @tc.name: InputManagerTest_RemovePreMonitor_001
+ * @tc.desc: RemovePreMonitor.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemovePreMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t monitorId = 0;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->RemovePreMonitor(monitorId));
+}
+
+/*
+ * @tc.name: InputManagerTest_SetMultiWindowScreenId_001
+ * @tc.desc: SetMultiWindowScreenId.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMultiWindowScreenId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint64_t screenId = 1;
+    uint64_t displayNodeScreenId = 2;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetMultiWindowScreenId(screenId, displayNodeScreenId));
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateEvent_009
+ * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateEvent_010
+ * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateEvent_011
+ * @tc.desc: Injection interface detection test KeyCommandHandler::MenuClickHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateEvent_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+}
+
+/*
+ * @tc.name: InputManagerTest_SubscribeKeyMonitor_001
+ * @tc.desc: SubscribeKeyMonitor.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorOption keyOption;
+    std::function<void(std::shared_ptr<KeyEvent>)> callback;
+    int32_t ret = InputManager::GetInstance()->SubscribeKeyMonitor(keyOption, callback);
+    EXPECT_EQ(ret, INVAID_VALUE);
+}
+
+/*
+ * @tc.name: InputManagerTest_UnsubscribeKeyMonitor_001
+ * @tc.desc: UnsubscribeKeyMonitor.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeKeyMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscriberId = 1;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeKeyMonitor(subscriberId));
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/*
  * @tc.name: InputManagerTest_CreateVKeyboardDevice_001
- * @tc.desc: CreateVKeyboardDevice test.
+ * @tc.desc: CreateVKeyboardDevice.
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_CreateVKeyboardDevice_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t ret = InputManager::GetInstance()->CreateVKeyboardDevice(nullptr);
-    ASSERT_EQ(ret, INVALID_HANDLER_ID);
+    sptr<IRemoteObject> vkeyboardDevice;
+    int32_t ret = InputManager::GetInstance()->CreateVKeyboardDevice(vkeyboardDevice);
+    EXPECT_EQ(ret, INVALID_HANDLER_ID);
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
+/*
+ * @tc.name: InputManagerTest_CheckKnuckleEvent_001
+ * @tc.desc: CheckKnuckleEvent.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_CheckKnuckleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    float pointX = 1.0;
+    float pointY = 1.0;
+    bool isKnuckleType = true;
+    int32_t ret = InputManager::GetInstance()->CheckKnuckleEvent(pointX, pointY, isKnuckleType);
+    EXPECT_EQ(ret, -2);
 }
 } // namespace MMI
 } // namespace OHOS

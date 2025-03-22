@@ -130,6 +130,17 @@ void InputManager::UnsubscribeHotkey(int32_t subscriberId)
     InputMgrImpl.UnsubscribeHotkey(subscriberId);
 }
 
+int32_t InputManager::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    return InputMgrImpl.SubscribeKeyMonitor(keyOption, callback);
+}
+
+int32_t InputManager::UnsubscribeKeyMonitor(int32_t subscriberId)
+{
+    return InputMgrImpl.UnsubscribeKeyMonitor(subscriberId);
+}
+
 int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
     SwitchEvent::SwitchType switchType)
 {
@@ -139,6 +150,16 @@ int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<Sw
 void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)
 {
     InputMgrImpl.UnsubscribeSwitchEvent(subscriberId);
+}
+
+int32_t InputManager::SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback)
+{
+    return InputMgrImpl.SubscribeTabletProximity(callback);
+}
+
+void InputManager::UnsubscribetabletProximity(int32_t subscriberId)
+{
+    InputMgrImpl.UnsubscribetabletProximity(subscriberId);
 }
 
 int32_t InputManager::SubscribeLongPressEvent(const LongPressRequest &longPressRequest,

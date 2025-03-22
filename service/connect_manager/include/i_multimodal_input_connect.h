@@ -101,8 +101,14 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option) = 0;
     virtual int32_t UnsubscribeHotkey(int32_t subscribeId) = 0;
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    virtual int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption) = 0;
+    virtual int32_t UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption) = 0;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     virtual int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) = 0;
     virtual int32_t UnsubscribeSwitchEvent(int32_t subscribeId) = 0;
+    virtual int32_t SubscribeTabletProximity(int32_t subscribeId) = 0;
+    virtual int32_t UnsubscribetabletProximity(int32_t subscribeId) = 0;
     virtual int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) = 0;
     virtual int32_t UnsubscribeLongPressEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) = 0;

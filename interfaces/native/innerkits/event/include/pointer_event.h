@@ -181,6 +181,15 @@ public:
     static constexpr int32_t POINTER_ACTION_FINGERPRINT_CANCEL = 34;
 
     /**
+     * Indicates extra fingerprint action.
+     *
+     * @since 16
+     */
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_HOLD = 38;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_TOUCH = 39;
+
+    /**
      * Indicates that the pen proximity action.
      *
      * @since 12

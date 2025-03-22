@@ -120,7 +120,9 @@ enum {
     // 没有找到session
     SESSION_NOT_FOUND,
     // 监听增加失败
-    INVALID_MONITOR_MON
+    INVALID_MONITOR_MON,
+    // 功能不支持
+    CAPABILITY_NOT_SUPPORTED
 };
 } // namespace MMI
 } // namespace OHOS

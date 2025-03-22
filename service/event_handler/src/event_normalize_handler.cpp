@@ -49,6 +49,9 @@
 #include "res_sched_client.h"
 #include "res_type.h"
 #endif // OHOS_RSS_CLIENT
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+#include "x_key_event_processor.h"
+#endif // OHOS_BUILD_ENABLE_X_KEY
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -101,6 +104,7 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_GESTURE_PINCH_END),
     static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_DOWN),
     static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_UP),
+    static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_CANCEL),
     static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_MOTION),
     static_cast<int32_t>(LIBINPUT_EVENT_TABLET_TOOL_AXIS),
     static_cast<int32_t>(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY),
@@ -148,8 +152,8 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
     
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
-    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_HILOGD("This touch event is canceled type:%{public}d", type);
+    if (type == LIBINPUT_EVENT_TOUCH_FRAME) {
+        MMI_HILOGD("This touch event is LIBINPUT_EVENT_TOUCH_FRAME type:%{public}d", type);
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -223,6 +227,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
 #endif // OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        case LIBINPUT_EVENT_TOUCH_CANCEL:
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
@@ -392,6 +399,13 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+    MMI_HILOGI("X-key is defined.");
+    if (XKeyEventHdr->IsXKeyEvent(event)) {
+        MMI_HILOGI("event is x-key event.");
+        return XKeyEventHdr->HandleXKeyEvent(event);
+    }
+#endif // OHOS_BUILD_ENABLE_X_KEY
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     g_lastKeyboardEventTime = GetSysClockTime();
     BytraceAdapter::StartPackageEvent("package keyEvent");
@@ -718,6 +732,13 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             nextHandler_->HandleTouchEvent(pointerEvent);
         }
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_TOUCH_CANCEL) {
+        item.SetCanceled(true);
+        pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
     }

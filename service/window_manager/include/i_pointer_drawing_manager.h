@@ -170,6 +170,12 @@ public:
     {
         return false;
     }
+    virtual void AttachAllSurfaceNode() {}
+    virtual void DetachAllSurfaceNode() {}
+    virtual int32_t CheckHwcReady()
+    {
+        return 0;
+    }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 };
 } // namespace MMI

@@ -142,5 +142,17 @@ bool AncoWindows::Unmarshalling(Parcel &parcel, AncoWindows &windows)
     windows.updateType = static_cast<ANCO_WINDOW_UPDATE_TYPE>(updateType);
     return result;
 }
+
+bool AncoOneHandData::Marshalling(const AncoOneHandData &oneHandData, Parcel &parcel)
+{
+    return (parcel.WriteInt32(oneHandData.oneHandX) && parcel.WriteInt32(oneHandData.oneHandY) &&
+            parcel.WriteInt32(oneHandData.expandHeight) && parcel.WriteInt32(oneHandData.scalePercent));
+}
+
+bool AncoOneHandData::Unmarshalling(Parcel &parcel, AncoOneHandData &oneHandData)
+{
+    return (parcel.ReadInt32(oneHandData.oneHandX) && parcel.ReadInt32(oneHandData.oneHandY) &&
+            parcel.ReadInt32(oneHandData.expandHeight) && parcel.ReadInt32(oneHandData.scalePercent));
+}
 } // namespace MMI
 } // namespace OHOS

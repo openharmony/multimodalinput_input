@@ -72,6 +72,9 @@ public:
     bool HasPointerDevice();
     bool HasVirtualPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool HasVirtualKeyboardDevice();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     bool HasTouchDevice();
     const std::string& GetScreenId(int32_t deviceId) const;
     using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
