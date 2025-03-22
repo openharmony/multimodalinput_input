@@ -1468,7 +1468,14 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
     if (mouseDisplayState_ != state) {
         mouseDisplayState_ = state;
         if (mouseDisplayState_) {
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+            CHKPV(hardwareCursorPointerManager_);
+            if (!hardwareCursorPointerManager_->IsSupported()) {
+                InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+            }
+#else
             InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         }
         MMI_HILOGI("The state:%{public}s", state ? "true" : "false");
         UpdatePointerVisible();
