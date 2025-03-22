@@ -114,13 +114,12 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
     std::vector<DisplayInfo> GetDisplayInfoVector() const;
-    std::vector<WindowInfo> GetWindowInfoVector() const;
+    const std::vector<WindowInfo> GetWindowInfoVector() const;
     int32_t GetFocusWindowId() const;
     int32_t GetLogicalPositionX(int32_t id);
     int32_t GetLogicalPositionY(int32_t id);
     Direction GetLogicalPositionDirection(int32_t id);
     Direction GetPositionDisplayDirection(int32_t id);
-    // void SetDisplayGroupInfo(const DisplayGroupInfo &info);
     int32_t SetHoverScrollState(bool state);
     bool GetHoverScrollState() const;
     bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
@@ -160,7 +159,7 @@ public:
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
-    const shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const;
+    const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
@@ -188,8 +187,8 @@ public:
     void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    const shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id) const;
-    const shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id, const DisplayGroupInfo &displayGroupInfo) const;
+    const std::shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id) const;
+    const std::shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id, const DisplayGroupInfo &displayGroupInfo) const;
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerChangeAreas();
