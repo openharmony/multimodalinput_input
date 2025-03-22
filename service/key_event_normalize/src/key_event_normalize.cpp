@@ -89,6 +89,10 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{private}d", keyCode);
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
+    if (keyCode == KeyEvent::KEYCODE_UNKNOWN) {
+        MMI_HILOGE("The key value is unknown");
+        return RET_ERR;
+    }
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     keyCode = TransformVolumeKey(device, keyCode, keyAction);

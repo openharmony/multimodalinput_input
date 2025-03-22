@@ -166,7 +166,7 @@ ohos_shared_library("libmmi-server") {
   include_dirs = [ "${mmi_path}/frameworks/proxy/events/include" ]
 
   sources += [ "account_manager/src/account_manager.cpp" ]
-
+  sources += [ "subscriber/src/tablet_subscriber_handler.cpp" ]
   if (input_feature_keyboard) {
     sources += [
       "display_state_manager/src/display_event_monitor.cpp",
@@ -192,6 +192,9 @@ ohos_shared_library("libmmi-server") {
       if (input_shortcut_key_rules_enabled) {
         defines += [ "SHORTCUT_KEY_RULES_ENABLED" ]
       }
+    }
+    if (input_feature_key_pressed_handler) {
+      sources += [ "subscriber/src/key_monitor_manager.cpp" ]
     }
   }
 
@@ -235,8 +238,10 @@ ohos_shared_library("libmmi-server") {
     ]
   }
   if (input_feature_fingerprint) {
-    sources +=
-        [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
+    sources += [
+      "fingerprint_event_processor/src/fingerprint_event_processor.cpp",
+      "fingerprint_event_processor/src/x_key_event_processor.cpp",
+    ]
   }
   if (input_feature_joystick) {
     sources += [
@@ -283,8 +288,6 @@ ohos_shared_library("libmmi-server") {
     "cJSON:cjson",
     "c_utils:utils",
     "graphic_surface:surface",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -1131,6 +1134,7 @@ ohos_unittest("TouchDrawingManagerTest") {
 
   sources = [
     "window_manager/test/pointer_renderer_test.cpp",
+    "window_manager/test/screen_pointer_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
 
@@ -2739,6 +2743,58 @@ ohos_unittest("JoystickTest") {
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
+  ]
+}
+
+ohos_unittest("KeymapMgrTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  include_dirs = [
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/test/facility/libinput_interface/include",
+    "${mmi_path}/libudev/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/event_handler/test",
+  ]
+
+  sources = [
+    "event_handler/src/key_map_manager.cpp",
+    "event_handler/test/key_map_manager_mock.cpp",
+    "event_handler/test/key_map_manager_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_connect_callback_stub",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
+    "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+    "hisysevent:libhisysevent",
   ]
 }
 

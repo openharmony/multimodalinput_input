@@ -35,6 +35,8 @@ typedef std::function<void()> ClearTouchMessage;
 typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllKeyMessage;
 typedef std::function<void()> ClearKeyMessage;
 typedef std::function<void()> HardwareKeyEventDetected;
+typedef std::function<int32_t()> GetKeyboardActivationState;
+
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 enum VKeyboardMessageType {
     VNoMessage = -1,
@@ -65,6 +67,15 @@ enum class VTPStateMachineMessageType : int32_t {
     ROT_END = 17,
     LEFT_TOUCH_DOWN = 18,
     LEFT_TOUCH_UP = 19,
+    TWO_FINGER_TAP = 20,
+};
+
+enum class VKeyboardActivation : int32_t {
+    INACTIVE = 0,
+    ACTIVATED = 1,
+    TOUCH_CANCEL = 2,
+    TOUCH_DROP = 3,
+    EIGHT_FINGERS_UP = 4,
 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 class LibinputAdapter final {
@@ -78,6 +89,9 @@ public:
     void Stop();
     void ProcessPendingEvents();
     void ReloadDevice();
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+	void RegisterBootStatusReceiver();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     auto GetInputFds() const
     {
@@ -90,7 +104,8 @@ public:
         ClearTouchMessage clearTouchMessage,
         GetAllKeyMessage getAllKeyMessage,
         ClearKeyMessage clearKeyMessage,
-        HardwareKeyEventDetected hardwareKeyEventDetected);
+        HardwareKeyEventDetected hardwareKeyEventDetected,
+        GetKeyboardActivationState getKeyboardActivationState);
 
 private:
     void MultiKeyboardSetLedState(bool oldCapsLockState);
@@ -119,6 +134,8 @@ private:
     bool HandleVKeyTrackPadRightBtnDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRightBtnUp(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadTwoFingerTap(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadScrollBegin(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
@@ -164,6 +181,7 @@ private:
     GetAllKeyMessage getAllKeyMessage_ { nullptr };
     ClearKeyMessage clearKeyMessage_ { nullptr };
     HardwareKeyEventDetected hardwareKeyEventDetected_ { nullptr };
+    GetKeyboardActivationState getKeyboardActivationState_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;

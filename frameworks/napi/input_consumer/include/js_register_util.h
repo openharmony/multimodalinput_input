@@ -40,6 +40,8 @@ static void DeletePtr(T &ptr)
 }
 
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value);
+void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, uint32_t value);
+void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int64_t value);
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, std::string value);
 bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret);
 std::string GetNamedPropertyString(const napi_env &env, const napi_value &object, const std::string &name);

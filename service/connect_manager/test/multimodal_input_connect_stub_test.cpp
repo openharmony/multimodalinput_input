@@ -2753,5 +2753,124 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddPreInputHandler_003, TestSize.Le
     data.WriteInt32(keysLen);
     EXPECT_NO_FATAL_FAILURE(stub->StubAddPreInputHandler(data, reply));
 }
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_OnRemoteRequest_013
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_013, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_PRE_INPUT_HANDLER);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    int32_t temp = stub->StubSetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_PRE_INPUT_HANDLER);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DOUBLE_TAP_DRAG_STATE);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DOUBLE_TAP_DRAG_STATE);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_CURSOR_SURFACE_ID);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_LONG_PRESS);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_OnRemoteRequest_014
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_014, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_LONG_PRESS);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    int32_t temp = stub->StubSetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_MOUSE_CURSOR);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubSetMultiWindowScreenId(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_MONITOR);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubSubscribeKeyMonitor(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_MONITOR);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubUnsubscribeKeyMonitor(data, reply);
+    EXPECT_EQ(ret, temp);
+}
+
+/**
+ * @tc.name: StubSubscribeHotkey_001
+ * @tc.desc: Test the function StubSubscribeHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeHotkey_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 201;
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t ret = stub->StubSubscribeHotkey(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetClientInfo_001
+ * @tc.desc: Test the function StubSetClientInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetClientInfo_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 201;
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t ret = stub->StubSetClientInfo(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
 } // namespace MMI
 } // namespace OHOS

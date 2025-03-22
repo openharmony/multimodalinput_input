@@ -37,10 +37,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t ACCESSIBILITY_UID { 1103 };
+
 const std::string DEFAULT_KEYEVENT_INTERCEPT_WHITELIST = "2722;41;40;0;22;17;16;23;2841;9;2089;2083;";
 } // namespace
-
-std::unique_ptr<std::string> EventInterceptorHandler::keyevent_intercept_whitelist = nullptr;
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
@@ -49,33 +48,8 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
     if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
         return;
     }
-
-    if (keyevent_intercept_whitelist == nullptr) {
-        uint32_t size = 0;
-        int ret = SystemReadParam("const.multimodalinput.keyevent_intercept_whitelist", NULL, &size);
-        std::string intercept_whitelist = "";
-        if (ret == 0) {
-            std::vector<char> value(size + 1);
-            ret = SystemReadParam("const.multimodalinput.keyevent_intercept_whitelist",
-                value.data(), &size);
-            if (ret == 0) {
-                intercept_whitelist = std::string(value.data());
-            } else {
-                intercept_whitelist = DEFAULT_KEYEVENT_INTERCEPT_WHITELIST;
-            }
-        }
-
-        keyevent_intercept_whitelist = std::make_unique<std::string>(intercept_whitelist);
-        MMI_HILOGD("Initialize interception white list is %{public}s",
-            keyevent_intercept_whitelist->c_str());
-    }
-    std::string keyString = std::to_string(keyEvent->GetKeyCode());
-    keyString += ";";
-    bool isIntercept = keyevent_intercept_whitelist->find(keyString) == std::string::npos;
-    MMI_HILOGD("Received key event is %{public}s  isIntercept is %{public}d",
-        keyString.c_str(), isIntercept);
-
-    if (isIntercept && OnHandleEvent(keyEvent)) {
+    bool isIntercept = this->KeyInterceptByHostOSWhiteList(keyEvent->GetKeyCode());
+    if (!isIntercept && OnHandleEvent(keyEvent)) {
         MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{private}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
@@ -84,6 +58,33 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
+}
+
+bool EventInterceptorHandler::KeyInterceptByHostOSWhiteList(int32_t keyCode)
+{
+    if (keyevent_intercept_whitelist != nullptr && keyevent_intercept_whitelist->empty()) {
+        return false;
+    }
+    if (keyevent_intercept_whitelist == nullptr) {
+        uint32_t size = 0;
+        int ret = SystemReadParam("const.multimodalinput.keyevent_intercept_whitelist", nullptr, &size);
+        std::string intercept_whitelist = "";
+        if (ret == 0) {
+            std::vector<char> value(size + 1);
+            ret = SystemReadParam("const.multimodalinput.keyevent_intercept_whitelist", value.data(), &size);
+            if (ret == 0) {
+                intercept_whitelist = std::string(value.data());
+            } else {
+                intercept_whitelist = DEFAULT_KEYEVENT_INTERCEPT_WHITELIST;
+            }
+        }
+        keyevent_intercept_whitelist = std::make_unique<std::string>(intercept_whitelist);
+    }
+    std::string keyString = std::to_string(keyCode);
+    keyString += ";";
+    bool isIntercept = keyevent_intercept_whitelist->find(keyString) != std::string::npos;
+    MMI_HILOGD("Received key event is %{public}d  isIntercept is %{public}d", keyCode, isIntercept);
+    return isIntercept;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 

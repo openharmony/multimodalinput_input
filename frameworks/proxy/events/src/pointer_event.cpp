@@ -385,17 +385,14 @@ int32_t PointerEvent::PointerItem::GetRawDisplayX() const
 {
     return rawDisplayX_;
 }
- 
 void PointerEvent::PointerItem::SetRawDisplayX(int32_t rawDisplayX)
 {
     rawDisplayX_ = rawDisplayX;
 }
- 
 int32_t PointerEvent::PointerItem::GetRawDisplayY() const
 {
     return rawDisplayY_;
 }
- 
 void PointerEvent::PointerItem::SetRawDisplayY(int32_t rawDisplayY)
 {
     rawDisplayY_ = rawDisplayY;
@@ -692,6 +689,8 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE, "fingerprint-slide" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH, "fingerprint-retouch" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK, "fingerprint-click" },
+    { PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD, "fingerprint-hold" },
+    { PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH, "fingerprint-touch" },
     { PointerEvent::TOUCH_ACTION_SWIPE_DOWN, "touch-swipe-down" },
     { PointerEvent::TOUCH_ACTION_SWIPE_UP, "touch-swipe-up" },
     { PointerEvent::TOUCH_ACTION_SWIPE_LEFT, "touch-swipe-left" },

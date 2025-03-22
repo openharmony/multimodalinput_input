@@ -81,7 +81,7 @@ void MyCallback(int32_t paramA, int64_t paramB)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -134,7 +134,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
@@ -175,7 +175,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
@@ -208,7 +208,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
@@ -255,7 +255,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -279,7 +279,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -328,7 +328,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -364,7 +364,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
@@ -397,7 +397,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
@@ -438,7 +438,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -466,7 +466,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -494,7 +494,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.L
  * @tc.type: FUNC
  * @tc.require: I5QSN3
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -533,7 +533,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.L
  * @tc.type: FUNC
  * @tc.require: I5QSN3
  */
-HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchInputEvent_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchInputEvent_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -551,7 +551,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchInputEvent_001, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetEnhanceData_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetEnhanceData_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -581,7 +581,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetEnhanceData_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetToolDisplayX_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetToolDisplayX_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -601,7 +601,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetToolDisplayX_001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetToolDisplayY_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetToolDisplayY_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -621,7 +621,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetToolDisplayY_001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetToolWidth_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetToolWidth_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t toolWidth = 30;
@@ -638,7 +638,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetToolWidth_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetToolHeight_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetToolHeight_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t toolHeight = 40;
@@ -655,7 +655,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetToolHeight_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetLongAxis_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetLongAxis_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t longAxis = 50;
@@ -672,7 +672,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetLongAxis_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetShortAxis_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetShortAxis_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t shortAxis = 45;
@@ -689,7 +689,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetShortAxis_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetPointerCount_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetPointerCount_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -703,7 +703,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetPointerCount_001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     const uint32_t length = 5;
@@ -719,7 +719,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -734,7 +734,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetRawDx_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDx_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t rawDx = 55;
@@ -751,7 +751,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetRawDx_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetRawDy_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDy_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t rawDy = 60;
@@ -768,7 +768,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetRawDy_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ClearFlag_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ClearFlag_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -787,7 +787,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearFlag_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_From_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_From_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -805,7 +805,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_From_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_Reset_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_Reset_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -825,7 +825,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_Reset_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsButtonPressed_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsButtonPressed_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -844,7 +844,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsButtonPressed_001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_DeleteReleaseButton_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_DeleteReleaseButton_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -865,7 +865,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DeleteReleaseButton_001, TestSize.Le
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ClearButtonPressed_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ClearButtonPressed_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -886,7 +886,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearButtonPressed_001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisValue_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisValue_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -905,7 +905,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisValue_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetZorderValue_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetZorderValue_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -922,7 +922,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetZorderValue_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsValid_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsValid_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -949,7 +949,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValid_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -977,7 +977,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ClearBuffer_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ClearBuffer_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1002,7 +1002,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearBuffer_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerId_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerId_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t originPointerId = 11;
@@ -1017,7 +1017,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerId_001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayXPos_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayXPos_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     double displayX = 10.0;
@@ -1032,7 +1032,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayXPos_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayYPos_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayYPos_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     double displayY = 10.0;
@@ -1047,7 +1047,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayYPos_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetWindowXPos_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetWindowXPos_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     double x = 10.0;
@@ -1062,7 +1062,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetWindowXPos_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetWindowYPos_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetWindowYPos_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     double y = 10.0;
@@ -1078,7 +1078,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetWindowYPos_001, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t eventType = 1;
@@ -1110,7 +1110,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_001, TestSize.Level
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_AddCapability_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_AddCapability_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     InputDevice device;
@@ -1128,7 +1128,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_AddCapability_001, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     InputDevice device;
@@ -1148,7 +1148,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_001, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     InputDevice device;
@@ -1168,7 +1168,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_002, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     std::function<void(int32_t, int64_t)> processedCallback_;
@@ -1186,7 +1186,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_001, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
@@ -1202,7 +1202,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_002, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
@@ -1221,7 +1221,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_002, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
@@ -1240,7 +1240,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_001, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
@@ -1260,7 +1260,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_001, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
@@ -1282,7 +1282,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_002, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceX_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceX_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1298,7 +1298,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceX_001, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceY_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceY_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1316,7 +1316,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceY_001, TestSiz
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1331,7 +1331,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetAxisValue_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetAxisValue_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1350,7 +1350,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetAxisValue_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetAxisValue_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetAxisValue_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1370,7 +1370,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetAxisValue_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_HasAxis_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_HasAxis_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1393,7 +1393,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_HasAxis_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     double pressure = -1.0;
@@ -1409,7 +1409,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetMoveFlag_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetMoveFlag_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t moveFlag = -1;
@@ -1425,7 +1425,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetMoveFlag_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_003, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1468,7 +1468,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_003, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1511,7 +1511,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetTiltX_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetTiltX_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     double x = 10.0;
@@ -1526,7 +1526,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetTiltX_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetTiltY_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetTiltY_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     double y = 10.0;
@@ -1541,7 +1541,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetTiltY_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayX_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayX_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t rawDisplayX = 60;
@@ -1558,7 +1558,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayX_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayY_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayY_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     int32_t rawDisplayY = 60;
@@ -1575,7 +1575,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayY_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_EventTypeToString_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_EventTypeToString_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -1607,7 +1607,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_EventTypeToString_001, TestSize.Leve
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -1627,7 +1627,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_005, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_005, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -1649,7 +1649,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_005, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_004, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -1676,7 +1676,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_004, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_003, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -1706,7 +1706,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ToString, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ToString, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1724,7 +1724,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ToString, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     Parcel in;
@@ -1740,7 +1740,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -1756,7 +1756,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_from, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_from, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -1771,7 +1771,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_from, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetBlobId, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetBlobId, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -1789,7 +1789,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetBlobId, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetBlobId, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetBlobId, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -1806,7 +1806,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetBlobId, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsCanceled, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsCanceled, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto item = PointerEvent::PointerItem();
@@ -1821,11 +1821,11 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsCanceled, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayX, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayX, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto item = PointerEvent::PointerItem();
-    uint32_t disPlayX = 25;
+    int32_t disPlayX = 25;
     item.SetFixedDisplayX(disPlayX);
     ASSERT_EQ(item.GetFixedDisplayX(), disPlayX);
 }
@@ -1837,13 +1837,13 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayX, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayY, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayY, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto item = PointerEvent::PointerItem();
-    uint32_t disPlayY = 30;
-    item.SetFixedDisplayX(disPlayY);
-    ASSERT_EQ(item.GetFixedDisplayX(), disPlayY);
+    int32_t disPlayY = 30;
+    item.SetFixedDisplayY(disPlayY);
+    ASSERT_EQ(item.GetFixedDisplayY(), disPlayY);
 }
 
 /**
@@ -1853,7 +1853,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayY, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus_01, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus_01, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointer = PointerEvent::Create();
@@ -1869,7 +1869,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus_01, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetVelocity, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetVelocity, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointer = PointerEvent::Create();
@@ -1885,7 +1885,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetVelocity, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetHandOption, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetHandOption, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointer = PointerEvent::Create();
@@ -1901,7 +1901,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetHandOption, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerAction, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerAction, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointer = PointerEvent::Create();
@@ -1917,7 +1917,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerAction, TestSize.Lev
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetPullId, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetPullId, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointer = PointerEvent::Create();
@@ -1933,7 +1933,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetPullId, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetScrollRows, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetScrollRows, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointer = PointerEvent::Create();
@@ -1949,7 +1949,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetScrollRows, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetFixedMode, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetFixedMode, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointer = PointerEvent::Create();
@@ -1965,7 +1965,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetFixedMode, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetFixedModeStr, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_GetFixedModeStr, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointer = PointerEvent::Create();
@@ -1987,7 +1987,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedModeStr, TestSize.Level1)
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetProcessedCallback, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetProcessedCallback, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
@@ -2001,7 +2001,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetProcessedCallback, TestSize.Level
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2028,7 +2028,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_001, TestSize.Leve
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2055,7 +2055,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_002, TestSize.Leve
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_003, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2082,7 +2082,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_003, TestSize.Leve
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_004, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2098,7 +2098,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_004, TestSize.Leve
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2113,7 +2113,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_001, TestSize.
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_002, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_002, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2130,7 +2130,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_002, TestSize.
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_003, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_003, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2151,7 +2151,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_003, TestSize.
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_004, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_004, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2169,7 +2169,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_004, TestSize.
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_005, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_005, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2188,7 +2188,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_005, TestSize.
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_006, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_006, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2207,7 +2207,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_006, TestSize.
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_007, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_007, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -2217,6 +2217,42 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_007, TestSize.
     pointerEvent->SetButtonPressed(-1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     ASSERT_NO_FATAL_FAILURE(pointerEvent->IsValidCheckMouseFunc());
+}
+
+/**
+ * @tc.name: PointerEventTest_SetAngle_001
+ * @tc.desc: SetAngle
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetAngle_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    int32_t angle = 3;
+    ASSERT_NO_FATAL_FAILURE(item.SetAngle(angle));
+}
+
+/**
+ * @tc.name: PointerEventTest_GetAngle_001
+ * @tc.desc: GetAngle
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetAngle_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    int32_t angle = 3;
+    ASSERT_NO_FATAL_FAILURE(item.SetAngle(angle));
+    int32_t ret = item.GetAngle();
+    ASSERT_EQ(ret, angle);
 }
 } // namespace MMI
 } // namespace OHOS

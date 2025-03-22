@@ -109,7 +109,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyState, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyState_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyState_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     Input_KeyState inputKeyState;
@@ -146,7 +146,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectKeyEvent, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     Input_MouseEvent inputMouseEvent;
@@ -207,7 +207,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     Input_TouchEvent inputTouchEvent;
@@ -302,7 +302,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_006, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     Input_AxisEvent* inputAxisEvent = nullptr;
@@ -315,7 +315,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent_001, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     Input_AxisEvent* inputAxisEvent = new (std::nothrow) Input_AxisEvent();
@@ -346,7 +346,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventAxisValue, 
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeyCode, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeyCode, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     Input_KeyState keyState;
@@ -365,7 +365,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeyCode, TestSize.Le
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener, TestSize.Level2)
 {
     auto listener1 = new (std::nothrow) Input_DeviceListener();
     if (listener1 == nullptr) {
@@ -471,7 +471,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_Error003, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_Error003, TestSize.Level3)
 {
     Input_DeviceListener listener = {
         nullptr,
@@ -579,7 +579,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_001, Te
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_002, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_002, TestSize.Level2)
 {
     int32_t deviceId = 3;
     int32_t *keyboardType = nullptr;
@@ -593,7 +593,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_002, Te
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_003, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_003, TestSize.Level2)
 {
     int32_t deviceId = -1;
     int32_t keyboardType = -1;
@@ -681,7 +681,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_003, TestSize
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_004, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_004, TestSize.Level2)
 {
     int32_t deviceId = 0;
     Input_DeviceInfo *deviceInfo = nullptr;
@@ -781,7 +781,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceName_004, Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceAddress_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceAddress_001, TestSize.Level2)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -869,7 +869,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceAddress_004, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_001, TestSize.Level2)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -918,7 +918,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_002, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_003, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_003, TestSize.Level2)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -1092,7 +1092,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_002, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_003, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_003, TestSize.Level3)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -1116,7 +1116,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_003, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_004, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_004, TestSize.Level2)
 {
     Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
     int32_t version = -1;
@@ -1132,7 +1132,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_004, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_001, TestSize.Level2)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -1156,7 +1156,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_001, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_002, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_002, TestSize.Level2)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -1179,7 +1179,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_002, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_003, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_003, TestSize.Level2)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -1219,7 +1219,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_004, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVendor_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVendor_001, TestSize.Level2)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -1412,7 +1412,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_005, Te
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_005, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_005, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = -5;
@@ -1427,7 +1427,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_005, TestSize
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_005, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_005, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     const int32_t inSize = -5;

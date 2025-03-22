@@ -81,6 +81,15 @@ struct AncoWindows {
     static bool Unmarshalling(Parcel &parcel, AncoWindows &windows);
 };
 
+struct AncoOneHandData {
+    int32_t oneHandX;
+    int32_t oneHandY;
+    int32_t expandHeight;
+    int32_t scalePercent;
+    static bool Marshalling(const AncoOneHandData &oneHandData, Parcel &parcel);
+    static bool Unmarshalling(Parcel &parcel, AncoOneHandData &oneHandData);
+};
+
 class IAncoConsumer {
 public:
     IAncoConsumer() = default;
@@ -90,6 +99,7 @@ public:
     virtual int32_t SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) = 0;
     virtual int32_t SyncKnuckleStatus(bool isKnuckleEnable) = 0;
+    virtual int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

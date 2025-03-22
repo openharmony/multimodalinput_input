@@ -34,6 +34,7 @@ AncoChannelStub::AncoChannelStub()
         { AncoRequestId::SYNC_KEY_EVENT, &AncoChannelStub::StubSyncKeyEvent },
         { AncoRequestId::UPDATE_WINDOW_INFO, &AncoChannelStub::StubUpdateWindowInfo },
         { AncoRequestId::SYNC_KNUCKLE_STATUS, &AncoChannelStub::StubSyncKnuckleStatus },
+        { AncoRequestId::UPDATE_ONE_HAND_DATA, &AncoChannelStub::StubUpdateOneHandData },
     };
 }
 
@@ -99,6 +100,16 @@ int32_t AncoChannelStub::StubSyncKnuckleStatus(MessageParcel &data, MessageParce
         return RET_ERR;
     }
     return SyncKnuckleStatus(touchType);
+}
+
+int32_t AncoChannelStub::StubUpdateOneHandData(MessageParcel &data, MessageParcel &reply)
+{
+    AncoOneHandData oneHandData{};
+    if (!AncoOneHandData::Unmarshalling(data, oneHandData)) {
+        MMI_HILOGE("Failed to read one hand data.");
+        return RET_ERR;
+    }
+    return UpdateOneHandData(oneHandData);
 }
 } // namespace MMI
 } // namespace OHOS

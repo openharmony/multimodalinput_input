@@ -26,6 +26,7 @@ enum class AncoRequestId {
     SYNC_KEY_EVENT,
     UPDATE_WINDOW_INFO,
     SYNC_KNUCKLE_STATUS,
+    UPDATE_ONE_HAND_DATA,
 };
 
 class IAncoChannel : public IRemoteBroker {
@@ -36,6 +37,7 @@ public:
     virtual int32_t SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) = 0;
     virtual int32_t SyncKnuckleStatus(bool isKnuckleEnable) = 0;
+    virtual int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

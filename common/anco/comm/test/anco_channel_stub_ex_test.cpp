@@ -50,6 +50,10 @@ public:
     {
         return 0;
     }
+    int32_t UpdateOneHandData(const AncoOneHandData &oneHandData)
+    {
+        return 0;
+    }
 };
 } // namespace
 
@@ -80,7 +84,7 @@ void AncoChannelStubExTest::TearDownTestCase()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncPointerEvent, TestSize.Level1)
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncPointerEvent, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadFromParcel(_)).WillRepeatedly(Return(false));
@@ -131,7 +135,7 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKeyEvent, TestSize
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKeyEvent_001, TestSize.Level1)
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKeyEvent_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadFromParcel(_)).WillRepeatedly(Return(true));
@@ -164,7 +168,7 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubUpdateWindowInfo, Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKnuckleStatus, TestSize.Level1)
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKnuckleStatus, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<AncoChannelStub> ancoChannel = std::make_shared<AncoChannelTest>();
@@ -172,6 +176,22 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubSyncKnuckleStatus, Tes
     MessageParcel data;
     MessageParcel reply;
     EXPECT_EQ(ancoChannel->StubSyncKnuckleStatus(data, reply), RET_ERR);
+}
+
+/**
+ * @tc.name: AncoChannelStubExTest_StubUpdateOneHandData
+ * @tc.desc: Test StubUpdateOneHandData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubUpdateOneHandData, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<AncoChannelStub> ancoChannel = std::make_shared<AncoChannelTest>();
+    ASSERT_NE(ancoChannel, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(ancoChannel->StubUpdateOneHandData(data, reply), RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS

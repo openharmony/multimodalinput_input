@@ -31,6 +31,36 @@ constexpr size_t PRE_KEYS_NUM { 4 };
 } // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+bool KeyEventInputSubscribeManager::MonitorIdentity::operator<(const MonitorIdentity &other) const
+{
+    if (key_ != other.key_) {
+        return (key_ < other.key_);
+    }
+    if (action_ != other.action_) {
+        return (action_ < other.action_);
+    }
+    return (isRepeat_ < other.isRepeat_);
+}
+
+std::string KeyEventInputSubscribeManager::MonitorIdentity::Dump() const
+{
+    std::ostringstream sMonitor;
+    sMonitor << "Key:" << key_ << ",Action:" << action_
+        << ",IsRepeat:" << std::boolalpha << isRepeat_;
+    return std::move(sMonitor).str();
+}
+
+bool KeyEventInputSubscribeManager::MonitorIdentity::Want(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    return ((key_ == keyEvent->GetKeyCode()) &&
+            (action_ == keyEvent->GetKeyAction()) &&
+            (isRepeat_ ||
+             (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) ||
+             !keyEvent->IsRepeatKey()));
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+
 KeyEventInputSubscribeManager::KeyEventInputSubscribeManager() {}
 KeyEventInputSubscribeManager::~KeyEventInputSubscribeManager() {}
 
@@ -243,6 +273,74 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeHotkey(int32_t subscribeId)
     return RET_ERR;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+int32_t KeyEventInputSubscribeManager::SubscribeKeyMonitor(
+    const KeyMonitorOption &keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    CHKPR(callback, INVALID_SUBSCRIBE_ID);
+    std::lock_guard<std::mutex> guard(mtx_);
+    MonitorIdentity monitorId {
+        .key_  = keyOption.GetKey(),
+        .action_ = keyOption.GetAction(),
+        .isRepeat_ = keyOption.IsRepeat(),
+    };
+    auto iter = monitors_.find(monitorId);
+    if (iter == monitors_.end()) {
+        MMI_HILOGI("Subscribe key monitor(%{public}s) to server", monitorId.Dump().c_str());
+        int32_t ret = MMIEventHdl.SubscribeKeyMonitor(keyOption);
+        if (ret != RET_OK) {
+            MMI_HILOGE("SubscribeKeyMonitor fail, error:%{public}d", ret);
+            return (ret > 0 ? RET_ERR : ret);
+        }
+        auto [tIter, _] = monitors_.emplace(monitorId, std::map<int32_t, Monitor> {});
+        iter = tIter;
+    }
+    auto &monitors = iter->second;
+    auto [mIter, _] = monitors.emplace(
+        GenerateId(),
+        Monitor {
+            .callback_ = callback,
+        });
+    MMI_HILOGI("Subscribe key monitor(ID:%{public}d, %{public}s)", mIter->first, monitorId.Dump().c_str());
+    return mIter->first;
+}
+
+int32_t KeyEventInputSubscribeManager::UnsubscribeKeyMonitor(int32_t subscriberId)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    for (auto iter = monitors_.begin(); iter != monitors_.end(); ++iter) {
+        auto &monitorId = iter->first;
+        auto &monitors = iter->second;
+
+        auto tIter = monitors.find(subscriberId);
+        if (tIter == monitors.end()) {
+            continue;
+        }
+        MMI_HILOGI("Unsubscribe key monitor(ID:%{public}d, %{public}s)", subscriberId, monitorId.Dump().c_str());
+        monitors.erase(tIter);
+        int32_t ret { RET_OK };
+
+        if (monitors.empty()) {
+            MMI_HILOGI("Unsubscribe key monitor(%{public}s) from server", monitorId.Dump().c_str());
+            KeyMonitorOption keyOption {};
+            keyOption.SetKey(monitorId.key_);
+            keyOption.SetAction(monitorId.action_);
+            keyOption.SetRepeat(monitorId.isRepeat_);
+
+            ret = MMIEventHdl.UnsubscribeKeyMonitor(keyOption);
+            if (ret != RET_OK) {
+                MMI_HILOGE("UnsubscribeKeyMonitor fail, error:%{public}d", ret);
+            }
+            monitors_.erase(iter);
+        }
+        return ret;
+    }
+    MMI_HILOGW("No subscriber of key monitor with ID(%{public}d)", subscriberId);
+    return -PARAM_INPUT_INVALID;
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
@@ -267,19 +365,43 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+int32_t KeyEventInputSubscribeManager::OnSubscribeKeyMonitor(std::shared_ptr<KeyEvent> event)
+{
+    CHKPR(event, RET_ERR);
+    auto callbacks = CheckKeyMonitors(event);
+    std::for_each(callbacks.cbegin(), callbacks.cend(), [event](auto callback) {
+        if (callback) {
+            callback(event);
+        }
+    });
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+
 void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    if (subscribeInfos_.empty()) {
-        MMI_HILOGD("Leave, subscribeInfos_ is empty");
-        return;
-    }
     for (const auto& subscriberInfo : subscribeInfos_) {
         if (MMIEventHdl.SubscribeKeyEvent(subscriberInfo) != RET_OK) {
             MMI_HILOGE("Subscribe key event failed");
         }
     }
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    for (const auto &[monitorId, _] : monitors_) {
+        MMI_HILOGI("Subscribe key monitor(%{public}s) to server", monitorId.Dump().c_str());
+        KeyMonitorOption keyOption {};
+        keyOption.SetKey(monitorId.key_);
+        keyOption.SetAction(monitorId.action_);
+        keyOption.SetRepeat(monitorId.isRepeat_);
+
+        auto ret = MMIEventHdl.SubscribeKeyMonitor(keyOption);
+        if (ret != RET_OK) {
+            MMI_HILOGE("SubscribeKeyMonitor fail, error:%{public}d", ret);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 }
 
 std::shared_ptr<const KeyEventInputSubscribeManager::SubscribeKeyEventInfo>
@@ -297,5 +419,29 @@ KeyEventInputSubscribeManager::GetSubscribeKeyEvent(int32_t id)
     }
     return nullptr;
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+int32_t KeyEventInputSubscribeManager::GenerateId()
+{
+    return KeyEventInputSubscribeManager::subscribeIdManager_++;
+}
+
+std::vector<std::function<void(std::shared_ptr<KeyEvent>)>> KeyEventInputSubscribeManager::CheckKeyMonitors(
+    std::shared_ptr<KeyEvent> event)
+{
+    std::vector<std::function<void(std::shared_ptr<KeyEvent>)>> keyMonitors;
+    std::lock_guard<std::mutex> guard(mtx_);
+
+    for (const auto &[monitorId, monitors] : monitors_) {
+        if (!monitorId.Want(event)) {
+            continue;
+        }
+        std::for_each(monitors.cbegin(), monitors.cend(), [&](const auto &item) {
+            keyMonitors.emplace_back(item.second.callback_);
+        });
+    }
+    return keyMonitors;
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 } // namespace MMI
 } // namespace OHOS

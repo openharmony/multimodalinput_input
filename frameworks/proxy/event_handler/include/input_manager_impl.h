@@ -62,8 +62,13 @@ public:
     int32_t SubscribeHotkey(std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
     void UnsubscribeHotkey(int32_t subscriberId);
+    int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    int32_t UnsubscribeKeyMonitor(int32_t subscriberId);
     int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
+    int32_t SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback);
+    void UnsubscribetabletProximity(int32_t subscriberId);
     int32_t SubscribeLongPressEvent(const LongPressRequest &LongPressRequest,
         std::function<void(LongPressEvent)> callback);
     void UnsubscribeLongPressEvent(int32_t subscriberId);

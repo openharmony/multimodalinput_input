@@ -57,6 +57,7 @@ constexpr int32_t FOLD_PC_HEIGHT { 3296 };
 const char* DEVICE_TYPE_FOLD_PC { "FOLD_PC" };
 const char* DEVICE_TYPE_TABLET { "TABLET"};
 const char* DEVICE_TYPE_PC_PRO { "PC_PRO" };
+const char* DEVICE_TYPE_M_PC { "M_PC" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
@@ -151,14 +152,6 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #ifndef OHOS_BUILD_ENABLE_WATCH
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
-
-    if (MouseState->IsLeftBtnPressed()) {
-        if (!pointerEvent_->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) {
-            pointerEvent_->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
-        }
-    } else {
-        pointerEvent_->DeleteReleaseButton(PointerEvent::MOUSE_BUTTON_LEFT);
-    }
 
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
@@ -282,16 +275,16 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
 {
     struct libinput_device *dev = libinput_event_get_device(event);
     const std::string mouseName = libinput_device_get_name(dev);
-    const int32_t devType = libinput_device_get_id_bustype(dev);
-    MMI_HILOGD("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
+    const int32_t devType = static_cast<int32_t>(libinput_device_get_id_bustype(dev));
+    MMI_HILOGI("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
     if (devType != BUS_USB && devType != BUS_BLUETOOTH) {
         return;
     }
     std::string connectType = devType == BUS_USB ? "USB" : "BLUETOOTH";
-    MMI_HILOGD("connectType:%{public}s", connectType.c_str());
+    MMI_HILOGI("connectType:%{public}s", connectType.c_str());
     auto curMouseTimeMap = mouseMap.find(mouseName);
     if (curMouseTimeMap == mouseMap.end()) {
-        MMI_HILOGD("start to collect");
+        MMI_HILOGI("start to collect");
         mouseMap[mouseName] = std::chrono::steady_clock::now();
         mouseResponseMap[mouseName] = {};
     } else {
@@ -299,7 +292,7 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
         long long gap =
             std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curMouseTimeMap->second).count();
         mouseMap[mouseName] = curTime;
-        MMI_HILOGD("current time difference:%{public}lld", gap);
+        MMI_HILOGI("current time difference:%{public}lld", gap);
         std::map<long long, int32_t> &curMap = mouseResponseMap.find(mouseName)->second;
 
         if (gap < FINE_CALCULATE) {
@@ -329,12 +322,16 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
 void MouseTransformProcessor::HandleReportMouseResponseTime(
     std::string &connectType, std::map<long long, int32_t> &curMap)
 {
-    MMI_HILOGD("Start to report");
+    MMI_HILOGI("Start to report");
     long total = 0;
     for (const auto &[key, value] : curMap) {
         total += value;
     }
-    MMI_HILOGD("Total mouse movements: %{public}ld", total);
+    if (total <= 0) {
+        MMI_HILOGD("mouse not move");
+        return;
+    }
+    MMI_HILOGI("Total mouse movements: %{public}ld", total);
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
         "COLLECT_MOUSE_RESPONSE_TIME",
@@ -369,7 +366,7 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(
     if (ret != RET_OK) {
         MMI_HILOGE("Mouse write failed , ret:%{public}d", ret);
     }
-    MMI_HILOGD("Mouse write end , ret:%{public}d", ret);
+    MMI_HILOGI("Mouse write end , ret:%{public}d", ret);
 }
 
 void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
@@ -420,7 +417,12 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         MMI_HILOGD("Touch pad is disable");
         return RET_ERR;
     }
-    
+    PointerEvent::PointerItem pointerItem;
+    auto isItemExist = pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), pointerItem);
+    if (isItemExist) {
+        pointerItem.SetCanceled(false);
+        pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
+    }
     auto state = libinput_event_pointer_get_button_state(data);
     HandleTouchPadButton(state, type);
 
@@ -696,7 +698,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     DeviceType deviceType = DeviceType::DEVICE_PC;
     if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
         deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
-        double speedAdjustCoef = 0.1;
+        double speedAdjustCoef = 1.0;
         axisValue = axisValue * speedAdjustCoef;
     } else {
         if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
@@ -707,6 +709,9 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
         }
         if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
             deviceType = DeviceType::DEVICE_FOLD_PC;
+        }
+        if (PRODUCT_TYPE == DEVICE_TYPE_M_PC) {
+            deviceType = DeviceType::DEVICE_M_PC;
         }
     }
     int32_t ret =
@@ -833,8 +838,13 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
     pointerItem.SetDeviceId(deviceId_);
-    pointerItem.SetRawDx(static_cast<int32_t>(unaccelerated_.dx));
-    pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
+    if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+        pointerItem.SetRawDx(0);
+        pointerItem.SetRawDy(0);
+    } else {
+        pointerItem.SetRawDx(static_cast<int32_t>(unaccelerated_.dx));
+        pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
+    }
 
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
@@ -912,6 +922,7 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         return result;
     }
     PointerEvent::PointerItem pointerItem;
+    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), pointerItem);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     } else if (type == LIBINPUT_EVENT_POINTER_MOTION || type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE) {
@@ -1215,6 +1226,11 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
 void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
+    // skip button remapping for virtual trackpad
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        return;
+    }
+
     // touchpad two finger button -> 273
     uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
     if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
@@ -1344,6 +1360,12 @@ int32_t MouseTransformProcessor::SetTouchpadTapSwitch(bool switchFlag)
 
 void MouseTransformProcessor::GetTouchpadTapSwitch(bool &switchFlag)
 {
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        // always allow touchpad tap for virtual trackpad regardless of the settings.
+        switchFlag = true;
+        return;
+    }
+
     std::string name = "touchpadTap";
     GetConfigDataFromDatabase(name, switchFlag);
 }
@@ -1397,6 +1419,12 @@ int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
 
 void MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
 {
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        // always allow two finger tap to open menu for virtual trackpad regardless of the settings.
+        type = static_cast<int32_t>(RightClickType::TP_TWO_FINGER_TAP);
+        return;
+    }
+
     std::string name = "rightMenuSwitch";
     GetConfigDataFromDatabase(name, type);
 

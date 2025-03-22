@@ -26,10 +26,20 @@ namespace MMI {
 namespace {
 constexpr size_t EVENT_NAME_LEN { 64 };
 constexpr size_t PRE_KEYS_SIZE { 4 };
+constexpr size_t AT_LEAST_ONE_PARAMETER { 1 };
 constexpr size_t INPUT_PARAMETER_MIDDLE { 2 };
 constexpr size_t INPUT_PARAMETER_MAX { 3 };
+constexpr size_t KEY_MONITOR_EXPECT_N_PARAMS { 3 };
+constexpr size_t FIRST_PARAMETER { 0 };
+constexpr size_t SECOND_PARAMETER { 1 };
+constexpr size_t THIRD_PARAMETER { 2 };
+constexpr int32_t INVALID_SUBSCRIBER_ID { -1 };
 constexpr int32_t OCCUPIED_BY_SYSTEM { -3 };
 constexpr int32_t OCCUPIED_BY_OTHER { -4 };
+constexpr int32_t BOOLEAN_TRUE { 1 };
+constexpr int32_t BOOLEAN_FALSE { 0 };
+constexpr int32_t BOOLEAN_NONE { -1 };
+constexpr uint32_t DEFAULT_REFERENCE_COUNT { 1 };
 } // namespace
 
 static Callbacks callbacks = {};
@@ -503,9 +513,45 @@ bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInf
     return true;
 }
 
+static std::optional<std::string> ResolveEventType(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc { KEY_MONITOR_EXPECT_N_PARAMS };
+    napi_value argv[KEY_MONITOR_EXPECT_N_PARAMS] {};
+
+    auto ret = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_get_cb_info fail");
+        return std::nullopt;
+    }
+    if (argc < AT_LEAST_ONE_PARAMETER) {
+        MMI_HILOGE("Type of subscription is required");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type of subscription is required");
+        return std::nullopt;
+    }
+    if (!UtilNapi::TypeOf(env, argv[FIRST_PARAMETER], napi_string)) {
+        MMI_HILOGE("The first parameter is not string");
+        return std::nullopt;
+    }
+    char eventType[EVENT_NAME_LEN] {};
+    size_t typeLen { 0 };
+
+    ret = napi_get_value_string_utf8(env, argv[0], eventType, sizeof(eventType), &typeLen);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_get_value_string_utf8 fail");
+        return std::nullopt;
+    }
+    return std::string(eventType);
+}
+
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    auto etOpt = ResolveEventType(env, info);
+    if (etOpt && (*etOpt == KEY_MONITOR_SUBSCRIBE_TYPE)) {
+        JsInputConsumer::GetInstance()->SubscribeKeyMonitor(env, info);
+        return nullptr;
+    }
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
     CHKPP(event);
     event->env = env;
@@ -544,6 +590,11 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    auto etOpt = ResolveEventType(env, info);
+    if (etOpt && (*etOpt == KEY_MONITOR_SUBSCRIBE_TYPE)) {
+        JsInputConsumer::GetInstance()->UnsubscribeKeyMonitor(env, info);
+        return nullptr;
+    }
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
     CHKPP(event);
     event->env = env;
@@ -701,6 +752,499 @@ KeyEventMonitorInfo::~KeyEventMonitorInfo()
         CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
     }
     callback = nullptr;
+}
+
+const std::set<int32_t> JsInputConsumer::allowedKeys_ {
+    KeyEvent::KEYCODE_VOLUME_DOWN,
+    KeyEvent::KEYCODE_VOLUME_UP,
+};
+
+std::shared_ptr<JsInputConsumer> JsInputConsumer::GetInstance()
+{
+    static std::once_flag flag;
+    static std::shared_ptr<JsInputConsumer> instance_;
+
+    std::call_once(flag, []() {
+        instance_ = std::make_shared<JsInputConsumer>();
+    });
+    return instance_;
+}
+
+bool JsInputConsumer::KeyMonitor::Parse(napi_env env, napi_callback_info info)
+{
+    size_t argc { KEY_MONITOR_EXPECT_N_PARAMS };
+    napi_value argv[KEY_MONITOR_EXPECT_N_PARAMS] {};
+    CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+
+    if (argc < KEY_MONITOR_EXPECT_N_PARAMS) {
+        MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return false;
+    }
+    if (!UtilNapi::TypeOf(env, argv[FIRST_PARAMETER], napi_string)) {
+        MMI_HILOGE("The first parameter is not string");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
+        return false;
+    }
+    if (!UtilNapi::TypeOf(env, argv[SECOND_PARAMETER], napi_object)) {
+        MMI_HILOGE("The second parameter is not object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "options", "object");
+        return false;
+    }
+    if (!UtilNapi::TypeOf(env, argv[THIRD_PARAMETER], napi_function)) {
+        MMI_HILOGE("The third parameter is not function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return false;
+    }
+    if (!ParseKeyMonitorOption(env, argv[SECOND_PARAMETER])) {
+        MMI_HILOGE("Invalid KeyMonitorOption");
+        return false;
+    }
+    auto ret = napi_create_reference(env, argv[THIRD_PARAMETER], DEFAULT_REFERENCE_COUNT, &callback_);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_create_reference fail");
+        return false;
+    }
+    env_ = env;
+    return true;
+}
+
+bool JsInputConsumer::KeyMonitor::ParseKeyMonitorOption(napi_env env, napi_value keyOption)
+{
+    CALL_DEBUG_ENTER;
+    auto optKey = GetNamedPropertyInt32(env, keyOption, "key");
+    if (!optKey) {
+        MMI_HILOGE("Expect 'key'");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Expect 'key'");
+        return false;
+    }
+    auto optAction = GetNamedPropertyInt32(env, keyOption, "action");
+    if (!optAction) {
+        MMI_HILOGE("Expect 'action'");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Expect 'action'");
+        return false;
+    }
+    bool isRepeat { true };
+    if (!GetNamedPropertyBool(env, keyOption, "isRepeat", isRepeat)) {
+        MMI_HILOGE("Expect 'isRepeat'");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Expect 'isRepeat'");
+        return false;
+    }
+
+    keyOption_.SetKey(*optKey);
+    keyOption_.SetAction(JsInputConsumer::JsKeyAction2KeyAction(*optAction));
+    keyOption_.SetRepeat(isRepeat);
+
+    if (!JsInputConsumer::CheckKeyMonitorOption(keyOption_)) {
+        MMI_HILOGE("Input for KeyPressedConfig is invalid");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Input for KeyPressedConfig is invalid");
+        return false;
+    }
+    return true;
+}
+
+bool JsInputConsumer::KeyMonitor::ParseUnsubscription(napi_env env, napi_callback_info info)
+{
+    size_t argc { KEY_MONITOR_EXPECT_N_PARAMS };
+    napi_value argv[KEY_MONITOR_EXPECT_N_PARAMS] {};
+
+    auto ret = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_get_cb_info fail");
+        return false;
+    }
+    if (argc < AT_LEAST_ONE_PARAMETER) {
+        MMI_HILOGE("Type of subscription is required");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type of subscription is required");
+        return false;
+    }
+    if (argc == AT_LEAST_ONE_PARAMETER) {
+        callback_ = nullptr;
+        return true;
+    }
+    if (!UtilNapi::TypeOf(env, argv[SECOND_PARAMETER], napi_function)) {
+        MMI_HILOGE("The second parameter is not function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return false;
+    }
+    ret = napi_create_reference(env, argv[SECOND_PARAMETER], DEFAULT_REFERENCE_COUNT, &callback_);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_create_reference fail");
+        return false;
+    }
+    env_ = env;
+    return true;
+}
+
+void JsInputConsumer::SubscribeKeyMonitor(napi_env env, napi_callback_info info)
+{
+    std::lock_guard guard(mutex_);
+    KeyMonitor keyMonitor {};
+
+    if (!keyMonitor.Parse(env, info)) {
+        MMI_HILOGE("Unexpected key monitor");
+        return;
+    }
+    MMI_HILOGI("[NAPI] Subscribe key monitor");
+    if (!SubscribeKeyMonitor(env, keyMonitor)) {
+        CleanupKeyMonitor(env, keyMonitor);
+    }
+}
+
+void JsInputConsumer::UnsubscribeKeyMonitor(napi_env env, napi_callback_info info)
+{
+    std::lock_guard guard(mutex_);
+    KeyMonitor keyMonitor {};
+
+    if (!keyMonitor.ParseUnsubscription(env, info)) {
+        MMI_HILOGE("Unexpected key monitor");
+        return;
+    }
+    if (keyMonitor.callback_ != nullptr) {
+        MMI_HILOGI("[NAPI] Unsubscribe key monitor");
+        UnsubscribeKeyMonitor(env, keyMonitor);
+    } else {
+        UnsubscribeKeyMonitors(env);
+    }
+    CleanupKeyMonitor(env, keyMonitor);
+}
+
+size_t JsInputConsumer::GenerateId()
+{
+    return ++baseId_;
+}
+
+void JsInputConsumer::CleanupKeyMonitor(napi_env env, KeyMonitor &keyMonitor) const
+{
+    if (keyMonitor.callback_ != nullptr) {
+        auto ret = napi_delete_reference(env, keyMonitor.callback_);
+        if (ret != napi_ok) {
+            MMI_HILOGE("napi_delete_reference fail");
+        }
+        keyMonitor.callback_ = nullptr;
+    }
+}
+
+int32_t JsInputConsumer::IsIdentical(napi_env env, const KeyMonitor &sMonitor, const KeyMonitor &tMonitor) const
+{
+    napi_value sHandler { nullptr };
+    napi_value tHandler { nullptr };
+    bool isEqual { false };
+
+    auto ret = napi_get_reference_value(env, sMonitor.callback_, &sHandler);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_get_reference_value fail");
+        return BOOLEAN_NONE;
+    }
+    ret = napi_get_reference_value(env, tMonitor.callback_, &tHandler);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_get_reference_value fail");
+        return BOOLEAN_NONE;
+    }
+    ret = napi_strict_equals(env, sHandler, tHandler, &isEqual);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_strict_equals fail");
+        return BOOLEAN_NONE;
+    }
+    return (isEqual ? BOOLEAN_TRUE : BOOLEAN_FALSE);
+}
+
+int32_t JsInputConsumer::HasSubscribed(napi_env env, const KeyMonitor &keyMonitor) const
+{
+    napi_value sHandler { nullptr };
+    auto ret = napi_get_reference_value(env, keyMonitor.callback_, &sHandler);
+    if (ret != napi_ok) {
+        MMI_HILOGE("napi_get_reference_value fail");
+        return BOOLEAN_NONE;
+    }
+    for (const auto &[_, monitor] : monitors_) {
+        napi_value tHandler { nullptr };
+        auto ret = napi_get_reference_value(env, monitor.callback_, &tHandler);
+        if (ret != napi_ok) {
+            MMI_HILOGE("napi_get_reference_value fail");
+            return BOOLEAN_NONE;
+        }
+        bool isEqual { false };
+        ret = napi_strict_equals(env, sHandler, tHandler, &isEqual);
+        if (ret != napi_ok) {
+            MMI_HILOGE("napi_strict_equals fail");
+            return BOOLEAN_NONE;
+        }
+        if (isEqual) {
+            MMI_HILOGE("Callback already exist");
+            return BOOLEAN_TRUE;
+        }
+    }
+    return BOOLEAN_FALSE;
+}
+
+bool JsInputConsumer::SubscribeKeyMonitor(napi_env env, KeyMonitor &keyMonitor)
+{
+    auto hasSubscribed = HasSubscribed(env, keyMonitor);
+    if (hasSubscribed < 0) {
+        MMI_HILOGE("HasSubscribed fail");
+        return false;
+    }
+    if (hasSubscribed) {
+        MMI_HILOGE("Duplicate subscription of key monitor");
+        return false;
+    }
+    auto keyMonitorId = GenerateId();
+    auto subscriberId = InputManager::GetInstance()->SubscribeKeyMonitor(keyMonitor.keyOption_,
+        [keyMonitorId](std::shared_ptr<KeyEvent> keyEvent) {
+            JsInputConsumer::GetInstance()->OnSubscribeKeyMonitor(keyMonitorId, keyEvent);
+        });
+    if (subscriberId < 0) {
+        if (subscriberId == -CAPABILITY_NOT_SUPPORTED) {
+            MMI_HILOGE("Capability not supported");
+            THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+        } else if (subscriberId == -PARAM_INPUT_INVALID) {
+            MMI_HILOGE("Input is invalid");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Input is invalid");
+        } else {
+            MMI_HILOGE("SubscribeKeyMonitor fail, error:%{public}d", subscriberId);
+        }
+        return false;
+    }
+    MMI_HILOGI("[NAPI] Subscribe key monitor(ID:%{public}zu, subscriberId:%{public}d)", keyMonitorId, subscriberId);
+    keyMonitor.env_ = env;
+    keyMonitor.subscriberId_ = subscriberId;
+    monitors_.emplace(keyMonitorId, keyMonitor);
+    return true;
+}
+
+void JsInputConsumer::UnsubscribeKeyMonitor(napi_env env, const KeyMonitor &keyMonitor)
+{
+    for (auto mIter = monitors_.begin(); mIter != monitors_.end(); ++mIter) {
+        auto identical = IsIdentical(env, keyMonitor, mIter->second);
+        if (identical < 0) {
+            MMI_HILOGE("IsIdentical fail");
+            return;
+        }
+        if (identical) {
+            auto &tMonitor = mIter->second;
+            MMI_HILOGI("[NAPI] Unsubscribe key monitor(ID:%{public}zu, subscriberId:%{public}d)",
+                mIter->first, tMonitor.subscriberId_);
+            auto ret = InputManager::GetInstance()->UnsubscribeKeyMonitor(tMonitor.subscriberId_);
+            if (ret == -CAPABILITY_NOT_SUPPORTED) {
+                MMI_HILOGE("Capability not supported");
+                THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+            } else if (ret == -PARAM_INPUT_INVALID) {
+                MMI_HILOGE("Input is invalid");
+                THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Input is invalid");
+            } else if (ret != RET_OK) {
+                MMI_HILOGE("UnsubscribeKeyMonitor fail, error:%{public}d", ret);
+            }
+            CleanupKeyMonitor(env, tMonitor);
+            monitors_.erase(mIter);
+            return;
+        }
+    }
+    auto ret = InputManager::GetInstance()->UnsubscribeKeyMonitor(INVALID_SUBSCRIBER_ID);
+    if (ret == -CAPABILITY_NOT_SUPPORTED) {
+        MMI_HILOGE("Capability not supported");
+        THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+    } else {
+        MMI_HILOGE("Input is invalid");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Input is invalid");
+    }
+}
+
+void JsInputConsumer::UnsubscribeKeyMonitors(napi_env env)
+{
+    if (monitors_.empty()) {
+        auto ret = InputManager::GetInstance()->UnsubscribeKeyMonitor(INVALID_SUBSCRIBER_ID);
+        if (ret == -CAPABILITY_NOT_SUPPORTED) {
+            MMI_HILOGE("Capability not supported");
+            THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+        }
+        return;
+    }
+    for (auto &[monitorId, monitor] : monitors_) {
+        MMI_HILOGI("[NAPI] Unsubscribe key monitor(ID:%{public}zu, subscriberId:%{public}d)",
+            monitorId, monitor.subscriberId_);
+        auto ret = InputManager::GetInstance()->UnsubscribeKeyMonitor(monitor.subscriberId_);
+        if (ret != RET_OK) {
+            MMI_HILOGE("UnsubscribeKeyMonitor fail, error:%{public}d", ret);
+        }
+        CleanupKeyMonitor(env, monitor);
+    }
+    monitors_.clear();
+}
+
+void JsInputConsumer::OnSubscribeKeyMonitor(size_t keyMonitorId, std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    std::lock_guard guard(mutex_);
+    auto mIter = monitors_.find(keyMonitorId);
+    if (mIter == monitors_.end()) {
+        MMI_HILOGE("No key monitor with ID(%{public}zu)", keyMonitorId);
+        return;
+    }
+    auto &monitor = mIter->second;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(monitor.env_, &loop), GET_UV_EVENT_LOOP);
+
+    auto work = std::make_shared<Work>();
+    work->keyMonitorId_ = keyMonitorId;
+    work->work_.data = work.get();
+    work->keyEvent_ = keyEvent;
+
+    auto ret = uv_queue_work_with_qos(
+        loop, &work->work_,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work callback function is called");
+        },
+        JsInputConsumer::HandleKeyMonitor, uv_qos_user_initiated);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos fail, error:%{public}d", ret);
+        return;
+    }
+    pendingWorks_.emplace(&work->work_, work);
+}
+
+void JsInputConsumer::NotifyKeyMonitor(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(mutex_);
+    auto pwIter = pendingWorks_.find(work);
+    if (pwIter == pendingWorks_.end()) {
+        MMI_HILOGW("Not a pending work(%{private}p)", work);
+        return;
+    }
+    auto keyMonitorId = pwIter->second->keyMonitorId_;
+    auto keyEvent = pwIter->second->keyEvent_;
+    pendingWorks_.erase(pwIter);
+
+    auto mIter = monitors_.find(keyMonitorId);
+    if (mIter == monitors_.end()) {
+        MMI_HILOGE("No key monitor with ID(%{public}zu)", keyMonitorId);
+        return;
+    }
+    NotifyKeyMonitor(mIter->second, keyEvent);
+}
+
+void JsInputConsumer::NotifyKeyMonitor(const KeyMonitor &keyMonitor, std::shared_ptr<KeyEvent> keyEvent)
+{
+    napi_handle_scope scope { nullptr };
+    napi_open_handle_scope(keyMonitor.env_, &scope);
+    CHKPV(scope);
+    NotifyKeyMonitorScoped(keyMonitor, keyEvent);
+    napi_close_handle_scope(keyMonitor.env_, scope);
+}
+
+void JsInputConsumer::NotifyKeyMonitorScoped(const KeyMonitor &keyMonitor, std::shared_ptr<KeyEvent> keyEvent)
+{
+    napi_value callback { nullptr };
+    CHKRV(napi_get_reference_value(keyMonitor.env_, keyMonitor.callback_, &callback), GET_REFERENCE_VALUE);
+    napi_value jsKeyEvent = JsInputConsumer::KeyEvent2JsKeyEvent(keyMonitor.env_, keyEvent);
+    CHKPV(jsKeyEvent);
+    napi_value result { nullptr };
+    CHKRV(napi_call_function(keyMonitor.env_, nullptr, callback, 1, &jsKeyEvent, &result), CALL_FUNCTION);
+}
+
+bool JsInputConsumer::CheckKeyMonitorOption(const KeyMonitorOption &keyOption)
+{
+    return ((allowedKeys_.find(keyOption.GetKey()) != allowedKeys_.cend()) &&
+            (keyOption.GetAction() == KeyEvent::KEY_ACTION_DOWN));
+}
+
+napi_value JsInputConsumer::KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPP(keyEvent);
+    napi_value jsKeyEvent { nullptr };
+    CHKRP(napi_create_object(env, &jsKeyEvent), CREATE_OBJECT);
+
+    SetNamedProperty(env, jsKeyEvent, std::string("id"), keyEvent->GetId());
+    SetNamedProperty(env, jsKeyEvent, std::string("deviceId"), keyEvent->GetDeviceId());
+    SetNamedProperty(env, jsKeyEvent, std::string("actionTime"), keyEvent->GetActionTime());
+    SetNamedProperty(env, jsKeyEvent, std::string("screenId"), keyEvent->GetTargetDisplayId());
+    SetNamedProperty(env, jsKeyEvent, std::string("windowId"), keyEvent->GetTargetWindowId());
+    SetNamedProperty(env, jsKeyEvent, std::string("action"), KeyAction2JsKeyAction(keyEvent->GetKeyAction()));
+
+    auto keyItem = keyEvent->GetKeyItem();
+    if (!keyItem) {
+        MMI_HILOGE("No key item(No:%{public}d,KC:%{private}d)", keyEvent->GetId(), keyEvent->GetKeyCode());
+        return nullptr;
+    }
+    napi_value jsKey = JsInputConsumer::KeyItem2JsKey(env, *keyItem);
+    CHKPP(jsKey);
+    CHKRP(napi_set_named_property(env, jsKeyEvent, "key", jsKey), SET_NAMED_PROPERTY);
+    SetNamedProperty(env, jsKeyEvent, std::string("unicodeChar"), keyItem->GetUnicode());
+
+    napi_value jsKeys { nullptr };
+    uint32_t index { 0 };
+
+    CHKRP(napi_create_array(env, &jsKeys), CREATE_ARRAY);
+    auto keyItems = keyEvent->GetKeyItems();
+
+    for (const auto &keyItem : keyItems) {
+        jsKey = JsInputConsumer::KeyItem2JsKey(env, keyItem);
+        CHKPP(jsKey);
+        CHKRP(napi_set_element(env, jsKeys, index++, jsKey), SET_ELEMENT);
+    }
+
+    CHKRP(napi_set_named_property(env, jsKeyEvent, "keys", jsKeys), SET_NAMED_PROPERTY);
+    SetNamedProperty(env, jsKeyEvent, std::string("ctrlKey"),
+        (keyEvent->GetKeyItem(KeyEvent::KEYCODE_CTRL_LEFT) || keyEvent->GetKeyItem(KeyEvent::KEYCODE_CTRL_RIGHT)));
+    SetNamedProperty(env, jsKeyEvent, std::string("altKey"),
+        (keyEvent->GetKeyItem(KeyEvent::KEYCODE_ALT_LEFT) || keyEvent->GetKeyItem(KeyEvent::KEYCODE_ALT_RIGHT)));
+    SetNamedProperty(env, jsKeyEvent, std::string("shiftKey"),
+        (keyEvent->GetKeyItem(KeyEvent::KEYCODE_SHIFT_LEFT) || keyEvent->GetKeyItem(KeyEvent::KEYCODE_SHIFT_RIGHT)));
+    SetNamedProperty(env, jsKeyEvent, std::string("logoKey"),
+        (keyEvent->GetKeyItem(KeyEvent::KEYCODE_META_LEFT) || keyEvent->GetKeyItem(KeyEvent::KEYCODE_META_RIGHT)));
+    SetNamedProperty(env, jsKeyEvent, std::string("fnKey"), keyEvent->GetKeyItem(KeyEvent::KEYCODE_FN).has_value());
+    SetNamedProperty(env, jsKeyEvent, std::string("capsLock"),
+        keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    SetNamedProperty(env, jsKeyEvent, std::string("numLock"),
+        keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    SetNamedProperty(env, jsKeyEvent, std::string("scrollLock"),
+        keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    return jsKeyEvent;
+}
+
+napi_value JsInputConsumer::KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem &keyItem)
+{
+    napi_value jsKey { nullptr };
+    CHKRP(napi_create_object(env, &jsKey), CREATE_OBJECT);
+    SetNamedProperty(env, jsKey, std::string("code"), keyItem.GetKeyCode());
+    SetNamedProperty(env, jsKey, std::string("pressedTime"), keyItem.GetDownTime());
+    SetNamedProperty(env, jsKey, std::string("deviceId"), keyItem.GetDeviceId());
+    return jsKey;
+}
+
+void JsInputConsumer::HandleKeyMonitor(uv_work_t *work, int32_t status)
+{
+    JsInputConsumer::GetInstance()->NotifyKeyMonitor(work, status);
+}
+
+int32_t JsInputConsumer::JsKeyAction2KeyAction(int32_t action)
+{
+    static const std::map<int32_t, int32_t> keyActionMap {
+        { JsKeyAction::JS_KEY_ACTION_CANCEL, KeyEvent::KEY_ACTION_CANCEL },
+        { JsKeyAction::JS_KEY_ACTION_DOWN, KeyEvent::KEY_ACTION_DOWN },
+        { JsKeyAction::JS_KEY_ACTION_UP, KeyEvent::KEY_ACTION_UP },
+    };
+    if (auto iter = keyActionMap.find(action); iter != keyActionMap.cend()) {
+        return iter->second;
+    } else {
+        return KeyEvent::KEY_ACTION_UNKNOWN;
+    }
+}
+
+int32_t JsInputConsumer::KeyAction2JsKeyAction(int32_t action)
+{
+    static const std::map<int32_t, int32_t> keyActionMap {
+        { KeyEvent::KEY_ACTION_CANCEL, JsKeyAction::JS_KEY_ACTION_CANCEL },
+        { KeyEvent::KEY_ACTION_DOWN, JsKeyAction::JS_KEY_ACTION_DOWN },
+        { KeyEvent::KEY_ACTION_UP, JsKeyAction::JS_KEY_ACTION_UP },
+    };
+    if (auto iter = keyActionMap.find(action); iter != keyActionMap.cend()) {
+        return iter->second;
+    } else {
+        return JsKeyAction::JS_KEY_ACTION_CANCEL;
+    }
 }
 
 EXTERN_C_START

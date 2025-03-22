@@ -26,6 +26,7 @@
             OHOS::MMI::InputMonitorManager*;
             OHOS::MMI::KeyEvent*;
             OHOS::MMI::KeyEventInputSubscribeManager*;
+            OHOS::MMI::KeyMonitorOption::*;
             OHOS::MMI::KeyOption*;
             OHOS::MMI::PointerEvent*;
             OHOS::MMI::PointerStyle*;

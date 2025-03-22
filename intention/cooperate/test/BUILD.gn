@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("../../../device_status.gni")
 
-module_output_path = "${device_status_part_name}/unit_out"
+module_output_path = "${device_status_part_name}/input"
 
 ohos_unittest("CooperateClientTest") {
   sanitize = {
