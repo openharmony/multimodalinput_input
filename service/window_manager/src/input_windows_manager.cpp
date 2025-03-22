@@ -1438,6 +1438,12 @@ bool InputWindowsManager::JudgeCaramaInFore()
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (displayGroupInfo.displaysInfo.size() > 0) {
+        std::shared_ptr<PointEvent> pointerEvent = nullptr;
+        SendOneHandData(displayGroupInfo.displaysInfo[0], pointEvent);
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     auto action = UpdateWindowInfo(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
@@ -3782,7 +3788,7 @@ void InputWindowsManager::HandleOneHandMode(const DisplayInfo &displayInfo,
     std::shared_ptr<PointerEvent> &pointerEvent, PointerEvent::PointerItem &pointerItem)
 {
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    SendOneHandData(true, displayInfo);
+    SendOneHandData(displayInfo, pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ANCO
     pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
     MMI_HILOG_DISPATCHD("displayInfo.oneHandX=%{private}d, displayInfo.oneHandY=%{private}d, "
@@ -3830,7 +3836,7 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
         HandleOneHandMode(displayInfo, pointerEvent, pointerItem);
     } else {
 #ifdef OHOS_BUILD_ENABLE_ANCO
-        SendOneHandData(false, displayInfo);
+        SendOneHandData(displayInfo, pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ANCO
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
         pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
@@ -5827,16 +5833,24 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
     return IsAncoWindowFocus(*windowInfo);
 }
 
-void InputWindowsManager::SendOneHandData(bool inOneHand, const DisplayInfo &displayInfo)
+void InputWindowsManager::SendOneHandData(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent)
 {
-    std::lock_guard<std::mutex> lock(oneHandMtx_);
-    if (inOneHandMode_ != inOneHand) {
+    if (pointerEvent != nullptr) {
+        if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
+            MMI_HILOG_DISPATCHI("one hand mode %{public}s, displayInfo.oneHandX=%{private}d, "
+                                "displayInfo.oneHandY=%{private}d, expandHeight=%{public}d, scalePercent=%{public}d",
+                inOneHand ? "in" : "out", displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight,
+                displayInfo.scalePercent);
+            UpdateOneHandDataExt(displayInfo);
+        }
+    } else {
         UpdateOneHandDataExt(displayInfo);
-        inOneHandMode_ = inOneHand;
-        MMI_HILOG_DISPATCHI("one hand mode %{public}s, displayInfo.oneHandX=%{private}d, "
-                            "displayInfo.oneHandY=%{private}d, expandHeight=%{public}d, scalePercent=%{public}d",
-            inOneHand ? "in" : "out", displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight,
-            displayInfo.scalePercent);
     }
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
