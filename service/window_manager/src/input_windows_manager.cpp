@@ -1772,7 +1772,6 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
     int32_t DisplayInfoY = GetLogicalPositionY(displayId);
     Direction DirectionCopy = GetLogicalPositionDirection(displayId);
     Direction DisplayDirection = GetPositionDisplayDirection(displayId);
-    Direction  = GetLogicalPositionDirection(displayId);
     DispatchPointerCancel(displayId);
     int32_t logicX = mouseLocation.physicalX + DisplayInfoX;
     int32_t logicY = mouseLocation.physicalY + DisplayInfoY;
@@ -1857,8 +1856,8 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     pointerEvent->UpdateId();
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerAction);
     MouseLocation mouseLocation = GetMouseInfo();
-    int32_t DisplayInfoX = GetLogicalPositionX();
-    int32_t DisplayInfoY = GetLogicalPositionY();
+    int32_t DisplayInfoX = GetLogicalPositionX(mouseLocation.displayId);
+    int32_t DisplayInfoY = GetLogicalPositionY(mouseLocation.displayId);
     lastLogicX_ = mouseLocation.physicalX + DisplayInfoX;
     lastLogicY_ = mouseLocation.physicalY + DisplayInfoY;
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
