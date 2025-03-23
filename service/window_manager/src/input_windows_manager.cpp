@@ -5317,7 +5317,7 @@ CursorPosition InputWindowsManager::GetCursorPos()
 CursorPosition InputWindowsManager::ResetCursorPos()
 {
     auto displaysInfoVector = GetDisplayInfoVector();
-    if (!GetDisplayInfoVector.empty()) {
+    if (!displaysInfoVector.empty()) {
         DisplayInfo displayInfo = DisplaysInfo[0];
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         (void)GetMainScreenDisplayInfo(GetDisplayInfoVector, displayInfo);
