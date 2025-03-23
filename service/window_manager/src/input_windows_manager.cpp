@@ -1768,6 +1768,9 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
     displayId = displayId < 0 ? DisplaysInfo[0].id : displayId;
     int32_t DisplayInfoX = GetLogicalPositionX(displayId);
     int32_t DisplayInfoY = GetLogicalPositionY(displayId);
+    Direction DirectionCopy = GetLogicalPositionDirection(displayId);
+    Direction DisplayDirection = GetPositionDisplayDirection(displayId);
+    Direction  = GetLogicalPositionDirection(displayId);
     DispatchPointerCancel(displayId);
     int32_t logicX = mouseLocation.physicalX + DisplayInfoX;
     int32_t logicY = mouseLocation.physicalY + DisplayInfoY;
@@ -1780,8 +1783,8 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
             .x = logicX,
             .y = logicY,
         };
-        if (cursorPos_.direction != displayInfo->direction &&
-            cursorPos_.displayDirection == displayInfo->displayDirection) {
+        if (cursorPos_.direction != DirectionCopy &&
+            cursorPos_.displayDirection == DisplayDirection) {
             coord.x = cursorPos_.cursorPos.x;
             coord.y = cursorPos_.cursorPos.y;
             RotateDisplayScreen(*displayInfo, coord);
