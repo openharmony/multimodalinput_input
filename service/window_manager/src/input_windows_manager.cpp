@@ -2235,7 +2235,7 @@ const std::shared_ptr<DisplayInfo> InputWindowsManager::FindPhysicalDisplayInfo(
     }
     MMI_HILOGD("Failed to search for Physical,uniq:%{public}s", uniq.c_str());
     if (displaysInfo.size() > 0) {
-        return &displaysInfo[0];
+        return std::make_shared<DisplayInfo>(displaysInfo[0]);
     }
     return nullptr;
 }
