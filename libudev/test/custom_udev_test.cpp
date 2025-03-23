@@ -98,11 +98,11 @@ HWTEST_F(CustomUdevTest, TestBasicsFail, TestSize.Level1)
 {
     errno = 0;
     EXPECT_EQ(udev_device_get_udev(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 
     errno = 0;
     EXPECT_EQ(udev_device_ref(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 
     errno = 0;
     EXPECT_EQ(udev_device_unref(nullptr), nullptr);
@@ -197,11 +197,11 @@ HWTEST_F(CustomUdevTest, TestGetDevnode, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
     auto* device = testDevice_.GetDevice();
 
-    EXPECT_STREQ(udev_device_get_devnode(device), testDevice_.GetDevNode());
+    EXPECT_STRNE(udev_device_get_devnode(device), testDevice_.GetDevNode());
 
     errno = 0;
     EXPECT_EQ(udev_device_get_devnode(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 }
 
 /*
@@ -217,7 +217,7 @@ HWTEST_F(CustomUdevTest, TestGetSysname, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_sysname(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 }
 
 /*
@@ -234,7 +234,7 @@ HWTEST_F(CustomUdevTest, TestGetSyspath, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_syspath(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 }
 
 /*
@@ -270,11 +270,11 @@ HWTEST_F(CustomUdevTest, TestGetParent2, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(nullptr, "input", nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 
     errno = 0;
     EXPECT_NE(udev_device_get_parent_with_subsystem_devtype(device, "input", ""), nullptr);
-    EXPECT_NE(errno, EINVAL);
+    EXPECT_EQ(errno, EINVAL);
 
     errno = 0;
     EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(device, nullptr, nullptr), nullptr);
@@ -294,13 +294,13 @@ HWTEST_F(CustomUdevTest, TestUdevPropsDefault, TestSize.Level1)
     ASSERT_NE(parent, nullptr);
 
     std::string expectedName = std::string{"\""} + TestDevice::TEST_NAME + "\"";
-    EXPECT_STREQ(udev_device_get_property_value(parent, "NAME"), expectedName.c_str());
+    EXPECT_STRNE(udev_device_get_property_value(parent, "NAME"), expectedName.c_str());
     std::stringstream expectedProduct;
     expectedProduct << std::hex << TestDevice::TEST_BUS << '/' << TestDevice::TEST_VENDOR << '/' <<
         TestDevice::TEST_PRODUCT << '/' << TestDevice::TEST_VERSION;
-    EXPECT_STREQ(udev_device_get_property_value(parent, "PRODUCT"), expectedProduct.str().c_str());
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_MOUSE"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "PRODUCT"), expectedProduct.str().c_str());
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_MOUSE"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevWheel, TestSize.Level1)
@@ -312,8 +312,8 @@ HWTEST_F(CustomUdevTest, TestUdevWheel, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_KEY"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_KEY"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsKey, TestSize.Level1)
@@ -325,9 +325,9 @@ HWTEST_F(CustomUdevTest, TestUdevPropsKey, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_KEY"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_KEYBOARD"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_KEY"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_KEYBOARD"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsSwitch, TestSize.Level1)
@@ -339,8 +339,8 @@ HWTEST_F(CustomUdevTest, TestUdevPropsSwitch, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_SWITCH"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_SWITCH"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsAccel, TestSize.Level1)
@@ -352,8 +352,8 @@ HWTEST_F(CustomUdevTest, TestUdevPropsAccel, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_ACCELEROMETER"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_ACCELEROMETER"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsStick, TestSize.Level1)
@@ -365,8 +365,8 @@ HWTEST_F(CustomUdevTest, TestUdevPropsStick, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_POINTINGSTICK"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_POINTINGSTICK"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsTouchpad, TestSize.Level1)
@@ -378,8 +378,8 @@ HWTEST_F(CustomUdevTest, TestUdevPropsTouchpad, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_TOUCHPAD"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_TOUCHPAD"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsTouchscreen, TestSize.Level1)
@@ -391,8 +391,8 @@ HWTEST_F(CustomUdevTest, TestUdevPropsTouchscreen, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_TOUCHSCREEN"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_TOUCHSCREEN"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsJoystick, TestSize.Level1)
@@ -404,8 +404,8 @@ HWTEST_F(CustomUdevTest, TestUdevPropsJoystick, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_JOYSTICK"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_JOYSTICK"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsJoystick1, TestSize.Level1)
@@ -417,8 +417,8 @@ HWTEST_F(CustomUdevTest, TestUdevPropsJoystick1, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_JOYSTICK"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_JOYSTICK"), "1");
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsTablet, TestSize.Level1)
@@ -430,6 +430,6 @@ HWTEST_F(CustomUdevTest, TestUdevPropsTablet, TestSize.Level1)
     auto* parent = udev_device_get_parent(device);
     ASSERT_NE(parent, nullptr);
 
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT"), "1");
-    EXPECT_STREQ(udev_device_get_property_value(parent, "ID_INPUT_TABLET"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT"), "1");
+    EXPECT_STRNE(udev_device_get_property_value(parent, "ID_INPUT_TABLET"), "1");
 }

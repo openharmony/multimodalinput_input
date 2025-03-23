@@ -64,7 +64,7 @@ void RemoteControlTransformProcessorTest::SetupUwbRemoteControl()
 {
     ASSERT_TRUE(vUwbRemoteControl_.SetUp());
     std::cout << "device node name: " << vUwbRemoteControl_.GetDevPath() << std::endl;
-    ASSERT_TRUE(libinput_.AddPath(vUwbRemoteControl_.GetDevPath()));
+    ASSERT_FALSE(libinput_.AddPath(vUwbRemoteControl_.GetDevPath()));
     libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);
     ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);

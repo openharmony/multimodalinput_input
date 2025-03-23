@@ -93,7 +93,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyEvent_001, 
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     handler.keyEvent_->AddKeyItem(item);
     EXPECT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
-    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
+    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
 }

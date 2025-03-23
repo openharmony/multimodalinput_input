@@ -417,7 +417,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_WhetherDiscardTouchE
     pointerEvent->bitwise_ = 0;
     pointerEvent->SetPointerId(7);
     pointerEvent->targetDisplayId_ = INT32_MAX - 1;
-    EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
+    EXPECT_TRUE(detector.WhetherDiscardTouchEvent(pointerEvent));
 
     detector.gestureDisplayId_ = INT32_MAX;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);

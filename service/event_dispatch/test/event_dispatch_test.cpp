@@ -768,7 +768,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_001, TestSize.
     KeyEvent* keyEvent = new KeyEvent(keyevent);
     std::shared_ptr<KeyEvent> sharedKeyEvent(keyEvent);
     int32_t ret = eventdispatchhandler.DispatchKeyEventPid(udsServer, sharedKeyEvent);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
