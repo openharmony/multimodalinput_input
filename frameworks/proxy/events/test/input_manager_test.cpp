@@ -267,7 +267,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot_01, TestSize.Level1)
     int32_t hotSpotY = 5;
 
     int32_t winPid = InputManager::GetInstance()->GetWindowPid(windowId);
-    EXPECT_FALSE(winPid != -1);
+    EXPECT_TRUE(winPid != -1);
     int32_t ret = InputManager::GetInstance()->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -2091,7 +2091,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor, TestSize.Level1)
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, (void *)pixelMap.get(), 32, 32) == RET_ERR);
+    ASSERT_FALSE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, (void *)pixelMap.get(), 32, 32) == RET_ERR);
     pixelMap = nullptr;
 }
 

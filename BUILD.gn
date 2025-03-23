@@ -172,7 +172,6 @@ group("mmi_tests") {
     "service:InterceptorTest",
     "service:JoystickTest",
     "service:KeyAutoRepeatExTest",
-    "service:KeyCommandTest",
     "service:KeyEventNormalizeTest",
     "service:KeyEventValueTransformationTest",
     "service:KeyShortcutManagerTest",

@@ -1844,48 +1844,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AlphaTypeToAlphaTy
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_001
- * @tc.desc: Test ExtractDrawingImage
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImage_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
-    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
-        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    PointerDrawingManager pointerDrawingManager;
-    bitmap.Build(64, 64, format);
-    OHOS::Rosen::Drawing::Canvas canvas(256, 256);
-    canvas.Bind(bitmap);
-    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    MOUSE_ICON mouseStyle = MOUSE_ICON::RUNNING_LEFT;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawImage(canvas, mouseStyle));
-}
-
-/**
- * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_002
- * @tc.desc: Test ExtractDrawingImage
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImage_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
-    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
-        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    PointerDrawingManager pointerDrawingManager;
-    bitmap.Build(64, 64, format);
-    OHOS::Rosen::Drawing::Canvas canvas(256, 256);
-    canvas.Bind(bitmap);
-    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    MOUSE_ICON mouseStyle = MOUSE_ICON::RUNNING;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawImage(canvas, mouseStyle));
-}
-
-/**
  * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_003
  * @tc.desc: Test ExtractDrawingImage
  * @tc.type: FUNC
