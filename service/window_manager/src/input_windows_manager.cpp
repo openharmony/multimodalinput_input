@@ -1766,6 +1766,8 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
         return;
     }
     displayId = displayId < 0 ? DisplaysInfo[0].id : displayId;
+    auto displayInfo = GetPhysicalDisplay(displayId);
+    CHKPV(displayInfo);
     int32_t DisplayInfoX = GetLogicalPositionX(displayId);
     int32_t DisplayInfoY = GetLogicalPositionY(displayId);
     Direction DirectionCopy = GetLogicalPositionDirection(displayId);
