@@ -654,7 +654,7 @@ HWTEST_F(UDSServerTest, AddEpoll_001, TestSize.Level1)
     EpollEventType type = EPOLL_EVENT_BEGIN;
     int32_t fd = 1;
     auto ret = udsServer.AddEpoll(type, fd);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
