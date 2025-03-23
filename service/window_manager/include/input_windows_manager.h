@@ -352,7 +352,7 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     void DispatchTouch(int32_t pointerAction);
-    const shared_ptr<DisplayInfo> FindPhysicalDisplayInfo(const std::string& uniq) const;
+    const std::shared_ptr<DisplayInfo> FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
     void TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId);
