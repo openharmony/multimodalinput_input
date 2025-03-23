@@ -2607,7 +2607,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
     MouseLocation mouseLocation = GetMouseInfo();
     int32_t displayId = MouseEventHdr->GetDisplayId();
     auto DisplaysInfo = GetDisplayInfoVector();
-    if (DisplaysInfo.empty) {
+    if (DisplaysInfo.empty()) {
         MMI_HILOGW("DisplaysInfo is empty");
         return false;
     }
