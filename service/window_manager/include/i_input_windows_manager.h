@@ -96,7 +96,7 @@ public:
     virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
     virtual int32_t GetCurrentUserId() = 0;
     virtual void SetFoldState () = 0;
-    virtual bool CheckAppFocused (int32_t pid) = 0;
+    virtual bool CheckAppFocused(int32_t pid) = 0;
     virtual bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
