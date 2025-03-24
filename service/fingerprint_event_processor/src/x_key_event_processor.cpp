@@ -180,13 +180,14 @@ void XKeyEventProcessor::RemoveTimer()
 
 void XKeyEventProcessor::ResetCount()
 {
+  	MMI_HILOGD("reset press count");
     pressCount_ = 0;
 }
 
 int32_t XKeyEventProcessor::HandleQuickAccessMenu(int32_t xKeyEventType)
 {
     if (X_KEY_DOWN != xKeyEventType && X_KEY_UP != xKeyEventType) {
-        MMI_HILOGI("reset press count");
+      	StartXKeyIfNeeded(xKeyEventType);
         ResetCount();
         RemoveTimer();
     }
@@ -200,7 +201,6 @@ int32_t XKeyEventProcessor::HandleQuickAccessMenu(int32_t xKeyEventType)
         eventMonitorHandler_->OnHandleEvent(pointerEvent);
     }
 #endif // (OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH) && OHOS_BUILD_ENABLE_MONITOR
-    StartXKeyIfNeeded(xKeyEventType);
     return RET_OK;
 }
 
@@ -208,7 +208,7 @@ void XKeyEventProcessor::StartXKeyIfNeeded(int32_t xKeyEventType)
 {
     if (!isStartedXKey_) {
         isStartedXKey_ = true;
-        MMI_HILOGI("start nine-square grid panel.");
+        MMI_HILOGI("start x-key.");
         AAFwk::Want want;
         want.SetElementName(X_KEY_APP_BUNDLE_NAME, X_KEY_APP_ABILITY_NAME);
         want.SetParam("xKeyEventType", xKeyEventType);
