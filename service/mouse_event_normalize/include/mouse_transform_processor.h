@@ -164,7 +164,7 @@ public:
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static void GetTouchpadPointerSpeed(int32_t &speed);
     static void GetTouchpadCDG(TouchpadCDG &touchpadCDG);
-    static void UpdateTouchpadCDG(double touchpadPPi, double touchpadSize);
+    static void UpdateTouchpadCDG(double touchpadPPi, double touchpadSize, int32_t frequency);
     static int32_t GetTouchpadSpeed();
 
 private:

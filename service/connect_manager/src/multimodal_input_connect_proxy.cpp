@@ -1563,6 +1563,7 @@ int32_t MultimodalInputConnectProxy::InjectTouchPadEvent(std::shared_ptr<Pointer
     WRITEDOUBLE(data, touchpadCDG.ppi, ERR_INVALID_VALUE);
     WRITEDOUBLE(data, touchpadCDG.size, ERR_INVALID_VALUE);
     WRITEINT32(data, touchpadCDG.speed, ERR_INVALID_VALUE);
+    WRITEINT32(data, touchpadCDG.frequency, ERR_INVALID_VALUE);
     WRITEBOOL(data, isNativeInject, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
@@ -1983,7 +1984,8 @@ int32_t MultimodalInputConnectProxy::GetTouchpadInt32Data(int32_t &value, int32_
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetTouchpadCDGData(double &ppi, double &size, int32_t &speed, int32_t type)
+int32_t MultimodalInputConnectProxy::GetTouchpadCDGData(double &ppi, double &size, int32_t &speed, int32_t &frequency,
+    int32_t type)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -2003,6 +2005,7 @@ int32_t MultimodalInputConnectProxy::GetTouchpadCDGData(double &ppi, double &siz
     READDOUBLE(reply, ppi, IPC_PROXY_DEAD_OBJECT_ERR);
     READDOUBLE(reply, size, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, speed, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, frequency, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 
@@ -2056,7 +2059,7 @@ int32_t MultimodalInputConnectProxy::GetTouchpadPointerSpeed(int32_t &speed)
 
 int32_t MultimodalInputConnectProxy::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
 {
-    return GetTouchpadCDGData(touchpadCDG.ppi, touchpadCDG.size, touchpadCDG.speed,
+    return GetTouchpadCDGData(touchpadCDG.ppi, touchpadCDG.size, touchpadCDG.speed, touchpadCDG.frequency,
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_OPTION));
 }
 
