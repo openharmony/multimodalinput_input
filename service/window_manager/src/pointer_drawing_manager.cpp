@@ -1032,6 +1032,7 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         .userIconPixelMap = DecodeImageToPixelMap(mouseStyle),
     };
     for (auto it : screenPointers) {
+        CHKPV(it.second);
         cfg.dpi = it.second->GetDPI() * it.second->GetScale();
         cfg.direction = it.second->IsMirror() ? DIRECTION0 : displayInfo_.direction;
         MMI_HILOGD("HardwareCursorRender, screen = %{public}u, dpi = %{public}f",
@@ -1099,6 +1100,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
             .isHard = false,
             .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
         };
+        CHKPV(it.second);
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
         MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}u, dpi = %{public}f",
