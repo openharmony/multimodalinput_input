@@ -88,7 +88,7 @@ public:
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual bool IsWindowVisible(int32_t pid) = 0;
     virtual ExtraData GetExtraData() const = 0;
-    virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
+    virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
     virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
@@ -136,7 +136,7 @@ public:
         EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
-    virtual const DisplayInfo *GetDefaultDisplayInfo() const = 0;
+    virtual const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
     virtual void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual void SendCancelEventWhenLock() = 0;
@@ -145,7 +145,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent) = 0;
-    virtual const DisplayInfo* GetPhysicalDisplay(int32_t id) const = 0;
+    virtual const std::shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id) const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
