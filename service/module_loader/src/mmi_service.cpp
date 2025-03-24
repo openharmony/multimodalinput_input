@@ -137,7 +137,7 @@ typedef int32_t (*HANDLE_TOUCHPOINT_TYPE)(
     int32_t longAxis, int32_t shortAxis);
 HANDLE_TOUCHPOINT_TYPE handleTouchPoint_ = nullptr;
 typedef int32_t (*STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)(
-    int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode);
+    int& delayMs, int& toggleCodeSecond, int& keyCode);
 STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE statemachineMessageQueue_getLibinputMessage_ = nullptr;
 typedef void (*TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)(
     std::vector<std::vector<int32_t>>& retMsgList);

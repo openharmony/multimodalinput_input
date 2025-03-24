@@ -29,7 +29,7 @@ typedef std::function<int32_t(double screenX,
                               double touchPressure,
                               int32_t longAxis,
                               int32_t shortAxis)> HandleTouchPoint;
-typedef std::function<int32_t(int& toggleCodeFirst, int& toggleCodeSecond, int& keyCode)> GetMessage;
+typedef std::function<int32_t(int& delayMs, int& toggleCodeSecond, int& keyCode)> GetMessage;
 typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllTouchMessage;
 typedef std::function<void()> ClearTouchMessage;
 typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllKeyMessage;
@@ -169,6 +169,7 @@ private:
     void HideMouseCursorTemporary();
     double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
     bool SkipTouchMove(int touchId, int32_t eventType); // compress touch move events in consecutive two frame
+    void StartVKBWorkerThread();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
