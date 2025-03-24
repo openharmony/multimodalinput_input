@@ -36,7 +36,7 @@ void UDSServer::UdsStop()
         close(epollFd_);
         epollFd_ = -1;
     }
-
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
     for (const auto &item : sessionsMap_) {
         item.second->Close();
     }
@@ -58,6 +58,7 @@ int32_t UDSServer::GetClientFd(int32_t pid) const
 
 int32_t UDSServer::GetClientPid(int32_t fd) const
 {
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
         MMI_HILOGE("Not found fd:%{public}d", fd);
@@ -188,6 +189,7 @@ int32_t UDSServer::SetFdProperty(int32_t &tokenType, int32_t &serverFd, int32_t 
 void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
     mprintf(fd, "Uds_server information:\t");
     mprintf(fd, "uds_server: count=%zu", sessionsMap_.size());
     for (const auto &item : sessionsMap_) {
@@ -332,6 +334,7 @@ void UDSServer::DumpSession(const std::string &title)
 
 SessionPtr UDSServer::GetSession(int32_t fd) const
 {
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
         MMI_HILOGE("Session not found. fd:%{public}d", fd);
@@ -369,6 +372,7 @@ bool UDSServer::AddSession(SessionPtr ses)
         return false;
     }
     idxPidMap_[pid] = fd;
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
@@ -392,6 +396,7 @@ void UDSServer::DelSession(int32_t fd)
     if (pid > 0) {
         idxPidMap_.erase(pid);
     }
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
     auto it = sessionsMap_.find(fd);
     if (it != sessionsMap_.end()) {
         NotifySessionDeleted(it->second);

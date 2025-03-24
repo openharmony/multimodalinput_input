@@ -177,7 +177,7 @@ private:
     int32_t GetTouchpadBoolData(bool &date, int32_t type);
     int32_t SetTouchpadInt32Data(int32_t date, int32_t type);
     int32_t GetTouchpadInt32Data(int32_t &date, int32_t type);
-    int32_t GetTouchpadCDGData(double &ppi, double &size, int32_t &speed, int32_t type);
+    int32_t GetTouchpadCDGData(double &ppi, double &size, int32_t &speed, int32_t &frequency, int32_t type);
     int32_t HandleGestureMonitor(uint32_t code, InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
 };

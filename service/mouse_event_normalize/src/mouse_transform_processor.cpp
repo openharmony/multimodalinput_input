@@ -171,12 +171,12 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     deviceTypeGlobal_ = deviceType;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        ret = UpdateTouchpadMoveLocation(displayInfo, event, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
+        ret = UpdateTouchpadMoveLocation(displayInfo.get(), event, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
             static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
-        ret = UpdateMouseMoveLocation(displayInfo, offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
+        ret = UpdateMouseMoveLocation(displayInfo.get(), offset, cursorPos.cursorPos.x, cursorPos.cursorPos.y,
             static_cast<int32_t>(deviceType));
     }
     if (ret != RET_OK) {
@@ -265,6 +265,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
         if (touchpadPPi < CONST_DOUBLE_ONE || touchpadSize < CONST_DOUBLE_ONE || frequency < CONST_DOUBLE_ONE) {
             return RET_ERR;
         }
+        UpdateTouchpadCDG(touchpadPPi, touchpadSize, frequency);
         ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, GetTouchpadSpeed(), displaySize, touchpadSize, touchpadPPi, frequency);
         return ret;
@@ -1398,11 +1399,12 @@ void MouseTransformProcessor::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
     touchpadCDG = touchpadOption_;
 }
 
-void MouseTransformProcessor::UpdateTouchpadCDG(double touchpadPPi, double touchpadSize)
+void MouseTransformProcessor::UpdateTouchpadCDG(double touchpadPPi, double touchpadSize, int32_t frequency)
 {
     touchpadOption_.ppi = touchpadPPi;
     touchpadOption_.size = touchpadSize;
     touchpadOption_.speed = GetTouchpadSpeed();
+    touchpadOption_.frequency = frequency;
 }
 
 int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)

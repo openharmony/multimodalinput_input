@@ -176,7 +176,8 @@ enum class WindowInputType : uint8_t {
     TRANSMIT_LEFT_RIGHT = 6,
     TRANSMIT_BUTTOM = 7,
     MIX_LEFT_RIGHT_ANTI_AXIS_MOVE = 18,
-    MIX_BUTTOM_ANTI_AXIS_MOVE = 19
+    MIX_BUTTOM_ANTI_AXIS_MOVE = 19,
+    TRANSMIT_ANTI_AXIS_MOVE = 50
 };
 
 struct WindowInfo {
