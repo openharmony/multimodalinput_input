@@ -180,14 +180,14 @@ void XKeyEventProcessor::RemoveTimer()
 
 void XKeyEventProcessor::ResetCount()
 {
-  	MMI_HILOGD("reset press count");
+    MMI_HILOGD("reset press count");
     pressCount_ = 0;
 }
 
 int32_t XKeyEventProcessor::HandleQuickAccessMenu(int32_t xKeyEventType)
 {
     if (X_KEY_DOWN != xKeyEventType && X_KEY_UP != xKeyEventType) {
-      	StartXKeyIfNeeded(xKeyEventType);
+        StartXKeyIfNeeded(xKeyEventType);
         ResetCount();
         RemoveTimer();
     }
