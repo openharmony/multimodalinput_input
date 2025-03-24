@@ -3274,12 +3274,11 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.color = static_cast<uint32_t>(GetPointerColor());
     cfg.size = static_cast<uint32_t>(GetPointerSize());
     cfg.isHard = isHard;
-    cfg.dpi = sp->GetRenderDPI();
+    float scale = isHard ? sp->GetScale() : 1.0f;
+    cfg.dpi = sp->GetDPI() * scale;
     cfg.direction = sp->IsMirror() ? DIRECTION0 : displayInfo_.direction;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
-        float scale = sp->IsMirror() ? sp->GetScale() : 1.0f;
-        scale = (sp->IsExtend() && sp->GetIsCurrentOffScreenRendering()) ? sp->GetOffRenderScale() : scale;
         cfg.userIconPixelMap = GetUserIconCopy();
         CHKPV(cfg.userIconPixelMap);
         cfg.userIconHotSpotX = userIconHotSpotX_ * scale;
