@@ -738,7 +738,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_001
 {
     CALL_TEST_DEBUG;
     int32_t id = 1;
-    const DisplayInfo* displayInfo = WIN_MGR->GetPhysicalDisplay(id);
+    const std::shared_ptr<DisplayInfo> displayInfo = WIN_MGR->GetPhysicalDisplay(id);
     EXPECT_NE(displayInfo, nullptr);
     EXPECT_EQ(displayInfo->id, id);
 }
@@ -753,7 +753,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_002
 {
     CALL_TEST_DEBUG;
     int32_t id = -1;
-    const DisplayInfo* displayInfo = WIN_MGR->GetPhysicalDisplay(id);
+    const std::shared_ptr<DisplayInfo> displayInfo = WIN_MGR->GetPhysicalDisplay(id);
     EXPECT_EQ(displayInfo, nullptr);
 }
 
