@@ -119,6 +119,8 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
         // 计算速度
         double speed = distance / deltaTime;
         double throwAngle = atan2(dy, dx) * 180 / M_PI;
+        MMI_HILOGI("PullThrow On Detect, speed: %{public}lf, angle: %{public}lf,", speed, throwAngle);
+        MMI_HILOGI("PullThrow On Detect, distance: %{public}lf", distance);
         // 检查速度距离是否大于阈值
         if (speed > THRES_SPEED && distance > MIN_THRES_DIST) {
             // 判断方向

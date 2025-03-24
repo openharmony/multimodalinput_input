@@ -501,12 +501,9 @@ private:
     int32_t lastDpi_ { 0 };
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
     std::mutex mtx_;
-<<<<<<< HEAD
     std::atomic_bool isHPR_ { false };
     std::mutex oneHandMtx_;
     bool inOneHandMode_ = false;
-=======
->>>>>>> 880896402ca95af589273457cd5707f75906065b
 };
 } // namespace MMI
 } // namespace OHOS
