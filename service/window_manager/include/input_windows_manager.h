@@ -212,7 +212,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
-    void CancelAllTouches(std::shared_ptr<PointerEvent> event);
+    void CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged = false);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return lastPointerEventforGesture_; };
