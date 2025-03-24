@@ -79,7 +79,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
  * @tc.require:
  */
 HWTEST_F(SwitchEventInputSubscribeManagerTest,
-    SwitchEventInputSubscribeManagerTest_UnsubscribeSwitchEvent_001, TestSize.Level1)
+    SwitchEventInputSubscribeManagerTest_UnsubscribeSwitchEvent_001, TestSize.Level2)
 {
     auto func = [](std::shared_ptr<SwitchEvent> event) {
         MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
@@ -101,7 +101,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
  * @tc.require:
  */
 HWTEST_F(SwitchEventInputSubscribeManagerTest,
-    SwitchEventInputSubscribeManagerTest_OnSubscribeSwitchEventCallback_001, TestSize.Level1)
+    SwitchEventInputSubscribeManagerTest_OnSubscribeSwitchEventCallback_001, TestSize.Level2)
 {
     auto func = [](std::shared_ptr<SwitchEvent> event) {
         MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
@@ -197,7 +197,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
  * @tc.require:
  */
 HWTEST_F(SwitchEventInputSubscribeManagerTest,
-    SwitchEventInputSubscribeManagerTest_GetTouchpadScrollSwitch_001, TestSize.Level1)
+    SwitchEventInputSubscribeManagerTest_GetTouchpadScrollSwitch_001, TestSize.Level3)
 {
     InputManagerImpl inputManager;
     bool switchFlag = true;

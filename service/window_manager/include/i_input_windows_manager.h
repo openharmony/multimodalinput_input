@@ -72,7 +72,9 @@ public:
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId) = 0;
     virtual bool AdjustFingerFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual void PrintEnterEventInfo(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    virtual bool IsFocusedSession(int32_t session) const = 0;
     virtual void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo) = 0;
     virtual void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
@@ -86,7 +88,7 @@ public:
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual bool IsWindowVisible(int32_t pid) = 0;
     virtual ExtraData GetExtraData() const = 0;
-    virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
+    virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
     virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
@@ -119,8 +121,8 @@ public:
         PointerStyle &pointerStyle, bool isUiExtension = false) const = 0;
     virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
-    virtual bool IsMouseSimulate() const = 0;
-    virtual bool HasMouseHideFlag() const = 0;
+    virtual bool IsMouseSimulate() = 0;
+    virtual bool HasMouseHideFlag() = 0;
     virtual void UpdatePointerDrawingManagerWindowInfo() = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -131,10 +133,10 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId) = 0;
+        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
-    virtual const DisplayInfo *GetDefaultDisplayInfo() const = 0;
+    virtual const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
     virtual void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual void SendCancelEventWhenLock() = 0;
@@ -143,7 +145,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent) = 0;
-    virtual const DisplayInfo* GetPhysicalDisplay(int32_t id) const = 0;
+    virtual const std::shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id) const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -172,7 +174,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     virtual void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr) = 0;
-    virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event) = 0;
+    virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged = false) = 0;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() = 0;

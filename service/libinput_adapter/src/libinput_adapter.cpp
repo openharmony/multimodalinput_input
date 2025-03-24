@@ -16,6 +16,9 @@
 #include "libinput_adapter.h"
 
 #include <regex>
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+#include <common_event_manager.h>
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 #include "param_wrapper.h"
 #include "property_reader.h"
@@ -61,12 +64,16 @@ constexpr uint32_t LIBINPUT_KEY_VOLUME_UP { 115 };
 constexpr uint32_t LIBINPUT_KEY_POWER { 116 };
 constexpr uint32_t LIBINPUT_KEY_FN { 240 };
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
+constexpr double VTP_LEFT_BUTTON_DELTA_X { 0.0 };
+constexpr double VTP_LEFT_BUTTON_DELTA_Y { -1.0 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
     TOUCH_MOVE = 2,
     TOUCH_FRAME = 3,
 };
+#define SCREEN_RECORD_WINDOW_WIDTH 400
+#define SCREEN_RECORD_WINDOW_HEIGHT 200
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t KEY_CAPSLOCK { 58 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -169,6 +176,34 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
 };
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+bool isBooted = false;
+
+class BootStatusReceiver : public EventFwk::CommonEventSubscriber {
+public:
+    explicit BootStatusReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
+        : OHOS::EventFwk::CommonEventSubscriber(subscribeInfo)
+    {
+    }
+ 
+    virtual ~BootStatusReceiver() = default;
+ 
+    void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
+    {
+        isBooted = true;
+    }
+};
+
+void LibinputAdapter::RegisterBootStatusReceiver()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("common.event.SCREENLOCK_BOOT_COMPLETED");
+    EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
+    OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
+        std::make_shared<BootStatusReceiver>(commonEventSubscribeInfo));
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
 bool LibinputAdapter::Init(FunInputEvent funInputEvent)
 {
     CALL_DEBUG_ENTER;
@@ -232,7 +267,8 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     ClearTouchMessage clearTouchMessage,
     GetAllKeyMessage getAllKeyMessage,
     ClearKeyMessage clearKeyMessage,
-    HardwareKeyEventDetected hardwareKeyEventDetected)
+    HardwareKeyEventDetected hardwareKeyEventDetected,
+    GetKeyboardActivationState getKeyboardActivationState)
 {
     handleTouchPoint_ = handleTouchPoint;
     getMessage_ = getMessage;
@@ -241,6 +277,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     getAllKeyMessage_ = getAllKeyMessage;
     clearKeyMessage_ = clearKeyMessage;
     hardwareKeyEventDetected_ = hardwareKeyEventDetected;
+    getKeyboardActivationState_ = getKeyboardActivationState;
 
     deviceId = -1;
 
@@ -256,6 +293,7 @@ void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCod
                                      libinput_key_state state, int64_t frameTime)
 {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    // Note: during caps lock down, the vkeyboardData.capsLock inside libinput is toggled.
     libinput_event_keyboard* key_event_pressed =
             libinput_create_keyboard_event(touch, keyCode, state);
 
@@ -392,6 +430,11 @@ void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
                     MMI_HILOGE("Virtual TrackPad right button up event cannot be handled");
                 }
                 break;
+            case VTPStateMachineMessageType::TWO_FINGER_TAP:
+                if (!HandleVKeyTrackPadTwoFingerTap(touch, msgItem)) {
+                    MMI_HILOGE("Virtual TrackPad two finger tap event cannot be handled");
+                }
+                break;
             default:
                 OnVKeyTrackPadGestureMessage(touch, msgType, msgItem);
                 break;
@@ -517,6 +560,10 @@ bool LibinputAdapter::HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
     pEvent.button = VKEY_TP_LB_ID;
     pEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_ONE;
     pEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_PRESSED;
+    pEvent.delta_x = VTP_LEFT_BUTTON_DELTA_X;
+    pEvent.delta_y = VTP_LEFT_BUTTON_DELTA_Y;
+    pEvent.delta_raw_x = VTP_LEFT_BUTTON_DELTA_X;
+    pEvent.delta_raw_y = VTP_LEFT_BUTTON_DELTA_Y;
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
@@ -541,6 +588,10 @@ bool LibinputAdapter::HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
     pEvent.button = VKEY_TP_LB_ID;
     pEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_NONE;
     pEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_RELEASED;
+    pEvent.delta_x = VTP_LEFT_BUTTON_DELTA_X;
+    pEvent.delta_y = VTP_LEFT_BUTTON_DELTA_Y;
+    pEvent.delta_raw_x = VTP_LEFT_BUTTON_DELTA_X;
+    pEvent.delta_raw_y = VTP_LEFT_BUTTON_DELTA_Y;
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
@@ -594,6 +645,40 @@ bool LibinputAdapter::HandleVKeyTrackPadRightBtnUp(libinput_event_touch* touch,
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lpEvent, frameTime);
     free(lpEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadTwoFingerTap(libinput_event_touch* touch, const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int64_t frameTime = GetSysClockTime();
+    // tap down
+    event_pointer pDownEvent;
+    pDownEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_TAP;
+    pDownEvent.button = VKEY_TP_RB_ID;
+    pDownEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_NONE;
+    pDownEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_PRESSED;
+    libinput_event_pointer* lpDownEvent = libinput_create_pointer_event(touch, pDownEvent);
+    CHKPF(lpDownEvent);
+    PrintVKeyTPPointerLog(pDownEvent);
+    funInputEvent_((libinput_event*)lpDownEvent, frameTime);
+    free(lpDownEvent);
+
+    // tap up
+    event_pointer pUpEvent;
+    pUpEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_TAP;
+    pUpEvent.button = VKEY_TP_RB_ID;
+    pUpEvent.seat_button_count = VKEY_TP_SEAT_BTN_COUNT_NONE;
+    pUpEvent.state = libinput_button_state::LIBINPUT_BUTTON_STATE_RELEASED;
+    libinput_event_pointer* lpUpEvent = libinput_create_pointer_event(touch, pUpEvent);
+    CHKPF(lpUpEvent);
+    PrintVKeyTPPointerLog(pUpEvent);
+    funInputEvent_((libinput_event*)lpUpEvent, frameTime);
+    free(lpUpEvent);
     return true;
 }
 
@@ -1181,7 +1266,9 @@ void LibinputAdapter::OnEventHandler()
         libinput_event_type eventType = libinput_event_get_type(event);
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
+        static int32_t downCount = 0;
 
+        // add the logic of screen capture window conuming touch point in high priority
         bool isCaptureMode = false;
         InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
         if (inputWindowsManager != nullptr) {
@@ -1189,16 +1276,20 @@ void LibinputAdapter::OnEventHandler()
 
             for (auto &windowInfo : displayGroupInfo.windowsInfo) {
                 if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
-                    isCaptureMode = true;
+                    // screen recorder scenario will be an exception to true
+                    isCaptureMode = ((windowInfo.area.width <= SCREEN_RECORD_WINDOW_WIDTH) \
+                        && (windowInfo.area.height <= SCREEN_RECORD_WINDOW_HEIGHT)) ? false : true;
+                    MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
                     break;
                 }
             }
         }
 
-        if ((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
+        if (((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
-            || eventType == LIBINPUT_EVENT_TOUCH_FRAME
+            || eventType == LIBINPUT_EVENT_TOUCH_CANCEL
+            || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBooted
             ) {
             touch = libinput_event_get_touch_event(event);
             double touchPressure = 0.0;
@@ -1257,7 +1348,49 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                 MMI_HILOGD("Inside vkeyboard area");
                 HandleVFullKeyboardMessages(event, frameTime, eventType, touch);
             } else {
-                funInputEvent_(event, frameTime);
+                bool bDropEventFlag = false;
+
+                if (getKeyboardActivationState_ != nullptr) {
+                    VKeyboardActivation activateState = (VKeyboardActivation)getKeyboardActivationState_();
+                    switch (activateState) {
+                        case VKeyboardActivation::INACTIVE : {
+                            break;
+                        }
+                        case VKeyboardActivation::ACTIVATED : {
+                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
+                            break;
+                        }
+                        case VKeyboardActivation::TOUCH_CANCEL : {
+                            MMI_HILOGI("activation state: %{public}d, sending touch cancel event",
+                                static_cast<int32_t>(activateState));
+                            if (eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
+                                libinput_set_touch_event_type(touch, LIBINPUT_EVENT_TOUCH_CANCEL);
+                            }
+                            if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
+                                bDropEventFlag = true;
+                            }
+                            break;
+                        }
+                        case VKeyboardActivation::TOUCH_DROP : {
+                            MMI_HILOGI("activation state: %{public}d, dropping event",
+                                static_cast<int32_t>(activateState));
+                            if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
+                                bDropEventFlag = true;
+                            }
+                            break;
+                        }
+                        case VKeyboardActivation::EIGHT_FINGERS_UP : {
+                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+
+                if (!bDropEventFlag) {
+                    funInputEvent_(event, frameTime);
+                }
                 libinput_event_destroy(event);
             }
         } else if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {

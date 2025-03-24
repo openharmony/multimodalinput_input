@@ -384,7 +384,6 @@ void InputHandlerManager::UpdateAddToServerActions()
 }
 
 int32_t InputHandlerManager::RemoveLocalActions(int32_t handlerId, InputHandlerType handlerType)
- 
 {
     if (handlerType == InputHandlerType::MONITOR) {
         auto iter = actionsMonitorHandlers_.find(handlerId);
@@ -540,7 +539,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
     }
 
     if (consumerCount == 0) {
-        MMI_HILOGE("All task post failed");
+        MMI_HILOGD("All task post failed");
         return;
     }
     int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
@@ -627,8 +626,11 @@ bool InputHandlerManager::IsFingerprintType(std::shared_ptr<PointerEvent> pointe
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
-        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
-        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
+        ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH)) {
             return true;
     }
     MMI_HILOGD("not fingerprint event");
@@ -952,7 +954,7 @@ bool InputHandlerManager::IsMatchGesture(const Handler &handler, int32_t action,
             return true;
         }
         default: {
-            MMI_HILOGW("Unknown action:%{public}d", action);
+            MMI_HILOGD("Unknown action:%{public}d", action);
             return false;
         }
     }

@@ -176,7 +176,8 @@ enum class WindowInputType : uint8_t {
     TRANSMIT_LEFT_RIGHT = 6,
     TRANSMIT_BUTTOM = 7,
     MIX_LEFT_RIGHT_ANTI_AXIS_MOVE = 18,
-    MIX_BUTTOM_ANTI_AXIS_MOVE = 19
+    MIX_BUTTOM_ANTI_AXIS_MOVE = 19,
+    TRANSMIT_ANTI_AXIS_MOVE = 50
 };
 
 struct WindowInfo {
@@ -332,6 +333,8 @@ struct WindowInfo {
     bool rectChangeBySystem { false };
 
     bool isDisplayCoord { false };
+
+    bool isSkipSelfWhenShowOnVirtualScreen { false };
 };
 
 /**
@@ -447,6 +450,16 @@ struct DisplayInfo {
     int32_t oneHandX = 0;
     int32_t oneHandY = 0;
     /**
+     * Scale percent of oneHand rect to display rect.
+     * If 'scalePercent < 100', it means one hand mode.
+     * If 'scalePercent == 100', it means not in one hand mode.
+     */
+    int32_t scalePercent = 100;
+    /**
+     * Expand height from bottom.
+     */
+    int32_t expandHeight = 0;
+    /**
      * Use for off screen policy
      *
      * @since 12
@@ -492,6 +505,20 @@ struct DisplayInfo {
      * @since 12
      */
     int32_t physicalHeight { 0 };
+
+    /**
+     * The Pointer Active Width
+     *
+     * @since 12
+     */
+    int32_t pointerActiveWidth { 0 };
+
+    /**
+     * The Pointer Active Height
+     *
+     * @since 12
+     */
+    int32_t pointerActiveHeight { 0 };
 };
 
 /**

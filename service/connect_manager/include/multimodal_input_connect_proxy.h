@@ -86,8 +86,14 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     int32_t SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     int32_t UnsubscribeHotkey(int32_t subscribeId) override;
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption) override;
+    int32_t UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption) override;
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
+    int32_t SubscribeTabletProximity(int32_t subscribeId) override;
+    int32_t UnsubscribetabletProximity(int32_t subscribeId) override;
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
@@ -163,6 +169,7 @@ public:
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
+    int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
@@ -170,7 +177,7 @@ private:
     int32_t GetTouchpadBoolData(bool &date, int32_t type);
     int32_t SetTouchpadInt32Data(int32_t date, int32_t type);
     int32_t GetTouchpadInt32Data(int32_t &date, int32_t type);
-    int32_t GetTouchpadCDGData(double &ppi, double &size, int32_t &speed, int32_t type);
+    int32_t GetTouchpadCDGData(double &ppi, double &size, int32_t &speed, int32_t &frequency, int32_t type);
     int32_t HandleGestureMonitor(uint32_t code, InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
 };

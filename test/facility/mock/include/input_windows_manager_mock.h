@@ -37,6 +37,8 @@ public:
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>, int32_t));
     MOCK_METHOD(bool, AdjustFingerFlag, (std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, PrintEnterEventInfo, (std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(bool, IsFocusedSession, (int32_t), (const));
     void UpdateDisplayInfo(DisplayGroupInfo&) override {}
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo&, bool) override {}
     void UpdateWindowInfo(const WindowGroupInfo&) override {}
@@ -50,7 +52,7 @@ public:
     MOCK_METHOD(int32_t, AppendExtraData, (const ExtraData&));
     MOCK_METHOD(bool, IsWindowVisible, (int32_t));
     MOCK_METHOD(ExtraData, GetExtraData, (), (const));
-    MOCK_METHOD(const std::vector<WindowInfo>&, GetWindowGroupInfoByDisplayId, (int32_t), (const));
+    MOCK_METHOD(const std::vector<WindowInfo>, GetWindowGroupInfoByDisplayId, (int32_t), (const));
     MOCK_METHOD((std::pair<double, double>), TransformWindowXY, (const WindowInfo&, double, double), (const));
     MOCK_METHOD((std::pair<double, double>), TransformDisplayXY, (const DisplayInfo&, double, double), (const));
     void ClearTargetWindowId(int32_t pointerId) override {}
@@ -74,8 +76,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
-    MOCK_METHOD(bool, IsMouseSimulate, (), (const));
-    MOCK_METHOD(bool, HasMouseHideFlag, (), (const));
+    MOCK_METHOD(bool, IsMouseSimulate, ());
+    MOCK_METHOD(bool, HasMouseHideFlag, ());
     MOCK_METHOD(bool, SelectPointerChangeArea, (int32_t, int32_t, int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -94,9 +96,9 @@ public:
 #endif //OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    MOCK_METHOD(bool, TouchPointToDisplayPoint, (int32_t, struct libinput_event_touch*, EventTouch&, int32_t&));
+    MOCK_METHOD(bool, TouchPointToDisplayPoint, (int32_t, struct libinput_event_touch*, EventTouch&, int32_t&, bool));
     MOCK_METHOD(bool, CalculateTipPoint, (struct libinput_event_tablet_tool*, int32_t&, PhysicalCoordinate&), (const));
-    MOCK_METHOD(const DisplayInfo*, GetDefaultDisplayInfo, (), (const));
+    MOCK_METHOD(const std::shared_ptr<DisplayInfo>, GetDefaultDisplayInfo, (), (const));
     MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
     MOCK_METHOD(void, SendCancelEventWhenLock, ());
     MOCK_METHOD(void, FoldScreenRotation, (std::shared_ptr<PointerEvent>));
@@ -105,7 +107,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void DrawTouchGraphic(std::shared_ptr<PointerEvent>) override {}
     MOCK_METHOD(int32_t, UpdateTargetPointer, (std::shared_ptr<PointerEvent>));
-    MOCK_METHOD(const DisplayInfo*, GetPhysicalDisplay, (int32_t), (const));
+    MOCK_METHOD(const std::shared_ptr<DisplayInfo>, GetPhysicalDisplay, (int32_t), (const));
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -137,7 +139,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     MOCK_METHOD(void, AttachTouchGestureMgr, (std::shared_ptr<TouchGestureManager>));
-    MOCK_METHOD(void, CancelAllTouches, (std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, CancelAllTouches, (std::shared_ptr<PointerEvent>, bool));
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(std::shared_ptr<PointerEvent>, GetLastPointerEventForGesture, ());

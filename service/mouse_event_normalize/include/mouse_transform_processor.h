@@ -38,6 +38,7 @@ extern "C" {
         DEVICE_HARD_PC_PRO = 3,
         DEVICE_TABLET = 4,
         DEVICE_FOLD_PC = 5,
+        DEVICE_M_PC = 6,
         DEVICE_FOLD_PC_VIRT = 7,
     };
     int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
@@ -112,6 +113,7 @@ private:
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
+    void HandleTouchPadButton(enum libinput_button_state state, int32_t type);
     int32_t UpdateMouseMoveLocation(const DisplayInfo* displayInfo, Offset &offset,
         double &abs_x, double &abs_y, int32_t deviceType);
     int32_t UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo, struct libinput_event* event,
@@ -162,7 +164,7 @@ public:
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static void GetTouchpadPointerSpeed(int32_t &speed);
     static void GetTouchpadCDG(TouchpadCDG &touchpadCDG);
-    static void UpdateTouchpadCDG(double touchpadPPi, double touchpadSize);
+    static void UpdateTouchpadCDG(double touchpadPPi, double touchpadSize, int32_t frequency);
     static int32_t GetTouchpadSpeed();
 
 private:

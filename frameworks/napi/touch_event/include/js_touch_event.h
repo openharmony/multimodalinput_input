@@ -51,8 +51,8 @@ public:
     };
 
     enum class FixedMode : int32_t {
-        NORMAL = 1,
-        ONE_HAND = 2,
+        NONE = 0,
+        ONE_HAND = 1,
     };
     JsTouchEvent() = default;
     ~JsTouchEvent() = default;

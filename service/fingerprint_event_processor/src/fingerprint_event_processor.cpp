@@ -77,10 +77,8 @@ bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
         struct libinput_event_keyboard* keyBoard = libinput_event_get_keyboard_event(event);
         CHKPR(keyBoard, false);
         auto key = libinput_event_keyboard_get_key(keyBoard);
-        if (key != FINGERPRINT_CODE_DOWN && key != FINGERPRINT_CODE_UP
-            && key != FINGERPRINT_CODE_CLICK && key != FINGERPRINT_CODE_RETOUCH
-            && key != FINGERPRINT_CODE_CANCEL
-            ) {
+        if ((key < FINGERPRINT_CODE_DOWN || key > FINGERPRINT_CODE_TOUCH) &&
+             key != FINGERPRINT_CODE_AFT_ON && key != FINGERPRINT_CODE_AFT_OFF) {
             MMI_HILOGD("Not FingerprintEvent event");
             return false;
         }
@@ -136,8 +134,6 @@ void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
     }
     ChangeScreenMissTouchFlag(screenState_, cancelState_);
 }
- 
- 
 /*
 * This is a poorly designed state machine for handling screen touch errors, SAD :(
 */
@@ -161,22 +157,19 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
         }
     }
 }
- 
 bool FingerprintEventProcessor::CheckMisTouchState()
 {
-    if (CheckKeyMisTouchState() || CheckScreenMisTouchState()) {
+    if (antiFalseTouchSwitch_ && (CheckKeyMisTouchState() || CheckScreenMisTouchState())) {
         return true;
     }
     return false;
 }
- 
 bool FingerprintEventProcessor::CheckScreenMisTouchState()
 {
     int32_t flag = screenMissTouchFlag_ ? 1 : 0;
     MMI_HILOGI("The screenMissTouchFlag_ is %{public}d", flag);
     return screenMissTouchFlag_;
 }
- 
 bool FingerprintEventProcessor::CheckKeyMisTouchState()
 {
     CALL_DEBUG_ENTER;
@@ -265,6 +258,16 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     isStartedSmartKeyBySlide_ = false;
     switch (key) {
+        case FINGERPRINT_CODE_AFT_ON: {
+            antiFalseTouchSwitch_ = true;
+            MMI_HILOGI("FingerPrint AFT on!");
+            return RET_OK;
+        }
+        case FINGERPRINT_CODE_AFT_OFF: {
+            antiFalseTouchSwitch_ = false;
+            MMI_HILOGI("FingerPrint AFT off!");
+            return RET_OK;
+        }
         case FINGERPRINT_CODE_DOWN: {
             fingerprintFlag_ = true;
             cancelState_ = false;
@@ -298,6 +301,16 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
             fingerprintFlag_ = false;
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK);
             ProcessClickEvent();
+            break;
+        }
+        case FINGERPRINT_CODE_HOLD: {
+            fingerprintFlag_ = true;
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD);
+            break;
+        }
+        case FINGERPRINT_CODE_TOUCH: {
+            fingerprintFlag_ = true;
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH);
             break;
         }
         default:
@@ -363,7 +376,6 @@ int32_t FingerprintEventProcessor::AnalyseMsdpPointEvent(libinput_event * event)
     pointerEvent->SetHandOption(value);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MSDP_HAND_OPTINON);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
     if (eventMonitorHandler_ != nullptr) {

@@ -136,5 +136,30 @@ int32_t AncoChannelProxy::SyncKnuckleStatus(bool isKnuckleEnable)
     }
     return ret;
 }
+
+int32_t AncoChannelProxy::UpdateOneHandData(const AncoOneHandData &oneHandData)
+{
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IAncoChannel::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+    if (!AncoOneHandData::Marshalling(oneHandData, data)) {
+        MMI_HILOGE("Failed to write one hand data");
+        return RET_ERR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(AncoRequestId::UPDATE_ONE_HAND_DATA), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SendRequest fail, error:%{public}d", ret);
+        return ret;
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

@@ -157,6 +157,12 @@
             "triggerType": "down"
         },
         {
+            "preKeys": [],
+            "finalKey": 22,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
             "preKeys": [ 2049 ],
             "finalKey": 2076,
             "longPressTime": 6000,
@@ -621,6 +627,78 @@
         {
             "preKeys": [],
             "finalKey": 2067,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 3219,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 3219,
+            "longPressTime": 0,
+            "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 20,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 20,
+            "longPressTime": 200,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 20,
+            "longPressTime": 0,
+            "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 20,
+            "longPressTime": 200,
+            "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2077,
+            "longPressTime": 0,
+            "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2627,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 1,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2053,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2626,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2634,
             "longPressTime": 0,
             "triggerType": "down"
         }

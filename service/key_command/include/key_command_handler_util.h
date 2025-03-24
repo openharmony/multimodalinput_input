@@ -68,6 +68,7 @@ constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
 constexpr int32_t LONG_ABILITY_START_DELAY = 2000;
 constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
+constexpr int32_t WINDOW_SCREENSHOT_TYPE = 2123;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
@@ -75,6 +76,7 @@ const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
 const std::string SETTING_KNUCKLE_SWITCH = "settings.game.forbid_finger_knuckle";
 const std::string RECORD_KNUCKLE_SWITCH = "fingersense_screen_recording_enabled";
 const std::string SNAPSHOT_KNUCKLE_SWITCH = "fingersense_smartshot_enabled";
+constexpr int32_t MENU_KEY_DOWN_DELAY = 800;
 
 enum SpecialType {
     SPECIAL_ALL = 0,
@@ -137,6 +139,7 @@ bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, 
 float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent);
 bool IsEqual(float f1, float f2);
 bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, MultiFingersTap &mulFingersTap);
+char* GetProFileAbsPath(const char* fileName, char* buf, int32_t length);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_COMMAND_HANDLER_UTIL_H

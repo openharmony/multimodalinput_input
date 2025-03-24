@@ -442,6 +442,22 @@ int32_t MultimodalInputConnectManager::UnsubscribeHotkey(int32_t subscribeId)
     return multimodalInputConnectService_->UnsubscribeHotkey(subscribeId);
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+int32_t MultimodalInputConnectManager::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SubscribeKeyMonitor(keyOption);
+}
+
+int32_t MultimodalInputConnectManager::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->UnsubscribeKeyMonitor(keyOption);
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+
 int32_t MultimodalInputConnectManager::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -454,6 +470,20 @@ int32_t MultimodalInputConnectManager::UnsubscribeSwitchEvent(int32_t subscribeI
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->UnsubscribeSwitchEvent(subscribeId);
+}
+
+int32_t MultimodalInputConnectManager::SubscribeTabletProximity(int32_t subscribeId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SubscribeTabletProximity(subscribeId);
+}
+
+int32_t MultimodalInputConnectManager::UnsubscribetabletProximity(int32_t subscribeId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->UnsubscribetabletProximity(subscribeId);
 }
 
 int32_t MultimodalInputConnectManager::SubscribeLongPressEvent(int32_t subscribeId,
@@ -1014,6 +1044,13 @@ int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomC
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCustomCursor(windowId, cursor, options);
+}
+
+int32_t MultimodalInputConnectManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMultiWindowScreenId(screenId, displayNodeScreenId);
 }
 } // namespace MMI
 } // namespace OHOS
