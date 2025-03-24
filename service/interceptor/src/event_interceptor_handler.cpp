@@ -272,7 +272,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         if(session != nullptr){
             int32_t tokenType = session->GetTokenType();
             int32_t pid = session->GetPid();
-            if(tokenType == TOKEN_HAP && !IInputWindowsManager::GetInstance()->CheckAppFocused(pid)){
+            if (tokenType == TOKEN_HAP && !IInputWindowsManager::GetInstance()->CheckAppFocused(pid)) {
                 MMI_HILOGD("Token hap is not focus");
                 continue;
             }
