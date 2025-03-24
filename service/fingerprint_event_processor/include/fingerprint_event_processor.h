@@ -47,7 +47,10 @@ public:
     static constexpr int32_t FINGERPRINT_CODE_CLICK { 123 };
     static constexpr int32_t FINGERPRINT_CODE_RETOUCH { 124 };
     static constexpr int32_t FINGERPRINT_CODE_CANCEL { 125 };
- 
+    static constexpr int32_t FINGERPRINT_CODE_HOLD { 126 };
+    static constexpr int32_t FINGERPRINT_CODE_TOUCH { 127 };
+    static constexpr int32_t FINGERPRINT_CODE_AFT_ON { 200 };
+    static constexpr int32_t FINGERPRINT_CODE_AFT_OFF { 201 };
     static constexpr int32_t KEY_VOLUME_DOWN { 114 };
     static constexpr int32_t KEY_VOLUME_UP { 115 };
     static constexpr int32_t KEY_POWER { 116 };
@@ -91,6 +94,7 @@ private:
     std::atomic_bool isStartedSmartKeyBySlide_ { false };
     std::atomic_bool isStartedSmartKey_ { false };
     std::atomic_bool isCreatedObserver_ { false };
+    std::atomic_bool antiFalseTouchSwitch_ { true };
     std::mutex mutex_;
     struct SmartKeySwitch smartKeySwitch_;
 };

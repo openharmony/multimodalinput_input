@@ -43,6 +43,20 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
 }
 
+void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, uint32_t value)
+{
+    napi_value napiValue;
+    CHKRV(napi_create_uint32(env, value, &napiValue), CREATE_UINT32);
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int64_t value)
+{
+    napi_value napiValue;
+    CHKRV(napi_create_int64(env, value, &napiValue), CREATE_INT64);
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, std::string value)
 {
     MMI_HILOGD("%{public}s=%{public}s", name.c_str(), value.c_str());

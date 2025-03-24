@@ -65,7 +65,7 @@ protected:
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_001, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_001, TestSize.Level2)
 {
     MyInputHandlerManager manager;
     int32_t handlerId = 1;
@@ -114,7 +114,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_HasHandler_001, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_001, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_001, TestSize.Level3)
 {
     MyInputHandlerManager manager;
     int32_t eventId = 1;
@@ -148,7 +148,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetNextId_001, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetNextId_001, TestSize.Level3)
 {
     MyInputHandlerManager manager;
     manager.nextId_ = std::numeric_limits<int32_t>::max();
@@ -162,7 +162,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetNextId_001, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetNextId_002, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetNextId_002, TestSize.Level2)
 {
     MyInputHandlerManager manager;
     manager.nextId_ = 5;
@@ -194,7 +194,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_002, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_003, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_003, TestSize.Level2)
 {
     MYInputHandlerManager manager;
     int32_t handlerId = 1;
@@ -242,7 +242,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_005, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_003, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_003, TestSize.Level2)
 {
     MyInputHandlerManager manager;
     int32_t eventId = 4;
@@ -259,7 +259,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_004, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_004, TestSize.Level2)
 {
     MyInputHandlerManager manager;
     int32_t eventId = 10;
@@ -292,7 +292,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_006, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_006, TestSize.Level3)
 {
     MyInputHandlerManager manager;
     int32_t eventId = 2;
@@ -309,7 +309,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource_001, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource_001, TestSize.Level2)
 {
     MyInputHandlerManager manager;
     uint32_t deviceTags = 4;
@@ -405,7 +405,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RecoverPointerEvent, T
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDisconnected, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDisconnected, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
     MYInputHandlerManager inputHdlMgr;
@@ -496,7 +496,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_HasHandler_002, TestSi
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource_004, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource_004, TestSize.Level2)
 {
     MyInputHandlerManager manager;
     uint32_t deviceTags = 1;

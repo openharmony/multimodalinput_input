@@ -34,6 +34,7 @@ public:
     int32_t SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) override;
     int32_t SyncKnuckleStatus(bool isKnuckleEnable) override;
+    int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) override;
 
 private:
     static inline BrokerDelegator<AncoChannelProxy> delegator_;

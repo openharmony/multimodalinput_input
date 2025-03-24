@@ -19,21 +19,21 @@
 namespace OHOS {
 namespace MMI {
 struct LongPressRequest {
-    int32_t fingerCount;
-    int32_t duration;
+    int32_t fingerCount { -1 };
+    int32_t duration { -1 };
 };
 
 struct LongPressEvent {
-    int32_t fingerCount;
-    int32_t duration;
-    int32_t pid;
-    int32_t displayId;
-    int32_t displayX;
-    int32_t displayY;
-    int32_t result; // If the value is 0, it indicates correct reporting; non-zero indicates cancellation
-    int32_t windowId;
-    int32_t pointerId;
-    int64_t downTime;
+    int32_t fingerCount { -1 };
+    int32_t duration { -1 };
+    int32_t pid { -1 };
+    int32_t displayId { -1 };
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
+    int32_t result { -1 }; // If the value is 0, it indicates correct reporting; non-zero indicates cancellation
+    int32_t windowId { -1 };
+    int32_t pointerId { -1 };
+    int64_t downTime { -1 };
     std::string bundleName;
 };
 } // namespace MMI

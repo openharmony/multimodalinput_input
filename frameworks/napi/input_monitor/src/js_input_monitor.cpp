@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
 #include "js_input_monitor.h"
 
 #include "define_multimodal.h"
@@ -58,6 +57,8 @@ constexpr int32_t FINGERPRINT_SLIDE { 2 };
 constexpr int32_t FINGERPRINT_RETOUCH { 3 };
 constexpr int32_t FINGERPRINT_CLICK { 4 };
 constexpr int32_t FINGERPRINT_CANCEL { 5 };
+constexpr int32_t FINGERPRINT_HOLD { 6 };
+constexpr int32_t FINGERPRINT_TOUCH { 7 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
@@ -922,6 +923,12 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
         }
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL: {
             return FINGERPRINT_CANCEL;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD: {
+            return FINGERPRINT_HOLD;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH: {
+            return FINGERPRINT_TOUCH;
         }
         default: {
             MMI_HILOGE("Wrong action is %{public}d", action);
@@ -1937,7 +1944,9 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
         ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
         pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL)) {
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH)) {
         return true;
     }
     MMI_HILOGD("Not fingerprint event");
@@ -1965,11 +1974,8 @@ void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     }
     CHKPV(monitor_);
     CHKPV(keyEvent);
-    {
-        std::lock_guard<std::mutex> guard(mutex_);
-        preEvQueue_.push(keyEvent);
-    }
-    if (!preEvQueue_.empty()) {
+    preEvQueue_.Push(keyEvent);
+    if (!preEvQueue_.Empty()) {
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
@@ -2025,9 +2031,9 @@ void JsInputMonitor::OnKeyEventInJsThread(const std::string &typeName)
     }
     CHKPV(jsEnv_);
     CHKPV(receiver_);
-    while (!preEvQueue_.empty()) {
-        auto keyEventItem = preEvQueue_.front();
-        preEvQueue_.pop();
+    while (!preEvQueue_.Empty()) {
+        auto keyEventItem = preEvQueue_.Front();
+        preEvQueue_.Pop();
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);

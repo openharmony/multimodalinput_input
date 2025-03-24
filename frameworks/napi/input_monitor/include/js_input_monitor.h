@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 #include "i_input_event_consumer.h"
 #include "js_touch_event.h"
 #include "js_joystick_event.h"
+#include "thread_safety_container.h"
 
 namespace OHOS {
 namespace MMI {
@@ -164,7 +165,7 @@ private:
     std::shared_ptr<InputMonitor> monitor_ { nullptr };
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
     std::queue<std::shared_ptr<PointerEvent>> pointerQueue_;
-    std::queue<std::shared_ptr<KeyEvent>> preEvQueue_;
+    ThreadSafeQueue<std::shared_ptr<KeyEvent>> preEvQueue_;
     napi_ref receiver_ { nullptr };
     napi_env jsEnv_ { nullptr };
     std::string typeName_;

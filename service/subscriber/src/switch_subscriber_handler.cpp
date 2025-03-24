@@ -21,7 +21,6 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "util_ex.h"
-
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG

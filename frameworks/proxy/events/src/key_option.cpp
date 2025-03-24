@@ -130,5 +130,51 @@ bool KeyOption::WriteToParcel(Parcel &out) const
         out.WriteBool(isRepeat_)
     );
 }
+
+int32_t KeyMonitorOption::GetKey() const
+{
+    return key_;
+}
+
+int32_t KeyMonitorOption::GetAction() const
+{
+    return action_;
+}
+
+bool KeyMonitorOption::IsRepeat() const
+{
+    return isRepeat_;
+}
+
+void KeyMonitorOption::SetKey(int32_t key)
+{
+    key_ = key;
+}
+
+void KeyMonitorOption::SetAction(int32_t action)
+{
+    action_ = action;
+}
+
+void KeyMonitorOption::SetRepeat(bool repeat)
+{
+    isRepeat_ = repeat;
+}
+
+bool KeyMonitorOption::Marshalling(Parcel &parcel) const
+{
+    return (parcel.WriteInt32(key_) &&
+            parcel.WriteInt32(action_) &&
+            parcel.WriteBool(isRepeat_));
+}
+
+bool KeyMonitorOption::Unmarshalling(Parcel &parcel)
+{
+    return (
+        parcel.ReadInt32(key_) &&
+        parcel.ReadInt32(action_) &&
+        parcel.ReadBool(isRepeat_)
+    );
+}
 } // namespace MMI
 } // namespace OHOS

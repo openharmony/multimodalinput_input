@@ -447,10 +447,8 @@ void TouchDrawingManager::CreateTouchWindow()
 #endif
     surfaceNode_->SetRotation(0);
     screenId_ = static_cast<uint64_t>(displayInfo_.id);
-    if (displayInfo_.displayMode == DisplayMode::MAIN) {
-        screenId_ = FOLD_SCREEN_MAIN_ID;
-    } else if (displayInfo_.displayMode == DisplayMode::FULL) {
-        screenId_ = FOLD_SCREEN_FULL_ID;
+    if (windowScreenId_ == screenId_) {
+        screenId_ = displayNodeScreenId_;
     }
     surfaceNode_->AttachToDisplay(screenId_);
     MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId_, surfaceNode_->GetId());

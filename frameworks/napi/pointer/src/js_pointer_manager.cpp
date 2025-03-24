@@ -1201,16 +1201,18 @@ void JsPointerManager::ExecuteSetCustomCursorWork(napi_env env, void* data)
         asyncContext->windowId,
         asyncContext->cursor,
         asyncContext->options);
-    napi_create_int32(env, asyncContext->errorCode, &asyncContext->resultValue);
 }
 
 void JsPointerManager::HandleSetCustomCursorCompletion(napi_env env, napi_status status, void* data)
 {
+    napi_value results[2] = { 0 };
+    int32_t size = 2;
+
     CHKPV(data);
     sptr<CustomCursorAsyncContext> asyncContext(static_cast<CustomCursorAsyncContext*>(data));
     CHKPV(asyncContext);
-    napi_value results[2] = { 0 };
-    int32_t size = 2;
+    napi_create_int32(env, asyncContext->errorCode, &asyncContext->resultValue);
+
     if (!GetResult(asyncContext, results, size)) {
         asyncContext->DecStrongRef(nullptr);
         return;

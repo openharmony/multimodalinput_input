@@ -86,7 +86,7 @@ napi_value JsTouchEvent::Export(napi_env env, napi_value exports)
     CHKRP(napi_set_named_property(env, exports, "SourceType", sourceType), SET_NAMED_PROPERTY);
 
     napi_property_descriptor fixedModeArr[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("NORMAL", GetNapiInt32(env, static_cast<int32_t>(FixedMode::NORMAL))),
+        DECLARE_NAPI_STATIC_PROPERTY("NONE", GetNapiInt32(env, static_cast<int32_t>(FixedMode::NONE))),
         DECLARE_NAPI_STATIC_PROPERTY("ONE_HAND", GetNapiInt32(env, static_cast<int32_t>(FixedMode::ONE_HAND))),
     };
     napi_value fixedMode = nullptr;

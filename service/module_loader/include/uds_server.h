@@ -78,6 +78,7 @@ protected:
 protected:
     MsgServerFunCallback recvFun_ { nullptr };
     std::map<int32_t, SessionPtr> sessionsMap_;
+    mutable std::mutex sessionsMapMutex_;
     std::map<int32_t, int32_t> idxPidMap_;
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
