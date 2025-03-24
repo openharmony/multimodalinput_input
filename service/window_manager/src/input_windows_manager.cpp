@@ -320,6 +320,23 @@ const std::vector<WindowInfo> InputWindowsManager::GetWindowGroupInfoByDisplayId
     return iter->second.windowsInfo;
 }
 
+bool InputWindowsManager::CheckAppFocused(int32_t pid)
+{
+    int32_t focusWindowId = displayGroupInfo_.focusWindowId;
+    for (auto windowinfo : displayGroupInfo_.windowsInfo) {
+        if (windowinfo.id == focusWindowId) {
+            if (windowinfo.pid != pid) {
+                MMI_HILOGW("CheckAppFocused focusWindowId:%{public}d, pid:%{public}d, windowinfo.pid:%{public}d",
+                    focusWindowId, pid, windowinfo.pid);
+                    return false;
+            }
+            return true;
+        }
+    }
+    MMI_HILOGW("CheckAppFocused failed:%{public}d", focusWindowId);
+    return false;
+}
+
 bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
