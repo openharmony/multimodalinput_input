@@ -174,7 +174,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     virtual void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr) = 0;
-    virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event) = 0;
+    virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged = false) = 0;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() = 0;
