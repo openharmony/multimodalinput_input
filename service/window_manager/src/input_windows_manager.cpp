@@ -2960,6 +2960,11 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             }
+            if (item.windowInputType == WindowInputType::TRANSMIT_ANTI_AXIS_MOVE) {
+                MMI_HILOG_DISPATCHW("Pointer enents do not respond to the window, windowInputType%{public}d",
+                    static_cast<int32_t>(item.windowInputType));
+                continue;
+            }
             if (SkipPrivacyProtectionWindow(pointerEvent, item.isSkipSelfWhenShowOnVirtualScreen)) {
                 winId2ZorderMap.insert({item.id, item.zOrder});
                 continue;
