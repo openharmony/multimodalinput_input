@@ -80,7 +80,11 @@ public:
 
     float GetScale() const
     {
-        return scale_;
+        if (GetIsCurrentOffScreenRendering() && IsExtend()) {
+            return offRenderScale_;
+        } else {
+            return scale_;
+        }
     }
 
     bool IsMain() const
