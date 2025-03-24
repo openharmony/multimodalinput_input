@@ -269,7 +269,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     uint32_t capKeyboard = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     for (const auto &interceptor : interceptors_) {
         auto session = interceptor.session_;
-        if(session != nullptr){
+        if (session != nullptr) {
             int32_t tokenType = session->GetTokenType();
             int32_t pid = session->GetPid();
             if (tokenType == TOKEN_HAP && !IInputWindowsManager::GetInstance()->CheckAppFocused(pid)) {
