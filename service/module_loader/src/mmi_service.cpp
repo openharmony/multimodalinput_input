@@ -2349,6 +2349,9 @@ void MMIService::PreEventLoop()
     SetupTouchGestureHandler();
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     libinputAdapter_.ProcessPendingEvents();
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+    TOUCH_DRAWING_MGR->Initialize();
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
 }
 
 bool MMIService::InitSignalHandler()

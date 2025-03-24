@@ -22,6 +22,7 @@
 #include "i_multimodal_input_connect.h"
 #include "input_windows_manager.h"
 #include "table_dump.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -36,6 +37,8 @@ const static Rosen::Drawing::Color LABELS_RED_COLOR = Rosen::Drawing::Color::Col
 const static Rosen::Drawing::Color TRACKER_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 96, 255);
 const static Rosen::Drawing::Color POINTER_RED_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 255, 0, 0);
 const static Rosen::Drawing::Color CROSS_HAIR_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 0, 192);
+constexpr int32_t REPEAT_ONCE { 1 };
+constexpr int32_t REPEAT_COOLING_TIME { 500 };
 constexpr int32_t DENSITY_BASELINE { 160 };
 constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
 constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
@@ -83,6 +86,37 @@ TouchDrawingManager::TouchDrawingManager()
 {}
 
 TouchDrawingManager::~TouchDrawingManager() {}
+
+void TouchDrawingManager::Initialize()
+{
+    int32_t nRetries { 60 };
+    SetupSettingObserver(nRetries);
+}
+
+void TouchDrawingManager::SetupSettingObserver(int32_t nRetries)
+{
+    if (HasDisplayInfo()) {
+        CreateObserver();
+        if (hasBubbleObserver_ && hasPointerObserver_) {
+            return;
+        }
+    }
+    if (nRetries <= 0) {
+        MMI_HILOGE("Failed to setup setting observer after tens of retries");
+        return;
+    }
+    auto timerId = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, nRetries]() {
+        SetupSettingObserver(nRetries - 1);
+    });
+    if (timerId < 0) {
+        MMI_HILOGE("AddTimer fail");
+    }
+}
+
+bool TouchDrawingManager::HasDisplayInfo() const
+{
+    return ((scaleW_ != 0) && (scaleH_ != 0));
+}
 
 void TouchDrawingManager::RecordLabelsInfo()
 {
@@ -282,10 +316,12 @@ void TouchDrawingManager::CreateObserver()
 {
     CALL_DEBUG_ENTER;
     if (!hasBubbleObserver_) {
+        MMI_HILOGI("Setup observer of show-touch-track");
         bubbleMode_.SwitchName = showCursorSwitchName;
         CreateBubbleObserver(bubbleMode_);
     }
     if (!hasPointerObserver_) {
+        MMI_HILOGI("Setup observer of show-touch-position");
         pointerMode_.SwitchName = pointerPositionSwitchName;
         CreatePointerObserver(pointerMode_);
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
