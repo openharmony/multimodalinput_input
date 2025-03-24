@@ -236,6 +236,10 @@ ohos_shared_library("libmmi-server") {
       "touch_event_normalize/src/touch_gesture_detector.cpp",
       "touch_event_normalize/src/touch_gesture_manager.cpp",
     ]
+
+    if (input_feature_product == "pc") {
+      defines += [ "TOUCH_GESTURE_MONITOR_ENABLED" ]
+    }
   }
   if (input_feature_fingerprint) {
     sources += [
