@@ -4184,7 +4184,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t logicalY1 = 0;
 
     int32_t DisplayInfoX = GetLogicalPositionX(displayId);
-    int32_t DisplayInfoY = GetLogicalPositionY(displayId); 
+    int32_t DisplayInfoY = GetLogicalPositionY(displayId);
     if (!AddInt32(static_cast<int32_t>(physicalX), DisplayInfoX, logicalX1)) {
         MMI_HILOG_DISPATCHE("The addition of logicalX overflows");
         return RET_ERR;
@@ -6087,8 +6087,7 @@ void InputWindowsManager::SetFoldState()
 const std::shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id,
     const DisplayGroupInfo &displayGroupInfo) const
 {
-    auto displayInfo = GetDisplayInfoVector();
-    for (const auto &it : displayInfo) {
+    for (const auto &it : displayGroupInfo.displaysInfo) {
         if (it.id == id) {
             return std::make_shared<DisplayInfo>(it);
         }
