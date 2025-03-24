@@ -671,6 +671,36 @@
             "finalKey": 2077,
             "longPressTime": 0,
             "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2627,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 1,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2053,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2626,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2634,
+            "longPressTime": 0,
+            "triggerType": "down"
         }
     ]
 }
