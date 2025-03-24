@@ -834,7 +834,15 @@ void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroup
 {
     auto WindowInfo = GetWindowInfoVector();
     int32_t focusWindowId = GetFocusWindowId();
-    if (captureModeInfo_.isCaptureMode && (!WindowInfo.empty()) &&
+    if (displayGroupInfo.windowsInfo.empty()) {
+        MMI_HILOGW("windowsInfo is empty");
+        return;
+    }
+    if (WindowInfo.empty()) {
+        MMI_HILOGW("windowsInfo is empty");
+        return;
+    }
+    if (captureModeInfo_.isCaptureMode && !WindowInfo.empty() &&
         ((focusWindowId != displayGroupInfo.focusWindowId) ||
         (WindowInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
         captureModeInfo_.isCaptureMode = false;
@@ -4038,6 +4046,7 @@ void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t 
     const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,pid:%{public}d", windowInfo.pid);
+    CHKPV(pointerEvent);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
