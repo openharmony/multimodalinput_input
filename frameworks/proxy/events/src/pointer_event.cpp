@@ -1468,7 +1468,7 @@ std::string PointerEvent::GetFixedModeStr() const
     switch (fixedMode_) {
         case PointerEvent::FixedMode::NORMAL:
             return "normal";
-        case PointerEvent::FixedMode::ONE_HAND:
+        case PointerEvent::FixedMode::AUTO:
             return "one-hand";
         default:
             return "unknown";
