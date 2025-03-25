@@ -200,6 +200,8 @@ public:
 
     static constexpr int32_t POINTER_ACTION_PULL_CANCEL = 37;
 
+    static constexpr int32_t POINTER_ACTION_PULL_THROW = 38;
+
     /**
      * 表示触屏手势动作
      *
@@ -1349,6 +1351,34 @@ public:
     void SetPointerAction(int32_t pointerAction);
 
     /**
+     * @brief Get throw Angle
+     * @return Return the pull throw angle
+     * @since 18
+     */
+    double GetThrowAngle() const;
+
+    /**
+     * @brief Set throw Angle
+     * @return void
+     * @since 18
+     */
+    void SetThrowAngle(double throwAngle);
+
+    /**
+     * @brief Get throw Speed
+     * @return Return the pull throw speed
+     * @since 18
+     */
+    double GetThrowSpeed() const;
+
+    /**
+     * @brief Set throw Speed
+     * @return void
+     * @since 18
+     */
+    void SetThrowSpeed(double throwSpeed);
+
+    /**
      * @brief Dumps the action of this pointer input event as a string.
      * @return Returns the pointer to the string.
      * @since 9
@@ -1838,9 +1868,11 @@ private:
     bool ancoDeal_ { false };
 #endif // OHOS_BUILD_ENABLE_ANCO
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
+    double throwAngle_ { 0.0 };
+    double throwSpeed_ { 0.0 };
     Settings settings_ {};
     bool autoToVirtualScreen_ { true };
-    //Left and right hand steady-state reporting status
+    // Left and right hand steady-state reporting status
     int32_t handOption_ { -1 };
     FixedMode fixedMode_ { FixedMode::NORMAL };
 };

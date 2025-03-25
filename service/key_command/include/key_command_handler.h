@@ -269,6 +269,7 @@ private:
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void InitializeLongPressConfigurations();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void StartTwoFingerGesture();

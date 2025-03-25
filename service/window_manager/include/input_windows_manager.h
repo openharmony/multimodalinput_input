@@ -141,7 +141,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool IsNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-#endif //OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
@@ -501,6 +501,9 @@ private:
     int32_t lastDpi_ { 0 };
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
     std::mutex mtx_;
+    std::atomic_bool isHPR_ { false };
+    std::mutex oneHandMtx_;
+    bool inOneHandMode_ = false;
 };
 } // namespace MMI
 } // namespace OHOS
