@@ -398,6 +398,11 @@ int32_t MultiModalInputPreferencesManager::SetShortKeyDuration(const std::string
     return 0;
 }
 
+bool MultiModalInputPreferencesManager::IsInitPreference()
+{
+    return false;
+}
+
 InputEventHandler::InputEventHandler() {}
 
 InputEventHandler::~InputEventHandler() {}

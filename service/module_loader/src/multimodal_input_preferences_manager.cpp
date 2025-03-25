@@ -77,7 +77,13 @@ int32_t MultiModalInputPreferencesManager::InitPreferences()
         MMI_HILOGE("Init multimodal input preferences map failed");
         return RET_ERR;
     }
+    isInitPreference_.store(true);
     return RET_OK;
+}
+
+bool MultiModalInputPreferencesManager::IsInitPreference()
+{
+    return isInitPreference_.load();
 }
 
 int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()

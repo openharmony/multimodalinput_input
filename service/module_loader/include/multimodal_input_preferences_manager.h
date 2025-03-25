@@ -38,6 +38,7 @@ public:
     int32_t SetBoolValue(const std::string &key, const std::string &setFile, bool setValue);
     int32_t GetShortKeyDuration(const std::string &key);
     int32_t SetShortKeyDuration(const std::string &key, int32_t setValue);
+    bool IsInitPreference();
 
 private:
     std::map<std::string, std::pair<std::string, int32_t>> preferencesMap_;
@@ -56,6 +57,7 @@ private:
     bool touchpadPinchSwitch_ { true };
     bool touchpadSwipeSwitch_ { true };
     bool hoverScrollState_ { true };
+    std::atomic<bool> isInitPreference_ { false };
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     bool moveEventFilterFlag_ { false };
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
