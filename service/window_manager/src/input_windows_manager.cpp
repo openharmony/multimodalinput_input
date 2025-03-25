@@ -6242,14 +6242,6 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event, 
     }
 }
 
-void InputWindowsManager::ClearEventData(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    MMI_HILOG_DISPATCHI("Clear extra data");
-    pointerEvent->ClearBuffer();
-    lastTouchEvent_ = nullptr;
-    lastTouchWindowInfo_.id = -1;
-    ClearExtraData();
-}
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 
 std::shared_ptr<PointerEvent> InputWindowsManager::GetlastPointerEvent()

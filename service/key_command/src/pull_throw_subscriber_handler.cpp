@@ -101,15 +101,14 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
         return;
     }
     if (gestureInProgress_) {
-        auto fingerCount = touchEvent->GetPointerIds().size();
         MMI_HILOGI("PullThrow On gestureInProgress");
         double endTime = touchEvent->GetActionTime();
         // 计算距离
         int32_t id = touchEvent->GetPointerId();
         PointerEvent::PointerItem item;
         touchEvent->GetPointerItem(id, item);
-        double dx = item.GetDisplayX() - fingerGesture_.touches[fingerCount - 1].x;
-        double dy = item.GetDisplayY() - fingerGesture_.touches[fingerCount - 1].y;
+        double dx = item.GetDisplayX() - fingerGesture_.touches[FIRST_TOUCH_FINGER].x;
+        double dy = item.GetDisplayY() - fingerGesture_.touches[FIRST_TOUCH_FINGER].y;
         double distance = std::sqrt(dx * dx + dy * dy);
         // 计算时间差，转换为秒
         double deltaTime = (endTime - triggerTime_) / 1e3; // 如果时间戳是毫秒
@@ -119,8 +118,7 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
         // 计算速度
         double speed = distance / deltaTime;
         double throwAngle = atan2(dy, dx) * 180 / M_PI;
-        MMI_HILOGI("PullThrow On Detect, speed: %{public}lf, angle: %{public}lf,", speed, throwAngle);
-        MMI_HILOGI("PullThrow On Detect, distance: %{public}lf", distance);
+        MMI_HILOGI("Throw speed: %{public}lf, angle: %{public}lf, dist: %{public}lf", speed, throwAngle, distance);
         // 检查速度距离是否大于阈值
         if (speed > THRES_SPEED && distance > MIN_THRES_DIST) {
             // 判断方向
@@ -146,13 +144,12 @@ void PullThrowSubscriberHandler::HandleFingerGestureUpEvent(std::shared_ptr<Poin
 void PullThrowSubscriberHandler::UpdateFingerPoisition(std::shared_ptr<PointerEvent> touchEvent)
 {
     CHKPV(touchEvent);
-    auto fingerCount = touchEvent->GetPointerIds().size();
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
-    fingerGesture_.touches[fingerCount - 1].id = id;
-    fingerGesture_.touches[fingerCount - 1].x = item.GetDisplayX();
-    fingerGesture_.touches[fingerCount - 1].y = item.GetDisplayY();
+    fingerGesture_.touches[FIRST_TOUCH_FINGER].id = id;
+    fingerGesture_.touches[FIRST_TOUCH_FINGER].x = item.GetDisplayX();
+    fingerGesture_.touches[FIRST_TOUCH_FINGER].y = item.GetDisplayY();
 }
 
 bool PullThrowSubscriberHandler::CheckFingerValidation(std::shared_ptr<PointerEvent> touchEvent) const
