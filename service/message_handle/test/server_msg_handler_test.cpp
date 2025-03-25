@@ -2252,5 +2252,29 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_004, TestSize.
     << transform << 1 << 1 << 1 << 1 << false;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
 }
+
+/**
+ * @tc.name: ServerMsgHandlerTest_DealGesturePointers
+ * @tc.desc: Test the function DealGesturePointers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_DealGesturePointers, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerId(10001);
+    auto touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10002);
+    item.SetOriginPointerId(10002);
+    item.SetPressed(true);
+    touchEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.DealGesturePointers(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS

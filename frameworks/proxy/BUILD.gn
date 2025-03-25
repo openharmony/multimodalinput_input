@@ -164,6 +164,11 @@ ohos_unittest("ut-mmi-proxy-out") {
   module_out_path = module_output_path
   include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
   configs = [

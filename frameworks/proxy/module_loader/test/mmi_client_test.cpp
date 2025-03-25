@@ -120,5 +120,22 @@ HWTEST_F(MMIClientTest, MMIClientTest_OnDisconnect_001, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(client->OnDisconnect());
     client->Stop();
 }
+
+/**
+ * @tc.name: MMIClientTest_StartEventRunner_001
+ * @tc.desc: Start event runner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MMIClientTest_StartEventRunner_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->isConnected_ = true;
+    client->fd_ = 1;
+    client->eventHandler_ = nullptr;
+    bool result = client->StartEventRunner();
+    EXPECT_TRUE(result);
+}
 }
 } // namespace MMI
