@@ -183,6 +183,11 @@ ohos_unittest("ut-mmi-proxy-out") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
+
+  defines += [
+    "private=public",
+    "protected=public"
+  ]
 }
 
 ohos_unittest("KeyEventTest") {
