@@ -343,7 +343,7 @@ public:
         /**
          * Indicates one-hand mode.
          */
-        ONE_HAND,
+        AUTO,
         /**
          * Indicates invalid max.
          */

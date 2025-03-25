@@ -3939,7 +3939,7 @@ void InputWindowsManager::HandleOneHandMode(const DisplayInfo &displayInfo,
 #ifdef OHOS_BUILD_ENABLE_ANCO
     SendOneHandData(displayInfo, pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ANCO
-    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
     MMI_HILOG_DISPATCHD("displayInfo.oneHandX=%{private}d, displayInfo.oneHandY=%{private}d, "
                         "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
         displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight, displayInfo.scalePercent,
