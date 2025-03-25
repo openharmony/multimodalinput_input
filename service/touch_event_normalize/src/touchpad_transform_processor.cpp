@@ -650,6 +650,10 @@ void TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
 int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(bool switchFlag)
 {
     std::string name = "touchpadDoubleTapAndDrag";
+    if (!PREFERENCES_MGR->IsInitPreference()) {
+        MMI_HILOGE("Preference is not init");
+        return RET_ERR;
+    }
     if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
         MMI_HILOGE("PutConfigDataToDatabase failed");
         return RET_ERR;

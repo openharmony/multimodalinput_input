@@ -36,6 +36,7 @@ public:
     MOCK_METHOD(int32_t, SetBoolValue, (const std::string&, const std::string&, bool));
     MOCK_METHOD(int32_t, GetShortKeyDuration, (const std::string&));
     MOCK_METHOD(int32_t, SetShortKeyDuration, (const std::string&, int32_t));
+    MOCK_METHOD(bool, IsInitPreference, ());
 
     static std::shared_ptr<PreferencesManagerMock> GetInstance();
 

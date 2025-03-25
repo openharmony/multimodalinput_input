@@ -33,6 +33,7 @@ public:
     virtual int32_t SetBoolValue(const std::string &key, const std::string &setFile, bool setValue) = 0;
     virtual int32_t GetShortKeyDuration(const std::string &key) = 0;
     virtual int32_t SetShortKeyDuration(const std::string &key, int32_t setValue) = 0;
+    virtual bool IsInitPreference() = 0;
 
     static std::shared_ptr<IPreferenceManager> GetInstance();
 
