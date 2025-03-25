@@ -1032,7 +1032,8 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         .userIconPixelMap = DecodeImageToPixelMap(mouseStyle),
     };
     for (auto it : screenPointers) {
-        cfg.dpi = it.second->GetRenderDPI();
+        CHKPV(it.second);
+        cfg.dpi = it.second->GetDPI() * it.second->GetScale();
         cfg.direction = it.second->IsMirror() ? DIRECTION0 : displayInfo_.direction;
         MMI_HILOGD("HardwareCursorRender, screen = %{public}u, dpi = %{public}f",
             it.first, cfg.dpi);
@@ -1099,8 +1100,9 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
             .isHard = false,
             .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
         };
+        CHKPV(it.second);
         auto sn = it.second->GetSurfaceNode();
-        cfg.dpi = it.second->GetRenderDPI();
+        cfg.dpi = it.second->GetDPI();
         MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}u, dpi = %{public}f",
             it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
@@ -3274,12 +3276,11 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.color = static_cast<uint32_t>(GetPointerColor());
     cfg.size = static_cast<uint32_t>(GetPointerSize());
     cfg.isHard = isHard;
-    cfg.dpi = sp->GetRenderDPI();
+    float scale = isHard ? sp->GetScale() : 1.0f;
+    cfg.dpi = sp->GetDPI() * scale;
     cfg.direction = sp->IsMirror() ? DIRECTION0 : displayInfo_.direction;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
-        float scale = sp->IsMirror() ? sp->GetScale() : 1.0f;
-        scale = (sp->IsExtend() && sp->GetIsCurrentOffScreenRendering()) ? sp->GetOffRenderScale() : scale;
         cfg.userIconPixelMap = GetUserIconCopy();
         CHKPV(cfg.userIconPixelMap);
         cfg.userIconHotSpotX = userIconHotSpotX_ * scale;
