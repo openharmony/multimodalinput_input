@@ -38,13 +38,16 @@ private:
     int32_t HandleQuickAccessMenu(int32_t xKeyEventType);
     // 重置计数器
     void ResetCount();
-    void StartXKeyIfNeeded();
+    void StartXKeyIfNeeded(int32_t xKeyEventType);
     bool IsRemoveDelaySingleClick();
     void StartLongPressTimer();
     void StartSingleClickTimer();
+    void RemoveTimer();
 
+    int32_t singleClickTimerId_ { -1 };
+    int32_t longPressTimerId_ { -1 };
     // 按压次数
-    std::atomic<int32_t> pressCount_ {0};
+    std::atomic<int32_t> pressCount_ { 0 };
 
     const std::string X_KEY_SOURCE_KEY { "fkey" };
     std::atomic_bool isStartedXKey_ { false };

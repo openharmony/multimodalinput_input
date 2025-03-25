@@ -38,7 +38,8 @@ namespace {
     const std::string DOUBLE_CLICK_ENABLE_STATUS = "0";
     const std::string X_KEY_APP_BUNDLE_NAME = "";
     const std::string X_KEY_APP_ABILITY_NAME = "";
-    const std::string SETTINGS_DATA_SECURE_PRE_URI = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_";
+    const std::string SETTINGS_DATA_SECURE_PRE_URI =
+    	"datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_";
     const std::string SETTINGS_DATA_SECURE_POST_URI = "?Proxy=true";
     const int32_t X_KEY_DOUBLE_CLICK_ENABLE_COUNT = 2;
     constexpr int32_t DOUBLE_CLICK_DELAY { 300 };
@@ -64,27 +65,11 @@ bool XKeyEventProcessor::IsXKeyEvent(struct libinput_event* event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, false);
     std::string name = libinput_device_get_name(device);
-    MMI_HILOGI("service name is:%{public}s", name.c_str());
     if (X_KEY_SOURCE_KEY != name) {
-        MMI_HILOGI("Not X-key");
+        MMI_HILOGD("Not X-key");
         return false;
     }
-    StartXKeyIfNeeded();
     return true;
-}
-
-void XKeyEventProcessor::StartXKeyIfNeeded()
-{
-    if (!isStartedXKey_) {
-        isStartedXKey_ = true;
-        MMI_HILOGI("start nine-square grid panel.");
-        AAFwk::Want want;
-        want.SetElementName(X_KEY_APP_BUNDLE_NAME, X_KEY_APP_ABILITY_NAME);
-        ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-        if (err != ERR_OK) {
-            MMI_HILOGI("start ability fail.");
-        }
-    }
 }
 
 int32_t XKeyEventProcessor::HandleXKeyEvent(struct libinput_event* event)
@@ -108,7 +93,7 @@ int32_t XKeyEventProcessor::AnalyseKeyEvent(struct libinput_event* event)
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto keyCode = libinput_event_keyboard_get_key(keyEvent);
     int32_t keyState = libinput_event_keyboard_get_key_state(keyEvent);
-    MMI_HILOGI("keyCode:%{public}d, keyState:%{public}d", keyCode, keyState);
+    MMI_HILOGD("keyCode:%{private}d, keyState:%{private}d", keyCode, keyState);
     int32_t keyAction = keyState == 0 ? KeyEvent::KEY_ACTION_UP : KeyEvent::KEY_ACTION_DOWN;
     if (KeyEvent::KEY_ACTION_DOWN == keyAction) {
         InterceptXKeyDown();
@@ -132,8 +117,8 @@ void XKeyEventProcessor::InterceptXKeyDown()
 
 void XKeyEventProcessor::StartLongPressTimer()
 {
-    MMI_HILOGI("start long press timer.");
-    TimerMgr->AddTimer(LONG_PRESS_DELAY, 1, [this] () {
+    MMI_HILOGD("start long press timer.");
+    longPressTimerId_ = TimerMgr->AddTimer(LONG_PRESS_DELAY, 1, [this] () {
         if (this->pressCount_ == 1 && !this->handledLongPress_) {
             HandleQuickAccessMenu(LONG_PRESS);
             MMI_HILOGI("X-key is long press.");
@@ -172,8 +157,8 @@ bool XKeyEventProcessor::IsRemoveDelaySingleClick()
 
 void XKeyEventProcessor::StartSingleClickTimer()
 {
-    MMI_HILOGI("start single click timer.");
-    TimerMgr->AddTimer(DOUBLE_CLICK_DELAY, 1, [this] () {
+    MMI_HILOGD("start single click timer.");
+    singleClickTimerId_ = TimerMgr->AddTimer(DOUBLE_CLICK_DELAY, 1, [this] () {
         if (this->pressCount_ == 1) {
             HandleQuickAccessMenu(SINGLE_CLICK);
             MMI_HILOGI("X-key is single click.");
@@ -181,16 +166,30 @@ void XKeyEventProcessor::StartSingleClickTimer()
     });
 }
 
+void XKeyEventProcessor::RemoveTimer()
+{
+    if (singleClickTimerId_ != -1) {
+        TimerMgr->RemoveTimer(singleClickTimerId_);
+        singleClickTimerId_ = -1;
+    }
+    if (longPressTimerId_ != -1) {
+        TimerMgr->RemoveTimer(longPressTimerId_);
+        longPressTimerId_ = -1;
+    }
+}
+
 void XKeyEventProcessor::ResetCount()
 {
-    pressCount_ == 0;
+    MMI_HILOGD("reset press count");
+    pressCount_ = 0;
 }
 
 int32_t XKeyEventProcessor::HandleQuickAccessMenu(int32_t xKeyEventType)
 {
     if (X_KEY_DOWN != xKeyEventType && X_KEY_UP != xKeyEventType) {
-        MMI_HILOGI("reset press count");
+        StartXKeyIfNeeded(xKeyEventType);
         ResetCount();
+        RemoveTimer();
     }
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -203,6 +202,21 @@ int32_t XKeyEventProcessor::HandleQuickAccessMenu(int32_t xKeyEventType)
     }
 #endif // (OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH) && OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
+}
+
+void XKeyEventProcessor::StartXKeyIfNeeded(int32_t xKeyEventType)
+{
+    if (!isStartedXKey_) {
+        isStartedXKey_ = true;
+        MMI_HILOGI("start x-key.");
+        AAFwk::Want want;
+        want.SetElementName(X_KEY_APP_BUNDLE_NAME, X_KEY_APP_ABILITY_NAME);
+        want.SetParam("xKeyEventType", xKeyEventType);
+        ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+        if (err != ERR_OK) {
+            MMI_HILOGI("start ability fail.");
+        }
+    }
 }
 #endif // OHOS_BUILD_ENABLE_X_KEY
 } // namespace MMI
