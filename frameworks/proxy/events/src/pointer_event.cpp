@@ -532,6 +532,8 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       ancoDeal_(other.ancoDeal_),
 #endif // OHOS_BUILD_ENABLE_ANCO
       handleEventType_(other.handleEventType_),
+      throwAngle_(other.throwAngle_),
+      throwSpeed_(other.throwSpeed_),
       settings_(other.settings_),
       autoToVirtualScreen_(other.autoToVirtualScreen_),
       handOption_(other.handOption_), fixedMode_(other.fixedMode_) {}
@@ -606,6 +608,26 @@ std::string PointerEvent::ToString()
 int32_t PointerEvent::GetPointerAction() const
 {
     return pointerAction_;
+}
+
+double PointerEvent::GetThrowAngle() const
+{
+    return throwAngle_ ;
+}
+
+void PointerEvent::SetThrowAngle(double throwAngle)
+{
+    throwAngle_ = throwAngle;
+}
+
+double PointerEvent::GetThrowSpeed() const
+{
+    return throwSpeed_;
+}
+
+void PointerEvent::SetThrowSpeed(double throwSpeed)
+{
+    throwSpeed_ = throwSpeed;
 }
 
 void PointerEvent::SetPointerAction(int32_t pointerAction)
