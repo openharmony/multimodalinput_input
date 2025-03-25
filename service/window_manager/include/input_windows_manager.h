@@ -408,7 +408,6 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     bool CancelTouch(int32_t touch);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    void ClearEventData(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool IsPointerActiveRectValid(const DisplayInfo &currentDisplay);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD

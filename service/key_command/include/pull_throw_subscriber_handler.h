@@ -71,6 +71,7 @@ private:
     bool alreadyTouchDown_ = false;
     static constexpr double THRES_SPEED = 0.6; // 阈值，单位像素/秒
     static constexpr int64_t MIN_THRES_DIST = 100; // 阈值，单位像素
+    static constexpr int32_t FIRST_TOUCH_FINGER = 0; // 最大手指数量
     const int64_t WINDOW_TIME_INTERVAL = 0.5e6; // 采样窗口，单位u秒
 };
 #define PULL_THROW_EVENT_HANDLER ::OHOS::DelayedSingleton<PullThrowSubscriberHandler>::GetInstance()
