@@ -443,6 +443,10 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RENDER_SERVICE);
     AddAppDebugListener();
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
+    AddSystemAbilityListener(SENSOR_SERVICE_ABILITY_ID);
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1846,6 +1850,13 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
+    if (systemAbilityId == SENSOR_SERVICE_ABILITY_ID) {
+        auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+        CHKPV(eventKeyCommandHandler);
+        eventKeyCommandHandler->RegisterProximitySensor();
+    }
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
 }
 
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)

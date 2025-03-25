@@ -98,7 +98,8 @@
         "qos_manager",
         "audio_framework",
         "graphic_surface",
-        "ipc"
+        "ipc",
+        "sensor"
       ],
       "third_party": [
         "libuv",
