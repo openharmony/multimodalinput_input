@@ -34,7 +34,7 @@ typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAl
 typedef std::function<void()> ClearTouchMessage;
 typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllKeyMessage;
 typedef std::function<void()> ClearKeyMessage;
-typedef std::function<void()> HardwareKeyEventDetected;
+typedef std::function<void(const std::string &keyName)> HardwareKeyEventDetected;
 typedef std::function<int32_t()> GetKeyboardActivationState;
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD

@@ -25,6 +25,7 @@
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "key_event_normalize.h"
+#include "key_event_value_transformation.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -1240,16 +1241,16 @@ void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event* event)
             return;
         }
         uint32_t keyCode = libinput_event_keyboard_get_key(keyboardEvent);
+        auto keyValueInfo = TransferKeyValue(static_cast<int32_t>(keyCode));
         int32_t hasFnKey = libinput_device_has_key(device, LIBINPUT_KEY_FN);
-        const char* outPutName = libinput_device_get_name(device);
-        MMI_HILOGD("The current keyCode:%{private}u, hasFnKey %{private}d, outPutName:%{private}s",
-            keyCode, hasFnKey, outPutName);
+        MMI_HILOGD("The current keyCode:%{private}u, hasFnKey:%{private}d, keyName:%{private}s",
+            keyCode, hasFnKey, keyValueInfo.keyEvent.c_str());
         if ((keyCode == LIBINPUT_KEY_VOLUME_DOWN || keyCode == LIBINPUT_KEY_VOLUME_UP ||
             keyCode == LIBINPUT_KEY_POWER) && !hasFnKey) {
             MMI_HILOGD("Skip device local button keyCode:%{private}u", keyCode);
             return;
         }
-        hardwareKeyEventDetected_();
+        hardwareKeyEventDetected_(keyValueInfo.keyEvent);
     }
 }
 
