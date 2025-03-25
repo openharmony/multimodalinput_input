@@ -762,8 +762,8 @@ impl FoldPcVirtTouchpadAccelerateCurves {
                     },
                     CurveItem {
                         speeds: vec![1.53, 3.73, 4.54, 5.19],
-                        slopes: vec![1.50, 3.01, 6.34, 9.66],
-                        diff_nums: vec![0.00, -2.31, -14.73, -29.8]
+                        slopes: vec![1.00, 2.12, 2.95, 4.5],
+                        diff_nums: vec![0.00, -1.7136, -4.8095, -11.8465]
                     },
                     CurveItem {
                         speeds: vec![1.53, 3.73, 4.54, 5.19],
