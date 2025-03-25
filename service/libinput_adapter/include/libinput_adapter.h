@@ -129,7 +129,11 @@ private:
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadTouchPadDown(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadTouchPadUp(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRightBtnDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
