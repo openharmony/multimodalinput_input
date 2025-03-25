@@ -3927,13 +3927,10 @@ bool InputWindowsManager::IsNavigationWindowInjectEvent(std::shared_ptr<PointerE
 void InputWindowsManager::UpdateDisplayXYInOneHandMode(double &physicalX, double &physicalY,
     const DisplayInfo &displayInfo, float oneHandScale)
 {
-    int32_t oneHandXMax = displayInfo.oneHandX + displayInfo.width * oneHandScale;
-    if ((physicalY >= displayInfo.oneHandY) && (physicalX >= displayInfo.oneHandX) && (physicalX <= oneHandXMax)) {
-        double virtualY = physicalY - displayInfo.oneHandY;
-        double virtualX = physicalX - displayInfo.oneHandX;
-        physicalX = virtualX / oneHandScale;
-        physicalY = virtualY / oneHandScale;
-    }
+    double virtualY = physicalY - displayInfo.oneHandY;
+    double virtualX = physicalX - displayInfo.oneHandX;
+    physicalX = virtualX / oneHandScale;
+    physicalY = virtualY / oneHandScale;
 }
 
 void InputWindowsManager::HandleOneHandMode(const DisplayInfo &displayInfo,
