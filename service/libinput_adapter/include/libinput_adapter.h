@@ -169,7 +169,8 @@ private:
     void HideMouseCursorTemporary();
     double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
     bool SkipTouchMove(int touchId, int32_t eventType); // compress touch move events in consecutive two frame
-    void StartVKBWorkerThread();
+    bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
+    void StartVKeyboardDelayTimer();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
