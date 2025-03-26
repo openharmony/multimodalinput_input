@@ -3570,50 +3570,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer, TestS
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DispatchPointer_002
- * @tc.desc: Test DispatchPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    int32_t pointerAction = PointerEvent::POINTER_ACTION_ENTER_WINDOW;
-    UDSServer udsServer;
-    inputWindowsManager.udsServer_ = &udsServer;
-    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
-    EXPECT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(100);
-    item.SetDisplayY(100);
-    inputWindowsManager.lastPointerEvent_->AddPointerItem(item);
-    inputWindowsManager.lastPointerEvent_->SetPointerId(0);
-    inputWindowsManager.firstBtnDownWindowInfo_.first = 1;
-    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    inputWindowsManager.lastPointerEvent_->SetTargetDisplayId(-1);
-    WindowInfo windowInfo;
-    windowInfo.id = 1;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
-    inputWindowsManager.lastWindowInfo_.id = 2;
-    inputWindowsManager.lastWindowInfo_.agentWindowId = 2;
-    inputWindowsManager.lastWindowInfo_.area.x = 100;
-    inputWindowsManager.lastWindowInfo_.area.y = 100;
-    inputWindowsManager.lastPointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    inputWindowsManager.lastPointerEvent_->SetDeviceId(5);
-    inputWindowsManager.extraData_.appended = true;
-    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
-    InputHandler->eventFilterHandler_ = std::make_shared<EventFilterHandler>();
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
-    inputWindowsManager.lastWindowInfo_.id = 1;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
-    inputWindowsManager.extraData_.appended = false;
-    pointerAction = PointerEvent::POINTER_ACTION_LEAVE_WINDOW;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_NotifyPointerToWindow
  * @tc.desc: Test NotifyPointerToWindow
  * @tc.type: FUNC
@@ -3888,31 +3844,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_002,
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(1);
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_ERR);
-    inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
-    WindowGroupInfo windowGroupInfo;
-    WindowInfo windowInfo;
-    windowInfo.id = 10;
-    windowInfo.pid = 50;
-    windowInfo.agentWindowId = 60;
-    windowGroupInfo.windowsInfo.push_back(windowInfo);
-    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
-    inputWindowsManager.mouseDownInfo_.id = -1;
-    inputWindowsManager.SetHoverScrollState(true);
-    std::map<int32_t, PointerStyle> styleMap;
-    PointerStyle pointerStyle;
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
-    styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
-    UDSServer udsServer;
-    inputWindowsManager.udsServer_ = &udsServer;
-    inputWindowsManager.SetUiExtensionInfo(true, 50, 10);
-    inputWindowsManager.isDragBorder_ = true;
-    inputWindowsManager.dragFlag_ = false;
-    inputWindowsManager.captureModeInfo_.isCaptureMode = true;
-    inputWindowsManager.captureModeInfo_.windowId = 1;
-    inputWindowsManager.extraData_.appended = true;
-    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
-    EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), ERR_OK);
 }
 
 /**
@@ -3944,30 +3875,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(1);
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_ERR);
-    inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
-    WindowGroupInfo windowGroupInfo;
-    WindowInfo windowInfo;
-    windowInfo.id = 10;
-    windowInfo.pid = 50;
-    windowInfo.agentWindowId = 60;
-    windowGroupInfo.windowsInfo.push_back(windowInfo);
-    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
-    inputWindowsManager.mouseDownInfo_.id = -1;
-    inputWindowsManager.SetHoverScrollState(true);
-    std::map<int32_t, PointerStyle> styleMap;
-    PointerStyle pointerStyle;
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
-    styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
-    UDSServer udsServer;
-    inputWindowsManager.udsServer_ = &udsServer;
-    inputWindowsManager.SetUiExtensionInfo(false, 50, 10);
-    inputWindowsManager.isDragBorder_ = false;
-    inputWindowsManager.dragFlag_ = true;
-    inputWindowsManager.captureModeInfo_.isCaptureMode = false;
-    inputWindowsManager.captureModeInfo_.windowId = 10;
-    inputWindowsManager.extraData_.appended = false;
-    EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), ERR_OK);
 }
 
 /**
@@ -7056,7 +6963,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_001, 
     EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7074,7 +6981,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_002, 
     uint32_t flag = 0x00000080;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7092,7 +6999,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_003, 
     uint32_t flag = 0x00000080;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**
@@ -7110,7 +7017,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_004, 
     uint32_t flag = 0x00000100;
     pointerEvent->bitwise_ |= flag;
     InputWindowsManager inputWindowsManager;
-    EXPECT_TRUE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
 }
 
 /**

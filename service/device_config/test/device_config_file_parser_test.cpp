@@ -46,14 +46,9 @@ public:
  */
 HWTEST_F(DeviceConfigFileParserTest, DeviceConfigFileParserTest_CombDeviceFileName_001, TestSize.Level1)
 {
-    class MockLibinputDeviceNullName : public MockLibinputDevice {
-    public:
-        const char* LibinputDeviceGetName() const override { return nullptr; }
-    };
-
-    MockLibinputDeviceNullName mockDevice;
     DeviceConfigManagement configManager;
-    std::string fileName = configManager.CombDeviceFileName(reinterpret_cast<struct libinput_device*>(&mockDevice));
+    struct libinput_device *device = nullptr;
+    std::string fileName = configManager.CombDeviceFileName(device);
     EXPECT_NE(fileName, "63373_13888_63373_x");
 }
 
