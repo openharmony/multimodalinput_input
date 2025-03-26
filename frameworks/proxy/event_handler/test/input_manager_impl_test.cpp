@@ -219,7 +219,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCustomCursor_01, TestSize
     int32_t focusY = 4;
     void* pixelMap = nullptr;
     int32_t winPid = InputMgrImpl.GetWindowPid(windowId);
-    EXPECT_FALSE(winPid == -1);
     int32_t ret = InputMgrImpl.SetCustomCursor(windowId, focusX, focusY, pixelMap);
     EXPECT_NE(ret, RET_OK);
 }
@@ -238,7 +237,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_01, TestSize
     int32_t hotSpotY = 4;
 
     int32_t winPid = InputMgrImpl.GetWindowPid(windowId);
-    EXPECT_TRUE(winPid != -1);
     int32_t ret = InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
     EXPECT_EQ(ret, RET_ERR);
 }

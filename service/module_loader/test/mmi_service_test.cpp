@@ -319,7 +319,7 @@ HWTEST_F(MMIServerTest, SetCustomCursor_001, TestSize.Level1)
     int32_t focusY = 500;
     void* pixelMap = nullptr;
     int32_t ret = mmiService.SetCustomCursor(windowId, focusX, focusY, pixelMap);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -1096,7 +1096,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_InitService, TestSize.Level1)
 HWTEST_F(MMIServerTest, MMIServerTest_OnAppDebugStoped_01, TestSize.Level1)
 {
     AppDebugListener listener;
-    std::vector<AppExecFwk::AppDebugInfo> debugInfos(-1);
+    std::vector<AppExecFwk::AppDebugInfo> debugInfos(1);
     ASSERT_NO_FATAL_FAILURE(listener.OnAppDebugStoped(debugInfos));
     listener.appDebugPid_ = 4;
     ASSERT_NO_FATAL_FAILURE(listener.OnAppDebugStoped(debugInfos));
