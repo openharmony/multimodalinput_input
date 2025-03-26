@@ -335,7 +335,7 @@ void EventDispatchHandler::UpdateDisplayXY(const std::shared_ptr<PointerEvent> &
     int32_t targetDisplayId = point->GetTargetDisplayId();
     int32_t targetWindowId = pointerItem.GetTargetWindowId();
     std::optional<WindowInfo> opt = WIN_MGR->GetWindowAndDisplayInfo(targetWindowId, targetDisplayId);
-    if (opt && point->GetFixedMode() == PointerEvent::FixedMode::ONE_HAND) {
+    if (opt && point->GetFixedMode() == PointerEvent::FixedMode::AUTO) {
         WindowInputType windowInputType = opt.value().windowInputType;
         if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {

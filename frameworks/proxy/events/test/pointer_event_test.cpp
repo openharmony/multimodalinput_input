@@ -1975,7 +1975,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedModeStr, TestSize.Level2)
     fixedMode = PointerEvent::FixedMode::NORMAL;
     pointer->SetFixedMode(fixedMode);
     ASSERT_EQ(pointer->GetFixedModeStr(), "normal");
-    fixedMode = PointerEvent::FixedMode::ONE_HAND;
+    fixedMode = PointerEvent::FixedMode::AUTO;
     pointer->SetFixedMode(fixedMode);
     ASSERT_EQ(pointer->GetFixedModeStr(), "one-hand");
 }
