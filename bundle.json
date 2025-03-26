@@ -91,7 +91,8 @@
         "googletest",
         "player_framework",
         "cJSON",
-        "qos_manager"
+        "qos_manager",
+        "runtime_core"
       ],
       "third_party": [
         "libuv",
