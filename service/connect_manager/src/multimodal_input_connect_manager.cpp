@@ -1052,5 +1052,12 @@ int32_t MultimodalInputConnectManager::SetMultiWindowScreenId(uint64_t screenId,
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMultiWindowScreenId(screenId, displayNodeScreenId);
 }
+
+int32_t MultimodalInputConnectManager::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetKnuckleSwitch(knuckleSwitch);
+}
 } // namespace MMI
 } // namespace OHOS

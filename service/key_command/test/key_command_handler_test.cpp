@@ -1321,7 +1321,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
     ASSERT_NE(touchEvent, nullptr);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     handler.singleKnuckleGesture_.state = false;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
     touchEvent->AddPointerItem(item);
     touchEvent->SetPointerId(1);
     touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -1512,7 +1512,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     handler.twoFingerGesture_.active = true;
-    handler.knuckleSwitch_.statusConfigValue = true;
+    handler.gameForbidFingerKnuckle_ = true;
 
     item.SetPointerId(2);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
@@ -1534,7 +1534,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     handler.twoFingerGesture_.active = true;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
 
     item.SetPointerId(2);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
@@ -3336,7 +3336,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
     touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     handler.singleKnuckleGesture_.state = false;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
 }
 
@@ -3360,7 +3360,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
     touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     handler.singleKnuckleGesture_.state = false;
-    handler.knuckleSwitch_.statusConfigValue = true;
+    handler.gameForbidFingerKnuckle_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
 }
 
@@ -5725,7 +5725,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     touchEvent->SetTargetDisplayId(0);
 
     KeyCommandHandler handler;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
 
     DisplayInfo displayInfo;
     displayInfo.id = 0;
@@ -5856,7 +5856,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_001,
     touchEvent->SetPointerId(0);
 
     KeyCommandHandler handler;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
     handler.singleKnuckleGesture_.state = false;
 
     DisplayInfo displayInfo;
@@ -5911,7 +5911,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_002,
     touchEvent->SetPointerId(0);
 
     KeyCommandHandler handler;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
     handler.singleKnuckleGesture_.state = false;
 
     DisplayInfo displayInfo;
