@@ -1131,9 +1131,9 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_, repeatKeyMaxTimes_);
-    screenshotSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    screenshotSwitch_.statusConfig = SNAPSHOT_KNUCKLE_SWITCH;
     screenshotSwitch_.statusConfigValue = true;
-    recordSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    recordSwitch_.statusConfig = RECORD_KNUCKLE_SWITCH;
     recordSwitch_.statusConfigValue = true;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
