@@ -2985,5 +2985,27 @@ int32_t MultimodalInputConnectProxy::SetMultiWindowScreenId(uint64_t screenId, u
     }
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEBOOL(data, knuckleSwitch, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KNUCKLE_SWITCH),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

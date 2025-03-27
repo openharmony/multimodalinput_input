@@ -165,13 +165,13 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 
 bool KeyCommandHandler::GetKnuckleSwitchValue()
 {
-    return knuckleSwitch_.statusConfigValue;
+    return gameForbidFingerKnuckle_;
 }
 
 bool KeyCommandHandler::SkipKnuckleDetect()
 {
     return ((!screenshotSwitch_.statusConfigValue) && (!recordSwitch_.statusConfigValue)) ||
-        knuckleSwitch_.statusConfigValue;
+        gameForbidFingerKnuckle_;
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -399,7 +399,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
             return;
         }
     }
-    if (knuckleSwitch_.statusConfigValue) {
+    if (gameForbidFingerKnuckle_) {
         MMI_HILOGI("Knuckle switch closed");
         return;
     }
@@ -764,7 +764,7 @@ bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touc
             return false;
         }
     }
-    if (knuckleSwitch_.statusConfigValue) {
+    if (gameForbidFingerKnuckle_) {
         if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
             touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
             MMI_HILOGI("Knuckle switch closed");
@@ -1131,10 +1131,9 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_, repeatKeyMaxTimes_);
-    knuckleSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
-    screenshotSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    screenshotSwitch_.statusConfig = SNAPSHOT_KNUCKLE_SWITCH;
     screenshotSwitch_.statusConfigValue = true;
-    recordSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    recordSwitch_.statusConfig = RECORD_KNUCKLE_SWITCH;
     recordSwitch_.statusConfigValue = true;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
@@ -1538,7 +1537,6 @@ void KeyCommandHandler::InitKeyObserver()
         isParseStatusConfig_ = true;
     }
     if (!isKnuckleSwitchConfig_) {
-        CreateStatusConfigObserver(knuckleSwitch_);
         CreateKnuckleConfigObserver(screenshotSwitch_);
         CreateKnuckleConfigObserver(recordSwitch_);
         isKnuckleSwitchConfig_ = true;
@@ -2908,8 +2906,7 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
 void KeyCommandHandler::OnKunckleSwitchStatusChange(const std::string switchName)
 {
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (switchName != SETTING_KNUCKLE_SWITCH && switchName != SNAPSHOT_KNUCKLE_SWITCH
-        && switchName != RECORD_KNUCKLE_SWITCH) {
+    if (switchName != SNAPSHOT_KNUCKLE_SWITCH && switchName != RECORD_KNUCKLE_SWITCH) {
         return;
     }
     bool isKnuckleEnable = !SkipKnuckleDetect();
@@ -3012,6 +3009,13 @@ void KeyCommandHandler::RegisterProximitySensor()
     if (ret != 0) {
         MMI_HILOGE("Failed to ActivateSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
     }
+}
+
+int32_t KeyCommandHandler::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    gameForbidFingerKnuckle_ = !knuckleSwitch;
+    MMI_HILOGI("SetKnuckleSwitch is successful in keyCommand handler, knuckleSwitch:%{public}d", knuckleSwitch);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
