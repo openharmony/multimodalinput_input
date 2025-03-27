@@ -2503,7 +2503,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_branchCoverage, Test
     pointerDrawingManager.cursorWidth_ = 1;
     pointerDrawingManager.canvasHeight_ = 0;
     pointerDrawingManager.cursorHeight_ = 1;
-    pointerDrawingManager.SetFaceNodeBounds();
+    pointerDrawingManager.SetsurfaceNodeBounds();
     ret = pointerDrawingManager.DrawNewDpiPointer();
     ASSERT_NE(ret, RET_OK);
 }
