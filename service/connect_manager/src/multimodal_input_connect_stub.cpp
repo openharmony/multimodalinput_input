@@ -3470,8 +3470,8 @@ int32_t MultimodalInputConnectStub::StubSetKnuckleSwitch(MessageParcel &data, Me
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetKnuckleSwitch failed, ret:%{public}d", ret);
         return ret;
-     }
-     return RET_OK;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
