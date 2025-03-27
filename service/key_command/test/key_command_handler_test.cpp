@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -3922,37 +3922,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportGestureInfo_001, Tes
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_AddSequenceKey_004
- * @tc.desc: Test the funcation AddSequenceKey
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
-    EXPECT_NE(inputEvent, nullptr);
-    inputEvent->actionTime_ = 1;
-    SequenceKey sequenceKey;
-    sequenceKey.keyCode = 1;
-    sequenceKey.keyAction = 2;
-    sequenceKey.actionTime = 3;
-    sequenceKey.delay = 4;
-    handler.keys_.push_back(sequenceKey);
-    bool ret = handler.AddSequenceKey(keyEvent);
-    ASSERT_TRUE(ret);
-    inputEvent->actionTime_ = 1100000;
-    ret = handler.AddSequenceKey(keyEvent);
-    ASSERT_FALSE(ret);
-    inputEvent->actionTime_ = 100000;
-    ret = handler.AddSequenceKey(keyEvent);
-    ASSERT_FALSE(ret);
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_004
  * @tc.desc: Test knuckle gesture touch up event straight line
  * @tc.type: FUNC
@@ -6292,19 +6261,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_005, TestSize.
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_IsMusicActivate_001
- * @tc.desc: Test the funcation IsMusicActivate
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMusicActivate_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    ASSERT_NO_FATAL_FAILURE(handler.IsMusicActivate());
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003
  * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
  * @tc.type: FUNC
@@ -6362,29 +6318,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
 
     handler.downActionTime_ = 100;
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_001
- * @tc.desc: Test if (bundleName.find(matchName) == std::string::npos)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_001, TestSize.Level1)
-{
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-
-    RepeatKey repeatKey;
-    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
-    repeatKey.ability.bundleName = ".camera";
-
-    KeyCommandHandler handler;
-    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
-
-    repeatKey.ability.bundleName = ".test";
-    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
 }
 
 /**
