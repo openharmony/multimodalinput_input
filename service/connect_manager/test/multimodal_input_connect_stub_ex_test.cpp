@@ -383,7 +383,6 @@ public:
     {
         return static_cast<int32_t>(knuckleSwitch);
     };
-
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;
