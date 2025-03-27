@@ -185,6 +185,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void InitKeyObserver();
     bool PreHandleEvent();
+    int32_t SetKnuckleSwitch(bool knuckleSwitch);
     void RegisterProximitySensor();
 
 private:
@@ -350,7 +351,6 @@ private:
     bool isTimeConfig_ { false };
     bool isDistanceConfig_ { false };
     bool isKnuckleSwitchConfig_ { false };
-    struct KnuckleSwitch knuckleSwitch_;
     struct KnuckleSwitch screenshotSwitch_;
     struct KnuckleSwitch recordSwitch_;
     int32_t checkAdjustIntervalTimeCount_ { 0 };
@@ -408,6 +408,7 @@ private:
     int64_t lastMenuDownTime_ {0};
     bool existMenuDown_ { false };
     std::shared_ptr<KeyEvent> tmpkeyEvent_ {nullptr};
+    bool gameForbidFingerKnuckle_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

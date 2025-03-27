@@ -201,6 +201,7 @@ public:
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     int32_t SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId);
+    int32_t SetKnuckleSwitch(bool knuckleSwitch) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

@@ -184,6 +184,7 @@ protected:
     int32_t StubShiftAppPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCustomMouseCursor(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMultiWindowScreenId(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetKnuckleSwitch(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);
