@@ -1993,6 +1993,13 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         currentPointerItem.SetDisplayX(mouseLocation_.physicalX);
         currentPointerItem.SetDisplayY(mouseLocation_.physicalY);
         pointerEvent->SetTargetDisplayId(mouseLocation_.displayId);
+        if (IsMouseSimulate()) {
+            currentPointerItem.SetWindowX(lastPointerItem.GetWindowX());
+            currentPointerItem.SetWindowY(lastPointerItem.GetWindowY());
+            currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
+            currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+            pointerEvent->SetTargetDisplayId(lastPointerEventCopy->GetTargetDisplayId());
+        }
     } else {
         if (IsMouseSimulate()) {
             currentPointerItem.SetWindowX(lastPointerItem.GetWindowX());
@@ -2060,7 +2067,17 @@ void InputWindowsManager::NotifyPointerToWindow()
             static_cast<int32_t>(lastPointerEventCopy->GetPressedButtons().size()));
         return;
     }
-    windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+    if (IsMouseSimulate()) {
+        int32_t pointerId = lastPointerEventCopy->GetPointerId();
+        PointerEvent::PointerItem pointerItem;
+        if (!lastPointerEventCopy->GetPointerItem(pointerId, pointerItem)) {
+            MMI_HILOGE("Get pointer item failed, pointerId:%{public}d", pointerId);
+            return;
+        }
+        windowInfo = GetWindowInfo(pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+    } else {
+        windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+    }
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
         return;
