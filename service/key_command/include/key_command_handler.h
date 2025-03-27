@@ -185,6 +185,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void InitKeyObserver();
     bool PreHandleEvent();
+    void RegisterProximitySensor();
 
 private:
     void Print();

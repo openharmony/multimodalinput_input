@@ -29,6 +29,8 @@
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
+#include "sensor_agent.h"
+#include "sensor_agent_type.h"
 #include "stylus_key_handler.h"
 
 #undef MMI_LOG_DOMAIN
@@ -75,7 +77,27 @@ const std::string SECURE_SETTING_URI_PROXY {
 const char *TV_MENU_BUNDLE_NAME = "com.ohos.sceneboard";
 const char *TV_MENU_ABILITY_NAME = "com.ohos.sceneboard.MultimodalInputService";
 constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
+constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
+constexpr int32_t SENSOR_REPORT_INTERVAL = 100000000;
+struct SensorUser g_user = {.name = {0}, .callback = nullptr, .userData = nullptr};
+std::atomic<int32_t> g_distance { 0 };
 } // namespace
+
+static void SensorDataCallbackImpl(SensorEvent *event)
+{
+    if (event == nullptr) {
+        MMI_HILOGE("Event is nullptr");
+        return;
+    }
+    if (event->sensorTypeId != SENSOR_TYPE_ID_PROXIMITY) {
+        MMI_HILOGE("Event sensorTypeId is not SENSOR_TYPE_ID_PROXIMITY");
+        return;
+    }
+    ProximityData* proximityData = reinterpret_cast<ProximityData*>(event->data);
+    int32_t distance = static_cast<int32_t>(proximityData->distance);
+    MMI_HILOGI("Proximity distance %{public}d", distance);
+    g_distance = distance;
+}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
@@ -1073,7 +1095,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         return true;
     }
     if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
-        !IsMusicActivate()) {
+        !IsMusicActivate() && (g_distance > 0)) {
         return true;
     }
     MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
@@ -2970,6 +2992,26 @@ void KeyCommandHandler::MenuClickProcess(const std::string bundleName,
     ability.abilityName = abilityName;
     ability.params.emplace(std::make_pair("trigger_type", action));
     LaunchAbility(ability, NO_DELAY);
+}
+
+void KeyCommandHandler::RegisterProximitySensor()
+{
+    CALL_INFO_TRACE;
+    g_user.callback = SensorDataCallbackImpl;
+    int32_t ret = SubscribeSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
+    if (ret != 0) {
+        MMI_HILOGE("Failed to SubscribeSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+        return;
+    }
+    ret = SetBatch(SENSOR_TYPE_ID_PROXIMITY, &g_user, SENSOR_SAMPLING_INTERVAL, SENSOR_REPORT_INTERVAL);
+    if (ret != 0) {
+        MMI_HILOGE("Failed to SetBatch: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+        return;
+    }
+    ret = ActivateSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
+    if (ret != 0) {
+        MMI_HILOGE("Failed to ActivateSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
