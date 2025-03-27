@@ -56,7 +56,6 @@ constexpr int32_t TOUCH_TOP_LIMIT = 80;
 constexpr int32_t TOUCH_BOTTOM_LIMIT = 41;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
-constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
 const std::string EXTENSION_ABILITY = "extensionAbility";
