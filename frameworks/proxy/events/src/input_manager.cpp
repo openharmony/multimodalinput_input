@@ -890,5 +890,10 @@ void InputManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNod
 {
     InputMgrImpl.SetMultiWindowScreenId(screenId, displayNodeScreenId);
 }
+
+int32_t InputManager::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    return InputMgrImpl.SetKnuckleSwitch(knuckleSwitch);
+}
 } // namespace MMI
 } // namespace OHOS

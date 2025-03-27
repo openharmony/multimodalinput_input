@@ -3771,5 +3771,24 @@ int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNo
     }
     return RET_OK;
 }
+
+int32_t MMIService::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPR(eventKeyCommandHandler, RET_ERR);
+    int32_t ret = delegateTasks_.PostAsyncTask(
+        [knuckleSwitch, eventKeyCommandHandler] {
+            return eventKeyCommandHandler->SetKnuckleSwitch(knuckleSwitch);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetKnuckleSwitch failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

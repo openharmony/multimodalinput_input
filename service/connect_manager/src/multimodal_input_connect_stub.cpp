@@ -493,6 +493,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID):
             ret = StubSetMultiWindowScreenId(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KNUCKLE_SWITCH):
+            ret = StubSetKnuckleSwitch(data, reply);
+            break;
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_MONITOR):
             ret = StubSubscribeKeyMonitor(data, reply);
@@ -3446,7 +3449,26 @@ int32_t MultimodalInputConnectStub::StubSetMultiWindowScreenId(MessageParcel &da
     READUINT64(data, displayNodeScreenId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetMultiWindowScreenId(screenId, displayNodeScreenId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SkipPointerLayer failed, ret:%{public}d", ret);
+        MMI_HILOGE("Call SetMultiWindowScreenId failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetKnuckleSwitch(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t callingUid = GetCallingUid();
+    int32_t gameUid = 7011 ;
+    if (callingUid != gameUid || !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    bool knuckleSwitch = true;
+    READBOOL(data, knuckleSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetKnuckleSwitch(knuckleSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetKnuckleSwitch failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

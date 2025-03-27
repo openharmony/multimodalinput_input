@@ -1142,6 +1142,8 @@ public:
 
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
+    int32_t SetKnuckleSwitch(bool knuckleSwitch);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
