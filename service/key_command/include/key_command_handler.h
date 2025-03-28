@@ -171,7 +171,6 @@ public:
     void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
     bool GetKnuckleSwitchValue();
     bool SkipKnuckleDetect();
@@ -291,7 +290,6 @@ private:
     void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
         KnuckleGesture &knuckleGesture, KnuckleType type);
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
-    void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
     bool CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -348,7 +346,6 @@ private:
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
     MultiFingersTap threeFingersTap_;
-    bool isTimeConfig_ { false };
     bool isDistanceConfig_ { false };
     bool isKnuckleSwitchConfig_ { false };
     struct KnuckleSwitch screenshotSwitch_;
