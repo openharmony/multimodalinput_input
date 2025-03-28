@@ -204,7 +204,7 @@ private:
         PointerStyle pointerStyle);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
-    void SetsurfaceNodeBounds();
+    void SetSurfaceNodeBounds();
     int32_t DrawNewDpiPointer() override;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
