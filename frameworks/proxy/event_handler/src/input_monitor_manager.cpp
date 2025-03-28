@@ -22,11 +22,8 @@
 
 namespace OHOS {
 namespace MMI {
-InputMonitorManager &InputMonitorManager::GetInstance()
-{
-    __attribute__((no_destroy)) static InputMonitorManager instance;
-    return instance;
-}
+InputMonitorManager::InputMonitorManager() {}
+InputMonitorManager::~InputMonitorManager() {}
 
 int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType)
 {
