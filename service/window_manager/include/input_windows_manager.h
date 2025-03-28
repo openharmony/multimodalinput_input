@@ -503,7 +503,7 @@ private:
     std::mutex mtx_;
     std::atomic_bool isHPR_ { false };
     std::mutex oneHandMtx_;
-    bool inOneHandMode_ = false;
+    int32_t scalePercent_ = 100;
 };
 } // namespace MMI
 } // namespace OHOS
