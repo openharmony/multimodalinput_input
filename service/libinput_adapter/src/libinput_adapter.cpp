@@ -29,6 +29,8 @@
 #include "key_event_value_transformation.h"
 #include "timer_manager.h"
 #include <shared_mutex>
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 #undef MMI_LOG_DOMAIN
@@ -182,7 +184,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
 };
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-bool isBooted = false;
+bool isBooted_ = false;
 
 class BootStatusReceiver : public EventFwk::CommonEventSubscriber {
 public:
@@ -195,16 +197,27 @@ public:
  
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
-        isBooted = true;
+        isBooted_ = true;
+        std::string action = eventData.GetWant().GetAction();
+        if (action.empty()) {
+            MMI_HILOGE("The action is empty");
+            return;
+        }
+        MMI_HILOGI("Received boot status:%{public}s", action.c_str());
     }
 };
 
 void LibinputAdapter::RegisterBootStatusReceiver()
 {
+    if (hasInitSubscriber_) {
+        MMI_HILOGE("Current common event has subscribered");
+        return;
+    }
+    MMI_HILOGI("Subscribe Boot Events");
     EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent("common.event.SCREENLOCK_BOOT_COMPLETED");
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
-    OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
+    hasInitSubscriber_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<BootStatusReceiver>(commonEventSubscribeInfo));
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1432,7 +1445,7 @@ void LibinputAdapter::OnEventHandler()
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
             || eventType == LIBINPUT_EVENT_TOUCH_CANCEL
-            || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBooted
+            || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBooted_
             ) {
             touch = libinput_event_get_touch_event(event);
             double touchPressure = 0.0;

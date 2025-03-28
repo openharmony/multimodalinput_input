@@ -175,6 +175,8 @@ private:
     bool SkipTouchMove(int touchId, int32_t eventType); // compress touch move events in consecutive two frame
     bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
     void StartVKeyboardDelayTimer();
+    // set as true once subscriber succeeded.
+    bool hasInitSubscriber_ { false };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
