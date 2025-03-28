@@ -1483,9 +1483,14 @@ bool InputWindowsManager::JudgeCaramaInFore()
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (displayGroupInfo.displaysInfo.size() > 0) {
-        std::shared_ptr<PointEvent> pointerEvent = nullptr;
-        SendOneHandData(displayGroupInfo.displaysInfo[0], pointEvent);
+    if (!displayGroupInfo.displaysInfo.empty()) {
+        const auto &displayInfo = displayGroupInfo.displaysInfo.front();
+        std::lock_guard<std::mutex> lock(oneHandMtx_);
+        if (scalePercent_ != displayInfo.scalePercent) {
+            MMI_HILOGI("Send one hand data to anco, scalePercent:%{public}d", displayInfo.scalePercent);
+            UpdateOneHandDataExt(displayInfo);
+            scalePercent_ = displayInfo.scalePercent;
+        }
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     auto action = UpdateWindowInfo(displayGroupInfo);
@@ -3953,9 +3958,6 @@ void InputWindowsManager::UpdateDisplayXYInOneHandMode(double &physicalX, double
 void InputWindowsManager::HandleOneHandMode(const DisplayInfo &displayInfo,
     std::shared_ptr<PointerEvent> &pointerEvent, PointerEvent::PointerItem &pointerItem)
 {
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    SendOneHandData(displayInfo, pointerEvent);
-#endif // OHOS_BUILD_ENABLE_ANCO
     pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
     MMI_HILOG_DISPATCHD("displayInfo.oneHandX=%{private}d, displayInfo.oneHandY=%{private}d, "
                         "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
@@ -4001,9 +4003,6 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const DisplayInfo &disp
     if (displayInfo.scalePercent > 0 && displayInfo.scalePercent < 100) {
         HandleOneHandMode(displayInfo, pointerEvent, pointerItem);
     } else {
-#ifdef OHOS_BUILD_ENABLE_ANCO
-        SendOneHandData(displayInfo, pointerEvent);
-#endif // OHOS_BUILD_ENABLE_ANCO
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
         pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
         pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
@@ -6018,27 +6017,6 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
     }
 
     return IsAncoWindowFocus(*windowInfo);
-}
-
-void InputWindowsManager::SendOneHandData(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent)
-{
-    if (pointerEvent != nullptr) {
-        if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
-            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
-            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
-            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
-            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
-            MMI_HILOG_DISPATCHI("one hand mode %{public}s, displayInfo.oneHandX=%{private}d, "
-                                "displayInfo.oneHandY=%{private}d, expandHeight=%{public}d, scalePercent=%{public}d",
-                inOneHand ? "in" : "out", displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight,
-                displayInfo.scalePercent);
-            UpdateOneHandDataExt(displayInfo);
-        }
-    } else {
-        UpdateOneHandDataExt(displayInfo);
-    }
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 
