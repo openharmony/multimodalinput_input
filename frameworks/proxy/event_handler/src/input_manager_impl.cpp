@@ -979,7 +979,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddMonitor(consumer, eventType);
+    return IMonitorMgr.AddMonitor(consumer, eventType);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -995,7 +995,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddMonitor(consumer, actionsType);
+    return IMonitorMgr.AddMonitor(consumer, actionsType);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -1010,7 +1010,7 @@ int32_t InputManagerImpl::RemoveMonitor(int32_t monitorId)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->RemoveMonitor(monitorId);
+    return IMonitorMgr.RemoveMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -1026,7 +1026,7 @@ int32_t InputManagerImpl::AddGestureMonitor(
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddGestureMonitor(consumer, type, fingers);
+    return IMonitorMgr.AddGestureMonitor(consumer, type, fingers);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -1040,7 +1040,7 @@ int32_t InputManagerImpl::RemoveGestureMonitor(int32_t monitorId)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->RemoveGestureMonitor(monitorId);
+    return IMonitorMgr.RemoveGestureMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -1055,7 +1055,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    IMonitorMgr->MarkConsumed(monitorId, eventId);
+    IMonitorMgr.MarkConsumed(monitorId, eventId);
 #else
     MMI_HILOGI("Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
