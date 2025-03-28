@@ -1537,7 +1537,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         SendOneHandData(displayGroupInfo.displaysInfo[0], pointEvent);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    MMI_HILOGI("Displays Info size:%{public}lu, focusWindowId:%{public}d",
+    MMI_HILOGI("Displays Info size:%{public}zu, focusWindowId:%{public}d",
         displayGroupInfo.displaysInfo.size(), displayGroupInfo.focusWindowId);
     auto action = UpdateWindowInfo(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
