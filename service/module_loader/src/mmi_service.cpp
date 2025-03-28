@@ -1224,6 +1224,7 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
         return COMMON_PARAMETER_ERROR;
     }
     auto tmpDevice = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    CHKPR(tmpDevice, COMMON_PARAMETER_ERROR);
     inputDevice->SetId(tmpDevice->GetId());
     inputDevice->SetType(tmpDevice->GetType());
     inputDevice->SetName(tmpDevice->GetName());
