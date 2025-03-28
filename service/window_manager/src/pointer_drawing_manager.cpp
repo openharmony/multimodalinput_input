@@ -3567,12 +3567,18 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
             cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
             focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
     }
-    SetFaceNodeBounds();
+    SetSurfaceNodeBounds();
     return pixelMapPtr;
 }
 
-void PointerDrawingManager::SetFaceNodeBounds()
+void PointerDrawingManager::SetSurfaceNodeBounds()
 {
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CHKPV(hardwareCursorPointerManager_);
+    if (hardwareCursorPointerManager_->IsSupported()) {
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (canvasWidth_ < cursorWidth_ && canvasHeight_ < cursorHeight_) {
         canvasWidth_ = cursorWidth_;
         canvasHeight_ = cursorHeight_;
