@@ -1710,6 +1710,44 @@ ohos_unittest("KeyEventNormalizeTest") {
   ]
 }
 
+ohos_unittest("KeyUnicodeTransformationTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/event_handler/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "key_event_normalize/test/key_unicode_transformation_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libwm",
+  ]
+}
+
 ohos_unittest("KeyEventValueTransformationTest") {
   module_out_path = module_output_path
 
