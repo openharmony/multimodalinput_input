@@ -48,7 +48,6 @@ constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t INTERVAL_TIME = 100;
 constexpr int32_t INTERVAL_TIME_OUT = 500000;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
-constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
 constexpr int32_t TWO_FINGERS_DISTANCE_LIMIT = 16;
 constexpr int32_t TOUCH_LIFT_LIMIT = 24;
@@ -57,7 +56,6 @@ constexpr int32_t TOUCH_TOP_LIMIT = 80;
 constexpr int32_t TOUCH_BOTTOM_LIMIT = 41;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
-constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
 const std::string EXTENSION_ABILITY = "extensionAbility";
@@ -1358,7 +1356,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleTouchEvent, TestSi
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     handler.isParseConfig_ = false;
-    handler.isTimeConfig_ = false;
     handler.isDistanceConfig_ = false;
     handler.isKnuckleSwitchConfig_ = true;
     item.SetPointerId(1);
@@ -2009,7 +2006,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_001, TestSize.
     auto pointerEvent = SetupSingleKnuckleDownEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
     keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
@@ -2042,7 +2038,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_002, TestSize.
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
     keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
     ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
@@ -2091,7 +2086,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_004, TestSize.
     auto pointerEvent = SetupSingleKnuckleDownEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
     keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
@@ -2124,7 +2118,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_005, TestSize.
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
     keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
     ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
@@ -2307,30 +2300,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UpdateSettingsXml_001, Tes
     ASSERT_EQ(handler.UpdateSettingsXml("businessId", 1000), 0);
     auto result = PREFERENCES_MGR->SetShortKeyDuration("businessId", 100);
     ASSERT_EQ(handler.UpdateSettingsXml("businessId", 100), result);
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed_001
- * @tc.desc: Adjust timeInterval configIf need verify
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed_001, TestSize.Level1)
-{
-    KeyCommandHandler handler;
-    int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
-    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_SLOW);
-    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
-    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    ASSERT_NE(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
-    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
-    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_SLOW);
-    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_SLOW);
 }
 
 /**
@@ -2721,20 +2690,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_InterruptTimers, TestSize.
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_SetKnuckleDoubleTapIntervalTime
- * @tc.desc: SetKnuckleDoubleTapIntervalTime
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetKnuckleDoubleTapIntervalTime, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    int64_t interval = -1;
-    ASSERT_NO_FATAL_FAILURE(handler.SetKnuckleDoubleTapIntervalTime(interval));
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_SetKnuckleDoubleTapDistance
  * @tc.desc: SetKnuckleDoubleTapDistance
  * @tc.type: FUNC
@@ -3006,32 +2961,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
     key->SetKeyCode(KeyEvent::KEYCODE_L);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed
- * @tc.desc: Test AdjustTimeIntervalConfigIfNeed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    int64_t intervalTime = 300000;
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
-    handler.checkAdjustIntervalTimeCount_ = 0;
-    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
-
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
-    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
-
-    intervalTime = 10000;
-    handler.checkAdjustIntervalTimeCount_ = 6;
-    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
-
-    handler.downToPrevUpTimeConfig_ = 100000;
-    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
 }
 
 /**
