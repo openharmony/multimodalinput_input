@@ -519,6 +519,12 @@ struct DisplayInfo {
      * @since 12
      */
     int32_t pointerActiveHeight { 0 };
+
+    /** Unique ID of the physical display
+     *
+     * @since 12
+     */
+    int32_t uniqueId { 0 };
 };
 
 /**
