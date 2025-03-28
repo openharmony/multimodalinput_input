@@ -101,6 +101,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         MMI_HILOGE("Call socketpair failed, errno:%{public}d", errno);
         return RET_ERR;
     }
+    fdsan_exchange_owner_tag(sockFds[0], 0, TAG);
+    fdsan_exchange_owner_tag(sockFds[1], 0, TAG);
     serverFd = sockFds[0];
     toReturnClientFd = sockFds[1];
     if (serverFd < 0 || toReturnClientFd < 0) {
@@ -134,9 +136,9 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     return RET_OK;
 
     CLOSE_SOCK:
-    close(serverFd);
+    fdsan_close_with_tag(sockFds[0], TAG);
     serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
-    close(toReturnClientFd);
+    fdsan_close_with_tag(sockFds[1], TAG);
     toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     return RET_ERR;
 }
@@ -246,7 +248,7 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     } else {
         MMI_HILOGE("Can't find fd");
     }
-    if (close(fd) == RET_OK) {
+    if (fdsan_close_with_tag(fd, TAG) == RET_OK) {
         DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     } else {
         DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);

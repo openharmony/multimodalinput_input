@@ -99,6 +99,9 @@ void ResetLogTrace();
 
 #define MMI_LOG_DOMAIN MMI_LOG_FRAMEWORK
 
+#ifndef TAG
+#define TAG static_cast<uint64_t>(MMI_LOG_DOMAIN)
+#endif
 #ifndef MMI_FUNC_INFO
 #define MMI_FUNC_INFO __FUNCTION__
 #endif

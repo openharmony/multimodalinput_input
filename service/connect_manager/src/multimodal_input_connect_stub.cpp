@@ -534,20 +534,20 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     if (ret != RET_OK) {
         MMI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
-            close(clientFd);
+            fdsan_close_with_tag(clientFd, TAG);
         }
         return ret;
     }
 
     if (!reply.WriteFileDescriptor(clientFd)) {
         MMI_HILOGE("Write file descriptor failed");
-        close(clientFd);
+        fdsan_close_with_tag(clientFd, TAG);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
     WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGI("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
-    close(clientFd);
+    fdsan_close_with_tag(clientFd, TAG);
     return RET_OK;
 }
 
