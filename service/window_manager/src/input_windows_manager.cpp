@@ -1743,7 +1743,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             isDragBorder_ = false;
         }
         int32_t focusWindowId = GetFocusWindowId();
-        bool isCursopRestoredFlag = (firstBtnDownWindowInfo_.first != displayGroupInfo_.focusWindowId) &&
+        bool isCursopRestoredFlag = (firstBtnDownWindowInfo_.first != focusWindowId) &&
             (PRODUCT_TYPE == PRODUCT_TYPE_PC) && isDragBorder_;
         if (isCursopRestoredFlag) {
             dragPointerStyle_ = pointerStyle;
