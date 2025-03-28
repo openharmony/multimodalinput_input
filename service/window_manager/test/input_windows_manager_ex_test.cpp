@@ -4080,5 +4080,63 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
         (logicalX, logicalY, windowInfo, pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_003
+ * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 10;
+    int32_t logicalY = 20;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
+    inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.targetWindowId_ = 2;
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::POINTER_ACTION_DOWN;
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 11;
+    windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SkipPrivacyProtectionWindow
+ * @tc.desc: Test the funcation SkipPrivacyProtectionWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipPrivacyProtectionWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
+    inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    bool isSkip = true;
+    EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
+    inputWindowsManager->privacyProtection_.isOpen = true;
+    EXPECT_TRUE(inputWindowsManager->isOpenPrivacyProtectionserver_);
+    EXPECT_TRUE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
+    isSkip = false;
+    EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
+}
 } // namespace MMI
 } // namespace OHOS
