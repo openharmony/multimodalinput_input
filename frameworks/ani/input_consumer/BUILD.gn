@@ -61,7 +61,7 @@ ohos_shared_library("input_consumer") {
 
 generate_static_abc("input_consumer_abc") {
   base_url = "./ets"
-  files = [ "./ets/@ohos.multimodalInput.inputConsumer.d.ets" ]
+  files = [ "./ets/@ohos.multimodalInput.inputConsumer.ets" ]
   dst_file = "$target_out_dir/input_consumer.abc"
   out_puts = [ "$target_out_dir/input_consumer.abc" ]
   is_boot_abc = "True"

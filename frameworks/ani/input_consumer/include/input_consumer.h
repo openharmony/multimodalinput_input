@@ -48,7 +48,37 @@ struct KeyEventMonitorInfo {
     int32_t subscribeId = 0;
     ani_ref keyOptionsObj = nullptr;
     std::shared_ptr<KeyOption> keyOption = nullptr;
-    ~KeyEventMonitorInfo() {};
+    ~KeyEventMonitorInfo();
+};
+
+class AniLocalScopeGuard {
+public:
+    AniLocalScopeGuard(ani_env *env, size_t nrRefs) : env_(env)
+    {
+        status_ = env_->CreateLocalScope(nrRefs);
+    }
+
+    ~AniLocalScopeGuard()
+    {
+        if (ANI_OK != status_) {
+            return;
+        }
+        env_->DestroyLocalScope();
+    }
+
+    bool IsStatusOK()
+    {
+        return ANI_OK == status_;
+    }
+
+    ani_status GetStatus()
+    {
+        return status_;
+    }
+
+private:
+    ani_env *env_ = nullptr;
+    ani_status status_ = ANI_ERROR;
 };
 typedef std::map<std::string, std::list<std::shared_ptr<KeyEventMonitorInfo>>> Callbacks;
 } // namespace MMI
