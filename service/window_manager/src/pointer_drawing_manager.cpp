@@ -228,7 +228,7 @@ void PointerDrawingManager::DestroyPointerWindow()
     CHKPV(delegateProxy_);
     delegateProxy_->OnPostSyncTask([this] {
         if (surfaceNode_ != nullptr) {
-            MMI_HILOGI("Pointer window destroy start screenId_ %{public}lu", screenId_);
+            MMI_HILOGI("Pointer window destroy start screenId_ %{public}" PRIu64, screenId_);
             g_isRsRemoteDied = false;
             surfaceNode_->DetachToDisplay(screenId_);
             surfaceNode_ = nullptr;
@@ -665,7 +665,7 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
             MMI_HILOGD("Switch pointer style");
             int64_t nodeId = static_cast<int64_t>(this->surfaceNode_->GetId());
             if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
-                MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}lu", screenId_);
+                MMI_HILOGI("DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
                 surfaceNode_->DetachToDisplay(screenId_);
                 surfaceNode_ = nullptr;
                 Rosen::RSTransaction::FlushImplicitTransaction();
@@ -798,7 +798,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     }
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
-        MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}lu", screenId_);
+        MMI_HILOGI("DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
@@ -1011,7 +1011,7 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
     pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
-    MMI_HILOGD("DrawDynamicHardwareCursor on ScreenPointer success, screenId_:%{public}lu", screenId_);
+    MMI_HILOGD("DrawDynamicHardwareCursor success, screenId_:%{public}" PRIu64, screenId_);
     return RET_OK;
 }
 
@@ -2343,7 +2343,7 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
     MouseEventHdr->OnDisplayLost(displayInfo_.uniqueId);
     if (surfaceNode_ != nullptr) {
 #ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}lu", screenId_);
+        MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -2414,7 +2414,7 @@ void PointerDrawingManager::DrawManager()
         && (lastDrawPointerStyle_.id == DEVELOPER_DEFINED_ICON
         || currentMouseStyle_.id == DEVELOPER_DEFINED_ICON)) {
         if (surfaceNode_ != nullptr) {
-            MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}lu", screenId_);
+            MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
             surfaceNode_->DetachToDisplay(screenId_);
             surfaceNode_ = nullptr;
             Rosen::RSTransaction::FlushImplicitTransaction();
@@ -2557,7 +2557,7 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     MMI_HILOGI("The g_isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
     if (g_isRsRemoteDied && surfaceNode_ != nullptr) {
         g_isRsRemoteDied = false;
-        MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}lu", screenId_);
+        MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
@@ -3314,7 +3314,7 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         RenderConfig cfg;
         CreateRenderConfig(cfg, it.second, mouseStyle, true);
-        MMI_HILOGI("HardwareCursorRender, screen:%{public}u, dpi:%{public}f, screenId_:%{public}lu",
+        MMI_HILOGI("HardwareCursorRender, screen:%{public}u, dpi:%{public}f, screenId_:%{public}" PRIu64,
             it.first, cfg.dpi, screenId_);
         if (it.second->IsMirror() || it.first == screenId_) {
             DrawHardCursor(it.second, cfg);
@@ -3338,7 +3338,7 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         RenderConfig cfg;
         CreateRenderConfig(cfg, it.second, mouseStyle, false);
         MMI_HILOGI("SoftwareCursorRender, screen:%{public}u, dpi:%{public}f, direction:%{public}d,"
-            "screenId_:%{public}lu", it.first, cfg.dpi, cfg.direction, screenId_);
+            "screenId_:%{public}" PRIu64, it.first, cfg.dpi, cfg.direction, screenId_);
         if (!it.second->IsMirror() && it.first != screenId_) {
             cfg.style = MOUSE_ICON::TRANSPARENT_ICON;
             cfg.align = MouseIcon2IconType(cfg.style);
@@ -3393,7 +3393,7 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
     CHKPR(addr, RET_ERR);
     pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
 
-    MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId_:%{public}lu", screenId_);
+    MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId_:%{public}" PRIu64, screenId_);
     return RET_OK;
 }
 
@@ -3506,7 +3506,7 @@ void PointerDrawingManager::HideHardwareCursors()
 
     for (auto msp : GetMirrorScreenPointers()) {
         if (!msp->SetInvisible()) {
-            MMI_HILOGE("Hide cursor of mirror screen failed, screenId_: %{public}lu", screenId_);
+            MMI_HILOGE("Hide cursor of mirror screen failed, screenId_: %{public}" PRIu64, screenId_);
         }
     }
 }
