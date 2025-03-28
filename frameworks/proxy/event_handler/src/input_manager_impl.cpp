@@ -812,7 +812,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
             << item.validWidth << item.validHeight << item.fixedDirection
             << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight
-            << item.oneHandX << item.oneHandY;
+            << item.oneHandX << item.oneHandY << item.uniqueId;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt << item.pointerActiveWidth << item.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
