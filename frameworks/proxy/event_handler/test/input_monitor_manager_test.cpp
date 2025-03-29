@@ -45,10 +45,9 @@ public:
 HWTEST_F(InputMonitorManagerTest, MarkConsumed_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputMonitorManager manager;
     int32_t monitorId = 1;
     int32_t eventId = 2;
-    ASSERT_NO_FATAL_FAILURE(manager.MarkConsumed(monitorId, eventId));
+    ASSERT_NO_FATAL_FAILURE(IMonitorMgr.MarkConsumed(monitorId, eventId));
 }
 
 /**
@@ -60,8 +59,7 @@ HWTEST_F(InputMonitorManagerTest, MarkConsumed_Test_001, TestSize.Level1)
 HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    OHOS::MMI::InputMonitorManager inputMonitorManager;
-    EXPECT_TRUE(inputMonitorManager.CheckMonitorValid(TOUCH_GESTURE_TYPE_SWIPE, ALL_FINGER_COUNT));
+    EXPECT_TRUE(IMonitorMgr.CheckMonitorValid(TOUCH_GESTURE_TYPE_SWIPE, ALL_FINGER_COUNT));
 }
 
 /**
@@ -73,8 +71,7 @@ HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_001, TestSi
 HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    OHOS::MMI::InputMonitorManager inputMonitorManager;
-    EXPECT_FALSE(inputMonitorManager.CheckMonitorValid(TOUCH_GESTURE_TYPE_SWIPE, INVALID_HANDLER_ID));
+    EXPECT_FALSE(IMonitorMgr.CheckMonitorValid(TOUCH_GESTURE_TYPE_SWIPE, INVALID_HANDLER_ID));
 }
 
  /**
@@ -86,8 +83,7 @@ HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_002, TestSi
 HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    OHOS::MMI::InputMonitorManager inputMonitorManager;
-    EXPECT_TRUE(inputMonitorManager.CheckMonitorValid(TOUCH_GESTURE_TYPE_PINCH, MAX_FINGERS_COUNT));
+    EXPECT_TRUE(IMonitorMgr.CheckMonitorValid(TOUCH_GESTURE_TYPE_PINCH, MAX_FINGERS_COUNT));
 }
 
  /**
@@ -100,8 +96,7 @@ HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_003, TestSi
 HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    OHOS::MMI::InputMonitorManager inputMonitorManager;
-    EXPECT_FALSE(inputMonitorManager.CheckMonitorValid(TOUCH_GESTURE_TYPE_SWIPE, ERROR_EXCEED_MAX_COUNT));
+    EXPECT_FALSE(IMonitorMgr.CheckMonitorValid(TOUCH_GESTURE_TYPE_SWIPE, ERROR_EXCEED_MAX_COUNT));
 }
 
  /**
@@ -114,8 +109,7 @@ HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_004, TestSi
 HWTEST_F(InputMonitorManagerTest, CheckMonitorValid_ShouldReturnTrue_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    OHOS::MMI::InputMonitorManager inputMonitorManager;
-    EXPECT_FALSE(inputMonitorManager.CheckMonitorValid(TOUCH_GESTURE_TYPE_NONE, FOUR_FINGER_COUNT));
+    EXPECT_FALSE(IMonitorMgr.CheckMonitorValid(TOUCH_GESTURE_TYPE_NONE, FOUR_FINGER_COUNT));
 }
 
 } // namespace MMI
