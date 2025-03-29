@@ -181,6 +181,7 @@ public:
     void CleanShellWindowIds();
     bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent);
     void SendOneHandData(onst DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
+    bool IsAncoGameActive();
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -205,6 +206,7 @@ public:
     int32_t GetWindowStateNotifyPid();
     int32_t GetPidByWindowId(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_ANCO
+    void InitializeAnco();
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
     int32_t SyncKnuckleStatus(bool isKnuckleEnable);

@@ -4468,7 +4468,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 touchWindow->id, isCompensatePointer, isFirstSpecialWindow);
         }
         if (isCompensatePointer || isFirstSpecialWindow) {
-            SimulatePointerExt(pointerEvent);
+            if (!(IsAncoGameActive() && MMI_GE(pointerEvent->GetZOrder(), 0.0f))) {
+                SimulatePointerExt(pointerEvent);
+            } else {
+                MMI_HILOG_DISPATCHD("In the anco game scene, events from gestureNav are not allowed");
+            }
             isFirstSpecialWindow = false;
         } else {
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
