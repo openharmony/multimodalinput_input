@@ -75,7 +75,6 @@ const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hin
 const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string PRIVACY_SWITCH_NAME {"huaweicast.data.privacy_projection_state"};
-const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_PC = "2in1";
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 constexpr int32_t REPEAT_COOLING_TIME { 100 };
