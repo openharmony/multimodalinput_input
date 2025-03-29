@@ -173,6 +173,7 @@ public:
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
+    int32_t LaunchAiScreenAbility();
 
 private:
     MultimodalInputConnectManager() = default;

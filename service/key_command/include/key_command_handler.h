@@ -103,6 +103,10 @@ struct TwoFingerGesture {
     bool active = false;
     int32_t timerId = -1;
     int64_t abilityStartDelay = 0;
+    int64_t startTime = 0;
+    int32_t windowId = -1;
+    bool longPressFlag = false;
+    std::shared_ptr<PointerEvent> touchEvent = nullptr;
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -186,6 +190,7 @@ public:
     bool PreHandleEvent();
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
     void RegisterProximitySensor();
+    int32_t LaunchAiScreenAbility();
 
 private:
     void Print();
@@ -321,6 +326,7 @@ private:
     void SendSaveEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool MenuClickHandle(std::shared_ptr<KeyEvent> event);
     void MenuClickProcess(const std::string bundleName, const std::string abilityName, const std::string action);
+    int32_t CheckTwoFingerGesture();
 
 private:
     Sequence matchedSequence_;

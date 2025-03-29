@@ -496,6 +496,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KNUCKLE_SWITCH):
             ret = StubSetKnuckleSwitch(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::LAUNCH_AI_SCREEN_ABILITY):
+            ret = StubLaunchAiScreenAbility(data, reply);
+            break;
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_MONITOR):
             ret = StubSubscribeKeyMonitor(data, reply);
@@ -3469,6 +3472,21 @@ int32_t MultimodalInputConnectStub::StubSetKnuckleSwitch(MessageParcel &data, Me
     int32_t ret = SetKnuckleSwitch(knuckleSwitch);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetKnuckleSwitch failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubLaunchAiScreenAbility(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t ret = LaunchAiScreenAbility();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call LaunchAiScreenAbility failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
