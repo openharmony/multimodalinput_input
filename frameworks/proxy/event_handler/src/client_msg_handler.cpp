@@ -396,7 +396,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         }
         case MONITOR: {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-            IMonitorMgr->OnInputEvent(keyEvent, deviceTags);
+            IMonitorMgr.OnInputEvent(keyEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_MONITOR
             break;
         }
@@ -438,7 +438,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         }
         case MONITOR: {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-            IMonitorMgr->OnInputEvent(pointerEvent, deviceTags);
+            IMonitorMgr.OnInputEvent(pointerEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_MONITOR
             break;
         }
