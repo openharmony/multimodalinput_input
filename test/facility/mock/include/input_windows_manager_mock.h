@@ -126,6 +126,7 @@ public:
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
 #ifdef OHOS_BUILD_ENABLE_ANCO
+    void InitializeAnco() override {}
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(void, CleanShellWindowIds, ());
