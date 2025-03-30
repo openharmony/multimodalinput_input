@@ -1460,7 +1460,11 @@ ohos_unittest("SubscriberTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
+  sources = [
+    "module_loader/src/input_screen_capture_agent.cpp",
+    "subscriber/test/key_subscriber_handler_test.cpp",
+    "subscriber/test/tablet_subscriber_handler_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -1476,6 +1480,7 @@ ohos_unittest("SubscriberTest") {
     "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
     "jsoncpp:jsoncpp",
