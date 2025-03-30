@@ -375,6 +375,7 @@ ohos_unittest("InputMonitorManagerTest") {
     "event_handler/src/tablet_event_input_subscribe_manager.cpp",
     "event_handler/test/input_monitor_manager_test.cpp",
     "event_handler/test/pre_monitor_manager_test.cpp",
+    "event_handler/test/tablet_event_input_subscribe_manager_test.cpp",
   ]
 
   if (input_feature_switch) {
