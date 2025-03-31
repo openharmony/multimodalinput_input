@@ -24,6 +24,16 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+static const std::vector<int32_t> supportedKeyCodes = {
+    KeyEvent::KEYCODE_POWER,
+    KeyEvent::KEYCODE_META_LEFT,
+    KeyEvent::KEYCODE_VOLUME_UP,
+    KeyEvent::KEYCODE_VOLUME_DOWN,
+    KeyEvent::KEYCODE_META_RIGHT,
+    KeyEvent::KEYCODE_FUNCTION
+};
+} // namespace
 PreMonitorManager::PreMonitorManager() {}
 PreMonitorManager::~PreMonitorManager() {}
 
@@ -31,6 +41,12 @@ int32_t PreMonitorManager::AddHandler(
     std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType, std::vector<int32_t> keys)
 {
     CALL_DEBUG_ENTER;
+    for (auto& keycode : keys) {
+        if (std::find(supportedKeyCodes.begin(), supportedKeyCodes.end(), keycode) == supportedKeyCodes.end()) {
+            MMI_HILOGE("PreKeys is not expect");
+            return RET_ERR;
+        }
+    }
     CHKPR(consumer, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
