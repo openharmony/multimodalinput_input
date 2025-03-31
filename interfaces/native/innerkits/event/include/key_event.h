@@ -3107,40 +3107,54 @@ public:
      */
     static const int32_t KEYCODE_CALL_NOTIFICATION_CENTER;
 
-     /**
+    /**
      * Outbound Control Center
      *
      * @since 11
      */
     static const int32_t KEYCODE_CALL_CONTROL_CENTER;
 
-         /**
+    /**
      * Dagger Press
      *
      * @since 12
      */
     static const int32_t KEYCODE_DAGGER_CLICK;
 
-     /**
+    /**
      * Dagger Click
      *
      * @since 13
      */
     static const int32_t KEYCODE_DAGGER_DOUBLE_CLICK;
 
-     /**
+    /**
      * Dagger Long Press
      *
      * @since 14
      */
     static const int32_t KEYCODE_DAGGER_LONG_PRESS;
 
-     /**
+    /**
      * Aod slide unlock
      *
      * @since 16
      */
     static const int32_t KEYCODE_AOD_SLIDE_UNLOCK;
+
+    /**
+     * Recent
+     *
+     * @since 18
+     */
+    static const int32_t KEYCODE_RECENT;
+
+    /**
+     * Floating back
+     *
+     * @since 18
+     */
+    static const int32_t KEYCODE_FLOATING_BACK;
 public:
     class KeyItem {
     public:
