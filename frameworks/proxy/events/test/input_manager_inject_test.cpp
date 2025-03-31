@@ -1720,47 +1720,5 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_008, 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
-
-/**
- * @tc.name: InputManager_InjectTouchscreenEvent_013
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchscreenEvent_013, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectTouchscreenEvent_013");
-    };
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
-    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(0);
-    PointerEvent::PointerItem item1;
-    item1.SetPointerId(1);
-    item1.SetDisplayX(200);
-    item1.SetDisplayY(200);
-    item1.SetDownTime(0);
-    item1.SetPressed(true);
-    PointerEvent::PointerItem item2;
-    item2.SetPointerId(2);
-    item2.SetDisplayX(250);
-    item2.SetDisplayY(250);
-    item2.SetDownTime(0);
-    item2.SetPressed(true);
-    pointerEvent->AddPointerItem(item1);
-    pointerEvent->AddPointerItem(item2);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    int32_t ret = InputManager::GetInstance()->LaunchAiScreenAbility();
-    ASSERT_NE(ret, RET_OK);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
 } // namespace MMI
 } // namespace OHOS

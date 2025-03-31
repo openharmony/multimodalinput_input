@@ -383,8 +383,6 @@ public:
     {
         return static_cast<int32_t>(knuckleSwitch);
     };
-    int32_t LaunchAiScreenAbility() override { return RET_OK; }
-
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;
@@ -9143,22 +9141,6 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_005, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetMouseIcon(data, reply));
-}
-
-/**
- * @tc.name: StubLaunchAiScreenAbility_001
- * @tc.desc: Test the function StubLaunchAiScreenAbility
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MultimodalInputConnectStubTest, StubLaunchAiScreenAbility_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
-    ASSERT_NE(stub, nullptr);
-    MessageParcel data;
-    MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubLaunchAiScreenAbility(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS
