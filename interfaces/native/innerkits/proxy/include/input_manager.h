@@ -1142,6 +1142,12 @@ public:
 
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
+    /**
+     * @brief Enables or disables the knuckle switch.
+     * @param knuckleSwitch Set to true to enable, false to disable.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 18
+    */
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
 
     /**
