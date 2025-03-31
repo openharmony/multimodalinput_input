@@ -171,7 +171,6 @@ public:
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     int32_t SetKnuckleSwitch(bool knuckleSwitch) override;
-    int32_t LaunchAiScreenAbility() override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

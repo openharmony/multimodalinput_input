@@ -895,10 +895,5 @@ int32_t InputManager::SetKnuckleSwitch(bool knuckleSwitch)
 {
     return InputMgrImpl.SetKnuckleSwitch(knuckleSwitch);
 }
-
-int32_t InputManager::LaunchAiScreenAbility()
-{
-    return InputMgrImpl.LaunchAiScreenAbility();
-}
 } // namespace MMI
 } // namespace OHOS
