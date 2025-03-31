@@ -45,7 +45,6 @@ group("test") {
     "getwindowpid_fuzzer:fuzztest",
     "injectevent_fuzzer:fuzztest",
     "inputdevicemanager_fuzzer:fuzztest",
-    "launchaiscreenability_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "notifynaponline_fuzzer:fuzztest",
