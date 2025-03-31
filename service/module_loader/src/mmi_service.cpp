@@ -3794,20 +3794,5 @@ int32_t MMIService::SetKnuckleSwitch(bool knuckleSwitch)
     }
     return RET_OK;
 }
-
-int32_t MMIService::LaunchAiScreenAbility()
-{
-    int ret = delegateTasks_.PostSyncTask([] {
-        auto keyHandler = InputHandler->GetKeyCommandHandler();
-        if (keyHandler == nullptr) {
-            return RET_ERR;
-        }
-        return keyHandler->LaunchAiScreenAbility();
-    });
-    if (ret != RET_OK) {
-        MMI_HILOGE("LaunchAiScreenAbility failed, return:%{public}d", ret);
-    }
-    return ret;
-}
 } // namespace MMI
 } // namespace OHOS

@@ -27,15 +27,13 @@
 #include "input_handler_type.h"
 #include "input_windows_manager.h"
 #include "i_preference_manager.h"
+#include "key_command_handler.h"
 #include "key_shortcut_manager.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_preferences_manager.h"
 #include "system_info.h"
 #include "stylus_key_handler.h"
-#define private public
-#include "key_command_handler.h"
-#undef private
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -6449,38 +6447,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount_001, 
 
     handler.walletLaunchDelayTimes_ = 1;
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyCount(repeatKey, keyEvent));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_LaunchAiScreenAbility_001
- * @tc.desc: Test LaunchAiScreenAbility
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAiScreenAbility_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    int32_t ret = handler.LaunchAiScreenAbility();
-    EXPECT_NE(ret, RET_OK);
-
-    handler.twoFingerGesture_.touchEvent = PointerEvent::Create();
-    ret = handler.LaunchAiScreenAbility();
-    EXPECT_NE(ret, RET_OK);
-
-    auto now = std::chrono::high_resolution_clock::now();
-    auto duration = now.time_since_epoch();
-    handler.twoFingerGesture_.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    ret = handler.LaunchAiScreenAbility();
-    EXPECT_NE(ret, RET_OK);
-
-    handler.twoFingerGesture_.windowId = handler.twoFingerGesture_.touchEvent->GetTargetWindowId();
-    ret = handler.LaunchAiScreenAbility();
-    EXPECT_NE(ret, RET_OK);
-
-    handler.twoFingerGesture_.longPressFlag = true;
-    ret = handler.LaunchAiScreenAbility();
-    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

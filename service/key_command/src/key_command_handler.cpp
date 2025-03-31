@@ -55,7 +55,6 @@ constexpr int64_t SOS_DELAY_TIMES { 1000000 };
 constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 15000 };
-constexpr int64_t SCREEN_TIME_OUT { 100 };
 const char* AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const char* WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const char* SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
@@ -188,7 +187,6 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         isParseConfig_ = true;
     }
-    twoFingerGesture_.touchEvent = touchEvent;
     InitializeLongPressConfigurations();
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_PULL_MOVE:
@@ -598,9 +596,6 @@ void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<Pointer
 void KeyCommandHandler::StartTwoFingerGesture()
 {
     CALL_DEBUG_ENTER;
-    twoFingerGesture_.startTime = 0;
-    twoFingerGesture_.longPressFlag = false;
-    twoFingerGesture_.windowId = -1;
     twoFingerGesture_.timerId = TimerMgr->AddTimer(twoFingerGesture_.abilityStartDelay, 1, [this]() {
         twoFingerGesture_.timerId = -1;
         if (!CheckTwoFingerGestureAction()) {
@@ -610,12 +605,10 @@ void KeyCommandHandler::StartTwoFingerGesture()
         twoFingerGesture_.ability.params["displayY1"] = std::to_string(twoFingerGesture_.touches[0].y);
         twoFingerGesture_.ability.params["displayX2"] = std::to_string(twoFingerGesture_.touches[1].x);
         twoFingerGesture_.ability.params["displayY2"] = std::to_string(twoFingerGesture_.touches[1].y);
-        MMI_HILOGI("Dual-finger long press capability information saving");
-        twoFingerGesture_.longPressFlag = true;
-        twoFingerGesture_.windowId = twoFingerGesture_.touchEvent->GetTargetWindowId();
-        auto now = std::chrono::high_resolution_clock::now();
-        auto duration = now.time_since_epoch();
-        twoFingerGesture_.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+        MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, twoFingerGesture_.ability.bundleName);
+        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
+        BytraceAdapter::StopLaunchAbility();
     });
 }
 
@@ -2979,51 +2972,6 @@ int32_t KeyCommandHandler::SetKnuckleSwitch(bool knuckleSwitch)
 {
     gameForbidFingerKnuckle_ = !knuckleSwitch;
     MMI_HILOGI("SetKnuckleSwitch is successful in keyCommand handler, knuckleSwitch:%{public}d", knuckleSwitch);
-    return RET_OK;
-}
-
-int32_t KeyCommandHandler::CheckTwoFingerGesture()
-{
-    auto now = std::chrono::high_resolution_clock::now();
-    auto duration = now.time_since_epoch();
-    int64_t milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    int64_t timeOut = milliseconds - twoFingerGesture_.startTime;
-    if (twoFingerGesture_.touchEvent == nullptr) {
-        MMI_HILOGE("twoFingerGesture_.touchEvent == nullptr");
-        return RET_ERR;
-    }
-    if (timeOut > SCREEN_TIME_OUT) {
-        MMI_HILOGE("Double finger press timeout");
-        return RET_ERR;
-    }
-
-    if ((twoFingerGesture_.windowId < 0) || (twoFingerGesture_.touchEvent->GetTargetWindowId() !=
-        twoFingerGesture_.windowId)) {
-        MMI_HILOGE("Window changefocusWindowId:%{public}d, twoFingerGesture_.focusWindowId:%{public}d",
-            twoFingerGesture_.touchEvent->GetTargetWindowId(), twoFingerGesture_.windowId);
-        return RET_ERR;
-    }
-
-    if (!twoFingerGesture_.longPressFlag) {
-        MMI_HILOGE("The long press state is not set");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-int32_t KeyCommandHandler::LaunchAiScreenAbility()
-{
-    if (CheckTwoFingerGesture() != RET_OK) {
-        return RET_ERR;
-    }
-
-    BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, twoFingerGesture_.ability.bundleName);
-    LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
-    BytraceAdapter::StopLaunchAbility();
-
-    twoFingerGesture_.startTime = 0;
-    twoFingerGesture_.longPressFlag = false;
-    twoFingerGesture_.windowId = -1;
     return RET_OK;
 }
 } // namespace MMI
