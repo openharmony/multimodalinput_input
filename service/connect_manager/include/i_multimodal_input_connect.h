@@ -185,6 +185,7 @@ public:
     virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
     virtual int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) = 0;
     virtual int32_t SetKnuckleSwitch(bool knuckleSwitch) = 0;
+    virtual int32_t LaunchAiScreenAbility() = 0;
 };
 } // namespace MMI
 } // namespace OHOS
