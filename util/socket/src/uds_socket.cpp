@@ -135,7 +135,7 @@ void UDSSocket::EpollClose()
 void UDSSocket::Close()
 {
     if (fd_ >= 0) {
-        auto rf = close(fd_);
+        auto rf = fdsan_close_with_tag(fd_, TAG);
         if (rf > 0) {
             MMI_HILOGE("Socket close failed rf:%{public}d", rf);
         }
