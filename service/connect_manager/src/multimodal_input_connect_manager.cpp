@@ -1059,5 +1059,12 @@ int32_t MultimodalInputConnectManager::SetKnuckleSwitch(bool knuckleSwitch)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetKnuckleSwitch(knuckleSwitch);
 }
+
+int32_t MultimodalInputConnectManager::LaunchAiScreenAbility()
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->LaunchAiScreenAbility();
+}
 } // namespace MMI
 } // namespace OHOS
