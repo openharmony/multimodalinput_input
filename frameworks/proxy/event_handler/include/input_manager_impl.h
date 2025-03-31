@@ -239,6 +239,7 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
+    int32_t LaunchAiScreenAbility();
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
