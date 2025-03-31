@@ -713,6 +713,54 @@
             "finalKey": 10012,
             "longPressTime": 0,
             "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2072, 2076 ],
+            "finalKey": 2013,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2072, 2077 ],
+            "finalKey": 2013,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2073, 2076 ],
+            "finalKey": 2013,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2073, 2077 ],
+            "finalKey": 2013,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2072, 2076 ],
+            "finalKey": 2012,
+            "longPressTime": 0,
+            "triggerType": "up"
+        },
+        {
+            "preKeys": [ 2072, 2077 ],
+            "finalKey": 2012,
+            "longPressTime": 0,
+            "triggerType": "up"
+        },
+        {
+            "preKeys": [ 2073, 2076 ],
+            "finalKey": 2012,
+            "longPressTime": 0,
+            "triggerType": "up"
+        },
+        {
+            "preKeys": [ 2073, 2077 ],
+            "finalKey": 2012,
+            "longPressTime": 0,
+            "triggerType": "up"
         }
     ]
 }
