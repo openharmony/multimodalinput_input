@@ -1150,6 +1150,13 @@ public:
     */
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
 
+    /**
+     * @brief 拉起小艺识屏
+     * @return 如果成功，则返回0；否则返回非0值。
+     * @since 14
+     */
+    int32_t LaunchAiScreenAbility();
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
