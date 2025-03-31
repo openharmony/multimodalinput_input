@@ -2762,5 +2762,11 @@ int32_t InputManagerImpl::SetKnuckleSwitch(bool knuckleSwitch)
     knuckleSwitch_ = knuckleSwitch;
     return MULTIMODAL_INPUT_CONNECT_MGR->SetKnuckleSwitch(knuckleSwitch);
 }
+
+int32_t InputManagerImpl::LaunchAiScreenAbility()
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->LaunchAiScreenAbility();
+}
 } // namespace MMI
 } // namespace OHOS

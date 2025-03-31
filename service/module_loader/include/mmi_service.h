@@ -202,6 +202,7 @@ public:
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     int32_t SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch) override;
+    int32_t LaunchAiScreenAbility() override;
 
 protected:
     void OnConnected(SessionPtr s) override;
