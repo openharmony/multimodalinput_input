@@ -453,8 +453,6 @@ int32_t PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
-    displayId_ = displayId;
-    UpdateBindDisplayId(displayId);
     if (surfaceNode_ != nullptr) {
         if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             return;
@@ -2329,7 +2327,8 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
 {
     CALL_DEBUG_ENTER;
     for (const auto& item : displayGroupInfo.displaysInfo) {
-        if (item.id == displayInfo_.id) {
+        if (item.uniqueId == displayInfo_.uniqueId &&
+            item.screenCombination == displayInfo_.screenCombination) {
             UpdateDisplayInfo(item);
             DrawManager();
             return;
@@ -3216,11 +3215,6 @@ bool PointerDrawingManager::IsSupported()
 
 void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
 {
-    if (surfaceNode_ != nullptr) {
-    surfaceNode_->DetachToDisplay(screenId_);
-    surfaceNode_ = nullptr;
-    }
-
     MMI_HILOGI("OnScreenModeChange enter, screen size:%{public}lu", screens.size());
     std::set<uint32_t> sids;
     uint32_t mainWidth = 0;
@@ -3231,13 +3225,13 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         // construct ScreenPointers for new screens
         for (auto si : screens) {
             MMI_HILOGI("Got screen, id:%{public}lu, shape=(%{public}u,%{public}u), rotation=%{public}u, "
-                "dpi=%{public}f", si->GetScreenId(), GetScreenInfoWidth(si), GetScreenInfoHeight(si),
+                "dpi=%{public}f", si->GetRsId(), GetScreenInfoWidth(si), GetScreenInfoHeight(si),
                 si->GetRotation(), si->GetVirtualPixelRatio());
             if (si->GetType() != OHOS::Rosen::ScreenType::REAL) {
                 continue;
             }
 
-            uint32_t sid = si->GetScreenId();
+            uint32_t sid = si->GetRsId();
             sids.insert(sid);
 
             if (si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
