@@ -771,7 +771,8 @@ static const std::vector<int32_t> specialKeyCodes = {
     KeyEvent::KEYCODE_HEADSETHOOK,
     KeyEvent::KEYCODE_HOME,
     KeyEvent::KEYCODE_MENU,
-    KeyEvent::KEYCODE_VOICE_ASSISTANT
+    KeyEvent::KEYCODE_VOICE_ASSISTANT,
+    KeyEvent::KEYCODE_REMOTE_POWER,
 };
 
 bool KeyShortcutManager::IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent)
