@@ -197,6 +197,13 @@ public:
     static const int32_t KEYCODE_POWER;
 
     /**
+     * Remote Power KeyCode
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_REMOTE_POWER;
+
+    /**
      * Camera key
      * <p>This key is used to start the camera or take photos.
      *
