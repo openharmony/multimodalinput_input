@@ -484,7 +484,12 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     }
     OnVKeyTrackPadMessage(touch, touchMsgList);
 }
-
+void update_pointer_move(auto msgType)
+{
+    if (msgType != VTPStateMachineMessageType::POINTER_MOVE) {
+        pointer_move_count = 0;
+    }
+}
 void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
     const std::vector<std::vector<int32_t>>& msgList)
 {
@@ -495,16 +500,12 @@ void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
             continue;
         }
         auto msgType = static_cast<VTPStateMachineMessageType>(msgItem[VKEY_TP_SM_MSG_TYPE_IDX]);
-        if (msgType != VTPStateMachineMessageType::POINTER_MOVE) {
-            pointer_move_count = 0;
-        }
+        update_pointer_move(msgType);
         switch (msgType) {
             case VTPStateMachineMessageType::POINTER_MOVE:
                 pointer_move_count ++;
-                if (pointer_move_count < DEBOUNCE_MOVE) {
-                    break;
-                }
-                if (!HandleVKeyTrackPadPointerMove(touch, msgItem)) {
+                if (pointer_move_count < DEBOUNCE_MOVE ||
+                !HandleVKeyTrackPadPointerMove(touch, msgItem)) {
                     MMI_HILOGE("Virtual TrackPad pointer move event cannot be handled");
                 }
                 break;
