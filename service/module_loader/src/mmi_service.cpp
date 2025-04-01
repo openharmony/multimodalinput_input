@@ -3758,7 +3758,9 @@ int32_t MMIService::SyncKnuckleStatus()
 
 int32_t MMIService::SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId)
 {
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     return RET_OK;
 }
 

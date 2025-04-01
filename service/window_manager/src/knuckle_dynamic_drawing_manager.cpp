@@ -16,6 +16,7 @@
 #include "knuckle_dynamic_drawing_manager.h"
 #include "image_source.h"
 
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 #ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
@@ -205,7 +206,7 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
         auto id = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(id, pointerItem);
-        auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+        auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
         glowTraceSystem_->ResetDivergentPoints(displayXY.first, displayXY.second);
     }
     isDrawing_ = true;
@@ -232,7 +233,7 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(id, pointerItem);
-    auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+    auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
     float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownX_ - displayXY.first, POW_SQUARE) +
         pow(lastDownY_ - displayXY.second, POW_SQUARE)));
     bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
@@ -260,7 +261,7 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(id, pointerItem);
-    auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+    auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
     traceControlPoints_[pointCounter_].Set(displayXY.first, displayXY.second);
     int pointIndex4 = 4;
     bool draw = (pointerEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;

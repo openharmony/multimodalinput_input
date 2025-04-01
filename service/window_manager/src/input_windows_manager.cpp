@@ -6326,5 +6326,19 @@ std::shared_ptr<PointerEvent> InputWindowsManager::GetlastPointerEvent()
     std::lock_guard<std::mutex> guard(mtx_);
     return lastPointerEvent_;
 }
+
+std::pair<int32_t, int32_t> InputWindowsManager::CalcDrawCoordinate(const DisplayInfo& displayInfo,
+    PointerEvent::PointerItem pointerItem);
+{
+    CALL_DEBUG_ENTER;
+    double physicalX = pointerItem.GetRawDisplayX();
+    double physicalY = pointerItem.GetRawDisplayY();
+    if (!displayInfo.transform.empty()) {
+        auto displayXY = TransformDisplayXY(displayInfo, physicalX, physicalY);
+        physicalX = displayXY.first;
+        physicalY = displayXY.second;
+    }
+    return {static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY)};
+}
 } // namespace MMI
 } // namespace OHOS
