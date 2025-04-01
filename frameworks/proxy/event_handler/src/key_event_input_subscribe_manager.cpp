@@ -360,6 +360,8 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         MMI_HILOGE("Callback is null");
         return RET_ERR;
     }
+    MMI_HILOGI("key event callback executed, Key event id:%{public}d, value:%{public}d",
+        subscribeId, event->GetKeyCode());
     callback(event);
     MMI_HILOGD("Key event id:%{public}d, keyCode:%{private}d", subscribeId, event->GetKeyCode());
     return RET_OK;
