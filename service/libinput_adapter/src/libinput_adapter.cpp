@@ -485,7 +485,12 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     }
     OnVKeyTrackPadMessage(touch, touchMsgList);
 }
-
+void LibinputAdapter::update_pointer_move(auto msgType)
+{
+    if (msgType != VTPStateMachineMessageType::POINTER_MOVE) {
+        pointer_move_count = 0;
+    }
+}
 void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
     const std::vector<std::vector<int32_t>>& msgList)
 {
@@ -496,6 +501,7 @@ void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
             continue;
         }
         auto msgType = static_cast<VTPStateMachineMessageType>(msgItem[VKEY_TP_SM_MSG_TYPE_IDX]);
+        update_pointer_move(msgType);
         switch (msgType) {
             case VTPStateMachineMessageType::POINTER_MOVE:
                 if (!HandleVKeyTrackPadPointerMove(touch, msgItem)) {
