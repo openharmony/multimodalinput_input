@@ -165,6 +165,7 @@ private:
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRotateEnd(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
+    void update_pointer_move(VTPStateMachineMessageType msgType);
     int32_t ConvertToTouchEventType(libinput_event_type eventType);
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
