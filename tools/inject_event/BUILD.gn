@@ -71,7 +71,7 @@ ohos_executable("uinput") {
   part_name = "input"
 }
 
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 ohos_unittest("InjectEventTest") {
   module_out_path = module_output_path
   configs = [ "${mmi_path}:coverage_flags" ]
