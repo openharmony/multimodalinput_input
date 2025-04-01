@@ -6394,26 +6394,27 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAiScreenAbility_001,
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
-    int32_t ret = handler.LaunchAiScreenAbility();
+    int32_t pid = 1;
+    int32_t ret = handler.LaunchAiScreenAbility(pid);
     EXPECT_NE(ret, RET_OK);
 
     handler.twoFingerGesture_.touchEvent = PointerEvent::Create();
-    ret = handler.LaunchAiScreenAbility();
+    ret = handler.LaunchAiScreenAbility(pid);
     EXPECT_NE(ret, RET_OK);
 
     auto now = std::chrono::high_resolution_clock::now();
     auto duration = now.time_since_epoch();
     handler.twoFingerGesture_.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    ret = handler.LaunchAiScreenAbility();
+    ret = handler.LaunchAiScreenAbility(pid);
     EXPECT_NE(ret, RET_OK);
 
     handler.twoFingerGesture_.windowId = handler.twoFingerGesture_.touchEvent->GetTargetWindowId();
-    ret = handler.LaunchAiScreenAbility();
+    ret = handler.LaunchAiScreenAbility(pid);
     EXPECT_NE(ret, RET_OK);
 
     handler.twoFingerGesture_.longPressFlag = true;
-    ret = handler.LaunchAiScreenAbility();
-    EXPECT_EQ(ret, RET_OK);
+    ret = handler.LaunchAiScreenAbility(pid);
+    EXPECT_NE(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
