@@ -286,7 +286,8 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     GetAllKeyMessage getAllKeyMessage,
     ClearKeyMessage clearKeyMessage,
     HardwareKeyEventDetected hardwareKeyEventDetected,
-    GetKeyboardActivationState getKeyboardActivationState)
+    GetKeyboardActivationState getKeyboardActivationState,
+    IsFloatingKeyboard isFloatingKeyboard)
 {
     handleTouchPoint_ = handleTouchPoint;
     getMessage_ = getMessage;
@@ -296,6 +297,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     clearKeyMessage_ = clearKeyMessage;
     hardwareKeyEventDetected_ = hardwareKeyEventDetected;
     getKeyboardActivationState_ = getKeyboardActivationState;
+    isFloatingKeyboard_ = isFloatingKeyboard;
 
     deviceId = -1;
 
@@ -1429,12 +1431,14 @@ void LibinputAdapter::OnEventHandler()
         InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
         if (inputWindowsManager != nullptr) {
             DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
-
+            bool isFloating = false;
             for (auto &windowInfo : displayGroupInfo.windowsInfo) {
                 if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
                     // screen recorder scenario will be an exception to true
-                    isCaptureMode = ((windowInfo.area.width <= SCREEN_RECORD_WINDOW_WIDTH) \
-                        && (windowInfo.area.height <= SCREEN_RECORD_WINDOW_HEIGHT)) ? false : true;
+                    isFloating = (isFloatingKeyboard_==nullptr) ?
+                        isFloating = false : isFloating = isFloatingKeyboard_();
+                    isCaptureMode = ((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
+                        && (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT) && isFloating) ? true : false;
                     MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
                     break;
                 }

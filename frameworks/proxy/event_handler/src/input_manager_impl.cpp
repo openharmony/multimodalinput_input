@@ -356,6 +356,11 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyOption, RET_ERR);
     CHKPR(callback, RET_ERR);
+    if (keyOption->GetPriority() > 0
+        && (keyOption->GetFinalKey() != KeyEvent::KEYCODE_HEADSETHOOK || keyOption->GetPreKeys().size() > 0)) {
+        MMI_HILOGE("KeyOption validation failed");
+        return RET_ERR;
+    }
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
     MMI_HILOGW("Keyboard device does not support");
