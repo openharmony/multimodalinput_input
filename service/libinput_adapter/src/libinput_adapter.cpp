@@ -483,7 +483,7 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     }
     OnVKeyTrackPadMessage(touch, touchMsgList);
 }
-void update_pointer_move(auto msgType)
+void LibinputAdapter::update_pointer_move(auto msgType)
 {
     if (msgType != VTPStateMachineMessageType::POINTER_MOVE) {
         pointer_move_count = 0;
