@@ -614,6 +614,18 @@
         },
         {
             "preKeys": [],
+            "finalKey": 4000,
+            "longPressTime": 500,
+            "triggerType": "down"
+        },
+		{
+            "preKeys": [],
+            "finalKey": 4000,
+            "longPressTime": 3000,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
             "finalKey": 1,
             "longPressTime": 0,
             "triggerType": "up"
