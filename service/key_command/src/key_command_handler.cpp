@@ -601,6 +601,7 @@ void KeyCommandHandler::StartTwoFingerGesture()
     twoFingerGesture_.startTime = 0;
     twoFingerGesture_.longPressFlag = false;
     twoFingerGesture_.windowId = -1;
+    twoFingerGesture_.windowPid = -1;
     twoFingerGesture_.timerId = TimerMgr->AddTimer(twoFingerGesture_.abilityStartDelay, 1, [this]() {
         twoFingerGesture_.timerId = -1;
         if (!CheckTwoFingerGestureAction()) {
@@ -613,6 +614,7 @@ void KeyCommandHandler::StartTwoFingerGesture()
         MMI_HILOGI("Dual-finger long press capability information saving");
         twoFingerGesture_.longPressFlag = true;
         twoFingerGesture_.windowId = twoFingerGesture_.touchEvent->GetTargetWindowId();
+        twoFingerGesture_.windowPid = WIN_MGR->GetWindowPid(twoFingerGesture_.windowId);
         auto now = std::chrono::high_resolution_clock::now();
         auto duration = now.time_since_epoch();
         twoFingerGesture_.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
@@ -2982,7 +2984,7 @@ int32_t KeyCommandHandler::SetKnuckleSwitch(bool knuckleSwitch)
     return RET_OK;
 }
 
-int32_t KeyCommandHandler::CheckTwoFingerGesture()
+int32_t KeyCommandHandler::CheckTwoFingerGesture(int32_t pid)
 {
     auto now = std::chrono::high_resolution_clock::now();
     auto duration = now.time_since_epoch();
@@ -3004,6 +3006,11 @@ int32_t KeyCommandHandler::CheckTwoFingerGesture()
         return RET_ERR;
     }
 
+    if (twoFingerGesture_.windowPid != pid) {
+        MMI_HILOGE("twoFingerGesture_.windowPid:%{public}d, pid:%{public}d", twoFingerGesture_.windowPid, pid);
+        return RET_ERR;
+    }
+
     if (!twoFingerGesture_.longPressFlag) {
         MMI_HILOGE("The long press state is not set");
         return RET_ERR;
@@ -3011,9 +3018,13 @@ int32_t KeyCommandHandler::CheckTwoFingerGesture()
     return RET_OK;
 }
 
-int32_t KeyCommandHandler::LaunchAiScreenAbility()
+int32_t KeyCommandHandler::LaunchAiScreenAbility(int32_t pid)
 {
-    if (CheckTwoFingerGesture() != RET_OK) {
+    if (CheckTwoFingerGesture(pid) != RET_OK) {
+        twoFingerGesture_.startTime = 0;
+        twoFingerGesture_.longPressFlag = false;
+        twoFingerGesture_.windowId = -1;
+        twoFingerGesture_.windowPid = -1;
         return RET_ERR;
     }
 
@@ -3025,6 +3036,7 @@ int32_t KeyCommandHandler::LaunchAiScreenAbility()
     twoFingerGesture_.startTime = 0;
     twoFingerGesture_.longPressFlag = false;
     twoFingerGesture_.windowId = -1;
+    twoFingerGesture_.windowPid = -1;
     return RET_OK;
 }
 } // namespace MMI

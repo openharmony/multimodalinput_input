@@ -3480,10 +3480,6 @@ int32_t MultimodalInputConnectStub::StubSetKnuckleSwitch(MessageParcel &data, Me
 int32_t MultimodalInputConnectStub::StubLaunchAiScreenAbility(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     int32_t ret = LaunchAiScreenAbility();
     if (ret != RET_OK) {
         MMI_HILOGE("Call LaunchAiScreenAbility failed ret:%{public}d", ret);
