@@ -79,6 +79,7 @@ enum class VKeyboardTouchEventType : int32_t {
     TOUCH_MOVE = 2,
     TOUCH_FRAME = 3,
 };
+const int32_t DEBOUNCE_MOVE = 26;
 #define SCREEN_RECORD_WINDOW_WIDTH 400
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -494,8 +495,15 @@ void LibinputAdapter::OnVKeyTrackPadMessage(libinput_event_touch* touch,
             continue;
         }
         auto msgType = static_cast<VTPStateMachineMessageType>(msgItem[VKEY_TP_SM_MSG_TYPE_IDX]);
+        if (msgType != VTPStateMachineMessageType::POINTER_MOVE) {
+            pointer_move_count = 0;
+        }
         switch (msgType) {
             case VTPStateMachineMessageType::POINTER_MOVE:
+                pointer_move_count ++;
+                if (pointer_move_count < DEBOUNCE_MOVE) {
+                    break;
+                }
                 if (!HandleVKeyTrackPadPointerMove(touch, msgItem)) {
                     MMI_HILOGE("Virtual TrackPad pointer move event cannot be handled");
                 }
