@@ -30,36 +30,27 @@ using namespace OHOS::MMI;
 namespace {
 constexpr int32_t ANI_SCOPE_SIZE = 16;
 constexpr int32_t MILLISECOND_FACTOR = 1000;
-constexpr size_t EVENT_NAME_LEN { 64 };
 constexpr size_t PRE_KEYS_SIZE { 4 };
-constexpr size_t INPUT_PARAMETER_MIDDLE { 2 };
-constexpr size_t INPUT_PARAMETER_MAX { 3 };
-constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
-constexpr int32_t OCCUPIED_BY_OTHER = -4;
 const double INT32_MAX_D = static_cast<double>(std::numeric_limits<int32_t>::max());
 } // namespace
 
 static Callbacks callbacks = {};
-static Callbacks hotkeyCallbacks = {};
 std::mutex sCallBacksMutex;
-static const std::vector<int32_t> pressKeyCodes = {
-    KeyEvent::KEYCODE_ALT_LEFT,
-    KeyEvent::KEYCODE_ALT_RIGHT,
-    KeyEvent::KEYCODE_SHIFT_LEFT,
-    KeyEvent::KEYCODE_SHIFT_RIGHT,
-    KeyEvent::KEYCODE_CTRL_LEFT,
-    KeyEvent::KEYCODE_CTRL_RIGHT
-};
-static const std::vector<int32_t> finalKeyCodes = {
-    KeyEvent::KEYCODE_ALT_LEFT,
-    KeyEvent::KEYCODE_ALT_RIGHT,
-    KeyEvent::KEYCODE_SHIFT_LEFT,
-    KeyEvent::KEYCODE_SHIFT_RIGHT,
-    KeyEvent::KEYCODE_CTRL_LEFT,
-    KeyEvent::KEYCODE_CTRL_RIGHT,
-    KeyEvent::KEYCODE_META_LEFT,
-    KeyEvent::KEYCODE_META_RIGHT
-};
+
+KeyEventMonitorInfo::~KeyEventMonitorInfo()
+{
+    if (env == nullptr) {
+        return;
+    }
+    if (callback != nullptr) {
+        env->GlobalReference_Delete(callback);
+    }
+    if (keyOptionsObj != nullptr) {
+        env->GlobalReference_Delete(keyOptionsObj);
+    }
+    callback = nullptr;
+    keyOptionsObj = nullptr;
+}
 
 static ani_error CreateAniError(ani_env *env, std::string &&errMsg)
 {
@@ -109,16 +100,16 @@ static std::optional<bool> GetIsRepeat(ani_env *env, ani_object keyOptionsObj)
     return static_cast<bool>(isRepeat);
 }
 
-static std::string AniStringToString(ani_env *env, ani_string ani_str)
+static std::string AniStringToString(ani_env *env, ani_string aniStr)
 {
     ani_size strSize;
-    env->String_GetUTF8Size(ani_str, &strSize);
+    env->String_GetUTF8Size(aniStr, &strSize);
 
     std::vector<char> buffer(strSize + 1);
     char* utf8Buffer = buffer.data();
 
     ani_size bytes_written = 0;
-    env->String_GetUTF8(ani_str, utf8Buffer, strSize + 1, &bytes_written);
+    env->String_GetUTF8(aniStr, utf8Buffer, strSize + 1, &bytes_written);
 
     utf8Buffer[bytes_written] = '\0';
     std::string content = std::string(utf8Buffer);
@@ -127,6 +118,7 @@ static std::string AniStringToString(ani_env *env, ani_string ani_str)
 
 static bool GetPreKeys(ani_env *env, ani_object keyOptionsObj, std::set<int32_t> &preKeys)
 {
+    CALL_DEBUG_ENTER;
     ani_ref ref;
     if (ANI_OK != env->Object_GetPropertyByName_Ref(keyOptionsObj, "preKeys", &ref)) {
         MMI_HILOGE("Object_GetPropertyByName_Ref Failed");
@@ -139,14 +131,14 @@ static bool GetPreKeys(ani_env *env, ani_object keyOptionsObj, std::set<int32_t>
         return false;
     }
     for (int i = 0; i < int(length); i++) {
-        ani_ref IntArrayRef;
-        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, "$_get", "I:Lstd/core/Object;", &IntArrayRef,
+        ani_ref intArrayRef;
+        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, "$_get", "I:Lstd/core/Object;", &intArrayRef,
             (ani_int)i)) {
             MMI_HILOGE("Object_GetPropertyByName_Ref Failed");
             return false;
         }
         ani_double doubleEntry;
-        if (ANI_OK != env->Object_CallMethodByName_Double(static_cast<ani_object>(IntArrayRef), "unboxed", nullptr,
+        if (ANI_OK != env->Object_CallMethodByName_Double(static_cast<ani_object>(intArrayRef), "unboxed", nullptr,
             &doubleEntry)) {
             MMI_HILOGE("Object_CallMethodByName_Double unbox Failed");
             return false;
@@ -165,19 +157,33 @@ static bool GetPreKeys(ani_env *env, ani_object keyOptionsObj, std::set<int32_t>
     return true;
 }
 
-static std::shared_ptr<KeyOption> ParsekeyOptions(ani_env *env, ani_object keyOptionsObj, std::string &subKeyNames)
+static std::string GenerateEventType(std::shared_ptr<KeyOption> &keyOptionPtr)
 {
+    CALL_DEBUG_ENTER;
+    std::string eventType;
+    for (const auto &preKey : keyOptionPtr->GetPreKeys()) {
+        eventType = eventType + std::to_string(preKey) + ",";
+    }
+    eventType = eventType + std::to_string(keyOptionPtr->GetFinalKey()) + "," +
+        std::to_string(keyOptionPtr->IsFinalKeyDown()) + "," +
+        std::to_string(keyOptionPtr->GetFinalKeyDownDuration()) + "," +
+        std::to_string(keyOptionPtr->IsRepeat());
+    return eventType;
+}
+
+static std::shared_ptr<KeyOption> ParseKeyOptions(ani_env *env, ani_object keyOptionsObj)
+{
+    CALL_DEBUG_ENTER;
     std::shared_ptr<KeyOption> keyOptionPtr = std::make_shared<KeyOption>();
 
     std::set<int32_t> preKeys;
     if (!GetPreKeys(env, keyOptionsObj, preKeys) || preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("PreKeys is invalid");
+        ani_error error = CreateAniError(env, "PreKeys is invalid");
+        env->ThrowError(error);
         return nullptr;
     }
     keyOptionPtr->SetPreKeys(preKeys);
-    for (const auto &preKey : preKeys) {
-        subKeyNames = subKeyNames + std::to_string(preKey) + ",";
-    }
 
     ani_double finalKey;
     if (ANI_OK != env->Object_GetPropertyByName_Double(keyOptionsObj, "finalKey", &finalKey)) {
@@ -186,10 +192,11 @@ static std::shared_ptr<KeyOption> ParsekeyOptions(ani_env *env, ani_object keyOp
     }
     if (finalKey > INT32_MAX_D || finalKey < 0) {
         MMI_HILOGE("finalKey:%{private}f is less 0 or greater than INT32_MAX, can not process", finalKey);
+        ani_error error = CreateAniError(env, "finalKey must be between 0 and INT32_MAX");
+        env->ThrowError(error);
         return nullptr;
     }
     keyOptionPtr->SetFinalKey(static_cast<int32_t>(finalKey));
-    subKeyNames = subKeyNames + std::to_string(static_cast<int32_t>(finalKey)) + ",";
 
     ani_boolean isFinalKeyDown;
     if (ANI_OK != env->Object_GetPropertyByName_Boolean(keyOptionsObj, "isFinalKeyDown", &isFinalKeyDown)) {
@@ -197,7 +204,6 @@ static std::shared_ptr<KeyOption> ParsekeyOptions(ani_env *env, ani_object keyOp
         return nullptr;
     }
     keyOptionPtr->SetFinalKeyDown(static_cast<bool>(isFinalKeyDown));
-    subKeyNames = subKeyNames + std::to_string(isFinalKeyDown) + ",";
 
     ani_double finalKeyDownDuration;
     if (ANI_OK != env->Object_GetPropertyByName_Double(keyOptionsObj, "finalKeyDownDuration", &finalKeyDownDuration)) {
@@ -206,10 +212,11 @@ static std::shared_ptr<KeyOption> ParsekeyOptions(ani_env *env, ani_object keyOp
     }
     if (finalKeyDownDuration > INT32_MAX_D || finalKeyDownDuration < 0) {
         MMI_HILOGE("finalKeyDownDuration:%{public}f is less 0 or greater INT32_MAX", finalKeyDownDuration);
+        ani_error error = CreateAniError(env, "finalKeyDownDuration must be between 0 and INT32_MAX");
+        env->ThrowError(error);
         return nullptr;
     }
     keyOptionPtr->SetFinalKeyDownDuration(static_cast<int32_t>(finalKeyDownDuration));
-    subKeyNames = subKeyNames + std::to_string(static_cast<int32_t>(finalKeyDownDuration)) + ",";
 
     bool isRepeat = true;
     auto isRepeatOpt = GetIsRepeat(env, keyOptionsObj);
@@ -217,7 +224,6 @@ static std::shared_ptr<KeyOption> ParsekeyOptions(ani_env *env, ani_object keyOp
         isRepeat = isRepeatOpt.value();
     }
     keyOptionPtr->SetRepeat(isRepeat);
-    subKeyNames += std::to_string(isRepeat);
 
     return keyOptionPtr;
 }
@@ -236,51 +242,44 @@ static bool IsMatchKeyAction(bool isFinalKeydown, int32_t keyAction)
     return false;
 }
 
-static bool MatchCombinationKey(std::shared_ptr<KeyEventMonitorInfo> monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
+static bool MatchCombinationKey(KeyOption &combinationKeyOption, KeyEvent &keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(monitorInfo);
-    CHKPF(keyEvent);
-    auto keyOption = monitorInfo->keyOption;
-    std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
-    int32_t infoFinalKey = keyOption->GetFinalKey();
-    int32_t keyEventFinalKey = keyEvent->GetKeyCode();
-    bool isFinalKeydown = keyOption->IsFinalKeyDown();
+    std::vector<KeyEvent::KeyItem> items = keyEvent.GetKeyItems();
+    int32_t infoFinalKey = combinationKeyOption.GetFinalKey();
+    int32_t keyEventFinalKey = keyEvent.GetKeyCode();
+    bool isFinalKeydown = combinationKeyOption.IsFinalKeyDown();
     MMI_HILOGD("InfoFinalKey:%{public}d,keyEventFinalKey:%{public}d,isFinalKeydown:%{public}d",
         infoFinalKey, keyEventFinalKey, isFinalKeydown);
     if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE ||
-        !IsMatchKeyAction(isFinalKeydown, keyEvent->GetKeyAction())) {
+        !IsMatchKeyAction(isFinalKeydown, keyEvent.GetKeyAction())) {
         MMI_HILOGD("key Param invalid");
         return false;
     }
-    std::set<int32_t> infoPreKeys = keyOption->GetPreKeys();
-    int32_t infoSize = 0;
-    for (auto it = infoPreKeys.begin(); it != infoPreKeys.end(); ++it) {
-        if (*it >= 0) {
-            infoSize++;
-        }
-    }
+
+    std::set<int32_t> preKeys = combinationKeyOption.GetPreKeys();
+    int32_t infoSize = std::count_if(preKeys.begin(), preKeys.end(), [](int32_t preKey) { return preKey >= 0; });
     int32_t count = 0;
     for (const auto &item : items) {
         if (item.GetKeyCode() == keyEventFinalKey) {
             continue;
         }
-        auto iter = find(infoPreKeys.begin(), infoPreKeys.end(), item.GetKeyCode());
-        if (iter == infoPreKeys.end()) {
+        auto iter = find(preKeys.begin(), preKeys.end(), item.GetKeyCode());
+        if (iter == preKeys.end()) {
             MMI_HILOGW("No keyCode in preKeys");
             return false;
         }
         count++;
     }
     MMI_HILOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
-    std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+    std::optional<KeyEvent::KeyItem> keyItem = keyEvent.GetKeyItem();
     if (!keyItem) {
         MMI_HILOGE("The keyItem is nullopt");
         return false;
     }
     auto downTime = keyItem->GetDownTime();
-    auto upTime = keyEvent->GetActionTime();
-    auto curDurationTime = keyOption->GetFinalKeyDownDuration();
+    auto upTime = keyEvent.GetActionTime();
+    auto curDurationTime = combinationKeyOption.GetFinalKeyDownDuration();
     if (curDurationTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurationTime) * MILLISECOND_FACTOR))) {
         MMI_HILOGE("Skip, upTime - downTime >= duration");
         return false;
@@ -295,12 +294,12 @@ static bool SendEventToMainThread(const std::function<void()> func)
         MMI_HILOGE("%{public}s: func == nullptr", __func__);
         return false;
     }
-    std::shared_ptr<OHOS::AppExecFwk::EventRunner> runner = OHOS::AppExecFwk::EventRunner::GetMainEventRunner();
+    auto runner = OHOS::AppExecFwk::EventRunner::GetMainEventRunner();
     if (!runner) {
         MMI_HILOGE("%{public}s: runner == nullptr", __func__);
         return false;
     }
-    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner);
+    auto handler = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner);
     handler->PostTask(func, "", 0, OHOS::AppExecFwk::EventQueue::Priority::HIGH, {});
     MMI_HILOGD("%{public}s: PostTask success", __func__);
     return true;
@@ -325,8 +324,9 @@ static void EmitAsyncCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEve
     CHKPV(reportEvent);
     auto task = [reportEvent]() {
         MMI_HILOGD("%{public}s: Begin to call task", __func__);
-        ani_size nr_refs = ANI_SCOPE_SIZE;
-        if (ANI_OK != reportEvent->env->CreateLocalScope(nr_refs)) {
+        ani_size nrRefs = ANI_SCOPE_SIZE;
+        AniLocalScopeGuard aniLocalScopeGuard(reportEvent->env, nrRefs);
+        if (!aniLocalScopeGuard.IsStatusOK()) {
             MMI_HILOGE("%{public}s: CreateLocalScope failed", __func__);
             return;
         }
@@ -353,7 +353,6 @@ static void EmitAsyncCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEve
             return;
         }
         MMI_HILOGD("%{public}s: FunctionalObject_Call success", __func__);
-        reportEvent->env->DestroyLocalScope();
     };
     if (!SendEventToMainThread(task)) {
         MMI_HILOGE("%{public}s: failed to send event", __func__);
@@ -373,7 +372,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
         auto infoIter = list.begin();
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
-            if (MatchCombinationKey(monitorInfo, keyEvent)) {
+            if (MatchCombinationKey(*(monitorInfo->keyOption), *keyEvent)) {
                 MMI_HILOGD("MatchCombinationKey success");
                 EmitAsyncCallbackWork(monitorInfo);
             }
@@ -434,29 +433,29 @@ static int32_t SubscribeKey(ani_env *env, std::shared_ptr<KeyEventMonitorInfo> &
 {
     CALL_DEBUG_ENTER;
     std::string subKeyNames = "";
-    auto keyOptionsPtr = ParsekeyOptions(env, static_cast<ani_object>(event->keyOptionsObj), subKeyNames);
+    auto keyOptionsPtr = ParseKeyOptions(env, static_cast<ani_object>(event->keyOptionsObj));
     if (keyOptionsPtr == nullptr) {
         MMI_HILOGE("keyOptionsPtr is nullptr");
-        return -1;
+        return ERROR_CODE;
     }
     event->keyOption = keyOptionsPtr;
-    event->eventType = subKeyNames;
+    event->eventType = GenerateEventType(keyOptionsPtr);
 
     int32_t preSubscribeId = GetPreSubscribeId(event);
-    if (preSubscribeId < 0) {
-        MMI_HILOGD("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
-        int32_t subscribeId = -1;
-        subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(event->keyOption, SubKeyEventCallback);
-        if (subscribeId < 0) {
-            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
-            return subscribeId;
-        }
-        MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
-        event->subscribeId = subscribeId;
-    } else {
+    if (preSubscribeId >= 0) {
         event->subscribeId = preSubscribeId;
+        return AddEventCallback(event);
     }
 
+    MMI_HILOGD("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
+    int32_t subscribeId = -1;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(event->keyOption, SubKeyEventCallback);
+    if (subscribeId < 0) {
+        MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+        return subscribeId;
+    }
+    MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
+    event->subscribeId = subscribeId;
     return AddEventCallback(event);
 }
 
@@ -466,11 +465,11 @@ static void On([[maybe_unused]] ani_env *env, ani_string strObj, ani_object keyO
     std::shared_ptr<KeyEventMonitorInfo> event = std::make_shared<KeyEventMonitorInfo>();
     event->env = env;
     if (ANI_OK != env->GlobalReference_Create(callback, &event->callback)) {
-        MMI_HILOGE("Create callback failed");
+        MMI_HILOGE("Create global reference 'callback' failed");
         return;
     }
     if (ANI_OK != env->GlobalReference_Create(keyOptionsObj, &event->keyOptionsObj)) {
-        MMI_HILOGE("Create callback failed");
+        MMI_HILOGE("Create global reference 'keyOptionsObj' failed");
         return;
     }
 
@@ -557,7 +556,7 @@ static void Off([[maybe_unused]] ani_env *env, ani_string strObj, ani_object key
         event->callback = nullptr;
     } else {
         if (ANI_OK != env->GlobalReference_Create(callback, &event->callback)) {
-            MMI_HILOGE("Create callback failed");
+            MMI_HILOGE("%{public}s: Create global reference 'callback' failed", __func__);
             return;
         }
     }
@@ -569,13 +568,13 @@ static void Off([[maybe_unused]] ani_env *env, ani_string strObj, ani_object key
         MMI_HILOGD("%{public}s: Enter Hotkey.", __func__);
     } else if (keyType == SUBSCRIBE_TYPE) {
         std::string subKeyNames = "";
-        auto keyOptionsPtr = ParsekeyOptions(env, static_cast<ani_object>(event->keyOptionsObj), subKeyNames);
+        auto keyOptionsPtr = ParseKeyOptions(env, static_cast<ani_object>(event->keyOptionsObj));
         if (keyOptionsPtr == nullptr) {
-            MMI_HILOGE("%{public}s: ParsekeyOptions failed", __func__);
+            MMI_HILOGE("%{public}s: ParseKeyOptions failed", __func__);
             return;
         }
         event->keyOption = keyOptionsPtr;
-        event->eventType = subKeyNames;
+        event->eventType = GenerateEventType(keyOptionsPtr);
         if (DelEventCallback(event, subscribeId) < 0) {
             MMI_HILOGE("DelEventCallback failed");
             return;
