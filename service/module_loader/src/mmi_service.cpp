@@ -157,6 +157,8 @@ typedef void (*VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)(const std::string &keyNa
 VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE vkeyboard_hardwareKeyEventDetected_ = nullptr;
 typedef int32_t (*VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)();
 VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE vkeyboard_getKeyboardActivationState_ = nullptr;
+typedef bool (*GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE)();
+GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE gaussiankeyboard_isFloatingKeyboard_ = nullptr;
 
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
@@ -3210,6 +3212,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "HardwareKeyEventDetected");
             vkeyboard_getKeyboardActivationState_ = (VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)dlsym(
                 g_VKeyboardHandle, "GetKeyboardActivationState");
+            gaussiankeyboard_isFloatingKeyboard_ = (GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE)dlsym(
+                g_VKeyboardHandle, "IsFloatingKeyboard");
 
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
                 statemachineMessageQueue_getLibinputMessage_,
@@ -3218,7 +3222,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 trackPadEngine_getAllKeyMessage_,
                 trackPadEngine_clearKeyMessage_,
                 vkeyboard_hardwareKeyEventDetected_,
-                vkeyboard_getKeyboardActivationState_);
+                vkeyboard_getKeyboardActivationState_,
+                gaussiankeyboard_isFloatingKeyboard_);
         }
     }
 }

@@ -36,6 +36,7 @@ typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAl
 typedef std::function<void()> ClearKeyMessage;
 typedef std::function<void(const std::string &keyName)> HardwareKeyEventDetected;
 typedef std::function<int32_t()> GetKeyboardActivationState;
+typedef std::function<bool()> IsFloatingKeyboard;
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 enum VKeyboardMessageType {
@@ -105,7 +106,9 @@ public:
         GetAllKeyMessage getAllKeyMessage,
         ClearKeyMessage clearKeyMessage,
         HardwareKeyEventDetected hardwareKeyEventDetected,
-        GetKeyboardActivationState getKeyboardActivationState);
+        GetKeyboardActivationState getKeyboardActivationState,
+        IsFloatingKeyboard isFloatingKeyboard
+        );
 
 private:
     void MultiKeyboardSetLedState(bool oldCapsLockState);
@@ -190,6 +193,7 @@ private:
     ClearKeyMessage clearKeyMessage_ { nullptr };
     HardwareKeyEventDetected hardwareKeyEventDetected_ { nullptr };
     GetKeyboardActivationState getKeyboardActivationState_ { nullptr };
+    IsFloatingKeyboard isFloatingKeyboard_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
