@@ -41,7 +41,7 @@ ohos_source_set("intention_channel") {
 }
 
 ohos_unittest("intention_channel_test") {
-  module_out_path = "${device_status_part_name}/devicestatussrv"
+  module_out_path = "input/input"
 
   sources = [ "test/channel_test.cpp" ]
 

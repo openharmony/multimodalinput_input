@@ -16,7 +16,7 @@ import("//build/test.gni")
 import("../multimodalinput_mini.gni")
 
 defines = input_default_defines
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 mmi_service_path = "${mmi_path}/service"
 
 ohos_prebuilt_etc("mmi_device_config.ini") {
@@ -414,7 +414,7 @@ ohos_shared_library("libmmi-server") {
 }
 
 import("//build/test.gni")
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 
 ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
