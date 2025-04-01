@@ -70,8 +70,6 @@ public:
     {
         delegateProxy_ = proxy;
     }
-    std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
-        PointerEvent::PointerItem pointerItem);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
     {
         windowScreenId_ = screenId;
