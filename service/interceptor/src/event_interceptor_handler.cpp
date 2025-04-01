@@ -335,9 +335,10 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         auto session = interceptor.session_;
         if (session != nullptr) {
             int32_t tokenType = session->GetTokenType();
-            int32_t pid = session->GetPid();
-            if (tokenType == TokenType::TOKEN_HAP && !IInputWindowsManager::GetInstance()->CheckAppFocused(pid)) {
-                MMI_HILOGD("Token hap is not focus, no need interceptor pointer");
+            if ((tokenType == TokenType::TOKEN_HAP) &&
+                (IInputWindowsManager::GetInstance()->GetWindowPid(pointerEvent->GetTargetWindowId()) !=
+                session->GetPid())) {
+                MMI_HILOGD("Token hap is not hit, no need interceptor pointer");
                 continue;
             }
         }
