@@ -94,6 +94,9 @@ bool TouchTransformProcessor::OnEventTouchCancel(struct libinput_event *event)
     item.SetToolDisplayY(touchInfo.toolRect.point.y);
     item.SetToolWidth(touchInfo.toolRect.width);
     item.SetToolHeight(touchInfo.toolRect.height);
+    pointerEvent_->SetTargetWindowId(item.GetTargetWindowId());
+    auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(item.GetTargetWindowId(), pointerEvent_->GetTargetDisplayId());
+    pointerEvent_->SetAgentWindowId(windowInfo->agentWindowId);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
     pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
