@@ -927,6 +927,11 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_012, TestSize.Level1)
     ret = stub->OnRemoteRequest(code, data, reply, option);
     temp = stub->StubGetTouchpadScrollRows(data, reply);
     EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::QUERY_SWITCH_STATE_EVENT);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubQuerySwitchStatus(data, reply);
+    EXPECT_EQ(ret, temp);
 }
 
 /**
@@ -1542,6 +1547,22 @@ HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeSwitchEvent_001, TestSiz
     MessageParcel reply;
     int32_t returnCode = 65142800;
     int32_t ret = stub->StubUnsubscribeSwitchEvent(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubQuerySwitchStatusEvent_001
+ * @tc.desc: Test the function StubQuerySwitchStatusEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubQuerySwitchStatusEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubQuerySwitchStatus(data, reply);
     EXPECT_EQ(ret, returnCode);
 }
 
