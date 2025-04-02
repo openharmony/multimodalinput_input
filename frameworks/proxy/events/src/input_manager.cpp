@@ -152,6 +152,14 @@ void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeSwitchEvent(subscriberId);
 }
 
+int32_t InputManager::QuerySwitchStatus(SwitchEvent::SwitchType switchType, SwitchEvent::SwitchState &state)
+{
+    auto inState = static_cast<int32_t>(state);
+    int32_t ret = InputMgrImpl.QuerySwitchStatus(static_cast<int32_t>(switchType), inState);
+    state = static_cast<SwitchEvent::SwitchState>(inState);
+    return ret;
+}
+
 int32_t InputManager::SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback)
 {
     return InputMgrImpl.SubscribeTabletProximity(callback);

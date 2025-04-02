@@ -2280,6 +2280,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
 }
 
 /**
+ * @tc.name: InputManagerTest_QuerySwitchStatus_001
+ * @tc.desc: Unsubscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_QuerySwitchStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SwitchEvent::SwitchState state = SwitchEvent::SwitchState::STATE_OFF;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_TABLET,
+        state));
+}
+
+/**
  * @tc.name: InputManagerTest_SubscribeLongPressEvent_01
  * @tc.desc: Verify invalid parameter : finger count less than 0.
  * @tc.type: FUNC

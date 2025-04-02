@@ -2085,6 +2085,23 @@ int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
     return RET_OK;
 }
 
+int32_t MMIService::QuerySwitchStatus(int32_t switchType, int32_t& state)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, switchType, &state] {
+            return sMsgHandler_.OnQuerySwitchStatus(switchType, state);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The query switch state processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_SWITCH
+    return RET_OK;
+}
+
 int32_t MMIService::SubscribeTabletProximity(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
