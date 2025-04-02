@@ -16,13 +16,14 @@
 import hilog from '@ohos.hilog'
 import { Callback, AsyncCallback } from '@ohos.base';
 import { BusinessError } from "@ohos.base"
-import { KeyCode } from '@ohos.multimodalInput.keyCode';
 
 export namespace inputDevice {
     loadLibrary("ani_input_device");
 
     export native function getDeviceListInner(): Array<number>;
     export native function getDeviceInfoInner(deviceId: number): InputDeviceData;
+
+    export native function on(type: 'change', listener: Callback<DeviceListener>): void;
 
   /**
    * Add or remove device
@@ -329,6 +330,10 @@ export namespace inputDevice {
       this.nativePtr = context;
     }
 
+  setEmptyAxisRanges(): void {
+    this.axisRanges = new Array<AxisRange>();
+  }
+
     id: number;
     name: string;
     sources: Array<SourceType>;
@@ -339,6 +344,27 @@ export namespace inputDevice {
     version: number;
     phys: string;
     uniq: string;
+  }
+
+  class AxisRangeImpl implements AxisRange {
+    private nativePtr:long = 0;
+    constructor(context:long) {
+      hilog.info(0x0000, 'input_device', "in constructor, context is ", context)
+      this.nativePtr = context;
+    }
+
+    source: SourceType;
+    axis: AxisType;
+    max: number;
+    min: number;
+    fuzz: number;
+    flat: number;
+    resolution: number;
+  }
+
+  class DeviceListenerImpl implements DeviceListener {
+    type: ChangedType;
+    deviceId: number;
   }
 
   function getDeviceList(callback: AsyncCallback<Array<number>>): void {
