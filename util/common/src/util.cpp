@@ -411,21 +411,21 @@ static int32_t ConfigItemSwitch(const std::string &configItem, const std::string
         return RET_ERR;
     }
     if (configItem == CONFIG_ITEM_REPEAT) {
-        devConf.autoSwitch = stoi(value);
+        devConf.autoSwitch = atoi(value.c_str());
     } else if (configItem == CONFIG_ITEM_DELAY) {
-        devConf.delayTime = stoi(value);
+        devConf.delayTime = atoi(value.c_str());
         if (devConf.delayTime < MIN_DELAYTIME || devConf.delayTime > MAX_DELAYTIME) {
             MMI_HILOGE("Unusual the delaytime");
             return RET_ERR;
         }
     } else if (configItem == CONFIG_ITEM_INTERVAL) {
-        devConf.intervalTime = stoi(value);
+        devConf.intervalTime = atoi(value.c_str());
         if (devConf.intervalTime < MIN_INTERVALTIME || devConf.intervalTime > MAX_INTERVALTIME) {
             MMI_HILOGE("Unusual the intervaltime");
             return RET_ERR;
         }
     } else if (configItem == CONFIG_ITEM_TYPE) {
-        devConf.keyboardType = stoi(value);
+        devConf.keyboardType = atoi(value.c_str());
     }
     return RET_OK;
 }
