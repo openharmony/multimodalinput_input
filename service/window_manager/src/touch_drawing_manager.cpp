@@ -21,7 +21,6 @@
 
 #include "i_multimodal_input_connect.h"
 #include "input_windows_manager.h"
-#include "input_windows_manager.h"
 #include "table_dump.h"
 
 #undef MMI_LOG_DOMAIN
