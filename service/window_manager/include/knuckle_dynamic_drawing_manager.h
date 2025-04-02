@@ -27,7 +27,7 @@ class KnuckleDynamicDrawingManager {
 public:
     KnuckleDynamicDrawingManager();
     ~KnuckleDynamicDrawingManager() = default;
-    void KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
+    void KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent, int32_t displayId = -1);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
     void SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr);
 

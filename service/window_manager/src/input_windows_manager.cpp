@@ -4941,10 +4941,10 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     if (!knuckleSwitch && !isInMethodWindow) {
         knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
-        knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
+        knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent, physicDisplayInfo->uniqueId);
 #ifndef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
         knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
-        knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent);
+        knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent, physicDisplayInfo->uniqueId);
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY && OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
