@@ -6328,7 +6328,7 @@ std::shared_ptr<PointerEvent> InputWindowsManager::GetlastPointerEvent()
 }
 
 std::pair<int32_t, int32_t> InputWindowsManager::CalcDrawCoordinate(const DisplayInfo& displayInfo,
-    PointerEvent::PointerItem pointerItem);
+    PointerEvent::PointerItem pointerItem)
 {
     CALL_DEBUG_ENTER;
     double physicalX = pointerItem.GetRawDisplayX();
