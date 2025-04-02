@@ -54,7 +54,12 @@ constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 constexpr int32_t ERR_DEVICE_NOT_EXIST { 3900002 };
 constexpr int32_t ERR_NON_INPUT_APPLICATION { 3900003 };
-
+constexpr float FACTOR_0 { 1.0f };
+constexpr float FACTOR_8 { 0.7f };
+constexpr float FACTOR_18 { 1.0f };
+constexpr float FACTOR_27 { 1.2f };
+constexpr float FACTOR_55 { 1.6f };
+constexpr float FACTOR_MAX { 2.4f };
 class RemoteObjectTest : public IRemoteObject {
 public:
     explicit RemoteObjectTest(std::u16string descriptor) : IRemoteObject(descriptor) {}
@@ -2276,5 +2281,284 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_DealGesturePointers, TestSiz
     touchEvent->AddPointerItem(item);
     ASSERT_NO_FATAL_FAILURE(handler.DealGesturePointers(pointerEvent));
 }
+
+/**
+@tc.name: ServerMsgHandlerTest_DealGesturePointers_001
+@tc.desc: Test the function DealGesturePointers
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_DealGesturePointers_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerId(10001);
+    ASSERT_NO_FATAL_FAILURE(handler.DealGesturePointers(pointerEvent));
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_ScreenFactor_001
+@tc.desc: Test the function ScreenFactor
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ScreenFactor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t diagonalInch = 0;
+    EXPECT_EQ(handler.ScreenFactor(diagonalInch), FACTOR_0);
+    diagonalInch = 5;
+    EXPECT_EQ(handler.ScreenFactor(diagonalInch), FACTOR_8);
+    diagonalInch = 10;
+    EXPECT_EQ(handler.ScreenFactor(diagonalInch), FACTOR_18);
+    diagonalInch = 20;
+    EXPECT_EQ(handler.ScreenFactor(diagonalInch), FACTOR_27);
+    diagonalInch = 30;
+    EXPECT_EQ(handler.ScreenFactor(diagonalInch), FACTOR_55);
+    diagonalInch = 55;
+    EXPECT_EQ(handler.ScreenFactor(diagonalInch), FACTOR_MAX);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_UpdateTouchEvent_001
+@tc.desc: Test the function UpdateTouchEvent
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateTouchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerId(10001);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
+    pointerEvent->SetTargetWindowId(10);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10001);
+    pointerEvent->AddPointerItem(item);
+    int32_t action = PointerEvent::POINTER_ACTION_HOVER_ENTER;
+    int32_t targetWindowId = 10;
+    bool result = handler.UpdateTouchEvent(pointerEvent, action, targetWindowId);
+    EXPECT_TRUE(result);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_UpdateTouchEvent_002
+@tc.desc: Test the function UpdateTouchEvent
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateTouchEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerId(10001);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetWindowId(10);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10001);
+    pointerEvent->AddPointerItem(item);
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    int32_t targetWindowId = 10;
+    bool result = handler.UpdateTouchEvent(pointerEvent, action, targetWindowId);
+    EXPECT_TRUE(result);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_UpdateTouchEvent_003
+@tc.desc: Test the function UpdateTouchEvent
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateTouchEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerId(10001);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetTargetWindowId(-1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10001);
+    pointerEvent->AddPointerItem(item);
+    int32_t action = PointerEvent::POINTER_ACTION_CANCEL;
+    int32_t targetWindowId = -1;
+    bool result = handler.UpdateTouchEvent(pointerEvent, action, targetWindowId);
+    EXPECT_TRUE(result);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_UpdateTouchEvent_004
+@tc.desc: Test the function UpdateTouchEvent
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateTouchEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerId(10001);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetTargetWindowId(10);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10001);
+    pointerEvent->AddPointerItem(item);
+    int32_t action = PointerEvent::POINTER_ACTION_CANCEL;
+    int32_t targetWindowId = 10;
+    bool result = handler.UpdateTouchEvent(pointerEvent, action, targetWindowId);
+    EXPECT_TRUE(result);
+    pointerEvent->RemoveAllPointerItems();
+    EXPECT_FALSE(handler.UpdateTouchEvent(pointerEvent, action, targetWindowId));
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_SubscribeKeyMonitor_001
+@tc.desc: Test the function SubscribeKeyMonitor
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SubscribeKeyMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler serverMsgHandler;
+    int32_t session = 1;
+    KeyMonitorOption keyOption;
+    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.SubscribeKeyMonitor(session, keyOption));
+}
+
+
+/**
+@tc.name: ServerMsgHandlerTest_UnsubscribeKeyMonitor
+@tc.desc: Test the function UnsubscribeKeyMonitor
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler serverMsgHandler;
+    int32_t session = 1;
+    KeyMonitorOption keyOption;
+    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.UnsubscribeKeyMonitor(session, keyOption));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_005
+ * @tc.desc: Test the function OnAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.CurrentPID_ = 12345;
+    handler.authorizationCollection_[12345] = AuthorizationStatus::UNAUTHORIZED;
+    int32_t result = handler.OnAuthorize(true);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_006
+ * @tc.desc: Test the function OnAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.CurrentPID_ = 12345;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+    int32_t result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnCancelInjection_005
+ * @tc.desc: Test the function OnCancelInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    int callPid = 12345;
+    int32_t ret = handler.OnCancelInjection(callPid);
+    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnCancelInjection_006
+ * @tc.desc: Test the function OnCancelInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    int callPid = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.OnCancelInjection(callPid));
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+    ASSERT_NO_FATAL_FAILURE(handler.OnCancelInjection(callPid));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_AddInjectNotice_005
+ * @tc.desc: Test the function AddInjectNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    InjectNoticeInfo noticeInfo;
+    handler.injectNotice_ =nullptr;
+    bool ret = handler.InitInjectNoticeSource();
+    handler.injectNotice_->isStartSrv_ = true;
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    EXPECT_NE(nullptr, manager.connectionCallback_);
+    auto connection = handler.injectNotice_->GetConnection();
+    connection->isConnected_ = true;
+    EXPECT_TRUE(handler.AddInjectNotice(noticeInfo));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_005
+ * @tc.desc: Test the function CloseInjectNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    int32_t pid = 12345;
+    handler.injectNotice_ =nullptr;
+    bool ret = handler.InitInjectNoticeSource();
+    handler.injectNotice_->isStartSrv_ = true;
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    EXPECT_NE(nullptr, manager.connectionCallback_);
+    auto connection = handler.injectNotice_->GetConnection();
+    connection->isConnected_ = true;
+    EXPECT_TRUE(handler.CloseInjectNotice(pid));
+}
+
 } // namespace MMI
 } // namespace OHOS
