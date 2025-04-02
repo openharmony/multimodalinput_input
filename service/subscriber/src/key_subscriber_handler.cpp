@@ -909,7 +909,6 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
         CHKPC(sess);
         if (!isForegroundExits_ || foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             interestedSubscribers.push_back(subscriber);
-            HandleKeyUpWithDelay(keyEvent, subscriber);
             handled = true;
         }
     }
