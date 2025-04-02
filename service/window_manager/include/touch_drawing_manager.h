@@ -57,6 +57,8 @@ struct DevMode {
     DECLARE_DELAYED_SINGLETON(TouchDrawingManager);
 public:
     DISALLOW_COPY_AND_MOVE(TouchDrawingManager);
+    void Initialize();
+    void SetupSettingObserver(int32_t nRetries);
     void TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateLabels();
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
@@ -79,6 +81,7 @@ public:
     };
 
 private:
+    bool HasDisplayInfo() const;
     void CreateObserver();
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
         bool isNeedRotate = true);
