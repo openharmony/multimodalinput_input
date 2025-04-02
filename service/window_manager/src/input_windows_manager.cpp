@@ -1119,19 +1119,18 @@ CursorPosition  InputWindowsManager::ResetCursorPos(const DisplayGroupInfo &disp
 {
     if (!displayGroupInfo.displaysInfo.empty()) {
         DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
-        MMI_HILOGI("ResetCursorPos displayId:%{public}d", displayInfo.id);
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
+        x = displayInfo.validWidth * HALF_RATIO;
+        y = displayInfo.validHeight * HALF_RATIO;
         if (IsSupported()) {
             if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
                 std::swap(x, y);
             }
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        displayInfo.validWidth * HALF_RATIO;
-        displayInfo.validHeight * HALF_RATIO;
         cursorPos_.displayId = displayInfo.id;
         cursorPos_.cursorPos.x = x;
         cursorPos_.cursorPos.y = y;
@@ -1195,7 +1194,7 @@ void InputWindowsManager::HandleValidDisplayChange(const DisplayGroupInfo &displ
 
 CursorPosition InputWindowsManager::GetCursorPos(const DisplayGroupInfo &displayGroupInfo)
 {
-    if ((cursorPos_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
+    if ((cursorPos_.displayId < 0) && !displayGroupInfo.displaysInfo.empty()) {
         DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
@@ -5439,7 +5438,6 @@ CursorPosition InputWindowsManager::ResetCursorPos()
     auto displaysInfoVector = GetDisplayInfoVector();
     if (!displaysInfoVector.empty()) {
         DisplayInfo displayInfo = displaysInfoVector[0];
-        MMI_HILOGI("ResetCursorPos displayId:%{public}d", displayInfo.id);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
         if (IsSupported()) {
