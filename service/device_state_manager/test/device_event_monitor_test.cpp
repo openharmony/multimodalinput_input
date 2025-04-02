@@ -142,7 +142,6 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_005, TestSize.Level1)
     ced.SetWant(want);
     deviceEventMonitor.SetCallState(ced, 1);
     ASSERT_EQ(deviceEventMonitor.callState_, 5);
-
 }
 
 /**
