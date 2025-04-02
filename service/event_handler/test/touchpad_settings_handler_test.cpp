@@ -286,7 +286,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
     observer.updateFunc_ = UpdateFunc;
     int32_t serviceId = 3101;
     observer.pressureObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_pressureKey, observer.updateFunc_);   
+            .CreateObserver(g_pressureKey, observer.updateFunc_);
     observer.vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_vibrationKey, observer.updateFunc_);
     observer.touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
