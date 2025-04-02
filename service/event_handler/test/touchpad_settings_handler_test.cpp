@@ -223,7 +223,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
     observer.currentAccountId_ = 1;
     int32_t serviceId = 3101;
     observer.pressureObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_pressureKey, observer.updateFunc_);   
+            .CreateObserver(g_pressureKey, observer.updateFunc_);
     observer.vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_vibrationKey, observer.updateFunc_);
     observer.touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
@@ -298,7 +298,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
     observer.vibrationObserver_ = nullptr;
     observer.touchpadSwitchesObserver_ = nullptr;
     observer.knuckleSwitchesObserver_ = nullptr;
-
 }
 /**
  * @tc.name: GetInstance_001
