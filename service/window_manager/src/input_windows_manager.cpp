@@ -75,6 +75,7 @@ const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hin
 const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string PRIVACY_SWITCH_NAME {"huaweicast.data.privacy_projection_state"};
+const std::string PRODUCT_TYPE_PC = "2in1";
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 constexpr int32_t REPEAT_COOLING_TIME { 100 };
 constexpr int32_t REPEAT_ONCE { 1 };
@@ -1798,7 +1799,9 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             isDragBorder_ = false;
         }
         int32_t focusWindowId = GetFocusWindowId();
-        if (firstBtnDownWindowInfo_.first != focusWindowId && !extraData_.appended) {
+        bool isCursopRestoredFlag = (firstBtnDownWindowInfo_.first != focusWindowId) &&
+            (PRODUCT_TYPE == PRODUCT_TYPE_PC) && isDragBorder_;
+        if (isCursopRestoredFlag) {
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGI("Window is changed, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }

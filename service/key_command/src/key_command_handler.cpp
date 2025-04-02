@@ -1239,6 +1239,11 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
         }
         return true;
     }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_SYSRQ) {
+        auto iterms = key->GetKeyItems();
+        MMI_HILOGI("Recording response VM");
+        return iterms.size() != 1 ? enableCombineKey_ : true;
+    }
     return enableCombineKey_;
 }
 
