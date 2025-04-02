@@ -92,7 +92,7 @@ public:
     void ReloadDevice();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static void SetBootCompleted();
-	void RegisterBootStatusReceiver();
+    void RegisterBootStatusReceiver();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     auto GetInputFds() const
