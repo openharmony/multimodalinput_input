@@ -1834,9 +1834,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #ifdef OHOS_BUILD_ENABLE_ANCO
         WIN_MGR->InitializeAnco();
 #endif // OHOS_BUILD_ENABLE_ANCO
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        libinputAdapter_.RegisterBootStatusReceiver();
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
