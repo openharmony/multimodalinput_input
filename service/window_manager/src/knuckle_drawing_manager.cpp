@@ -152,7 +152,7 @@ KnuckleDrawingManager::KnuckleDrawingManager()
     displayInfo_.displayDirection = Direction::DIRECTION0;
 }
 
-void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent)
+void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -162,7 +162,9 @@ void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> tou
     CreateObserver();
     int32_t touchAction = touchEvent->GetPointerAction();
     if (IsValidAction(touchAction) && IsSingleKnuckleDoubleClick(touchEvent)) {
-        int32_t displayId = touchEvent->GetTargetDisplayId();
+        if (displayId == DEFAULT_VALUE) {
+            displayId = touchEvent->GetTargetDisplayId();
+        }
         CreateTouchWindow(displayId);
         StartTouchDraw(touchEvent);
     }
