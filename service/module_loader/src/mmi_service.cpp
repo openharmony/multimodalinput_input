@@ -3802,12 +3802,14 @@ int32_t MMIService::SetKnuckleSwitch(bool knuckleSwitch)
 
 int32_t MMIService::LaunchAiScreenAbility()
 {
-    int ret = delegateTasks_.PostSyncTask([] {
+    int32_t pid = GetCallingPid();
+    int ret = delegateTasks_.PostSyncTask(
+        [pid] {
         auto keyHandler = InputHandler->GetKeyCommandHandler();
         if (keyHandler == nullptr) {
             return RET_ERR;
         }
-        return keyHandler->LaunchAiScreenAbility();
+        return keyHandler->LaunchAiScreenAbility(pid);
     });
     if (ret != RET_OK) {
         MMI_HILOGE("LaunchAiScreenAbility failed, return:%{public}d", ret);
