@@ -1103,6 +1103,14 @@ int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t p
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->UnsubscribeSwitchEvent(sess, subscribeId);
 }
+
+int32_t ServerMsgHandler::OnQuerySwitchStatus(int32_t switchType, int32_t& state)
+{
+    CALL_DEBUG_ENTER;
+    auto subscriberHandler = InputHandler->GetSwitchSubscriberHandler();
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
+    return subscriberHandler->QuerySwitchStatus(switchType, state);
+}
 #endif // OHOS_BUILD_ENABLE_SWITCH
 
 int32_t ServerMsgHandler::OnSubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,

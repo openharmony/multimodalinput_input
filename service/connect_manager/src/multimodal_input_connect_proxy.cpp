@@ -1474,6 +1474,29 @@ int32_t MultimodalInputConnectProxy::UnsubscribeSwitchEvent(int32_t subscribeId)
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::QuerySwitchStatus(int32_t switchType, int32_t& state)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, switchType, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        QUERY_SWITCH_STATE_EVENT), data, reply, option);
+    READINT32(reply, state, ERR_INVALID_VALUE);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, result:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::SubscribeLongPressEvent(int32_t subscribeId,
     const LongPressRequest &longPressRequest)
 {

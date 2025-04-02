@@ -308,7 +308,14 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   ]
 
   sources = [
+    "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
+    "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
+    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
+    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
+    "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
+    "event_handler/src/tablet_event_input_subscribe_manager.cpp",
     "event_handler/test/switch_event_input_subscribe_manager_test.cpp",
   ]
 
@@ -338,6 +345,7 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]

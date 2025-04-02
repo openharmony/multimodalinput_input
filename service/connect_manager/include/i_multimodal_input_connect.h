@@ -107,6 +107,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     virtual int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) = 0;
     virtual int32_t UnsubscribeSwitchEvent(int32_t subscribeId) = 0;
+    virtual int32_t QuerySwitchStatus(int32_t switchType, int32_t& state) = 0;
     virtual int32_t SubscribeTabletProximity(int32_t subscribeId) = 0;
     virtual int32_t UnsubscribetabletProximity(int32_t subscribeId) = 0;
     virtual int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) = 0;

@@ -507,6 +507,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubUnsubscribeKeyMonitor(data, reply);
             break;
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::QUERY_SWITCH_STATE_EVENT):
+            ret = StubQuerySwitchStatus(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -1710,6 +1713,29 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& da
     return ret;
 }
 
+int32_t MultimodalInputConnectStub::StubQuerySwitchStatus(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t type = 0;
+    int32_t state = 0;
+    READINT32(data, type, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = QuerySwitchStatus(type, state);
+    WRITEINT32(reply, state, ERR_INVALID_VALUE);
+    if (ret != RET_OK) {
+        MMI_HILOGE("QuerySwitchStatus failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 
 int32_t MultimodalInputConnectStub::StubSubscribeTabletProximity(MessageParcel& data, MessageParcel& reply)
 {

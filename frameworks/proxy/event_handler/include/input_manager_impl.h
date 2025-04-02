@@ -67,6 +67,7 @@ public:
     int32_t UnsubscribeKeyMonitor(int32_t subscriberId);
     int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
+    int32_t QuerySwitchStatus(int32_t switchTpe, int32_t& state);
     int32_t SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback);
     void UnsubscribetabletProximity(int32_t subscriberId);
     int32_t SubscribeLongPressEvent(const LongPressRequest &LongPressRequest,
