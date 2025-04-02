@@ -16,7 +16,6 @@
 import hilog from '@ohos.hilog'
 import { AsyncCallback } from "@ohos.base"
 import { BusinessError } from "@ohos.base"
-import image from '@ohos.multimedia.image';
 
 export namespace pointer {
   loadLibrary("ani_pointer");
@@ -374,6 +373,7 @@ export namespace pointer {
         callback(err, undefined);
       }).catch((error: NullishType) => {
         let err =  error as BusinessError<void>;
+        hilog.info(0x0000, 'pointer', "setPointerStyleInner err is " + err);
         callback(err, undefined);
       });
   }

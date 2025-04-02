@@ -16,17 +16,22 @@
 #ifndef ANI_MULTI_MODAL_INPUT_DEVICE_H
 #define ANI_MULTI_MODAL_INPUT_DEVICE_H
 
-#include <ani.h>
-#include <array>
-#include <list>
-#include <map>
-#include <set>
-#include <string>
+#include "ani_input_device_manager.h"
 
-#define SUCCESS_CODE 0
-#define ERROR_CODE (-1)
-#define UNREGISTERED_CODE (-2)
-#define PRE_KEY_MAX_COUNT 4
+namespace OHOS {
+namespace MMI {
+class AniInputDeviceContext final {
+public:
+    AniInputDeviceContext();
+    DISALLOW_COPY_AND_MOVE(AniInputDeviceContext);
+    ~AniInputDeviceContext();
 
+    void On(ani_env *env, ani_string info, ani_object callback);
 
+private:
+    std::shared_ptr<AniInputDeviceManager> mgr_ { nullptr };
+    std::mutex mtx_;
+};
+} // namespace MMI
+} // namespace OHOS
 #endif // ANI_MULTI_MODAL_INPUT_DEVICE_H

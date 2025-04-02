@@ -32,7 +32,12 @@ ohos_shared_library("ani_input_device") {
     "-Wno-unused-function",
     "-Wno-unused-const-variable",
   ]
-  sources = [ "src/input_device.cpp" ]
+  sources = [
+    "src/ani_event_target.cpp",
+    "src/ani_input_device_context.cpp",
+    "src/ani_input_device_manager.cpp",
+    "src/ani_util.cpp",
+  ]
 
   include_dirs = [
     "include",
@@ -42,6 +47,7 @@ ohos_shared_library("ani_input_device") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
   ]

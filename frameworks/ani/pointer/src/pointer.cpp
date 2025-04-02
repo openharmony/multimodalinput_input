@@ -17,8 +17,12 @@
 #include <iostream>
 
 #include "define_multimodal.h"
+#include "input_manager.h"
 #include "mmi_log.h"
 
+#include <cstdint>
+#include <cmath>
+#include <limits>
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AniPointer"
@@ -37,8 +41,82 @@ constexpr int32_t OCCUPIED_BY_OTHER = -4;
 const double INT32_MAX_D = static_cast<double>(std::numeric_limits<int32_t>::max());
 } // namespace
 
-static int SetPointerStyleInner(ani_env *env, ani_object context, ani_object idObj, ani_enum_item enumObj)
+enum NapiErrorCode : int32_t {
+    COMMON_PARAMETER_ERROR = 401,
+    COMMON_USE_SYSAPI_ERROR = 202,
+};
+
+static ani_error CreateAniError(ani_env *env, std::string&& errMsg)
 {
+    static const char *errorClsName = "Lescompat/Error;";
+    ani_class cls {};
+    if (ANI_OK != env->FindClass(errorClsName, &cls)) {
+        MMI_HILOGE("%{public}s: Not found namespace %{public}s.", __func__, errorClsName);
+        return nullptr;
+    }
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;:V", &ctor)) {
+        MMI_HILOGE("%{public}s: Not found <ctor> in %{public}s.", __func__, errorClsName);
+        return nullptr;
+    }
+    ani_string error_msg;
+    env->String_NewUTF8(errMsg.c_str(), errMsg.size(), &error_msg);
+    ani_object errorObject;
+    env->Object_New(cls, ctor, &errorObject, error_msg);
+    return static_cast<ani_error>(errorObject);
+}
+
+int32_t ToInt32ECMAScript(double value)
+{
+    if (std::isnan(value) || std::isinf(value)) {
+        return 0;
+    }
+
+    double truncated = std::trunc(value);
+    double modValue = std::fmod(truncated, 4294967296.0);
+    uint32_t uint32Val = static_cast<uint32_t>(modValue);
+    return static_cast<int32_t>(uint32Val);
+}
+
+static ani_int ParseEnumToInt(ani_env *env, ani_enum_item enumItem)
+{
+    ani_int intValue = -1;
+    if (ANI_OK != env->EnumItem_GetValue_Int(enumItem, &intValue)) {
+        MMI_HILOGE("%{public}s: EnumItem_GetValue_Int FAILD.", __func__);
+        return -1;
+    }
+    MMI_HILOGD("%{public}s: Enum Value: %{public}d.", __func__, intValue);
+    return intValue;
+}
+
+static int SetPointerStyleInner(ani_env *env, ani_double windowid, ani_enum_item pointerStyle)
+{
+    int32_t windowID = ToInt32ECMAScript(static_cast<double>(windowid));
+    if (windowID < 0 && windowID != GLOBAL_WINDOW_ID) {
+        MMI_HILOGE("Invalid windowid");
+        ani_error err = CreateAniError(env, "Windowid is invalid");
+        env->ThrowError(err);
+        return COMMON_PARAMETER_ERROR;
+    }
+
+    int32_t pointerStyleID = ParseEnumToInt(env, pointerStyle);
+    if ((pointerStyleID < DEFAULT && pointerStyleID != DEVELOPER_DEFINED_ICON) || pointerStyleID > RUNNING) {
+        MMI_HILOGE("Undefined pointer style");
+        ani_error err = CreateAniError(env, "Pointer style does not exist");
+        env->ThrowError(err);
+        return COMMON_PARAMETER_ERROR;
+    }
+
+    PointerStyle style;
+    style.id = pointerStyleID;
+    int32_t errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, style);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("The windowId is negative number and no system applications use system API");
+        ani_error err = CreateAniError(env, "windowId is negative number and no system applications use system API");
+        env->ThrowError(err);
+        return COMMON_USE_SYSAPI_ERROR;
+    }
+    MMI_HILOGD(" SetPointerStyleInner end.");
     return 0;
 }
 
