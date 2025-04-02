@@ -66,7 +66,7 @@ uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const DisplayInfo &di)
     : hwcMgr_(hwcMgr), handler_(handler)
 {
-    screenId_ = di.id;
+    screenId_ = di.uniqueId;
     width_ = di.width;
     height_ = di.height;
     rotation_ = static_cast<rotation_t>(di.direction);
@@ -82,7 +82,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const D
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_info_ptr_t si)
     : hwcMgr_(hwcMgr), handler_(handler)
 {
-    screenId_ = si->GetScreenId();
+    screenId_ = si->GetRsId();
     width_ = GetScreenInfoWidth(si);
     height_ = GetScreenInfoHeight(si);
     mode_ = si->GetSourceMode();
@@ -165,13 +165,13 @@ bool ScreenPointer::InitSurface()
 
 void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
 {
-    auto id = si->GetScreenId();
+    auto id = si->GetRsId();
     if (screenId_ != id) {
         surfaceNode_->AttachToDisplay(id);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
 
-    screenId_ = si->GetScreenId();
+    screenId_ = si->GetRsId();
     width_ = GetScreenInfoWidth(si);
     height_ = GetScreenInfoHeight(si);
     mode_ = si->GetSourceMode();
@@ -187,7 +187,7 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
 
 void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
 {
-    if (screenId_ != uint32_t(di.id)) {
+    if (screenId_ != uint32_t(di.uniqueId)) {
         return;
     }
 
