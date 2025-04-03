@@ -613,6 +613,9 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
                 MMI_HILOGE("Set mute fail, ret:%{public}d", ret);
                 return false;
             }
+#if defined(OHOS_BUILD_ENABLE_DFX_RADAR) && defined(OHOS_BUILD_ENABLE_WATCH)
+            DfxHisysevent::ReportCallingMute();
+#endif // defined(OHOS_BUILD_ENABLE_DFX_RADAR) && defined(OHOS_BUILD_ENABLE_WATCH)
             MMI_HILOGW("Set mute success");
             DEVICE_MONITOR->SetHasHandleRingMute(true);
             if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {

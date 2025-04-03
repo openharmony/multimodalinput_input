@@ -59,6 +59,7 @@ void SwitchSubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
 void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
 {
     CHKPV(switchEvent);
+    UpdateSwitchState(switchEvent);
     if (OnSubscribeSwitchEvent(switchEvent)) {
         MMI_HILOGI("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
         return;
@@ -114,7 +115,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
     for (const auto &subscriber : subscribers_) {
         if (subscriber->switchType_ == switchEvent->GetSwitchType() ||
             (subscriber->switchType_ == SwitchEvent::SwitchType::SWITCH_DEFAULT &&
-                switchEvent->GetSwitchType() != SwitchEvent::SwitchType::SWITCH_PRIVACY)) {
+                switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID)) {
             MMI_HILOGI("The subscriber:%{public}d", subscriber->sess_->GetPid());
             NotifySubscriber(switchEvent, subscriber);
             handled = true;
@@ -216,6 +217,31 @@ void SwitchSubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &a
         mprintf(fd, "subscriber id:%d | Pid:%d | Uid:%d | Fd:%d\t",
                 subscriber->id_, session->GetPid(), session->GetUid(), session->GetFd());
     }
+}
+
+bool SwitchSubscriberHandler::UpdateSwitchState(const std::shared_ptr<SwitchEvent> switchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(switchEvent);
+    switchStateRecord_[switchEvent->GetSwitchType()] = switchEvent->GetSwitchValue();
+    return true;
+}
+
+int32_t SwitchSubscriberHandler::QuerySwitchStatus(int32_t switchType, int32_t& state)
+{
+    CALL_INFO_TRACE;
+    MMI_HILOGD("QuerySwitchStatus");
+    if (switchStateRecord_.find(switchType) != switchStateRecord_.end()) {
+        if (switchStateRecord_[switchType] == SwitchEvent::SWITCH_ON) {
+            state = SwitchEvent::STATE_ON;
+        } else {
+            state = SwitchEvent::STATE_OFF;
+        }
+        return RET_OK;
+    }
+    state = SwitchEvent::STATE_UNKNOW;
+    MMI_HILOGI("No info about switch %{public}d", switchType);
+    return RET_ERR;
 }
 } // namespace MMI
 } // namespace OHOS

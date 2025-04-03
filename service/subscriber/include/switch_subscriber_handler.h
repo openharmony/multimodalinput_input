@@ -16,6 +16,7 @@
 #ifndef SWITCH_SUBSCRIBER_HANDLER_H
 #define SWITCH_SUBSCRIBER_HANDLER_H
 
+#include <unordered_map>
 #include "i_input_event_handler.h"
 #include "uds_server.h"
 
@@ -41,6 +42,8 @@ public:
     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    bool UpdateSwitchState(const std::shared_ptr<SwitchEvent> switchEvent);
+    int32_t QuerySwitchStatus(int32_t switchType, int32_t& state);
 private:
     struct Subscriber {
         Subscriber(int32_t id, SessionPtr sess, int32_t switchType)
@@ -64,6 +67,7 @@ private:
     std::list<std::shared_ptr<Subscriber>> subscribers_ {};
     std::atomic_bool callbackInitialized_ { false };
     std::shared_ptr<SwitchEvent> switchEvent_ { nullptr };
+    std::unordered_map<int32_t, int32_t> switchStateRecord_;
 };
 } // namespace MMI
 } // namespace OHOS

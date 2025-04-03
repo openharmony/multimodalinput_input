@@ -41,6 +41,22 @@ bool StubUnsubscribeSwitchEventFuzzTest(const uint8_t* data, size_t size)
     return true;
 }
 
+bool StubQuerySwitchStatusFuzzTest(const uint8_t* data, size_t size)
+{
+    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
+        !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
+    MMIService::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::QUERY_SWITCH_STATE_EVENT), datas, reply, option);
+    return true;
+}
+
 bool StubSetTouchpadRotateSwitchFuzzTest(const uint8_t* data, size_t size)
 {
     const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
@@ -440,6 +456,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
 
     OHOS::StubUnsubscribeSwitchEventFuzzTest(data, size);
+    OHOS::StubQuerySwitchStatusFuzzTest(data, size);
     OHOS::StubSetTouchpadRotateSwitchFuzzTest(data, size);
     OHOS::StubGetTouchpadRotateSwitchFuzzTest(data, size);
     OHOS::StubGetKeyStateFuzzTest(data, size);

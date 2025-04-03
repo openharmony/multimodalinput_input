@@ -4941,10 +4941,10 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     if (!knuckleSwitch && !isInMethodWindow) {
         knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
-        knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
+        knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent, physicDisplayInfo->uniqueId);
 #ifndef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
         knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
-        knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent);
+        knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent, physicDisplayInfo->uniqueId);
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY && OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -6326,6 +6326,20 @@ std::shared_ptr<PointerEvent> InputWindowsManager::GetlastPointerEvent()
 {
     std::lock_guard<std::mutex> guard(mtx_);
     return lastPointerEvent_;
+}
+
+std::pair<int32_t, int32_t> InputWindowsManager::CalcDrawCoordinate(const DisplayInfo& displayInfo,
+    PointerEvent::PointerItem pointerItem)
+{
+    CALL_DEBUG_ENTER;
+    double physicalX = pointerItem.GetRawDisplayX();
+    double physicalY = pointerItem.GetRawDisplayY();
+    if (!displayInfo.transform.empty()) {
+        auto displayXY = TransformDisplayXY(displayInfo, physicalX, physicalY);
+        physicalX = displayXY.first;
+        physicalY = displayXY.second;
+    }
+    return {static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY)};
 }
 } // namespace MMI
 } // namespace OHOS
