@@ -447,7 +447,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_Dump_001, TestSi
     eventPreMonitorHandler.monitors_.sessionHandlers_[keys] =
         std::list<std::shared_ptr<EventPreMonitorHandler::SessionHandler>>();
     eventPreMonitorHandler.monitors_.sessionHandlers_[keys].push_back(sessionHandler);
-    ASSERT_NO_FATAL_FAILURE(monitorCollection.Dump(fd, args));   
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.Dump(fd, args));
 }
 } // namespace MMI
 } // namespace OHOS
