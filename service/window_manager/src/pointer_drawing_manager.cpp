@@ -536,10 +536,6 @@ void PointerDrawingManager::UpdateMouseStyle()
     GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (curPointerStyle.id == CURSOR_CIRCLE_STYLE || curPointerStyle.id == AECH_DEVELOPER_DEFINED_STYLE) {
         lastMouseStyle_.id = curPointerStyle.id;
-        int ret = SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Set pointer style failed");
-        }
         return;
     }
 }
