@@ -116,16 +116,23 @@ group("input_jsapi_group") {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
     if (input_feature_mouse) {
-      deps += [ "frameworks/napi/pointer:pointer" ]
+      deps += [
+        "frameworks/ani/pointer:ani_pointer_package",
+        "frameworks/napi/pointer:pointer",
+      ]
     }
     if (input_feature_keyboard) {
       deps += [
+        "frameworks/ani/input_consumer:input_consumer_package",
         "frameworks/napi/input_consumer:inputconsumer",
         "frameworks/napi/input_event_client:inputeventclient",
       ]
     }
     if (input_feature_input_device) {
-      deps += [ "frameworks/napi/input_device:inputdevice" ]
+      deps += [
+        "frameworks/ani/input_device:ani_input_device_package",
+        "frameworks/napi/input_device:inputdevice",
+      ]
     }
     if (input_feature_short_key) {
       deps += [ "frameworks/napi/short_key:shortkey" ]
