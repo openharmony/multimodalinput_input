@@ -65,6 +65,7 @@ const std::string WALLET_BUNDLE_NAME { "com.hmos.walletservice" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 const std::string NAME_CANCEL { "cancel" };
 const std::string TOUCH_SCREEN_ON { "screen on" };
+static constexpr char WATCH_CROWN_MUTE[] { "WATCH_CROWN_MUTE" };
 } // namespace
 
 static std::string GetVendorInfo(const char* nodePath)
@@ -1276,7 +1277,7 @@ void DfxHisysevent::ReportFailHandleKey(std::string name, int32_t keyCode, int32
 void DfxHisysevent::ReportCallingMute()
 {
     int32_t ret = HiSysEventWrite(
-        OHOS::HiviewDFX::HiSysEvent::Domain::INPUT_UE,
+        WATCH_CROWN_MUTE,
         "CALL_UI_WATCH_CROWN_MUTE",
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
         "PNAMEID", "",
