@@ -87,6 +87,16 @@ void JsCommon::ThrowError(napi_env env, int32_t code)
     }
 }
 
+static void EnvCleanUp(void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    KeyEventMonitorInfo *info = reinterpret_cast<KeyEventMonitorInfo *>(data);
+    std::lock_guard<std::mutex> lock(info->envMutex_);
+    info->env = nullptr;
+}
+
 napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
@@ -741,8 +751,18 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
     return exports;
 }
 
+KeyEventMonitorInfo::KeyEventMonitorInfo()
+{
+    (void)napi_add_env_cleanup_hook(env, EnvCleanUp, this);
+}
+
 KeyEventMonitorInfo::~KeyEventMonitorInfo()
 {
+    std::lock_guard<std::mutex> lock(envMutex_);
+    if (env == nullptr) {
+        return;
+    }
+    (void)napi_remove_env_cleanup_hook(env, EnvCleanUp, this);
     if (callback == nullptr) {
         return;
     }
