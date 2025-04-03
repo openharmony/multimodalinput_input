@@ -1280,7 +1280,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_002, Tes
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsXKey_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EventPreMonitorHandler::MonitorCollection eventMonitorHandler;
+    EventMonitorHandler::MonitorCollection eventMonitorHandler;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
