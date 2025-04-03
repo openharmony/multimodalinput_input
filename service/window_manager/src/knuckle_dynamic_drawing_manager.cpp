@@ -110,14 +110,17 @@ void KnuckleDynamicDrawingManager::UpdateTrackColors()
     pointerPathPaint_.setColor(PATH_COLOR);
 }
 
-void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     if (!IsSingleKnuckle(pointerEvent)) {
         return;
     }
-    auto displayId = pointerEvent->GetTargetDisplayId();
+    if (displayId == DEFAULT_VALUE) {
+        displayId = pointerEvent->GetTargetDisplayId();
+    }
     CreateTouchWindow(displayId);
     if (CheckPointerAction(pointerEvent)) {
         StartTouchDraw(pointerEvent);
