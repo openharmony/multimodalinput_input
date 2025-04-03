@@ -457,6 +457,23 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
 #endif // OHOS_BUILD_ENABLE_SWITCH
 }
 
+int32_t InputManagerImpl::QuerySwitchStatus(int32_t switchTpe, int32_t& state)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    if (switchTpe < SwitchEvent::SwitchType::SWITCH_DEFAULT ||
+        switchTpe > SwitchEvent::SwitchType::SWITCH_PRIVACY) {
+        MMI_HILOGE("Switch type error, switchType:%{public}d", switchTpe);
+        return RET_ERR;
+    }
+    return MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(switchTpe, state);
+#else
+    MMI_HILOGW("Switch device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
 int32_t InputManagerImpl::SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback)
 {
     CALL_INFO_TRACE;

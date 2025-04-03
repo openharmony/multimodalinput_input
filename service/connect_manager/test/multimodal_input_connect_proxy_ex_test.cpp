@@ -188,6 +188,42 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_Unsubs
 }
 
 /**
+ * @tc.name: MultimodalInputConnectProxyTest_QuerySwitchStatus_001
+ * @tc.desc: Cover if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_QuerySwitchStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillOnce(Return(false));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    int32_t switchType = 0;
+    int32_t switchState = 0;
+    EXPECT_EQ(proxy.QuerySwitchStatus(switchType, switchState), ERR_INVALID_VALUE);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_QuerySwitchStatus_002
+ * @tc.desc: Cover the else branch of if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor()))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_QuerySwitchStatus_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    int32_t switchType = 0;
+    int32_t switchState = 0;
+    EXPECT_EQ(proxy.QuerySwitchStatus(switchType, switchState), RET_OK);
+}
+
+/**
  * @tc.name: MultimodalInputConnectProxyTest_SetMouseHotSpot_001
  * @tc.desc: Cover if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) branch
  * @tc.type: FUNC

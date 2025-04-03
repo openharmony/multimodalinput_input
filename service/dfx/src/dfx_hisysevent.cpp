@@ -1272,5 +1272,19 @@ void DfxHisysevent::ReportFailHandleKey(std::string name, int32_t keyCode, int32
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+
+void DfxHisysevent::ReportCallingMute()
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::INPUT_UE,
+        "CALL_UI_WATCH_CROWN_MUTE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "PNAMEID", "",
+        "PVERSIONID", "",
+        "MUTE_TYPE", 1);
+    if (ret != 0) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
 } // namespace MMI
 } // namespace OHOS

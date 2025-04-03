@@ -24,6 +24,7 @@
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
 #include "i_multimodal_input_connect.h"
+#include "input_windows_manager.h"
 #include "setting_datashare.h"
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 #include "timer_manager.h"
@@ -151,7 +152,7 @@ KnuckleDrawingManager::KnuckleDrawingManager()
     displayInfo_.displayDirection = Direction::DIRECTION0;
 }
 
-void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent)
+void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -161,7 +162,9 @@ void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> tou
     CreateObserver();
     int32_t touchAction = touchEvent->GetPointerAction();
     if (IsValidAction(touchAction) && IsSingleKnuckleDoubleClick(touchEvent)) {
-        int32_t displayId = touchEvent->GetTargetDisplayId();
+        if (displayId == DEFAULT_VALUE) {
+            displayId = touchEvent->GetTargetDisplayId();
+        }
         CreateTouchWindow(displayId);
         StartTouchDraw(touchEvent);
     }
@@ -204,7 +207,7 @@ bool KnuckleDrawingManager::IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEv
         int32_t id = touchEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         touchEvent->GetPointerItem(id, pointerItem);
-        auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+        auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
         float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownPointer_.x - displayXY.first, POW_SQUARE) +
             pow(lastDownPointer_.y - displayXY.second, POW_SQUARE)));
         bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
@@ -487,7 +490,7 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+    auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
     pointerInfo.x = displayXY.first;
     pointerInfo.y = displayXY.second;
     pointerInfos_.push_back(pointerInfo);
