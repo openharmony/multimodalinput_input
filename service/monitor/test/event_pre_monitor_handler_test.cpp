@@ -296,5 +296,158 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_SendToClient_001
     NetPacket keyEventPkt(MmiMessageId::ON_PRE_KEY_EVENT);
     ASSERT_NO_FATAL_FAILURE(sessionHandler->SendToClient(keyEvent, keyEventPkt, 1));
 }
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_SendToClient_002
+ * @tc.desc: Verify the keyEvent and pointerEvent of SendToClient
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_SendToClient_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_PRE_KEY;
+    std::vector<int32_t> keys = {1, 2, 3};
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    auto sessionHandler = std::make_shared<EventPreMonitorHandler::SessionHandler>(session, 1, eventType, keys);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    NetPacket keyEventPkt(MmiMessageId::ON_PRE_KEY_EVENT);
+    std::vector<KeyEvent::KeyItem> keyItems;
+    for (int i = 0; i < 400; ++i) {
+        KeyEvent::KeyItem item;
+        item.deviceId_ = i;
+        item.keyCode_ = i;
+        item.downTime_ = i;
+        keyItems.push_back(item);
+    }
+    keyEvent->SetKeyItem(keyItems);
+    ASSERT_NO_FATAL_FAILURE(sessionHandler->SendToClient(keyEvent, keyEventPkt, 1));
+}
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_AddMonitor_001
+ * @tc.desc: Verify the invalid and valid event type of AddMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_AddMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler::MonitorCollection monitorCollection;
+    std::vector<int32_t> keys = {1, 2, 3};
+    HandleEventType eventType = HANDLE_EVENT_TYPE_PRE_KEY;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    auto sessionHandler = std::make_shared<EventPreMonitorHandler::SessionHandler>(session, 1, eventType, keys);
+    for (int i = 0; i < 20; ++i) {
+        std::vector<int32_t> key = {i};
+        std::list<std::shared_ptr<EventPreMonitorHandler::SessionHandler>> value;
+        value.push_back(std::make_shared<EventPreMonitorHandler::SessionHandler>(session, i, eventType, keys));
+        monitorCollection.sessionHandlers_[key] = value;
+    }
+    int32_t ret = monitorCollection.AddMonitor(sessionHandler, keys);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_AddMonitor_001
+ * @tc.desc: Verify the invalid and valid event type of AddMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_AddMonitor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler::MonitorCollection monitorCollection;
+    std::vector<int32_t> keys = {1, 2, 3};
+    HandleEventType eventType = HANDLE_EVENT_TYPE_PRE_KEY;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    auto sessionHandler = std::make_shared<EventPreMonitorHandler::SessionHandler>(session, 1, eventType, keys);
+    for (int i = 0; i < 15; ++i) {
+        std::vector<int32_t> key = {i};
+        std::list<std::shared_ptr<EventPreMonitorHandler::SessionHandler>> value;
+        value.push_back(std::make_shared<EventPreMonitorHandler::SessionHandler>(session, i, eventType, keys));
+        monitorCollection.sessionHandlers_[key] = value;
+    }
+    int32_t ret = monitorCollection.AddMonitor(sessionHandler, keys);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_IsEqualsKeys_002
+ * @tc.desc: Verify the invalid and valid event type of IsEqualsKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_IsEqualsKeys_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler::MonitorCollection monitorCollection;
+    std::vector<int32_t> newKeys = {1, 2, 3};
+    std::vector<int32_t> oldKeys = {4, 5, 6};
+    bool ret = monitorCollection.IsEqualsKeys(newKeys, oldKeys);
+    ASSERT_FALSE(ret);
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: EventPreMonitorHandlerTest_HandleEvent_001
+ * @tc.desc: Verify HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_HandleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler::MonitorCollection monitorCollection;
+    EventPreMonitorHandler eventPreMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    StreamBuffer streamBuffer;
+    streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    bool ret = monitorCollection.HandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+    streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    ret = monitorCollection.HandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+    HandleEventType eventType = HANDLE_EVENT_TYPE_PRE_KEY;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    std::vector<int32_t> keys = {1, 2, 3};
+    auto sessionHandler = std::make_shared<EventPreMonitorHandler::SessionHandler>(session, 1, eventType, keys);
+    eventPreMonitorHandler.monitors_.sessionHandlers_[keys] =
+        std::list<std::shared_ptr<EventPreMonitorHandler::SessionHandler>>();
+    eventPreMonitorHandler.monitors_.sessionHandlers_[keys].push_back(sessionHandler);
+    sessionHandler->keys_ = {1, 2, 3};
+    keyEvent->SetKeyCode(2);
+    ret = monitorCollection.HandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+    keyEvent->SetKeyCode(5);
+    ret = monitorCollection.HandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_Dump_001
+ * @tc.desc: Verify the invalid and valid event type of Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_Dump_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler::MonitorCollection monitorCollection;
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.Dump(fd, args));
+    EventPreMonitorHandler eventPreMonitorHandler;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    HandleEventType eventType = HANDLE_EVENT_TYPE_PRE_KEY;
+    std::vector<int32_t> keys = {1, 2, 3};
+    auto sessionHandler = std::make_shared<EventPreMonitorHandler::SessionHandler>(session, 1, eventType, keys);
+    eventPreMonitorHandler.monitors_.sessionHandlers_[keys] =
+        std::list<std::shared_ptr<EventPreMonitorHandler::SessionHandler>>();
+    eventPreMonitorHandler.monitors_.sessionHandlers_[keys].push_back(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.Dump(fd, args));
+}
 } // namespace MMI
 } // namespace OHOS
