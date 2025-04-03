@@ -297,6 +297,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_SendToClient_001
     ASSERT_NO_FATAL_FAILURE(sessionHandler->SendToClient(keyEvent, keyEventPkt, 1));
 }
 
+/**
  * @tc.name: EventPreMonitorHandlerTest_SendToClient_002
  * @tc.desc: Verify the keyEvent and pointerEvent of SendToClient
  * @tc.type: FUNC
