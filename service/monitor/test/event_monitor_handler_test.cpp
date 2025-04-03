@@ -1280,13 +1280,13 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_002, Tes
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsXKey_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EventMonitorHandler eventMonitorHandler;
+    EventPreMonitorHandler::MonitorCollection eventMonitorHandler;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->setSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
     bool ret = eventMonitorHandler.IsXKey(pointerEvent);
     ASSERT_TRUE(ret);
-    pointerEvent->setSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     ret = eventMonitorHandler.IsXKey(pointerEvent);
     ASSERT_FALSE(ret);
 }
