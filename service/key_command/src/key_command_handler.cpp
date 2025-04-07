@@ -3000,7 +3000,8 @@ int32_t KeyCommandHandler::CheckTwoFingerGesture(int32_t pid)
         return RET_ERR;
     }
     if (timeOut > SCREEN_TIME_OUT) {
-        MMI_HILOGE("Double finger press timeout");
+        MMI_HILOGE("Start application timeout, startTime:%{public}lld, millisecond:%{public}lld, timeOut:%{public}lld",
+            twoFingerGesture_.startTime, milliseconds, timeOut);
         return RET_ERR;
     }
 
