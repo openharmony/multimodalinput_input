@@ -2358,7 +2358,7 @@ void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
         windowId_ = info.windowId;
         pid_ = info.windowPid;
         PointerStyle curPointerStyle;
-        GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+        GetPointerStyle(pid_, windowId_, curPointerStyle);
         lastMouseStyle_ = curPointerStyle;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         PostTask([this]() {
