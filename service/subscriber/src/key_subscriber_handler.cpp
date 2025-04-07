@@ -829,6 +829,8 @@ int32_t KeySubscriberHandler::GetHighestPrioritySubscriber(const std::list<std::
 {
     int highestPriority = std::numeric_limits<int>::min();
     for (const auto &subscriber : subscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
         int prio = subscriber->keyOption_->GetPriority();
         if (prio > highestPriority) {
             highestPriority = prio;
