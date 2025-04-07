@@ -1935,5 +1935,36 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_CreateAllSystemHotkeys_001, T
     Input_Hotkey **hotkey = OH_Input_CreateAllSystemHotkeys(count);
     EXPECT_EQ(hotkey, nullptr);
 }
+
+/**
+ * @tc.name: InputNativeTest_OH_Input_GetAllSystemHotkeys_003
+ * @tc.desc: Verify the InputNativeTest_OH_Input_GetAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAllSystemHotkey_003, TestSize.Level1)
+{
+    int32_t count = -2;
+    Input_Hotkey **hotkey = OH_Input_CreateAllSystemHotkeys(count);
+    Input_Result ret = OH_Input_GetAllSystemHotkeys(hotkey, &count);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+    OH_Input_DestroyAllSystemHotkeys(hotkey, count);
+    ret = OH_Input_GetAllSystemHotkeys(nullptr, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: InputNativeTest_OH_Input_GetAllSystemHotkeys_003
+ * @tc.desc: Verify the InputNativeTest_OH_Input_GetAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAllSystemHotkey_003, TestSize.Level1)
+{
+    int32_t count = -1;
+    Input_Hotkey* hotkeys = nullptr;
+    Input_Result ret = OH_Input_GetAllSystemHotkeys(&hotkeys, &count);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
 } // namespace MMI
 } // namespace OHOS

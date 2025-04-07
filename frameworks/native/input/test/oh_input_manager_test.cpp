@@ -19,6 +19,7 @@
 #include <map>
 
 #include "oh_input_manager.h"
+#include "input_manager.h"
 #include "pointer_event.h"
 #include "mmi_log.h"
 
@@ -72,7 +73,7 @@ struct Input_AxisEvent {
     int32_t windowId { -1 };
     int32_t displayId { -1 };
 };
-
+static std::shared_ptr<OHOS::MMI::PointerEvent> g_touchEvent = OHOS::MMI::PointerEvent::Create();
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -1340,20 +1341,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_001, T
 }
 
 /**
- * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState
- * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001, TestSize.Level1)
-{
-    int32_t keyCode = 1;
-    int32_t state = -1;
-    Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-}
-
-/**
  * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState_002
  * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
  * @tc.type: FUNC
@@ -1505,6 +1492,14 @@ static void TouchEventCallback(const struct Input_TouchEvent* touchEvent)
     int32_t action = OH_Input_GetTouchEventAction(touchEvent);
     int32_t id = OH_Input_GetTouchEventFingerId(touchEvent);
     MMI_HILOGI("TouchEventCallback, action:%{public}d, id:%{public}d", action, id);
+}
+
+static void KeyEventCallback(const struct Input_KeyEvent* keyEvent)
+{
+    EXPECT_NE(keyEvent, nullptr);
+    int32_t action = OH_Input_GetKeyEventAction(keyEvent);
+    int32_t id = OH_Input_GetKeyEventDisplayId(keyEvent);
+    MMI_HILOGI("KeyEventCallback, action:%{public}d, id:%{public}d", action, id);
 }
 
 static void AxisEventCallback(const struct Input_AxisEvent* axisEvent)
@@ -1699,6 +1694,234 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_003,
     ret = OH_Input_AddMouseEventMonitor(callback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
     event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent
+ * @tc.desc: Test the funcation OH_Input_InjectMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:nhj
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent inputMouseEvent;
+    inputMouseEvent.actionTime = 1;
+    inputMouseEvent.action = MOUSE_ACTION_CANCEL;
+    inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
+    inputMouseEvent.button = MOUSE_BUTTON_LEFT;
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
+
+    inputMouseEvent.actionTime = 100;
+    inputMouseEvent.displayX = 300;
+    inputMouseEvent.displayY = 300;
+    inputMouseEvent.action = TOUCH_ACTION_DOWN;
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
+
+    inputMouseEvent.action = MOUSE_ACTION_AXIS_END;
+    inputMouseEvent.button = static_cast<Input_MouseEventButton>(10);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent
+ * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_008, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = -100;
+    inputTouchEvent.displayX = -1;
+    inputTouchEvent.action = TOUCH_ACTION_DOWN;
+    EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent
+ * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.action = TOUCH_ACTION_UP;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    int32_t pointerId = 3;
+    event->SetPointerId(pointerId);
+    auto pointerIds = event->GetPointerIds();
+    EXPECT_TRUE(pointerIds.empty());
+    EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_005
+ * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.displayX = 300;
+    inputTouchEvent.displayY = -1;
+    inputTouchEvent.action = TOUCH_ACTION_CANCEL;
+    EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventMonitor
+ * @tc.desc: Test the funcation OH_Input_AddKeyEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventMonitor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_KeyEventCallback callback;
+    callback = KeyEventCallback;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    Input_Result retResult = OH_Input_RemoveKeyEventMonitor(callback);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    event->SetSourceType(SOURCE_TYPE_TOUCHSCREEN);
+    Input_Result ret = OH_Input_AddKeyEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetSourceType(SOURCE_TYPE_MOUSE);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    ret = OH_Input_AddKeyEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    ret = OH_Input_AddKeyEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
+    ret = OH_Input_AddKeyEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ret = OH_Input_AddKeyEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState_003
+ * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 1;
+    int32_t state = 1;
+    Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    EXPECT_EQ(retResult, INPUT_KEYBOARD_DEVICE_NOT_EXIST);
+    keyCode = -1;
+    retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    keyCode = 5;
+    retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    state = -1;
+    retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState
+ * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 1;
+    int32_t state = -1;
+    bool resultState = true;
+    Input_Result retResult = OH_Input_GetFunctionKeyState(keyCode, &state);
+    int32_t napiCode = OHOS::MMI::InputManager::GetInstance()->GetFunctionKeyState(keyCode, resultState);
+    EXPECT_EQ(napiCode, INPUT_KEYBOARD_DEVICE_NOT_EXIST);
+    EXPECT_EQ(retResult, INPUT_KEYBOARD_DEVICE_NOT_EXIST);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
+ * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_006, TestSize.Level2)
+{
+    int32_t deviceId = 0;
+    int32_t keyboardType = 0;
+    Input_Result ret = OH_Input_GetKeyboardType(deviceId, &keyboardType); // 假设 deviceId=0 是有效设备
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_NE(keyboardType, 0);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
+ * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_007, TestSize.Level1)
+{
+    int32_t deviceId = 99999;
+    int32_t keyboardType = -1;
+    Input_Result retResult = OH_Input_GetKeyboardType(deviceId, &keyboardType);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds
+ * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_006, TestSize.Level1)
+{
+    const int32_t inSize = 0;
+    int32_t outSize = 1;
+    int32_t deviceIds[inSize] = {};
+    Input_Result retResult = OH_Input_GetDeviceIds(deviceIds, inSize, &outSize);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+    EXPECT_EQ(outSize, 0);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_004
+ * @tc.desc: Test the funcation OH_Input_AddMouseEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEventCallback callback;
+    callback = MouseEventCallback;
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(SOURCE_TYPE_TOUCHSCREEN);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_PULL_DOWN);
+    Input_Result ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_PULL_MOVE);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_PULL_UP);
+    ret = OH_Input_AddMouseEventMonitor(callback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW);
     ret = OH_Input_AddMouseEventMonitor(callback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
