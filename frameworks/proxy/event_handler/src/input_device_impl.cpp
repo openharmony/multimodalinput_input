@@ -38,51 +38,71 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
 {
     CHKPR(listener, RET_ERR);
     MMI_HILOGI("Register listener of change of input devices");
-    std::lock_guard guard(mtx_);
 
-    auto iter = devListener_.find(type);
-    if (iter == devListener_.end()) {
-        MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
-        return RET_ERR;
-    }
-    auto &listeners = iter->second;
+    bool needStartServer = false;
+    {
+        std::lock_guard guard(devListenerMutex_);
+        auto iter = devListener_.find(type);
+        if (iter == devListener_.end()) {
+            MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
+            return RET_ERR;
+        }
 
-    auto ret = StartListeningToServer();
-    if (ret != RET_OK) {
-        MMI_HILOGE("StartListeningToServer fail, error:%{public}d", ret);
-        return ret;
+        auto &listeners = iter->second;
+        bool isNew = std::all_of(listeners.cbegin(), listeners.cend(),
+            [listener](InputDevListenerPtr tListener) {
+                return (tListener != listener);
+            });
+        if (isNew) {
+            listeners.push_back(listener);
+            needStartServer = listeners.size();
+        }
     }
-    bool isNew = std::all_of(listeners.cbegin(), listeners.cend(),
-        [listener](InputDevListenerPtr tListener) {
-            return (tListener != listener);
-        });
-    if (isNew) {
-        listeners.push_back(listener);
+
+    if (needStartServer) {
+        auto ret = StartListeningToServer();
+        if (ret != RET_OK) {
+            MMI_HILOGE("StartListeningToServer fail, error:%{public}d", ret);
+            std::lock_guard guard(devListenerMutex_);
+            auto iter = devListener_.find(type);
+            if (iter != devListener_.end()) {
+                iter->second.remove(listener);
+            }
+            return ret;
+        }
     }
+
     MMI_HILOGI("Succeed to register listener of change of input devices");
     return RET_OK;
 }
 
 int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
-    std::lock_guard guard(mtx_);
-    auto iter = devListener_.find(type);
-    if (iter == devListener_.end()) {
+    bool needStopServer = false;
+    {
+        std::lock_guard guard(devListenerMutex_);
+        auto iter = devListener_.find(type);
+        if (iter == devListener_.end()) {
         MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
         return RET_ERR;
-    }
-    auto &listeners = iter->second;
+        }
 
-    if (listener == nullptr) {
-        MMI_HILOGI("Unregister all listeners of change of input devices");
-        listeners.clear();
-    } else {
-        MMI_HILOGI("Unregister listener of change of input devices");
-        listeners.remove_if([listener](const auto &item) {
-            return (item == listener);
-        });
+        auto &listeners = iter->second;
+        if (listener == nullptr) {
+            MMI_HILOGI("Unregister all listeners of change of input devices");
+            needStopServer = !listeners.empty();
+            listeners.clear();
+        } else {
+            MMI_HILOGI("Unregister listener of change of input devices");
+            size_t oldSize = listeners.size();
+            listeners.remove_if([listener](const auto &item) {
+                return (item == listener);
+            });
+            needStopServer = (oldSize > 0) && listeners.empty();
+        }
     }
-    if (listeners.empty()) {
+
+    if (needStopServer) {
         StopListeningToServer();
     }
     return RET_OK;
@@ -92,12 +112,17 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Change(%{public}s) of input device(%{public}d)", type.c_str(), deviceId);
-    std::lock_guard guard(mtx_);
-    auto iter = devListener_.find(CHANGED_TYPE);
-    if (iter == devListener_.end()) {
-        MMI_HILOGE("Find change failed");
-        return;
+    std::vector<InputDevListenerPtr> listenersToNotify;
+    {
+        std::lock_guard guard(devListenerMutex_);
+        auto iter = devListener_.find(CHANGED_TYPE);
+        if (iter == devListener_.end()) {
+            MMI_HILOGE("Find change failed");
+            return;
+        }
+        listenersToNotify.assign(iter->second.begin(), iter->second.end());
     }
+
     BytraceAdapter::StartDevListener(type, deviceId);
 
     for (const auto &item : iter->second) {
@@ -218,7 +243,7 @@ int32_t InputDeviceImpl::RegisterInputdevice(int32_t deviceId, bool enable, std:
     CHKPR(callback, RET_ERR);
     int32_t _id;
     {
-        std::lock_guard guard(mtx_);
+        std::lock_guardstd::mutex guard(inputDeviceMutex);
         _id = operationIndex_++;
         inputdeviceList_[_id] = callback;
     }
@@ -233,23 +258,33 @@ int32_t InputDeviceImpl::RegisterInputdevice(int32_t deviceId, bool enable, std:
 void InputDeviceImpl::OnSetInputDeviceAck(int32_t index, int32_t result)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(mtx_);
-    auto iter = inputdeviceList_.find(index);
-    if (iter == inputdeviceList_.end()) {
-        MMI_HILOGE("Find index failed");
-        return;
+    std::function<void(int32_t)> callback;
+    {
+        std::lock_guardstd::mutex guard(inputDeviceMutex_);
+        auto iter = inputdeviceList_.find(index);
+        if (iter == inputdeviceList_.end()) {
+            MMI_HILOGE("Find index failed");
+            return;
+        }
+        callback = std::move(iter->second);
+        inputdeviceList_.erase(iter);
     }
-    iter->second(result);
-    inputdeviceList_.erase(index);
+    callback(result);
 }
 
 void InputDeviceImpl::OnConnected()
 {
-    std::lock_guard guard(mtx_);
-    auto iter = devListener_.find(CHANGED_TYPE);
-    if ((iter == devListener_.end()) || iter->second.empty()) {
+    bool shouldStartServer = false;
+    {
+        std::lock_guardstd::mutex guard(devListenerMutex_);
+        auto iter = devListener_.find(CHANGED_TYPE);
+        shouldStartServer = (iter != devListener_.end()) && !iter->second.empty();
+    }
+
+    if (!shouldStartServer) {
         return;
     }
+
     auto ret = StartListeningToServer();
     if (ret != RET_OK) {
         MMI_HILOGE("StartListeningToServer fail, error:%{public}d", ret);
@@ -259,13 +294,12 @@ void InputDeviceImpl::OnConnected()
 void InputDeviceImpl::OnDisconnected()
 {
     MMI_HILOGI("Disconnected from server");
-    std::lock_guard guard(mtx_);
-    isListeningProcess_ = false;
+    isListeningProcess_.store(false);
 }
 
 int32_t InputDeviceImpl::StartListeningToServer()
 {
-    if (isListeningProcess_) {
+    if (isListeningProcess_.load()) {
         return RET_OK;
     }
     MMI_HILOGI("Start monitoring changes of input devices");
@@ -274,13 +308,13 @@ int32_t InputDeviceImpl::StartListeningToServer()
         MMI_HILOGE("RegisterDevListener to server fail, error:%{public}d", ret);
         return ret;
     }
-    isListeningProcess_ = true;
+    isListeningProcess_.store(true);
     return RET_OK;
 }
 
 void InputDeviceImpl::StopListeningToServer()
 {
-    if (!isListeningProcess_) {
+    if (!isListeningProcess_.load()) {
         return;
     }
     MMI_HILOGI("Stop monitoring changes of input devices");
@@ -288,7 +322,7 @@ void InputDeviceImpl::StopListeningToServer()
     if (ret != RET_OK) {
         MMI_HILOGE("UnregisterDevListener from server fail, error:%{public}d", ret);
     }
-    isListeningProcess_ = false;
+    isListeningProcess_.store(false);
 }
 } // namespace MMI
 } // namespace OHOS
