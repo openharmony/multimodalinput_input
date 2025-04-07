@@ -73,6 +73,7 @@ constexpr uint32_t LIBINPUT_KEY_FN { 240 };
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
 constexpr double VTP_LEFT_BUTTON_DELTA_X { 0.0 };
 constexpr double VTP_LEFT_BUTTON_DELTA_Y { -1.0 };
+constexpr uint32_t VKEY_PINCH_SECOND_FINGER_ID { 1 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
@@ -967,6 +968,14 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchBegin(libinput_event_touch* touch,
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
+	
+    event_touch tEvent;
+    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN;
+    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
+    funInputEvent_((libinput_event*)ltEvent, frameTime);
+    free(ltEvent);
+	
     return true;
 }
 
@@ -1003,6 +1012,14 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchUpdate(libinput_event_touch* touch,
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
+	
+    event_touch tEvent;
+    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION;
+    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
+    funInputEvent_((libinput_event*)ltEvent, frameTime);
+    free(ltEvent);
+	
     return true;
 }
 
@@ -1039,6 +1056,14 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
+	
+    event_touch tEvent;
+    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP;
+    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
+    funInputEvent_((libinput_event*)ltEvent, frameTime);
+    free(ltEvent);
+	
     return true;
 }
 
