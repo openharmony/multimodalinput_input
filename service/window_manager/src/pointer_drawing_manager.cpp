@@ -127,7 +127,7 @@ constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t MAX_CUSTOM_CURSOR_SIZE { 256 };
 constexpr float MAX_CUSTOM_CURSOR_DIMENSION { 256.0f };
 constexpr uint32_t CURSOR_STRIDE { 4 };
-constexpr int32_t MAX_FAIL_COUNT { 40 };
+constexpr int32_t MAX_FAIL_COUNT { 1000 };
 constexpr int32_t CHECK_SLEEP_TIME { 10 };
 std::atomic<bool> g_isRsRestart { false };
 } // namespace
@@ -155,18 +155,24 @@ public:
             return;
         }
         MMI_HILOGI("Received screen status:%{public}s", action.c_str());
-        PointerStyle curPointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             IPointerDrawingManager::GetInstance()->DetachAllSurfaceNode();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-            PointerStyle curPointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
-            curPointerStyle.id = MOUSE_ICON::DEFAULT;
             int32_t ret = IPointerDrawingManager::GetInstance()->CheckHwcReady();
             if (ret != RET_OK) {
                 MMI_HILOGE("CheckHwcReady failed");
             }
-            IPointerDrawingManager::GetInstance()->DrawPointerStyle(curPointerStyle);
-            IPointerDrawingManager::GetInstance()->AttachAllSurfaceNode();
+            std::shared_ptr<DelegateInterface> delegateProxy =
+                IPointerDrawingManager::GetInstance()->GetDelegateProxy();
+            CHKPV(delegateProxy);
+            delegateProxy->OnPostSyncTask([] {
+                PointerStyle curPointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
+                MMI_HILOGI("curPointerStyle:%{public}d", curPointerStyle.id);
+                curPointerStyle.id = MOUSE_ICON::DEFAULT;
+                IPointerDrawingManager::GetInstance()->DrawPointerStyle(curPointerStyle);
+                IPointerDrawingManager::GetInstance()->AttachAllSurfaceNode();
+                return RET_OK;
+            });
         }
     }
 };
@@ -2406,6 +2412,55 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void PointerDrawingManager::AttachAllSurfaceNode()
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    for (auto sp : screenPointers_) {
+        if (sp.second == nullptr) {
+            continue;
+        }
+        auto surfaceNode = sp.second->GetSurfaceNode();
+        if (surfaceNode == nullptr) {
+            continue;
+        }
+        auto screenId = sp.second->GetScreenId();
+        if (screenId == screenId_ && surfaceNode_ == nullptr) {
+            MMI_HILOGI("surfaceNode_ is nullptr skip screenId:%{public}u", screenId);
+            continue;
+        }
+        MMI_HILOGI("Attach screenId:%{public}u", screenId);
+        surfaceNode->AttachToDisplay(screenId);
+    }
+    if (surfaceNode_ == nullptr) {
+        for (auto sp : screenPointers_) {
+            if (sp.second != nullptr && sp.second->IsMirror()) {
+                sp.second->SetInvisible();
+                MMI_HILOGI("surfaceNode_ is nullptr, hide mirror pointer screenId:%{public}u",
+                    sp.second->GetScreenId());
+            }
+        }
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+}
+ 
+void PointerDrawingManager::DetachAllSurfaceNode()
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    for (auto sp : screenPointers_) {
+        if (sp.second != nullptr) {
+            auto surfaceNode = sp.second->GetSurfaceNode();
+            if (surfaceNode != nullptr) {
+                auto screenId = sp.second->GetScreenId();
+                MMI_HILOGI("Detach screenId:%{public}u", screenId);
+                surfaceNode->DetachToDisplay(screenId);
+            }
+        }
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
 void PointerDrawingManager::DrawManager()
 {
     CALL_DEBUG_ENTER;
@@ -3459,8 +3514,7 @@ int32_t PointerDrawingManager::CheckHwcReady()
     auto sp = GetScreenPointer(displayId_);
     CHKPR(sp, RET_ERR);
     int32_t failCount = 0;
-    while (!(sp->Move(lastPhysicalX_, lastPhysicalY_, ICON_TYPE::ANGLE_NW) &&
-            failCount >= MAX_FAIL_COUNT / CALCULATE_MIDDLE)) {
+    while (sp != nullptr && !sp->Move(lastPhysicalX_, lastPhysicalY_, ICON_TYPE::ANGLE_NW)) {
         failCount++;
         if (failCount > MAX_FAIL_COUNT) {
             MMI_HILOGE("CheckHwcReady failed, screenId: %{public}u", displayId_);
@@ -3468,7 +3522,7 @@ int32_t PointerDrawingManager::CheckHwcReady()
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(CHECK_SLEEP_TIME));
     }
-    MMI_HILOGI("heckHwcReady success, screenId: %{public}u, check counts: %{public}d", displayId_, failCount);
+    MMI_HILOGI("CheckHwcReady success, screenId: %{public}u, check counts: %{public}d", displayId_, failCount);
     return RET_OK;
 }
 
