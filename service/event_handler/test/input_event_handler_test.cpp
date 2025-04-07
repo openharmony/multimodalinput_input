@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,34 +13,50 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <libinput.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <gmock/gmock.h>
 
 #include <cinttypes>
+#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <functional>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <vector>
 
 #include "general_touchpad.h"
+#include "i_input_windows_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
 #include "key_command_handler.h"
-#include "libinput_wrapper.h"
+#include "libinput_mock.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
 #include "util.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputEventHandlerTest"
+
+static double g_mockLibinputDeviceGetSizeWidth = 0.0;
+static int g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
+
+using namespace testing;
+using namespace testing::ext;
+
+extern "C" {
+int libinput_device_get_size(struct libinput_device *device, double *width, double *height)
+{
+    if (width != nullptr) {
+        *width = g_mockLibinputDeviceGetSizeWidth;
+    }
+    return g_mockLibinputDeviceGetSizeRetrunIntValue;
+}
+}  // extern "C"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-using namespace testing::ext;
-} // namespace
+
+void EventNormalizeHandler::HandleEvent(libinput_event *event, int64_t frameTime) {}
 
 class InputEventHandlerTest : public testing::Test {
 public:
@@ -48,208 +64,34 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    
-private:
-    static void SetupTouchpad();
-    static void CloseTouchpad();
-    static GeneralTouchpad vTouchpad_;
-    static LibinputWrapper libinput_;
 };
 
-GeneralTouchpad InputEventHandlerTest::vTouchpad_;
-LibinputWrapper InputEventHandlerTest::libinput_;
+void InputEventHandlerTest::SetUpTestCase(void) {}
 
-void InputEventHandlerTest::SetUpTestCase(void)
+void InputEventHandlerTest::TearDownTestCase(void) {}
+
+void InputEventHandlerTest::SetUp(void)
 {
-    ASSERT_TRUE(libinput_.Init());
-    SetupTouchpad();
+    g_mockLibinputDeviceGetSizeWidth = 0.0;
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
 }
 
-void InputEventHandlerTest::TearDownTestCase(void)
-{
-    CloseTouchpad();
-}
-
-void InputEventHandlerTest::SetupTouchpad()
-{
-    ASSERT_TRUE(vTouchpad_.SetUp());
-    std::cout << "device node name: " << vTouchpad_.GetDevPath() << std::endl;
-    ASSERT_TRUE(libinput_.AddPath(vTouchpad_.GetDevPath()));
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
-    struct libinput_device *device = libinput_event_get_device(event);
-    ASSERT_TRUE(device != nullptr);
-    INPUT_DEV_MGR->OnInputDeviceAdded(device);
-}
-
-void InputEventHandlerTest::CloseTouchpad()
-{
-    libinput_.RemovePath(vTouchpad_.GetDevPath());
-    vTouchpad_.Close();
-}
-
-void InputEventHandlerTest::SetUp()
-{
-}
-
-void InputEventHandlerTest::TearDown()
-{
-}
-
-/**
- * @tc.name: InputEventHandler_GetEventDispatchHandler_001
- * @tc.desc: Get event dispatch handler verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetEventDispatchHandler_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetEventDispatchHandler();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_GetFilterHandler_001
- * @tc.desc: Get filter handler verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetFilterHandler_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetFilterHandler();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_GetMonitorHandler_001
- * @tc.desc: Get monitor handler verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetMonitorHandler_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetMonitorHandler();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_GetKeyCommandHandler_001
- * @tc.desc: Get monitor handler verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetKeyCommandHandler_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetKeyCommandHandler();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_GetSwitchSubscriberHandler_001
- * @tc.desc: Get switch subscriber handler verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetSwitchSubscriberHandler_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetSwitchSubscriberHandler();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_GetSubscriberHandler_001
- * @tc.desc: Get subscriber handler verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetSubscriberHandler_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetSubscriberHandler();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_GetInterceptorHandler_001
- * @tc.desc: Get interceptor handler verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetInterceptorHandler_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetInterceptorHandler();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_GetEventNormalizeHandler_001
- * @tc.desc: Get eventNormalize handler verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetEventNormalizeHandler_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetEventNormalizeHandler();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_GetUDSServer_001
- * @tc.desc: Get UDS server verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetUDSServer_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->GetUDSServer();
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: InputEventHandler_BuildInputHandlerChain_001
- * @tc.desc: Build input handler chain verify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_BuildInputHandlerChain_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    UDSServer udsServer;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->Init(udsServer));
-}
+void InputEventHandlerTest::TearDown(void) {}
 
 /**
  * @tc.name: InputEventHandler_OnEvent_001
- * @tc.desc: On event verify
+ * @tc.desc: Test the funcation OnEvent
  * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
+ * @tc.require:
  */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_001, TestSize.Level1)
+HWTEST_F(InputEventHandlerTest, InputEventHandler_OnEvent_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    void* mockEvent = nullptr;
-    int64_t mockFrameTime = 123456789;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->OnEvent(mockEvent, mockFrameTime));
+    void *event = nullptr;
+    int64_t frameTime = 0;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->OnEvent(event, frameTime));
 }
 
 /**
@@ -258,73 +100,299 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_001, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_002, TestSize.Level1)
+HWTEST_F(InputEventHandlerTest, InputEventHandler_OnEvent_002, TestSize.Level1)
 {
-    InputEventHandler inputEventHandler ;
-    void *event = nullptr;
-    int64_t frameTime = 1234;
-    inputEventHandler.eventNormalizeHandler_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event, frameTime));
+    CALL_DEBUG_ENTER;
+    libinput_event event;
+    libinput_event_pointer pointer;
+    pointer.buttonState = LIBINPUT_BUTTON_STATE_RELEASED;
+    int64_t frameTime = 0;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType)
+        .WillOnce(Return(LIBINPUT_EVENT_POINTER_AXIS))
+        .WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN))
+        .WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD));
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(nullptr));
+    EXPECT_CALL(libinputMock, GetDevice).WillOnce(Return(nullptr));
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    inputEventHandler->idSeed_ = std::numeric_limits<uint64_t>::max() - 1;
+    inputEventHandler->isButtonMistouch_ = true;
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = false;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->OnEvent(&event, frameTime));
 }
 
 /**
- * @tc.name: InputEventHandler_OnEvent_003
- * @tc.desc: Test the funcation OnEvent
+ * @tc.name: InputEventHandler_UpdateDwtRecord_001
+ * @tc.desc: Test the funcation UpdateDwtRecord
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_003, TestSize.Level1)
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtRecord_001, TestSize.Level1)
 {
-    InputEventHandler inputEventHandler ;
-    void *event = nullptr;
-    int64_t frameTime = 1234;
-    inputEventHandler.eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    ASSERT_TRUE(inputEventHandler.eventNormalizeHandler_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event, frameTime));
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(nullptr));
+    libinput_event event;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtRecord(&event));
 }
 
 /**
- * @tc.name: InputEventHandler_OnEvent_004
- * @tc.desc: Test the funcation OnEvent
+ * @tc.name: InputEventHandler_UpdateDwtRecord_002
+ * @tc.desc: Test the funcation UpdateDwtRecord
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_004, TestSize.Level1)
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtRecord_002, TestSize.Level1)
 {
-    InputEventHandler inputEventHandler ;
-    int64_t frameTime = 1234;
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 185);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 1511);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 384);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOUCH, 1);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOOL_FINGER, 1);
-    vTouchpad_.SendEvent(EV_ABS, ABS_X, 1511);
-    vTouchpad_.SendEvent(EV_ABS, ABS_Y, 384);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 0);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 1510);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 386);
-    vTouchpad_.SendEvent(EV_ABS, ABS_X, 1510);
-    vTouchpad_.SendEvent(EV_ABS, ABS_Y, 386);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 42000);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, -1);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOUCH, 0);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOOL_FINGER, 0);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 123000);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    inputEventHandler.eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    ASSERT_TRUE(inputEventHandler.eventNormalizeHandler_ != nullptr);
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
-    const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
-    inputEventHandler.idSeed_ = maxUInt64 + 1;
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event, frameTime));
-    inputEventHandler.idSeed_ = 123;
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event, frameTime));
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_MOTION));
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(nullptr));
+    libinput_event event;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtRecord(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtRecord_003
+ * @tc.desc: Test the funcation UpdateDwtRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtRecord_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_KEYBOARD_KEY));
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillOnce(Return(nullptr));
+    libinput_event event;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtRecord(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtRecord_004
+ * @tc.desc: Test the funcation UpdateDwtRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtRecord_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_NONE));
+    libinput_event event;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtRecord(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_001
+ * @tc.desc: Test the funcation UpdateDwtTouchpadRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_touch touchpadEvent;
+    libinput_event event;
+    libinput_device touchpadDevice;
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_NONE));
+    EXPECT_CALL(libinputMock, GetDevice).WillOnce(Return(&touchpadDevice));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtTouchpadRecord(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_002
+ * @tc.desc: Test the funcation UpdateDwtTouchpadRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_touch touchpadEvent;
+    libinput_event event;
+    libinput_device touchpadDevice;
+    touchpadEvent.x = InputEventHandler::TOUCHPAD_EDGE_WIDTH_FOR_TAP + 1;
+    touchpadEvent.y = 0;
+    g_mockLibinputDeviceGetSizeWidth = 1000.0;
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtTouchpadRecord(&event));
+
+    touchpadEvent.x = 2000.0;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtTouchpadRecord(&event));
+
+    touchpadEvent.x = 1.0;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtTouchpadRecord(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_003
+ * @tc.desc: Test the funcation UpdateDwtTouchpadRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_touch touchpadEvent;
+    libinput_event event;
+    libinput_device touchpadDevice;
+    touchpadEvent.x = InputEventHandler::TOUCHPAD_EDGE_WIDTH_RELEASE + 1;
+    touchpadEvent.y = 0;
+    g_mockLibinputDeviceGetSizeWidth = 1000.0;
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_MOTION));
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtTouchpadRecord(&event));
+
+    touchpadEvent.x = 2000.0;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtTouchpadRecord(&event));
+
+    touchpadEvent.x = 1.0;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtTouchpadRecord(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_004
+ * @tc.desc: Test the funcation UpdateDwtTouchpadRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_touch touchpadEvent;
+    libinput_event event;
+    libinput_device touchpadDevice;
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_MOTION));
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtTouchpadRecord(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_001
+ * @tc.desc: Test the funcation UpdateDwtKeyboardRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_keyboard keyboardEvent;
+    libinput_event event;
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKey).WillOnce(Return(KEY_LEFTCTRL));
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillOnce(Return(&keyboardEvent));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtKeyboardRecord(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_002
+ * @tc.desc: Test the funcation UpdateDwtKeyboardRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_keyboard keyboardEvent;
+    libinput_event event;
+    uint32_t key = KEY_LEFTCTRL;
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillOnce(Return(&keyboardEvent));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKey).WillOnce(Return(key));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState).WillOnce(Return(LIBINPUT_KEY_STATE_PRESSED));
+    inputEventHandler->modifierPressedCount_ = 10;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtKeyboardRecord(&event));
+    EXPECT_TRUE(inputEventHandler->isKeyPressedWithAnyModifiers_[key]);
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_003
+ * @tc.desc: Test the funcation UpdateDwtKeyboardRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_keyboard keyboardEvent;
+    libinput_event event;
+    uint32_t key = KEY_LEFTCTRL;
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillRepeatedly(Return(&keyboardEvent));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKey).WillRepeatedly(Return(key));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState)
+        .WillOnce(Return(LIBINPUT_KEY_STATE_PRESSED))
+        .WillOnce(Return(LIBINPUT_KEY_STATE_PRESSED))
+        .WillOnce(Return(LIBINPUT_KEY_STATE_RELEASED))
+        .WillOnce(Return(LIBINPUT_KEY_STATE_RELEASED));
+    inputEventHandler->modifierPressedCount_ = 10;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtKeyboardRecord(&event));
+    EXPECT_TRUE(inputEventHandler->isKeyPressedWithAnyModifiers_[key]);
+
+    inputEventHandler->modifierPressedCount_ = 0;
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtKeyboardRecord(&event));
+    EXPECT_TRUE(inputEventHandler->isKeyPressedWithAnyModifiers_[key]);
+
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtKeyboardRecord(&event));
+    EXPECT_FALSE(inputEventHandler->isKeyPressedWithAnyModifiers_[key]);
+
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler->UpdateDwtKeyboardRecord(&event));
+    EXPECT_FALSE(inputEventHandler->isKeyPressedWithAnyModifiers_[key]);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsStandaloneFunctionKey_001
+ * @tc.desc: Test the funcation IsStandaloneFunctionKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsStandaloneFunctionKey_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    uint32_t keycode = KEY_ESC;
+    EXPECT_TRUE(inputEventHandler->IsStandaloneFunctionKey(keycode));
+}
+
+/**
+ * @tc.name: InputEventHandler_IsStandaloneFunctionKey_002
+ * @tc.desc: Test the funcation IsStandaloneFunctionKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsStandaloneFunctionKey_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    uint32_t keycode = 0;
+    EXPECT_FALSE(inputEventHandler->IsStandaloneFunctionKey(keycode));
 }
 
 /**
@@ -333,98 +401,69 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_004, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_IsTouchpadMistouch_001, TestSize.Level1)
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadMistouch_001, TestSize.Level1)
 {
-    InputEventHandler inputEventHandler ;
-    libinput_event* event = nullptr;
-    bool ret = inputEventHandler.IsTouchpadMistouch(event);
-    ASSERT_FALSE(ret);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 185);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 1511);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 384);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOUCH, 1);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOOL_FINGER, 1);
-    vTouchpad_.SendEvent(EV_ABS, ABS_X, 1511);
-    vTouchpad_.SendEvent(EV_ABS, ABS_Y, 384);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 0);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    auto touchpad = libinput_event_get_touchpad_event(event);
-    ASSERT_TRUE(touchpad != nullptr);
-    auto type = libinput_event_get_type(event);
-    ASSERT_FALSE(ret);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 1510);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 386);
-    vTouchpad_.SendEvent(EV_ABS, ABS_X, 1510);
-    vTouchpad_.SendEvent(EV_ABS, ABS_Y, 386);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 42000);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    touchpad = libinput_event_get_touchpad_event(event);
-    ASSERT_TRUE(touchpad != nullptr);
-    type = libinput_event_get_type(event);
-    ASSERT_FALSE(ret);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, -1);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOUCH, 0);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOOL_FINGER, 0);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 123000);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    touchpad = libinput_event_get_touchpad_event(event);
-    type = libinput_event_get_type(event);
-    ASSERT_FALSE(ret);
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    libinput_event event;
+    libinput_event_touch touchpadEvent;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType)
+        .WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_MOTION))
+        .WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_TIP))
+        .WillOnce(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD))
+        .WillOnce(Return(LIBINPUT_EVENT_POINTER_TAP))
+        .WillOnce(Return(LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD));
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, TouchpadGetTool).WillOnce(Return(MT_TOOL_PALM)).WillRepeatedly(Return(MT_TOOL_PEN));
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = false;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadMistouch(&event));
+
+    EXPECT_FALSE(inputEventHandler->IsTouchpadMistouch(&event));
+
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(nullptr));
+    EXPECT_FALSE(inputEventHandler->IsTouchpadMistouch(&event));
+
+    EXPECT_FALSE(inputEventHandler->IsTouchpadMistouch(&event));
+
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = false;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadMistouch(&event));
 }
 
 /**
- * @tc.name: InputEventHandler_IsTouchpadMistouch_002
- * @tc.desc: Test the funcation IsTouchpadMistouch
+ * @tc.name: InputEventHandler_IsTouchpadButtonMistouch_001
+ * @tc.desc: Test the funcation IsTouchpadButtonMistouch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_IsTouchpadMistouch_002, TestSize.Level1)
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadButtonMistouch_001, TestSize.Level1)
 {
-    InputEventHandler inputEventHandler ;
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 189);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 10);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 1050);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOUCH, 1);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOOL_FINGER, 1);
-    vTouchpad_.SendEvent(EV_ABS, ABS_X, 10);
-    vTouchpad_.SendEvent(EV_ABS, ABS_Y, 1050);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 0);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    auto touchpad = libinput_event_get_touchpad_event(event);
-    auto type = libinput_event_get_type(event);
-    bool ret = inputEventHandler.IsTouchpadMistouch(event);
-    ASSERT_FALSE(ret);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 1510);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 386);
-    vTouchpad_.SendEvent(EV_ABS, ABS_X, 1510);
-    vTouchpad_.SendEvent(EV_ABS, ABS_Y, 386);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 42000);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    touchpad = libinput_event_get_touchpad_event(event);
-    ASSERT_TRUE(touchpad != nullptr);
-    type = libinput_event_get_type(event);
-    ASSERT_FALSE(ret);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, -1);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOUCH, 0);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOOL_FINGER, 0);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 362000);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    touchpad = libinput_event_get_touchpad_event(event);
-    ASSERT_TRUE(touchpad != nullptr);
-    type = libinput_event_get_type(event);
-    ASSERT_FALSE(ret);
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    libinput_event event;
+    libinput_device touchpadDevice;
+    libinput_event_pointer touchpadButtonEvent;
+    touchpadButtonEvent.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(&touchpadButtonEvent));
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    inputEventHandler->isDwtEdgeAreaForTouchpadButtonActing_ = true;
+    inputEventHandler->touchpadEventAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH_FOR_BUTTON;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadButtonMistouch(&event));
+
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
+    inputEventHandler->touchpadEventAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH_FOR_BUTTON + 1;
+    EXPECT_TRUE(inputEventHandler->IsTouchpadButtonMistouch(&event));
+
+    inputEventHandler->isDwtEdgeAreaForTouchpadButtonActing_ = false;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadButtonMistouch(&event));
+
+    touchpadButtonEvent.buttonState = LIBINPUT_BUTTON_STATE_RELEASED;
+    inputEventHandler->isButtonMistouch_ = true;
+    EXPECT_TRUE(inputEventHandler->IsTouchpadButtonMistouch(&event));
+
+    EXPECT_FALSE(inputEventHandler->IsTouchpadButtonMistouch(&event));
 }
 
 /**
@@ -433,41 +472,104 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_IsTouchpadMistouch_002, Te
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_IsTouchpadTapMistouch_001, TestSize.Level1)
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadTapMistouch_001, TestSize.Level1)
 {
-    InputEventHandler inputEventHandler ;
-    libinput_event* event = nullptr;
-    bool ret = inputEventHandler.IsTouchpadTapMistouch(event);
-    ASSERT_FALSE(ret);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 189);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 10);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 1050);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOUCH, 1);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOOL_FINGER, 1);
-    vTouchpad_.SendEvent(EV_ABS, ABS_X, 10);
-    vTouchpad_.SendEvent(EV_ABS, ABS_Y, 1050);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 0);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    ASSERT_FALSE(ret);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 1510);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 386);
-    vTouchpad_.SendEvent(EV_ABS, ABS_X, 1510);
-    vTouchpad_.SendEvent(EV_ABS, ABS_Y, 386);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 42000);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    ASSERT_FALSE(ret);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, -1);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOUCH, 0);
-    vTouchpad_.SendEvent(EV_KEY, BTN_TOOL_FINGER, 0);
-    vTouchpad_.SendEvent(EV_MSC, MSC_TIMESTAMP, 362000);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    ASSERT_FALSE(ret);
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    libinput_event event;
+    libinput_event_pointer touchpadButtonEvent;
+    libinput_device touchpadDevice;
+    touchpadButtonEvent.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(&touchpadButtonEvent));
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    EXPECT_FALSE(inputEventHandler->IsTouchpadTapMistouch(&event));
+
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
+    g_mockLibinputDeviceGetSizeWidth = 1000.0;
+    inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH_FOR_TAP;
+    inputEventHandler->isDwtEdgeAreaForTouchpadTapActing_ = true;
+    EXPECT_TRUE(inputEventHandler->IsTouchpadTapMistouch(&event));
+
+    inputEventHandler->isDwtEdgeAreaForTouchpadTapActing_ = false;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadTapMistouch(&event));
+
+    touchpadButtonEvent.buttonState = LIBINPUT_BUTTON_STATE_RELEASED;
+    inputEventHandler->isTapMistouch_ = true;
+    EXPECT_TRUE(inputEventHandler->IsTouchpadTapMistouch(&event));
+
+    inputEventHandler->isTapMistouch_ = false;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadTapMistouch(&event));
 }
-} // namespace MMI
-} // namespace OHOS
+
+/**
+ * @tc.name: InputEventHandler_IsTouchpadMotionMistouch_001
+ * @tc.desc: Test the funcation IsTouchpadMotionMistouch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadMotionMistouch_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    libinput_event event;
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = false;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadMotionMistouch(&event));
+
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = true;
+    libinput_event_touch touchpadEvent;
+    libinput_device touchpadDevice;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadMotionMistouch(&event));
+
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
+    g_mockLibinputDeviceGetSizeWidth = InputEventHandler::TOUCHPAD_EDGE_WIDTH;
+    inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH + 1;
+    EXPECT_TRUE(inputEventHandler->IsTouchpadMotionMistouch(&event));
+
+    g_mockLibinputDeviceGetSizeWidth = 1000.0;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadMotionMistouch(&event));
+}
+
+/**
+ * @tc.name: InputEventHandler_IsTouchpadPointerMotionMistouch_001
+ * @tc.desc: Test the funcation IsTouchpadPointerMotionMistouch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadPointerMotionMistouch_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    libinput_event event;
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = false;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
+
+    libinput_event_pointer pointerEvent;
+    libinput_device touchpadDevice;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = true;
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(&pointerEvent));
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    EXPECT_FALSE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
+
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
+    inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH;
+    EXPECT_TRUE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
+
+    g_mockLibinputDeviceGetSizeWidth = InputEventHandler::TOUCHPAD_EDGE_WIDTH;
+    inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH + 1;
+    EXPECT_TRUE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
+
+    g_mockLibinputDeviceGetSizeWidth = 1000.0;
+    inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH + 1;
+    EXPECT_FALSE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
+}
+}  // namespace MMI
+}  // namespace OHOS
