@@ -91,7 +91,8 @@ public:
     void ProcessPendingEvents();
     void ReloadDevice();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-	void RegisterBootStatusReceiver();
+    static void SetBootCompleted();
+    void RegisterBootStatusReceiver();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     auto GetInputFds() const
@@ -177,10 +178,15 @@ private:
     void HideMouseCursorTemporary();
     double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
     bool SkipTouchMove(int touchId, int32_t eventType); // compress touch move events in consecutive two frame
+    void DelayInjectKeyEventCallback();
     bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
-    void StartVKeyboardDelayTimer();
+    void StartVKeyboardDelayTimer(int32_t delayMs);
+
+    libinput_event *vkbDelayedEvent_ = nullptr;
+    int32_t vkbDelayedKeyCode_ = 0;
     // set as true once subscriber succeeded.
-    bool hasInitSubscriber_ { false };
+    std::atomic_bool hasInitSubscriber_ { false };
+    static std::atomic_bool isBootCompleted_;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };

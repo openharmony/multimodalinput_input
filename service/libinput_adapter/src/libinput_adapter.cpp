@@ -185,8 +185,6 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
 };
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-bool isBooted_ = false;
-
 class BootStatusReceiver : public EventFwk::CommonEventSubscriber {
 public:
     explicit BootStatusReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
@@ -198,7 +196,7 @@ public:
  
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
-        isBooted_ = true;
+        LibinputAdapter::SetBootCompleted();
         std::string action = eventData.GetWant().GetAction();
         if (action.empty()) {
             MMI_HILOGE("The action is empty");
@@ -207,6 +205,13 @@ public:
         MMI_HILOGI("Received boot status:%{public}s", action.c_str());
     }
 };
+
+std::atomic_bool LibinputAdapter::isBootCompleted_ = false;
+
+void LibinputAdapter::SetBootCompleted()
+{
+    isBootCompleted_ = true;
+}
 
 void LibinputAdapter::RegisterBootStatusReceiver()
 {
@@ -311,59 +316,42 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-struct VKBDelayedMessage {
-public:
-    libinput_event *DelayedEvent = nullptr;
-    int32_t DelayMs = 0;
-    int32_t KeyCode = 0;
-};
-
-FunInputEvent funInputEventTemp_ = nullptr;
-std::mutex vkbDelayedMutex_;
-VKBDelayedMessage vkbDelayedMessage_;
-
-void DelayInjectKeyEventCallback()
+void LibinputAdapter::DelayInjectKeyEventCallback()
 {
-    std::lock_guard<std::mutex> guard(vkbDelayedMutex_);
-    MMI_HILOGI("Delayed %{public}d ms done for kc:%{private}d.",
-        vkbDelayedMessage_.DelayMs, vkbDelayedMessage_.KeyCode);
-    CHKPV(vkbDelayedMessage_.DelayedEvent);
-    libinput_event_touch *touch = libinput_event_get_touch_event(vkbDelayedMessage_.DelayedEvent);
+    MMI_HILOGI("Delayed done for kc:%{private}d.", vkbDelayedKeyCode_);
+    CHKPV(vkbDelayedEvent_);
+    libinput_event_touch *touch = libinput_event_get_touch_event(vkbDelayedEvent_);
     CHKPV(touch);
     libinput_event_keyboard *key_event_pressed = libinput_create_keyboard_event(
-        touch, vkbDelayedMessage_.KeyCode, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED);
-    CHKPV(funInputEventTemp_);
+        touch, vkbDelayedKeyCode_, libinput_key_state::LIBINPUT_KEY_STATE_RELEASED);
+    CHKPV(funInputEvent_);
     int64_t frameTime = GetSysClockTime();
-    funInputEventTemp_((libinput_event *)key_event_pressed, frameTime);
+    funInputEvent_((libinput_event *)key_event_pressed, frameTime);
     free(key_event_pressed);
-    libinput_event_destroy(vkbDelayedMessage_.DelayedEvent);
-    vkbDelayedMessage_.DelayedEvent = nullptr;
+    libinput_event_destroy(vkbDelayedEvent_);
+    vkbDelayedEvent_ = nullptr;
 }
 
 // return true if timer has started successfully.
 bool LibinputAdapter::CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode)
 {
-    if (funInputEventTemp_ == nullptr) {
-        funInputEventTemp_ = funInputEvent_;
+    if (vkbDelayedEvent_ != nullptr) {
+        MMI_HILOGI("A delayed event is pending, skip delay msg for KC=%{private}d, Delay=%{public}d",
+            keyCode, delayMs);
+        return false;
     }
-    std::lock_guard<std::mutex> guard(vkbDelayedMutex_);
-    if (vkbDelayedMessage_.DelayedEvent == nullptr) {
-        // allow creating if timer is not run.
-        vkbDelayedMessage_.DelayedEvent = event;
-        vkbDelayedMessage_.DelayMs = delayMs;
-        vkbDelayedMessage_.KeyCode = keyCode;
-        MMI_HILOGI("Create the delayed event for KC=%{private}d, Delay=%{public}d", keyCode, delayMs);
-        return true;
-    }
-    MMI_HILOGI("A delayed event is pending, skip delay msg for KC=%{private}d, Delay=%{public}d",
-        keyCode, delayMs);
-    return false;
+
+    vkbDelayedEvent_ = event;
+    vkbDelayedKeyCode_ = keyCode;
+    MMI_HILOGI("Create the delayed event for KC=%{private}d, Delay=%{public}d", keyCode, delayMs);
+    return true;
 }
 
-void LibinputAdapter::StartVKeyboardDelayTimer()
+void LibinputAdapter::StartVKeyboardDelayTimer(int32_t delayMs)
 {
-    std::lock_guard<std::mutex> guard(vkbDelayedMutex_);
-    TimerMgr->AddTimer(vkbDelayedMessage_.DelayMs, 1, DelayInjectKeyEventCallback);
+    TimerMgr->AddTimer(delayMs, 1, [this]() {
+        DelayInjectKeyEventCallback();
+    });
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
@@ -399,6 +387,7 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
 {
     // delay the event destroy.
     bool delayDestroy = false;
+    int32_t confirmedDelayMs(0);
 
     // handle keyboard and trackpad messages.
     while (true) {
@@ -417,6 +406,7 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
             delayDestroy = CreateVKeyboardDelayTimer(event, delayMs, keyCode);
             if (delayDestroy) {
                 // create and delay this event.
+                confirmedDelayMs = delayMs;
                 continue;
             }
         }
@@ -453,7 +443,7 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
         funInputEvent_(event, frameTime);
     }
     if (delayDestroy) {
-        StartVKeyboardDelayTimer();
+        StartVKeyboardDelayTimer(confirmedDelayMs);
     } else {
         libinput_event_destroy(event);
     }
@@ -1480,8 +1470,7 @@ void LibinputAdapter::OnEventHandler()
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
             || eventType == LIBINPUT_EVENT_TOUCH_CANCEL
-            || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBooted_
-            ) {
+            || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBootCompleted_) {
             touch = libinput_event_get_touch_event(event);
             double touchPressure = 0.0;
             double accumulatedPressure = 0.0;
