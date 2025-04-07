@@ -1959,7 +1959,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAllSystemHotkey_003, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAllSystemHotkey_003, TestSize.Level1)
+HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAllSystemHotkey_004, TestSize.Level1)
 {
     int32_t count = -1;
     Input_Hotkey* hotkeys = nullptr;
