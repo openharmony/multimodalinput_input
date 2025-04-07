@@ -1735,7 +1735,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDel
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_007
- * @tc.desc:  
+ * @tc.desc: Tests when jsonData is not an object
  * @tc.type: FUNC
  * @tc.require:
  */
