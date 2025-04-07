@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -5594,6 +5594,93 @@ HWTEST_F(InputManagerTest, InputManagerTest_CheckKnuckleEvent_001, TestSize.Leve
     bool isKnuckleType = true;
     int32_t ret = InputManager::GetInstance()->CheckKnuckleEvent(pointX, pointY, isKnuckleType);
     EXPECT_EQ(ret, -2);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeTabletProximity_001
+ * @tc.desc: Test SubscribeTabletProximity
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeTabletProximity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<PointerEvent>)> callback;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    EXPECT_EQ(inputManager->SubscribeTabletProximity(callback), RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_UnsubscribetabletProximity_001
+ * @tc.desc: Test UnsubscribetabletProximity
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribetabletProximity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscriberId = INVAID_VALUE;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->UnsubscribetabletProximity(subscriberId));
+}
+
+/**
+ * @tc.name: InputManagerTest_AddPreMonitor_002
+ * @tc.desc: Test AddPreMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddPreMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<IInputEventConsumer> monitor = nullptr;
+    HandleEventType eventType = 0;
+    std::vector<int32_t> keys;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    EXPECT_EQ(inputManager->AddPreMonitor(monitor, eventType, keys), INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerTest_RemovePreMonitor_002
+ * @tc.desc: Test RemovePreMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemovePreMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t monitorId = INVAID_VALUE;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->RemovePreMonitor(monitorId));
+}
+
+/*
+ * @tc.name: InputManagerTest_SetMultiWindowScreenId_002
+ * @tc.desc: SetMultiWindowScreenId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMultiWindowScreenId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint64_t screenId = 0;
+    uint64_t displayNodeScreenId = 0;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->SetMultiWindowScreenId(screenId, displayNodeScreenId));
+}
+
+/*
+ * @tc.name: InputManagerTest_SetKnuckleSwitch_001
+ * @tc.desc: SetKnuckleSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetKnuckleSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool knuckleSwitch = false;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->SetKnuckleSwitch(knuckleSwitch));
 }
 } // namespace MMI
 } // namespace OHOS
