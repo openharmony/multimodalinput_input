@@ -1228,5 +1228,113 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClien
     ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: EventMonitorHandlerTest_OnHandleEvent_002
+ * @tc.desc: Test OnHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    InputEventHandler inputEventHandler ;
+    inputEventHandler.eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    ASSERT_TRUE(inputEventHandler.eventNormalizeHandler_ != nullptr);
+    EventNormalizeHandler eventNormalizeHandler;
+    eventNormalizeHandler.currentHandleKeyCode_ = 1;
+    keyEvent->SetKeyCode(2);
+    bool ret = eventMonitorHandler.OnHandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+    keyEvent->SetKeyCode(1);
+    ret = eventMonitorHandler.OnHandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->bitwise_ = 0x00000002;
+    ret = eventMonitorHandler.OnHandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+    inputEvent->bitwise_ = 0x00000000;
+    ret = eventMonitorHandler.OnHandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+    int32_t deviceId = 1;
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    consumptionState.isMonitorConsumed_ = true;
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId, consumptionState));
+    ret = eventMonitorHandler.OnHandleEvent(keyEvent);
+    ASSERT_FALSE(ret);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+/**
+ * @tc.name: EventMonitorHandlerTest_IsXKey_001
+ * @tc.desc: Test IsXKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsXKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
+    bool ret = eventMonitorHandler.IsXKey(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    ret = eventMonitorHandler.IsXKey(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+#endif // OHOS_BUILD_ENABLE_X_KEY
+
+/**
+ * @tc.name: EventMonitorHandlerTest_CheckHasInputHandler_002
+ * @tc.desc: Test CheckHasInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckHasInputHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    HandleEventType eventType = 1;
+    bool ret = eventMonitorHandler.CheckHasInputHandler(eventType);
+    ASSERT_FALSE(ret);
+    int32_t deviceId = 1;
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    consumptionState.isMonitorConsumed_ = true;
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId, consumptionState));
+    ret = eventMonitorHandler.CheckHasInputHandler(eventType);
+    ASSERT_FALSE(ret);
+}
+
+#ifdef PLAYER_FRAMEWORK_EXISTS
+/**
+ * @tc.name: EventMonitorHandlerTest_ProcessScreenCapture_005
+ * @tc.desc: Test ProcessScreenCapture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ProcessScreenCapture_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    UDSServer udSever;
+    InputHandler->udsServer_ = &udSever;
+    auto udsServerPtr = InputHandler->GetUDSServer();
+    EXPECT_NE(udsServerPtr, nullptr);
+    int32_t pid = 2;
+    bool isStart = true;
+    udSever.idxPidMap_.insert(std::make_pair(pid, 2));
+    eventMonitorHandler.ProcessScreenCapture(pid, isStart);
+    isStart = false;
+    eventMonitorHandler.ProcessScreenCapture(pid, isStart);
+}
+#endif // PLAYER_FRAMEWORK_EXISTS
 } // namespace MMI
 } // namespace OHOS
