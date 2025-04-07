@@ -290,7 +290,6 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
     std::shared_ptr<PointerEvent> touchEvent = WIN_MGR->GetLastPointerEventForGesture();
     if (touchEvent != nullptr) {
         std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
-        MMI_HILOGI("Check : LastPointerEvent's item count is:%{public}d", listPtItems.size());
         for (auto &item : listPtItems) {
             MMI_HILOGI("Check : current Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
                 item.GetPointerId(), item.GetOriginPointerId());
