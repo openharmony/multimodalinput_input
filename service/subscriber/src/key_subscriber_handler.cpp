@@ -832,6 +832,8 @@ int32_t KeySubscriberHandler::GetHighestPrioritySubscriber(const std::list<std::
 {
     int highestPriority = std::numeric_limits<int>::min();
     for (const auto &subscriber : subscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
         int prio = subscriber->keyOption_->GetPriority();
         if (prio > highestPriority) {
             highestPriority = prio;
@@ -865,6 +867,8 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
 
     int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
     for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
         if (subscriber->keyOption_->GetPriority() == highestPriority) {
             NotifySubscriber(keyEvent, subscriber);
             MMI_HILOGD("Notified high priority subscriber");
@@ -891,6 +895,8 @@ void KeySubscriberHandler::NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &k
 
     int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
     for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
         if (subscriber->keyOption_->GetPriority() == highestPriority) {
             MMI_HILOGD("Add timer");
             if (!AddTimer(subscriber, keyEvent)) {
@@ -912,13 +918,14 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
         CHKPC(sess);
         if (!isForegroundExits_ || foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             interestedSubscribers.push_back(subscriber);
-            HandleKeyUpWithDelay(keyEvent, subscriber);
             handled = true;
         }
     }
 
     int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
     for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
         if (subscriber->keyOption_->GetPriority() == highestPriority) {
             HandleKeyUpWithDelay(keyEvent, subscriber);
         }
