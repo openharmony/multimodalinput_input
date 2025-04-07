@@ -132,6 +132,10 @@ public:
     {
         delegateProxy_ = proxy;
     }
+    std::shared_ptr<DelegateInterface> GetDelegateProxy() override
+    {
+        return delegateProxy_;
+    }
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -241,6 +245,8 @@ private:
     void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle);
     void UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, DisplayInfo displayInfo);
+    void AttachAllSurfaceNode() override;
+    void DetachAllSurfaceNode() override;
     int32_t CheckHwcReady() override;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
