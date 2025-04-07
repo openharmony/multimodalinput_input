@@ -742,25 +742,25 @@
             "preKeys": [ 2072, 2076 ],
             "finalKey": 2012,
             "longPressTime": 0,
-            "triggerType": "up"
+            "triggerType": "down"
         },
         {
             "preKeys": [ 2072, 2077 ],
             "finalKey": 2012,
             "longPressTime": 0,
-            "triggerType": "up"
+            "triggerType": "down"
         },
         {
             "preKeys": [ 2073, 2076 ],
             "finalKey": 2012,
             "longPressTime": 0,
-            "triggerType": "up"
+            "triggerType": "down"
         },
         {
             "preKeys": [ 2073, 2077 ],
             "finalKey": 2012,
             "longPressTime": 0,
-            "triggerType": "up"
+            "triggerType": "down"
         }
     ]
 }
