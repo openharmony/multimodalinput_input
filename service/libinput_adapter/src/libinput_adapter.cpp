@@ -1437,8 +1437,8 @@ void LibinputAdapter::OnEventHandler()
                     // screen recorder scenario will be an exception to true
                     isFloating = (isFloatingKeyboard_==nullptr) ?
                         isFloating = false : isFloating = isFloatingKeyboard_();
-                    isCaptureMode = ((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
-                        && (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT) && isFloating) ? true : false;
+                    isCaptureMode = (((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
+                        || (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT) && isFloating)) ? true : false;
                     MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
                     break;
                 }
