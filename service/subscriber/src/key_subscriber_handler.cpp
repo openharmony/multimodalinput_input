@@ -862,6 +862,7 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
 
     int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
     for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
         if (subscriber->keyOption_->GetPriority() == highestPriority) {
             NotifySubscriber(keyEvent, subscriber);
             MMI_HILOGD("Notified high priority subscriber");
@@ -888,6 +889,7 @@ void KeySubscriberHandler::NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &k
 
     int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
     for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
         if (subscriber->keyOption_->GetPriority() == highestPriority) {
             MMI_HILOGD("Add timer");
             if (!AddTimer(subscriber, keyEvent)) {
@@ -915,6 +917,7 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
 
     int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
     for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
         if (subscriber->keyOption_->GetPriority() == highestPriority) {
             HandleKeyUpWithDelay(keyEvent, subscriber);
         }
