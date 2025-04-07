@@ -153,6 +153,10 @@ public:
         return 0;
     }
     virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
+    virtual std::shared_ptr<DelegateInterface> GetDelegateProxy()
+    {
+        return nullptr;
+    }
     virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
     virtual void SubscribeScreenModeChange() {}
