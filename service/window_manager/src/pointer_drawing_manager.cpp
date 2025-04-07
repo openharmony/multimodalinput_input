@@ -2417,18 +2417,20 @@ void PointerDrawingManager::AttachAllSurfaceNode()
 {
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto sp : screenPointers_) {
-        if (sp.second != nullptr) {
-            auto surfaceNode = sp.second->GetSurfaceNode();
-            if (surfaceNode != nullptr) {
-                auto screenId = sp.second->GetScreenId();
-                if (screenId == screenId_ && surfaceNode_ == nullptr) {
-                    MMI_HILOGI("surfaceNode_ is nullptr skip screenId:%{public}u", screenId);
-                    continue;
-                }
-                MMI_HILOGI("Attach screenId:%{public}u", screenId);
-                surfaceNode->AttachToDisplay(screenId);
-            }
+        if (sp.second == nullptr) {
+            continue;
         }
+        auto surfaceNode = sp.second->GetSurfaceNode();
+        if (surfaceNode == nullptr) {
+            continue;
+        }
+        auto screenId = sp.second->GetScreenId();
+        if (screenId == screenId_ && surfaceNode_ == nullptr) {
+            MMI_HILOGI("surfaceNode_ is nullptr skip screenId:%{public}u", screenId);
+            continue;
+        }
+        MMI_HILOGI("Attach screenId:%{public}u", screenId);
+        surfaceNode->AttachToDisplay(screenId);
     }
     if (surfaceNode_ == nullptr) {
         for (auto sp : screenPointers_) {
