@@ -70,8 +70,9 @@ private:
         { CHANGED_TYPE, {} }
     };
     int32_t userData_ { 0 };
-    bool isListeningProcess_ { false };
-    std::mutex mtx_;
+    std::atomic_bool isListeningProcess_ { false };
+    std::mutex inputDeviceMutex_;
+    std::mutex devListenerMutex_;
     std::map<int32_t, FunSetInputDeviceAck> inputdeviceList_;
     int32_t operationIndex_ { 0 };
 };
