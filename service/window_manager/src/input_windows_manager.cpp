@@ -2077,7 +2077,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(currentPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
-    pointerEvent->SetSourceType(lastPointerEventCopy->GetSourceType());
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     int64_t time = GetSysClockTime();
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
@@ -3519,6 +3519,21 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
     lastLogicY_ = logicalY;
     {
         std::lock_guard<std::mutex> guard(mtx_);
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+            std::vector<int32_t> pointerIds{ pointerEvent->GetPointerIds() };
+            std::string isSimulate = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
+            auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent->GetDeviceId());
+            std::string deviceName { "Null" };
+            if (device != nullptr) {
+                deviceName = device->GetName();
+            }
+            MMI_HILOGE("Not mouse event id:%{public}d,PI:%{public}d,AC:%{public}d,wid:%{public}d by:%{public}s,"
+                " SI:%{public}s,PC:%{public}zu, LastEvent id:%{public}d,PI:%{public}d,AC:%{public}d,wid:%{public}d",
+                pointerEvent->GetId(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction(),
+                pointerEvent->GetTargetWindowId(), deviceName.c_str(), isSimulate.c_str(), pointerIds.size(),
+                lastPointerEvent_->GetId(), lastPointerEvent_->GetPointerId(), lastPointerEvent_->GetPointerAction(),
+                lastPointerEvent_->GetTargetWindowId());
+        }
         lastPointerEvent_ = pointerEvent;
     }
     lastWindowInfo_ = touchWindow;
