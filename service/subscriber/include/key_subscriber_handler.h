@@ -107,6 +107,7 @@ private:
     int32_t AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option, bool isSystem);
     int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId, bool isSystem);
     bool IsMatchForegroundPid(std::list<std::shared_ptr<Subscriber>> subs, std::set<int32_t> foregroundPids);
+    int32_t GetHighestPrioritySubscriber(const std::list<std::shared_ptr<Subscriber>> &subscribers);
     void NotifyKeyDownSubscriber(const std::shared_ptr<KeyEvent> &keyEvent, std::shared_ptr<KeyOption> keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
     void NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent> &keyEvent,

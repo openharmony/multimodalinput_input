@@ -824,11 +824,27 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
         NotifyKeyDownDelay(keyEvent, subscribers, handled);
     }
 }
+
+int32_t KeySubscriberHandler::GetHighestPrioritySubscriber(const std::list<std::shared_ptr<Subscriber>> &subscribers)
+{
+    int highestPriority = std::numeric_limits<int>::min();
+    for (const auto &subscriber : subscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
+        int prio = subscriber->keyOption_->GetPriority();
+        if (prio > highestPriority) {
+            highestPriority = prio;
+        }
+    }
+    return highestPriority;
+}
+
 void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent> &keyEvent,
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool isRepeat, bool &handled)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("The subscribe list size is %{public}zu", subscribers.size());
+    std::list<std::shared_ptr<Subscriber>> interestedSubscribers;
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
@@ -841,8 +857,18 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
                 handled = true;
                 continue;
             }
-            NotifySubscriber(keyEvent, subscriber);
+            interestedSubscribers.push_back(subscriber);
             handled = true;
+        }
+    }
+
+    int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
+    for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
+        if (subscriber->keyOption_->GetPriority() == highestPriority) {
+            NotifySubscriber(keyEvent, subscriber);
+            MMI_HILOGD("Notified high priority subscriber");
         }
     }
 }
@@ -852,18 +878,27 @@ void KeySubscriberHandler::NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &k
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("The subscribe list size is %{public}zu", subscribers.size());
+    std::list<std::shared_ptr<Subscriber>> interestedSubscribers;
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
         CHKPC(sess);
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
             foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
+            interestedSubscribers.push_back(subscriber);
+            handled = true;
+        }
+    }
+
+    int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
+    for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
+        if (subscriber->keyOption_->GetPriority() == highestPriority) {
             MMI_HILOGD("Add timer");
             if (!AddTimer(subscriber, keyEvent)) {
                 MMI_HILOGE("Add time failed, subscriberId:%{public}d", subscriber->id_);
-                continue;
             }
-            handled = true;
         }
     }
 }
@@ -873,13 +908,23 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Subscribers size:%{public}zu", subscribers.size());
+    std::list<std::shared_ptr<Subscriber>> interestedSubscribers;
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
         CHKPC(sess);
         if (!isForegroundExits_ || foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
-            HandleKeyUpWithDelay(keyEvent, subscriber);
+            interestedSubscribers.push_back(subscriber);
             handled = true;
+        }
+    }
+
+    int32_t highestPriority = GetHighestPrioritySubscriber(interestedSubscribers);
+    for (auto &subscriber : interestedSubscribers) {
+        CHKPC(subscriber);
+        CHKPC(subscriber->keyOption_);
+        if (subscriber->keyOption_->GetPriority() == highestPriority) {
+            HandleKeyUpWithDelay(keyEvent, subscriber);
         }
     }
 }
