@@ -47,9 +47,8 @@ int32_t RenderConfig::GetImageSize() const
 std::string RenderConfig::ToString() const
 {
     std::ostringstream oss;
-    oss << "{style=" << style << ", align=" << align << ", path" << path << ", color=" << color
-        << ", size=" << size << ", rotationAngle=" << rotationAngle
-        << ", [" << rotationFocusX << " " <<rotationFocusY << "]"
+    oss << "{style=" << style << ", align=" << align << ", color=" << color
+        << ", size=" << size << ", direction=" << direction
         <<", dpi=" << dpi
         << ", isHard=" << isHard << ", ImageSize=" << GetImageSize() << "}";
     return oss.str();

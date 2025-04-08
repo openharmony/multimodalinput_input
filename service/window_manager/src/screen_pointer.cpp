@@ -301,6 +301,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
+    if (IsPositionOutScreen(x, y)) {
+        MMI_HILOGE("Position out of screen");
+    }
 
     int32_t px = 0;
     int32_t py = 0;
@@ -329,6 +332,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(surfaceNode_);
+    if (IsPositionOutScreen(x, y)) {
+        MMI_HILOGE("Position out of screen");
+    }
     int32_t px = 0;
     int32_t py = 0;
     if (IsMirror()) {
@@ -386,6 +392,19 @@ float ScreenPointer::GetRenderDPI() const
     } else {
         return dpi_ * scale_;
     }
+}
+
+bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
+{
+    if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
+        CalculateHwcPositionForExtend(x, y);
+    }
+    if (x < 0 || y < 0 || x > width_ || y > height_) {
+        MMI_HILOGE("Position out of screen, x=%{public}d, y=%{public}d, width=%{public}u, height=%{public}u",
+            x, y, width_, height_);
+        return true;
+    }
+    return false;
 }
 
 } // namespace OHOS::MMI
