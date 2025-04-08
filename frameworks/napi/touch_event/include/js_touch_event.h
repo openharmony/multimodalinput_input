@@ -52,7 +52,7 @@ public:
 
     enum class FixedMode : int32_t {
         NONE = 0,
-        ONE_HAND = 1,
+        AUTO = 1,
     };
     JsTouchEvent() = default;
     ~JsTouchEvent() = default;

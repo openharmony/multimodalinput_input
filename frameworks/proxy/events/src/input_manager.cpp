@@ -152,6 +152,14 @@ void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeSwitchEvent(subscriberId);
 }
 
+int32_t InputManager::QuerySwitchStatus(SwitchEvent::SwitchType switchType, SwitchEvent::SwitchState &state)
+{
+    auto inState = static_cast<int32_t>(state);
+    int32_t ret = InputMgrImpl.QuerySwitchStatus(static_cast<int32_t>(switchType), inState);
+    state = static_cast<SwitchEvent::SwitchState>(inState);
+    return ret;
+}
+
 int32_t InputManager::SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback)
 {
     return InputMgrImpl.SubscribeTabletProximity(callback);
@@ -889,6 +897,16 @@ int32_t InputManager::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuc
 void InputManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
 {
     InputMgrImpl.SetMultiWindowScreenId(screenId, displayNodeScreenId);
+}
+
+int32_t InputManager::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    return InputMgrImpl.SetKnuckleSwitch(knuckleSwitch);
+}
+
+int32_t InputManager::LaunchAiScreenAbility()
+{
+    return InputMgrImpl.LaunchAiScreenAbility();
 }
 } // namespace MMI
 } // namespace OHOS

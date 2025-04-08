@@ -67,6 +67,7 @@ public:
     int32_t UnsubscribeKeyMonitor(int32_t subscriberId);
     int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
+    int32_t QuerySwitchStatus(int32_t switchTpe, int32_t& state);
     int32_t SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback);
     void UnsubscribetabletProximity(int32_t subscriberId);
     int32_t SubscribeLongPressEvent(const LongPressRequest &LongPressRequest,
@@ -85,6 +86,7 @@ public:
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
+    int32_t SetKnuckleSwitch(bool knuckleSwitch);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -238,6 +240,7 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
+    int32_t LaunchAiScreenAbility();
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -292,6 +295,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::function<void(int32_t, int32_t)> windowStatecallback_;
+    bool knuckleSwitch_ { true };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;

@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-output_path = "multimodalinput/mmi_unit_out"
+output_path = "input/input"
 
 group("test") {
   testonly = true

@@ -98,7 +98,7 @@ void UDSSession::Close()
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Enter fd:%{public}d", fd_);
     if (fd_ >= 0) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, TAG);
         fd_ = -1;
         UpdateDescript();
     }

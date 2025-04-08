@@ -776,7 +776,8 @@ static const std::vector<int32_t> specialKeyCodes = {
     KeyEvent::KEYCODE_KEY_PEN_LIGHT_PINCH,
     KeyEvent::KEYCODE_KEY_PEN_AI,
     KeyEvent::KEYCODE_KEY_PEN_END_CLICK,
-    KeyEvent::KEYCODE_KEY_PEN_END_DOUBLE_CLICK
+    KeyEvent::KEYCODE_KEY_PEN_END_DOUBLE_CLICK,
+    KeyEvent::KEYCODE_REMOTE_POWER
 };
 
 bool KeyShortcutManager::IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent)

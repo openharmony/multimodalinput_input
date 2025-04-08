@@ -132,6 +132,10 @@ public:
     {
         delegateProxy_ = proxy;
     }
+    std::shared_ptr<DelegateInterface> GetDelegateProxy() override
+    {
+        return delegateProxy_;
+    }
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -204,7 +208,7 @@ private:
         PointerStyle pointerStyle);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
-    void SetFaceNodeBounds();
+    void SetSurfaceNodeBounds();
     int32_t DrawNewDpiPointer() override;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
@@ -241,6 +245,8 @@ private:
     void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle);
     void UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, DisplayInfo displayInfo);
+    void AttachAllSurfaceNode() override;
+    void DetachAllSurfaceNode() override;
     int32_t CheckHwcReady() override;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 

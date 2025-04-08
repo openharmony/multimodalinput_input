@@ -356,6 +356,11 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyOption, RET_ERR);
     CHKPR(callback, RET_ERR);
+    if (keyOption->GetPriority() > 0
+        && (keyOption->GetFinalKey() != KeyEvent::KEYCODE_HEADSETHOOK || keyOption->GetPreKeys().size() > 0)) {
+        MMI_HILOGE("KeyOption validation failed");
+        return RET_ERR;
+    }
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
     MMI_HILOGW("Keyboard device does not support");
@@ -446,6 +451,23 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
         return RET_ERR;
     }
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(switchType, callback);
+#else
+    MMI_HILOGW("Switch device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
+int32_t InputManagerImpl::QuerySwitchStatus(int32_t switchTpe, int32_t& state)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    if (switchTpe < SwitchEvent::SwitchType::SWITCH_DEFAULT ||
+        switchTpe > SwitchEvent::SwitchType::SWITCH_PRIVACY) {
+        MMI_HILOGE("Switch type error, switchType:%{public}d", switchTpe);
+        return RET_ERR;
+    }
+    return MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(switchTpe, state);
 #else
     MMI_HILOGW("Switch device does not support");
     return ERROR_UNSUPPORT;
@@ -812,7 +834,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
             << item.validWidth << item.validHeight << item.fixedDirection
             << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight
-            << item.oneHandX << item.oneHandY;
+            << item.oneHandX << item.oneHandY << item.uniqueId;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt << item.pointerActiveWidth << item.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -979,7 +1001,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddMonitor(consumer, eventType);
+    return IMonitorMgr.AddMonitor(consumer, eventType);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -995,7 +1017,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddMonitor(consumer, actionsType);
+    return IMonitorMgr.AddMonitor(consumer, actionsType);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -1010,7 +1032,7 @@ int32_t InputManagerImpl::RemoveMonitor(int32_t monitorId)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->RemoveMonitor(monitorId);
+    return IMonitorMgr.RemoveMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -1026,7 +1048,7 @@ int32_t InputManagerImpl::AddGestureMonitor(
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddGestureMonitor(consumer, type, fingers);
+    return IMonitorMgr.AddGestureMonitor(consumer, type, fingers);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -1040,7 +1062,7 @@ int32_t InputManagerImpl::RemoveGestureMonitor(int32_t monitorId)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->RemoveGestureMonitor(monitorId);
+    return IMonitorMgr.RemoveGestureMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -1055,7 +1077,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    IMonitorMgr->MarkConsumed(monitorId, eventId);
+    IMonitorMgr.MarkConsumed(monitorId, eventId);
 #else
     MMI_HILOGI("Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -1597,6 +1619,7 @@ void InputManagerImpl::OnConnected()
             MMI_HILOGE("Get client failed");
         }
     }
+    MULTIMODAL_INPUT_CONNECT_MGR->SetKnuckleSwitch(knuckleSwitch_);
     if (anrObservers_.empty()) {
         return;
     }
@@ -2754,6 +2777,18 @@ int32_t InputManagerImpl::CheckKnuckleEvent(float pointX, float pointY, bool &is
 void InputManagerImpl::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
 {
     MULTIMODAL_INPUT_CONNECT_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+}
+
+int32_t InputManagerImpl::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    knuckleSwitch_ = knuckleSwitch;
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetKnuckleSwitch(knuckleSwitch);
+}
+
+int32_t InputManagerImpl::LaunchAiScreenAbility()
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->LaunchAiScreenAbility();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -41,6 +41,12 @@ public:
         SWITCH_PRIVACY
     };
 
+    enum SwitchState {
+        STATE_UNKNOW = -1,
+        STATE_ON,
+        STATE_OFF
+    };
+
 public:
     int32_t GetSwitchType() const
     {

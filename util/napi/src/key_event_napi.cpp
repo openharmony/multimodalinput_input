@@ -60,7 +60,9 @@ napi_status KeyEventNapi::GetKeyEvent(napi_env env, napi_value in, std::shared_p
     out->SetKeyCode(item.GetKeyCode());
 
     uint32_t unicode = GetNamePropertyUint32(env, in, "unicodeChar");
-    out->GetKeyItem()->SetUnicode(unicode);
+    if (auto keyItem = out->GetKeyItem()) {
+        keyItem->SetUnicode(unicode);
+    }
 
     int32_t keyAction = GetNamePropertyInt32(env, in, "action");
     out->SetKeyAction(keyAction + KeyEvent::KEY_ACTION_CANCEL);
@@ -82,14 +84,16 @@ napi_status KeyEventNapi::GetKeyEvent(napi_env env, napi_value in, std::shared_p
 
 napi_status KeyEventNapi::CreateKeyItem(napi_env env, const std::optional<KeyEvent::KeyItem> in, napi_value &out)
 {
-    auto status = SetNameProperty(env, out, "code", in->GetKeyCode());
-    CHKRR(status, "set code property", status);
+    if (in.has_value()) {
+        auto status = SetNameProperty(env, out, "code", in->GetKeyCode());
+        CHKRR(status, "set code property", status);
 
-    status = SetNameProperty(env, out, "pressedTime", in->GetDownTime());
-    CHKRR(status, "set pressedTime property", status);
+        status = SetNameProperty(env, out, "pressedTime", in->GetDownTime());
+        CHKRR(status, "set pressedTime property", status);
 
-    status = SetNameProperty(env, out, "deviceId", in->GetDeviceId());
-    CHKRR(status, "set deviceId property", status);
+        status = SetNameProperty(env, out, "deviceId", in->GetDeviceId());
+        CHKRR(status, "set deviceId property", status);
+    }
 
     return napi_ok;
 }

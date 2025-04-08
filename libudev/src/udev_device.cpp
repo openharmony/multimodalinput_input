@@ -290,7 +290,10 @@ public:
         if (!parentDevice_.has_value()) {
             parentDevice_ = NewFromChild(this);
         }
-        return *parentDevice_;
+        if (parentDevice_.value() != nullptr) {
+            return *parentDevice_;
+        }
+        return nullptr;
     }
 
     const std::string &GetSyspath() const
