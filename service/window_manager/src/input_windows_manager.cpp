@@ -2801,7 +2801,9 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
         return RET_OK;
     }
     auto sceneIter = pointerStyle_.find(scenePid);
-    if (sceneIter == pointerStyle_.end() || sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
+    if (sceneIter == pointerStyle_.end()) {
+        pointerStyle_[scenePid] = {};
+    } else if (sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
         if (sceneIter->second.size() > POINTER_STYLE_WINDOW_NUM) {
             pointerStyle_[scenePid] = {};
             MMI_HILOG_CURSORE("SceneBoardPid %{public}d windowId:%{public}d exceed",
