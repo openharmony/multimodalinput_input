@@ -277,7 +277,7 @@ void InputDeviceImpl::OnConnected()
 {
     bool shouldStartServer = false;
     {
-        std::lock_guard<std::mutex> guard(inputDeviceMutex_);
+        std::lock_guardstd::mutex guard(devListenerMutex_);
         auto iter = devListener_.find(CHANGED_TYPE);
         shouldStartServer = (iter != devListener_.end()) && !iter->second.empty();
     }
