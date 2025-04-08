@@ -3511,7 +3511,7 @@ void PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
             if (!it.second->Move(x, y, align)) {
                 MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
             }
-        } else if (it.first != displayId_) {
+        } else if (static_cast<int32_t>(it.first) != displayId_) {
             if (!it.second->Move(0, 0, align)) {
                 MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
             }
