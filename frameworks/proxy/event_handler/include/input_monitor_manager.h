@@ -16,14 +16,13 @@
 #ifndef INPUT_MONITOR_MANAGER_H
 #define INPUT_MONITOR_MANAGER_H
 
-#include "singleton.h"
+#include "nocopyable.h"
 
 #include "input_handler_manager.h"
 
 namespace OHOS {
 namespace MMI {
 class InputMonitorManager final : public InputHandlerManager {
-    DECLARE_DELAYED_SINGLETON(InputMonitorManager);
 public:
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
 
@@ -37,8 +36,10 @@ public:
         std::vector<int32_t> actionsType);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     InputHandlerType GetHandlerType() const override;
+    static InputMonitorManager &GetInstance();
 
 private:
+    InputMonitorManager() = default;
     bool CheckMonitorValid(TouchGestureType type, int32_t fingers) override;
 };
 
@@ -47,7 +48,7 @@ inline InputHandlerType InputMonitorManager::GetHandlerType() const
     return InputHandlerType::MONITOR;
 }
 
-#define IMonitorMgr ::OHOS::DelayedSingleton<InputMonitorManager>::GetInstance()
+#define IMonitorMgr ::OHOS::MMI::InputMonitorManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_MONITOR_MANAGER_H
