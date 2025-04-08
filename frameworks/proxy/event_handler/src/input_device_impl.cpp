@@ -41,7 +41,7 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
 
     bool needStartServer = false;
     {
-        std::lock_guard guard(devListenerMutex_);
+        std::lock_guard<std::mutex> guard(devListenerMutex_);
         auto iter = devListener_.find(type);
         if (iter == devListener_.end()) {
             MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
@@ -63,7 +63,7 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
         auto ret = StartListeningToServer();
         if (ret != RET_OK) {
             MMI_HILOGE("StartListeningToServer fail, error:%{public}d", ret);
-            std::lock_guard guard(devListenerMutex_);
+            std::lock_guard<std::mutex> guard(devListenerMutex_);
             auto iter = devListener_.find(type);
             if (iter != devListener_.end()) {
                 iter->second.remove(listener);
@@ -80,7 +80,7 @@ int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDev
 {
     bool needStopServer = false;
     {
-        std::lock_guard guard(devListenerMutex_);
+        std::lock_guard<std::mutex> guard(devListenerMutex_);
         auto iter = devListener_.find(type);
         if (iter == devListener_.end()) {
             MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
@@ -115,7 +115,7 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 
     std::vector<InputDevListenerPtr> listenersToNotify;
     {
-        std::lock_guard guard(devListenerMutex_);
+        std::lock_guard<std::mutex> guard(devListenerMutex_);
         auto iter = devListener_.find(CHANGED_TYPE);
         if (iter == devListener_.end()) {
             MMI_HILOGE("Find change failed");
