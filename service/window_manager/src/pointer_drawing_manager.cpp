@@ -238,6 +238,7 @@ void PointerDrawingManager::DestroyPointerWindow()
             g_isRsRemoteDied = false;
             surfaceNode_->DetachToDisplay(screenId_);
             surfaceNode_ = nullptr;
+            MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
             Rosen::RSTransaction::FlushImplicitTransaction();
             MMI_HILOGI("Pointer window destroy success");
         }
@@ -798,6 +799,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
         MMI_HILOGE("Init layer is failed, Layer is nullptr");
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
+        MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
         return RET_ERR;
@@ -807,6 +809,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
         MMI_HILOGI("DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
+        MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
         return RET_ERR;
@@ -1017,7 +1020,8 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
     pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
-    MMI_HILOGD("DrawDynamicHardwareCursor success, screenId_:%{public}" PRIu64, screenId_);
+    MMI_HILOGI("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u, style = %{public}d",
+        sp->GetScreenId(), cfg.style);
     return RET_OK;
 }
 
@@ -1086,7 +1090,7 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
         layer->CancelBuffer(buffer);
         return RET_ERR;
     }
-    MMI_HILOGD("DrawDynamicSoftCursor on sn success");
+    MMI_HILOGI("DrawDynamicSoftCursor on sn success, styel = %{public}d", cfg.style);
     return RET_OK;
 }
 
@@ -2384,7 +2388,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     bool isHotPlug)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("The hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
+    MMI_HILOGI("The hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
         hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
@@ -2411,6 +2415,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         MMI_HILOGD("Pointer window destroy start");
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
+        MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
     }
@@ -2481,7 +2486,7 @@ void PointerDrawingManager::DrawManager()
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (hasDisplay_ && hasPointerDevice_ && surfaceNode_ == nullptr) {
-        MMI_HILOGD("Draw pointer begin");
+        MMI_HILOGI("Draw pointer begin");
         PointerStyle pointerStyle;
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGD("Get pid %{public}d with pointerStyle %{public}d", pid_, pointerStyle.id);
@@ -2491,11 +2496,11 @@ void PointerDrawingManager::DrawManager()
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.uniqueId, displayInfo_.validWidth / CALCULATE_MIDDLE,
                 displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
-            MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
+            MMI_HILOGI("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
         DrawPointer(displayInfo_.uniqueId, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
-        MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
+        MMI_HILOGI("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
     }
 }
@@ -2601,7 +2606,7 @@ bool PointerDrawingManager::IsPointerVisible()
         }
     }
     if (pidInfos_.empty()) {
-        MMI_HILOGD("Visible property is true");
+        MMI_HILOGI("Visible property is true");
         return true;
     }
     auto info = pidInfos_.back();
@@ -3432,7 +3437,7 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
         layer->CancelBuffer(buffer);
         return RET_ERR;
     }
-    MMI_HILOGD("DrawSoftCursor on SurfaceNode success");
+    MMI_HILOGI("DrawSoftCursor on SurfaceNode success, style=%{public}d", cfg.style);
     return RET_OK;
 }
 
@@ -3447,7 +3452,8 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
     CHKPR(addr, RET_ERR);
     pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
 
-    MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId_:%{public}" PRIu64, screenId_);
+    MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u, style=%{public}d",
+        sp->GetScreenId(), cfg.style);
     return RET_OK;
 }
 
