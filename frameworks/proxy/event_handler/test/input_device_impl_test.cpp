@@ -172,6 +172,31 @@ HWTEST_F(InputDeviceImplTest, InputDeviceImplTest_GetInputDevice_001, TestSize.L
 }
 
 /**
+ * @tc.name: InputDeviceImplTest_GetInputDevice_002
+ * @tc.desc: Test the function GetInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceImplTest, InputDeviceImplTest_GetInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceImpl inputDevice;
+
+    int32_t id = -1;
+    bool checked = true;
+    std::shared_ptr inputDeviceImpl = inputDevice.GetInputDevice(id, checked);
+    EXPECT_EQ(inputDeviceImpl, nullptr);
+    id = 1;
+    checked = false;
+    inputDeviceImpl = inputDevice.GetInputDevice(id, checked);
+    EXPECT_EQ(inputDeviceImpl, nullptr);
+    id = -1;
+    checked = false;
+    inputDeviceImpl = inputDevice.GetInputDevice(id, checked);
+    EXPECT_EQ(inputDeviceImpl, nullptr);
+}
+
+/**
  * @tc.name: InputDeviceImplTest_GetInputDeviceIds_001
  * @tc.desc: Test the function GetInputDeviceIds
  * @tc.type: FUNC
@@ -182,6 +207,21 @@ HWTEST_F(InputDeviceImplTest, InputDeviceImplTest_GetInputDeviceIds_001, TestSiz
     CALL_TEST_DEBUG;
     InputDeviceImpl inputDevice;
     ASSERT_NO_FATAL_FAILURE(inputDevice.GetInputDeviceIds());
+}
+
+/**
+ * @tc.name: InputDeviceImplTest_GetInputDeviceIds_002
+ * @tc.desc: Test the function GetInputDeviceIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceImplTest, InputDeviceImplTest_GetInputDeviceIds_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceImpl manager;
+    std::vector<int32_t> expectedIds = {1, 2, 3};
+    std::vector<int32_t> actualIds = manager.GetInputDeviceIds();
+    ASSERT_NE(expectedIds, actualIds);
 }
 
 /**
@@ -203,6 +243,44 @@ HWTEST_F(InputDeviceImplTest, InputDeviceImplTest_SupportKeys_001, TestSize.Leve
 }
 
 /**
+ * @tc.name: InputDeviceImplTest_SupportKeys_002
+ * @tc.desc: Test the function SupportKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceImplTest, InputDeviceImplTest_SupportKeys_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceImpl inputDevice;
+    int32_t deviceId = 1;
+    int32_t COMMON_PARAMETER_ERROR = 401;
+    std::vector<int32_t> keyCodes = {1, 2, 3};
+    std::vector<bool> keystrokes{true};
+    int32_t ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
+    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
+    EXPECT_NE(keystrokes.size(), keyCodes.size());
+    EXPECT_TRUE(keystrokes[0]);
+    EXPECT_FALSE(keystrokes[1]);
+    EXPECT_FALSE(keystrokes[2]);
+    deviceId = -1;
+    keyCodes = {1, 2, 3};
+    ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
+    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
+    EXPECT_FALSE(keystrokes.empty());
+    deviceId = 100;
+    keyCodes = {1, 2, 3};
+    ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
+    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
+    EXPECT_FALSE(keystrokes.empty());
+    deviceId = 1;
+    keyCodes.clear();
+    keystrokes.clear();
+    ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
+    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
+    EXPECT_TRUE(keystrokes.empty());
+}
+
+/**
  * @tc.name: InputDeviceImplTest_GetKeyboardType_001
  * @tc.desc: Test the function GetKeyboardType
  * @tc.type: FUNC
@@ -216,6 +294,31 @@ HWTEST_F(InputDeviceImplTest, InputDeviceImplTest_GetKeyboardType_001, TestSize.
     int32_t keyboardType = 1;
     int32_t returnCode = 401;
     int32_t ret = inputDevice.GetKeyboardType(deviceId, keyboardType);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: InputDeviceImplTest_GetKeyboardType_002
+ * @tc.desc: Test the function GetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceImplTest, InputDeviceImplTest_GetKeyboardType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceImpl inputDevice;
+    int32_t deviceId = 1;
+    int32_t keyboardType = -100;
+    int32_t returnCode = 401;
+    int32_t ret = inputDevice.GetKeyboardType(deviceId, keyboardType);
+    EXPECT_EQ(ret, returnCode);
+    deviceId = -1;
+    keyboardType = 1;
+    ret = inputDevice.GetKeyboardType(deviceId, keyboardType);
+    EXPECT_EQ(ret, returnCode);
+    deviceId = -10;
+    keyboardType = -5;
+    ret = inputDevice.GetKeyboardType(deviceId, keyboardType);
     EXPECT_EQ(ret, returnCode);
 }
 } // namespace MMI
