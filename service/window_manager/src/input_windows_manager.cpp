@@ -1781,7 +1781,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
         GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
-        MMI_HILOGD("Get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
+        MMI_HILOGI("Get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
             info.windowPid, info.windowId, pointerStyle.id);
         if (!dragFlag_) {
             SetMouseFlag(lastPointerEventCopy->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -5188,7 +5188,8 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
             continue;
         }
         acrossDirection = CalculateAcrossDirection(displayInfo, layout);
-        MMI_HILOGI("acrossDirection :%{public}d.", acrossDirection);
+        MMI_HILOGI("acrossDirection :%{public}d, current displayId:%{public}d, target displayId:%{public}d",
+            acrossDirection, displayInfo.id, item.id);
         if (acrossDirection == AcrossDirection::ACROSS_ERROR) {
             return;
         }

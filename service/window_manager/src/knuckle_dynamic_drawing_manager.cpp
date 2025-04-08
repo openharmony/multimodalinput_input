@@ -432,6 +432,7 @@ void KnuckleDynamicDrawingManager::DestoryWindow()
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     canvasNode_.reset();
     surfaceNode_.reset();
+    MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 } // namespace MMI
