@@ -415,8 +415,8 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
-        unaccelerated_.dx = libinput_event_pointer_get_dx_unaccelerated(data);
-        unaccelerated_.dy = libinput_event_pointer_get_dy_unaccelerated(data);
+        unaccelerated_.dx = libinput_event_vtrackpad_get_dx_unaccelerated(data);
+        unaccelerated_.dy = libinput_event_vtrackpad_get_dy_unaccelerated(data);
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
