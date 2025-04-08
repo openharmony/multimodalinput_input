@@ -21,6 +21,10 @@
 
 namespace OHOS {
 namespace MMI {
+enum SubscribePriority {
+    PRIORITY_0 = 0,
+    PRIORITY_100 = 100,
+};
 class KeyOption {
 public:
     KeyOption() = default;
@@ -119,6 +123,10 @@ public:
 
     void SetRepeat(bool repeat);
 
+    int32_t GetPriority() const;
+
+    void SetPriority(int32_t priority);
+
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -143,6 +151,7 @@ private:
     int32_t finalKeyDownDuration_ { 0 };
     int32_t finalKeyUpDelay_ { 0 };
     bool isRepeat_ { true };
+    int32_t priority_ = SubscribePriority::PRIORITY_0;
 };
 
 class KeyMonitorOption final {
