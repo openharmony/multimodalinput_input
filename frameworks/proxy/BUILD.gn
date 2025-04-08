@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,7 +17,7 @@ import("../../multimodalinput_mini.gni")
 
 defines = input_default_defines
 
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 
 config("libmmi_client_config") {
   visibility = [ ":*" ]
@@ -308,7 +308,14 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   ]
 
   sources = [
+    "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
+    "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
+    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
+    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
+    "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
+    "event_handler/src/tablet_event_input_subscribe_manager.cpp",
     "event_handler/test/switch_event_input_subscribe_manager_test.cpp",
   ]
 
@@ -338,6 +345,80 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
+ohos_unittest("InputMonitorManagerTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+  ]
+
+  sources = [
+    "${mmi_path}/common/anco/comm/src/anco_channel.cpp",
+    "${mmi_path}/common/anco/comm/src/anco_channel_stub.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
+    "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
+    "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
+    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
+    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
+    "${mmi_path}/service/filter/src/event_filter_service.cpp",
+    "${mmi_path}/service/filter/src/event_filter_stub.cpp",
+    "event_handler/src/anr_handler.cpp",
+    "event_handler/src/bytrace_adapter.cpp",
+    "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/input_manager_impl.cpp",
+    "event_handler/src/key_event_input_subscribe_manager.cpp",
+    "event_handler/src/long_press_event_subscribe_manager.cpp",
+    "event_handler/src/multimodal_event_handler.cpp",
+    "event_handler/src/pre_monitor_manager.cpp",
+    "event_handler/src/tablet_event_input_subscribe_manager.cpp",
+    "event_handler/test/input_monitor_manager_test.cpp",
+    "event_handler/test/pre_monitor_manager_test.cpp",
+    "event_handler/test/tablet_event_input_subscribe_manager_test.cpp",
+  ]
+
+  if (input_feature_switch) {
+    sources += [ "event_handler/src/switch_event_input_subscribe_manager.cpp" ]
+  }
+
+  if (input_ext_feature_anco) {
+    sources += [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
+  }
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -436,6 +517,11 @@ ohos_unittest("InputManagerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_test_util",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   deps = [

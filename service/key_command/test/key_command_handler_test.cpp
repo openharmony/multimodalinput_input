@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,13 +27,15 @@
 #include "input_handler_type.h"
 #include "input_windows_manager.h"
 #include "i_preference_manager.h"
-#include "key_command_handler.h"
 #include "key_shortcut_manager.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_preferences_manager.h"
 #include "system_info.h"
 #include "stylus_key_handler.h"
+#define private public
+#include "key_command_handler.h"
+#undef private
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -48,7 +50,6 @@ constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t INTERVAL_TIME = 100;
 constexpr int32_t INTERVAL_TIME_OUT = 500000;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
-constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
 constexpr int32_t TWO_FINGERS_DISTANCE_LIMIT = 16;
 constexpr int32_t TOUCH_LIFT_LIMIT = 24;
@@ -57,7 +58,6 @@ constexpr int32_t TOUCH_TOP_LIMIT = 80;
 constexpr int32_t TOUCH_BOTTOM_LIMIT = 41;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
-constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
 const std::string EXTENSION_ABILITY = "extensionAbility";
@@ -1321,7 +1321,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
     ASSERT_NE(touchEvent, nullptr);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     handler.singleKnuckleGesture_.state = false;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
     touchEvent->AddPointerItem(item);
     touchEvent->SetPointerId(1);
     touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -1358,7 +1358,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleTouchEvent, TestSi
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     handler.isParseConfig_ = false;
-    handler.isTimeConfig_ = false;
     handler.isDistanceConfig_ = false;
     handler.isKnuckleSwitchConfig_ = true;
     item.SetPointerId(1);
@@ -1512,7 +1511,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     handler.twoFingerGesture_.active = true;
-    handler.knuckleSwitch_.statusConfigValue = true;
+    handler.gameForbidFingerKnuckle_ = true;
 
     item.SetPointerId(2);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
@@ -1534,7 +1533,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     handler.twoFingerGesture_.active = true;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
 
     item.SetPointerId(2);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
@@ -2009,7 +2008,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_001, TestSize.
     auto pointerEvent = SetupSingleKnuckleDownEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
     keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
@@ -2042,7 +2040,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_002, TestSize.
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
     keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
     ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
@@ -2091,7 +2088,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_004, TestSize.
     auto pointerEvent = SetupSingleKnuckleDownEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
     keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
@@ -2124,7 +2120,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_005, TestSize.
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
     keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
     ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
@@ -2307,30 +2302,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UpdateSettingsXml_001, Tes
     ASSERT_EQ(handler.UpdateSettingsXml("businessId", 1000), 0);
     auto result = PREFERENCES_MGR->SetShortKeyDuration("businessId", 100);
     ASSERT_EQ(handler.UpdateSettingsXml("businessId", 100), result);
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed_001
- * @tc.desc: Adjust timeInterval configIf need verify
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed_001, TestSize.Level1)
-{
-    KeyCommandHandler handler;
-    int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
-    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_SLOW);
-    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
-    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    ASSERT_NE(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
-    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
-    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_SLOW);
-    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_SLOW);
 }
 
 /**
@@ -2721,20 +2692,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_InterruptTimers, TestSize.
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_SetKnuckleDoubleTapIntervalTime
- * @tc.desc: SetKnuckleDoubleTapIntervalTime
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetKnuckleDoubleTapIntervalTime, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    int64_t interval = -1;
-    ASSERT_NO_FATAL_FAILURE(handler.SetKnuckleDoubleTapIntervalTime(interval));
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_SetKnuckleDoubleTapDistance
  * @tc.desc: SetKnuckleDoubleTapDistance
  * @tc.type: FUNC
@@ -3006,32 +2963,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
     key->SetKeyCode(KeyEvent::KEYCODE_L);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed
- * @tc.desc: Test AdjustTimeIntervalConfigIfNeed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    int64_t intervalTime = 300000;
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
-    handler.checkAdjustIntervalTimeCount_ = 0;
-    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
-
-    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
-    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
-
-    intervalTime = 10000;
-    handler.checkAdjustIntervalTimeCount_ = 6;
-    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
-
-    handler.downToPrevUpTimeConfig_ = 100000;
-    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
 }
 
 /**
@@ -3336,7 +3267,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
     touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     handler.singleKnuckleGesture_.state = false;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
 }
 
@@ -3360,7 +3291,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
     touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     handler.singleKnuckleGesture_.state = false;
-    handler.knuckleSwitch_.statusConfigValue = true;
+    handler.gameForbidFingerKnuckle_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
 }
 
@@ -3919,37 +3850,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportGestureInfo_001, Tes
     ASSERT_NO_FATAL_FAILURE(handler.ReportGestureInfo());
     handler.isLastGestureSucceed_ = false;
     ASSERT_NO_FATAL_FAILURE(handler.ReportGestureInfo());
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_AddSequenceKey_004
- * @tc.desc: Test the funcation AddSequenceKey
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
-    EXPECT_NE(inputEvent, nullptr);
-    inputEvent->actionTime_ = 1;
-    SequenceKey sequenceKey;
-    sequenceKey.keyCode = 1;
-    sequenceKey.keyAction = 2;
-    sequenceKey.actionTime = 3;
-    sequenceKey.delay = 4;
-    handler.keys_.push_back(sequenceKey);
-    bool ret = handler.AddSequenceKey(keyEvent);
-    ASSERT_TRUE(ret);
-    inputEvent->actionTime_ = 1100000;
-    ret = handler.AddSequenceKey(keyEvent);
-    ASSERT_FALSE(ret);
-    inputEvent->actionTime_ = 100000;
-    ret = handler.AddSequenceKey(keyEvent);
-    ASSERT_FALSE(ret);
 }
 
 /**
@@ -5339,51 +5239,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_01, TestSi
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_CalcDrawCoordinate_001
- * @tc.desc: Test CalcDrawCoordinate
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CalcDrawCoordinate_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    DisplayInfo displayInfo;
-    PointerEvent::PointerItem pointerItem;
-    int32_t physicalX = 1;
-    int32_t physicalY = 1;
-    pointerItem.SetRawDisplayX(physicalX);
-    pointerItem.SetRawDisplayY(physicalY);
-    auto retPair = handler.CalcDrawCoordinate(displayInfo, pointerItem);
-    EXPECT_EQ(retPair.first, 1);
-    EXPECT_EQ(retPair.second, 1);
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_CalcDrawCoordinate_002
- * @tc.desc: Test CalcDrawCoordinate
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CalcDrawCoordinate_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    DisplayInfo displayInfo = {
-        .id = 0, .x = 0, .y = 0, .width = 100, .height = 200, .dpi = 240,
-        .transform = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}
-    };
-    PointerEvent::PointerItem pointerItem;
-    int32_t physicalX = 10;
-    int32_t physicalY = 10;
-    pointerItem.SetRawDisplayX(physicalX);
-    pointerItem.SetRawDisplayY(physicalY);
-    auto retPair = handler.CalcDrawCoordinate(displayInfo, pointerItem);
-    EXPECT_EQ(retPair.first, 21);
-    EXPECT_EQ(retPair.second, 21);
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_IsMatchedAbility
  * @tc.desc: Test IsMatchedAbility
  * @tc.type: Function
@@ -5725,7 +5580,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     touchEvent->SetTargetDisplayId(0);
 
     KeyCommandHandler handler;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
 
     DisplayInfo displayInfo;
     displayInfo.id = 0;
@@ -5856,7 +5711,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_001,
     touchEvent->SetPointerId(0);
 
     KeyCommandHandler handler;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
     handler.singleKnuckleGesture_.state = false;
 
     DisplayInfo displayInfo;
@@ -5911,7 +5766,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_002,
     touchEvent->SetPointerId(0);
 
     KeyCommandHandler handler;
-    handler.knuckleSwitch_.statusConfigValue = false;
+    handler.gameForbidFingerKnuckle_ = false;
     handler.singleKnuckleGesture_.state = false;
 
     DisplayInfo displayInfo;
@@ -6292,19 +6147,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_005, TestSize.
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_IsMusicActivate_001
- * @tc.desc: Test the funcation IsMusicActivate
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMusicActivate_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    ASSERT_NO_FATAL_FAILURE(handler.IsMusicActivate());
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_003
  * @tc.desc: Test if (item.ability.bundleName == SOS_BUNDLE_NAME)
  * @tc.type: FUNC
@@ -6362,29 +6204,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
 
     handler.downActionTime_ = 100;
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyOwnCount(repeatKey));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_001
- * @tc.desc: Test if (bundleName.find(matchName) == std::string::npos)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_001, TestSize.Level1)
-{
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-
-    RepeatKey repeatKey;
-    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
-    repeatKey.ability.bundleName = ".camera";
-
-    KeyCommandHandler handler;
-    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
-
-    repeatKey.ability.bundleName = ".test";
-    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -6518,6 +6337,39 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount_001, 
 
     handler.walletLaunchDelayTimes_ = 1;
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyCount(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchAiScreenAbility_001
+ * @tc.desc: Test LaunchAiScreenAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAiScreenAbility_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int32_t pid = 1;
+    int32_t ret = handler.LaunchAiScreenAbility(pid);
+    EXPECT_NE(ret, RET_OK);
+
+    handler.twoFingerGesture_.touchEvent = PointerEvent::Create();
+    ret = handler.LaunchAiScreenAbility(pid);
+    EXPECT_NE(ret, RET_OK);
+
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    handler.twoFingerGesture_.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    ret = handler.LaunchAiScreenAbility(pid);
+    EXPECT_NE(ret, RET_OK);
+
+    handler.twoFingerGesture_.windowId = handler.twoFingerGesture_.touchEvent->GetTargetWindowId();
+    ret = handler.LaunchAiScreenAbility(pid);
+    EXPECT_NE(ret, RET_OK);
+
+    handler.twoFingerGesture_.longPressFlag = true;
+    ret = handler.LaunchAiScreenAbility(pid);
+    EXPECT_NE(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

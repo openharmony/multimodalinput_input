@@ -29,6 +29,8 @@
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
+#include "sensor_agent.h"
+#include "sensor_agent_type.h"
 #include "stylus_key_handler.h"
 
 #undef MMI_LOG_DOMAIN
@@ -53,6 +55,7 @@ constexpr int64_t SOS_DELAY_TIMES { 1000000 };
 constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 15000 };
+constexpr int64_t SCREEN_TIME_OUT { 100 };
 const char* AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const char* WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const char* SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
@@ -75,7 +78,27 @@ const std::string SECURE_SETTING_URI_PROXY {
 const char *TV_MENU_BUNDLE_NAME = "com.ohos.sceneboard";
 const char *TV_MENU_ABILITY_NAME = "com.ohos.sceneboard.MultimodalInputService";
 constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
+constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
+constexpr int32_t SENSOR_REPORT_INTERVAL = 100000000;
+struct SensorUser g_user = {.name = {0}, .callback = nullptr, .userData = nullptr};
+std::atomic<int32_t> g_distance { 0 };
 } // namespace
+
+static void SensorDataCallbackImpl(SensorEvent *event)
+{
+    if (event == nullptr) {
+        MMI_HILOGE("Event is nullptr");
+        return;
+    }
+    if (event->sensorTypeId != SENSOR_TYPE_ID_PROXIMITY) {
+        MMI_HILOGE("Event sensorTypeId is not SENSOR_TYPE_ID_PROXIMITY");
+        return;
+    }
+    ProximityData* proximityData = reinterpret_cast<ProximityData*>(event->data);
+    int32_t distance = static_cast<int32_t>(proximityData->distance);
+    MMI_HILOGI("Proximity distance %{public}d", distance);
+    g_distance = distance;
+}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
@@ -143,13 +166,13 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 
 bool KeyCommandHandler::GetKnuckleSwitchValue()
 {
-    return knuckleSwitch_.statusConfigValue;
+    return gameForbidFingerKnuckle_;
 }
 
 bool KeyCommandHandler::SkipKnuckleDetect()
 {
     return ((!screenshotSwitch_.statusConfigValue) && (!recordSwitch_.statusConfigValue)) ||
-        knuckleSwitch_.statusConfigValue;
+        gameForbidFingerKnuckle_;
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -165,6 +188,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         isParseConfig_ = true;
     }
+    twoFingerGesture_.touchEvent = touchEvent;
     InitializeLongPressConfigurations();
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_PULL_MOVE:
@@ -201,10 +225,6 @@ void KeyCommandHandler::InitializeLongPressConfigurations()
             MMI_HILOGE("Parse long press configFile failed");
         }
         isParseLongPressConfig_ = true;
-    }
-    if (!isTimeConfig_) {
-        SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
-        isTimeConfig_ = true;
     }
     if (!isDistanceConfig_) {
         distanceDefaultConfig_ = DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG * VPR_CONFIG;
@@ -377,7 +397,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
             return;
         }
     }
-    if (knuckleSwitch_.statusConfigValue) {
+    if (gameForbidFingerKnuckle_) {
         MMI_HILOGI("Knuckle switch closed");
         return;
     }
@@ -448,7 +468,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
         return;
     }
     int64_t intervalTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
-    bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= downToPrevUpTimeConfig_;
+    bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW;
     float downToPrevDownDistance = AbsDiff(knuckleGesture, touchEvent);
     bool isDistanceReady = downToPrevDownDistance < downToPrevDownDistanceConfig_;
     knuckleGesture.downToPrevUpTime = intervalTime;
@@ -481,7 +501,6 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
             }
         }
     }
-    AdjustTimeIntervalConfigIfNeed(intervalTime);
     AdjustDistanceConfigIfNeed(downToPrevDownDistance);
 }
 
@@ -537,34 +556,6 @@ void KeyCommandHandler::UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEv
     knuckleGesture.lastDownPointer.id = touchEvent->GetId();
 }
 
-void KeyCommandHandler::AdjustTimeIntervalConfigIfNeed(int64_t intervalTime)
-{
-    CALL_DEBUG_ENTER;
-    int64_t newTimeConfig;
-    MMI_HILOGI("Down to prev up interval time:%{public}" PRId64 ",config time:%{public}" PRId64"",
-        intervalTime, downToPrevUpTimeConfig_);
-    if (downToPrevUpTimeConfig_ == DOUBLE_CLICK_INTERVAL_TIME_DEFAULT) {
-        if (intervalTime < DOUBLE_CLICK_INTERVAL_TIME_DEFAULT || intervalTime > DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
-            return;
-        }
-        newTimeConfig = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
-    } else if (downToPrevUpTimeConfig_ == DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
-        if (intervalTime > DOUBLE_CLICK_INTERVAL_TIME_DEFAULT) {
-            return;
-        }
-        newTimeConfig = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
-    } else {
-        return;
-    }
-    checkAdjustIntervalTimeCount_++;
-    if (checkAdjustIntervalTimeCount_ < MAX_TIME_FOR_ADJUST_CONFIG) {
-        return;
-    }
-    MMI_HILOGI("Adjust new double click interval time:%{public}" PRId64 "", newTimeConfig);
-    downToPrevUpTimeConfig_ = newTimeConfig;
-    checkAdjustIntervalTimeCount_ = 0;
-}
-
 void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
 {
     CALL_DEBUG_ENTER;
@@ -607,6 +598,10 @@ void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<Pointer
 void KeyCommandHandler::StartTwoFingerGesture()
 {
     CALL_DEBUG_ENTER;
+    twoFingerGesture_.startTime = 0;
+    twoFingerGesture_.longPressFlag = false;
+    twoFingerGesture_.windowId = -1;
+    twoFingerGesture_.windowPid = -1;
     twoFingerGesture_.timerId = TimerMgr->AddTimer(twoFingerGesture_.abilityStartDelay, 1, [this]() {
         twoFingerGesture_.timerId = -1;
         if (!CheckTwoFingerGestureAction()) {
@@ -616,10 +611,13 @@ void KeyCommandHandler::StartTwoFingerGesture()
         twoFingerGesture_.ability.params["displayY1"] = std::to_string(twoFingerGesture_.touches[0].y);
         twoFingerGesture_.ability.params["displayX2"] = std::to_string(twoFingerGesture_.touches[1].x);
         twoFingerGesture_.ability.params["displayY2"] = std::to_string(twoFingerGesture_.touches[1].y);
-        MMI_HILOGI("Start launch ability immediately");
-        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, twoFingerGesture_.ability.bundleName);
-        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
-        BytraceAdapter::StopLaunchAbility();
+        MMI_HILOGI("Dual-finger long press capability information saving");
+        twoFingerGesture_.longPressFlag = true;
+        twoFingerGesture_.windowId = twoFingerGesture_.touchEvent->GetTargetWindowId();
+        twoFingerGesture_.windowPid = WIN_MGR->GetWindowPid(twoFingerGesture_.windowId);
+        auto now = std::chrono::high_resolution_clock::now();
+        auto duration = now.time_since_epoch();
+        twoFingerGesture_.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     });
 }
 
@@ -742,7 +740,7 @@ bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touc
             return false;
         }
     }
-    if (knuckleSwitch_.statusConfigValue) {
+    if (gameForbidFingerKnuckle_) {
         if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
             touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
             MMI_HILOGI("Knuckle switch closed");
@@ -1073,7 +1071,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         return true;
     }
     if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
-        !IsMusicActivate()) {
+        !IsMusicActivate() && (g_distance > 0)) {
         return true;
     }
     MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
@@ -1109,10 +1107,9 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_, repeatKeyMaxTimes_);
-    knuckleSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
-    screenshotSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    screenshotSwitch_.statusConfig = SNAPSHOT_KNUCKLE_SWITCH;
     screenshotSwitch_.statusConfigValue = true;
-    recordSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    recordSwitch_.statusConfig = RECORD_KNUCKLE_SWITCH;
     recordSwitch_.statusConfigValue = true;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
@@ -1243,6 +1240,11 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
             }
         }
         return true;
+    }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_SYSRQ) {
+        auto iterms = key->GetKeyItems();
+        MMI_HILOGI("Recording response VM");
+        return iterms.size() != 1 ? enableCombineKey_ : true;
     }
     return enableCombineKey_;
 }
@@ -1516,7 +1518,6 @@ void KeyCommandHandler::InitKeyObserver()
         isParseStatusConfig_ = true;
     }
     if (!isKnuckleSwitchConfig_) {
-        CreateStatusConfigObserver(knuckleSwitch_);
         CreateKnuckleConfigObserver(screenshotSwitch_);
         CreateKnuckleConfigObserver(recordSwitch_);
         isKnuckleSwitchConfig_ = true;
@@ -2628,16 +2629,6 @@ KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture() const
     return doubleKnuckleGesture_;
 }
 
-void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
-{
-    CALL_DEBUG_ENTER;
-    if (interval < 0) {
-        MMI_HILOGE("Invalid interval time:%{public}" PRId64 "", interval);
-        return;
-    }
-    downToPrevUpTimeConfig_ = interval;
-}
-
 void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
 {
     CALL_DEBUG_ENTER;
@@ -2775,7 +2766,7 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
     }
     tappingCount_++;
     int64_t timeDiffToPrevKnuckleUpTime = currentDownTime - previousUpTime_;
-    if (timeDiffToPrevKnuckleUpTime <= downToPrevUpTimeConfig_) {
+    if (timeDiffToPrevKnuckleUpTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
         if (tappingCount_ == MAX_TAP_COUNT) {
             DfxHisysevent::ReportFailIfOneSuccTwoFail(touchEvent);
         }
@@ -2886,8 +2877,7 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
 void KeyCommandHandler::OnKunckleSwitchStatusChange(const std::string switchName)
 {
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (switchName != SETTING_KNUCKLE_SWITCH && switchName != SNAPSHOT_KNUCKLE_SWITCH
-        && switchName != RECORD_KNUCKLE_SWITCH) {
+    if (switchName != SNAPSHOT_KNUCKLE_SWITCH && switchName != RECORD_KNUCKLE_SWITCH) {
         return;
     }
     bool isKnuckleEnable = !SkipKnuckleDetect();
@@ -2970,6 +2960,90 @@ void KeyCommandHandler::MenuClickProcess(const std::string bundleName,
     ability.abilityName = abilityName;
     ability.params.emplace(std::make_pair("trigger_type", action));
     LaunchAbility(ability, NO_DELAY);
+}
+
+void KeyCommandHandler::RegisterProximitySensor()
+{
+    CALL_INFO_TRACE;
+    g_user.callback = SensorDataCallbackImpl;
+    int32_t ret = SubscribeSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
+    if (ret != 0) {
+        MMI_HILOGE("Failed to SubscribeSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+        return;
+    }
+    ret = SetBatch(SENSOR_TYPE_ID_PROXIMITY, &g_user, SENSOR_SAMPLING_INTERVAL, SENSOR_REPORT_INTERVAL);
+    if (ret != 0) {
+        MMI_HILOGE("Failed to SetBatch: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+        return;
+    }
+    ret = ActivateSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
+    if (ret != 0) {
+        MMI_HILOGE("Failed to ActivateSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+    }
+}
+
+int32_t KeyCommandHandler::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    gameForbidFingerKnuckle_ = !knuckleSwitch;
+    MMI_HILOGI("SetKnuckleSwitch is successful in keyCommand handler, knuckleSwitch:%{public}d", knuckleSwitch);
+    return RET_OK;
+}
+
+int32_t KeyCommandHandler::CheckTwoFingerGesture(int32_t pid)
+{
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    int64_t milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    int64_t timeOut = milliseconds - twoFingerGesture_.startTime;
+    if (twoFingerGesture_.touchEvent == nullptr) {
+        MMI_HILOGE("twoFingerGesture_.touchEvent == nullptr");
+        return RET_ERR;
+    }
+    if (timeOut > SCREEN_TIME_OUT) {
+        MMI_HILOGE("Start application timeout, startTime:%{public}lld, millisecond:%{public}lld, timeOut:%{public}lld",
+            twoFingerGesture_.startTime, milliseconds, timeOut);
+        return RET_ERR;
+    }
+
+    if ((twoFingerGesture_.windowId < 0) || (twoFingerGesture_.touchEvent->GetTargetWindowId() !=
+        twoFingerGesture_.windowId)) {
+        MMI_HILOGE("Window changefocusWindowId:%{public}d, twoFingerGesture_.focusWindowId:%{public}d",
+            twoFingerGesture_.touchEvent->GetTargetWindowId(), twoFingerGesture_.windowId);
+        return RET_ERR;
+    }
+
+    if (twoFingerGesture_.windowPid != pid) {
+        MMI_HILOGE("twoFingerGesture_.windowPid:%{public}d, pid:%{public}d", twoFingerGesture_.windowPid, pid);
+        return RET_ERR;
+    }
+
+    if (!twoFingerGesture_.longPressFlag) {
+        MMI_HILOGE("The long press state is not set");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t KeyCommandHandler::LaunchAiScreenAbility(int32_t pid)
+{
+    if (CheckTwoFingerGesture(pid) != RET_OK) {
+        twoFingerGesture_.startTime = 0;
+        twoFingerGesture_.longPressFlag = false;
+        twoFingerGesture_.windowId = -1;
+        twoFingerGesture_.windowPid = -1;
+        return RET_ERR;
+    }
+
+    MMI_HILOGE("Start launch ai screen ability immediately");
+    BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, twoFingerGesture_.ability.bundleName);
+    LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
+    BytraceAdapter::StopLaunchAbility();
+
+    twoFingerGesture_.startTime = 0;
+    twoFingerGesture_.longPressFlag = false;
+    twoFingerGesture_.windowId = -1;
+    twoFingerGesture_.windowPid = -1;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

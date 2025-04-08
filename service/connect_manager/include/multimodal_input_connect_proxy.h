@@ -92,6 +92,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
+    int32_t QuerySwitchStatus(int32_t switchType, int32_t& state) override;
     int32_t SubscribeTabletProximity(int32_t subscribeId) override;
     int32_t UnsubscribetabletProximity(int32_t subscribeId) override;
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
@@ -170,6 +171,8 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
+    int32_t SetKnuckleSwitch(bool knuckleSwitch) override;
+    int32_t LaunchAiScreenAbility() override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,7 +16,7 @@ import("//build/test.gni")
 import("../multimodalinput_mini.gni")
 
 defines = input_default_defines
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 mmi_service_path = "${mmi_path}/service"
 
 ohos_prebuilt_etc("mmi_device_config.ini") {
@@ -236,6 +236,10 @@ ohos_shared_library("libmmi-server") {
       "touch_event_normalize/src/touch_gesture_detector.cpp",
       "touch_event_normalize/src/touch_gesture_manager.cpp",
     ]
+
+    if (input_feature_product == "pc") {
+      defines += [ "TOUCH_GESTURE_MONITOR_ENABLED" ]
+    }
   }
   if (input_feature_fingerprint) {
     sources += [
@@ -336,6 +340,10 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
+  if (input_feature_combination_key) {
+    external_deps += [ "sensor:sensor_interface_native" ]
+  }
+
   external_deps += [
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
@@ -406,7 +414,7 @@ ohos_shared_library("libmmi-server") {
 }
 
 import("//build/test.gni")
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 
 ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
@@ -678,12 +686,19 @@ ohos_unittest("KeyShortcutManagerTest") {
     "subscriber/test/src/timer_manager.cpp",
   ]
 
+  if (input_feature_key_pressed_handler) {
+    sources += [ "subscriber/test/src/key_monitor_manager_test.cpp" ]
+  }
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [
     "ability_runtime:ability_manager",
@@ -1275,7 +1290,12 @@ ohos_unittest("InputWindowsManagerTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "window_manager/test/input_windows_manager_test.cpp" ]
+  include_dirs = [ "${mmi_path}/service/event_handler/include" ]
+
+  sources = [
+    "window_manager/test/mock_input_windows_manager.cpp",
+    "window_manager/test/input_windows_manager_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -1290,6 +1310,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",
     "graphic_2d:librender_service_base",
@@ -1452,7 +1473,11 @@ ohos_unittest("SubscriberTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
+  sources = [
+    "module_loader/src/input_screen_capture_agent.cpp",
+    "subscriber/test/key_subscriber_handler_test.cpp",
+    "subscriber/test/tablet_subscriber_handler_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -1468,6 +1493,7 @@ ohos_unittest("SubscriberTest") {
     "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
     "jsoncpp:jsoncpp",
@@ -1679,6 +1705,44 @@ ohos_unittest("KeyEventNormalizeTest") {
   ]
 
   sources = [ "key_event_normalize/test/key_event_normalize_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("KeyUnicodeTransformationTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/event_handler/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "key_event_normalize/test/key_unicode_transformation_test.cpp" ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -2065,7 +2129,6 @@ ohos_unittest("EventHandlerTest") {
   sources = [
     "event_handler/test/anr_manager_test.cpp",
     "event_handler/test/event_normalize_handler_test.cpp",
-    "event_handler/test/input_event_handler_test.cpp",
     "event_handler/test/key_auto_repeat_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
     "event_handler/test/touchpad_settings_handler_test.cpp",
@@ -2082,6 +2145,76 @@ ohos_unittest("EventHandlerTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("InputEventHandlerTest") {
+  module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  cflags_cc = [ "-Wno-string-conversion" ]
+
+  include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/test/facility/mock/include",
+    "${mmi_path}/util/common/include",
+  ]
+
+  if (input_feature_joystick) {
+    include_dirs += [ "${mmi_path}/service/joystick/include" ]
+  }
+
+  sources = [ "event_handler/test/input_event_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -2668,6 +2801,46 @@ ohos_unittest("EventDumpTest") {
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("DeviceEventMonitorTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/device_state_manager/include",
+    "${mmi_path}/test/unittest/common/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "device_state_manager/test/device_event_monitor_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_consumer",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
   ]
 }
 

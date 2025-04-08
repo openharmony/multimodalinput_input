@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 
 ohos_unittest("InputNativeTest") {
   module_out_path = module_output_path

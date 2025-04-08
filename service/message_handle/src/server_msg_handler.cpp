@@ -305,7 +305,6 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
     std::shared_ptr<PointerEvent> touchEvent = WIN_MGR->GetLastPointerEventForGesture();
     if (touchEvent != nullptr) {
         std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
-        MMI_HILOGI("Check : LastPointerEvent's item count is:%{public}d", listPtItems.size());
         for (auto &item : listPtItems) {
             MMI_HILOGI("Check : current Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
                 item.GetPointerId(), item.GetOriginPointerId());
@@ -743,7 +742,7 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
             >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
             >> info.validWidth >> info.validHeight >> info.fixedDirection
             >> info.physicalWidth >> info.physicalHeight >> info.scalePercent >> info.expandHeight
-            >> info.oneHandX >> info.oneHandY;
+            >> info.oneHandX >> info.oneHandY >> info.uniqueId;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt >> info.pointerActiveWidth >> info.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1102,6 +1101,14 @@ int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t p
     auto subscriberHandler = InputHandler->GetSwitchSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->UnsubscribeSwitchEvent(sess, subscribeId);
+}
+
+int32_t ServerMsgHandler::OnQuerySwitchStatus(int32_t switchType, int32_t& state)
+{
+    CALL_DEBUG_ENTER;
+    auto subscriberHandler = InputHandler->GetSwitchSubscriberHandler();
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
+    return subscriberHandler->QuerySwitchStatus(switchType, state);
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
 

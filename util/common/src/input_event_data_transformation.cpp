@@ -515,7 +515,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         MMI_HILOGE("Malloc failed");
         return RET_ERR;
     }
-    if (event->GetFixedMode() == PointerEvent::FixedMode::ONE_HAND) {
+    if (event->GetFixedMode() == PointerEvent::FixedMode::AUTO) {
         secCompPointEvent->touchX = pointerItem.GetFixedDisplayX();
         secCompPointEvent->touchY = pointerItem.GetFixedDisplayY();
     } else {

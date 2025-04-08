@@ -58,6 +58,8 @@ const char* DEVICE_TYPE_FOLD_PC { "FOLD_PC" };
 const char* DEVICE_TYPE_TABLET { "TABLET"};
 const char* DEVICE_TYPE_PC_PRO { "PC_PRO" };
 const char* DEVICE_TYPE_M_PC { "M_PC" };
+const char* DEVICE_TYPE_M_TABLET1 { "MRDI" };
+const char* DEVICE_TYPE_M_TABLET2 { "MRO" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
@@ -413,6 +415,13 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     bool tpTapSwitch = true;
     GetTouchpadTapSwitch(tpTapSwitch);
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        unaccelerated_.dx = libinput_event_vtrackpad_get_dx_unaccelerated(data);
+        unaccelerated_.dy = libinput_event_vtrackpad_get_dy_unaccelerated(data);
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
     // touch pad tap switch is disable
     if (type == LIBINPUT_EVENT_POINTER_TAP && !tpTapSwitch) {
         MMI_HILOGD("Touch pad is disable");
@@ -713,6 +722,9 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
         }
         if (PRODUCT_TYPE == DEVICE_TYPE_M_PC) {
             deviceType = DeviceType::DEVICE_M_PC;
+        }
+        if (PRODUCT_TYPE == DEVICE_TYPE_M_TABLET1 || PRODUCT_TYPE == DEVICE_TYPE_M_TABLET2) {
+            deviceType = DeviceType::DEVICE_M_TABLET;
         }
     }
     int32_t ret =

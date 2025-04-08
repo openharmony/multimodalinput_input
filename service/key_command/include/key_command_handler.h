@@ -103,6 +103,11 @@ struct TwoFingerGesture {
     bool active = false;
     int32_t timerId = -1;
     int64_t abilityStartDelay = 0;
+    int64_t startTime = 0;
+    int32_t windowId = -1;
+    int32_t windowPid = -1;
+    bool longPressFlag = false;
+    std::shared_ptr<PointerEvent> touchEvent = nullptr;
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -171,7 +176,6 @@ public:
     void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
     bool GetKnuckleSwitchValue();
     bool SkipKnuckleDetect();
@@ -185,6 +189,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void InitKeyObserver();
     bool PreHandleEvent();
+    int32_t SetKnuckleSwitch(bool knuckleSwitch);
+    void RegisterProximitySensor();
+    int32_t LaunchAiScreenAbility(int32_t pid);
 
 private:
     void Print();
@@ -289,7 +296,6 @@ private:
     void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
         KnuckleGesture &knuckleGesture, KnuckleType type);
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
-    void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
     bool CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -321,6 +327,7 @@ private:
     void SendSaveEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool MenuClickHandle(std::shared_ptr<KeyEvent> event);
     void MenuClickProcess(const std::string bundleName, const std::string abilityName, const std::string action);
+    int32_t CheckTwoFingerGesture(int32_t pid);
 
 private:
     Sequence matchedSequence_;
@@ -346,10 +353,8 @@ private:
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
     MultiFingersTap threeFingersTap_;
-    bool isTimeConfig_ { false };
     bool isDistanceConfig_ { false };
     bool isKnuckleSwitchConfig_ { false };
-    struct KnuckleSwitch knuckleSwitch_;
     struct KnuckleSwitch screenshotSwitch_;
     struct KnuckleSwitch recordSwitch_;
     int32_t checkAdjustIntervalTimeCount_ { 0 };
@@ -407,6 +412,7 @@ private:
     int64_t lastMenuDownTime_ {0};
     bool existMenuDown_ { false };
     std::shared_ptr<KeyEvent> tmpkeyEvent_ {nullptr};
+    bool gameForbidFingerKnuckle_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

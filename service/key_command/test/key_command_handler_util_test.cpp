@@ -1607,5 +1607,224 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToKeySequen
     EXPECT_FALSE(OHOS::MMI::ConvertToKeySequence(jsonData, sequence));
     cJSON_Delete(jsonData);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToExcludeKey_001
+ * @tc.desc: Tests when jsonData is not an number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToExcludeKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "keyCode", cJSON_CreateString("not a number"));
+    ExcludeKey exKey;
+    EXPECT_FALSE(OHOS::MMI::ConvertToExcludeKey(jsonData, exKey));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToExcludeKey_002
+ * @tc.desc: Tests when jsonData is not an number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToExcludeKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "keyAction", cJSON_CreateString("not a number"));
+    ExcludeKey exKey;
+    bool ret = OHOS::MMI::ConvertToExcludeKey(jsonData, exKey);
+    EXPECT_FALSE(ret);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToExcludeKey_003
+ * @tc.desc: Tests when jsonData is not an number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToExcludeKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "delay", cJSON_CreateString("not a number"));
+    ExcludeKey exKey;
+    EXPECT_FALSE(OHOS::MMI::ConvertToExcludeKey(jsonData, exKey));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetRepeatTimes_005
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetRepeatTimes_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = nullptr;
+    int32_t repeatTimesInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetRepeatTimes(jsonData, repeatTimesInt));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetRepeatTimes_006
+ * @tc.desc: Tests when jsonData is not an number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetRepeatTimes_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "repeatTimes", cJSON_CreateString("not a number"));
+    int32_t repeatTimesInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetRepeatTimes(jsonData, repeatTimesInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetRepeatTimes_007
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetRepeatTimes_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "repeatTimes", -1);
+    int32_t repeatTimesInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetRepeatTimes(jsonData, repeatTimesInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_005
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = nullptr;
+    int64_t abilityStartDelayInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetAbilityStartDelay(jsonData, abilityStartDelayInt));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_006
+ * @tc.desc: Tests when delay is not number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "abilityStartDelay", cJSON_CreateString("not a number"));
+    int64_t abilityStartDelayInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetAbilityStartDelay(jsonData, abilityStartDelayInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_007
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "abilityStartDelay", -1);
+    int64_t abilityStartDelayInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetAbilityStartDelay(jsonData, abilityStartDelayInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_008
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "abilityStartDelay", 1);
+    int64_t abilityStartDelayInt = 1;
+    EXPECT_TRUE(OHOS::MMI::GetAbilityStartDelay(jsonData, abilityStartDelayInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ParseMultiFingersTap_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ParseMultiFingersTap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    JsonParser parser;
+    std::string ability;
+    MultiFingersTap mulFingersTap;
+    EXPECT_FALSE(OHOS::MMI::ParseMultiFingersTap(parser, ability, mulFingersTap));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ParseMultiFingersTap_002
+ * @tc.desc: Tests when mulFingersTap gesture failed
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ParseMultiFingersTap_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string ability;
+    JsonParser parser;
+    MultiFingersTap mulFingersTap;
+    cJSON_AddNumberToObject(parser, "ability", 1);
+    EXPECT_FALSE(OHOS::MMI::ParseMultiFingersTap(parser, ability, mulFingersTap));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_IsParseKnuckleGesture_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsParseKnuckleGesture_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string ability;
+    JsonParser parser;
+    KnuckleGesture knuckleGesture;
+    EXPECT_FALSE(OHOS::MMI::IsParseKnuckleGesture(parser, ability, knuckleGesture));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_IsParseKnuckleGesture_002
+ * @tc.desc: Tests when knuckle gesture failed
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsParseKnuckleGesture_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string ability;
+    JsonParser parser;
+    KnuckleGesture knuckleGesture;
+    cJSON_AddNumberToObject(parser, "ability", 1);
+    EXPECT_FALSE(OHOS::MMI::IsParseKnuckleGesture(parser, ability, knuckleGesture));
+}
 } // namespace MMI
 } // namespace OHOS

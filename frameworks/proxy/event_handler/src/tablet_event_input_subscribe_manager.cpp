@@ -119,7 +119,6 @@ void TabletEventInputSubscribeManager::OnConnected()
         return;
     }
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
-        SubscribeTabletEventInfo &subscribeInfo = it->second;
         int32_t ret = MMIEventHdl.SubscribeTabletProximity(it->first);
         if (ret != RET_OK) {
             MMI_HILOGE("Subscribe switch event failed, ret:%{public}d", ret);

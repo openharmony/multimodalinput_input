@@ -101,6 +101,7 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubQuerySwitchStatus(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeTabletProximity(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnSubscribetabletProximity(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeLongPressEvent(MessageParcel& data, MessageParcel& reply);
@@ -184,6 +185,8 @@ protected:
     int32_t StubShiftAppPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCustomMouseCursor(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMultiWindowScreenId(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetKnuckleSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubLaunchAiScreenAbility(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

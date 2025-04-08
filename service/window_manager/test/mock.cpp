@@ -442,7 +442,7 @@ KnuckleDrawingManager::KnuckleDrawingManager()
 void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {}
 
-void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent)
+void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t displayId)
 {}
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
@@ -451,7 +451,8 @@ KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
 void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {}
 
-void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t displayId)
 {}
 
 void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)

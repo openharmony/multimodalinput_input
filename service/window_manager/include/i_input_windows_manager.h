@@ -161,6 +161,7 @@ public:
     virtual int32_t GetWindowStateNotifyPid() = 0;
     virtual int32_t GetPidByWindowId(int32_t pid) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
+    virtual void InitializeAnco() = 0;
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
     virtual void CleanShellWindowIds() = 0;
@@ -180,6 +181,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    virtual std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+        PointerEvent::PointerItem pointerItem) = 0;
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();

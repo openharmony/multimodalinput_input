@@ -202,6 +202,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override { return subscribeId; }
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override { return subscribeId; }
+    int32_t QuerySwitchStatus(int32_t switchType, int32_t& state) override { return RET_OK; };
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override
     {
         return subscribeId;
@@ -378,6 +379,12 @@ public:
     {
         return static_cast<int32_t>(screenId);
     };
+
+    int32_t SetKnuckleSwitch(bool knuckleSwitch) override
+    {
+        return static_cast<int32_t>(knuckleSwitch);
+    };
+    int32_t LaunchAiScreenAbility() override { return RET_OK; }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
@@ -3606,6 +3613,80 @@ HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeSwitchEvent_004, TestSiz
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubUnsubscribeSwitchEvent(data, reply));
+}
+
+/**
+ * @tc.name: StubQuerySwitchStatus_001
+ * @tc.desc: Test the function StubQuerySwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubQuerySwitchStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubQuerySwitchStatus(data, reply));
+}
+
+/**
+ * @tc.name: StubQuerySwitchStatus_002
+ * @tc.desc: Test the function StubQuerySwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubQuerySwitchStatus_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubQuerySwitchStatus(data, reply));
+}
+
+/**
+ * @tc.name: StubQuerySwitchStatus_003
+ * @tc.desc: Test the function StubQuerySwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubQuerySwitchStatus_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubQuerySwitchStatus(data, reply));
+}
+
+/**
+ * @tc.name: StubQuerySwitchStatus_004
+ * @tc.desc: Test the function StubQuerySwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubQuerySwitchStatus_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubQuerySwitchStatus(data, reply));
 }
 
 /**
@@ -9137,6 +9218,22 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_005, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetMouseIcon(data, reply));
+}
+
+/**
+ * @tc.name: StubLaunchAiScreenAbility_001
+ * @tc.desc: Test the function StubLaunchAiScreenAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubLaunchAiScreenAbility_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubLaunchAiScreenAbility(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS

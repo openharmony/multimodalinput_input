@@ -169,6 +169,15 @@ public:
      */
     void UnsubscribeSwitchEvent(int32_t subscriberId);
 
+    /**
+     * @brief Query the current status of switches that meet specific conditions.
+     * @param switchType Indicates the type of switch to query.
+     * @param state Indicates the state of switch with given type.
+     * @return Returns <b>0<b/> if success; returns a non-0 value otherwise.
+     * @since 16
+     */
+    int32_t QuerySwitchStatus(SwitchEvent::SwitchType switchType, SwitchEvent::SwitchState &state);
+
  /**
      * @brief Subscribes to the switch input event that meets a specific condition. When such an event occurs,
      * the <b>callback</b> specified is invoked to process the event.
@@ -1141,6 +1150,21 @@ public:
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType);
 
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
+
+    /**
+     * @brief Enables or disables the knuckle switch.
+     * @param knuckleSwitch Set to true to enable, false to disable.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 18
+    */
+    int32_t SetKnuckleSwitch(bool knuckleSwitch);
+
+    /**
+     * @brief 拉起小艺识屏
+     * @return 如果成功，则返回0；否则返回非0值。
+     * @since 14
+     */
+    int32_t LaunchAiScreenAbility();
 
 private:
     InputManager() = default;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1012,6 +1012,21 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerId_001, TestSize.Lev
 }
 
 /**
+ * @tc.name: PointerEvent_PointerItem_GetAngle_001
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEvent_PointerItem_GetAngle_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    int32_t angle = 1;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetAngle(angle));
+    ASSERT_EQ(item.GetAngle(), angle);
+}
+
+/**
  * @tc.name: PointerEventTest_SetDisplayXPos_001
  * @tc.desc: Sets the x coordinate relative to the upper left corner of the screen.
  * @tc.type: FUNC
@@ -1975,7 +1990,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedModeStr, TestSize.Level2)
     fixedMode = PointerEvent::FixedMode::NORMAL;
     pointer->SetFixedMode(fixedMode);
     ASSERT_EQ(pointer->GetFixedModeStr(), "normal");
-    fixedMode = PointerEvent::FixedMode::ONE_HAND;
+    fixedMode = PointerEvent::FixedMode::AUTO;
     pointer->SetFixedMode(fixedMode);
     ASSERT_EQ(pointer->GetFixedModeStr(), "one-hand");
 }

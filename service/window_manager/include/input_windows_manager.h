@@ -181,6 +181,7 @@ public:
     void CleanShellWindowIds();
     bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent);
     void SendOneHandData(onst DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
+    bool IsAncoGameActive();
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -205,6 +206,7 @@ public:
     int32_t GetWindowStateNotifyPid();
     int32_t GetPidByWindowId(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_ANCO
+    void InitializeAnco();
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
     int32_t SyncKnuckleStatus(bool isKnuckleEnable);
@@ -225,6 +227,8 @@ public:
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return lastPointerEventforGesture_; };
+    std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+        PointerEvent::PointerItem pointerItem);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
@@ -405,6 +409,8 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
     int32_t ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown);
+    CursorPosition GetCursorPos(const DisplayGroupInfo &displayGroupInfo);
+    CursorPosition ResetCursorPos(const DisplayGroupInfo &displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     bool CancelTouch(int32_t touch);
@@ -503,7 +509,7 @@ private:
     std::mutex mtx_;
     std::atomic_bool isHPR_ { false };
     std::mutex oneHandMtx_;
-    bool inOneHandMode_ = false;
+    int32_t scalePercent_ = 100;
 };
 } // namespace MMI
 } // namespace OHOS

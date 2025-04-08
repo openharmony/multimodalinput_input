@@ -137,6 +137,8 @@ enum class MultimodalinputConnectInterfaceCode {
     INJECT_TOUCHPAD_EVENT = 121,
     GET_TOUCHPAD_OPTION = 122,
     SET_MUILT_WINDOW_SCREEN_ID = 123,
+    SET_KNUCKLE_SWITCH = 124,
+    LAUNCH_AI_SCREEN_ABILITY = 125,
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     CREATE_VKEYBOARD_DEVICE = 153,
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -158,6 +160,7 @@ enum class MultimodalinputConnectInterfaceCode {
     SUBSCRIBE_KEY_MONITOR = 351,
     UNSUBSCRIBE_KEY_MONITOR = 352,
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    QUERY_SWITCH_STATE_EVENT = 353,
 };
 
 enum class MultimodalinputEventObserverCode {

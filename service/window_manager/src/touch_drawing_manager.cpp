@@ -22,6 +22,7 @@
 #include "i_multimodal_input_connect.h"
 #include "input_windows_manager.h"
 #include "table_dump.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -36,6 +37,8 @@ const static Rosen::Drawing::Color LABELS_RED_COLOR = Rosen::Drawing::Color::Col
 const static Rosen::Drawing::Color TRACKER_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 96, 255);
 const static Rosen::Drawing::Color POINTER_RED_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 255, 0, 0);
 const static Rosen::Drawing::Color CROSS_HAIR_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 0, 192);
+constexpr int32_t REPEAT_ONCE { 1 };
+constexpr int32_t REPEAT_COOLING_TIME { 500 };
 constexpr int32_t DENSITY_BASELINE { 160 };
 constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
 constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
@@ -84,6 +87,37 @@ TouchDrawingManager::TouchDrawingManager()
 
 TouchDrawingManager::~TouchDrawingManager() {}
 
+void TouchDrawingManager::Initialize()
+{
+    int32_t nRetries { 60 };
+    SetupSettingObserver(nRetries);
+}
+
+void TouchDrawingManager::SetupSettingObserver(int32_t nRetries)
+{
+    if (HasDisplayInfo()) {
+        CreateObserver();
+        if (hasBubbleObserver_ && hasPointerObserver_) {
+            return;
+        }
+    }
+    if (nRetries <= 0) {
+        MMI_HILOGE("Failed to setup setting observer after tens of retries");
+        return;
+    }
+    auto timerId = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, nRetries]() {
+        SetupSettingObserver(nRetries - 1);
+    });
+    if (timerId < 0) {
+        MMI_HILOGE("AddTimer fail");
+    }
+}
+
+bool TouchDrawingManager::HasDisplayInfo() const
+{
+    return ((scaleW_ != 0) && (scaleH_ != 0));
+}
+
 void TouchDrawingManager::RecordLabelsInfo()
 {
     CHKPV(pointerEvent_);
@@ -92,7 +126,7 @@ void TouchDrawingManager::RecordLabelsInfo()
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", currentPointerId_);
         return;
     }
-    auto displayXY = CalcDrawCoordinate(displayInfo_, pointerItem);
+    auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
     if (pointerItem.IsPressed()) {
         currentPt_.SetX(displayXY.first);
         currentPt_.SetY(displayXY.second);
@@ -155,6 +189,14 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
     scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
+    if (displayInfo.screenCombination != displayInfo_.screenCombination ||
+        displayInfo.uniqueId != displayInfo_.uniqueId) {
+        if (surfaceNode_ != nullptr) {
+            surfaceNode_->ClearChildren();
+            surfaceNode_.reset();
+            isChangedMode_ = true;
+        }
+    }
     displayInfo_ = displayInfo;
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
@@ -274,10 +316,12 @@ void TouchDrawingManager::CreateObserver()
 {
     CALL_DEBUG_ENTER;
     if (!hasBubbleObserver_) {
+        MMI_HILOGI("Setup observer of show-touch-track");
         bubbleMode_.SwitchName = showCursorSwitchName;
         CreateBubbleObserver(bubbleMode_);
     }
     if (!hasPointerObserver_) {
+        MMI_HILOGI("Setup observer of show-touch-position");
         pointerMode_.SwitchName = pointerPositionSwitchName;
         CreatePointerObserver(pointerMode_);
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
@@ -356,11 +400,11 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(surfaceNode_);
-    if (canvasNode != nullptr && screenId_ == static_cast<uint64_t>(displayInfo_.id)) {
+    if (canvasNode != nullptr && screenId_ == static_cast<uint64_t>(displayInfo_.uniqueId)) {
         return;
     }
-    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}d", screenId_, displayInfo_.id);
-    screenId_ = static_cast<uint64_t>(displayInfo_.id);
+    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}d", screenId_, displayInfo_.uniqueId);
+    screenId_ = static_cast<uint64_t>(displayInfo_.uniqueId);
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
@@ -446,7 +490,7 @@ void TouchDrawingManager::CreateTouchWindow()
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
     surfaceNode_->SetRotation(0);
-    screenId_ = static_cast<uint64_t>(displayInfo_.id);
+    screenId_ = static_cast<uint64_t>(displayInfo_.uniqueId);
     if (windowScreenId_ == screenId_) {
         screenId_ = displayNodeScreenId_;
     }
@@ -486,7 +530,7 @@ void TouchDrawingManager::DrawBubble()
             MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
             return;
         }
-        auto displayXY = CalcDrawCoordinate(displayInfo_, pointerItem);
+        auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
         Rosen::Drawing::Point centerPt(displayXY.first, displayXY.second);
         Rosen::Drawing::Pen pen;
         pen.SetColor(Rosen::Drawing::Color::COLOR_BLACK);
@@ -531,7 +575,7 @@ void TouchDrawingManager::DrawPointerPositionHandler()
             MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
             return;
         }
-        auto displayXY = CalcDrawCoordinate(displayInfo_, pointerItem);
+        auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
         DrawTracker(displayXY.first, displayXY.second, pointerId);
         if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
             DrawCrosshairs(canvas, displayXY.first, displayXY.second);
@@ -602,7 +646,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
     bool find = false;
     for (auto &item : lastPointerItem_) {
         if (item.GetPointerId() == pointerId) {
-            auto displayXY = CalcDrawCoordinate(displayInfo_, item);
+            auto displayXY = WIN_MGR->CalcDrawCoordinate(displayInfo_, item);
             lastPt.SetX(displayXY.first);
             lastPt.SetY(displayXY.second);
             find = true;
@@ -878,20 +922,6 @@ void TouchDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
 
     std::string dumpInfo = oss.str();
     dprintf(fd, dumpInfo.c_str());
-}
-
-std::pair<int32_t, int32_t> TouchDrawingManager::CalcDrawCoordinate(const DisplayInfo& displayInfo,
-    PointerEvent::PointerItem pointerItem)
-{
-    CALL_DEBUG_ENTER;
-    double physicalX = pointerItem.GetRawDisplayX();
-    double physicalY = pointerItem.GetRawDisplayY();
-    if (!displayInfo.transform.empty()) {
-        auto displayXY = WIN_MGR->TransformDisplayXY(displayInfo, physicalX, physicalY);
-        physicalX = displayXY.first;
-        physicalY = displayXY.second;
-    }
-    return {static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY)};
 }
 } // namespace MMI
 } // namespace OHOS
