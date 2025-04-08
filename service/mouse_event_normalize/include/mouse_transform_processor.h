@@ -69,6 +69,8 @@ public:
         TP_RIGHT_BUTTON = 1,
         TP_LEFT_BUTTON = 2,
         TP_TWO_FINGER_TAP = 3,
+        TP_TWO_FINGER_TAP_OR_RIGHT_BUTTON = 4,
+        TP_TWO_FINGER_TAP_OR_LEFT_BUTTON = 5,
     };
 
     enum class PointerDataSource {
@@ -122,6 +124,10 @@ private:
     void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
+    void HandleTouchpadTwoFingerButtonOrRightButton(struct libinput_event_pointer* data,
+        const int32_t evenType, uint32_t &button);
+    void HandleTouchpadTwoFingerButtonOrLeftButton(struct libinput_event_pointer* data,
+        const int32_t evenType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
     double HandleAxisAccelateTouchPad(double axisValue);
 #endif // OHOS_BUILD_ENABLE_WATCH
