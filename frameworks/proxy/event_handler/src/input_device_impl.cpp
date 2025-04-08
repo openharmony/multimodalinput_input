@@ -83,8 +83,8 @@ int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDev
         std::lock_guard guard(devListenerMutex_);
         auto iter = devListener_.find(type);
         if (iter == devListener_.end()) {
-        MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
-        return RET_ERR;
+            MMI_HILOGE("Type of listener (%{public}s) is not supported", type.c_str());
+            return RET_ERR;
         }
 
         auto &listeners = iter->second;
@@ -112,6 +112,7 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Change(%{public}s) of input device(%{public}d)", type.c_str(), deviceId);
+
     std::vector<InputDevListenerPtr> listenersToNotify;
     {
         std::lock_guard guard(devListenerMutex_);
@@ -125,7 +126,7 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 
     BytraceAdapter::StartDevListener(type, deviceId);
 
-    for (const auto &item : iter->second) {
+    for (const auto &item : listenersToNotify) {
         if (type == INPUT_DEV_CHANGE_ADD_DEV) {
             item->OnDeviceAdded(deviceId, type);
         } else if (type == INPUT_DEV_CHANGE_REMOVE_DEV) {
@@ -243,7 +244,7 @@ int32_t InputDeviceImpl::RegisterInputdevice(int32_t deviceId, bool enable, std:
     CHKPR(callback, RET_ERR);
     int32_t _id;
     {
-        std::lock_guardstd::mutex guard(inputDeviceMutex);
+        std::lock_guard<std::mutex> guard(inputDeviceMutex_);
         _id = operationIndex_++;
         inputdeviceList_[_id] = callback;
     }
@@ -260,7 +261,7 @@ void InputDeviceImpl::OnSetInputDeviceAck(int32_t index, int32_t result)
     CALL_DEBUG_ENTER;
     std::function<void(int32_t)> callback;
     {
-        std::lock_guardstd::mutex guard(inputDeviceMutex_);
+        std::lock_guard<std::mutex> guard(inputDeviceMutex_);
         auto iter = inputdeviceList_.find(index);
         if (iter == inputdeviceList_.end()) {
             MMI_HILOGE("Find index failed");
@@ -276,7 +277,7 @@ void InputDeviceImpl::OnConnected()
 {
     bool shouldStartServer = false;
     {
-        std::lock_guardstd::mutex guard(devListenerMutex_);
+        std::lock_guard<std::mutex> guard(inputDeviceMutex_);
         auto iter = devListener_.find(CHANGED_TYPE);
         shouldStartServer = (iter != devListener_.end()) && !iter->second.empty();
     }
