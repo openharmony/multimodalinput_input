@@ -1267,6 +1267,30 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
     }
 }
 
+void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrRightButton(struct libinput_event_pointer *data,
+    const int32_t evenType, uint32_t &button)
+{
+    uint32_t buttonTemp = button;
+    HandleTouchpadTwoFingerButton(data, evenType, buttonTemp);
+    if (buttonTemp == mouse_device_state::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+        button = buttonTemp;
+        return;
+    }
+    HandleTouchpadRightButton(data, evenType, button);
+}
+
+void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrLeftButton(struct libinput_event_pointer *data,
+    const int32_t evenType, uint32_t &button)
+{
+    uint32_t buttonTemp = button;
+    HandleTouchpadTwoFingerButton(data, evenType, buttonTemp);
+    if (buttonTemp == mouse_device_state::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+        button = buttonTemp;
+        return;
+    }
+    HandleTouchpadLeftButton(data, evenType, button);
+}
+
 void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
@@ -1293,13 +1317,17 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         case RightClickType::TP_RIGHT_BUTTON:
             HandleTouchpadRightButton(data, evenType, button);
             break;
-
         case RightClickType::TP_LEFT_BUTTON:
             HandleTouchpadLeftButton(data, evenType, button);
             break;
-
         case RightClickType::TP_TWO_FINGER_TAP:
             HandleTouchpadTwoFingerButton(data, evenType, button);
+            break;
+        case RightClickType::TP_TWO_FINGER_TAP_OR_RIGHT_BUTTON:
+            HandleTouchpadTwoFingerButtonOrRightButton(data, evenType, button);
+            break;
+        case RightClickType::TP_TWO_FINGER_TAP_OR_LEFT_BUTTON:
+            HandleTouchpadTwoFingerButtonOrLeftButton(data, evenType, button);
             break;
         default:
             MMI_HILOGD("Invalid type, switchType:%{public}d", switchType);
