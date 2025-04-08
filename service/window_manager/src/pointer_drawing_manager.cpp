@@ -459,6 +459,10 @@ int32_t PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
+    displayId_ = displayId;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    UpdateBindDisplayId(displayId);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (surfaceNode_ != nullptr) {
         if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             return;
