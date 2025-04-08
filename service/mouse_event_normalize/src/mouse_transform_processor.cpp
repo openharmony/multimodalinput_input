@@ -1260,7 +1260,7 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrRightButton(struct 
 {
     uint32_t buttonTemp = button;
     HandleTouchpadTwoFingerButton(data, evenType, buttonTemp);
-    if (buttonTemp == mouse_device_state::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+    if (buttonTemp == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
         button = buttonTemp;
         return;
     }
@@ -1272,7 +1272,7 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrLeftButton(struct l
 {
     uint32_t buttonTemp = button;
     HandleTouchpadTwoFingerButton(data, evenType, buttonTemp);
-    if (buttonTemp == mouse_device_state::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+    if (buttonTemp == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
         button = buttonTemp;
         return;
     }
