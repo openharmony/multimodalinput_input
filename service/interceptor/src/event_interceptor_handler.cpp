@@ -276,6 +276,15 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
             continue;
         }
+        auto session = interceptor.session_;
+        if (session != nullptr) {
+            int32_t tokenType = session->GetTokenType();
+            int32_t pid = session->GetPid();
+            if (tokenType == TokenType::TOKEN_HAP && !IInputWindowsManager::GetInstance()->CheckAppFocused(pid)) {
+                MMI_HILOGD("Token hap is not focus, no need interceptor key");
+                continue;
+            }
+        }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
             interceptor.SendToClient(keyEvent);
             MMI_HILOGD("Key event was intercepted");
@@ -322,6 +331,16 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
             continue;
         }
 #endif // OHOS_BUILD_EMULATOR
+        auto session = interceptor.session_;
+        if (session != nullptr) {
+            int32_t tokenType = session->GetTokenType();
+            if ((tokenType == TokenType::TOKEN_HAP) &&
+                (IInputWindowsManager::GetInstance()->GetWindowPid(pointerEvent->GetTargetWindowId()) !=
+                session->GetPid())) {
+                MMI_HILOGD("Token hap is not hit, no need interceptor pointer");
+                continue;
+            }
+        }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
             interceptor.SendToClient(pointerEvent);
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
