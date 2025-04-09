@@ -59,6 +59,13 @@ public:
     int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
 
     /**
+     * @brief Updates the screen and window information array.
+     * @param displayGroupInfo Indicates the logical screen information array.
+     * @since 9
+     */
+    int32_t UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfo);
+
+    /**
      * @brief Updates the windows information.
      * @param windowGroupInfo Indicates the window group information.
      * @since 9

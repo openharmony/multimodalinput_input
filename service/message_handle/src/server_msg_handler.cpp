@@ -717,10 +717,11 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
         WindowInfo extensionInfo;
         pkt >> extensionInfo.id >> extensionInfo.pid >> extensionInfo.uid >> extensionInfo.area
             >> extensionInfo.defaultHotAreas >> extensionInfo.pointerHotAreas >> extensionInfo.agentWindowId
-            >> extensionInfo.flags >> extensionInfo.action >> extensionInfo.displayId >> extensionInfo.zOrder
-            >> extensionInfo.pointerChangeAreas >> extensionInfo.transform >> extensionInfo.windowInputType
-            >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag
-            >> extensionInfo.rectChangeBySystem >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen;
+            >> extensionInfo.flags >> extensionInfo.action >> extensionInfo.displayId >> extensionInfo.groupId
+            >> extensionInfo.zOrder >> extensionInfo.pointerChangeAreas >> extensionInfo.transform
+            >> extensionInfo.windowInputType >> extensionInfo.privacyMode >> extensionInfo.windowType
+            >> extensionInfo.privacyUIFlag >> extensionInfo.rectChangeBySystem
+            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen;
         info.uiExtentionWindowInfo.push_back(extensionInfo);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read extention window info failed");
@@ -746,6 +747,7 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt >> info.pointerActiveWidth >> info.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+        pkt >> info.groupId;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -775,8 +777,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         return RET_ERR;
     }
     DisplayGroupInfo displayGroupInfo;
-    pkt >> displayGroupInfo.width >> displayGroupInfo.height >>
-        displayGroupInfo.focusWindowId >> displayGroupInfo.currentUserId;
+    pkt >> displayGroupInfo.groupId >> displayGroupInfo.isMainGroup >> displayGroupInfo.width >>
+        displayGroupInfo.height >> displayGroupInfo.focusWindowId >> displayGroupInfo.currentUserId;
     uint32_t num = 0;
     pkt >> num;
     if (pkt.ChkRWError()) {
@@ -788,7 +790,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         int32_t byteCount = 0;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
-            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
+            >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType
             >> info.isSkipSelfWhenShowOnVirtualScreen >> byteCount;
 
@@ -829,7 +831,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
-            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
+            >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen;
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
