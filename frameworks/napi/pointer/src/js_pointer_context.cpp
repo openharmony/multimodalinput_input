@@ -1096,11 +1096,21 @@ napi_value JsPointerContext::CreateTouchpadRightClickType(napi_env env, napi_val
     CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_LEFT_BUTTON, &touchpad_left_button), CREATE_INT32);
     napi_value touchpad_two_finger_tap = nullptr;
     CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_TWO_FINGER_TAP, &touchpad_two_finger_tap), CREATE_INT32);
+    napi_value touchpad_two_finger_tap_or_right_button = nullptr;
+    CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON,
+        &touchpad_two_finger_tap_or_right_button), CREATE_INT32);
+    napi_value touchpad_two_finger_tap_or_left_button = nullptr;
+    CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON,
+        &touchpad_two_finger_tap_or_left_button), CREATE_INT32);
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_RIGHT_BUTTON", touchpad_right_button),
         DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_LEFT_BUTTON", touchpad_left_button),
         DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_TWO_FINGER_TAP", touchpad_two_finger_tap),
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON",
+            touchpad_two_finger_tap_or_right_button),
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON",
+            touchpad_two_finger_tap_or_left_button),
     };
     napi_value result = nullptr;
     CHKRP(napi_define_class(env, "RightClickType", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
