@@ -182,6 +182,7 @@ private:
     bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
     void StartVKeyboardDelayTimer(int32_t delayMs);
 
+    int32_t vKeyboardDeviceId_ { 0 };
     libinput_event *vkbDelayedEvent_ = nullptr;
     int32_t vkbDelayedKeyCode_ = 0;
     // set as true once subscriber succeeded.

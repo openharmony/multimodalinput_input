@@ -420,6 +420,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     bool hasPointer = false;
+    // parse physical devices for duplicate devices and pointer devices.
     for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin == inputDevice) {
             MMI_HILOGI("The device is already existent");
@@ -432,6 +433,12 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         }
         if ((!item.second.isRemote && item.second.isPointerDevice) ||
             (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
+            hasPointer = true;
+        }
+    }
+    // parse virtual devices for pointer devices.
+    for (const auto &item: virtualInputDevices_) {
+        if (IsPointerDevice(item.second)) {
             hasPointer = true;
         }
     }
@@ -463,7 +470,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     if (IsPointerDevice(inputDevice)) {
         WIN_MGR->UpdatePointerChangeAreas();
     }
-    if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
+    if (IsPointerDevice(inputDevice) && !hasPointer &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
     }
@@ -512,7 +519,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
+    if (IsPointerDevice(inputDevice) && !HasPointerDevice() && !HasVirtualPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
     }
@@ -537,6 +544,12 @@ void InputDeviceManager::ScanPointerDevice()
     bool hasPointerDevice = false;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.isPointerDevice && it->second.enable) {
+            hasPointerDevice = true;
+            break;
+        }
+    }
+    for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
+        if (it->second->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
             hasPointerDevice = true;
             break;
         }
@@ -767,6 +780,24 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
 {
     CALL_INFO_TRACE;
     CHKPR(device, RET_ERR);
+    bool hasPointer = false;
+    // parse physical devices for pointer devices.
+    for (const auto &item : inputDevice_) {
+        if ((!item.second.isRemote && item.second.isPointerDevice) ||
+            (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
+            hasPointer = true;
+        }
+    }
+    // parse physical devices for duplicate devices and pointer devices.
+    for (const auto &item: virtualInputDevices_) {
+        if (item.second->GetName() == device->GetName()) {
+            MMI_HILOGW("The virtual device already exists: %{public}s", device->GetName().c_str());
+            return RET_ERR;
+        }
+        if (IsPointerDevice(item.second)) {
+            hasPointer = true;
+        }
+    }
     if (GenerateVirtualDeviceId(deviceId) != RET_OK) {
         MMI_HILOGE("GenerateVirtualDeviceId failed");
         deviceId = INVALID_DEVICE_ID;
@@ -774,7 +805,9 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     }
     device->SetId(deviceId);
     virtualInputDevices_[deviceId] = device;
-    MMI_HILOGI("AddVirtualInputDevice successfully, deviceId:%{public}d", deviceId);
+    MMI_HILOGI("AddVirtualInputDevice successfully, deviceId:%{public}d, deviceName=%{public}s",
+        deviceId, device->GetName().c_str());
+    // in current structure, virtual devices are always enabled.
     for (const auto& item : devListeners_) {
         CHKPC(item);
         NotifyMessage(item, deviceId, "add");
@@ -785,6 +818,25 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
         return RET_ERR;
     }
     NotifyDevCallback(deviceId, deviceInfo);
+    if (!hasPointer && IsPointerDevice(device)) {
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+        if (HasTouchDevice()) {
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+        NotifyPointerDevice(true, true, true);
+        OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "true");
+        MMI_HILOGI("Set para input.pointer.device true");
+    }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (IsPointerDevice(device)) {
+        WIN_MGR->UpdatePointerChangeAreas();
+    }
+    if (IsPointerDevice(device) && !hasPointer &&
+        IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
 #endif
@@ -802,15 +854,23 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
     InputDeviceInfo deviceInfo;
     if (MakeVirtualDeviceInfo(iter->second, deviceInfo) != RET_OK) {
         MMI_HILOGE("MakeVirtualDeviceInfo failed");
+        virtualInputDevices_.erase(iter);
         return RET_ERR;
     }
     NotifyDevRemoveCallback(deviceId, deviceInfo);
-    virtualInputDevices_.erase(deviceId);
+    virtualInputDevices_.erase(iter);
     MMI_HILOGI("RemoveVirtualInputDevice successfully, deviceId:%{public}d", deviceId);
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (deviceInfo.isPointerDevice && !HasPointerDevice() && !HasVirtualPointerDevice() &&
+        IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     for (const auto& item : devListeners_) {
         CHKPC(item);
         NotifyMessage(item, deviceId, "remove");
     }
+    ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
 #endif
