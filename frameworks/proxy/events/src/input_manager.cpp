@@ -70,6 +70,11 @@ int32_t InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo
     return InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
+int32_t InputManager::UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfo)
+{
+    return InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
+}
+
 int32_t InputManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
     return InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
