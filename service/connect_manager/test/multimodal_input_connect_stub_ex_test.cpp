@@ -3363,7 +3363,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeKeyEvent_004, TestSize.Lev
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(false)))
         .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
         .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
         .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
@@ -3391,7 +3391,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeKeyEvent_005, TestSize.Lev
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(0), Return(false)))
         .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
         .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
         .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
