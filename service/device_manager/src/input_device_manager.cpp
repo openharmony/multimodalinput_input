@@ -323,7 +323,7 @@ bool InputDeviceManager::HasPointerDevice()
 bool InputDeviceManager::HasVirtualPointerDevice()
 {
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
-        if (it->second->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+        if (IsPointerDevice(it->second)) {
             return true;
         }
     }
@@ -335,7 +335,7 @@ bool InputDeviceManager::HasVirtualPointerDevice()
 bool InputDeviceManager::HasVirtualKeyboardDevice()
 {
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
-        if (it->second->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD)) {
+        if (IsKeyboardDevice(it->second)) {
             return true;
         }
     }
@@ -436,12 +436,14 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
             hasPointer = true;
         }
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     // parse virtual devices for pointer devices.
     for (const auto &item: virtualInputDevices_) {
         if (IsPointerDevice(item.second)) {
             hasPointer = true;
         }
     }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t deviceId = ParseDeviceId(inputDevice);
     if (deviceId < 0) {
         return;
@@ -548,12 +550,14 @@ void InputDeviceManager::ScanPointerDevice()
             break;
         }
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
-        if (it->second->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+        if (IsPointerDevice(it->second)) {
             hasPointerDevice = true;
             break;
         }
     }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     if (!hasPointerDevice) {
         NotifyPointerDevice(false, false, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
@@ -790,6 +794,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     }
     // parse physical devices for duplicate devices and pointer devices.
     for (const auto &item: virtualInputDevices_) {
+        CHKPC(item.second);
         if (item.second->GetName() == device->GetName()) {
             MMI_HILOGW("The virtual device already exists: %{public}s", device->GetName().c_str());
             return RET_ERR;
