@@ -3692,7 +3692,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     CHKPR(newPixelMap, RET_ERR);
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
-    if (imageInfo.size.width < cursor.focusX || imageInfo.size.width < cursor.focusY) {
+    if (imageInfo.size.width < cursor.focusX || imageInfo.size.height < cursor.focusY) {
         MMI_HILOGE("The focus is invalid");
         return RET_ERR;
     }
