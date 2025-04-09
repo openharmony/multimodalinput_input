@@ -417,8 +417,11 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
-        // always allow touchpad tap for virtual trackpad regardless of the settings.
-        tpTapSwitch = true;
+        if (!tpTapSwitch) {
+            // always allow touchpad tap for virtual trackpad regardless of the settings.
+            MMI_HILOGD("VTrackpad allows touchpad tap when setting=false.");
+            tpTapSwitch = true;
+        }
 
         unaccelerated_.dx = libinput_event_vtrackpad_get_dx_unaccelerated(data);
         unaccelerated_.dy = libinput_event_vtrackpad_get_dy_unaccelerated(data);
@@ -456,9 +459,13 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
         GetTouchpadRightClickType(switchTypeData);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+        const int32_t twoFingerSwitchType = static_cast<int32_t>(RightClickType::TP_TWO_FINGER_TAP);
+        if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT && switchTypeData != twoFingerSwitchType) {
             // always allow two finger tap to open menu for virtual trackpad regardless of the settings.
-            switchTypeData = static_cast<int32_t>(RightClickType::TP_TWO_FINGER_TAP);
+            MMI_HILOGD("VTrackpad uses menu settings %{public}d instead of %{public}d",
+                twoFingerSwitchType,
+                switchTypeData);
+            switchTypeData = twoFingerSwitchType;
         }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
         RightClickType switchType = RightClickType(switchTypeData);
@@ -1282,9 +1289,13 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
     GetTouchpadRightClickType(switchTypeData);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT) {
+    const int32_t twoFingerSwitchType = static_cast<int32_t>(RightClickType::TP_TWO_FINGER_TAP);
+    if (deviceTypeGlobal_ == DeviceType::DEVICE_FOLD_PC_VIRT && switchTypeData != twoFingerSwitchType) {
         // always allow two finger tap to open menu for virtual trackpad regardless of the settings.
-        switchTypeData = static_cast<int32_t>(RightClickType::TP_TWO_FINGER_TAP);
+        MMI_HILOGD("VTrackpad uses menu settings %{public}d instead of %{public}d",
+            twoFingerSwitchType,
+            switchTypeData);
+        switchTypeData = twoFingerSwitchType;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
