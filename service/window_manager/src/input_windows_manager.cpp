@@ -2096,6 +2096,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     auto filter = InputHandler->GetFilterHandler();
+    CHKPV(filter);
     filter->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
