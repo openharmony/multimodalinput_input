@@ -68,7 +68,9 @@
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
 #include "setting_datashare.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "app_mgr_client.h"
 #include "running_process_info.h"

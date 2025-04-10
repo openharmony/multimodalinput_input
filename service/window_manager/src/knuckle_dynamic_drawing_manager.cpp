@@ -24,7 +24,6 @@
 #include "recording/recording_canvas.h"
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
-#include "touch_drawing_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDynamicDrawingManager"
