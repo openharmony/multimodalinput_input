@@ -1234,6 +1234,10 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
         return;
     }
     canvasNode_->SetVisible(true);
+    canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    cursorWidth_ = imageWidth_;
+    cursorHeight_ = imageHeight_;
     float ratio = imageWidth_ * 1.0 / canvasWidth_;
     canvasNode_->SetPivot({RUNNING_X_RATIO * ratio, RUNNING_Y_RATIO * ratio});
     std::shared_ptr<OHOS::Media::PixelMap> pixelmap =
@@ -3594,22 +3598,17 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
 std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    if (userIcon_ == nullptr) {
-        MMI_HILOGI("userIcon_ is nullptr");
-        return nullptr;
-    }
+    CHKPP(userIcon_);
     MessageParcel data;
     userIcon_->Marshalling(data);
     std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr(OHOS::Media::PixelMap::Unmarshalling(data));
-    if (pixelMapPtr == nullptr) {
-        MMI_HILOGE("pixelMapPtr is nullptr");
-        return nullptr;
-    }
+    CHKPP(pixelMapPtr);
+    Media::ImageInfo imageInfo;
+    pixelMapPtr->GetImageInfo(imageInfo);
+    int32_t cursorSize = 1;
+    float axis = 1.0f;
     if (followSystem_) {
-        Media::ImageInfo imageInfo;
-        pixelMapPtr->GetImageInfo(imageInfo);
-        int32_t cursorSize = GetPointerSize();
-        float axis = 1.0f;
+        cursorSize = GetPointerSize();
         cursorWidth_ = pow(INCREASE_RATIO, cursorSize - 1) * imageInfo.size.width;
         cursorHeight_ = pow(INCREASE_RATIO, cursorSize - 1) * imageInfo.size.height;
         int32_t maxValue = imageInfo.size.width > imageInfo.size.height ? cursorWidth_ : cursorHeight_;
@@ -3619,17 +3618,17 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
             axis = (float)std::max(cursorWidth_, cursorHeight_) /
                 (float)std::max(imageInfo.size.width, imageInfo.size.height);
         }
-        pixelMapPtr->scale(axis, axis, Media::AntiAliasingOption::LOW);
-        cursorWidth_ = static_cast<int32_t>((float)imageInfo.size.width * axis);
-        cursorHeight_ = static_cast<int32_t>((float)imageInfo.size.height * axis);
-        userIconHotSpotX_ = static_cast<int32_t>((float)focusX_ * axis);
-        userIconHotSpotY_ = static_cast<int32_t>((float)focusY_ * axis);
-        MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d,"
-            "imageHeight:%{public}d, focusX:%{public}d, focusY:%{public}d, axis:%{public}f,"
-            "userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
-            cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
-            focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
     }
+    pixelMapPtr->scale(axis, axis, Media::AntiAliasingOption::LOW);
+    cursorWidth_ = static_cast<int32_t>((float)imageInfo.size.width * axis);
+    cursorHeight_ = static_cast<int32_t>((float)imageInfo.size.height * axis);
+    userIconHotSpotX_ = static_cast<int32_t>((float)focusX_ * axis);
+    userIconHotSpotY_ = static_cast<int32_t>((float)focusY_ * axis);
+    MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d,"
+        "imageHeight:%{public}d, focusX:%{private}d, focusY:%{private}d, axis:%{public}f,"
+        "userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
+        cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
+        focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
     SetSurfaceNodeBounds();
     return pixelMapPtr;
 }
