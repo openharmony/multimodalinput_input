@@ -435,6 +435,10 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     CalculateOffset(displayDirection, offset);
 #endif // OHOS_BUILD_EMULATOR
     int32_t ret = RET_OK;
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+        return RET_OK;
+    }
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER) &&
         pointerEvent->HasFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER)) {
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
