@@ -506,7 +506,7 @@ static void HandleTouchesProperty(napi_env env, std::shared_ptr<PointerEvent> po
     }
 }
 
-static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
+static bool HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item, int32_t action)
 {
     int32_t sourceType = 0;
@@ -525,12 +525,17 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
         MMI_HILOGE("Get screenId failed");
     }
     napi_value touchProperty = HandleTouchProperty(env, touchHandle);
-    CHKPV(touchProperty);
+    CHKPF(touchProperty);
     HandleTouchAttribute(env, pointerEvent, item, touchProperty, true);
 
     bool autoToVirtualScreen = true;
     int32_t fixedMode = 1;
     if (GetNamedPropertyInt32(env, touchHandle, "fixedMode", fixedMode, false) == RET_OK) {
+        if (fixedMode < static_cast<int32_t>(PointerEvent::FixedMode::NORMAL) ||
+            fixedMode >= static_cast<int32_t>(PointerEvent::FixedMode::SCREEN_MODE_MAX)) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fixedMode is not defined");
+            return false;
+        }
         if (fixedMode != static_cast<int32_t>(PointerEvent::FixedMode::AUTO)) {
             autoToVirtualScreen = false;
         }
@@ -550,6 +555,7 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if ((action == JS_CALLBACK_TOUCH_ACTION_MOVE) || (action == JS_CALLBACK_TOUCH_ACTION_UP)) {
         pointerEvent->UpdatePointerItem(item.GetPointerId(), item);
     }
+    return true;
 }
 
 static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
@@ -589,7 +595,9 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
     CHKPP(pointerEvent);
 
     int32_t action = HandleTouchAction(env, touchHandle, pointerEvent, item);
-    HandleTouchPropertyInt32(env, touchHandle, pointerEvent, item, action);
+    if (!HandleTouchPropertyInt32(env, touchHandle, pointerEvent, item, action)) {
+        return nullptr;
+    }
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent, pointerEvent->GetAutoToVirtualScreen());
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
