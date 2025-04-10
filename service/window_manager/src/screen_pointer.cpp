@@ -141,6 +141,7 @@ bool ScreenPointer::InitSurface()
     surfaceNode_->SetFrameGravity(Rosen::Gravity::TOP_LEFT);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->AttachToDisplay(screenId_);
+    surfaceNode_->SetBounds(0, 0, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     MMI_HILOGI("AttachToDisplay %{public}d completed", screenId_);
 
     // create canvas node
