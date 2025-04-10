@@ -56,8 +56,6 @@ ohos_shared_library("touchevent") {
     "napi:ace_napi",
   ]
 
-  cflags = [ "-fstack-protector-strong" ]
-
   relative_install_dir = "module/multimodalinput"
 
   part_name = "input"
