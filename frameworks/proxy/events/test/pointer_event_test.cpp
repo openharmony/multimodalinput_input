@@ -1012,18 +1012,18 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerId_001, TestSize.Lev
 }
 
 /**
- * @tc.name: PointerEvent_PointerItem_GetAngle_001
+ * @tc.name: PointerEvent_PointerItem_GetTwist_001
  * @tc.desc: Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerEventTest, PointerEvent_PointerItem_GetAngle_001, TestSize.Level2)
+HWTEST_F(PointerEventTest, PointerEvent_PointerItem_GetTwist_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
-    int32_t angle = 1;
+    int32_t twist = 1;
     PointerEvent::PointerItem item;
-    ASSERT_NO_FATAL_FAILURE(item.SetAngle(angle));
-    ASSERT_EQ(item.GetAngle(), angle);
+    ASSERT_NO_FATAL_FAILURE(item.SetTwist(twist));
+    ASSERT_EQ(item.GetTwist(), twist);
 }
 
 /**
@@ -2235,39 +2235,39 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckMouseFunc_007, TestSize.
 }
 
 /**
- * @tc.name: PointerEventTest_SetAngle_001
- * @tc.desc: SetAngle
+ * @tc.name: PointerEventTest_SetTwist_001
+ * @tc.desc: SetTwist
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetAngle_001, TestSize.Level2)
+HWTEST_F(PointerEventTest, PointerEventTest_SetTwist_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
-    int32_t angle = 3;
-    ASSERT_NO_FATAL_FAILURE(item.SetAngle(angle));
+    int32_t twist = 3;
+    ASSERT_NO_FATAL_FAILURE(item.SetTwist(twist));
 }
 
 /**
- * @tc.name: PointerEventTest_GetAngle_001
- * @tc.desc: GetAngle
+ * @tc.name: PointerEventTest_GetTwist_001
+ * @tc.desc: GetTwist
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_GetAngle_001, TestSize.Level2)
+HWTEST_F(PointerEventTest, PointerEventTest_GetTwist_001, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
-    int32_t angle = 3;
-    ASSERT_NO_FATAL_FAILURE(item.SetAngle(angle));
-    int32_t ret = item.GetAngle();
-    ASSERT_EQ(ret, angle);
+    int32_t twist = 3;
+    ASSERT_NO_FATAL_FAILURE(item.SetTwist(twist));
+    int32_t ret = item.GetTwist();
+    ASSERT_EQ(ret, twist);
 }
 } // namespace MMI
 } // namespace OHOS

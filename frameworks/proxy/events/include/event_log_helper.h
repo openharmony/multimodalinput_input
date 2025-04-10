@@ -286,27 +286,27 @@ private:
             }
             if (!IsBetaVersion()) {
                 MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, IP:%{public}d, P:%{public}.2f, MF:%{public}d, "
-                    "WI:%{public}d, OPI:%{public}d, SI:%{public}s, A:%{public}d",
+                    "WI:%{public}d, OPI:%{public}d, SI:%{public}s, T:%{public}d",
                     pointerId, item.IsPressed(), item.GetPressure(), item.GetMoveFlag(), item.GetTargetWindowId(),
-                    item.GetOriginPointerId(), isSimulate.c_str(), item.GetAngle());
+                    item.GetOriginPointerId(), isSimulate.c_str(), item.GetTwist());
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                     MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d,"
                         "P:%{public}.2f, MF:%{public}d, LA:%{public}d, SA:%{public}d, WI:%{public}d, "
-                        "DXP:%f, DYP:%f, WXP:%f, WYP:%f, OPI:%{public}d, A:%{public}d",
+                        "DXP:%f, DYP:%f, WXP:%f, WYP:%f, OPI:%{public}d, T:%{public}d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetPressure(), item.GetMoveFlag(), item.GetLongAxis(), item.GetShortAxis(),
                         item.GetTargetWindowId(), item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(),
-                        item.GetWindowYPos(), item.GetOriginPointerId(), item.GetAngle());
+                        item.GetWindowYPos(), item.GetOriginPointerId(), item.GetTwist());
                 } else {
                     MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, "
                         "DX:%{public}d, DY:%{public}d, P:%{public}.2f, MF:%{public}d, LA:%{public}d, SA:%{public}d, "
                         "WI:%{public}d, DXP:%{public}f, DYP:%{public}f, WXP:%{public}f, WYP:%{public}f, "
-                        "OPI:%{public}d, SI:%{public}s, A:%{public}d",
+                        "OPI:%{public}d, SI:%{public}s, T:%{public}d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetPressure(), item.GetMoveFlag(), item.GetLongAxis(), item.GetShortAxis(),
                         item.GetTargetWindowId(), item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(),
-                        item.GetWindowYPos(), item.GetOriginPointerId(), isSimulate.c_str(), item.GetAngle());
+                        item.GetWindowYPos(), item.GetOriginPointerId(), isSimulate.c_str(), item.GetTwist());
                 }
             }
         }
@@ -373,45 +373,45 @@ private:
             }
             if (!IsBetaVersion()) {
                 MMI_HILOG_HEADER(LOG_DEBUG, lh,
-                    "PI:%{public}d, IP:%{public}d, P:%{public}.2f, MF:%{public}d, ToolType:%{public}d, A:%{public}d",
+                    "PI:%{public}d, IP:%{public}d, P:%{public}.2f, MF:%{public}d, ToolType:%{public}d, T:%{public}d",
                     pointerId, item.IsPressed(), item.GetPressure(), item.GetMoveFlag(), item.GetToolType(),
-                    item.GetAngle());
+                    item.GetTwist());
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh,"PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d"
                         ", WX:%d, WY:%d, W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, "
                         "ToolWY:%d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
                         "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d, RawDisplayX:%d, "
-                        "RawDisplayY:%d, A:%{public}d",
+                        "RawDisplayY:%d, T:%{public}d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
                         item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
                         item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
                         item.GetMoveFlag(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(),
                         item.GetRawDx(), item.GetRawDy(), item.GetRawDisplayX(), item.GetRawDisplayY(),
-                        item.GetAngle());
+                        item.GetTwist());
                 } else {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh,"PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, "
                         "DX:%{public}d, DY:%{public}d, WX:%{public}d, WY:%{public}d, W:%{public}d, H:%{public}d, "
                         "TX:%{public}.2f, TY:%{public}.2f, TDX:%{public}d, TDY:%{public}d, ToolWX:%{public}d, "
                         "ToolWY:%{public}d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
                         "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%{public}d, RawDy:%{public}d"
-                        "RawDisplayX:%{public}d, RawDisplayY:%{public}d, A:%{public}d",
+                        "RawDisplayX:%{public}d, RawDisplayY:%{public}d, T:%{public}d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
                         item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
                         item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
                         item.GetMoveFlag(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(),
                         item.GetRawDx(), item.GetRawDy(), item.GetRawDisplayX(), item.GetRawDisplayY(),
-                        item.GetAngle());
+                        item.GetTwist());
                 }
             }
             if (!IsBetaVersion()) {
                 MMI_HILOG_HEADER(LOG_DEBUG, lh,
                     "PI:%{public}d" ", IP:%{public}d, P:%{public}.2f, MF:%{public}d, ToolType:%{public}d, "
-                    "A:%{public}d",
+                    "T:%{public}d",
                     pointerId, item.IsPressed(), item.GetPressure(), item.GetMoveFlag(), item.GetToolType(),
-                    item.GetAngle());
+                    item.GetTwist());
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh,
@@ -419,14 +419,14 @@ private:
                         "W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, ToolWY:%d, "
                         "ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
                         "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d, RawDisplayX:%d, "
-                        "RawDisplayY:%d, A:%{public}d",
+                        "RawDisplayY:%d, T:%{public}d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                         item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                         item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
                         item.GetToolWindowX(), item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(),
                         item.GetPressure(), item.GetMoveFlag(), item.GetToolType(), item.GetLongAxis(),
                         item.GetShortAxis(), item.GetRawDx(), item.GetRawDy(), item.GetRawDisplayX(),
-                        item.GetRawDisplayY(), item.GetAngle());
+                        item.GetRawDisplayY(), item.GetTwist());
                 } else {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh,
                         "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{public}d, DY:%{public}d, "
@@ -434,14 +434,14 @@ private:
                         "TDX:%{public}d, TDY:%{public}d, ToolWX:%{public}d, ToolWY:%{public}d, ToolW:%{public}d, "
                         "ToolH:%{public}d, P:%{public}.2f, ToolType:%{public}d, LA:%{public}d, SA:%{public}d, "
                         "RawDx:%{public}d, RawDy:%{public}d, RawDisplayX:%{public}d, RawDisplayY:%{public}d, "
-                        "A:%{public}d",
+                        "T:%{public}d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                         item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                         item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
                         item.GetToolWindowX(), item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(),
                         item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(),
                         item.GetRawDx(), item.GetRawDy(), item.GetRawDisplayX(), item.GetRawDisplayY(),
-                        item.GetAngle());
+                        item.GetTwist());
                 }
             }
         }

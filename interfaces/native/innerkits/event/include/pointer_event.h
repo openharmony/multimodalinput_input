@@ -1215,17 +1215,17 @@ public:
         void SetBlobId(int32_t blobId);
 
         /**
-         * @brief Obtains the angle in this event.
-         * @return Returns the angle.
+         * @brief Obtains the twist in this event.
+         * @return Returns the twist.
          */
-        int32_t GetAngle() const;
+        int32_t GetTwist() const;
 
         /**
-         * @brief Sets the angle in this event.
-         * @param angle Indicates the angle to set.
+         * @brief Sets the twist in this event.
+         * @param twist Indicates the twist to set.
          * @return void
          */
-        void SetAngle(int32_t angle);
+        void SetTwist(int32_t twist);
 
         /**
          * @brief Checks whether the pointer is canceled.
@@ -1304,7 +1304,7 @@ public:
         int32_t rawDisplayX_ {};
         int32_t rawDisplayY_ {};
         int32_t blobId_ {};
-        int32_t angle_ {};
+        int32_t twist_ {};
         bool canceled_ { false };
     };
 
