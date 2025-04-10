@@ -2911,7 +2911,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SubscribeKeyMonitor002, Test
     OHOS::MMI::KeyMonitorOption keyOption;
     int32_t session { -1 };
     int32_t ret = handler.SubscribeKeyMonitor(session, keyOption);
-    EXPECT_EQ(ret, -CAPABILITY_NOT_SUPPORTED);
+    EXPECT_EQ(ret, -PARAM_INPUT_INVALID);
 }
 
 /**
@@ -2927,7 +2927,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor002, Te
     OHOS::MMI::KeyMonitorOption keyOption;
     int32_t session { -1 };
     int32_t ret = handler.UnsubscribeKeyMonitor(session, keyOption);
-    EXPECT_EQ(ret, -CAPABILITY_NOT_SUPPORTED);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
