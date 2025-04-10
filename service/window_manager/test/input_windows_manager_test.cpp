@@ -8980,8 +8980,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_002, 
     windowInfo.action = WINDOW_UPDATE_ACTION::ADD;
     displayGroupInfo.windowsInfo.push_back(windowInfo);
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
     NiceMock<MockInputWindowsManager> mockInputWindowsManager;
-    EXPECT_CALL(mockInputWindowsManager, IsAncoWindow).WillOnce(Return(true));
+    EXPECT_CALL(mockInputWindowsManager, IsAncoWindow).WillRepeatedly(Return(true));
+#endif  // OHOS_BUILD_ENABLE_ANCO
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateWindowInfo(displayGroupInfo));
 
     displayGroupInfo.windowsInfo.clear();
