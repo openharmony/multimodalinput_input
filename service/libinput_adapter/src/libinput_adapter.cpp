@@ -1062,6 +1062,15 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
 	
+    InjectEventForCastWindow(touch);
+	
+    return true;
+}
+
+void LibinputAdapter::InjectEventForCastWindow(libinput_event_touch* touch)
+{
+    int64_t frameTime = GetSysClockTime();
+
     event_touch tEvent;
     tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP;
     tEvent.seat_slot = VKEY_PINCH_FIRST_FINGER_ID;
@@ -1098,8 +1107,6 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     funInputEvent_((libinput_event*)lpEvent, frameTime);
     free(lpEvent);
-	
-    return true;
 }
 
 bool LibinputAdapter::HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
