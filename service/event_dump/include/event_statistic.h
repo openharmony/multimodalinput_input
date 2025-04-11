@@ -22,18 +22,27 @@
 #include <unistd.h>
 
 #include "pointer_event.h"
+#include "key_event.h"
+#include "switch_event.h"
 
 namespace OHOS {
 namespace MMI {
 class EventStatistic final {
 public:
-    static void PushEvent(std::shared_ptr<InputEvent> eventPtr);
+    static void PushEventStr(std::string eventStr);
     static void PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr);
+    static void PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr);
+    static void PushSwitchEvent(std::shared_ptr<SwitchEvent> eventPtr);
     static std::string PopEvent();
     static void WriteEventFile();
     static void Dump(int32_t fd, const std::vector<std::string> &args);
-    static std::string ConvertEventToStr(const std::shared_ptr<InputEvent> eventPtr);
+    static std::string ConvertInputEventToStr(const std::shared_ptr<InputEvent> eventPtr);
     static std::string ConvertTimeToStr(int64_t timestamp);
+    static const char* ConvertEventTypeToString(int32_t eventType);
+    static const char* ConvertSourceTypeToString(int32_t sourceType_);
+    static const char* ConvertPointerActionToString(std::shared_ptr<PointerEvent> eventPtr);
+    static const char* ConvertKeyActionToString(int32_t keyAction);
+    static const char* ConvertSwitchTypeToString(int32_t switchType);
 
 private:
     static std::queue<std::string> eventQueue_;
