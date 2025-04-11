@@ -278,6 +278,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_01, TestSize.Le
     DelegateInterface delegateInterface(delegate, asyncFun);
     DelegateInterface::HandlerSummary summary;
     summary.handlerName = "handler1";
+    auto callback = [](std::shared_ptr<PointerEvent> event) -> int32_t {
+        return RET_OK;
+    };
+    summary.cb = callback;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
     delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
@@ -285,11 +289,11 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_01, TestSize.Le
 
     InputHandlerType type = InputHandlerType::MONITOR;
     int32_t ret = delegateInterface.AddHandler(type, summary);
-    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    EXPECT_EQ(ret, RET_OK);
 
     summary.handlerName = "handler";
     int32_t ret2 = delegateInterface.AddHandler(type, summary);
-    EXPECT_EQ(ret2, ERROR_NULL_POINTER);
+    EXPECT_EQ(ret2, RET_OK);
 }
 
 /**
@@ -310,6 +314,10 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_02, TestSize.Le
     DelegateInterface delegateInterface(delegate, asyncFun);
     DelegateInterface::HandlerSummary summary;
     summary.handlerName = "handler";
+    auto callback = [](std::shared_ptr<PointerEvent> event) -> int32_t {
+        return RET_OK;
+    };
+    summary.cb = callback;
     DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
     DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
     delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
@@ -333,7 +341,151 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_02, TestSize.Le
     newType = delegateInterface.GetEventType(type);
     EXPECT_FALSE(currentType != newType);
     int32_t ret2 = delegateInterface.AddHandler(type, summary);
-    EXPECT_EQ(ret2, ERROR_NULL_POINTER);
+    EXPECT_EQ(ret2, RET_OK);
 }
+
+/**
+ * @tc.name: DelegateInterfaceTest_OnPostAsyncTask_01
+ * @tc.desc: Test the function OnPostAsyncTask
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnPostAsyncTask_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
+    DTaskCallback myCallback = []() -> int32_t {
+        return RET_OK;
+    };
+    int32_t ret = delegateInterface.OnPostAsyncTask(myCallback);
+    EXPECT_EQ(ret, RET_OK);
+}
+/**
+ * @tc.name: DelegateInterfaceTest_OnPostAsyncTask_02
+ * @tc.desc: Test the function OnPostAsyncTask
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnPostAsyncTask_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
+    DTaskCallback myCallback = []() -> int32_t {
+        return RET_ERR;
+    };
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnPostAsyncTask(myCallback));
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_OnPostSyncTask_02
+ * @tc.desc: Test the function OnPostSyncTask
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnPostSyncTask_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
+    DTaskCallback myCallback = []() -> int32_t {
+        return RET_ERR;
+    };
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnPostSyncTask(myCallback));
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_OnInputEventHandler_02
+ * @tc.desc: Test the function OnInputEventHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnInputEventHandler_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    InputHandlerType type = InputHandlerType::NONE;
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    type = InputHandlerType::MONITOR;
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
+#endif // OHOS_BUILD_ENABLE_MONITOR
+
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    type = InputHandlerType::INTERCEPTOR;
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    auto callback = [](std::shared_ptr<PointerEvent> event) -> int32_t {
+        return RET_OK;
+    };
+    handler1.cb = callback;
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
+    handler1.mode = HandlerMode::ASYNC;
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_RemoveHandler_01
+ * @tc.desc: Test the function RemoveHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_RemoveHandler_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    std::function<int32_t(DTaskCallback)> asyncFun = [this](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate, asyncFun);
+    DelegateInterface::HandlerSummary summary;
+    summary.handlerName = "handler1";
+    auto callback = [](std::shared_ptr<PointerEvent> event) -> int32_t {
+        return RET_OK;
+    };
+    summary.cb = callback;
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers_.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers_.insert({MONITOR, handler2});
+
+    InputHandlerType type = InputHandlerType::MONITOR;
+    delegateInterface.AddHandler(type, summary);
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.RemoveHandler(type, summary.handlerName));
+    type = InputHandlerType::INTERCEPTOR;
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.RemoveHandler(type, summary.handlerName));
+}
+
 } // namespace MMI
 } // namespace OHOS
