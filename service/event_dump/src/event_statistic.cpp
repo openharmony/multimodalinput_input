@@ -178,7 +178,7 @@ void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
 
 void EventStatistic::PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr)
 {
-    CHKPV(eventPtr);
+    std::lock_guard<std::mutex> lock(queueMutex_);
     std::string eventStr = ConvertInputEventToStr(eventPtr);
     std::string keyCode = "***";
     std::string keyItemCode = "***";
