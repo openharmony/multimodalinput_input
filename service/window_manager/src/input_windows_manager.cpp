@@ -3425,10 +3425,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     for (const auto &item : windowsInfo) {
         for (const auto &windowInfo : item.uiExtentionWindowInfo) {
             if (windowInfo.id == firstBtnDownWindowInfo_.first) {
+                firstBtnDownWindowInfo_.second = pointerEvent->GetTargetDisplayId();
                 return std::make_optional(windowInfo);
             }
         }
         if (item.id == firstBtnDownWindowInfo_.first) {
+            firstBtnDownWindowInfo_.second = pointerEvent->GetTargetDisplayId();
             return std::make_optional(item);
         }
     }
