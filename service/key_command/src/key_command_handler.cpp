@@ -3082,17 +3082,16 @@ void KeyCommandHandler::UnregisterProximitySensor()
         MMI_HILOGI("Has registered sensor: %{public}d", SENSOR_TYPE_ID_PROXIMITY);
         return;  
     }
+    hasRegisteredSensor_ = false;
     int32_t ret = DeactiveSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user)
     if (ret != 0) {
         MMI_HILOGE("Failed to DeactiveSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
-        return;
     }
     ret = UnsubscribeSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
     if (ret != 0) {
         MMI_HILOGE("Failed to UnsubscribeSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
-        return;
     }
-    hasRegisteredSensor_ = false;
+
 }
 } // namespace MMI
 } // namespace OHOS
