@@ -1075,11 +1075,10 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     }
     if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
         !IsMusicActivate()) {
-        if (PRODUCT_TYPE == "VDE") {
+        if (PRODUCT_TYPE == "VDE" && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
             RegisterProximitySensor();
             int32_t timerId = TimerMgr->AddTimer(FREQUENCY, 1, [this]() {
                 UnregisterProximitySensor();
-                hasRegisteredSensor_ = false;
             });
             if (timerId < 0) {
                 MMI_HILOGE("Add timer failed");
@@ -2994,7 +2993,6 @@ void KeyCommandHandler::RegisterProximitySensor()
         MMI_HILOGD("Screen not fold");
         return;
     }
-    hasRegisteredSensor_ = true;
     g_user.callback = SensorDataCallbackImpl;
     int32_t ret = SubscribeSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
     if (ret != 0) {
@@ -3009,7 +3007,9 @@ void KeyCommandHandler::RegisterProximitySensor()
     ret = ActivateSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
     if (ret != 0) {
         MMI_HILOGE("Failed to ActivateSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+        return;
     }
+    hasRegisteredSensor_ = true;
 }
 
 int32_t KeyCommandHandler::SetKnuckleSwitch(bool knuckleSwitch)
@@ -3078,6 +3078,10 @@ int32_t KeyCommandHandler::LaunchAiScreenAbility(int32_t pid)
 
 void KeyCommandHandler::UnregisterProximitySensor()
 {
+    if (!hasRegisteredSensor_) {
+        MMI_HILOGI("Has registered sensor: %{public}d", SENSOR_TYPE_ID_PROXIMITY);
+        return;  
+    }
     int32_t ret = DeactiveSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user)
     if (ret != 0) {
         MMI_HILOGE("Failed to DeactiveSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
@@ -3088,6 +3092,7 @@ void KeyCommandHandler::UnregisterProximitySensor()
         MMI_HILOGE("Failed to UnsubscribeSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
         return;
     }
+    hasRegisteredSensor_ = false;
 }
 } // namespace MMI
 } // namespace OHOS
