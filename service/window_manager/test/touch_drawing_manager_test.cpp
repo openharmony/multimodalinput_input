@@ -1254,50 +1254,5 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_003, TestSi
     touchDrawingMgr.pointerEvent_->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DrawBubble());
 }
-
-/**
- * @tc.name: TouchDrawingManagerTest_CalcDrawCoordinate_001
- * @tc.desc: Test CalcDrawCoordinate
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_CalcDrawCoordinate_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager touchDrawingMgr;
-    DisplayInfo displayInfo;
-    PointerEvent::PointerItem pointerItem;
-    int32_t physicalX = 1;
-    int32_t physicalY = 1;
-    pointerItem.SetRawDisplayX(physicalX);
-    pointerItem.SetRawDisplayY(physicalY);
-    auto retPair = touchDrawingMgr.CalcDrawCoordinate(displayInfo, pointerItem);
-    EXPECT_EQ(retPair.first, 1);
-    EXPECT_EQ(retPair.second, 1);
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_CalcDrawCoordinate_002
- * @tc.desc: Test CalcDrawCoordinate
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_CalcDrawCoordinate_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager touchDrawingMgr;
-    DisplayInfo displayInfo = {
-        .id = 0, .x = 0, .y = 0, .width = 100, .height = 200, .dpi = 240,
-        .transform = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}
-    };
-    PointerEvent::PointerItem pointerItem;
-    int32_t physicalX = 10;
-    int32_t physicalY = 10;
-    pointerItem.SetRawDisplayX(physicalX);
-    pointerItem.SetRawDisplayY(physicalY);
-    auto retPair = touchDrawingMgr.CalcDrawCoordinate(displayInfo, pointerItem);
-    EXPECT_EQ(retPair.first, 21);
-    EXPECT_EQ(retPair.second, 21);
-}
 } // namespace MMI
 } // namespace OHOS

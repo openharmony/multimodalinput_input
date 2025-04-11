@@ -68,7 +68,9 @@
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
 #include "setting_datashare.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "app_mgr_client.h"
 #include "running_process_info.h"
@@ -153,10 +155,12 @@ typedef int32_t (*VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)(IRemoteObject* &vkeyboar
 VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE vkeyboard_createVKeyboardDevice_ = nullptr;
 typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcKeyEvent);
 VKEYBOARD_ONFUNCKEYEVENT_TYPE vkeyboard_onFuncKeyEvent_ = nullptr;
-typedef void (*VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)();
+typedef void (*VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)(const std::string &keyName);
 VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE vkeyboard_hardwareKeyEventDetected_ = nullptr;
 typedef int32_t (*VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)();
 VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE vkeyboard_getKeyboardActivationState_ = nullptr;
+typedef bool (*GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE)();
+GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE gaussiankeyboard_isFloatingKeyboard_ = nullptr;
 
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
@@ -1224,6 +1228,7 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
         return COMMON_PARAMETER_ERROR;
     }
     auto tmpDevice = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    CHKPR(tmpDevice, COMMON_PARAMETER_ERROR);
     inputDevice->SetId(tmpDevice->GetId());
     inputDevice->SetType(tmpDevice->GetType());
     inputDevice->SetName(tmpDevice->GetName());
@@ -1828,6 +1833,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         libinputAdapter_.RegisterBootStatusReceiver();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+#ifdef OHOS_BUILD_ENABLE_ANCO
+        WIN_MGR->InitializeAnco();
+#endif // OHOS_BUILD_ENABLE_ANCO
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
@@ -2073,6 +2081,23 @@ int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
         );
     if (ret != RET_OK) {
         MMI_HILOGE("The unsubscribe switch event processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_SWITCH
+    return RET_OK;
+}
+
+int32_t MMIService::QuerySwitchStatus(int32_t switchType, int32_t& state)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, switchType, &state] {
+            return sMsgHandler_.OnQuerySwitchStatus(switchType, state);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The query switch state processed failed, ret:%{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_SWITCH
@@ -2343,6 +2368,9 @@ void MMIService::PreEventLoop()
     SetupTouchGestureHandler();
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     libinputAdapter_.ProcessPendingEvents();
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+    TOUCH_DRAWING_MGR->Initialize();
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
 }
 
 bool MMIService::InitSignalHandler()
@@ -3206,6 +3234,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "HardwareKeyEventDetected");
             vkeyboard_getKeyboardActivationState_ = (VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)dlsym(
                 g_VKeyboardHandle, "GetKeyboardActivationState");
+            gaussiankeyboard_isFloatingKeyboard_ = (GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE)dlsym(
+                g_VKeyboardHandle, "IsFloatingKeyboard");
 
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
                 statemachineMessageQueue_getLibinputMessage_,
@@ -3214,7 +3244,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 trackPadEngine_getAllKeyMessage_,
                 trackPadEngine_clearKeyMessage_,
                 vkeyboard_hardwareKeyEventDetected_,
-                vkeyboard_getKeyboardActivationState_);
+                vkeyboard_getKeyboardActivationState_,
+                gaussiankeyboard_isFloatingKeyboard_);
         }
     }
 }
@@ -3754,7 +3785,9 @@ int32_t MMIService::SyncKnuckleStatus()
 
 int32_t MMIService::SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId)
 {
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     return RET_OK;
 }
 
@@ -3770,6 +3803,42 @@ int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNo
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MMIService::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPR(eventKeyCommandHandler, RET_ERR);
+    int32_t ret = delegateTasks_.PostAsyncTask(
+        [knuckleSwitch, eventKeyCommandHandler] {
+            return eventKeyCommandHandler->SetKnuckleSwitch(knuckleSwitch);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetKnuckleSwitch failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::LaunchAiScreenAbility()
+{
+    int32_t pid = GetCallingPid();
+    int ret = delegateTasks_.PostSyncTask(
+        [pid] {
+        auto keyHandler = InputHandler->GetKeyCommandHandler();
+        if (keyHandler == nullptr) {
+            return RET_ERR;
+        }
+        return keyHandler->LaunchAiScreenAbility(pid);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("LaunchAiScreenAbility failed, return:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -23,6 +23,7 @@ namespace MMI {
 inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
 
 inline constexpr int32_t DEFAULT_DISPLAY_ID = -1;
+inline constexpr int32_t DEFAULT_GROUP_ID = -1;
 
 enum SecureFlag {
     DEFAULT_MODE = 0,
@@ -291,6 +292,13 @@ struct WindowInfo {
     int32_t displayId { DEFAULT_DISPLAY_ID };
 
     /**
+     * display group ID
+     *
+     * @since 16
+     */
+    int32_t groupId { DEFAULT_GROUP_ID };
+
+    /**
      * Window order in Z-index
      *
      * @since 9
@@ -519,6 +527,19 @@ struct DisplayInfo {
      * @since 12
      */
     int32_t pointerActiveHeight { 0 };
+
+    /** Unique ID of the physical display
+     *
+     * @since 12
+     */
+    int32_t uniqueId { 0 };
+
+	/**
+     * Display group ID
+     *
+     * @since 16
+     */
+    int32_t groupId { DEFAULT_GROUP_ID };
 };
 
 /**
@@ -527,6 +548,20 @@ struct DisplayInfo {
  * @since 9
  */
 struct DisplayGroupInfo {
+    /**
+     * index of group. default=-1
+     *
+     * @since 16
+     */
+    int32_t groupId { DEFAULT_GROUP_ID };
+
+    /**
+     * main group flag. default=true
+     *
+     * @since 16
+     */
+    bool isMainGroup { true };
+
     /**
      * Width of the logical display
      *

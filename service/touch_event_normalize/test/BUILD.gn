@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("../../../multimodalinput_mini.gni")
 
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 
 ohos_unittest("TouchEventNormalizeTest") {
   module_out_path = module_output_path
@@ -882,6 +882,51 @@ ohos_unittest("TouchGestureAdapterTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+  ]
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
+}
+
+ohos_unittest("TouchGestureManagerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./../../ipc_blocklist.txt"
+  }
+
+  include_dirs = [ "${mmi_path}/service/touch_event_normalize/include" ]
+
+  sources = [ "src/touch_gesture_manager_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "libinput:libinput-third-mmi",

@@ -84,6 +84,16 @@ void KeyOption::SetRepeat(bool repeat)
     isRepeat_ = repeat;
 }
 
+int32_t KeyOption::GetPriority() const
+{
+    return priority_;
+}
+
+void KeyOption::SetPriority(int32_t priority)
+{
+    priority_ = priority;
+}
+
 bool KeyOption::ReadFromParcel(Parcel &in)
 {
     int32_t preKeysSize = 0;
@@ -106,7 +116,8 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         in.ReadBool(isFinalKeyDown_) &&
         in.ReadInt32(finalKeyDownDuration_) &&
         in.ReadInt32(finalKeyUpDelay_) &&
-        in.ReadBool(isRepeat_)
+        in.ReadBool(isRepeat_) &&
+        in.ReadInt32(priority_)
     );
 }
 
@@ -127,7 +138,8 @@ bool KeyOption::WriteToParcel(Parcel &out) const
         out.WriteBool(isFinalKeyDown_) &&
         out.WriteInt32(finalKeyDownDuration_) &&
         out.WriteInt32(finalKeyUpDelay_) &&
-        out.WriteBool(isRepeat_)
+        out.WriteBool(isRepeat_) &&
+        out.WriteInt32(priority_)
     );
 }
 

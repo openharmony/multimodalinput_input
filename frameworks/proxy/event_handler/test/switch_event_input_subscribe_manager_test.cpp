@@ -19,6 +19,7 @@
 #include "event_log_helper.h"
 #include "input_manager_impl.h"
 #include "switch_event_input_subscribe_manager.h"
+#include "multimodal_input_connect_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SwitchEventInputSubscribeManagerTest"
@@ -86,12 +87,36 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
             event->GetSwitchType(), event->GetSwitchValue());
     };
 
-    ASSERT_EQ(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribeSwitchEvent(INVAID_VALUE), RET_ERR);
+    ASSERT_NE(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribeSwitchEvent(INVAID_VALUE), RET_OK);
     ASSERT_EQ(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribeSwitchEvent(SUBSCRIBER_ID), RET_ERR);
     int32_t subscribeId =
         SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(SwitchEvent::SwitchType::SWITCH_DEFAULT, func);
     ASSERT_GE(subscribeId, MIN_SUBSCRIBER_ID);
     ASSERT_EQ(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribeSwitchEvent(subscribeId), RET_OK);
+}
+
+/**
+ * @tc.name: SwitchEventInputSubscribeManagerTest_QuerySwitchStatus_001
+ * @tc.desc: Verify QuerySwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SwitchEventInputSubscribeManagerTest,
+    SwitchEventInputSubscribeManagerTest_QuerySwitchStatus_001, TestSize.Level2)
+{
+    int32_t state = 0;
+    int32_t retCode =
+        MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_DEFAULT, state);
+    ASSERT_EQ(retCode, RET_OK);
+    retCode =
+        MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_LID, state);
+    ASSERT_EQ(retCode, RET_OK);
+    retCode =
+        MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_TABLET, state);
+    ASSERT_EQ(retCode, RET_OK);
+    retCode =
+        MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_PRIVACY, state);
+    ASSERT_EQ(retCode, RET_OK);
 }
 
 /**

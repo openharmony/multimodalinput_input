@@ -66,7 +66,7 @@ uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const DisplayInfo &di)
     : hwcMgr_(hwcMgr), handler_(handler)
 {
-    screenId_ = di.id;
+    screenId_ = di.uniqueId;
     width_ = di.width;
     height_ = di.height;
     rotation_ = static_cast<rotation_t>(di.direction);
@@ -82,7 +82,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const D
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_info_ptr_t si)
     : hwcMgr_(hwcMgr), handler_(handler)
 {
-    screenId_ = si->GetScreenId();
+    screenId_ = si->GetRsId();
     width_ = GetScreenInfoWidth(si);
     height_ = GetScreenInfoHeight(si);
     mode_ = si->GetSourceMode();
@@ -141,6 +141,7 @@ bool ScreenPointer::InitSurface()
     surfaceNode_->SetFrameGravity(Rosen::Gravity::TOP_LEFT);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->AttachToDisplay(screenId_);
+    surfaceNode_->SetBounds(0, 0, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     MMI_HILOGI("AttachToDisplay %{public}d completed", screenId_);
 
     // create canvas node
@@ -165,13 +166,13 @@ bool ScreenPointer::InitSurface()
 
 void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
 {
-    auto id = si->GetScreenId();
+    auto id = si->GetRsId();
     if (screenId_ != id) {
         surfaceNode_->AttachToDisplay(id);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
 
-    screenId_ = si->GetScreenId();
+    screenId_ = si->GetRsId();
     width_ = GetScreenInfoWidth(si);
     height_ = GetScreenInfoHeight(si);
     mode_ = si->GetSourceMode();
@@ -187,7 +188,7 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
 
 void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
 {
-    if (screenId_ != uint32_t(di.id)) {
+    if (screenId_ != uint32_t(di.uniqueId)) {
         return;
     }
 
@@ -301,6 +302,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
+    if (IsPositionOutScreen(x, y)) {
+        MMI_HILOGE("Position out of screen");
+    }
 
     int32_t px = 0;
     int32_t py = 0;
@@ -329,6 +333,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(surfaceNode_);
+    if (IsPositionOutScreen(x, y)) {
+        MMI_HILOGE("Position out of screen");
+    }
     int32_t px = 0;
     int32_t py = 0;
     if (IsMirror()) {
@@ -386,6 +393,19 @@ float ScreenPointer::GetRenderDPI() const
     } else {
         return dpi_ * scale_;
     }
+}
+
+bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
+{
+    if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
+        CalculateHwcPositionForExtend(x, y);
+    }
+    if (x < 0 || y < 0 || x > width_ || y > height_) {
+        MMI_HILOGE("Position out of screen, x=%{public}d, y=%{public}d, width=%{public}u, height=%{public}u",
+            x, y, width_, height_);
+        return true;
+    }
+    return false;
 }
 
 } // namespace OHOS::MMI

@@ -52,6 +52,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    int32_t UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfo);
     int32_t UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
@@ -67,6 +68,7 @@ public:
     int32_t UnsubscribeKeyMonitor(int32_t subscriberId);
     int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
+    int32_t QuerySwitchStatus(int32_t switchTpe, int32_t& state);
     int32_t SubscribeTabletProximity(std::function<void(std::shared_ptr<PointerEvent>)> callback);
     void UnsubscribetabletProximity(int32_t subscriberId);
     int32_t SubscribeLongPressEvent(const LongPressRequest &LongPressRequest,
@@ -85,6 +87,7 @@ public:
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
+    int32_t SetKnuckleSwitch(bool knuckleSwitch);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -92,7 +95,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    int32_t PackDisplayData(NetPacket &pkt);
+    int32_t PackDisplayData(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
@@ -238,17 +241,18 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
+    int32_t LaunchAiScreenAbility();
 
 private:
-    int32_t PackWindowInfo(NetPacket &pkt);
+    int32_t PackWindowInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
-    int32_t PackDisplayInfo(NetPacket &pkt);
+    int32_t PackDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
     int32_t PackUiExtentionWindowInfo(const std::vector<WindowInfo>& windowsInfo, NetPacket &pkt);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo);
-    void PrintDisplayInfo();
+    void PrintDisplayInfo(DisplayGroupInfo &displayGroupInfo);
     void PrintWindowGroupInfo();
-    int32_t SendDisplayInfo();
+    int32_t SendDisplayInfo(DisplayGroupInfo &displayGroupInfo);
     int32_t SendWindowInfo();
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
     bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);
@@ -292,6 +296,8 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::function<void(int32_t, int32_t)> windowStatecallback_;
+    bool knuckleSwitch_ { true };
+    std::vector<DisplayGroupInfo> displayGroupInfoArray_;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;

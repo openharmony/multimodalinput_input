@@ -176,6 +176,7 @@ public:
     static void ReportFailSubscribeKey(std::string functionName, std::string subscribeName,
         int32_t keyCode, int32_t errorCode);
     static void ReportFailHandleKey(std::string name, int32_t keyCode, int32_t errorCode);
+    static void ReportCallingMute();
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };

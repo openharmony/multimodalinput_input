@@ -33,18 +33,20 @@ UDSServer::~UDSServer()
 void UDSServer::UdsStop()
 {
     if (epollFd_ != -1) {
-        close(epollFd_);
+        int32_t tmpFd = epollFd_;
         epollFd_ = -1;
+        close(tmpFd);
     }
-    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
-    for (const auto &item : sessionsMap_) {
+    auto tmpMap = GetSessionMapCopy();
+    for (const auto &item : tmpMap) {
         item.second->Close();
     }
-    sessionsMap_.clear();
+    ClearSessionMap();
 }
 
 int32_t UDSServer::GetClientFd(int32_t pid) const
 {
+    std::lock_guard<std::mutex> lock(idxPidMapMutex_);
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
         if (pid_ != pid) {
@@ -58,13 +60,12 @@ int32_t UDSServer::GetClientFd(int32_t pid) const
 
 int32_t UDSServer::GetClientPid(int32_t fd) const
 {
-    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
-    auto it = sessionsMap_.find(fd);
-    if (it == sessionsMap_.end()) {
+    auto sp = GetSession(fd);
+    if (sp == nullptr) {
         MMI_HILOGE("Not found fd:%{public}d", fd);
         return INVALID_PID;
     }
-    return it->second->GetPid();
+    return sp->GetPid();
 }
 
 bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
@@ -100,6 +101,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         MMI_HILOGE("Call socketpair failed, errno:%{public}d", errno);
         return RET_ERR;
     }
+    fdsan_exchange_owner_tag(sockFds[0], 0, TAG);
+    fdsan_exchange_owner_tag(sockFds[1], 0, TAG);
     serverFd = sockFds[0];
     toReturnClientFd = sockFds[1];
     if (serverFd < 0 || toReturnClientFd < 0) {
@@ -133,9 +136,9 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     return RET_OK;
 
     CLOSE_SOCK:
-    close(serverFd);
+    fdsan_close_with_tag(sockFds[0], TAG);
     serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
-    close(toReturnClientFd);
+    fdsan_close_with_tag(sockFds[1], TAG);
     toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     return RET_ERR;
 }
@@ -189,10 +192,10 @@ int32_t UDSServer::SetFdProperty(int32_t &tokenType, int32_t &serverFd, int32_t 
 void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
     mprintf(fd, "Uds_server information:\t");
-    mprintf(fd, "uds_server: count=%zu", sessionsMap_.size());
-    for (const auto &item : sessionsMap_) {
+    mprintf(fd, "uds_server: count=%zu", GetSessionSize());
+    auto tmpMap = GetSessionMapCopy();
+    for (const auto &item : tmpMap) {
         std::shared_ptr<UDSSession> udsSession = item.second;
         CHKPV(udsSession);
         mprintf(fd,
@@ -245,7 +248,7 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     } else {
         MMI_HILOGE("Can't find fd");
     }
-    if (close(fd) == RET_OK) {
+    if (fdsan_close_with_tag(fd, TAG) == RET_OK) {
         DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     } else {
         DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
@@ -325,7 +328,8 @@ void UDSServer::DumpSession(const std::string &title)
 {
     MMI_HILOGD("in %s: %s", __func__, title.c_str());
     int32_t i = 0;
-    for (auto &[key, value] : sessionsMap_) {
+    auto tmpMap = GetSessionMapCopy();
+    for (auto &[key, value] : tmpMap) {
         CHKPV(value);
         MMI_HILOGD("%d, %s", i, value->GetDescript().c_str());
         i++;
@@ -342,6 +346,50 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
     }
     CHKPP(it->second);
     return it->second->GetSharedPtr();
+}
+
+void UDSServer::EarseSessionByFd(int32_t fd)
+{
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
+    auto it = sessionsMap_.find(fd);
+    if (it == sessionsMap_.end()) {
+        MMI_HILOGI("Session not found. fd:%{public}d", fd);
+        return;
+    }
+    sessionsMap_.erase(it);
+}
+
+size_t UDSServer::GetSessionSize()
+{
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
+    return sessionsMap_.size();
+}
+
+bool UDSServer::InsertSession(int32_t fd, SessionPtr sp)
+{
+    if (fd < 0 || sp == nullptr) {
+        MMI_HILOGE("invalid param");
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
+    sessionsMap_[fd] = sp;
+    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
+        MMI_HILOGW("Too many clients. Warning Value:%{public}d, Current Value:%{public}zd",
+                   MAX_SESSON_ALARM, sessionsMap_.size());
+    }
+    return true;
+}
+
+std::map<int32_t, SessionPtr> UDSServer::GetSessionMapCopy()
+{
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
+    return sessionsMap_;
+}
+
+void UDSServer::ClearSessionMap()
+{
+    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
+    sessionsMap_.clear();
 }
 
 SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
@@ -371,14 +419,14 @@ bool UDSServer::AddSession(SessionPtr ses)
         MMI_HILOGE("Get process failed");
         return false;
     }
-    idxPidMap_[pid] = fd;
-    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
-    sessionsMap_[fd] = ses;
-    DumpSession("AddSession");
-    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        MMI_HILOGW("Too many clients. Warning Value:%{public}d, Current Value:%{public}zd",
-                   MAX_SESSON_ALARM, sessionsMap_.size());
+    {
+        std::lock_guard<std::mutex> lock(idxPidMapMutex_);
+        idxPidMap_[pid] = fd;
     }
+    if (InsertSession(fd, ses) != true) {
+        return false;
+    }
+    DumpSession("AddSession");
     MMI_HILOGI("AddSession end");
     return true;
 }
@@ -394,13 +442,13 @@ void UDSServer::DelSession(int32_t fd)
     auto pid = GetClientPid(fd);
     MMI_HILOGI("The pid:%{public}d", pid);
     if (pid > 0) {
+        std::lock_guard<std::mutex> lock(idxPidMapMutex_);
         idxPidMap_.erase(pid);
     }
-    std::lock_guard<std::mutex> lock(sessionsMapMutex_);
-    auto it = sessionsMap_.find(fd);
-    if (it != sessionsMap_.end()) {
-        NotifySessionDeleted(it->second);
-        sessionsMap_.erase(it);
+    SessionPtr sp = GetSession(fd);
+    if (sp != nullptr) {
+        NotifySessionDeleted(sp);
+        EarseSessionByFd(fd);
     }
     DumpSession("DelSession");
 }

@@ -17,7 +17,7 @@ import("../multimodalinput_mini.gni")
 
 defines = input_default_defines
 
-module_output_path = "multimodalinput/mmi_unit_out"
+module_output_path = "input/input"
 
 config("libmmi_util_public_config") {
   include_dirs = [
