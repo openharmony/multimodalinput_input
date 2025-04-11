@@ -1863,9 +1863,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
     if (systemAbilityId == SENSOR_SERVICE_ABILITY_ID) {
-        auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
-        CHKPV(eventKeyCommandHandler);
-        eventKeyCommandHandler->RegisterProximitySensor();
+        MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);
     }
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
 }
