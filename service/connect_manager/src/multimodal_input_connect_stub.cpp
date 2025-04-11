@@ -43,6 +43,7 @@ constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 constexpr int32_t MAX_SPEED { 20 };
 constexpr int32_t MIN_SPEED { 1 };
 constexpr int32_t KEY_MAX_LIST_SIZE { 5 };
+constexpr int32_t CALL_MANAGER_UID { 5523 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -1529,6 +1530,11 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
     if (!keyOption->ReadFromParcel(data)) {
         MMI_HILOGE("Read keyOption failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t callingUid = GetCallingUid();
+    if (keyOption->GetPriority() > SubscribePriority::PRIORITY_0 && callingUid != CALL_MANAGER_UID) {
+        MMI_HILOGE("CallingUid is not within the range:%{public}d", callingUid);
+        return RET_ERR;
     }
     int32_t ret = SubscribeKeyEvent(subscribeId, keyOption);
     if (ret != RET_OK) {
