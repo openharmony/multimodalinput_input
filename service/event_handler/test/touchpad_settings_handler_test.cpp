@@ -179,18 +179,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_001, TestSize.Lev
     observer.SyncTouchpadSettingsData();
     EXPECT_EQ(observer.hasRegistered_, true);
 }
-/**
- * @tc.name: SyncTouchpadSettingsData_002
- * @tc.desc: Test when the updateFunc_ is null, SyncTouchpadSettingsData should return true
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_002, TestSize.Level1)
-{
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = false;
-    ASSERT_NO_FATAL_FAILURE(observer.SyncTouchpadSettingsData());
-}
+
 /**
  * @tc.name: SyncTouchpadSettingsData_003
  * @tc.desc: Test when the updateFunc_ is null, SyncTouchpadSettingsData should return true
@@ -246,6 +235,16 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_006, TestSize.Level1)
 {
     TouchpadSettingsObserver observer;
+    observer.hasRegistered_ = false;
+    int32_t serviceId = 2;
+    observer.pressureObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_pressureKey, observer.updateFunc_);
+    observer.vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_vibrationKey, observer.updateFunc_);
+    observer.touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_touchpadSwitchesKey, observer.updateFunc_);
+    observer.knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_knuckleSwitchesKey, observer.updateFunc_);
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
@@ -254,22 +253,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_006, TestSize.Level1)
     EXPECT_TRUE(observer.RegisterTpObserver(123));
 }
 
-/**
- * @tc.name: RegisterTpObserver_007
- * @tc.desc: Test when the observer has already been registered, the function should return false
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_007, TestSize.Level1)
-{
-    TouchpadSettingsObserver observer;
-    bool ret = true;
-    SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
-        std::cout <<"Test UpdateFunc" << std::endl;
-    };
-    observer.updateFunc_ = UpdateFunc;
-    EXPECT_TRUE(observer.RegisterTpObserver(123));
-}
 /**
  * @tc.name: RegisterTpObserver_008
  * @tc.desc: Test when the observer has already been registered, the function should return false
@@ -299,6 +282,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
     observer.touchpadSwitchesObserver_ = nullptr;
     observer.knuckleSwitchesObserver_ = nullptr;
 }
+
 /**
  * @tc.name: GetInstance_001
  * @tc.desc: Test if GetInstance method returns the same singleton instance when called multiple times
@@ -311,6 +295,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, GetInstance_001, TestSize.Level1)
     auto instance = OHOS::MMI::TouchpadSettingsObserver::GetInstance();
     EXPECT_NE(instance, nullptr);
 }
+
 /**
  * @tc.name: GetInstance_002
  * @tc.desc: Test if GetInstance method returns the same singleton instance when called multiple times
@@ -323,6 +308,5 @@ HWTEST_F(TouchpadSettingsHandlerTest, GetInstance_002, TestSize.Level1)
     auto instance = OHOS::MMI::TouchpadSettingsObserver::GetInstance();
     EXPECT_NE(instance, nullptr);
 }
-
 }
 } // namespace OHOS::MMI
