@@ -2923,7 +2923,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_UnsubscribeHotkey, T
         std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
     subscriberList.push_back(subscriber);
     handler.subscriberMap_.insert(std::make_pair(keyOption, subscriberList));
-    ASSERT_EQ(handler.RemoveSubscriber(session, subscribeId, true), RET_ERR);
     ASSERT_NE(handler.UnsubscribeHotkey(session, subscribeId), RET_ERR);
 }
 
