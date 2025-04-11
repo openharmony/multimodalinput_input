@@ -46,6 +46,7 @@ public:
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
     void SetCurrentShieldMode(int32_t shieldMode);
     int32_t GetCurrentShieldMode();
+    bool IsScreenFold();
 
 private:
     void ReadProductConfig(InputProductConfig &config) const;
