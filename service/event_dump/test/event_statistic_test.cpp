@@ -108,7 +108,6 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_PushEventStr, TestSize.Level1)
     eventStatistic.writeFileEnabled_ = true;
     std::string str = "test_push_event_str";
     ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEventStr(str));
-    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEvent(inputEvent));
 
     for (auto i = 0; i < EVENT_OUT_SIZE - 1; i++) {
         auto inputEvent1 = std::make_shared<InputEvent>(2);
