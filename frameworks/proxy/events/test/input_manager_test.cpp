@@ -5319,6 +5319,82 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_019, TestSize.Leve
 }
 
 /*
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_022
+ * @tc.desc: Verify subscribe KEYCODE_HEADSETHOOK and high priority and uid is not within the range event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_022, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_HEADSETHOOK);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    keyOption->SetPriority(SubscribePriority::PRIORITY_100);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event KEYCODE_HOME down trigger callback");
+    });
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/*
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_023
+ * @tc.desc: Verify subscribe KEYCODE_HOME and high priority event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_023, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_HOME);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    keyOption->SetPriority(SubscribePriority::PRIORITY_100);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event KEYCODE_HOME down trigger callback");
+    });
+    EXPECT_TRUE(subscribeId < 0);
+}
+
+/*
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_024
+ * @tc.desc: Verify subscribe KEYCODE_HEADSETHOOK and low priority event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_024, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_HEADSETHOOK);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    keyOption->SetPriority(SubscribePriority::PRIORITY_0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event KEYCODE_HOME down trigger callback");
+    });
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    EXPECT_TRUE(subscribeId >= 0);
+#else
+    EXPECT_TRUE(subscribeId < 0);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+/*
  * @tc.name: InputManagerTest_AddPreMonitor_001
  * @tc.desc: AddPreMonitor.
  * @tc.type: FUNC
