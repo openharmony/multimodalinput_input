@@ -37,12 +37,12 @@ public:
 };
 
 /**
- * @tc.name: EventDumpTest_ConvertEventToStr
- * @tc.desc: Event dump ConvertEventToStr
+ * @tc.name: EventDumpTest_ConvertInputEventToStr
+ * @tc.desc: Event dump ConvertInputEventToStr
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertEventToStr, TestSize.Level1)
+HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertInputEventToStr, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventStatistic eventStatistic;
@@ -52,7 +52,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertEventToStr, TestSize.Leve
     inputEvent->deviceId_ = 2;
     inputEvent->sourceType_ = 6;
     std::string str = "";
-    str = eventStatistic.ConvertEventToStr(inputEvent);
+    str = eventStatistic.ConvertInputEventToStr(inputEvent);
     ASSERT_FALSE(str.empty());
 }
 
@@ -96,26 +96,26 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerEvent, TestSize.Level
 }
 
 /**
- * @tc.name: EventDumpTest_PushEvent
- * @tc.desc: Event dump PushEvent
+ * @tc.name: EventDumpTest_PushEventStr
+ * @tc.desc: Event dump PushEventStr
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventStatisticTest, EventStatisticTest_PushEvent, TestSize.Level1)
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushEventStr, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventStatistic eventStatistic;
-    auto inputEvent = std::make_shared<InputEvent>(3);
     eventStatistic.writeFileEnabled_ = true;
+    std::string str = "test_push_event_str";
+    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEventStr(str));
     ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEvent(inputEvent));
 
     for (auto i = 0; i < EVENT_OUT_SIZE - 1; i++) {
         auto inputEvent1 = std::make_shared<InputEvent>(2);
-        eventStatistic.dumperEventList_.push_back(EventStatistic::ConvertEventToStr(inputEvent1));
+        eventStatistic.dumperEventList_.push_back(EventStatistic::ConvertInputEventToStr(inputEvent1));
     }
     eventStatistic.writeFileEnabled_ = false;
-    auto inputEvent2 = std::make_shared<InputEvent>(1);
-    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEvent(inputEvent));
+    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushEventStr(str));
 }
 
 /**
