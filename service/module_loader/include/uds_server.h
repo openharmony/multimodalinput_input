@@ -74,12 +74,18 @@ protected:
     void NotifySessionDeleted(SessionPtr ses);
     int32_t SetFdProperty(int32_t &tokenType, int32_t &serverFd, int32_t &toReturnClientFd,
         const std::string &programName, bool &readOnly);
+    void EarseSessionByFd(int32_t fd);
+    size_t GetSessionSize();
+    bool InsertSession(int32_t fd, SessionPtr sp);
+    std::map<int32_t, SessionPtr> GetSessionMapCopy();
+    void ClearSessionMap();
 
 protected:
     MsgServerFunCallback recvFun_ { nullptr };
     std::map<int32_t, SessionPtr> sessionsMap_;
     mutable std::mutex sessionsMapMutex_;
     std::map<int32_t, int32_t> idxPidMap_;
+    mutable std::mutex idxPidMapMutex_;
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
     std::map<int32_t, std::shared_ptr<mmi_epoll_event>> epollEventMap_;

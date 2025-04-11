@@ -129,6 +129,8 @@ public:
         return rotation_;
     }
 
+    bool IsPositionOutScreen(int32_t x, int32_t y);
+
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();

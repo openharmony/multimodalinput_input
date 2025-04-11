@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,6 +47,7 @@ constexpr int32_t POINTER_ITEM_DISPLAY_Y_TWO = 258;
 constexpr int32_t POINTER_ITEM_WINDOW_X = 701;
 constexpr int32_t POINTER_ITEM_WINDOW_Y = 702;
 constexpr int32_t KEY_DOWN_DURATION = 300;
+constexpr int32_t KEY_DOWN_DURATION_TWO = 500;
 constexpr int32_t FINAL_KEY_DOWN_DURATION_ONE = 10;
 constexpr int32_t FINAL_KEY_DOWN_DURATION_TWO = 2000;
 constexpr int32_t POINTER_SENSOR_INPUT_TIME = 2000;
@@ -912,11 +913,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_12, TestSize.Level
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_14, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t tvPower = 4000;
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(tvPower);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_REMOTE_POWER);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
     int32_t subscribeId = INVAID_VALUE;
@@ -929,10 +929,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_14, TestSize.Level
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(tvPower);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_REMOTE_POWER);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(tvPower);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_REMOTE_POWER);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
@@ -952,11 +952,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_14, TestSize.Level
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_15, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t tvPower = 4000;
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(tvPower);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_REMOTE_POWER);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
     int32_t subscribeId = INVAID_VALUE;
@@ -969,6 +968,83 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_15, TestSize.Level
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
 }
 
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_020
+ * @tc.desc: Verify subscribe key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_REMOTE_POWER);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(KEY_DOWN_DURATION_TWO);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event %{public}d down trigger callback", keyEvent->GetKeyCode());
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = KEY_DOWN_DURATION_TWO + 1;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_REMOTE_POWER);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_REMOTE_POWER);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_020
+ * @tc.desc: Verify subscribe key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_021, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_REMOTE_POWER);
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event %{public}d down trigger callback", keyEvent->GetKeyCode());
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_REMOTE_POWER);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_REMOTE_POWER);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
 /**
  * @tc.name: TestGetKeystrokeAbility_001
  * @tc.desc: Verify SupportKeys
@@ -2201,6 +2277,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
     CALL_TEST_DEBUG;
     int32_t subscriberId = INVAID_VALUE;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeSwitchEvent(subscriberId));
+}
+
+/**
+ * @tc.name: InputManagerTest_QuerySwitchStatus_001
+ * @tc.desc: Unsubscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_QuerySwitchStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SwitchEvent::SwitchState state = SwitchEvent::SwitchState::STATE_OFF;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_TABLET,
+        state));
 }
 
 /**
@@ -5504,6 +5594,93 @@ HWTEST_F(InputManagerTest, InputManagerTest_CheckKnuckleEvent_001, TestSize.Leve
     bool isKnuckleType = true;
     int32_t ret = InputManager::GetInstance()->CheckKnuckleEvent(pointX, pointY, isKnuckleType);
     EXPECT_EQ(ret, -2);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeTabletProximity_001
+ * @tc.desc: Test SubscribeTabletProximity
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeTabletProximity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<PointerEvent>)> callback;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    EXPECT_EQ(inputManager->SubscribeTabletProximity(callback), RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_UnsubscribetabletProximity_001
+ * @tc.desc: Test UnsubscribetabletProximity
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribetabletProximity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscriberId = INVAID_VALUE;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->UnsubscribetabletProximity(subscriberId));
+}
+
+/**
+ * @tc.name: InputManagerTest_AddPreMonitor_002
+ * @tc.desc: Test AddPreMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddPreMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<IInputEventConsumer> monitor = nullptr;
+    HandleEventType eventType = 0;
+    std::vector<int32_t> keys;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    EXPECT_EQ(inputManager->AddPreMonitor(monitor, eventType, keys), INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerTest_RemovePreMonitor_002
+ * @tc.desc: Test RemovePreMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemovePreMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t monitorId = INVAID_VALUE;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->RemovePreMonitor(monitorId));
+}
+
+/*
+ * @tc.name: InputManagerTest_SetMultiWindowScreenId_002
+ * @tc.desc: SetMultiWindowScreenId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMultiWindowScreenId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint64_t screenId = 0;
+    uint64_t displayNodeScreenId = 0;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->SetMultiWindowScreenId(screenId, displayNodeScreenId));
+}
+
+/*
+ * @tc.name: InputManagerTest_SetKnuckleSwitch_001
+ * @tc.desc: SetKnuckleSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetKnuckleSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool knuckleSwitch = false;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->SetKnuckleSwitch(knuckleSwitch));
 }
 } // namespace MMI
 } // namespace OHOS

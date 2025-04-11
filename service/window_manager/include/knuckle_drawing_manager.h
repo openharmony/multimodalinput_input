@@ -37,7 +37,7 @@ struct ScreenReadState {
 
 class KnuckleDrawingManager {
 public:
-    void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent);
+    void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t displayId = -1);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
     KnuckleDrawingManager();
     ~KnuckleDrawingManager() = default;

@@ -119,6 +119,8 @@ public:
     void SetWindowStateNotifyPid(int32_t pid) override {}
     int32_t GetWindowStateNotifyPid() override { return 0; }
     int32_t GetPidByWindowId(int32_t pid) override { return 0; }
+    std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+        PointerEvent::PointerItem pointerItem) override { return { 0, 0 }; }
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }
     MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
 
@@ -126,6 +128,7 @@ public:
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
 #ifdef OHOS_BUILD_ENABLE_ANCO
+    void InitializeAnco() override {}
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(void, CleanShellWindowIds, ());

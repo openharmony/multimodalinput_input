@@ -382,6 +382,7 @@ if (input_ext_feature_anco) {
 
   libmmi_service_sources += [
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
+    "${mmi_ext_path}/anco_uds_manager/src/input_common_monitor.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
   ]

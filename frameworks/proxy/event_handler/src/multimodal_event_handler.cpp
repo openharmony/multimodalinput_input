@@ -43,7 +43,7 @@ void OnConnected(const IfMMIClient& client)
 #endif // OHOS_BUILD_ENABLE_SWITCH
     TABLET_EVENT_INPUT_SUBSCRIBE_MGR.OnConnected();
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    IMonitorMgr->OnConnected();
+    IMonitorMgr.OnConnected();
     PRE_MONITOR_MGR.OnConnected();
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -57,7 +57,7 @@ void OnDisconnected(const IfMMIClient &client)
     InputMgrImpl.OnDisconnected();
     INPUT_DEVICE_IMPL.OnDisconnected();
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    IMonitorMgr->OnDisconnected();
+    IMonitorMgr.OnDisconnected();
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 

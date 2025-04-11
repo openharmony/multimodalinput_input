@@ -289,6 +289,7 @@ int32_t MMIClient::Socket()
     } else {
         MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
+    fdsan_exchange_owner_tag(fd_, 0, TAG);
     return fd_;
 }
 

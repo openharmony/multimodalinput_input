@@ -493,6 +493,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID):
             ret = StubSetMultiWindowScreenId(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KNUCKLE_SWITCH):
+            ret = StubSetKnuckleSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::LAUNCH_AI_SCREEN_ABILITY):
+            ret = StubLaunchAiScreenAbility(data, reply);
+            break;
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_MONITOR):
             ret = StubSubscribeKeyMonitor(data, reply);
@@ -501,6 +507,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubUnsubscribeKeyMonitor(data, reply);
             break;
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::QUERY_SWITCH_STATE_EVENT):
+            ret = StubQuerySwitchStatus(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -531,20 +540,20 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     if (ret != RET_OK) {
         MMI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
-            close(clientFd);
+            fdsan_close_with_tag(clientFd, TAG);
         }
         return ret;
     }
 
     if (!reply.WriteFileDescriptor(clientFd)) {
         MMI_HILOGE("Write file descriptor failed");
-        close(clientFd);
+        fdsan_close_with_tag(clientFd, TAG);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
     WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGI("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
-    close(clientFd);
+    fdsan_close_with_tag(clientFd, TAG);
     return RET_OK;
 }
 
@@ -1704,6 +1713,29 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& da
     return ret;
 }
 
+int32_t MultimodalInputConnectStub::StubQuerySwitchStatus(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t type = 0;
+    int32_t state = 0;
+    READINT32(data, type, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = QuerySwitchStatus(type, state);
+    WRITEINT32(reply, state, ERR_INVALID_VALUE);
+    if (ret != RET_OK) {
+        MMI_HILOGE("QuerySwitchStatus failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 
 int32_t MultimodalInputConnectStub::StubSubscribeTabletProximity(MessageParcel& data, MessageParcel& reply)
 {
@@ -2625,7 +2657,9 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadRightClickType(MessageParcel&
     int32_t type = 1;
     READINT32(data, type, IPC_PROXY_DEAD_OBJECT_ERR);
     if (type != RightClickType::TOUCHPAD_RIGHT_BUTTON && type != RightClickType::TOUCHPAD_LEFT_BUTTON &&
-        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP) {
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP &&
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON &&
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON) {
         MMI_HILOGE("Invalid type:%{public}d", type);
         return RET_ERR;
     }
@@ -3446,7 +3480,37 @@ int32_t MultimodalInputConnectStub::StubSetMultiWindowScreenId(MessageParcel &da
     READUINT64(data, displayNodeScreenId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetMultiWindowScreenId(screenId, displayNodeScreenId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SkipPointerLayer failed, ret:%{public}d", ret);
+        MMI_HILOGE("Call SetMultiWindowScreenId failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetKnuckleSwitch(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t callingUid = GetCallingUid();
+    int32_t gameUid = 7011 ;
+    if (callingUid != gameUid || !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    bool knuckleSwitch = true;
+    READBOOL(data, knuckleSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetKnuckleSwitch(knuckleSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetKnuckleSwitch failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubLaunchAiScreenAbility(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = LaunchAiScreenAbility();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call LaunchAiScreenAbility failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

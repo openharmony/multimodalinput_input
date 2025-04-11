@@ -34,8 +34,9 @@ typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAl
 typedef std::function<void()> ClearTouchMessage;
 typedef std::function<void(std::vector<std::vector<int32_t>>& retMsgList)> GetAllKeyMessage;
 typedef std::function<void()> ClearKeyMessage;
-typedef std::function<void()> HardwareKeyEventDetected;
+typedef std::function<void(const std::string &keyName)> HardwareKeyEventDetected;
 typedef std::function<int32_t()> GetKeyboardActivationState;
+typedef std::function<bool()> IsFloatingKeyboard;
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 enum VKeyboardMessageType {
@@ -90,7 +91,8 @@ public:
     void ProcessPendingEvents();
     void ReloadDevice();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-	void RegisterBootStatusReceiver();
+    static void SetBootCompleted();
+    void RegisterBootStatusReceiver();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     auto GetInputFds() const
@@ -105,7 +107,9 @@ public:
         GetAllKeyMessage getAllKeyMessage,
         ClearKeyMessage clearKeyMessage,
         HardwareKeyEventDetected hardwareKeyEventDetected,
-        GetKeyboardActivationState getKeyboardActivationState);
+        GetKeyboardActivationState getKeyboardActivationState,
+        IsFloatingKeyboard isFloatingKeyboard
+        );
 
 private:
     void MultiKeyboardSetLedState(bool oldCapsLockState);
@@ -129,7 +133,11 @@ private:
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadTouchPadDown(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadTouchPadUp(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRightBtnDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
@@ -161,6 +169,7 @@ private:
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRotateEnd(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
+    void update_pointer_move(VTPStateMachineMessageType msgType);
     int32_t ConvertToTouchEventType(libinput_event_type eventType);
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
@@ -169,8 +178,15 @@ private:
     void HideMouseCursorTemporary();
     double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
     bool SkipTouchMove(int touchId, int32_t eventType); // compress touch move events in consecutive two frame
+    void DelayInjectKeyEventCallback();
     bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
-    void StartVKeyboardDelayTimer();
+    void StartVKeyboardDelayTimer(int32_t delayMs);
+
+    libinput_event *vkbDelayedEvent_ = nullptr;
+    int32_t vkbDelayedKeyCode_ = 0;
+    // set as true once subscriber succeeded.
+    std::atomic_bool hasInitSubscriber_ { false };
+    static std::atomic_bool isBootCompleted_;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
@@ -184,6 +200,7 @@ private:
     ClearKeyMessage clearKeyMessage_ { nullptr };
     HardwareKeyEventDetected hardwareKeyEventDetected_ { nullptr };
     GetKeyboardActivationState getKeyboardActivationState_ { nullptr };
+    IsFloatingKeyboard isFloatingKeyboard_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;

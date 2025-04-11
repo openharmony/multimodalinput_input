@@ -472,6 +472,13 @@ int32_t MultimodalInputConnectManager::UnsubscribeSwitchEvent(int32_t subscribeI
     return multimodalInputConnectService_->UnsubscribeSwitchEvent(subscribeId);
 }
 
+int32_t MultimodalInputConnectManager::QuerySwitchStatus(int32_t switchType, int32_t& state)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->QuerySwitchStatus(switchType, state);
+}
+
 int32_t MultimodalInputConnectManager::SubscribeTabletProximity(int32_t subscribeId)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -1051,6 +1058,20 @@ int32_t MultimodalInputConnectManager::SetMultiWindowScreenId(uint64_t screenId,
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+}
+
+int32_t MultimodalInputConnectManager::SetKnuckleSwitch(bool knuckleSwitch)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetKnuckleSwitch(knuckleSwitch);
+}
+
+int32_t MultimodalInputConnectManager::LaunchAiScreenAbility()
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->LaunchAiScreenAbility();
 }
 } // namespace MMI
 } // namespace OHOS
