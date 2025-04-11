@@ -73,7 +73,10 @@ constexpr uint32_t LIBINPUT_KEY_FN { 240 };
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
 constexpr double VTP_LEFT_BUTTON_DELTA_X { 0.0 };
 constexpr double VTP_LEFT_BUTTON_DELTA_Y { -1.0 };
+constexpr uint32_t VKEY_PINCH_FIRST_FINGER_ID { 0 };
 constexpr uint32_t VKEY_PINCH_SECOND_FINGER_ID { 1 };
+constexpr float VKEY_RAW_COORDINATE_RATIO { 8.0 };
+constexpr uint32_t VKEY_PINCH_CURSOR_FAKE_DX { 1 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
@@ -961,8 +964,14 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchBegin(libinput_event_touch* touch,
 	
     event_touch tEvent;
     tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN;
-    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    tEvent.seat_slot = VKEY_PINCH_FIRST_FINGER_ID;
     libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
+    funInputEvent_((libinput_event*)ltEvent, frameTime);
+    free(ltEvent);
+
+    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN;
+    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    ltEvent = libinput_create_touch_event(touch, tEvent);
     funInputEvent_((libinput_event*)ltEvent, frameTime);
     free(ltEvent);
 	
@@ -1005,8 +1014,14 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchUpdate(libinput_event_touch* touch,
 	
     event_touch tEvent;
     tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION;
-    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    tEvent.seat_slot = VKEY_PINCH_FIRST_FINGER_ID;
     libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
+    funInputEvent_((libinput_event*)ltEvent, frameTime);
+    free(ltEvent);
+
+    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION;
+    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    ltEvent = libinput_create_touch_event(touch, tEvent);
     funInputEvent_((libinput_event*)ltEvent, frameTime);
     free(ltEvent);
 	
@@ -1049,10 +1064,40 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
 	
     event_touch tEvent;
     tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP;
-    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    tEvent.seat_slot = VKEY_PINCH_FIRST_FINGER_ID;
     libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
     funInputEvent_((libinput_event*)ltEvent, frameTime);
     free(ltEvent);
+
+    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP;
+    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    ltEvent = libinput_create_touch_event(touch, tEvent);
+    funInputEvent_((libinput_event*)ltEvent, frameTime);
+    free(ltEvent);
+
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
+
+    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCH_DOWN;
+    tEvent.x = mouseInfo.physicalX * VKEY_RAW_COORDINATE_RATIO;
+    tEvent.y = mouseInfo.physicalY * VKEY_RAW_COORDINATE_RATIO;
+    tEvent.seat_slot = 0;
+    tEvent.slot = 0;
+    ltEvent = libinput_create_touch_event(touch, tEvent);
+    funInputEvent_((libinput_event*)ltEvent, frameTime);
+    free(ltEvent);
+
+    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCH_UP;
+    ltEvent = libinput_create_touch_event(touch, tEvent);
+    funInputEvent_((libinput_event*)ltEvent, frameTime);
+    free(ltEvent);
+
+    event_pointer pEvent;
+    pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
+    pEvent.delta_raw_x = VKEY_PINCH_CURSOR_FAKE_DX;
+    pEvent.delta_raw_y = 0;
+    libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    funInputEvent_((libinput_event*)lpEvent, frameTime);
+    free(lpEvent);
 	
     return true;
 }
