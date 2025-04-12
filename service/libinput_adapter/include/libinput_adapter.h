@@ -157,6 +157,7 @@ private:
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
+    void InjectEventForCastWindow(libinput_event_touch* touch);
     bool HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadPanUpdate(libinput_event_touch* touch,
