@@ -259,7 +259,7 @@ static float GetCanvasSize()
     if (IsNum(ret)) {
         return g_hardwareCanvasSize;
     }
-    return std::stoi(ret.c_str());
+    return std::atoi(ret.c_str());
 }
 
 static float GetFocusCoordinates()
@@ -268,7 +268,7 @@ static float GetFocusCoordinates()
     if (IsNum(ret)) {
         return g_focalPoint;
     }
-    return std::stoi(ret.c_str());
+    return std::atoi(ret.c_str());
 }
 
 PointerDrawingManager::PointerDrawingManager()
