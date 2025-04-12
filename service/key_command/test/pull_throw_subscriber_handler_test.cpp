@@ -127,7 +127,6 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     CALL_TEST_DEBUG;
     auto touchEvent = SetupFingerPoisitionEvent();
     ASSERT_TRUE(touchEvent != nullptr);
-    // PULL_THROW_EVENT_HANDLER->UpdateFingerPoisition(touchEvent);
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent));
 }
 
@@ -143,7 +142,6 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     CALL_TEST_DEBUG;
     auto touchEvent = SetupSingleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
-
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent));
 }
 
@@ -160,7 +158,6 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     auto touchEvent = SetupDoubleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
     PULL_THROW_EVENT_HANDLER->StartFingerGesture();
-
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent));
 }
 
@@ -192,7 +189,6 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     auto touchEvent = SetupDoubleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent));
-    MMI_HILOGI("LYY HandleFingerGesturePullMoveEvent On PullUp Event");
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent));
 }
 
@@ -205,19 +201,15 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
 HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_003, testing::ext::TestSize
 .Level1)
 {
-    MMI_HILOGI("LYY On");
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
     PULL_THROW_EVENT_HANDLER->StartFingerGesture();
-    MMI_HILOGI("LYY StartFingerGesture success");
 
     PULL_THROW_EVENT_HANDLER->StopFingerGesture(touchEvent);
-    MMI_HILOGI("LYY StopFingerGesture success");
     double actionTime = touchEvent->GetActionTime();
     touchEvent->SetActionTime(actionTime + WINDOW_TIME_INTERVAL);
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent));
-    MMI_HILOGI("LYY HandleFingerGesturePullMoveEvent success");
 }
 
 /**
@@ -233,7 +225,6 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     auto touchEvent = SetupSingleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent));
-    MMI_HILOGI("LYY HandleFingerGesturePullUpEvent success");
 }
 
 /**
@@ -249,9 +240,7 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     auto touchEvent = SetupDoubleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
     PULL_THROW_EVENT_HANDLER->StartFingerGesture();
-    MMI_HILOGI("LYY StartFingerGesture success");
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent));
-    MMI_HILOGI("LYY HandleFingerGesturePullUpEvent success");
 }
 /**
  * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_003
@@ -266,13 +255,10 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     auto touchEvent = SetupDoubleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
     PULL_THROW_EVENT_HANDLER->StartFingerGesture();
-    MMI_HILOGI("LYY StartFingerGesture success");
     auto touchEvent1 = SetupFingerPoisitionEvent();
     PULL_THROW_EVENT_HANDLER->UpdateFingerPoisition(touchEvent1);
-    MMI_HILOGI("LYY UpdateFingerPoisition success");
     touchEvent->SetActionTime(0);
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent));
-    MMI_HILOGI("LYY HandleFingerGesturePullUpEvent success");
 }
 
 /**
@@ -288,12 +274,9 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     auto touchEvent = SetupDoubleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
     PULL_THROW_EVENT_HANDLER->StartFingerGesture();
-    MMI_HILOGI("LYY StartFingerGesture success");
     PULL_THROW_EVENT_HANDLER->UpdateFingerPoisition(touchEvent);
-    MMI_HILOGI("LYY UpdateFingerPoisition success");
     touchEvent->SetActionTime(0);
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent));
-    MMI_HILOGI("LYY HandleFingerGesturePullUpEvent success");
 }
 
 /**
@@ -309,7 +292,6 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_UpdateFi
     auto touchEvent = SetupDoubleFingerDownEvent();
     ASSERT_TRUE(touchEvent != nullptr);
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->UpdateFingerPoisition(touchEvent));
-    MMI_HILOGI("LYY UpdateFingerPoisition success");
 }
 
 /**
@@ -323,7 +305,6 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_StartFin
 {
     CALL_TEST_DEBUG;
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->StartFingerGesture());
-    MMI_HILOGI("LYY StartFingerGesture success");
 }
 } // namespace MMI
 } // namespace OHOS
