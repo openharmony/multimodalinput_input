@@ -315,5 +315,187 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_02, TestSize.L
     EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
     ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
 }
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutTimeout_01
+ * @tc.desc: Test the funcation AccShortcutTimeout
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 1;
+    std::string key = "testKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    auto accountMgr = ACCOUNT_MGR;
+    accountMgr->accounts_.emplace(accountId, std::make_unique<AccountManager::AccountSetting>(accountId));
+    ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutTimeout(accountId, key));
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutTimeout_02
+ * @tc.desc: Test the funcation AccShortcutTimeout
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 2;
+    std::string key = "testKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    auto accountMgr = ACCOUNT_MGR;
+    ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutTimeout(accountId, key));
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutEnabled_01
+ * @tc.desc: Test the funcation AccShortcutEnabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabled_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 1;
+    std::string key = "shortcutKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    auto accountMgr = ACCOUNT_MGR;
+    accountMgr->accounts_.emplace(accountId, std::make_unique<AccountManager::AccountSetting>(accountId));
+    ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutEnabled(accountId, key));
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutEnabled_02
+ * @tc.desc: Test the funcation AccShortcutEnabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabled_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 2;
+    std::string key = "shortcutKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    auto accountMgr = ACCOUNT_MGR;
+    ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutEnabled(accountId, key));
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutEnabledOnScreenLocked_01
+ * @tc.desc: Test the funcation AccShortcutEnabledOnScreenLocked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabledOnScreenLocked_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 1;
+    std::string key = "shortcutKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    auto accountMgr = ACCOUNT_MGR;
+    accountMgr->accounts_.emplace(accountId, std::make_unique<AccountManager::AccountSetting>(accountId));
+    ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutEnabledOnScreenLocked(accountId, key));
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutEnabledOnScreenLocked_02
+ * @tc.desc: Test the funcation AccShortcutEnabledOnScreenLocked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabledOnScreenLocked_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 2;
+    std::string key = "shortcutKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    auto accountMgr = ACCOUNT_MGR;
+    ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutEnabledOnScreenLocked(accountId, key));
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadSwitchStatus_03
+ * @tc.desc: Test the funcation ReadSwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = -1;
+    AccountManager::AccountSetting accountSetting(accountId);
+    std::string key = "down";
+    bool currentSwitchStatus = true;
+    bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadSwitchStatus_04
+ * @tc.desc: Test the funcation ReadSwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 5;
+    AccountManager::AccountSetting accountSetting(accountId);
+    std::string key = "down";
+    bool currentSwitchStatus = false;
+
+    char buf[DEFAULT_BUFFER_LENGTH] {};
+    EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
+    bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadLongPressTime_03
+ * @tc.desc: Test the funcation ReadLongPressTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = -1;
+    AccountManager::AccountSetting accountSetting(accountId);
+    ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadLongPressTime_04
+ * @tc.desc: Test the funcation ReadLongPressTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 3;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.accountId_ = 2;
+    char buf[DEFAULT_BUFFER_LENGTH] {};
+    EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
+    ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
+}
+
+/**
+ * @tc.name: AccountManagerTest_GetCurrentAccountSetting
+ * @tc.desc: Test the funcation GetCurrentAccountSetting
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountSetting, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AccountManager manager;
+    manager.currentAccountId_ = 123;
+    ASSERT_NO_FATAL_FAILURE(manager.GetCurrentAccountSetting());
+}
+
 } // namespace MMI
 } // namespace OHOS
