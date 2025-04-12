@@ -20,6 +20,7 @@
 #include "device_observer.h"
 #include "input_device.h"
 #include "uds_session.h"
+#include <shared_mutex>
 
 namespace OHOS {
 namespace MMI {
@@ -75,6 +76,17 @@ public:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool HasVirtualKeyboardDevice();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+    bool CheckDuplicateInputDevice(struct libinput_device *inputDevice);
+    bool CheckDuplicateInputDevice(std::shared_ptr<InputDevice> inputDevice);
+    void AddPhysicalInputDeviceInner(int32_t deviceId, const struct InputDeviceInfo& info);
+    void AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice);
+    void RemovePhysicalInputDeviceInner(struct libinput_device *inputDevice, int32_t &deviceId, bool &enable);
+    int32_t RemoveVirtualInputDeviceInner(int32_t deviceId, struct InputDeviceInfo& info);
+    bool HasEnabledPhysicalPointerDevice();
+    void NotifyAddDeviceListeners(int32_t deviceId);
+    void NotifyRemoveDeviceListeners(int32_t deviceId);
+    void NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice);
+    void NotifyRemovePointerDevice(bool removePointerDevice);
     bool HasTouchDevice();
     const std::string& GetScreenId(int32_t deviceId) const;
     using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
@@ -108,6 +120,7 @@ private:
     int32_t NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result);
 
 private:
+    std::mutex inputDeviceMutex_;
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<int32_t, int32_t> recoverList_;
     std::map<int32_t, std::shared_ptr<InputDevice>> virtualInputDevices_;
