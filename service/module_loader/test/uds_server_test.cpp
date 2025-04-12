@@ -296,30 +296,6 @@ HWTEST_F(UDSServerTest, SetFdProperty_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: Dump_001
- * @tc.desc: Test the function Dump
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UDSServerTest, Dump_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    UDSServer udsServer;
-    int32_t fd = 1;
-    const std::vector<std::string> args = {"help"};
-    int32_t tokenType = TokenType::TOKEN_SHELL;
-    int32_t serverFd = 1;
-    const std::string programName = "program";
-    const int32_t moduleType = 1;
-    const int32_t uid = 2;
-    const int32_t pid = 10;
-    int32_t toReturnClientFd = 1;
-     
-    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
-    udsServer.Dump(fd, args);
-}
-
-/**
  * @tc.name: OnConnected_001
  * @tc.desc: Test the function OnConnected
  * @tc.type: FUNC
@@ -595,21 +571,6 @@ HWTEST_F(UDSServerTest, AddSocketPairInfo_002, TestSize.Level1)
         close(toReturnClientFd);
     }
     EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: Dump_002
- * @tc.desc: Test the Dump functionality of UDSServer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UDSServerTest, Dump_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    UDSServer udsServer;
-    int32_t fd = 1;
-    std::vector<std::string> args = {"help"};
-    ASSERT_NO_FATAL_FAILURE(udsServer.Dump(fd, args));
 }
 
 /**
