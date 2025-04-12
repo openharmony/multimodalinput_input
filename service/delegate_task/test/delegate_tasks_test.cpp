@@ -252,5 +252,65 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_GetKeyItem_001, TestSize.Level1)
     napi_status status = napi.GetKeyItem(env, in, out);
     ASSERT_EQ(status, napi_ok);
 }
+
+/**
+ * @tc.name: DelegateTasksTest_PostAsyncTask_002
+ * @tc.desc: Test the function PostAsyncTask
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostAsyncTask_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DelegateTasks delegateTasks;
+    auto callback = []() { return 0; };
+    ASSERT_NO_FATAL_FAILURE(delegateTasks.PostAsyncTask(callback));
+}
+/**
+ * @tc.name: DelegateTasksTest_ProcessTask_001
+ * @tc.desc: Test the function ProcessTask
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateTasksTest, DelegateTasksTest_ProcessTask_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto callback = []() { return 0; };
+    int32_t id = 1;
+    DelegateTasks::Task task(id, callback);
+    task.hasWaited_ = true;
+    ASSERT_NO_FATAL_FAILURE(task.ProcessTask());
+}
+/**
+ * @tc.name: DelegateTasksTest_ProcessTask_002
+ * @tc.desc: Test the function ProcessTask
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateTasksTest, DelegateTasksTest_ProcessTask_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto callback = []() { return 42; };
+    int32_t id = 3;
+    auto pro = std::make_shared<std::promise<int32_t>>();
+    DelegateTasks::Task task(id, callback, pro);
+    task.hasWaited_ = false;
+    ASSERT_NO_FATAL_FAILURE(task.ProcessTask());
+}
+/**
+ * @tc.name: DelegateTasksTest_ProcessTask_003
+ * @tc.desc: Test the function ProcessTask
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateTasksTest, DelegateTasksTest_ProcessTask_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto callback = []() { return 42; };
+    int32_t id = 2;
+    DelegateTasks::Task task(id, callback);
+    task.hasWaited_ = false;
+    ASSERT_NO_FATAL_FAILURE(task.ProcessTask());
+}
 } // namespace MMI
 } // namespace OHOS

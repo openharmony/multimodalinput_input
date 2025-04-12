@@ -117,8 +117,8 @@ const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
 HWTEST_F(KeyUnicodeTransformationTest, ShouldReturnOriginal, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto KeyEvent = KeyEvent::Create();
-    EXPECT_EQ(IsShiftPressed(KeyEvent), false);
+    auto keyEvent = KeyEvent::Create();
+    EXPECT_EQ(IsShiftPressed(keyEvent), false);
 }
 
 /**
@@ -183,6 +183,96 @@ HWTEST_F(KeyUnicodeTransformationTest, ShouldReturnTransitionedUnicode_003, Test
     item.SetKeyCode(KeyEvent::KEYCODE_DPAD_DOWN);
     keyEvent->AddKeyItem(item);
     EXPECT_NO_FATAL_FAILURE(KeyCodeToUnicode(keyCode, keyEvent));
+}
+/**
+ * @tc.name: ShouldReturnTransitionedUnicode_004
+ * @tc.desc: Test KeyCodeToUnicode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyUnicodeTransformationTest, ShouldReturnTransitionedUnicode_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = HOS_KEY_A;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(HOS_KEY_SHIFT_LEFT);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    EXPECT_NO_FATAL_FAILURE(KeyCodeToUnicode(keyCode, keyEvent));
+}
+
+/**
+ * @tc.name: ShouldReturnTransitionedUnicode_005
+ * @tc.desc: Test KeyCodeToUnicode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyUnicodeTransformationTest, ShouldReturnTransitionedUnicode_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = HOS_KEY_NUMPAD_DOT;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(HOS_KEY_SHIFT_LEFT);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    EXPECT_NO_FATAL_FAILURE(KeyCodeToUnicode(keyCode, keyEvent));
+}
+
+/**
+ * @tc.name: Test_IsShiftPressed_002
+ * @tc.desc: Test IsShiftPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyUnicodeTransformationTest, Test_IsShiftPressed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(HOS_KEY_SHIFT_LEFT);
+    item1.SetPressed(true);
+    item1.SetDownTime(500);
+    keyEvent->keys_.push_back(item1);
+    EXPECT_EQ(IsShiftPressed(keyEvent), true);
+}
+
+/**
+ * @tc.name: Test_IsShiftPressed_003
+ * @tc.desc: Test IsShiftPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyUnicodeTransformationTest, Test_IsShiftPressed_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(HOS_KEY_SHIFT_RIGHT);
+    item1.SetPressed(true);
+    item1.SetDownTime(500);
+    keyEvent->keys_.push_back(item1);
+    EXPECT_EQ(IsShiftPressed(keyEvent), true);
+}
+/**
+ * @tc.name: Test_IsShiftPressed_004
+ * @tc.desc: Test IsShiftPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyUnicodeTransformationTest, Test_IsShiftPressed_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(HOS_KEY_ALT_RIGHT);
+    item1.SetPressed(true);
+    item1.SetDownTime(500);
+    keyEvent->keys_.push_back(item1);
+    EXPECT_EQ(IsShiftPressed(keyEvent), false);
 }
 
 }

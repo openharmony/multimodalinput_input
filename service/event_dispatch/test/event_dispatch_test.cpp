@@ -1380,13 +1380,16 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_004, Test
     EventDispatchHandler eventdispatchhandler;
     int32_t fd = 1;
     int32_t eventType = 3;
-    UDSServer* udsServer = new UDSServer();
-    InputHandler->udsServer_ = udsServer;
+    EXPECT_EQ(InputHandler->udsServer_, nullptr);
+    auto udsServer = std::make_unique<UDSServer>();
+    InputHandler->udsServer_ = udsServer.get();
+    EXPECT_NE(InputHandler->udsServer_, nullptr);
     std::shared_ptr<PointerEvent> sharedPointerEvent = std::make_shared<PointerEvent>(eventType);
     EXPECT_NE(sharedPointerEvent, nullptr);
     std::vector<int32_t> pointerIdList;
     EXPECT_FALSE(pointerIdList.size() > 1);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(sharedPointerEvent, fd));
+    InputHandler->udsServer_ = nullptr;
 }
 
 /**
@@ -1399,8 +1402,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_005, Test
 {
     EventDispatchHandler eventdispatchhandler;
     PointerEvent::PointerItem testPointerItem;
-    UDSServer* udsServer = new UDSServer();
-    InputHandler->udsServer_ = udsServer;
+    EXPECT_EQ(InputHandler->udsServer_, nullptr);
+    auto udsServer = std::make_unique<UDSServer>();
+    InputHandler->udsServer_ = udsServer.get();
+    EXPECT_NE(InputHandler->udsServer_, nullptr);
     int32_t fd = 1;
     int32_t eventType = 3;
     std::shared_ptr<PointerEvent> event = std::make_shared<PointerEvent>(eventType);
@@ -1413,6 +1418,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_005, Test
     testPointerItem.SetPointerId(testPointerId);
     event->AddPointerItem(testPointerItem);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(event, fd));
+    InputHandler->udsServer_ = nullptr;
 }
 
 /**
@@ -1425,8 +1431,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_006, Test
 {
     EventDispatchHandler eventdispatchhandler;
     PointerEvent::PointerItem testPointerItem;
-    UDSServer* udsServer = new UDSServer();
-    InputHandler->udsServer_ = udsServer;
+    EXPECT_EQ(InputHandler->udsServer_, nullptr);
+    auto udsServer = std::make_unique<UDSServer>();
+    InputHandler->udsServer_ = udsServer.get();
+    EXPECT_NE(InputHandler->udsServer_, nullptr);
     int32_t fd = 1;
     int32_t eventType = 3;
     std::shared_ptr<PointerEvent> event = std::make_shared<PointerEvent>(eventType);
@@ -1439,6 +1447,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_006, Test
     testPointerItem.SetPointerId(testPointerId + 1);
     event->AddPointerItem(testPointerItem);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(event, fd));
+    InputHandler->udsServer_ = nullptr;
 }
 
 /**
@@ -1453,8 +1462,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_007, Test
     int32_t fd = 1;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    UDSServer udsServer;
-    InputHandler->udsServer_ = &udsServer;
+    EXPECT_EQ(InputHandler->udsServer_, nullptr);
+    auto udsServer = std::make_unique<UDSServer>();
+    InputHandler->udsServer_ = udsServer.get();
+    EXPECT_NE(InputHandler->udsServer_, nullptr);
     PointerEvent::PointerItem testPointerItem;
     testPointerItem.pointerId_ = -1;
     pointerEvent->pointers_.push_back(testPointerItem);
@@ -1464,6 +1475,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_007, Test
     testPointerItem.displayY_ = 100;
     pointerEvent->pointers_.push_back(testPointerItem);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+    InputHandler->udsServer_ = nullptr;
 }
 
 /**
@@ -1953,5 +1965,115 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEvent_002, TestSize.Lev
     ret = handler.DispatchKeyEvent(fd, udsServer, key);
     EXPECT_EQ(ret, RET_ERR);
 }
+/**
+ * @tc.name: EventDispatchTest_SendWindowStateError_001
+ * @tc.desc: Test the funcation SendWindowStateError
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_SendWindowStateError_001, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t fd = 1;
+    int32_t windowId = 3;
+    auto udsServer = std::make_unique<UDSServer>();
+    InputHandler->udsServer_ = udsServer.get();
+    EXPECT_NE(InputHandler->udsServer_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.SendWindowStateError(fd, windowId));
+    InputHandler->udsServer_ = nullptr;
+}
+
+/**
+ * @tc.name: EventDispatchTest_GetClientFd_001
+ * @tc.desc: Test the funcation GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_001, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t pid = 1;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    point->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    point->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    EXPECT_EQ(eventdispatchhandler.GetClientFd(pid, point), INVALID_FD);
+}
+/**
+ * @tc.name: EventDispatchTest_GetClientFd_002
+ * @tc.desc: Test the funcation GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_002, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t pid = 1;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    point->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    point->SetSourceType(PointerEvent::SOURCE_TYPE_CROWN);
+    EXPECT_EQ(eventdispatchhandler.GetClientFd(pid, point), INVALID_FD);
+}
+/**
+ * @tc.name: EventDispatchTest_GetClientFd_003
+ * @tc.desc: Test the funcation GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_003, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t pid = 1;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    EXPECT_EQ(eventdispatchhandler.GetClientFd(pid, point), INVALID_FD);
+}
+
+/**
+ * @tc.name: EventDispatchTest_GetClientFd_004
+ * @tc.desc: Test the funcation GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_004, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t pid = 0;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    point->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    point->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    EXPECT_EQ(eventdispatchhandler.GetClientFd(pid, point), INVALID_FD);
+}
+/**
+ * @tc.name: EventDispatchTest_GetClientFd_005
+ * @tc.desc: Test the funcation GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_005, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t pid = 0;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    point->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    point->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    EXPECT_EQ(eventdispatchhandler.GetClientFd(pid, point), INVALID_FD);
+}
+
+/**
+ * @tc.name: EventDispatchTest_GetClientFd_006
+ * @tc.desc: Test the funcation GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_006, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t pid = 1;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    point->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    point->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    EXPECT_EQ(eventdispatchhandler.GetClientFd(pid, point), INVALID_FD);
+}
 } // namespace MMI
 } // namespace OHOS
+
