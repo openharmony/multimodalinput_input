@@ -305,9 +305,9 @@ const char* EventStatistic::ConvertEventTypeToString(int32_t eventType)
     }
 }
  
-const char* EventStatistic::ConvertSourceTypeToString(int32_t sourceType_)
+const char* EventStatistic::ConvertSourceTypeToString(int32_t sourceType)
 {
-    switch (sourceType_) {
+    switch (sourceType) {
         case InputEvent::SOURCE_TYPE_MOUSE: {
             return "mouse";
         }
