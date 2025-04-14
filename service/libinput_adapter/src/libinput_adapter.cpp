@@ -38,8 +38,6 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "LibinputAdapter"
 
-#define VTRACKPAD_ID 100
-
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -308,14 +306,16 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     getKeyboardActivationState_ = getKeyboardActivationState;
     isFloatingKeyboard_ = isFloatingKeyboard;
 
+    // init touch device Id.
     deviceId = -1;
 
-    auto vTrackpad = std::make_shared<InputDevice>();
-    vTrackpad->SetName("VirtualTrackpad");
-    vTrackpad->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
-    vTrackpad->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
-    int32_t trackpadId = VTRACKPAD_ID;
-    InputDeviceManager::GetInstance()->AddVirtualInputDevice(vTrackpad, trackpadId);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    auto vKeyboard = std::make_shared<InputDevice>();
+    CHKPV(vKeyboard);
+    vKeyboard->SetName("VirtualKeyboard");
+    vKeyboard->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    InputDeviceManager::GetInstance()->AddVirtualInputDevice(vKeyboard, vKeyboardDeviceId_);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
