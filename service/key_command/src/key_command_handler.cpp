@@ -1951,6 +1951,10 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         MMI_HILOGD("The same key is waiting timeout, skip");
         return true;
     }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VCR2 && WIN_MGR->JudgeCaramaInFore()) {
+        MMI_HILOGD("The camera has been activated");
+        return false;
+    }
     if (currentLaunchAbilityKey_.timerId >= 0 && IsKeyMatch(currentLaunchAbilityKey_, keyEvent)) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Repeat, current key %{public}d has launched ability", currentLaunchAbilityKey_.finalKey);
