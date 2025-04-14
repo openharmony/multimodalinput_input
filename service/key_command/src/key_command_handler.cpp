@@ -1077,8 +1077,13 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         !IsMusicActivate()) {
         if (PRODUCT_TYPE == "VDE" && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
             RegisterProximitySensor();
-            int32_t timerId = TimerMgr->AddTimer(FREQUENCY, 1, [this]() {
-                UnregisterProximitySensor();
+            std::weak_ptr<KeyCommandHandler> weakPtr = shared_from_this();
+            int32_t timerId = TimerMgr->AddTimer(FREQUENCY, 1, [weakPtr]() {
+                if (auto sharedPtr = weakPtr.lock()) {
+                    sharedPtr->UnregisterProximitySensor(); // 通过 shared_ptr 安全调用
+                } else {
+                    MMI_HILOGW("Timer fired, but object is already destroyed.");
+                }
             });
             if (timerId < 0) {
                 MMI_HILOGE("Add timer failed");
