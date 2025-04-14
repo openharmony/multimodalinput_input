@@ -882,7 +882,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
-    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
 }
 /**
@@ -895,7 +895,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
-    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
     int32_t pointerId = 3;
     pointerEvent->SetPointerId(pointerId);
     PointerEvent::PointerItem pointerItem;
@@ -913,7 +913,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
-    pointerEvent->SetFixedMode(PointerEvent::FixedMode::ONE_HAND);
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
     int32_t pointerId = 3;
     pointerEvent->SetPointerId(pointerId);
     PointerEvent::PointerItem pointerItem;
