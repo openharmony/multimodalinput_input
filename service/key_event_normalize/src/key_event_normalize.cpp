@@ -337,5 +337,11 @@ int32_t KeyEventNormalize::TransformVolumeKey(struct libinput_device *dev, int32
     }
     return (keyCode == KeyEvent::KEYCODE_VOLUME_DOWN ? KeyEvent::KEYCODE_VOLUME_UP : KeyEvent::KEYCODE_VOLUME_DOWN);
 }
+
+bool KeyEventNormalize::IsScreenFold()
+{
+    CHKPF(g_foldStatusCallback);
+    return g_foldStatusCallback->GetFoldStatus() == Rosen::FoldStatus::FOLDED;
+}
 } // namespace MMI
 } // namespace OHOS
