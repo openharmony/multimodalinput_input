@@ -172,6 +172,10 @@ int32_t DelEventCallbackRef(const napi_env &env, std::list<sptr<KeyEventMonitorI
             info.erase(iter++);
             continue;
         }
+        if (env != (*iter)->env) {
+            MMI_HILOGW("env mismatching");
+            continue;
+        }
         if (handler != nullptr) {
             napi_value iterHandler = nullptr;
             CHKRR(napi_get_reference_value(env, (*iter)->callback, &iterHandler),
@@ -219,6 +223,10 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEven
     auto it = callbacks.find(event->eventType);
     for (const auto &iter: it->second) {
         napi_value handler2 = nullptr;
+        if (iter->env != env) {
+            MMI_HILOGW("env mismatching");
+            continue;
+        }
         status = napi_get_reference_value(env, iter->callback, &handler2);
         if (status != napi_ok) {
             MMI_HILOGE("Handler2 get reference value failed");
@@ -298,6 +306,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     sptr<KeyEventMonitorInfo> dataWorker(static_cast<KeyEventMonitorInfo *>(work->data));
     DeletePtr<uv_work_t *>(work);
     dataWorker->DecStrongRef(nullptr);
+    std::lock_guard<std::mutex> lock(dataWorker->envMutex_);
     CHKPV(dataWorker->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(dataWorker->env, &scope);
@@ -330,6 +339,8 @@ void EmitAsyncCallbackWork(sptr<KeyEventMonitorInfo> reportEvent)
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
     uv_loop_s *loop = nullptr;
+    std::lock_guard<std::mutex> lock(reportEvent->envMutex_);
+    CHKPV(reportEvent->env);
     CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);

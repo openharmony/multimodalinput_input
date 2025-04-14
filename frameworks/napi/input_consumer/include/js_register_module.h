@@ -47,12 +47,14 @@ public:
 
 struct KeyEventMonitorInfo : RefBase {
     napi_env env{ nullptr };
+    std::mutex envMutex_;
     napi_async_work asyncWork{ nullptr };
     std::string eventType;
     std::string name;
     napi_ref callback{ nullptr };
     int32_t subscribeId{ 0 };
     std::shared_ptr<KeyOption> keyOption{ nullptr };
+    KeyEventMonitorInfo();
     ~KeyEventMonitorInfo();
 };
 typedef std::map<std::string, std::list<sptr<KeyEventMonitorInfo>>> Callbacks;
