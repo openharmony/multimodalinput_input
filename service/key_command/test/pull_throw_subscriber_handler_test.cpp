@@ -21,9 +21,9 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PullThrowSubscriberHandlerTest"
 
-namespace OHOS { 
-namespace MMI { 
-namespace { 
+namespace OHOS {
+namespace MMI {
+namespace {
 const int64_t WINDOW_TIME_INTERVAL = 0.5e6 + 1;
 } // namespace
 
@@ -106,8 +106,8 @@ std::shared_ptr<PointerEvent> PullThrowSubscriberHandlerTest::SetupDoubleFingerD
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureDownEvent_001, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureDownEvent_001,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
@@ -121,8 +121,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureDownEvent_002, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureDownEvent_002,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupFingerPoisitionEvent();
@@ -136,8 +136,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureMoveEvent_001, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureMoveEvent_001,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupSingleFingerDownEvent();
@@ -151,8 +151,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureMoveEvent_002, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureMoveEvent_002,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
@@ -167,8 +167,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_001, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_001,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupSingleFingerDownEvent();
@@ -182,8 +182,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_002, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_002,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
@@ -198,8 +198,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_003, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_003,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
@@ -218,8 +218,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_001, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_001,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupSingleFingerDownEvent();
@@ -233,8 +233,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_002, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_002,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
@@ -248,8 +248,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_003, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_003,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
@@ -267,8 +267,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_004, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_004,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
@@ -285,8 +285,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_UpdateFingerPoisition_001, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_UpdateFingerPoisition_001,
+    testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto touchEvent = SetupDoubleFingerDownEvent();
@@ -300,8 +300,8 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_UpdateFi
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_StartFingerGesture_001, testing::ext::TestSize
-.Level1)
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_StartFingerGesture_001,
+ testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->StartFingerGesture());
