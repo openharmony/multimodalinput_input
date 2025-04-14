@@ -101,5 +101,38 @@ HWTEST_F(UDSClientTest, Stop_001, TestSize.Level1)
     UDSClientUnitTest udsClientUt;
     ASSERT_NO_FATAL_FAILURE(udsClientUt.Stop());
 }
+
+HWTEST_F(UDSClientTest, SendMsg_003, TestSize.Level1)
+{
+    const char *buf = "1234#";
+    size_t size = 1025 * 8;
+
+    UDSClientUnitTest udsClientUt;
+    udsClientUt.SetFd(0);
+    auto retResult = udsClientUt.SendMsg(buf, size);
+    ASSERT_FALSE(retResult);
+}
+
+HWTEST_F(UDSClientTest, SendMsg_004, TestSize.Level1)
+{
+    const char *buf = "1234#";
+    size_t size = 0;
+
+    UDSClientUnitTest udsClientUt;
+    udsClientUt.SetFd(0);
+    auto retResult = udsClientUt.SendMsg(buf, size);
+    ASSERT_FALSE(retResult);
+}
+
+HWTEST_F(UDSClientTest, SendMsg_005, TestSize.Level1)
+{
+    const char *buf = "1234#";
+    size_t size = 8;
+
+    UDSClientUnitTest udsClientUt;
+    udsClientUt.SetFd(0);
+    auto retResult = udsClientUt.SendMsg(buf, size);
+    ASSERT_FALSE(retResult);
+}
 } // namespace MMI
 } // namespace OHOS
