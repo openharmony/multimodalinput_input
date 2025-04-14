@@ -3088,7 +3088,7 @@ void KeyCommandHandler::UnregisterProximitySensor()
         return;
     }
     hasRegisteredSensor_ = false;
-    int32_t ret = DeactiveSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user)
+    int32_t ret = DeactivateSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
     if (ret != 0) {
         MMI_HILOGE("Failed to DeactiveSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
     }
