@@ -178,7 +178,7 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     mode_ = si->GetSourceMode();
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
-    if (IsExtend()) {
+    if (IsExtend() || IsMirror()) {
         surfaceNode_->AttachToDisplay(screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
