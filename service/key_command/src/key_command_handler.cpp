@@ -24,6 +24,7 @@
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_command_handler_util.h"
+#include "key_event_normalize.h"
 #include "long_press_subscriber_handler.h"
 #include "pull_throw_subscriber_handler.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
@@ -32,6 +33,7 @@
 #include "sensor_agent.h"
 #include "sensor_agent_type.h"
 #include "stylus_key_handler.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -80,6 +82,7 @@ const char *TV_MENU_ABILITY_NAME = "com.ohos.sceneboard.MultimodalInputService";
 constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
 constexpr int32_t SENSOR_REPORT_INTERVAL = 100000000;
+const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 struct SensorUser g_user = {.name = {0}, .callback = nullptr, .userData = nullptr};
 std::atomic<int32_t> g_distance { 0 };
 } // namespace
@@ -1071,7 +1074,21 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         return true;
     }
     if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
-        !IsMusicActivate() && (g_distance > 0)) {
+        !IsMusicActivate()) {
+        if (PRODUCT_TYPE == "VDE" && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+            RegisterProximitySensor();
+            std::weak_ptr<KeyCommandHandler> weakPtr = shared_from_this();
+            int32_t timerId = TimerMgr->AddTimer(FREQUENCY, 1, [weakPtr]() {
+                if (auto sharedPtr = weakPtr.lock()) {
+                    sharedPtr->UnregisterProximitySensor(); // 通过 shared_ptr 安全调用
+                } else {
+                    MMI_HILOGW("Timer fired, but object is already destroyed.");
+                }
+            });
+            if (timerId < 0) {
+                MMI_HILOGE("Add timer failed");
+            }
+        }
         return true;
     }
     MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
@@ -1760,7 +1777,15 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
 {
     BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
     DfxHisysevent::ReportKeyEvent(item.ability.bundleName);
-    LaunchAbility(item.ability);
+    std::string bundleName = item.ability.bundleName;
+    std::string matchName = ".camera";
+    if (item.keyCode == KeyEvent::KEYCODE_VOLUME_DOWN && bundleName.find(matchName) != std::string::npos) {
+        if (g_distance > 0) {
+            LaunchAbility(item.ability);
+        }
+    } else {
+        LaunchAbility(item.ability);
+    }
     BytraceAdapter::StopLaunchAbility();
     repeatKeyCountMap_.clear();
     isLaunched = true;
@@ -2965,6 +2990,14 @@ void KeyCommandHandler::MenuClickProcess(const std::string bundleName,
 void KeyCommandHandler::RegisterProximitySensor()
 {
     CALL_INFO_TRACE;
+    if (hasRegisteredSensor_) {
+        MMI_HILOGE("Has SubscribeSensor %{public}d", SENSOR_TYPE_ID_PROXIMITY);
+        return;
+    }
+    if (!KeyEventHdr->IsScreenFold()) {
+        MMI_HILOGD("Screen not fold");
+        return;
+    }
     g_user.callback = SensorDataCallbackImpl;
     int32_t ret = SubscribeSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
     if (ret != 0) {
@@ -2979,7 +3012,9 @@ void KeyCommandHandler::RegisterProximitySensor()
     ret = ActivateSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
     if (ret != 0) {
         MMI_HILOGE("Failed to ActivateSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+        return;
     }
+    hasRegisteredSensor_ = true;
 }
 
 int32_t KeyCommandHandler::SetKnuckleSwitch(bool knuckleSwitch)
@@ -3044,6 +3079,23 @@ int32_t KeyCommandHandler::LaunchAiScreenAbility(int32_t pid)
     twoFingerGesture_.windowId = -1;
     twoFingerGesture_.windowPid = -1;
     return RET_OK;
+}
+
+void KeyCommandHandler::UnregisterProximitySensor()
+{
+    if (!hasRegisteredSensor_) {
+        MMI_HILOGI("Has registered sensor: %{public}d", SENSOR_TYPE_ID_PROXIMITY);
+        return;
+    }
+    hasRegisteredSensor_ = false;
+    int32_t ret = DeactivateSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
+    if (ret != 0) {
+        MMI_HILOGE("Failed to DeactiveSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+    }
+    ret = UnsubscribeSensor(SENSOR_TYPE_ID_PROXIMITY, &g_user);
+    if (ret != 0) {
+        MMI_HILOGE("Failed to UnsubscribeSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

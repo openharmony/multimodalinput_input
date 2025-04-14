@@ -191,6 +191,7 @@ public:
     bool PreHandleEvent();
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
     void RegisterProximitySensor();
+    void UnregisterProximitySensor();
     int32_t LaunchAiScreenAbility(int32_t pid);
 
 private:
@@ -413,6 +414,7 @@ private:
     bool existMenuDown_ { false };
     std::shared_ptr<KeyEvent> tmpkeyEvent_ {nullptr};
     bool gameForbidFingerKnuckle_ { false };
+    bool hasRegisteredSensor_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
