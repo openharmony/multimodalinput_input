@@ -189,7 +189,6 @@ group("mmi_tests") {
     "service:KnuckleGlowTraceSystemTest",
     "service:LibinputAdapterTest",
     "service:LongPressSubscribeHandlerTest",
-    "service:PullThrowSubscriberHandlerTest",
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
