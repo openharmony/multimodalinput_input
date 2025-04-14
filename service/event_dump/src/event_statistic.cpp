@@ -144,9 +144,9 @@ void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
     eventStr += ",pointers:[";
     size_t pointerSize = 0;
     std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
-    std::string displayX = "***";
-    std::string displayY = "***";
     for (auto it = pointerItems.begin(); it != pointerItems.end(); it++) {
+        std::string displayX = "***";
+        std::string displayY = "***";
         pointerSize++;
         if (!eventPtr->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             displayX = std::to_string((*it).GetDisplayX());
@@ -181,7 +181,6 @@ void EventStatistic::PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr)
     CHKPV(eventPtr);
     std::string eventStr = ConvertInputEventToStr(eventPtr);
     std::string keyCode = "***";
-    std::string keyItemCode = "***";
     if (!eventPtr->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         keyCode = std::to_string(eventPtr->GetKeyCode());
     }
@@ -191,6 +190,7 @@ void EventStatistic::PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr)
     auto keyItems = eventPtr->GetKeyItems();
     eventStr += ",keyItems:[";
     for (size_t i = 0; i < keyItems.size(); i++) {
+        std::string keyItemCode = "***";
         int32_t pressed = keyItems[i].IsPressed() ? 1 : 0;
         if (!eventPtr->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             keyItemCode = std::to_string(keyItems[i].GetKeyCode());
