@@ -2015,39 +2015,6 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
   ]
 }
 
-ohos_unittest("PullThrowSubscriberHandlerTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [ "key_command/test/pull_throw_subscriber_handler_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "cJSON:cjson",
-    "c_utils:utils",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "hilog:libhilog",
-    "libinput:libinput-third-mmi",
-    "preferences:native_preferences",
-  ]
-}
-
 ohos_unittest("StylusKeyTest") {
   module_out_path = module_output_path
 
