@@ -129,7 +129,7 @@ bool ScreenPointer::InitSurface()
     // create SurfaceNode
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = RS_SURFACE_NODE_NAME;
-    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE);
+    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, Rosen::RSSurfaceNodeType::CURSOR_NODE);
     CHKPF(surfaceNode_);
     MMI_HILOGE("SurfaceNode::Create success");
 
