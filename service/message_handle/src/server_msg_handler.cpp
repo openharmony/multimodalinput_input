@@ -758,7 +758,6 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
         pkt >> info.pointerActiveWidth >> info.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
         pkt >> info.groupId;
-        // hgc
         if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
             info.uniq = "default" + std::to_string(info.id);
         }
