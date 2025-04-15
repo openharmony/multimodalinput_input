@@ -29,8 +29,8 @@ namespace OHOS {
 namespace MMI {
 const char* SHORTHAND_ABILITY_NAME { "HiNotePcMainAbility" };
 const char* SHORTHAND_BUNDLE_NAME { "com.hmos.hinote" };
-const char* MEMORANDUM_ABILITY_NAME { "MainAbility" };
-const char* MEMORANDUM_BUNDLE_NAME { "com.hmos.hinote.notepad" };
+const char* MEMORANDUM_ABILITY_NAME { "QuickNoteAbility" };
+const char* MEMORANDUM_BUNDLE_NAME { "com.hmos.notepad" };
 const char* IS_SCREEN_OFF { "is_sceen_off" };
 const char* SHORTHAND_SWITCH { "shorthand_switch_state" };
 const char* SHORTHAND_TARGET { "shorthand_target" };
