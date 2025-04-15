@@ -26,6 +26,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t TEN_FINGERS { 10 };
+constexpr int32_t THREE_FINGERS { 3 };
+constexpr int32_t FOUR_FINGERS { 4 };
 } // namespace
 
 class InputHandlerManagerTest : public testing::Test {
@@ -599,7 +602,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsThreeFingersSwipeTyp
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->SetFingerCount(3);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
     bool ret = manager.IsThreeFingersSwipeType(pointerEvent);
     ASSERT_TRUE(ret);
@@ -612,12 +615,274 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsThreeFingersSwipeTyp
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
     ret = manager.IsThreeFingersSwipeType(pointerEvent);
     ASSERT_FALSE(ret);
-    pointerEvent->SetFingerCount(10);
+    pointerEvent->SetFingerCount(TEN_FINGERS);
     ret = manager.IsThreeFingersSwipeType(pointerEvent);
     ASSERT_FALSE(ret);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     ret = manager.IsThreeFingersSwipeType(pointerEvent);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_IsFourFingersSwipeType_001
+ * @tc.desc: Test the funcation IsFourFingersSwipeType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsFourFingersSwipeType_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetFingerCount(FOUR_FINGERS);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    bool ret = manager.IsFourFingersSwipeType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    ret = manager.IsFourFingersSwipeType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    ret = manager.IsFourFingersSwipeType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
+    ret = manager.IsFourFingersSwipeType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetFingerCount(TEN_FINGERS);
+    ret = manager.IsThreeFingersSwipeType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    ret = manager.IsFourFingersSwipeType(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_IsThreeFingersTapType_001
+ * @tc.desc: Test the funcation IsThreeFingersTapType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsThreeFingersTapType_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    bool ret = manager.IsThreeFingersTapType(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    ret = manager.IsThreeFingersTapType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetFingerCount(TEN_FINGERS);
+    ret = manager.IsThreeFingersTapType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    ret = manager.IsThreeFingersTapType(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+/**
+ * @tc.name: InputHandlerManagerTest_IsFingerprintType_001
+ * @tc.desc: Test the funcation IsFingerprintType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsFingerprintType_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_EXIT);
+    bool ret = manager.IsFingerprintType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
+    ret = manager.IsFingerprintType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
+    ret = manager.IsFingerprintType(pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK);
+    ret = manager.IsFingerprintType(pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL);
+    ret = manager.IsFingerprintType(pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD);
+    ret = manager.IsFingerprintType(pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH);
+    ret = manager.IsFingerprintType(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+/**
+ * @tc.name: InputHandlerManagerTest_IsXKeyType_001
+ * @tc.desc: Test the funcation IsXKeyType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsXKeyType_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    bool ret = manager.IsXKeyType(pointerEvent);
+    ASSERT_FALSE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
+    ret = manager.IsXKeyType(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+#endif // OHOS_BUILD_ENABLE_X_KEY
+
+/**
+ * @tc.name: InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_001
+ * @tc.desc: Test the funcation CheckIfNeedAddToConsumerInfos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    InputHandlerManager::Handler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_POINTER;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    bool ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_SWIPEINWARD;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_TOUCH;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_MOUSE;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_002
+ * @tc.desc: Test the funcation CheckIfNeedAddToConsumerInfos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_002, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    InputHandlerManager::Handler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_PINCH;
+    auto ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_THREEFINGERSSWIP;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_FOURFINGERSSWIP;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetFingerCount(FOUR_FINGERS);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_003
+ * @tc.desc: Test the funcation CheckIfNeedAddToConsumerInfos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_003, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    InputHandlerManager::Handler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    handler.eventType_ = HANDLE_EVENT_TYPE_ROTATE;
+    auto ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    handler.eventType_ = HANDLE_EVENT_TYPE_THREEFINGERSTAP;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    handler.eventType_ = HANDLE_EVENT_TYPE_FINGERPRINT;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+    #endif
+
+    #ifdef OHOS_BUILD_ENABLE_X_KEY
+    handler.eventType_ = HANDLE_EVENT_TYPE_X_KEY;
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
+    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
+    ASSERT_TRUE(ret);
+    #endif
 }
 } // namespace MMI
 } // namespace OHOS
