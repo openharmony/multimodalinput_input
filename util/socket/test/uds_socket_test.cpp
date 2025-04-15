@@ -132,5 +132,39 @@ HWTEST_F(UDSSocketTest, EpollWait_004, TestSize.Level1)
     int32_t retResult = socObj.EpollWait(*events, MAX_EVENT_SIZE, timeout);
     ASSERT_EQ(-1, retResult);
 }
+
+HWTEST_F(UDSSocketTest, EpollCtl_005, TestSize.Level1)
+{
+    int32_t fd = 1001;
+    int32_t op = 2;
+    int32_t epollFd = 1;
+    struct epoll_event event = {};
+
+    UDSSocketUnitTest socObj;
+    int32_t retResult = socObj.EpollCtl(fd, op, event, epollFd);
+    ASSERT_EQ(-1, retResult);
+}
+
+HWTEST_F(UDSSocketTest, EpollCtl_006, TestSize.Level1)
+{
+    int32_t fd = 1001;
+    int32_t op = 1;
+    int32_t epollFd = 1;
+    struct epoll_event event = {};
+
+    UDSSocketUnitTest socObj;
+    int32_t retResult = socObj.EpollCtl(fd, op, event, epollFd);
+    ASSERT_EQ(-1, retResult);
+}
+
+HWTEST_F(UDSSocketTest, EpollWait_005, TestSize.Level1)
+{
+    struct epoll_event events[MAX_EVENT_SIZE] = {};
+    int32_t timeout = -1001;
+    int32_t epollFd = 1;
+    UDSSocketUnitTest socObj;
+    int32_t retResult = socObj.EpollWait(*events, MAX_EVENT_SIZE, timeout, epollFd);
+    ASSERT_EQ(-1, retResult);
+}
 } // namespace MMI
 } // namespace OHOS
