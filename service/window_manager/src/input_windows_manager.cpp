@@ -2623,7 +2623,8 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         width, height, coord.x, coord.y);
     Coordinate2D pos = { .x = coord.x, .y = coord.y };
     if (IsPositionOutValidDisplay(pos, info, true)) {
-        MMI_HILOGD("The position is out of the valid display");
+        MMI_HILOGW("Position out valid display width:%{private}d, height:%{private}d, "
+            "physicalX:%{private}f, physicalY:%{private}f", width, height, pos.x, pos.y);
         if (isNeedClear) {
             int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
             TriggerTouchUpOnInvalidAreaEntry(seatSlot);
