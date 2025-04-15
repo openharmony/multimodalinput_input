@@ -144,9 +144,9 @@ public:
     {
         MMI_HILOGI("DisplyStatusReceiver register");
     }
- 
+
     virtual ~DisplyStatusReceiver() = default;
- 
+
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
         std::string action = eventData.GetWant().GetAction();
@@ -210,8 +210,8 @@ void PointerDrawingManager::InitPointerCallback()
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::SET_ON_REMOTE_DIED_CALLBACK, durationMS);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (HasMagicCursor() && surfaceNode_ != nullptr) {
-        surfaceNode_ = nullptr;
+    if (HasMagicCursor() && (GetSurfaceNode() != nullptr)) {
+        SetSurfaceNode(nullptr);
         MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -233,11 +233,12 @@ void PointerDrawingManager::DestroyPointerWindow()
     CALL_INFO_TRACE;
     CHKPV(delegateProxy_);
     delegateProxy_->OnPostSyncTask([this] {
-        if (surfaceNode_ != nullptr) {
+        auto surfaceNodePtr = GetSurfaceNode();
+        if (surfaceNodePtr != nullptr) {
             MMI_HILOGI("Pointer window destroy start screenId_ %{public}" PRIu64, screenId_);
             g_isRsRemoteDied = false;
-            surfaceNode_->DetachToDisplay(screenId_);
-            surfaceNode_ = nullptr;
+            surfaceNodePtr->DetachToDisplay(screenId_);
+            SetSurfaceNode(nullptr);
             MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
             Rosen::RSTransaction::FlushImplicitTransaction();
             MMI_HILOGI("Pointer window destroy success");
@@ -326,9 +327,10 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
         magicCursorSetBounds = true;
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPF(surfaceNodePtr);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hardwareCursorPointerManager_);
-    CHKPF(surfaceNode_);
     if (g_isHdiRemoteDied) {
         hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
@@ -341,8 +343,8 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
                 SoftwareCursorMoveAsync(physicalX, physicalY, iconType);
             }
         } else {
-            surfaceNode_->SetBounds(physicalX, physicalY, surfaceNode_->GetStagingProperties().GetBounds().z_,
-                surfaceNode_->GetStagingProperties().GetBounds().w_);
+            surfaceNodePtr->SetBounds(physicalX, physicalY, surfaceNodePtr->GetStagingProperties().GetBounds().z_,
+                surfaceNodePtr->GetStagingProperties().GetBounds().w_);
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
     }
@@ -354,8 +356,8 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
     }
 #else
     if (!magicCursorSetBounds) {
-        surfaceNode_->SetBounds(physicalX, physicalY,
-            surfaceNode_->GetStagingProperties().GetBounds().z_, surfaceNode_->GetStagingProperties().GetBounds().w_);
+        surfaceNodePtr->SetBounds(physicalX, physicalY, surfaceNodePtr->GetStagingProperties().GetBounds().z_,
+            surfaceNodePtr->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -386,7 +388,7 @@ int32_t PointerDrawingManager::UpdateMouseLayer(const PointerStyle& pointerStyle
 int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
-    CHKPR(surfaceNode_, RET_ERR);
+    CHKPR(GetSurfaceNode(), RET_ERR);
     MMI_HILOGD("Pointer window move success, pointerStyle id:%{public}d", pointerStyle.id);
     displayId_ = displayId;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -443,13 +445,12 @@ int32_t PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
+        auto surfaceNodePtr = GetSurfaceNode();
+        CHKPR(surfaceNodePtr, RET_ERR);
         if (currentMouseStyle_.id == DEVELOPER_DEFINED_ICON) {
-            surfaceNode_->SetBounds(physicalX, physicalY,
-                canvasWidth_, canvasHeight_);
+            surfaceNodePtr->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
         } else {
-            CHKPR(surfaceNode_, RET_ERR);
-            surfaceNode_->SetBounds(physicalX, physicalY,
-                imageWidth_, imageHeight_);
+            surfaceNodePtr->SetBounds(physicalX, physicalY, imageWidth_, imageHeight_);
         }
         return RET_OK;
     }
@@ -464,7 +465,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     UpdateBindDisplayId(displayId);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (surfaceNode_ != nullptr) {
+    if (GetSurfaceNode() != nullptr) {
         if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             return;
         }
@@ -529,7 +530,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
 #else
     CreatePointerWindow(displayId, physicalX, physicalY, direction);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    CHKPV(surfaceNode_);
+    CHKPV(GetSurfaceNode());
     UpdateMouseStyle();
     if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         MMI_HILOGE("Init layer failed");
@@ -667,14 +668,15 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
             MAGIC_CURSOR->InitRenderThread([]() { IPointerDrawingManager::GetInstance()->SwitchPointerStyle(); });
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-            CHKPV(surfaceNode_);
+            auto surfaceNodePtr = GetSurfaceNode();
+            CHKPV(surfaceNodePtr);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
             MMI_HILOGD("Switch pointer style");
-            int64_t nodeId = static_cast<int64_t>(this->surfaceNode_->GetId());
+            int64_t nodeId = static_cast<int64_t>(surfaceNodePtr->GetId());
             if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
                 MMI_HILOGI("DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
-                surfaceNode_->DetachToDisplay(screenId_);
-                surfaceNode_ = nullptr;
+                surfaceNodePtr->DetachToDisplay(screenId_);
+                SetSurfaceNode(nullptr);
                 Rosen::RSTransaction::FlushImplicitTransaction();
             }
             MAGIC_CURSOR->DetachDisplayNode();
@@ -707,7 +709,7 @@ bool PointerDrawingManager::HasMagicCursor()
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return hasMagicCursor_.isShow;
 }
- 
+
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
 {
@@ -791,14 +793,15 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(surfaceNode_, RET_ERR);
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPR(surfaceNodePtr, RET_ERR);
     DrawLoadingPointerStyle(mouseStyle);
     DrawRunningPointerAnimate(mouseStyle);
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
         MMI_HILOGE("Init layer is failed, Layer is nullptr");
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
+        surfaceNodePtr->DetachToDisplay(screenId_);
+        SetSurfaceNode(nullptr);
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
@@ -807,8 +810,8 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
         MMI_HILOGI("DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
+        surfaceNodePtr->DetachToDisplay(screenId_);
+        SetSurfaceNode(nullptr);
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
@@ -838,7 +841,8 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
 void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(surfaceNode_);
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPV(surfaceNodePtr);
     Rosen::RSAnimationTimingProtocol protocol;
     if (mouseStyle != MOUSE_ICON::LOADING &&
         (mouseStyle != MOUSE_ICON::DEFAULT ||
@@ -859,7 +863,7 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
         return;
     }
     float ratio = imageWidth_ * 1.0 / canvasWidth_;
-    surfaceNode_->SetPivot({LOADING_CENTER_RATIO * ratio, LOADING_CENTER_RATIO * ratio});
+    surfaceNodePtr->SetPivot({LOADING_CENTER_RATIO * ratio, LOADING_CENTER_RATIO * ratio});
     protocol.SetDuration(ANIMATION_DURATION);
     protocol.SetRepeatCount(DEFAULT_VALUE);
 
@@ -867,7 +871,11 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
     Rosen::RSNode::Animate(
         protocol,
         Rosen::RSAnimationTimingCurve::LINEAR,
-        [this]() { surfaceNode_->SetRotation(ROTATION_ANGLE); });
+        [this]() {
+            auto ptr = GetSurfaceNode();
+            CHKPV(ptr);
+            ptr->SetRotation(ROTATION_ANGLE);
+        });
 
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -1216,7 +1224,7 @@ void PointerDrawingManager::SoftCursorRenderThreadLoop()
 void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(surfaceNode_);
+    CHKPV(GetSurfaceNode());
     CHKPV(canvasNode_);
     if (mouseStyle != MOUSE_ICON::RUNNING && (mouseStyle != MOUSE_ICON::DEFAULT ||
             mouseIcons_[mouseStyle].iconPath != (IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg"))) {
@@ -1584,7 +1592,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
 void PointerDrawingManager::AttachToDisplay()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(surfaceNode_);
+    CHKPV(GetSurfaceNode());
     if (IsSingleDisplayFoldDevice() && (WIN_MGR->GetDisplayMode() == DisplayMode::MAIN)
         && (screenId_ == FOLD_SCREEN_ID_FULL)) {
         screenId_ = FOLD_SCREEN_ID_MAIN;
@@ -1599,18 +1607,21 @@ void PointerDrawingManager::AttachToDisplay()
     if (hardwareCursorPointerManager_->IsSupported()) {
         auto sp = GetScreenPointer(screenId_);
         CHKPV(sp);
-        surfaceNode_ = sp->GetSurfaceNode();
-        if (originSetColor_ != -1 && surfaceNode_ != nullptr) {
+        SetSurfaceNode(sp->GetSurfaceNode());
+        auto ptr = GetSurfaceNode();
+        if ((originSetColor_ != -1) && (ptr != nullptr)) {
             float alphaRatio = (static_cast<uint32_t>(originSetColor_) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
             if (alphaRatio > 1) {
                 MMI_HILOGW("Invalid alphaRatio:%{public}f", alphaRatio);
             } else {
-                surfaceNode_->SetAlpha(1 - alphaRatio);
+                ptr->SetAlpha(1 - alphaRatio);
             }
         }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    surfaceNode_->AttachToDisplay(screenId_);
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPV(surfaceNodePtr);
+    surfaceNodePtr->AttachToDisplay(screenId_);
 }
 
 void PointerDrawingManager::CreateCanvasNode()
@@ -1624,7 +1635,8 @@ void PointerDrawingManager::CreateCanvasNode()
         return;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(surfaceNode_);
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPV(surfaceNodePtr);
     canvasNode_ = Rosen::RSCanvasNode::Create();
     CHKPV(canvasNode_);
     canvasNode_->SetBounds(0, 0, canvasWidth_, canvasHeight_);
@@ -1637,7 +1649,7 @@ void PointerDrawingManager::CreateCanvasNode()
     canvasNode_->SetCornerRadius(1);
     canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     canvasNode_->SetRotation(0);
-    surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
+    surfaceNodePtr->AddChild(canvasNode_, DEFAULT_VALUE);
 }
 
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -1656,7 +1668,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
                     it.second->Init();
                 }
                 if (displayId == displayInfo_.uniqueId) {
-                    surfaceNode_ = sp->GetSurfaceNode();
+                    SetSurfaceNode(sp->GetSurfaceNode());
                 }
                 Rosen::RSTransaction::FlushImplicitTransaction();
                 g_isRsRestart = true;
@@ -1671,7 +1683,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
                 return RET_ERR;
             }
             if (displayId == displayInfo_.uniqueId) {
-                surfaceNode_ = sp->GetSurfaceNode();
+                SetSurfaceNode(sp->GetSurfaceNode());
             }
             MMI_HILOGI("ScreenPointer displayId %{public}d displayInfo_.uniqueId %{public}d",
                 displayId, displayInfo_.uniqueId);
@@ -1679,13 +1691,13 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
         }
     }
     CHKPR(sp, RET_ERR);
-    surfaceNode_ = sp->GetSurfaceNode(); // use SurfaceNode from current display
-    CHKPR(surfaceNode_, RET_ERR);
+    SetSurfaceNode(sp->GetSurfaceNode()); // use SurfaceNode from current display
+    CHKPR(GetSurfaceNode(), RET_ERR);
     sp->MoveSoft(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)));
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
- 
+
 int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t displayId,
     int32_t physicalX, int32_t physicalY)
 {
@@ -1693,15 +1705,16 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t dis
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    CHKPR(surfaceNode_, RET_ERR);
-    surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
-    surfaceNode_->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
+    SetSurfaceNode(Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType));
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPR(surfaceNodePtr, RET_ERR);
+    surfaceNodePtr->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
+    surfaceNodePtr->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
+    surfaceNodePtr->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
 #ifndef USE_ROSEN_DRAWING
-    surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
+    surfaceNodePtr->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
-    surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    surfaceNodePtr->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
     return RET_OK;
 }
@@ -1747,8 +1760,9 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
 {
     CALL_DEBUG_ENTER;
-    CHKPP(surfaceNode_);
-    return surfaceNode_->GetSurface();
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPP(surfaceNodePtr);
+    return surfaceNodePtr->GetSurface();
 }
 
 sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer)
@@ -1816,7 +1830,9 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
         SetPixelMap(userIconCopy);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     } else {
-        surfaceNode_->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
+        auto surfaceNodePtr = GetSurfaceNode();
+        CHKPV(surfaceNodePtr);
+        surfaceNodePtr->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
         if (mouseStyle == MOUSE_ICON::RUNNING) {
             pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
         } else {
@@ -2175,12 +2191,13 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     }
     MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
     if (!WIN_MGR->GetExtraData().drawCursor) {
-        if (surfaceNode_ != nullptr) {
+        auto surfaceNodePtr = GetSurfaceNode();
+        if (surfaceNodePtr != nullptr) {
             float alphaRatio = (static_cast<uint32_t>(color) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
             if (alphaRatio > 1) {
                 MMI_HILOGW("Invalid alphaRatio:%{public}f", alphaRatio);
             } else {
-                surfaceNode_->SetAlpha(1 - alphaRatio);
+                surfaceNodePtr->SetAlpha(1 - alphaRatio);
             }
         }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -2278,7 +2295,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
         return ret;
     }
 
-    CHKPR(surfaceNode_, RET_OK);
+    CHKPR(GetSurfaceNode(), RET_OK);
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
@@ -2332,7 +2349,8 @@ void PointerDrawingManager::GetPointerImageSize(int32_t &width, int32_t &height)
 
 int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
 {
-    surfaceId = (surfaceNode_ != nullptr ? surfaceNode_->GetId() : Rosen::INVALID_NODEID);
+    auto surfaceNodePtr = GetSurfaceNode();
+    surfaceId = ((surfaceNodePtr != nullptr) ? surfaceNodePtr->GetId() : Rosen::INVALID_NODEID);
     MMI_HILOGI("CursorSurfaceId:%{public}" PRIu64, surfaceId);
     return RET_OK;
 }
@@ -2356,11 +2374,12 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
     lastPhysicalX_ = displayInfo.validWidth / CALCULATE_MIDDLE;
     lastPhysicalY_ = displayInfo.validHeight / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.uniqueId);
-    if (surfaceNode_ != nullptr) {
+    auto surfaceNodePtr = GetSurfaceNode();
+    if (surfaceNodePtr != nullptr) {
 #ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
+        surfaceNodePtr->DetachToDisplay(screenId_);
+        SetSurfaceNode(nullptr);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
@@ -2396,7 +2415,8 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         DeletePointerVisible(getpid());
     }
     DrawManager();
-    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
+    auto surfaceNodePtr = GetSurfaceNode();
+    if (!hasPointerDevice_ && (surfaceNodePtr != nullptr)) {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         {
             std::lock_guard<std::mutex> lock(mtx_);
@@ -2408,8 +2428,8 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         MMI_HILOGD("Pointer window destroy start");
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
+        surfaceNodePtr->DetachToDisplay(screenId_);
+        SetSurfaceNode(nullptr);
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
@@ -2429,14 +2449,14 @@ void PointerDrawingManager::AttachAllSurfaceNode()
             continue;
         }
         auto screenId = sp.second->GetScreenId();
-        if (screenId == screenId_ && surfaceNode_ == nullptr) {
+        if (screenId == screenId_ && GetSurfaceNode() == nullptr) {
             MMI_HILOGI("surfaceNode_ is nullptr skip screenId:%{public}u", screenId);
             continue;
         }
         MMI_HILOGI("Attach screenId:%{public}u", screenId);
         surfaceNode->AttachToDisplay(screenId);
     }
-    if (surfaceNode_ == nullptr) {
+    if (GetSurfaceNode() == nullptr) {
         for (auto sp : screenPointers_) {
             if (sp.second != nullptr && sp.second->IsMirror()) {
                 sp.second->SetInvisible();
@@ -2447,7 +2467,7 @@ void PointerDrawingManager::AttachAllSurfaceNode()
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
- 
+
 void PointerDrawingManager::DetachAllSurfaceNode()
 {
     std::lock_guard<std::mutex> lock(mtx_);
@@ -2468,19 +2488,20 @@ void PointerDrawingManager::DetachAllSurfaceNode()
 void PointerDrawingManager::DrawManager()
 {
     CALL_DEBUG_ENTER;
+    auto surfaceNodePtr = GetSurfaceNode();
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor() && lastDrawPointerStyle_.id != currentMouseStyle_.id
         && (lastDrawPointerStyle_.id == DEVELOPER_DEFINED_ICON
         || currentMouseStyle_.id == DEVELOPER_DEFINED_ICON)) {
-        if (surfaceNode_ != nullptr) {
+        if (surfaceNodePtr != nullptr) {
             MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
-            surfaceNode_->DetachToDisplay(screenId_);
-            surfaceNode_ = nullptr;
+            surfaceNodePtr->DetachToDisplay(screenId_);
+            SetSurfaceNode(nullptr);
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (hasDisplay_ && hasPointerDevice_ && surfaceNode_ == nullptr) {
+    if (hasDisplay_ && hasPointerDevice_ && (surfaceNodePtr == nullptr)) {
         MMI_HILOGI("Draw pointer begin");
         PointerStyle pointerStyle;
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
@@ -2533,9 +2554,10 @@ IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(surfaceNode_);
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPV(surfaceNodePtr);
     if (IsPointerVisible() && mouseDisplayState_) {
-        surfaceNode_->SetVisible(true);
+        surfaceNodePtr->SetVisible(true);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         CHKPV(hardwareCursorPointerManager_);
         if (g_isHdiRemoteDied) {
@@ -2567,7 +2589,7 @@ void PointerDrawingManager::UpdatePointerVisible()
             HideHardwareCursors();
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        surfaceNode_->SetVisible(false);
+        surfaceNodePtr->SetVisible(false);
         MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s",
             mouseDisplayState_ ? "true" : "false");
     }
@@ -2614,11 +2636,12 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("The g_isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
-    if (g_isRsRemoteDied && surfaceNode_ != nullptr) {
+    auto surfaceNodePtr = GetSurfaceNode();
+    if (g_isRsRemoteDied && (surfaceNodePtr != nullptr)) {
         g_isRsRemoteDied = false;
         MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
+        surfaceNodePtr->DetachToDisplay(screenId_);
+        SetSurfaceNode(nullptr);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
     if (pidInfos_.empty()) {
@@ -2721,7 +2744,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t dis
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
     MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
-    CHKPV(surfaceNode_);
+    CHKPV(GetSurfaceNode());
     displayId_ = displayId;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPV(hardwareCursorPointerManager_);
@@ -2937,7 +2960,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
     CALL_DEBUG_ENTER;
     bool simulate = WIN_MGR->IsMouseSimulate();
     if (hasDisplay_ && (hasPointerDevice_ || simulate)) {
-        if (surfaceNode_ != nullptr) {
+        if (GetSurfaceNode() != nullptr) {
             AttachToDisplay();
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             PostTask([]() {
@@ -3132,17 +3155,19 @@ void PointerDrawingManager::RotateDegree(Direction direction)
             return;
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(surfaceNode_);
-    surfaceNode_->SetPivot(0, 0);
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPV(surfaceNodePtr);
+    surfaceNodePtr->SetPivot(0, 0);
     float degree = (static_cast<int>(DIRECTION0) - static_cast<int>(direction)) * ROTATION_ANGLE90;
-    surfaceNode_->SetRotation(degree);
+    surfaceNodePtr->SetRotation(degree);
 }
 
 int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
 {
     CALL_INFO_TRACE;
-    if (surfaceNode_ != nullptr) {
-        surfaceNode_->SetSkipLayer(isSkip);
+    auto surfaceNodePtr = GetSurfaceNode();
+    if (surfaceNodePtr != nullptr) {
+        surfaceNodePtr->SetSkipLayer(isSkip);
     }
     return RET_OK;
 }
@@ -3243,7 +3268,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
         screenId_ = static_cast<uint64_t>(displayId);
         MMI_HILOGI("The screenId_:%{public}" PRIu64, screenId_);
         AttachToDisplay();
- 
+
         // 新屏幕上重新绘制软硬光标
         UpdatePointerVisible();
     }
@@ -3571,7 +3596,7 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
 {
     CALL_DEBUG_ENTER;
     if (hasDisplay_ && hasPointerDevice_) {
-        if (surfaceNode_ != nullptr) {
+        if (GetSurfaceNode() != nullptr) {
             AttachToDisplay();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
@@ -3645,8 +3670,9 @@ void PointerDrawingManager::SetSurfaceNodeBounds()
         canvasWidth_ = cursorWidth_;
         canvasHeight_ = cursorHeight_;
     }
-    CHKPV(surfaceNode_);
-    surfaceNode_->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPV(surfaceNodePtr);
+    surfaceNodePtr->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
 }
 
 int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor,
@@ -3716,6 +3742,18 @@ int32_t PointerDrawingManager::DrawNewDpiPointer()
         return RET_ERR;
     }
     return RET_OK;
+}
+
+std::shared_ptr<Rosen::RSSurfaceNode> PointerDrawingManager::GetSurfaceNode()
+{
+    std::unique_lock<std::mutex> lockGuard(surfaceNodeMutex_);
+    return surfaceNode_;
+}
+
+void PointerDrawingManager::SetSurfaceNode(std::shared_ptr<Rosen::RSSurfaceNode> ptr)
+{
+    std::unique_lock<std::mutex> lockGuard(surfaceNodeMutex_);
+    surfaceNode_ = ptr;
 }
 } // namespace MMI
 } // namespace OHOS
