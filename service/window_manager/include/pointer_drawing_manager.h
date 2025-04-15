@@ -249,7 +249,8 @@ private:
     void DetachAllSurfaceNode() override;
     int32_t CheckHwcReady() override;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-
+    std::shared_ptr<Rosen::RSSurfaceNode> GetSurfaceNode();
+    void SetSurfaceNode(std::shared_ptr<Rosen::RSSurfaceNode> ptr);
 private:
     struct PidInfo {
         int32_t pid { 0 };
@@ -278,6 +279,7 @@ private:
     bool mouseIconUpdate_ { false };
     std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
     uint64_t screenId_ { 0 };
+    std::mutex surfaceNodeMutex_;
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_;
     int32_t userIconHotSpotX_ { 0 };
