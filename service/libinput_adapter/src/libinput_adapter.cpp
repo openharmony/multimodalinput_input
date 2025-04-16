@@ -1502,7 +1502,7 @@ void LibinputAdapter::OnEventHandler()
 
         // add the logic of screen capture window conuming touch point in high priority
         bool isCaptureMode = false;
-		bool hasScreenShotWindow = false;
+        bool hasScreenShotWindow = false;
         InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
         if (inputWindowsManager != nullptr) {
             DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();

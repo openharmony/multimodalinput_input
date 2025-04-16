@@ -344,7 +344,7 @@ struct WindowInfo {
 
     bool isSkipSelfWhenShowOnVirtualScreen { false };
 	
-    std::string windowName;	
+    std::string windowName;
 };
 
 /**
