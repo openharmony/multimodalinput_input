@@ -926,5 +926,15 @@ int32_t InputManager::SetInputDeviceConsumer(const std::vector<std::string>& dev
 {
     return InputMgrImpl.SetInputDeviceConsumer(deviceNames, consumer);
 }
+
+int32_t InputManager::SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval)
+{
+    return InputMgrImpl.SubscribeInputActive(inputEventConsumer, interval);
+}
+
+void InputManager::UnsubscribeInputActive(int32_t subscribeId)
+{
+    InputMgrImpl.UnsubscribeInputActive(subscribeId);
+}
 } // namespace MMI
 } // namespace OHOS

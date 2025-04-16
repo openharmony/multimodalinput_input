@@ -2838,7 +2838,7 @@ int32_t InputManagerImpl::SetInputDeviceConsumer(const std::vector<std::string>&
     }
     return DEVICE_CONSUMER.SetInputDeviceConsumer(deviceNames, consumer);
 }
- 
+
 void InputManagerImpl::OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -2849,6 +2849,36 @@ void InputManagerImpl::OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> point
     inputConsumer = DEVICE_CONSUMER.deviceConsumer_;
     inputConsumer->OnInputEvent(pointerEvent);
     MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
+}
+
+int32_t InputManagerImpl::SubscribeInputActive(
+    std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    CHKPR(inputEventConsumer, RET_ERR);
+    if (interval < 0) {
+        MMI_HILOGE("Interval time error, interval: %{public}" PRId64, interval);
+        return RET_ERR;
+    }
+    constexpr int64_t SUBSCRIBE_INPUT_ACTIVE_MIN_INTERVAL = 500; // ms
+    constexpr int64_t SUBSCRIBE_INPUT_ACTIVE_MAX_INTERVAL = 2000; // ms
+    // interval : 0 is a normal value, no filtering
+    if (interval > 0 && interval < SUBSCRIBE_INPUT_ACTIVE_MIN_INTERVAL) {
+        MMI_HILOGE("Interval(%{public}" PRId64 ") is less than minimum threshold(500ms)", interval);
+        interval = SUBSCRIBE_INPUT_ACTIVE_MIN_INTERVAL;
+    } else if (interval > SUBSCRIBE_INPUT_ACTIVE_MAX_INTERVAL) {
+        MMI_HILOGE("Interval(%{public}" PRId64 ") is greater than maximum threshold(2000ms)", interval);
+        interval = SUBSCRIBE_INPUT_ACTIVE_MAX_INTERVAL;
+    }
+    return INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(inputEventConsumer, interval);
+}
+
+void InputManagerImpl::UnsubscribeInputActive(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscribeId);
 }
 } // namespace MMI
 } // namespace OHOS
