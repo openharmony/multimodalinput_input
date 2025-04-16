@@ -690,7 +690,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
-            << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen;
+            << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowName;
         uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
         pkt << uiExtentionWindowInfoNum;
         MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
@@ -734,7 +734,7 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
             << item.windowType << item.privacyUIFlag << item.rectChangeBySystem
-            << item.isSkipSelfWhenShowOnVirtualScreen;
+            << item.isSkipSelfWhenShowOnVirtualScreen << item.windowName;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -754,7 +754,8 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas << item.transform
-            << item.windowInputType << item.privacyMode << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen;
+            << item.windowInputType << item.privacyMode << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen
+            << item.windowName;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
