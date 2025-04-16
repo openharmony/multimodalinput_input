@@ -408,14 +408,14 @@ void PointerEvent::PointerItem::SetBlobId(int32_t blobId)
     blobId_ = blobId;
 }
 
-int32_t PointerEvent::PointerItem::GetAngle() const
+int32_t PointerEvent::PointerItem::GetTwist() const
 {
-    return angle_;
+    return twist_;
 }
 
-void PointerEvent::PointerItem::SetAngle(int32_t angle)
+void PointerEvent::PointerItem::SetTwist(int32_t twist)
 {
-    angle_ = angle;
+    twist_ = twist;
 }
 
 bool PointerEvent::PointerItem::IsCanceled() const
@@ -464,7 +464,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(windowXPos_) &&
         out.WriteDouble(windowYPos_) &&
         out.WriteInt32(blobId_) &&
-        out.WriteInt32(angle_) &&
+        out.WriteInt32(twist_) &&
         out.WriteInt32(fixedDisplayX_) &&
         out.WriteInt32(fixedDisplayY_)
     );
@@ -506,7 +506,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(windowXPos_) &&
         in.ReadDouble(windowYPos_) &&
         in.ReadInt32(blobId_) &&
-        in.ReadInt32(angle_) &&
+        in.ReadInt32(twist_) &&
         in.ReadInt32(fixedDisplayX_) &&
         in.ReadInt32(fixedDisplayY_)
     );
