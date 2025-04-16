@@ -3487,10 +3487,6 @@ bool InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, 
     CALL_DEBUG_ENTER;
     int32_t windowId = windowInfo.id;
     bool findFlag = false;
-    if (DISPLAY_MONITOR->GetScreenLocked()) {
-        MMI_HILOGD("The screen is locked, no need to change the pointer style");
-        return findFlag;
-    }
     if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
         std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
         MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d",
@@ -3504,10 +3500,6 @@ bool InputWindowsManager::SelectPointerChangeArea(int32_t windowId, int32_t logi
 {
     CALL_DEBUG_ENTER;
     bool findFlag = false;
-    if (DISPLAY_MONITOR->GetScreenLocked()) {
-        MMI_HILOGD("The screen is locked, no need to change the pointer style");
-        return findFlag;
-    }
     if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
         std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
         MMI_HILOGE("windowHotAreas size:%{public}zu, windowId:%{public}d",
