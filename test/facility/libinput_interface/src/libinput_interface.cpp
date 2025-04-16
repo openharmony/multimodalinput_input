@@ -81,9 +81,9 @@ struct libinput_tablet_tool* libinput_event_tablet_tool_get_tool(struct libinput
     return g_instance->TabletToolGetTool(event);
 }
 
-int32_t libinput_event_tablet_tool_get_angle(struct libinput_event_tablet_tool *event)
+int32_t libinput_event_tablet_tool_get_twist(struct libinput_event_tablet_tool *event)
 {
-    return g_instance->TabletToolGetAngle(event);
+    return g_instance->TabletToolGetTwist(event);
 }
 
 struct libinput_device* libinput_event_get_device(struct libinput_event *event)

@@ -187,7 +187,7 @@ uint64_t libinput_event_tablet_tool_get_time_usec(struct libinput_event_tablet_t
 
 double libinput_event_tablet_tool_get_pressure(struct libinput_event_tablet_tool *event);
 
-int32_t libinput_event_tablet_tool_get_angle(struct libinput_event_tablet_tool *event);
+int32_t libinput_event_tablet_tool_get_twist(struct libinput_event_tablet_tool *event);
 
 struct libinput_device* libinput_event_get_device(struct libinput_event *event);
 

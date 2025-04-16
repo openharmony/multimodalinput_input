@@ -155,7 +155,7 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     double tiltY = libinput_event_tablet_tool_get_tilt_y(event);
     double pressure = libinput_event_tablet_tool_get_pressure(event);
     int32_t toolType = GetToolType(event);
-    int32_t angle = libinput_event_tablet_tool_get_angle(event);
+    int32_t twist = libinput_event_tablet_tool_get_twist(event);
 
     uint64_t time = libinput_event_tablet_tool_get_time_usec(event);
     pointerEvent_->SetActionStartTime(time);
@@ -180,7 +180,7 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     item.SetToolType(toolType);
     item.SetPressure(pressure);
     item.SetTargetWindowId(-1);
-    item.SetAngle(angle);
+    item.SetTwist(twist);
 
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
@@ -208,7 +208,7 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     double tiltY = libinput_event_tablet_tool_get_tilt_y(tabletEvent);
     double pressure = libinput_event_tablet_tool_get_pressure(tabletEvent);
     int32_t toolType = GetToolType(tabletEvent);
-    int32_t angle = libinput_event_tablet_tool_get_angle(tabletEvent);
+    int32_t twist = libinput_event_tablet_tool_get_twist(tabletEvent);
 
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
@@ -231,7 +231,7 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
-    item.SetAngle(angle);
+    item.SetTwist(twist);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
 }
