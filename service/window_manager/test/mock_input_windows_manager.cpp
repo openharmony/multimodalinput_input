@@ -38,23 +38,35 @@ static InputWindowsManagerInterface *GetInputWindowsManagerInterface()
 
 std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandler() const
 {
-    return GetInputWindowsManagerInterface()->GetEventNormalizeHandler();
+    if (GetInputWindowsManagerInterface() != nullptr) {
+        return GetInputWindowsManagerInterface()->GetEventNormalizeHandler();
+    }
+    return nullptr;
 }
 
 std::shared_ptr<EventDispatchHandler> InputEventHandler::GetEventDispatchHandler() const
 {
-    return GetInputWindowsManagerInterface()->GetEventDispatchHandler();
+    if (GetInputWindowsManagerInterface() != nullptr) {
+        return GetInputWindowsManagerInterface()->GetEventDispatchHandler();
+    }
+    return nullptr;
 }
 
 UDSServer *InputEventHandler::GetUDSServer() const
 {
-    return GetInputWindowsManagerInterface()->GetUDSServer();
+    if (GetInputWindowsManagerInterface() != nullptr) {
+        return GetInputWindowsManagerInterface()->GetUDSServer();
+    }
+    return nullptr;
 }
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
 bool InputWindowsManager::IsAncoWindow(const WindowInfo &window) const
 {
-    return GetInputWindowsManagerInterface()->IsAncoWindow(window);
+    if (GetInputWindowsManagerInterface() != nullptr) {
+        return GetInputWindowsManagerInterface()->IsAncoWindow(window);
+    }
+    return false;
 }
 
 void InputWindowsManager::UpdateShellWindow(const WindowInfo &window) {}

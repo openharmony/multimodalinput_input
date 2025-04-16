@@ -63,7 +63,7 @@ static InputWindowsManagerInterface *GetInputWindowsManagerInterface()
 
 std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId)
 {
-    if (g_inputWindowManagerInterface != nullptr) {
+    if (GetInputWindowsManagerInterface() != nullptr) {
         return GetInputWindowsManagerInterface()->GetWindowAndDisplayInfo(windowId, displayId);
     }
     return std::nullopt;
@@ -73,7 +73,7 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo) {}
 
 bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
 {
-    if (g_inputWindowManagerInterface != nullptr) {
+    if (GetInputWindowsManagerInterface() != nullptr) {
         return GetInputWindowsManagerInterface()->IsSceneBoardEnabled();
     }
     return false;
@@ -83,7 +83,7 @@ namespace MMI {
 namespace {
 constexpr int32_t CAST_INPUT_DEVICEID{ 0xAAAAAAFF };
 constexpr int32_t CAST_SCREEN_DEVICEID{ 0xAAAAAAFE };
-} // namespace
+}  // namespace
 
 std::string ReadJsonFile(const std::string &filePath)
 {
@@ -714,7 +714,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     std::optional<WindowInfo> result1 = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
     EXPECT_TRUE(result1.has_value());
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif  // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 /* *
@@ -730,7 +730,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPositionDispl
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     EXPECT_EQ(inputWindowsManager->GetPositionDisplayDirection(id), Direction::DIRECTION0);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif  // OHOS_BUILD_ENABLE_POINTER
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateCustomStyle_001
@@ -780,7 +780,6 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SkipPrivacyProte
     inputWindowsManager->privacyProtection_.isOpen = false;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
 }
-
 
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
 /* *
@@ -1236,7 +1235,67 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePoi
     inputWindowsManager->lastPointerEvent_ = pointerEvent;
     EXPECT_EQ(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown), RET_ERR);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif  // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_AppendExtraData_001
+ * @tc.desc: Test the funcation AppendExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AppendExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ExtraData extraData;
+    extraData.drawCursor = true;
+    extraData.eventId = 1;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->mouseDownEventId_ = -1;
+    EXPECT_EQ(inputWindowsManager->AppendExtraData(extraData), RET_ERR);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_AppendExtraData_002
+ * @tc.desc: Test the funcation AppendExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AppendExtraData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ExtraData extraData;
+    extraData.drawCursor = true;
+    extraData.eventId = 1;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->mouseDownEventId_ = extraData.eventId + 1;
+    EXPECT_EQ(inputWindowsManager->AppendExtraData(extraData), RET_ERR);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_AppendExtraData_003
+ * @tc.desc: Test the funcation AppendExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AppendExtraData_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ExtraData extraData;
+    extraData.drawCursor = true;
+    extraData.eventId = 1;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->mouseDownEventId_ = extraData.eventId;
+    EXPECT_EQ(inputWindowsManager->AppendExtraData(extraData), RET_OK);
+
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    EXPECT_EQ(inputWindowsManager->AppendExtraData(extraData), RET_OK);
+
+    extraData.eventId = 0;
+    EXPECT_EQ(inputWindowsManager->AppendExtraData(extraData), RET_OK);
+}
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ParseJson_001
@@ -1288,5 +1347,112 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPidByWindowId
     id = -1;
     EXPECT_EQ(inputWindowsManager->GetPidByWindowId(id), RET_ERR);
 }
-} // namespace MMI
-} // namespace OHOS
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+/* *
+ * @tc.name: InputWindowsManagerOneTest_CancelTouch_001
+ * @tc.desc: Test the funcation CancelTouch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CancelTouch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    int32_t touch = 1;
+    WindowInfoEX winInfoEx;
+    winInfoEx.flag = true;
+    inputWindowsManager->touchItemDownInfos_.insert(std::make_pair(touch, winInfoEx));
+    EXPECT_TRUE(inputWindowsManager->CancelTouch(touch));
+
+    EXPECT_FALSE(inputWindowsManager->CancelTouch(touch));
+
+    inputWindowsManager->touchItemDownInfos_.clear();
+    EXPECT_FALSE(inputWindowsManager->CancelTouch(touch));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_CancelAllTouches_001
+ * @tc.desc: Test the funcation CancelAllTouches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CancelAllTouches_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    bool isDisplayChanged = true;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    PointerEvent::PointerItem item;
+    item.pressed_ = false;
+    pointerEvent->pointers_.push_back(item);
+
+    item.pressed_ = true;
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    item.pointerId_ = 1;
+    inputWindowsManager->extraData_.pointerId = item.GetPointerId();
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->pointers_.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CancelAllTouches(pointerEvent, isDisplayChanged));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_CancelAllTouches_002
+ * @tc.desc: Test the funcation CancelAllTouches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CancelAllTouches_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    bool isDisplayChanged = true;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    PointerEvent::PointerItem item;
+    item.pressed_ = true;
+    item.pointerId_ = 1;
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    inputWindowsManager->extraData_.pointerId = item.GetPointerId() + 1;
+    pointerEvent->pointers_.push_back(item);
+
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    inputWindowsManager->extraData_.pointerId = item.GetPointerId() + 1;
+    pointerEvent->pointers_.push_back(item);
+
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    pointerEvent->pointers_.push_back(item);
+
+    inputWindowsManager->extraData_.appended = false;
+    pointerEvent->pointers_.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CancelAllTouches(pointerEvent, isDisplayChanged));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_CalcDrawCoordinate_001
+ * @tc.desc: Test the funcation CalcDrawCoordinate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CalcDrawCoordinate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    DisplayInfo displayInfo;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.rawDisplayX_ = 0;
+    pointerItem.rawDisplayY_ = 0;
+    displayInfo.transform.push_back(1.0f);
+    auto result = inputWindowsManager->CalcDrawCoordinate(displayInfo, pointerItem);
+    EXPECT_EQ(result.first, 0);
+    EXPECT_EQ(result.second, 0);
+}
+#endif  // OHOS_BUILD_ENABLE_TOUCH
+}  // namespace MMI
+}  // namespace OHOS
