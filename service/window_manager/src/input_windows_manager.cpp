@@ -2623,7 +2623,8 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         width, height, coord.x, coord.y);
     Coordinate2D pos = { .x = coord.x, .y = coord.y };
     if (IsPositionOutValidDisplay(pos, info, true)) {
-        MMI_HILOGD("The position is out of the valid display");
+        MMI_HILOGW("Position out valid display width:%{private}d, height:%{private}d, "
+            "physicalX:%{private}f, physicalY:%{private}f", width, height, pos.x, pos.y);
         if (isNeedClear) {
             int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
             TriggerTouchUpOnInvalidAreaEntry(seatSlot);
@@ -4664,7 +4665,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 constexpr int32_t touchDownBoost = 1006;
                 auto begin = std::chrono::high_resolution_clock::now();
                 OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchDownBoost, mapPayload);
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_SOCPERF_CUST_ACTION, touchDownBoost, mapPayload);
                 auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
@@ -4677,7 +4678,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 mapPayload["msg"] = "";
                 auto begin = std::chrono::high_resolution_clock::now();
                 OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchUpBoost, mapPayload);
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_SOCPERF_CUST_ACTION, touchUpBoost, mapPayload);
                 auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR

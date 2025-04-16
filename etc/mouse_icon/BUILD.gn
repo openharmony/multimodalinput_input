@@ -329,6 +329,13 @@ ohos_prebuilt_etc("drawing_pointer_image_Running_Right") {
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
+ohos_prebuilt_etc("drawing_pointer_image_ScreenRecorder_Cursor") {
+  source = "src/ScreenRecorder_Cursor.svg"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
   source = "${mmi_path}/etc/ability_launch_config.json"
   part_name = "input"
@@ -415,6 +422,7 @@ group("input_mouse_icon") {
     ":drawing_pointer_image_Resize_Up_Down",
     ":drawing_pointer_image_Running_Left",
     ":drawing_pointer_image_Running_Right",
+    ":drawing_pointer_image_ScreenRecorder_Cursor",
     ":drawing_pointer_image_Screenshot_Cross",
     ":drawing_pointer_image_Screenshot_Cursor",
     ":drawing_pointer_image_South",

@@ -1704,7 +1704,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t dis
     CALL_DEBUG_ENTER;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::CURSOR_NODE;
     SetSurfaceNode(Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType));
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPR(surfaceNodePtr, RET_ERR);
@@ -2861,7 +2861,7 @@ bool PointerDrawingManager::CheckPointerStyleParam(int32_t windowId, PointerStyl
         return false;
     }
     if ((pointerStyle.id < MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) ||
-        pointerStyle.id > MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON) {
+        pointerStyle.id > MOUSE_ICON::SCREENRECORDER_CURSOR) {
         return false;
     }
     return true;
@@ -3140,6 +3140,7 @@ void PointerDrawingManager::InitStyle()
         {AECH_DEVELOPER_DEFINED_ICON, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg"}},
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
         {TRANSPARENT_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
+        {SCREENRECORDER_CURSOR, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "ScreenRecorder_Cursor.svg"}},
     };
     CheckMouseIconPath();
 }

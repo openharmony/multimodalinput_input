@@ -129,7 +129,7 @@ bool ScreenPointer::InitSurface()
     // create SurfaceNode
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = RS_SURFACE_NODE_NAME;
-    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE);
+    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, Rosen::RSSurfaceNodeType::CURSOR_NODE);
     CHKPF(surfaceNode_);
     MMI_HILOGE("SurfaceNode::Create success");
 
@@ -178,10 +178,8 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     mode_ = si->GetSourceMode();
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
-    if (IsExtend()) {
-        surfaceNode_->AttachToDisplay(screenId_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
-    }
+    surfaceNode_->AttachToDisplay(screenId_);
+    Rosen::RSTransaction::FlushImplicitTransaction();
     MMI_HILOGI("Update with ScreenInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }

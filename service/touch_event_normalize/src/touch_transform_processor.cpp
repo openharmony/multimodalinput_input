@@ -56,12 +56,6 @@ bool TouchTransformProcessor::OnEventTouchCancel(struct libinput_event *event)
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
 
-    EventTouch touchInfo;
-    int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
-        MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
-        return false;
-    }
     PointerEvent::PointerItem item;
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
@@ -70,30 +64,6 @@ bool TouchTransformProcessor::OnEventTouchCancel(struct libinput_event *event)
     }
     int32_t blobId = libinput_event_touch_get_blob_id(touch);
     item.SetBlobId(blobId);
-    double pressure = libinput_event_touch_get_pressure(touch);
-    int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
-    int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
-    if (static_cast<uint32_t>(longAxis) & TOUCH_CANCEL_MASK) {
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisysevent::ReportPointerEventExitTimes(PointerEventStatistics::STYLUS_INTERRUPT_TOUCH);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
-        pointerItemCancelMarks_.emplace(seatSlot, true);
-    }
-    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
-    item.SetMoveFlag(moveFlag);
-    item.SetPressure(pressure);
-    item.SetLongAxis(longAxis);
-    item.SetShortAxis(shortAxis);
-    item.SetDisplayX(touchInfo.point.x);
-    item.SetDisplayY(touchInfo.point.y);
-    item.SetDisplayXPos(touchInfo.point.x);
-    item.SetDisplayYPos(touchInfo.point.y);
-    item.SetRawDisplayX(touchInfo.point.x);
-    item.SetRawDisplayY(touchInfo.point.y);
-    item.SetToolDisplayX(touchInfo.toolRect.point.x);
-    item.SetToolDisplayY(touchInfo.toolRect.point.y);
-    item.SetToolWidth(touchInfo.toolRect.width);
-    item.SetToolHeight(touchInfo.toolRect.height);
     pointerEvent_->SetTargetWindowId(item.GetTargetWindowId());
     auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(item.GetTargetWindowId(), pointerEvent_->GetTargetDisplayId());
     pointerEvent_->SetAgentWindowId(windowInfo->agentWindowId);

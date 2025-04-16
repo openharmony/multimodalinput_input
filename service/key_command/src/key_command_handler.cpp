@@ -1073,6 +1073,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         callState == StateType::CALL_STATUS_INCOMING || callState == StateType::CALL_STATUS_ANSWERED) {
         return true;
     }
+    MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
         !IsMusicActivate()) {
         if (PRODUCT_TYPE == "VDE" && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
@@ -1089,10 +1090,6 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
                 MMI_HILOGE("Add timer failed");
             }
         }
-        return true;
-    }
-    MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
-    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
         return false;
     }
     return true;
