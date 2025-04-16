@@ -2727,6 +2727,91 @@ ohos_unittest("ConnectManagerTest") {
   }
 }
 
+ohos_unittest("ConnectManagerOneTest") {
+  module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/fingersense_wrapper/include",
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/libinput_adapter/include",
+    "${mmi_path}/service/message_handle/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/permission_helper/include",
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/test/facility/libinput_interface/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket/include",
+    "connect_manager/test",
+  ]
+
+  if (input_feature_joystick) {
+    include_dirs += [ "${mmi_path}/service/joystick/include" ]
+  }
+
+  sources =
+      [ "connect_manager/test/multimodal_input_connect_stub_one_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/service:libmmi-server",
+  ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "window_manager:libwm",
+  ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+}
+
 ohos_unittest("ConnectManagerProxyEXTest") {
   module_out_path = module_output_path
 
