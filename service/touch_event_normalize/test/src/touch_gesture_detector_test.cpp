@@ -26,6 +26,7 @@ namespace OHOS {
 namespace MMI {
 using namespace testing;
 using namespace testing::ext;
+constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE { 3.0 };
 
 class TouchGestureDetectorTest : public testing::Test {
 public:
@@ -130,7 +131,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleDownEvent_01, 
 
     pointerEvent->pointerId_ = 3;
     detector.isRecognized_ = false;
-    
+
     std::list<PointerEvent::PointerItem> pointers_;
     PointerEvent::PointerItem item1;
     item1.SetPointerId(1);
@@ -1315,6 +1316,583 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleUpEvent_003, T
     detector.isRecognized_ = true;
     detector.lastTouchEvent_ = pointerEvent;
     ASSERT_NO_FATAL_FAILURE(detector.HandleUpEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_04
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:nhj
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> nullEvent = nullptr;
+    EXPECT_FALSE(detector.OnTouchEvent(nullEvent));
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    detector.gestureEnable_ = true;
+    detector.gestureDisplayId_ = INT32_MAX;
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_CANCEL;
+    EXPECT_TRUE(detector.WhetherDiscardTouchEvent(pointerEvent));
+
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    EXPECT_FALSE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleDownEvent_04
+ * @tc.desc: Test HandleDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleDownEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    pointerEvent->pointerId_ = 1;
+    detector.isRecognized_ = true;
+    detector.haveGestureWinEmerged_ = true;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
+    detector.lastTouchEvent_ = pointerEvent;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleDownEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleMoveEvent_05
+ * @tc.desc: Test HandleMoveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleMoveEvent_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    detector.isRecognized_ = true;
+    detector.gestureTimer_= 2;
+    detector.lastTouchEvent_ = pointerEvent;
+    detector.listener_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
+    detector.isRecognized_ = true;
+    detector.gestureTimer_= 2;
+    detector.listener_ = listener;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleSwipeMoveEvent_03
+ * @tc.desc: Test HandleSwipeMoveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleSwipeMoveEvent_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f, 150000);
+    detector.downPoint_[3] = Point(5.0f, 6.0f, 200000);
+    detector.isFingerReady_ = true;
+
+    auto state = detector.ClacFingerMoveDirection(pointerEvent);
+    state = TouchGestureDetector::SlideState::DIRECTION_LEFT;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleSwipeMoveEvent(pointerEvent));
+
+    state = TouchGestureDetector::SlideState::DIRECTION_UNKNOW;
+    GestureMode mode = detector.ChangeToGestureMode(state);
+    EXPECT_EQ(mode, GestureMode::ACTION_UNKNOWN);
+    detector.isRecognized_ = true;
+    detector.gestureTimer_= -1;
+    detector.lastTouchEvent_ = pointerEvent;
+    EXPECT_FALSE(detector.NotifyGestureEvent(pointerEvent, mode));
+    ASSERT_NO_FATAL_FAILURE(detector.HandleSwipeMoveEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleSwipeMoveEvent_04
+ * @tc.desc: Test HandleSwipeMoveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleSwipeMoveEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f, 150000);
+    detector.downPoint_[3] = Point(5.0f, 6.0f, 200000);
+    detector.isFingerReady_ = true;
+
+    auto state = detector.ClacFingerMoveDirection(pointerEvent);
+    state = TouchGestureDetector::SlideState::DIRECTION_LEFT;
+    detector.gestureTimer_= 2;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleSwipeMoveEvent(pointerEvent));
+
+    state = TouchGestureDetector::SlideState::DIRECTION_RIGHT;
+    detector.gestureTimer_= -2;
+    GestureMode mode = detector.ChangeToGestureMode(state);
+    EXPECT_NE(mode, GestureMode::ACTION_UNKNOWN);
+    ASSERT_NO_FATAL_FAILURE(detector.HandleSwipeMoveEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandlePinchMoveEvent_004
+ * @tc.desc: Test HandlePinchMoveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandlePinchMoveEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    std::unordered_set<TouchGestureDetector::SlideState> directions;
+    double angle;
+    angle = 20;
+    auto direction1 = detector.GetSlidingDirection(angle);
+    directions.insert(direction1);
+    angle = 50;
+    auto direction2 = detector.GetSlidingDirection(angle);
+    directions.insert(direction2);
+    EXPECT_EQ(directions.size(), 2);
+    ASSERT_NE(pointerEvent, nullptr);
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
+    detector.downPoint_[3] = Point(5.0f, 6.0f);
+    detector.downPoint_[4] = Point(7.0f, 8.0f);
+    detector.lastDistance_[1] = 1.0;
+    detector.lastDistance_[2] = 2.0;
+    detector.lastDistance_[3] = 3.0;
+    ASSERT_NO_FATAL_FAILURE(detector.HandlePinchMoveEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleUpEvent_004
+ * @tc.desc: Test HandleUpEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleUpEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
+    detector.downPoint_[3] = Point(5.0f, 6.0f);
+    detector.downPoint_[4] = Point(7.0f, 8.0f);
+    detector.lastDistance_[1] = 1.0;
+    detector.lastDistance_[2] = 2.0;
+    detector.lastDistance_[3] = 3.0;
+    EXPECT_FALSE(detector.lastDistance_.empty());
+    detector.isRecognized_ = true;
+    detector.lastTouchEvent_ = pointerEvent;
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(2);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->pointers_.push_back(item2);
+    pointerEvent->SetPointerId(2);
+    ASSERT_NO_FATAL_FAILURE(detector.HandleUpEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleUpEvent_005
+ * @tc.desc: Test HandleUpEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleUpEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    detector.gestureTimer_= -1;
+    detector.isRecognized_ = true;
+    detector.lastTouchEvent_ = nullptr;
+    detector.haveGestureWinEmerged_ = false;
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(2);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->pointers_.push_back(item2);
+    pointerEvent->SetPointerId(2);
+    ASSERT_NO_FATAL_FAILURE(detector.HandleUpEvent(pointerEvent));
+
+    detector.isRecognized_ = true;
+    detector.haveGestureWinEmerged_ = false;
+    detector.lastTouchEvent_ = pointerEvent;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleUpEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleUpEvent_006
+ * @tc.desc: Test HandleUpEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleUpEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    detector.gestureTimer_= -1;
+    detector.isRecognized_ = false;
+    detector.lastTouchEvent_ = pointerEvent;
+    detector.haveGestureWinEmerged_ = false;
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(1);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->SetPointerId(2);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_NO_FATAL_FAILURE(detector.HandleUpEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_WhetherDiscardTouchEvent_02
+ * @tc.desc: Test WhetherDiscardTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_WhetherDiscardTouchEvent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_MOUSE;
+    detector.gestureEnable_ = true;
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    detector.gestureDisplayId_ = INT32_MAX;
+    pointerEvent->targetDisplayId_ = INT32_MAX;
+    EXPECT_TRUE(detector.WhetherDiscardTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_ClacFingerMoveDirection_03
+ * @tc.desc: Test ClacFingerMoveDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_ClacFingerMoveDirection_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    size_t recognizedCount { 0 };
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+    std::unordered_set<TouchGestureDetector::SlideState> directions;
+    double angle;
+    angle = 20;
+    auto direction1 = detector.GetSlidingDirection(angle);
+    directions.insert(direction1);
+    angle = 50;
+    auto direction2 = detector.GetSlidingDirection(angle);
+    directions.insert(direction2);
+    std::map<int32_t, Point> points;
+    points[1] = Point(1.0f, 2.0f);
+    points[2] = Point(3.0f, 4.0f);
+    points[3] = Point(5.0f, 6.0f);
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
+    detector.downPoint_[3] = Point(5.0f, 6.0f);
+    int32_t count = static_cast<int32_t>(points.size());
+    EXPECT_TRUE(count > recognizedCount);
+    ASSERT_NO_FATAL_FAILURE(detector.ClacFingerMoveDirection(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_SortPoints_01
+ * @tc.desc: Test SortPoints
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_SortPoints_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    std::map<int32_t, Point> points;
+    points[1] = Point(1.0f, 2.0f);
+    points[2] = Point(3.0f, 4.0f);
+    points[3] = Point(5.0f, 6.0f);
+    int32_t count = static_cast<int32_t>(points.size());
+    EXPECT_TRUE(count > 0);
+    EXPECT_FALSE(points.empty());
+    auto ret = detector.SortPoints(points);
+    EXPECT_FALSE(ret.empty());
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_SortPoints_02
+ * @tc.desc: Test SortPoints
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_SortPoints_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    std::map<int32_t, Point> points;
+    int32_t count = static_cast<int32_t>(points.size());
+    EXPECT_EQ(count, 0);
+    EXPECT_TRUE(points.empty());
+    auto ret = detector.SortPoints(points);
+    EXPECT_TRUE(ret.empty());
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcClusterCenter_03
+ * @tc.desc: Test CalcClusterCenter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcClusterCenter_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::map<int32_t, Point> points;
+    EXPECT_TRUE(points.empty());
+    Point result = detector.CalcClusterCenter(points);
+    EXPECT_EQ(result.x, 0.0f);
+    EXPECT_EQ(result.y, 0.0f);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcClusterCenter_04
+ * @tc.desc: Test CalcClusterCenter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcClusterCenter_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::map<int32_t, Point> points{
+        {0, Point(2.0f, 3.0f)}, {1, Point(4.0f, 5.0f)}, {2, Point(6.0f, 7.0f)}
+    };
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    Point result = detector.CalcClusterCenter(points);
+    // 平均值：(2+4+6)/3=4, (3+5+7)/3=5
+    EXPECT_EQ(result.x, 4.0f);
+    EXPECT_EQ(result.y, 5.0f);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcGravityCenter_03
+ * @tc.desc: Test CalcGravityCenter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcGravityCenter_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::map<int32_t, Point> points;
+    int32_t count = static_cast<int32_t>(points.size());
+    EXPECT_EQ(count, 0);
+    EXPECT_TRUE(points.empty());
+    ASSERT_NO_FATAL_FAILURE(detector.CalcGravityCenter(points));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcMultiFingerMovement_03
+ * @tc.desc: Test CalcMultiFingerMovement
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcMultiFingerMovement_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::map<int32_t, Point> points;
+    points[1] = Point(1.0f, 2.0f);
+    points[2] = Point(3.0f, 4.0f);
+    points[3] = Point(5.0f, 6.0f);
+    detector.movePoint_ = {}; // 设置空的 movePoint_
+    int32_t result = detector.CalcMultiFingerMovement(points);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcMultiFingerMovement_04
+ * @tc.desc: Test CalcMultiFingerMovement
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcMultiFingerMovement_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::map<int32_t, Point> points;
+    points[1] = Point(1.0f, 2.0f);
+    detector.movePoint_[1] = Point(1.0f, 2.0f);
+    detector.movePoint_[2] = Point(3.0f, 4.0f);
+    int32_t result = detector.CalcMultiFingerMovement(points);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CalcMultiFingerMovement_05
+ * @tc.desc: Test CalcMultiFingerMovement
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcMultiFingerMovement_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::map<int32_t, Point> points;
+    points[1] = Point(MAXIMUM_SINGLE_SLIDE_DISTANCE + 0.0f, 0.0f);
+    points[2] = Point(1.0f, 2.0f + MAXIMUM_SINGLE_SLIDE_DISTANCE);
+    detector.movePoint_[1] = Point(0.0f, 0.0f);
+    detector.movePoint_[2] = Point(1.0f, 2.0f);
+    int32_t result = detector.CalcMultiFingerMovement(points);
+    EXPECT_EQ(result, 2);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_AntiJitter_02
+ * @tc.desc: Test AntiJitter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_AntiJitter_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    GestureMode mode;
+    mode = GestureMode::ACTION_PINCH_CLOSED;
+    detector.continuousCloseCount_ = 0;
+    EXPECT_FALSE(detector.AntiJitter(pointerEvent, mode));
+    mode = GestureMode::ACTION_PINCH_OPENED;
+    detector.continuousOpenCount_ = 0;
+    EXPECT_FALSE(detector.AntiJitter(pointerEvent, mode));
+
+    mode = GestureMode::ACTION_GESTURE_END;
+    EXPECT_FALSE(detector.AntiJitter(pointerEvent, mode));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleGestureWindowEmerged_001
+ * @tc.desc: Test HandleUpEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleGestureWindowEmerged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_PINCH;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> lastTouchEvent = PointerEvent::Create();
+    ASSERT_NE(lastTouchEvent, nullptr);
+    int32_t windowId = 1;
+    detector.isRecognized_ = true;
+    detector.lastTouchEvent_ = lastTouchEvent;
+    detector.haveGestureWinEmerged_ = false;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleGestureWindowEmerged(windowId, lastTouchEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_CheckGestureTrend_001
+ * @tc.desc: Test CheckGestureTrend
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CheckGestureTrend_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_PINCH;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
+    detector.downPoint_[3] = Point(5.0f, 6.0f);
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(2);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->pointers_.push_back(item2);
+    pointerEvent->SetPointerId(2);
+    ASSERT_NO_FATAL_FAILURE(detector.CheckGestureTrend(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
