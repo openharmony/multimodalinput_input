@@ -145,10 +145,11 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
         int32_t funcKey = keyEvent->TransitionFunctionKey(keyCode);
         if (funcKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
-            int32_t ret = keyEvent->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
+            int32_t funKeyState = libinput_get_funckey_state(device, funcKey);
+            int32_t ret = keyEvent->SetFunctionKey(funcKey, funKeyState);
             if (ret == funcKey) {
-                MMI_HILOGD("Set function key:%{public}d to state:%{public}d succeed",
-                           funcKey, keyEvent->GetFunctionKey(funcKey));
+                MMI_HILOGI("Set function key:%{public}d to state:%{public}d succeed",
+                           funcKey, funKeyState);
             }
         }
         std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent->GetKeyItem(keyCode);
