@@ -423,5 +423,20 @@ HWTEST_F(UDSSessionTest, GetEarliestEventTime, TestSize.Level1)
     int64_t eventTime = sesObj.GetEarliestEventTime(type);
     EXPECT_EQ(eventTime, earliestEventTime);
 }
+
+/**
+ * @tc.name: ReportSocketBufferFull
+ * @tc.desc: Verify uds session function ReportSocketBufferFull
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, ReportSocketBufferFull, TestSize.Level1)
+{
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    ASSERT_NO_FATAL_FAILURE(sesObj.ReportSocketBufferFull());
+    sesObj.lastReportTime_ = GetSysClockTime();
+    sesObj.lastReportedPid_ = sesObj.pid_;
+    ASSERT_NO_FATAL_FAILURE(sesObj.ReportSocketBufferFull());
+}
 } // namespace MMI
 } // namespace OHOS

@@ -49,8 +49,16 @@ HWTEST_F(TabletEventInputSubscribeManagerTest, TabletEventInputSubscribeManagerT
 {
     TabletEventInputSubscribeManager manager;
     auto callback = [](std::shared_ptr<PointerEvent> event) {};
-    int32_t subscribeId = manager.SubscribeTabletProximity(callback);
-    EXPECT_GE(subscribeId, 0);
+    int32_t ret = manager.SubscribeTabletProximity(callback);
+    EXPECT_GE(ret, 0);
+
+    manager.subscribeManagerId_ = INT_MAX;
+    ret = manager.SubscribeTabletProximity(callback);
+    EXPECT_GE(ret, INVALID_SUBSCRIBE_ID);
+
+    manager.subscribeManagerId_ = -1;
+    ret = manager.SubscribeTabletProximity(callback);
+    EXPECT_GE(ret, INVALID_SUBSCRIBE_ID);
 }
 
 /**
@@ -112,8 +120,20 @@ HWTEST_F(TabletEventInputSubscribeManagerTest, TabletEventInputSubscribeManagerT
     
     int32_t subscribeId = manager.SubscribeTabletProximity(callback);
     auto event = std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
-    manager.OnSubscribeTabletProximityCallback(event, subscribeId);
+    auto ret = manager.OnSubscribeTabletProximityCallback(event, subscribeId);
+    EXPECT_EQ(ret, RET_OK);
     EXPECT_TRUE(callbackExecuted);
+
+    EXPECT_EQ(manager.UnsubscribetabletProximity(subscribeId), RET_OK);
+    ret = manager.OnSubscribeTabletProximityCallback(event, subscribeId);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+
+    ret = manager.OnSubscribeTabletProximityCallback(nullptr, subscribeId);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+
+    subscribeId = -1;
+    ret = manager.OnSubscribeTabletProximityCallback(event, subscribeId);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -127,9 +147,13 @@ HWTEST_F(TabletEventInputSubscribeManagerTest, TabletEventInputSubscribeManagerT
 {
     TabletEventInputSubscribeManager manager;
     auto callback = [](std::shared_ptr<PointerEvent> event) {};
-    int32_t subscribeId = manager.SubscribeTabletProximity(callback);
-    EXPECT_EQ(manager.UnsubscribetabletProximity(subscribeId), RET_OK);
-    EXPECT_EQ(manager.UnsubscribetabletProximity(subscribeId), RET_ERR);
+    int32_t subscribeId1 = manager.SubscribeTabletProximity(callback);
+    int32_t subscribeId2 = manager.SubscribeTabletProximity(callback);
+    EXPECT_EQ(manager.UnsubscribetabletProximity(subscribeId1), RET_OK);
+    EXPECT_EQ(manager.UnsubscribetabletProximity(subscribeId1), RET_ERR);
+
+    EXPECT_EQ(manager.UnsubscribetabletProximity(subscribeId2), RET_OK);
+    EXPECT_EQ(manager.UnsubscribetabletProximity(subscribeId2), RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS

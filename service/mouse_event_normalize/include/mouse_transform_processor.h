@@ -145,6 +145,10 @@ private:
     DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    static void GetVirtualTouchpadTapSwitch(bool &switchFlag);
+    static void GetVirtualTouchpadRightClickType(int32_t &type);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static void GetConfigDataFromDatabase(std::string &key, bool &value);
     static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
