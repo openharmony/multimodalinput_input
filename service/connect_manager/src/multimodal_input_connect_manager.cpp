@@ -1094,5 +1094,27 @@ int32_t MultimodalInputConnectManager::GetMaxMultiTouchPointNum(int32_t &pointNu
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetMaxMultiTouchPointNum(pointNum);
 }
+
+int32_t MultimodalInputConnectManager::SubscribeInputActive(int32_t subscribeId, int64_t interval)
+{
+    sptr<IMultimodalInputConnect> multimodalInputConnectService = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(lock_);
+        CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+        multimodalInputConnectService = multimodalInputConnectService_;
+    }
+    return multimodalInputConnectService->SubscribeInputActive(subscribeId, interval);
+}
+
+int32_t MultimodalInputConnectManager::UnsubscribeInputActive(int32_t subscribeId)
+{
+    sptr<IMultimodalInputConnect> multimodalInputConnectService = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(lock_);
+        CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+        multimodalInputConnectService = multimodalInputConnectService_;
+    }
+    return multimodalInputConnectService->UnsubscribeInputActive(subscribeId);
+}
 } // namespace MMI
 } // namespace OHOS

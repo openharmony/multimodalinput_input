@@ -152,6 +152,7 @@ group("mmi_tests") {
     "frameworks/proxy:LongPressEventSubscribeManagerTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
+    "frameworks/proxy/event_handler/test:InputActiveSubscribeManagerTest",
     "libudev:test",
     "service:AccountManagerTest",
     "service:ApplicationStateObserverTest",

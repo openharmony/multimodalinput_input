@@ -3919,5 +3919,45 @@ int32_t MMIService::ClearInputDeviceConsumer(const std::vector<std::string>& dev
     }
     return RET_OK;
 }
+
+int32_t MMIService::SubscribeInputActive(int32_t subscribeId, int64_t interval)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId, interval] {
+            auto sess = this->GetSessionByPid(pid);
+            CHKPR(sess, RET_ERR);
+            auto subscriberHandler = InputHandler->GetInputActiveSubscriberHandler();
+            CHKPR(subscriberHandler, RET_ERR);
+            return subscriberHandler->SubscribeInputActive(sess, subscribeId, interval);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The subscribe input active processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribeInputActive(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, subscribeId] {
+            auto sess = this->GetSessionByPid(pid);
+            CHKPR(sess, RET_ERR);
+            auto subscriberHandler = InputHandler->GetInputActiveSubscriberHandler();
+            CHKPR(subscriberHandler, RET_ERR);
+            return subscriberHandler->UnsubscribeInputActive(sess, subscribeId);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("The unsubscribe input active processed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
