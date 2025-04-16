@@ -184,6 +184,8 @@ public:
     virtual int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) = 0;
     virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
     virtual int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) = 0;
+    virtual int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) = 0;
+    virtual int32_t UnsubscribeInputActive(int32_t subscribeId) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
