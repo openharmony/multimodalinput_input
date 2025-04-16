@@ -55,6 +55,7 @@ constexpr int32_t VKEY_TP_SM_MSG_POS_Y_IDX { 3 };
 constexpr int32_t VKEY_TP_SM_MSG_SCALE_IDX { 4 };
 constexpr int32_t VKEY_TP_SM_MSG_ANGLE_IDX { 5 };
 constexpr int32_t VKEY_TP_GSE_TWO_FINGERS { 2 };
+constexpr int32_t VKEY_TP_GSE_THREE_FINGERS { 3 };
 constexpr uint32_t VKEY_TP_LB_ID { 272 };
 constexpr uint32_t VKEY_TP_RB_ID { 273 };
 constexpr uint32_t VKEY_TP_SEAT_BTN_COUNT_NONE { 0 };
@@ -619,8 +620,127 @@ void LibinputAdapter::OnVKeyTrackPadGestureTwoMessage(libinput_event_touch* touc
             }
             break;
         default:
+            OnVKeyTrackPadGestureThreeMessage(touch, msgType, msgItem);
             break;
     }
+}
+
+void LibinputAdapter::OnVKeyTrackPadGestureThreeMessage(libinput_event_touch* touch,
+    VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem)
+{
+    switch (msgType) {
+        case VTPStateMachineMessageType::SWIPE_BEGIN:
+            if (!HandleVKeyTrackPadSwipeBegin(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad swipe begin event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::SWIPE_UPDATE:
+            if (!HandleVKeyTrackPadSwipeUpdate(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad swipe update event cannot be handled");
+            }
+            break;
+        case VTPStateMachineMessageType::SWIPE_END:
+            if (!HandleVKeyTrackPadSwipeEnd(touch, msgItem)) {
+                MMI_HILOGE("Virtual TrackPad swipe end event cannot be handled");
+            }
+            break;
+    }
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadSwipeBegin(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN;
+    gEvent.finger_count = VKEY_TP_GSE_THREE_FINGERS;
+    sloted_coords_info slotInfo = {};
+    slotInfo.active_count = VKEY_TP_GSE_THREE_FINGERS;
+    slotInfo.coords[0].is_active = true;
+    slotInfo.coords[0].x = static_cast<float>(msgPPosX);
+    slotInfo.coords[0].y = static_cast<float>(msgPPosY);
+    slotInfo.coords[0].is_active = true;
+    slotInfo.coords[1].x = static_cast<float>(msgPPosX);
+    slotInfo.coords[1].y = static_cast<float>(msgPPosY);
+    slotInfo.coords[1].is_active = true;
+    gEvent.solt_touches = slotInfo;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadSwipeUpdate(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPSwipe = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE;
+    gEvent.finger_count = VKEY_TP_GSE_THREE_FINGERS;
+    gEvent.delta_x = 0;
+    gEvent.delta_y = msgPSwipe;
+    gEvent.delta_unaccel_x = 0;
+    gEvent.delta_unaccel_y = msgPSwipe;
+    sloted_coords_info slotInfo = {};
+    slotInfo.active_count = VKEY_TP_GSE_THREE_FINGERS;
+    slotInfo.coords[0].is_active = true;
+    slotInfo.coords[0].x = static_cast<float>(msgPPosX);
+    slotInfo.coords[0].y = static_cast<float>(msgPPosY);
+    slotInfo.coords[0].is_active = true;
+    slotInfo.coords[1].x = static_cast<float>(msgPPosX);
+    slotInfo.coords[1].y = static_cast<float>(msgPPosY);
+    slotInfo.coords[1].is_active = true;
+    gEvent.solt_touches = slotInfo;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
+    return true;
+}
+
+bool LibinputAdapter::HandleVKeyTrackPadSwipeEnd(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem)
+{
+    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
+        MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
+            static_cast<int32_t>(msgItem.size()));
+        return false;
+    }
+    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPSwipe = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
+    event_gesture gEvent;
+    gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_SWIPE_END;
+    gEvent.finger_count = VKEY_TP_GSE_THREE_FINGERS;
+    sloted_coords_info slotInfo = {};
+    slotInfo.active_count = VKEY_TP_GSE_THREE_FINGERS;
+    slotInfo.coords[0].is_active = true;
+    slotInfo.coords[0].x = static_cast<float>(msgPPosX);
+    slotInfo.coords[0].y = static_cast<float>(msgPPosY);
+    slotInfo.coords[0].is_active = true;
+    slotInfo.coords[1].x = static_cast<float>(msgPPosX);
+    slotInfo.coords[1].y = static_cast<float>(msgPPosY);
+    slotInfo.coords[1].is_active = true;
+    gEvent.solt_touches = slotInfo;
+    libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    funInputEvent_((libinput_event*)lgEvent, frameTime);
+    free(lgEvent);
+    return true;
 }
 
 bool LibinputAdapter::HandleVKeyTrackPadPointerMove(libinput_event_touch* touch,

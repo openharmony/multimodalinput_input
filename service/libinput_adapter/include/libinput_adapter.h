@@ -69,6 +69,10 @@ enum class VTPStateMachineMessageType : int32_t {
     LEFT_TOUCH_DOWN = 18,
     LEFT_TOUCH_UP = 19,
     TWO_FINGER_TAP = 20,
+    LEFT_TOUCH_UP_CANCEL = 21,
+    SWIPE_BEGIN = 22,
+    SWIPE_UPDATE = 23,
+    SWIPE_END = 24,
 };
 
 enum class VKeyboardActivation : int32_t {
@@ -129,6 +133,8 @@ private:
         VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
     void OnVKeyTrackPadGestureTwoMessage(libinput_event_touch* touch,
         VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
+    void OnVKeyTrackPadGestureThreeMessage(libinput_event_touch* touch,
+        VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadPointerMove(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
@@ -163,6 +169,12 @@ private:
     bool HandleVKeyTrackPadPanUpdate(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadPanEnd(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadSwipeBegin(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadSwipeUpdate(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadSwipeEnd(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRotateBegin(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
