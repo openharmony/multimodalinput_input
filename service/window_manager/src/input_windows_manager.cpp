@@ -4665,7 +4665,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 constexpr int32_t touchDownBoost = 1006;
                 auto begin = std::chrono::high_resolution_clock::now();
                 OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchDownBoost, mapPayload);
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_SOCPERF_CUST_ACTION, touchDownBoost, mapPayload);
                 auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
@@ -4678,7 +4678,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 mapPayload["msg"] = "";
                 auto begin = std::chrono::high_resolution_clock::now();
                 OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchUpBoost, mapPayload);
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_SOCPERF_CUST_ACTION, touchUpBoost, mapPayload);
                 auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
