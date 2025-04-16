@@ -379,6 +379,9 @@ public:
         return static_cast<int32_t>(screenId);
     };
 
+    int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) override { return 0; }
+    int32_t UnsubscribeInputActive(int32_t subscribeId) override { return 0; }
+
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;

@@ -170,6 +170,8 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
+    int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) override;
+    int32_t UnsubscribeInputActive(int32_t subscribeId) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

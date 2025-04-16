@@ -43,10 +43,52 @@ ohos_unittest("key_shortcut_rules_test") {
   ]
 }
 
+ohos_unittest("InputActiveSubscriberHandlerTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/subscriber/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "input_active_subscriber_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "jsoncpp:jsoncpp",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+  ]
+}
+
 group("mmi_subscriber_tests") {
   testonly = true
-
+  deps = [ ":InputActiveSubscriberHandlerTest" ]
   if (input_shortcut_key_rules_enabled) {
-    deps = [ ":key_shortcut_rules_test" ]
+    deps += [ ":key_shortcut_rules_test" ]
   }
 }

@@ -890,5 +890,15 @@ void InputManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNod
 {
     InputMgrImpl.SetMultiWindowScreenId(screenId, displayNodeScreenId);
 }
+
+int32_t InputManager::SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval)
+{
+    return InputMgrImpl.SubscribeInputActive(inputEventConsumer, interval);
+}
+
+void InputManager::UnsubscribeInputActive(int32_t subscribeId)
+{
+    InputMgrImpl.UnsubscribeInputActive(subscribeId);
+}
 } // namespace MMI
 } // namespace OHOS
