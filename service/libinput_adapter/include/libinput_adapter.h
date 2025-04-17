@@ -182,6 +182,7 @@ private:
     void DelayInjectKeyEventCallback();
     bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
     void StartVKeyboardDelayTimer(int32_t delayMs);
+	bool GetIsCaptureMode();
 
     int32_t vKeyboardDeviceId_ { 0 };
     libinput_event *vkbDelayedEvent_ = nullptr;
