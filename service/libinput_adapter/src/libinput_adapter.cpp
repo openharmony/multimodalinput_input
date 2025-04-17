@@ -1538,7 +1538,6 @@ void LibinputAdapter::OnEventHandler()
 
         // add the logic of screen capture window conuming touch point in high priority
         bool isCaptureMode = GetIsCaptureMode();
-
         if (((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
             || eventType == LIBINPUT_EVENT_TOUCH_UP
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
