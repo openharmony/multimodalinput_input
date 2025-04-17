@@ -73,7 +73,8 @@ const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const std::string DEVICE_TYPE_HPR { "HPR" };
-const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string PRODUCT_TYPE_HPR = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRIVACY_SWITCH_NAME {"huaweicast.data.privacy_projection_state"};
 const std::string PRODUCT_TYPE_PC = "2in1";
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
@@ -4743,7 +4744,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
-    isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
+    isHPR_ = PRODUCT_TYPE_HPR == DEVICE_TYPE_HPR;
     if (isHPR_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent);
     }
