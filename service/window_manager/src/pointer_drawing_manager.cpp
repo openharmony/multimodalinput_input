@@ -3146,7 +3146,7 @@ void PointerDrawingManager::InitStyle()
         {AECH_DEVELOPER_DEFINED_ICON, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg"}},
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
         {TRANSPARENT_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
-        {SCREENRECORDER_CURSOR, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "ScreenRecorder_Cursor.svg"}},
+        {SCREENRECORDER_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ScreenRecorder_Cursor.svg"}},
     };
     CheckMouseIconPath();
 }
