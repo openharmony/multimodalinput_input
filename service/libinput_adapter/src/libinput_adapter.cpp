@@ -357,6 +357,42 @@ void LibinputAdapter::StartVKeyboardDelayTimer(int32_t delayMs)
         DelayInjectKeyEventCallback();
     });
 }
+
+bool LibinputAdapter::GetIsCaptureMode()
+{
+    bool isCaptureMode = false;
+    bool hasScreenShotWindow = false;
+
+    InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
+    if (inputWindowsManager != nullptr) {
+        DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
+        bool isFloating = false;
+        for (auto &windowInfo : displayGroupInfo.windowsInfo) {
+            std::string windowName = windowInfo.windowName;
+            std::string prefix = VKEY_SCREENSHOT_WINDOW_NAME;
+
+            if (windowName.size() >= prefix.size() && windowName.substr(0, prefix.size()) == prefix) {
+                hasScreenShotWindow = true;
+            }
+
+            if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
+                // screen recorder scenario will be an exception to true
+                isFloating = (isFloatingKeyboard_==nullptr) ?
+                    isFloating = false : isFloating = isFloatingKeyboard_();
+                isCaptureMode = ((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
+                    && (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT) && isFloating) ? true : false;
+                MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
+                break;
+            }
+        }
+
+        if (hasScreenShotWindow) {
+            isCaptureMode = false;
+        }
+    }
+
+    return isCaptureMode;
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCode,
@@ -1485,42 +1521,6 @@ void LibinputAdapter::MultiKeyboardSetFuncState(libinput_event* event)
                 libinput_toggle_caps_key();
             }
     }
-}
-
-bool LibinputAdapter::GetIsCaptureMode()
-{
-    bool isCaptureMode = false;
-    bool hasScreenShotWindow = false;
-
-    InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
-    if (inputWindowsManager != nullptr) {
-        DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
-        bool isFloating = false;
-        for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-            std::string windowName = windowInfo.windowName;
-            std::string prefix = VKEY_SCREENSHOT_WINDOW_NAME;
-
-            if (windowName.size() >= prefix.size() && windowName.substr(0, prefix.size()) == prefix) {
-                hasScreenShotWindow = true;
-            }
-
-            if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
-                // screen recorder scenario will be an exception to true
-                isFloating = (isFloatingKeyboard_==nullptr) ?
-                    isFloating = false : isFloating = isFloatingKeyboard_();
-                isCaptureMode = ((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
-                    && (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT) && isFloating) ? true : false;
-                MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
-                break;
-            }
-        }
-
-        if (hasScreenShotWindow) {
-            isCaptureMode = false;
-        }
-    }
-
-    return isCaptureMode;
 }
 
 void LibinputAdapter::OnEventHandler()
