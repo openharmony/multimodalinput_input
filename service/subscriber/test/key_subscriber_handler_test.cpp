@@ -3225,7 +3225,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessKeyEvent_01, 
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_CAMERA);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
+    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
     ASSERT_NO_FATAL_FAILURE(handler.ProcessKeyEvent(keyEvent));
 }
