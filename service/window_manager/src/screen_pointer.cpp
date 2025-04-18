@@ -397,9 +397,11 @@ bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
     if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
         CalculateHwcPositionForExtend(x, y);
     }
-    if (x < 0 || y < 0 || x > width_ || y > height_) {
-        MMI_HILOGE("Position out of screen, x=%{public}d, y=%{public}d, width=%{public}u, height=%{public}u",
-            x, y, width_, height_);
+    int32_t width = static_cast<int32_t>(width_);
+    int32_t height = static_cast<int32_t>(height_);
+    if (x < 0 || y < 0 || x > width || y > height) {
+        MMI_HILOGE("Position out of screen, x=%{public}d, y=%{public}d, width=%{public}d, height=%{public}d",
+            x, y, width, height);
         return true;
     }
     return false;
