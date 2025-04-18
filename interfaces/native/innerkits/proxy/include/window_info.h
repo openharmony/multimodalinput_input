@@ -343,6 +343,8 @@ struct WindowInfo {
     bool isDisplayCoord { false };
 
     bool isSkipSelfWhenShowOnVirtualScreen { false };
+	
+    std::string windowName;
 };
 
 /**
