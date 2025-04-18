@@ -392,3 +392,9 @@ EXTERNAL_CALL_STATISTIC:
   UNREGISTER_APP_DEBUG_LISTENER: {type: INT32, arrsize: 4, desc: unregister app debug listener}
   PUBLISH_COMMON_EVENT: {type: INT32, arrsize: 4, desc: publish common event}
   GET_VISIBILITY_WINDOW_INFO: {type: INT32, arrsize: 4, desc: get visibility window info}
+
+INPUT_EVENT_SOCKET_TIMEOUT:
+  __BASE: {type: FAULT, level: CRITICAL, desc: input event socket timeout}
+  MSG: {type: STRING, desc: message}
+  PROGRAM_NAME: {type: STRING, desc: program name}
+  REMOTE_PID: {type: INT32, desc: remote pid}
