@@ -117,13 +117,17 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
         }
         // 计算速度
         double speed = distance / deltaTime;
-        double throwAngle = atan2(dy, dx) * 180 / M_PI;
-        MMI_HILOGI("Throw speed: %{public}lf, angle: %{public}lf, dist: %{public}lf", speed, throwAngle, distance);
+        // 如果用户手指在靠近转轴区域操作，给予速度加成，提高识别成功率
+        if (item.GetDisplayY() > SPIN_UP_AREA_Y && item.GetDisplayY() < SPIN_DOWN_AREA_Y) {
+            speed = speed * SPEED_SCALE; // 2.0:速度倍率
+        }
+        double throwAngle = atan2(dy, dx) * 180 / M_PI; // 180:弧度转化为角度
+        MMI_HILOGI("Throw speed: %{public}f, angle: %{public}f, dist: %{public}f", speed, throwAngle, distance);
         // 检查速度距离是否大于阈值
-        if (speed > THRES_SPEED && distance > MIN_THRES_DIST) {
+        if (speed > THRES_SPEED && distance > MIN_THRES_DIST && CheckThrowAngleValid(throwAngle)) {
             // 判断方向
             touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_THROW);
-            touchEvent->SetThrowAngle(atan2(dy, dx) * 180 / M_PI); // 180:弧度转化为角度
+            touchEvent->SetThrowAngle(throwAngle);
             touchEvent->SetThrowSpeed(speed);
             MMI_HILOGI("PullThrow SUCCESS match gesture result");
         } else {
@@ -166,6 +170,18 @@ bool PullThrowSubscriberHandler::CheckProgressValid(std::shared_ptr<PointerEvent
 {
     if (gestureInProgress_ && CheckFingerValidation(touchEvent)) {
         StopFingerGesture(touchEvent);
+        return true;
+    }
+    return false;
+}
+
+bool PullThrowSubscriberHandler::CheckThrowAngleValid(double angle)
+{
+    angle = (angle < ANGLE_EPSILON) ? angle + FULL_CIRCLE_DEGREES : angle;
+    if (angle >= ANGLE_DOWN_MIN && angle < ANGLE_DOWN_MAX) {
+        return true;
+    }
+    if (angle >= ANGLE_UP_MIN && angle < ANGLE_UP_MAX) {
         return true;
     }
     return false;
