@@ -200,7 +200,7 @@ public:
 
     static constexpr int32_t POINTER_ACTION_PULL_CANCEL = 37;
 
-    static constexpr int32_t POINTER_ACTION_PULL_THROW = 38;
+    static constexpr int32_t POINTER_ACTION_PULL_THROW = 40;
 
     /**
      * 表示触屏手势动作
