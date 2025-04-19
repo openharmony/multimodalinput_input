@@ -3785,7 +3785,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     (void)direction;
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR            
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
             MMI_HILOGI("UpdateMouseTarget id:%{public}d, logicalX:%{public}d, logicalY:%{public}d,"
                 "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->uniqueId, logicalX, logicalY,
