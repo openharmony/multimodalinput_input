@@ -219,7 +219,7 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
                 + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
         }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-        if (INPUT_DEV_MGR.HasVirtualPointerDevice()) {
+        if (INPUT_DEV_MGR->HasVirtualPointerDevice()) {
             displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height * CONST_HALF, CONST_TWO));
             diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
                 + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
@@ -273,7 +273,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
             displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
         }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-        if (INPUT_DEV_MGR.HasVirtualPointerDevice()) {
+        if (INPUT_DEV_MGR->HasVirtualPointerDevice()) {
             displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height * CONST_HALF, CONST_TWO));
         }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
