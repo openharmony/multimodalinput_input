@@ -3781,7 +3781,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
-#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#else
+    (void)direction;
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR            
             IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
