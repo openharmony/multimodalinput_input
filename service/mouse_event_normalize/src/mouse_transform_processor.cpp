@@ -218,6 +218,13 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
             diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
                 + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
         }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+        if (INPUT_DEV_MGR.HasVirtualPointerDevice()) {
+            displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height * CONST_HALF, CONST_TWO));
+            diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
+                + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         if (diagonalMm > CONST_DOUBLE_ZERO) {
             displayPpi = displaySize * MM_TO_INCH / diagonalMm;
         }
@@ -227,6 +234,8 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
             &abs_x, &abs_y, globalPointerSpeed_, dalta_time, displayPpi, static_cast<double>(factor));
         return ret;
     } else {
+        MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
+            displayInfo->width, displayInfo->height);
         ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, globalPointerSpeed_, deviceType);
         return ret;
@@ -243,6 +252,8 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
     const std::string devName = libinput_device_get_name(device);
     if (displayInfo->width == static_cast<int32_t>(CONST_DOUBLE_ZERO) ||
         displayInfo->height == static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
+        MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
+        displayInfo->width, displayInfo->height);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, GetTouchpadSpeed(), deviceType);
         return ret;
@@ -261,6 +272,11 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
             (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
             displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
         }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+        if (INPUT_DEV_MGR.HasVirtualPointerDevice()) {
+            displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height * CONST_HALF, CONST_TWO));
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         double touchpadPPi = libinput_touchpad_device_get_ppi(device);
         double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
         int32_t frequency = libinput_touchpad_device_get_frequency(device);
