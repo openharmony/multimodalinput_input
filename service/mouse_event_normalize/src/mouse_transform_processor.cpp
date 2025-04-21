@@ -199,6 +199,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* displayInfo, Offset &offset,
     double &abs_x, double &abs_y, int32_t deviceType)
 {
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
     int32_t ret = RET_ERR;
     uint64_t dalta_time = 0;
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
@@ -218,6 +219,16 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
             diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
                 + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
         }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        if (displayInfo->pointerActiveWidth > static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
+            displayInfo->pointerActiveHeight > static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
+            MMI_HILOGD("vkb is show, use half display accelerate");
+            displaySize = sqrt(pow(displayInfo->pointerActiveWidth, CONST_TWO) +
+                pow(displayInfo->pointerActiveHeight, CONST_TWO));
+            diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO) +
+                pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
+        }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         if (diagonalMm > CONST_DOUBLE_ZERO) {
             displayPpi = displaySize * MM_TO_INCH / diagonalMm;
         }
@@ -227,6 +238,8 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
             &abs_x, &abs_y, globalPointerSpeed_, dalta_time, displayPpi, static_cast<double>(factor));
         return ret;
     } else {
+        MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
+            displayInfo->width, displayInfo->height);
         ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, globalPointerSpeed_, deviceType);
         return ret;
@@ -236,6 +249,7 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
 int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo,
     struct libinput_event* event, Offset &offset, double &abs_x, double &abs_y, int32_t deviceType)
 {
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
     int32_t ret = RET_ERR;
     CalculateOffset(displayInfo, offset);
     struct libinput_device *device = libinput_event_get_device(event);
@@ -243,6 +257,8 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
     const std::string devName = libinput_device_get_name(device);
     if (displayInfo->width == static_cast<int32_t>(CONST_DOUBLE_ZERO) ||
         displayInfo->height == static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
+        MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
+            displayInfo->width, displayInfo->height);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, GetTouchpadSpeed(), deviceType);
         return ret;
@@ -261,6 +277,14 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
             (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
             displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
         }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        if (displayInfo->pointerActiveWidth > static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
+            displayInfo->pointerActiveHeight > static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
+            MMI_HILOGD("vkb is show, use half display accelerate");
+            displaySize = sqrt(pow(displayInfo->pointerActiveWidth, CONST_TWO) +
+                pow(displayInfo->pointerActiveHeight, CONST_TWO));
+        }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         double touchpadPPi = libinput_touchpad_device_get_ppi(device);
         double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
         int32_t frequency = libinput_touchpad_device_get_frequency(device);
