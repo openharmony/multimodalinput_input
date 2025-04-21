@@ -134,6 +134,8 @@ private:
     void HandleVKeyTouchpadMessages(libinput_event_touch* touch);
     void OnVKeyTrackPadMessage(libinput_event_touch* touch,
         const std::vector<std::vector<int32_t>>& msgList);
+    void CheckSwipeState(libinput_event_touch* touch,
+        VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
     void OnVKeyTrackPadGestureMessage(libinput_event_touch* touch,
         VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
     void OnVKeyTrackPadGestureTwoMessage(libinput_event_touch* touch,
