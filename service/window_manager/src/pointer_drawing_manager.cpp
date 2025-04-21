@@ -3658,18 +3658,6 @@ void PointerDrawingManager::ResetMoveRetryTimer()
     }
 }
 
-void PointerDrawingManager::ResetMoveRetryTimer()
-{
-    if (moveRetryTimerId_ != DEFAULT_VALUE) {
-        TimerMgr->RemoveTimer(moveRetryTimerId_);
-        MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
-        moveRetryTimerId_ = DEFAULT_VALUE;
-    }
-    if (moveRetryCount_ > 0) {
-        moveRetryCount_ = 0;
-    }
-}
-
 void PointerDrawingManager::HideHardwareCursors()
 {
     auto curSp = GetScreenPointer(screenId_);
