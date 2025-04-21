@@ -224,7 +224,7 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
             MMI_HILOGD("vkb is show, use half display accelerate");
             displaySize = sqrt(pow(displayInfo->pointerActiveWidth, CONST_TWO) +
                 pow(displayInfo->pointerActiveHeight, CONST_TWO));
-            diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO) + 
+            diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO) +
                 pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
         }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
