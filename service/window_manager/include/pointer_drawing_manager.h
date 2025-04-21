@@ -239,6 +239,7 @@ private:
     void SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_TYPE align);
     void MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align);
+    void ResetMoveRetryTimer();
     int32_t HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void HideHardwareCursors();
     int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
