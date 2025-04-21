@@ -3563,6 +3563,7 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
         TimerMgr->RemoveTimer(moveRetryTimerId_);
         MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
         moveRetryTimerId_ = DEFAULT_VALUE;
+        moveRetryCount_ = 0;
     }
     int32_t ret = RET_OK;
     auto sp = GetScreenPointer(displayId_);
