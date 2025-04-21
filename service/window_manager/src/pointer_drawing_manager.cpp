@@ -364,6 +364,8 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
                 TimerMgr->RemoveTimer(moveRetryTimerId_);
                 MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
                 moveRetryTimerId_ = DEFAULT_VALUE;
+            }
+            if (moveRetryCount_ > 0) {
                 moveRetryCount_ = 0;
             }
             MoveRetryAsync(physicalX, physicalY, iconType);
@@ -509,6 +511,8 @@ void PointerDrawingManager::SetHardwareCursorPosition(int32_t displayId, int32_t
                 TimerMgr->RemoveTimer(moveRetryTimerId_);
                 MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
                 moveRetryTimerId_ = DEFAULT_VALUE;
+            }
+            if (moveRetryCount_ > 0) {
                 moveRetryCount_ = 0;
             }
             MoveRetryAsync(physicalX, physicalY, align);
@@ -1201,6 +1205,8 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
                 TimerMgr->RemoveTimer(moveRetryTimerId_);
                 MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
                 moveRetryTimerId_ = DEFAULT_VALUE;
+            }
+            if (moveRetryCount_ > 0) {
                 moveRetryCount_ = 0;
             }
             MoveRetryAsync(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
@@ -3650,7 +3656,6 @@ void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align
             moveRetryTimerId_ = DEFAULT_VALUE;
             if (moveRetryCount_ > MAX_MOVE_RETRY_COUNT) {
                 MMI_HILOGI("Move retry count exceeds limit");
-                moveRetryCount_ = 0;
                 return;
             }
             if (HardwareCursorMove(x, y, align) != RET_OK) {
