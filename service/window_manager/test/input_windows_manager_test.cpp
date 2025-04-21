@@ -5886,7 +5886,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectPointerChangeAre
     areas.push_back(rect);
     windowInfo.id = 100;
     inputWindowsMgr.windowsHotAreas_.insert(std::make_pair(100, areas));
-    EXPECT_TRUE(inputWindowsMgr.SelectPointerChangeArea(windowInfo, pointerStyle, logicalX, logicalY));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SelectPointerChangeArea(windowInfo, pointerStyle, logicalX, logicalY));
 }
 
 /**
@@ -7024,7 +7024,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectPointerChangeAre
     int32_t windowId = 100;
     int32_t logicalX = 300;
     int32_t logicalY = 300;
-    EXPECT_TRUE(inputWindowsMgr.SelectPointerChangeArea(windowId, logicalX, logicalY));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SelectPointerChangeArea(windowId, logicalX, logicalY));
 }
 
 /**
