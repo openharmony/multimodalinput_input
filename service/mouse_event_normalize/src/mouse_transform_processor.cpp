@@ -218,13 +218,16 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
             diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
                 + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
         }
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-        if (INPUT_DEV_MGR->HasVirtualPointerDevice()) {
-            displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height * CONST_HALF, CONST_TWO));
-            diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
-                + pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        if (displayInfo->pointerActiveWidth > static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
+            displayInfo->pointerActiveHeight > static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
+            MMI_HILOGD("vkb is show, use half display accelerate");
+            displaySize = sqrt(pow(displayInfo->pointerActiveWidth, CONST_TWO) +
+                pow(displayInfo->pointerActiveHeight * CONST_HALF, CONST_TWO));
+            diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO) + 
+                pow(displayInfo->physicalHeight * CONST_HALF, CONST_TWO));
         }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         if (diagonalMm > CONST_DOUBLE_ZERO) {
             displayPpi = displaySize * MM_TO_INCH / diagonalMm;
         }
@@ -272,11 +275,14 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* d
             (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
             displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
         }
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-        if (INPUT_DEV_MGR->HasVirtualPointerDevice()) {
-            displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height * CONST_HALF, CONST_TWO));
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        if (displayInfo->pointerActiveWidth > static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
+            displayInfo->pointerActiveHeight > static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
+            MMI_HILOGD("vkb is show, use half display accelerate");
+            displaySize = sqrt(pow(displayInfo->pointerActiveWidth, CONST_TWO) +
+                pow(displayInfo->pointerActiveHeight * CONST_HALF, CONST_TWO));
         }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         double touchpadPPi = libinput_touchpad_device_get_ppi(device);
         double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
         int32_t frequency = libinput_touchpad_device_get_frequency(device);
