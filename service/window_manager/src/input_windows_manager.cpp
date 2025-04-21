@@ -3931,7 +3931,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
-        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
+        auto windowXY = TransformWindowXY(
+            *touchWindow, logicalX - physicalDisplayInfo->x, logicalY - physicalDisplayInfo->y);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
