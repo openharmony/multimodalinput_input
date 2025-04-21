@@ -202,6 +202,7 @@ private:
     bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
     void StartVKeyboardDelayTimer(int32_t delayMs);
     bool GetIsCaptureMode();
+    VTPSwipeStateType vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
 
     int32_t vKeyboardDeviceId_ { 0 };
     libinput_event *vkbDelayedEvent_ = nullptr;
@@ -224,7 +225,6 @@ private:
     GetKeyboardActivationState getKeyboardActivationState_ { nullptr };
     IsFloatingKeyboard isFloatingKeyboard_ { nullptr };
     int32_t deviceId;
-    VTPSwipeStateType vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
     std::unordered_map<int32_t, double> touchPointPressureCache_;
