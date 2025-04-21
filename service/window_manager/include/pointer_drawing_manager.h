@@ -316,6 +316,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> moveRetryHander_ { nullptr };
     std::unique_ptr<std::thread> moveRetryThread_ { nullptr };
     int32_t moveRetryTimerId_ { -1 };
+    int32_t moveRetryCount_ { 0 };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
