@@ -146,6 +146,7 @@ private:
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    static void CheckEventFromVirtualTouchpad(struct libinput_event* event);
     static void GetVirtualTouchpadTapSwitch(bool &switchFlag);
     static void GetVirtualTouchpadRightClickType(int32_t &type);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -179,7 +180,9 @@ public:
     static int32_t GetTouchpadSpeed();
 
 private:
-    static DeviceType deviceTypeGlobal_;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    static std::atomic_bool isEventFromVirtualTouchpad_;
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     static int32_t globalPointerSpeed_;
     static int32_t scrollSwitchPid_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
