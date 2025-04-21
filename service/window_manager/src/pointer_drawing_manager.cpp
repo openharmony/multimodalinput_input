@@ -360,6 +360,12 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
         lastMouseStyle_.id != MOUSE_ICON::LOADING &&
         lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
         if (HardwareCursorMove(physicalX, physicalY, iconType) != RET_OK) {
+            if (moveRetryTimerId_ != DEFAULT_VALUE) {
+                TimerMgr->RemoveTimer(moveRetryTimerId_);
+                MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
+                moveRetryTimerId_ = DEFAULT_VALUE;
+                moveRetryCount_ = 0;
+            }
             MoveRetryAsync(physicalX, physicalY, iconType);
         }
     }
@@ -499,6 +505,12 @@ void PointerDrawingManager::SetHardwareCursorPosition(int32_t displayId, int32_t
             lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
         auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
         if (HardwareCursorMove(physicalX, physicalY, align) != RET_OK) {
+            if (moveRetryTimerId_ != DEFAULT_VALUE) {
+                TimerMgr->RemoveTimer(moveRetryTimerId_);
+                MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
+                moveRetryTimerId_ = DEFAULT_VALUE;
+                moveRetryCount_ = 0;
+            }
             MoveRetryAsync(physicalX, physicalY, align);
         }
     }
@@ -1185,6 +1197,12 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         HardwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
         if (HardwareCursorMove(lastPhysicalX_, lastPhysicalY_,
             MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id))) != RET_OK) {
+            if (moveRetryTimerId_ != DEFAULT_VALUE) {
+                TimerMgr->RemoveTimer(moveRetryTimerId_);
+                MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
+                moveRetryTimerId_ = DEFAULT_VALUE;
+                moveRetryCount_ = 0;
+            }
             MoveRetryAsync(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
         }
         PostSoftCursorTask([this]() {
@@ -3559,12 +3577,6 @@ std::shared_ptr<ScreenPointer> PointerDrawingManager::GetScreenPointer(uint32_t 
 int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align)
 {
     MMI_HILOGD("HardwareCursorMove loc: (%{public}d, %{public}d), align type: %{public}d", x, y, align);
-    if (moveRetryTimerId_ != DEFAULT_VALUE) {
-        TimerMgr->RemoveTimer(moveRetryTimerId_);
-        MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
-        moveRetryTimerId_ = DEFAULT_VALUE;
-        moveRetryCount_ = 0;
-    }
     int32_t ret = RET_OK;
     auto sp = GetScreenPointer(displayId_);
     CHKPR(sp, RET_ERR);
@@ -3643,6 +3655,8 @@ void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align
             }
             if (HardwareCursorMove(x, y, align) != RET_OK) {
                 MoveRetryAsync(x, y, align);
+            } else {
+                moveRetryCount_ = 0;
             }
         });
     });
