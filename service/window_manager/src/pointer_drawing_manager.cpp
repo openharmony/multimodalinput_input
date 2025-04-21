@@ -359,15 +359,8 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
     if (hardwareCursorPointerManager_->IsSupported() &&
         lastMouseStyle_.id != MOUSE_ICON::LOADING &&
         lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
+        ResetMoveRetryTimer();
         if (HardwareCursorMove(physicalX, physicalY, iconType) != RET_OK) {
-            if (moveRetryTimerId_ != DEFAULT_VALUE) {
-                TimerMgr->RemoveTimer(moveRetryTimerId_);
-                MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
-                moveRetryTimerId_ = DEFAULT_VALUE;
-            }
-            if (moveRetryCount_ > 0) {
-                moveRetryCount_ = 0;
-            }
             MoveRetryAsync(physicalX, physicalY, iconType);
         }
     }
@@ -506,15 +499,8 @@ void PointerDrawingManager::SetHardwareCursorPosition(int32_t displayId, int32_t
     if (hardwareCursorPointerManager_->IsSupported() && lastMouseStyle_.id != MOUSE_ICON::LOADING &&
             lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
         auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
+        ResetMoveRetryTimer();
         if (HardwareCursorMove(physicalX, physicalY, align) != RET_OK) {
-            if (moveRetryTimerId_ != DEFAULT_VALUE) {
-                TimerMgr->RemoveTimer(moveRetryTimerId_);
-                MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
-                moveRetryTimerId_ = DEFAULT_VALUE;
-            }
-            if (moveRetryCount_ > 0) {
-                moveRetryCount_ = 0;
-            }
             MoveRetryAsync(physicalX, physicalY, align);
         }
     }
@@ -1199,16 +1185,9 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         }
 
         HardwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
+        ResetMoveRetryTimer();
         if (HardwareCursorMove(lastPhysicalX_, lastPhysicalY_,
             MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id))) != RET_OK) {
-            if (moveRetryTimerId_ != DEFAULT_VALUE) {
-                TimerMgr->RemoveTimer(moveRetryTimerId_);
-                MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
-                moveRetryTimerId_ = DEFAULT_VALUE;
-            }
-            if (moveRetryCount_ > 0) {
-                moveRetryCount_ = 0;
-            }
             MoveRetryAsync(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
         }
         PostSoftCursorTask([this]() {
@@ -3660,13 +3639,23 @@ void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align
             }
             if (HardwareCursorMove(x, y, align) != RET_OK) {
                 MoveRetryAsync(x, y, align);
-            } else {
-                moveRetryCount_ = 0;
             }
         });
     });
     moveRetryCount_++;
     MMI_HILOGI("Create MoveRetry Timer, timerId: %d", moveRetryTimerId_);
+}
+
+void PointerDrawingManager::ResetMoveRetryTimer()
+{
+    if (moveRetryTimerId_ != DEFAULT_VALUE) {
+        TimerMgr->RemoveTimer(moveRetryTimerId_);
+        MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
+        moveRetryTimerId_ = DEFAULT_VALUE;
+    }
+    if (moveRetryCount_ > 0) {
+        moveRetryCount_ = 0;
+    }
 }
 
 void PointerDrawingManager::HideHardwareCursors()
