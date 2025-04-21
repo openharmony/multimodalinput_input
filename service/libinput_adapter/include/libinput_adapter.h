@@ -39,6 +39,11 @@ typedef std::function<int32_t()> GetKeyboardActivationState;
 typedef std::function<bool()> IsFloatingKeyboard;
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+enum VTPSwipeStateType {
+    SWIPE_BEGIN = 1,
+    SWIPE_UPDATE = 2,
+    SWIPE_END = 3,
+};
 enum VKeyboardMessageType {
     VNoMessage = -1,
     VKeyPressed = 0,
@@ -217,6 +222,7 @@ private:
     GetKeyboardActivationState getKeyboardActivationState_ { nullptr };
     IsFloatingKeyboard isFloatingKeyboard_ { nullptr };
     int32_t deviceId;
+    VTPSwipeStateType vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
     std::unordered_map<int32_t, double> touchPointPressureCache_;
