@@ -382,7 +382,7 @@ export namespace inputDevice {
 
   function getDeviceList(): Promise<Array<number>> {
     let p = new Promise<Array<number>>((resolve: (v: Array<number>) => void,
-      reject: (error: Object) => void) => {
+      reject: (error: Error) => void) => {
         let p1 = taskpool.execute(getDeviceListInner);
         p1.then((e :NullishType)=>{
           let r =  e as Array<number>;
@@ -408,7 +408,7 @@ export namespace inputDevice {
   }
   function getDeviceInfo(deviceId: number): Promise<InputDeviceData> {
     let p = new Promise<InputDeviceData>((resolve: (v: InputDeviceData) => void,
-      reject: (error: Object) => void) => {
+      reject: (error: Error) => void) => {
         let p1 = taskpool.execute(getDeviceInfoInner, deviceId);
         p1.then((e :NullishType)=>{
           let r =  e as InputDeviceData;
