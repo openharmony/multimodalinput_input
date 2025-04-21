@@ -3643,7 +3643,19 @@ void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align
         });
     });
     moveRetryCount_++;
-    MMI_HILOGI("Create MoveRetry Timer, timerId: %d", moveRetryTimerId_);
+    MMI_HILOGI("Create MoveRetry Timer, timerId: %{public}d", moveRetryTimerId_);
+}
+
+void PointerDrawingManager::ResetMoveRetryTimer()
+{
+    if (moveRetryTimerId_ != DEFAULT_VALUE) {
+        TimerMgr->RemoveTimer(moveRetryTimerId_);
+        MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
+        moveRetryTimerId_ = DEFAULT_VALUE;
+    }
+    if (moveRetryCount_ > 0) {
+        moveRetryCount_ = 0;
+    }
 }
 
 void PointerDrawingManager::ResetMoveRetryTimer()
