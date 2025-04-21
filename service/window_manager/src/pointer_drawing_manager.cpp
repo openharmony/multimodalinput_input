@@ -123,6 +123,7 @@ float g_hardwareCanvasSize = { 512.0f };
 float g_focalPoint = { 256.0f };
 constexpr int32_t REPEAT_COOLING_TIME { 1000 };
 constexpr int32_t REPEAT_ONCE { 1 };
+constexpr int32_t MOVE_RETRY_TIME { 50 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t MAX_CUSTOM_CURSOR_SIZE { 256 };
@@ -223,6 +224,7 @@ void PointerDrawingManager::InitPointerCallback()
             renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
             softCursorRenderThread_ =
                 std::make_unique<std::thread>([this] { this->SoftCursorRenderThreadLoop(); });
+            moveRetryThread_ = std::make_unique<std::thread>([this] { this->MoveRetryThreadLoop(); });
         }
         initEventhandlerFlag_.store(true);
     }
@@ -305,6 +307,9 @@ PointerDrawingManager::~PointerDrawingManager()
     if ((softCursorRenderThread_ != nullptr) && softCursorRenderThread_->joinable()) {
         softCursorRenderThread_->join();
     }
+    if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
+        moveRetryThread_->join();
+    }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGI("~PointerDrawingManager complete");
 }
@@ -353,7 +358,9 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
     if (hardwareCursorPointerManager_->IsSupported() &&
         lastMouseStyle_.id != MOUSE_ICON::LOADING &&
         lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
-        HardwareCursorMove(physicalX, physicalY, iconType);
+        if (HardwareCursorMove(physicalX, physicalY, iconType) != RET_OK) {
+            MoveRetryAsync(physicalX, physicalY, iconType);
+        }
     }
 #else
     if (!magicCursorSetBounds) {
@@ -490,7 +497,9 @@ void PointerDrawingManager::SetHardwareCursorPosition(int32_t displayId, int32_t
     if (hardwareCursorPointerManager_->IsSupported() && lastMouseStyle_.id != MOUSE_ICON::LOADING &&
             lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
         auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
-        HardwareCursorMove(physicalX, physicalY, align);
+        if (HardwareCursorMove(physicalX, physicalY, align) != RET_OK) {
+            MoveRetryAsync(physicalX, physicalY, align);
+        }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
@@ -995,6 +1004,17 @@ void PointerDrawingManager::PostSoftCursorTask(std::function<void()> task)
     }
 }
 
+void PointerDrawingManager::PostMoveRetryTask(std::function<void()> task)
+{
+    CHKPV(hardwareCursorPointerManager_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (moveRetryHander_ != nullptr) {
+        moveRetryHander_->PostTask(task);
+    }
+}
+
 void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
     int32_t px, int32_t py, ICON_TYPE align)
 {
@@ -1162,7 +1182,10 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         }
 
         HardwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
-        HardwareCursorMove(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
+        if (HardwareCursorMove(lastPhysicalX_, lastPhysicalY_,
+            MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id))) != RET_OK) {
+            MoveRetryAsync(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
+        }
         PostSoftCursorTask([this]() {
             SoftwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
             SoftwareCursorMove(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
@@ -1223,6 +1246,18 @@ void PointerDrawingManager::SoftCursorRenderThreadLoop()
     if (softCursorRunner_ != nullptr) {
         MMI_HILOGI("Runner is run");
         softCursorRunner_->Run();
+    }
+}
+
+void PointerDrawingManager::MoveRetryThreadLoop()
+{
+    moveRetryRunner_ = AppExecFwk::EventRunner::Create(false);
+    CHKPV(moveRetryRunner_);
+    moveRetryHander_ = std::make_shared<AppExecFwk::EventHandler>(moveRetryRunner_);
+    CHKPV(moveRetryHander_);
+    if (moveRetryRunner_ != nullptr) {
+        MMI_HILOGI("Runner is run");
+        moveRetryRunner_->Run();
     }
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -3520,12 +3555,19 @@ std::shared_ptr<ScreenPointer> PointerDrawingManager::GetScreenPointer(uint32_t 
     return nullptr;
 }
 
-void PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align)
+int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align)
 {
     MMI_HILOGD("HardwareCursorMove loc: (%{public}d, %{public}d), align type: %{public}d", x, y, align);
+    if (moveRetryTimerId_ != DEFAULT_VALUE) {
+        TimerMgr->RemoveTimer(moveRetryTimerId_);
+        MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
+        moveRetryTimerId_ = DEFAULT_VALUE;
+    }
+    int32_t ret = RET_OK;
     auto sp = GetScreenPointer(displayId_);
-    CHKPV(sp);
+    CHKPR(sp, RET_ERR);
     if (!sp->Move(x, y, align)) {
+        ret = RET_ERR;
         MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", displayId_);
     }
     std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
@@ -3536,14 +3578,17 @@ void PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     for (auto it : screenPointers) {
         if (it.second->IsMirror()) {
             if (!it.second->Move(x, y, align)) {
+                ret = RET_ERR;
                 MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
             }
         } else if (static_cast<int32_t>(it.first) != displayId_) {
             if (!it.second->Move(0, 0, align)) {
+                ret = RET_ERR;
                 MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
             }
         }
     }
+    return ret;
 }
 
 int32_t PointerDrawingManager::CheckHwcReady()
@@ -3580,6 +3625,21 @@ void PointerDrawingManager::SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_T
     PostSoftCursorTask([this, x, y, align]() {
         SoftwareCursorMove(x, y, align);
     });
+}
+
+void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align)
+{
+    moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, REPEAT_ONCE, [this, x, y, align]() {
+        PostMoveRetryTask([this, x, y, align]() {
+            MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, align:%{public}d, Timer Id:%{public}d",
+                x, y, align, moveRetryTimerId_);
+            moveRetryTimerId_ = DEFAULT_VALUE;
+            if (HardwareCursorMove(x, y, align) != RET_OK) {
+                MoveRetryAsync(x, y, align);
+            }
+        });
+    });
+    MMI_HILOGI("Create MoveRetry Timer, timerId: %d", moveRetryTimerId_);
 }
 
 void PointerDrawingManager::HideHardwareCursors()
