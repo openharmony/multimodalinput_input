@@ -60,6 +60,11 @@ protected:
     {
         return InputHandlerType::MONITOR;
     }
+private:
+    bool CheckMonitorValid(TouchGestureType type, int32_t fingers) override
+    {
+        return true;
+    }
 };
 
 /**
@@ -320,11 +325,19 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     bool result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
-    ASSERT_TRUE(result);
+    EXPECT_TRUE(result);
     deviceTags = 5;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
-    ASSERT_TRUE(result);
+    EXPECT_TRUE(result);
+
+    deviceTags = 8;
+    result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_TRUE(result);
+
+    deviceTags = 0;
+    result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_FALSE(result);
 }
 
 /**
@@ -341,15 +354,15 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     bool result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
-    ASSERT_TRUE(result);
+    EXPECT_TRUE(result);
     deviceTags = 3;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
-    ASSERT_TRUE(result);
-    deviceTags = 2;
+    EXPECT_TRUE(result);
+    deviceTags = 1;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
-    ASSERT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 /**
@@ -366,11 +379,36 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     bool result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
-    ASSERT_FALSE(result);
+    EXPECT_FALSE(result);
     deviceTags = 10;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
-    ASSERT_FALSE(result);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_CheckInputDeviceSource_005
+ * @tc.desc: Verify CheckInputDeviceSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource_005, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    uint32_t deviceTags = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    bool result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_TRUE(result);
+    deviceTags = 3;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_TRUE(result);
+    deviceTags = 1;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_FALSE(result);
 }
 
 /**
@@ -883,6 +921,249 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
     ASSERT_TRUE(ret);
     #endif
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_RemoveGestureMonitor_001
+ * @tc.desc: Test the funcation RemoveGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveGestureMonitor_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    int32_t handlerId = 0;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    auto ret = manager.RemoveGestureMonitor(handlerId, handlerType);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddGestureToLocal_001
+ * @tc.desc: Test the funcation AddGestureToLocal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddGestureToLocal_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    int32_t handlerId = 0;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    TouchGestureType gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    int32_t fingers = THREE_FINGERS;
+    std::shared_ptr<IInputEventConsumer> consumer = nullptr;
+
+    auto ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
+    EXPECT_EQ(ret, RET_ERR);
+
+    eventType = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddGestureToLocal_002
+ * @tc.desc: Test the funcation AddGestureToLocal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddGestureToLocal_002, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    int32_t handlerId = 0;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    TouchGestureType gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    int32_t fingers = THREE_FINGERS;
+    std::shared_ptr<IInputEventConsumer> consumer = nullptr;
+
+    auto ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
+    EXPECT_EQ(ret, RET_OK);
+
+    ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
+    EXPECT_EQ(ret, RET_ERR);
+
+    fingers = FOUR_FINGERS;
+    ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
+    EXPECT_EQ(ret, RET_ERR);
+
+    handlerId++;
+    ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
+    EXPECT_EQ(ret, RET_OK);
+
+    handlerId++;
+    fingers = THREE_FINGERS;
+    gestureType = TOUCH_GESTURE_TYPE_SWIPE;
+    ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddLocal_001
+ * @tc.desc: Test the funcation AddLocal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddLocal_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    int32_t handlerId = 0;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    int32_t priority = 1;
+    uint32_t deviceTags = 2;
+    std::shared_ptr<IInputEventConsumer> consumer = nullptr;
+
+    auto ret = manager.AddLocal(handlerId, handlerType, eventType, priority, deviceTags, consumer);
+    EXPECT_EQ(ret, RET_OK);
+
+    ret = manager.AddLocal(handlerId, handlerType, eventType, priority, deviceTags, consumer);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_RemoveLocal_001
+ * @tc.desc: Test the funcation RemoveLocal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveLocal_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    InputHandlerManager::Handler handle;
+    int32_t handlerId = 0;
+
+    manager.monitorHandlers_.emplace(handlerId, handle);
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    uint32_t deviceTags = 2;
+    auto ret = manager.RemoveLocal(handlerId, handlerType, deviceTags);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: InputHandlerManagerTest_OnInputEvent_001
+ * @tc.desc: Test the funcation OnInputEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnInputEvent_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    InputHandlerManager::Handler handle;
+    handle.eventType_ = 0;
+    int32_t handlerId = 0;
+
+    manager.monitorHandlers_.emplace(handlerId, handle);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    uint32_t deviceTags = 2;
+    EXPECT_NO_FATAL_FAILURE(manager.OnInputEvent(keyEvent, deviceTags));
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_OnInputEvent_002
+ * @tc.desc: Test the funcation OnInputEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnInputEvent_002, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    InputHandlerManager::Handler handle;
+    handle.eventType_ = 0;
+    int32_t handlerId = 0;
+
+    manager.interHandlers_.push_back(handle);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    uint32_t deviceTags = 2;
+    EXPECT_NO_FATAL_FAILURE(manager.OnInputEvent(keyEvent, deviceTags));
+}
+#endif
+
+/**
+ * @tc.name: InputHandlerManagerTest_GetConsumerInfos_001
+ * @tc.desc: Test the funcation GetConsumerInfos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetConsumerInfos_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    InputHandlerManager::Handler handle;
+    handle.eventType_ = 0;
+    handle.deviceTags_ = 0;
+    int32_t handlerId = 0;
+
+    manager.interHandlers_.push_back(handle);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    uint32_t deviceTags = 2;
+    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> consumerInfos;
+    EXPECT_NO_FATAL_FAILURE(manager.GetConsumerInfos(pointerEvent, deviceTags, consumerInfos));
+    EXPECT_EQ(consumerInfos.size(), 0);
+
+    manager.interHandlers_.clear();
+    handle.eventType_ = HANDLE_EVENT_TYPE_POINTER;
+    manager.interHandlers_.push_back(handle);
+
+    EXPECT_NO_FATAL_FAILURE(manager.GetConsumerInfos(pointerEvent, deviceTags, consumerInfos));
+    EXPECT_EQ(consumerInfos.size(), 0);
+    manager.interHandlers_.clear();
+    handle.deviceTags_ = 2;
+    manager.interHandlers_.push_back(handle);
+
+    EXPECT_NO_FATAL_FAILURE(manager.GetConsumerInfos(pointerEvent, deviceTags, consumerInfos));
+    EXPECT_EQ(consumerInfos.size(), 0);
+
+    deviceTags = 1;
+    EXPECT_NO_FATAL_FAILURE(manager.GetConsumerInfos(pointerEvent, deviceTags, consumerInfos));
+    EXPECT_EQ(consumerInfos.size(), 0);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_RegisterGestureMonitors_001
+ * @tc.desc: Test the funcation RegisterGestureMonitors
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RegisterGestureMonitors_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    InputHandlerManager::Handler handle;
+    handle.eventType_ = 0;
+    handle.deviceTags_ = 0;
+    int32_t handlerId = 0;
+
+    manager.monitorHandlers_.emplace(handlerId, handle);
+    EXPECT_NO_FATAL_FAILURE(manager.RegisterGestureMonitors());
+    
+    handlerId++;
+    handle.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    manager.monitorHandlers_.emplace(handlerId, handle);
+    EXPECT_NO_FATAL_FAILURE(manager.RegisterGestureMonitors());
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_OnConnected_001
+ * @tc.desc: Test the funcation OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnConnected_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    EXPECT_NO_FATAL_FAILURE(manager.OnConnected());
+
+    manager.addToServerActions_.push_back(0);
+    EXPECT_NO_FATAL_FAILURE(manager.OnConnected());
+
+    InputHandlerManager::Handler handle;
+    handle.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
+    int32_t handlerId = 0;
+    manager.monitorHandlers_.emplace(handlerId, handle);
+    EXPECT_NO_FATAL_FAILURE(manager.OnConnected());
 }
 } // namespace MMI
 } // namespace OHOS

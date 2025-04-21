@@ -670,6 +670,64 @@ ohos_unittest("KeyEventInputSubscribeManagerTest") {
   ]
 }
 
+ohos_unittest("LongPressEventSubscribeManagerTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "${mmi_path}/frameworks/proxy/event_handler/include" ]
+
+  sources = [
+    "event_handler/src/long_press_event_subscribe_manager.cpp",
+    "event_handler/test/long_press_event_subscribe_manager_test.cpp",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "hilog:libhilog",
+  ]
+}
+
+ohos_unittest("InputDeviceImplTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "${mmi_path}/frameworks/proxy/event_handler/include" ]
+
+  sources = [
+    #"event_handler/src/input_device_impl.cpp",
+    "event_handler/test/input_device_impl_test.cpp",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "hilog:libhilog",
+  ]
+}
+
 ohos_unittest("PointerEventTest") {
   module_out_path = module_output_path
   include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
