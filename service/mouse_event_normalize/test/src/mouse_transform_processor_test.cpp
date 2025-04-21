@@ -1437,6 +1437,48 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadR
 }
 
 /**
+ * @tc.name: MouseTransformProcessorTest_TransTouchpadRightButton_07
+ * @tc.desc: Test TransTouchpadRightButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadRightButton_07, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t type = 4;
+    processor.SetTouchpadRightClickType(type);
+    struct libinput_event_pointer *data = nullptr;
+    int32_t evenType = 60;
+    uint32_t button = BTN_RIGHT_MENUE_CODE;
+    processor.TransTouchpadRightButton(data, evenType, button);
+    int32_t newType = 1;
+    processor.GetTouchpadRightClickType(newType);
+    ASSERT_TRUE(type == newType);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_TransTouchpadRightButton_08
+ * @tc.desc: Test TransTouchpadRightButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadRightButton_08, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t type = 5;
+    processor.SetTouchpadRightClickType(type);
+    struct libinput_event_pointer *data = nullptr;
+    int32_t evenType = 60;
+    uint32_t button = BTN_RIGHT_MENUE_CODE;
+    processor.TransTouchpadRightButton(data, evenType, button);
+    int32_t newType = 1;
+    processor.GetTouchpadRightClickType(newType);
+    ASSERT_TRUE(type == newType);
+}
+
+/**
  * @tc.name: MouseTransformProcessorTest_HandlePostInner_01
  * @tc.desc: Test HandlePostInner
  * @tc.type: FUNC
