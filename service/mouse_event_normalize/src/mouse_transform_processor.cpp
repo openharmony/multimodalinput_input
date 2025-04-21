@@ -199,6 +199,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* displayInfo, Offset &offset,
     double &abs_x, double &abs_y, int32_t deviceType)
 {
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
     int32_t ret = RET_ERR;
     uint64_t dalta_time = 0;
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
@@ -248,6 +249,7 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
 int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo,
     struct libinput_event* event, Offset &offset, double &abs_x, double &abs_y, int32_t deviceType)
 {
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
     int32_t ret = RET_ERR;
     CalculateOffset(displayInfo, offset);
     struct libinput_device *device = libinput_event_get_device(event);
