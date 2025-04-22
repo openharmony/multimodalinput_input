@@ -916,5 +916,10 @@ int32_t InputManager::SwitchScreenCapturePermission(uint32_t permissionType, boo
 {
     return InputMgrImpl.SwitchScreenCapturePermission(permissionType, enable);
 }
+
+int32_t InputManager::SwitchTouchTracking(bool touchTracking)
+{
+    return InputMgrImpl.SwitchTouchTracking(touchTracking);
+}
 } // namespace MMI
 } // namespace OHOS

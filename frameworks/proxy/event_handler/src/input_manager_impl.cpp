@@ -2824,5 +2824,15 @@ int32_t InputManagerImpl::SwitchScreenCapturePermission(uint32_t permissionType,
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SwitchScreenCapturePermission(permissionType, enable);
 }
+
+int32_t InputManagerImpl::SwitchTouchTracking(bool touchTracking)
+{
+    CALL_INFO_TRACE;
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support touch-tracking on %{public}s", PRODUCT_TYPE.c_str());
+        return CAPABILITY_NOT_SUPPORTED;
+    }
+    return MULTIMODAL_INPUT_CONNECT_MGR->SwitchTouchTracking(touchTracking);
+}
 } // namespace MMI
 } // namespace OHOS
