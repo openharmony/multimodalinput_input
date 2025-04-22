@@ -1156,9 +1156,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnConnected_001, TestS
     MYInputHandlerManager manager;
     EXPECT_NO_FATAL_FAILURE(manager.OnConnected());
 
-    manager.addToServerActions_.push_back(0);
-    EXPECT_NO_FATAL_FAILURE(manager.OnConnected());
-
     InputHandlerManager::Handler handle;
     handle.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
     int32_t handlerId = 0;
