@@ -39,6 +39,11 @@ typedef std::function<int32_t()> GetKeyboardActivationState;
 typedef std::function<bool()> IsFloatingKeyboard;
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+enum VTPSwipeStateType {
+    SWIPE_BEGIN = 1,
+    SWIPE_UPDATE = 2,
+    SWIPE_END = 3,
+};
 enum VKeyboardMessageType {
     VNoMessage = -1,
     VKeyPressed = 0,
@@ -129,6 +134,8 @@ private:
     void HandleVKeyTouchpadMessages(libinput_event_touch* touch);
     void OnVKeyTrackPadMessage(libinput_event_touch* touch,
         const std::vector<std::vector<int32_t>>& msgList);
+    void CheckSwipeState(libinput_event_touch* touch,
+        VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
     void OnVKeyTrackPadGestureMessage(libinput_event_touch* touch,
         VTPStateMachineMessageType msgType, const std::vector<int32_t>& msgItem);
     void OnVKeyTrackPadGestureTwoMessage(libinput_event_touch* touch,
@@ -195,6 +202,7 @@ private:
     bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
     void StartVKeyboardDelayTimer(int32_t delayMs);
     bool GetIsCaptureMode();
+    VTPSwipeStateType vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
 
     libinput_event *vkbDelayedEvent_ = nullptr;
     int32_t vkbDelayedKeyCode_ = 0;
