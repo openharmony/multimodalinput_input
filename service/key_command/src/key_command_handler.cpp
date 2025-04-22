@@ -83,6 +83,7 @@ constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
 constexpr int32_t SENSOR_REPORT_INTERVAL = 100000000;
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string DEVICE_TYPE_HPR { "HPR" };
 struct SensorUser g_user = {.name = {0}, .callback = nullptr, .userData = nullptr};
 std::atomic<int32_t> g_distance { 0 };
 } // namespace
@@ -195,7 +196,9 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
     InitializeLongPressConfigurations();
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_PULL_MOVE:
-            PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+            if (PRODUCT_TYPE == DEVICE_TYPE_HPR) {
+                PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+            }
             break;
         case PointerEvent::POINTER_ACTION_CANCEL:
         case PointerEvent::POINTER_ACTION_UP: {
@@ -205,7 +208,9 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         case PointerEvent::POINTER_ACTION_MOVE: {
             HandlePointerActionMoveEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
-            PULL_THROW_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
+            if (PRODUCT_TYPE == DEVICE_TYPE_HPR) {
+                PULL_THROW_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
+            }
             break;
         }
         case PointerEvent::POINTER_ACTION_DOWN: {
@@ -255,7 +260,9 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             if (CheckBundleName(touchEvent)) {
                 LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             }
-            PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
+            if (PRODUCT_TYPE == DEVICE_TYPE_HPR) {
+                PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
+            }
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
@@ -316,7 +323,9 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureUpEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
-            PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
+            if (PRODUCT_TYPE == DEVICE_TYPE_HPR) {
+                PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
+            }
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
