@@ -731,7 +731,7 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.zOrder >> extensionInfo.pointerChangeAreas >> extensionInfo.transform
             >> extensionInfo.windowInputType >> extensionInfo.privacyMode >> extensionInfo.windowType
             >> extensionInfo.privacyUIFlag >> extensionInfo.rectChangeBySystem
-            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen >> extensionInfo.windowName;
+            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen >> extensionInfo.windowNameType;
         info.uiExtentionWindowInfo.push_back(extensionInfo);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read extention window info failed");
@@ -805,7 +805,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType
-            >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowName >> byteCount;
+            >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> byteCount;
 
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
@@ -846,7 +846,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen
-            >> info.windowName;
+            >> info.windowNameType;
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
         windowGroupInfo.windowsInfo.push_back(info);
