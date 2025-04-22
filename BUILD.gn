@@ -139,6 +139,7 @@ group("mmi_tests") {
   deps = [
     "common/anco/comm:AncoChannelStubTest",
     "frameworks/native/input:OHInputManagerTest",
+    "frameworks/proxy:InputDeviceImplTest",
     "frameworks/proxy:InputHandlerManagerTest",
     "frameworks/proxy:InputManagerFilterManualTest",
     "frameworks/proxy:InputManagerImplTest",
@@ -148,6 +149,7 @@ group("mmi_tests") {
     "frameworks/proxy:InputMonitorManagerTest",
     "frameworks/proxy:KeyEventInputSubscribeManagerTest",
     "frameworks/proxy:KeyEventTest",
+    "frameworks/proxy:LongPressEventSubscribeManagerTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "libudev:test",
