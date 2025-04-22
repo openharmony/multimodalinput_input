@@ -361,8 +361,7 @@ bool LibinputAdapter::GetIsCaptureMode()
         DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
         bool isFloating = false;
         for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-            if (windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT)
-            {
+            if (windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT) {
                 hasScreenShotWindow = true;
             }
 
