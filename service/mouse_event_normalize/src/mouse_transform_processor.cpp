@@ -740,7 +740,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
         deviceType = DeviceType::DEVICE_SOFT_PC_PRO;
     }
-    if (PRODUCT_TYPE == DEVICE_TYPE_TABLET || PRODUCT_TYPE == DEVICE_TYPE_PCE) {
+    if (PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
         deviceType = DeviceType::DEVICE_TABLET;
     }
     if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
