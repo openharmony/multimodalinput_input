@@ -190,6 +190,7 @@ public:
     virtual int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) = 0;
     virtual int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) = 0;
     virtual int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable) = 0;
+    virtual int32_t SwitchTouchTracking(bool touchTracking) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

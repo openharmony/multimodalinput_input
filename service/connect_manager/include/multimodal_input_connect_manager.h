@@ -178,6 +178,7 @@ public:
     int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames);
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
     int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
+    int32_t SwitchTouchTracking(bool touchTracking);
 
 private:
     MultimodalInputConnectManager() = default;

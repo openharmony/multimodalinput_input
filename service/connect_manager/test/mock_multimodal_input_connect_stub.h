@@ -204,8 +204,8 @@ public:
     MOCK_METHOD(bool, IsRunning, (), (const override));
     MOCK_METHOD(int32_t, GetMaxMultiTouchPointNum, (int32_t &pointNum), (override));
     MOCK_METHOD(int32_t, SwitchScreenCapturePermission, (uint32_t permissionType, bool enable), (override));
+    MOCK_METHOD(int32_t, SwitchTouchTracking, (bool touchTracking), (override));
 };
-
 }  // namespace MMI
 }  // namespace OHOS
 #endif  // MOCK_MULTIMODAL_INPUT_CONNECT_STUB_H

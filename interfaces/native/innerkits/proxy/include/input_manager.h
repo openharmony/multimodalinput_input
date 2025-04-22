@@ -1177,6 +1177,7 @@ public:
      * @since 20
     */
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+    int32_t SwitchTouchTracking(bool touchTracking);
 
     /**
     * @brief Temporarily enables or disables screen capture and screen recording permissions.

@@ -1094,5 +1094,12 @@ int32_t MultimodalInputConnectManager::SwitchScreenCapturePermission(uint32_t pe
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SwitchScreenCapturePermission(permissionType, enable);
 }
+
+int32_t MultimodalInputConnectManager::SwitchTouchTracking(bool touchTracking)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SwitchTouchTracking(touchTracking);
+}
 } // namespace MMI
 } // namespace OHOS
