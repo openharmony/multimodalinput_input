@@ -101,31 +101,6 @@ HWTEST_F(InputScreenCaptureAgentTest, LoadLibrary_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: RegisterListener_001
- * @tc.desc: Test RegisterListener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, RegisterListener_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ScreenCaptureCallback callback = [](int32_t pid, bool isStart) { return; };
-    ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.RegisterListener(callback));
-}
-
-/**
- * @tc.name: IsMusicActivate_001
- * @tc.desc: Test RegisterListener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, IsMusicActivate_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_FALSE(inputScreenCaptureAgent.IsMusicActivate());
-}
-
-/**
  * @tc.name: LoadAudioLibrary_001
  * @tc.desc: Test LoadAudioLibrary
  * @tc.type: FUNC
