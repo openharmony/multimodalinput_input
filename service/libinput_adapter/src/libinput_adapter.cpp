@@ -310,14 +310,6 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
 
     // init touch device Id.
     deviceId = -1;
-
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    auto vKeyboard = std::make_shared<InputDevice>();
-    CHKPV(vKeyboard);
-    vKeyboard->SetName("VirtualKeyboard");
-    vKeyboard->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
-    InputDeviceManager::GetInstance()->AddVirtualInputDevice(vKeyboard, vKeyboardDeviceId_);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD

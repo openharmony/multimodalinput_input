@@ -196,7 +196,6 @@ private:
     void StartVKeyboardDelayTimer(int32_t delayMs);
     bool GetIsCaptureMode();
 
-    int32_t vKeyboardDeviceId_ { 0 };
     libinput_event *vkbDelayedEvent_ = nullptr;
     int32_t vkbDelayedKeyCode_ = 0;
     // set as true once subscriber succeeded.
