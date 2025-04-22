@@ -148,5 +148,48 @@ HWTEST_F(LibinputAdapterTest, LibinputAdapterTest_Stop_001, TestSize.Level1)
     libinputAdapter.input_ = libinput_path_create_context(&LIBINPUT_INTERFACE, nullptr);
     ASSERT_NO_FATAL_FAILURE(libinputAdapter.Stop());
 }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/**
+ * @tc.name: LibinputAdapterTest_Swipe_001
+ * @tc.desc: Test HandleVKeyTrackPadSwipeEnd function when the state is already SWIPE_END
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LibinputAdapterTest, LibinputAdapterTest_Swipe_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LibinputAdapter libinputAdapter;
+    libinputAdapter.vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
+    EXPECT_FALSE(libinputAdapter.HandleVKeyTrackPadSwipeEnd(nullptr, {}));
+}
+
+/**
+ * @tc.name: LibinputAdapterTest_Swipe_002
+ * @tc.desc: Test HandleVKeyTrackPadSwipeUpdate function when the state is already SWIPE_END
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LibinputAdapterTest, LibinputAdapterTest_Swipe_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LibinputAdapter libinputAdapter;
+    libinputAdapter.vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
+    EXPECT_FALSE(libinputAdapter.HandleVKeyTrackPadSwipeUpdate(nullptr, {}));
+}
+
+/**
+ * @tc.name: LibinputAdapterTest_Swipe_003
+ * @tc.desc: Test HandleVKeyTrackPadSwipeBegin function when the state is not SWIPE_END
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LibinputAdapterTest, LibinputAdapterTest_Swipe_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LibinputAdapter libinputAdapter;
+    libinputAdapter.vtpSwipeState_ = VTPSwipeStateType::SWIPE_BEGIN;
+    EXPECT_FALSE(libinputAdapter.HandleVKeyTrackPadSwipeBegin(nullptr, {}));
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS
