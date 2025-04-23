@@ -434,7 +434,7 @@ void KeySubscriberHandler::GetForegroundPids(std::set<int32_t> &pids)
     CALL_DEBUG_ENTER;
     std::vector<AppExecFwk::AppStateData> list = APP_OBSERVER_MGR->GetForegroundAppData();
     for (auto iter = list.begin(); iter != list.end(); iter++) {
-        MMI_HILOGD("Foreground process pid:%{public}d", (*iter).pid);
+        MMI_HILOGI("Foreground process pid:%{public}d", (*iter).pid);
         pids.insert((*iter).pid);
     }
 }
@@ -820,7 +820,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(keyOption);
-    MMI_HILOGD("Notify key down subscribers size:%{public}zu", subscribers.size());
+    MMI_HILOGI("Notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
         NotifyKeyDownRightNow(keyEvent, subscribers,  keyOption->IsRepeat(), handled);
     } else {
@@ -846,17 +846,19 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool isRepeat, bool &handled)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("The subscribe list size is %{public}zu", subscribers.size());
+    MMI_HILOGI("The subscribe list size is %{public}zu", subscribers.size());
     std::list<std::shared_ptr<Subscriber>> interestedSubscribers;
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
         CHKPC(sess);
+        MMI_HILOGI("Notify subscribe conditions, isForegroundExits:%{public}d, KeyCode()%{public}d, pid:%{public}d",
+            isForegroundExits_, keyEvent->GetKeyCode(), sess->GetPid());
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
             foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             MMI_HILOGD("keyOption->GetFinalKeyDownDuration() <= 0");
             if (!isRepeat && keyEvent->GetKeyCode() == KeyRepeat->GetRepeatKeyCode()) {
-                MMI_HILOGD("Subscribers do not need to repeat events");
+                MMI_HILOGI("Subscribers do not need to repeat events");
                 handled = true;
                 continue;
             }
@@ -910,12 +912,14 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
     std::list<std::shared_ptr<Subscriber>> subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Subscribers size:%{public}zu", subscribers.size());
+    MMI_HILOGI("Subscribers size:%{public}zu", subscribers.size());
     std::list<std::shared_ptr<Subscriber>> interestedSubscribers;
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
         CHKPC(sess);
+        MMI_HILOGI("Notify subscribe conditions, isForegroundExits:%{public}d, KeyCode()%{public}d, pid:%{public}d",
+            isForegroundExits_, keyEvent->GetKeyCode(), sess->GetPid());
         if (!isForegroundExits_ || foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             interestedSubscribers.push_back(subscriber);
             handled = true;
@@ -935,7 +939,7 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
 void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     const std::shared_ptr<Subscriber> &subscriber) __attribute__((no_sanitize("cfi")))
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPV(keyEvent);
     CHKPV(subscriber);
 #ifdef SHORTCUT_KEY_RULES_ENABLED
@@ -1118,7 +1122,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
         }
         NotifyKeyDownSubscriber(keyEvent, keyOption, subscribers, handled);
     }
-    MMI_HILOGD("Handle key down:%{public}s", handled ? "true" : "false");
+    MMI_HILOGI("Handle key down:%{public}s", handled ? "true" : "false");
     return handled;
 }
 
@@ -1149,6 +1153,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
 {
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent) || !KEY_SHORTCUT_MGR->IsCheckUpShortcut(keyEvent)) {
+        MMI_HILOGI("Subscribe are not notify of key upevent!");
         return false;
     }
 #endif // SHORTCUT_KEY_RULES_ENABLED
@@ -1190,7 +1195,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         }
         NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
     }
-    MMI_HILOGD("Handle key up:%{public}s", handled ? "true" : "false");
+    MMI_HILOGI("Handle key up:%{public}s", handled ? "true" : "false");
     return handled;
 }
 
