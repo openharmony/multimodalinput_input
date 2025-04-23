@@ -76,7 +76,7 @@ constexpr uint32_t VKEY_PINCH_FIRST_FINGER_ID { 0 };
 constexpr uint32_t VKEY_PINCH_SECOND_FINGER_ID { 1 };
 constexpr float VKEY_RAW_COORDINATE_RATIO { 8.0 };
 constexpr uint32_t VKEY_PINCH_CURSOR_FAKE_DX { 1 };
-const std::string VKEY_SCREENSHOT_WINDOW_NAME = "ScreenShotWindow";
+constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
 enum class VKeyboardTouchEventType : int32_t {
     TOUCH_DOWN = 0,
     TOUCH_UP = 1,
@@ -361,19 +361,15 @@ bool LibinputAdapter::GetIsCaptureMode()
         DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
         bool isFloating = false;
         for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-            std::string windowName = windowInfo.windowName;
-            std::string prefix = VKEY_SCREENSHOT_WINDOW_NAME;
-
-            if (windowName.size() >= prefix.size() && windowName.substr(0, prefix.size()) == prefix) {
+            if (windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT) {
                 hasScreenShotWindow = true;
             }
 
             if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
                 // screen recorder scenario will be an exception to true
-                isFloating = (isFloatingKeyboard_==nullptr) ?
-                    isFloating = false : isFloating = isFloatingKeyboard_();
-                isCaptureMode = ((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
-                    && (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT) && isFloating) ? true : false;
+                isFloating = (isFloatingKeyboard_ == nullptr) ? false : isFloatingKeyboard_();
+                isCaptureMode = (((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
+                    || (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT)) && isFloating) ? true : false;
                 MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
                 break;
             }
