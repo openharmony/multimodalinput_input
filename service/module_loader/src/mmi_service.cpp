@@ -25,6 +25,7 @@
 #endif // OHOS_RSS_CLIENT
 
 #include "ability_manager_client.h"
+#include "account_manager.h"
 #include "anr_manager.h"
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
@@ -1827,6 +1828,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
+        ACCOUNT_MGR->GetCurrentAccountSetting();
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
         DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
