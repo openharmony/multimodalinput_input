@@ -864,5 +864,363 @@ HWTEST_F(UDSServerTest, UDSServerTest_DelSession, TestSize.Level1)
     udsServer.idxPidMap_.insert(std::make_pair(UDS_PID, fd));
     ASSERT_NO_FATAL_FAILURE(udsServer.DelSession(fd));
 }
+
+/**
+ * @tc.name: UdsStop_002
+ * @tc.desc: Test the function UdsStop
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UdsStop_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    udsServer.epollFd_ = 2;
+    ASSERT_NO_FATAL_FAILURE(udsServer.UdsStop());
+}
+
+/**
+ * @tc.name: GetClientPid_003
+ * @tc.desc: Test the function GetClientPid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, GetClientPid_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 125;
+    int32_t ret = udsServer.GetClientPid(fd);
+    EXPECT_EQ(ret, INVALID_PID);
+}
+
+/**
+ * @tc.name: GetClientPid_004
+ * @tc.desc: Test the function GetClientPid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, GetClientPid_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 125;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    int32_t ret = udsServer.GetClientPid(fd);
+    EXPECT_EQ(ret, 100);
+}
+
+/**
+ * @tc.name: SendMsg_004
+ * @tc.desc: Test the function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SendMsg_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = -10;
+    MmiMessageId msgId = MmiMessageId::INVALID;
+    NetPacket pkt(msgId);
+    bool ret = udsServer.SendMsg(fd, pkt);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SendMsg_005
+ * @tc.desc: Test the function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SendMsg_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    MmiMessageId msgId = MmiMessageId::INVALID;
+    NetPacket pkt(msgId);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    bool ret = udsServer.SendMsg(fd, pkt);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ReleaseSession_001
+ * @tc.desc: Test the function ReleaseSession
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, ReleaseSession_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    epoll_event ev;
+    ASSERT_NO_FATAL_FAILURE(udsServer.ReleaseSession(fd, ev));
+}
+
+/**
+ * @tc.name: ReleaseSession_002
+ * @tc.desc: Test the function ReleaseSession
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, ReleaseSession_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    epoll_event ev;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    ev.data.ptr = nullptr;
+    ASSERT_NO_FATAL_FAILURE(udsServer.ReleaseSession(fd, ev));
+}
+struct device_status_epoll_event {
+    int32_t fd { -1 };
+    EpollEventType event_type { EPOLL_EVENT_BEGIN };
+};
+
+/**
+ * @tc.name: ReleaseSession_003
+ * @tc.desc: Test the function ReleaseSession
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, ReleaseSession_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    epoll_event ev;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
+    ev.data.ptr = eventData;
+    ASSERT_NO_FATAL_FAILURE(udsServer.ReleaseSession(fd, ev));
+}
+
+/**
+ * @tc.name: OnEpollRecv_004
+ * @tc.desc: Test the OnEpollRecv function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnEpollRecv_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = -10;
+    epoll_event ev;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnEpollRecv(fd, ev));
+}
+
+/**
+ * @tc.name: OnEpollRecv_005
+ * @tc.desc: Test the OnEpollRecv function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnEpollRecv_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    epoll_event ev;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnEpollRecv(fd, ev));
+}
+
+/**
+ * @tc.name: OnEpollEvent_002
+ * @tc.desc: Test the OnEpollEvent function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnEpollEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    epoll_event ev;
+    ev.data.fd = -10;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnEpollEvent(ev));
+}
+
+/**
+ * @tc.name: OnEpollEvent_003
+ * @tc.desc: Test the OnEpollEvent function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnEpollEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    epoll_event ev;
+    ev.data.fd = 10;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnEpollEvent(ev));
+}
+
+/**
+ * @tc.name: EarseSessionByFd_001
+ * @tc.desc: Test the EarseSessionByFd function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, EarseSessionByFd_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    ASSERT_NO_FATAL_FAILURE(udsServer.EarseSessionByFd(fd));
+}
+
+/**
+ * @tc.name: EarseSessionByFd_002
+ * @tc.desc: Test the EarseSessionByFd function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, EarseSessionByFd_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    ASSERT_NO_FATAL_FAILURE(udsServer.EarseSessionByFd(fd));
+}
+
+/**
+ * @tc.name: InsertSession_001
+ * @tc.desc: Test the InsertSession function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, InsertSession_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = -10;
+    SessionPtr sp = nullptr;
+    bool ret = udsServer.InsertSession(fd, sp);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InsertSession_002
+ * @tc.desc: Test the InsertSession function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, InsertSession_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = -10;
+    SessionPtr sp = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    bool ret = udsServer.InsertSession(fd, sp);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InsertSession_003
+ * @tc.desc: Test the InsertSession function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, InsertSession_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    SessionPtr sp = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    bool ret = udsServer.InsertSession(fd, sp);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InsertSession_004
+ * @tc.desc: Test the InsertSession function of UDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, InsertSession_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 10;
+    SessionPtr sp = nullptr;
+    bool ret = udsServer.InsertSession(fd, sp);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: UDSServerTest_GetSessionByPid_001
+ * @tc.desc: Test Get Session By Pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_GetSessionByPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t pid = 150;
+    udsServer.pid_ = 10;
+    ASSERT_EQ(udsServer.GetSessionByPid(pid), nullptr);
+}
+
+/**
+ * @tc.name: AddSession_003
+ * @tc.desc: The AddSession function of UDSServer properly adds a session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, AddSession_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    SessionPtr ses = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ses->fd_ = -10;
+    bool ret = udsServer.AddSession(ses);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AddSession_004
+ * @tc.desc: The AddSession function of UDSServer properly adds a session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, AddSession_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    SessionPtr ses = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ses->fd_ = 10;
+    bool ret = udsServer.AddSession(ses);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DelSession_004
+ * @tc.desc: The DelSession function of UDSServer properly deletes a session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, DelSession_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = -10;
+    ASSERT_NO_FATAL_FAILURE(udsServer.DelSession(fd));
+    int32_t fds = 10;
+    ASSERT_NO_FATAL_FAILURE(udsServer.DelSession(fds));
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    ASSERT_NO_FATAL_FAILURE(udsServer.DelSession(fds));
+}
 } // namespace MMI
 } // namespace OHOS
