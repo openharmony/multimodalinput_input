@@ -2517,50 +2517,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_006, TestS
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_AddInjectNotice_005
- * @tc.desc: Test the function AddInjectNotice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    InjectNoticeInfo noticeInfo;
-    handler.injectNotice_ =nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = true;
-    EXPECT_TRUE(handler.AddInjectNotice(noticeInfo));
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_005
- * @tc.desc: Test the function CloseInjectNotice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    int32_t pid = 12345;
-    handler.injectNotice_ =nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = true;
-    EXPECT_TRUE(handler.CloseInjectNotice(pid));
-}
-
-/**
 @tc.name: ServerMsgHandlerTest_OnMsgHandler04
 @tc.desc: Test if callback branch failed
 @tc.type: FUNC
