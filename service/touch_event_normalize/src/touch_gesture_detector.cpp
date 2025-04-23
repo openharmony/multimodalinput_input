@@ -113,10 +113,10 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
         isFingerReady_ = HandleFingerDown();
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         CalcAndStoreDistance();
+        movePoint_ = downPoint_;
     }
-    MMI_HILOGI("The gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
-        gestureType_, downPoint_.size(), (isFingerReady_ ? "true" : "false"), pointerId);
-    movePoint_ = downPoint_;
+    MMI_HILOGI("The gestureType:%{public}d, touches:%{public}s, isFingerReady:%{public}d, pointerId:%{public}d",
+        gestureType_, DumpTouches().c_str(), isFingerReady_, pointerId);
 }
 
 void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
@@ -229,6 +229,8 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
     CALL_INFO_TRACE;
     downPoint_.erase(event->GetPointerId());
     movePoint_.erase(event->GetPointerId());
+    MMI_HILOGI("The gestureType:%{public}d, touches:%{public}s, isFingerReady:%{public}d, pointerId:%{public}d",
+        gestureType_, DumpTouches().c_str(), isFingerReady_, event->GetPointerId());
     if (gestureTimer_ >= 0) {
         TimerMgr->RemoveTimer(gestureTimer_);
         gestureTimer_ = -1;
@@ -275,6 +277,10 @@ bool TouchGestureDetector::IsPhysicalPointer(std::shared_ptr<PointerEvent> event
 void TouchGestureDetector::ReleaseData()
 {
     CALL_INFO_TRACE;
+    if (gestureTimer_ >= 0) {
+        TimerMgr->RemoveTimer(gestureTimer_);
+        gestureTimer_ = -1;
+    }
     isRecognized_ = false;
     isFingerReady_ = false;
     haveGestureWinEmerged_ = false;
@@ -652,6 +658,7 @@ void TouchGestureDetector::RemoveGestureFingers(int32_t fingers)
     }
     if (fingers_.empty()) {
         gestureEnable_ = false;
+        ReleaseData();
     }
 }
 
@@ -774,6 +781,18 @@ void TouchGestureDetector::OnGestureSendEvent(std::shared_ptr<PointerEvent> even
         CHKPV(inputEventNormalizeHandler);
         inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
     }
+}
+
+std::string TouchGestureDetector::DumpTouches() const
+{
+    std::ostringstream output;
+    output << "[" << downPoint_.size() << "]";
+
+    for (const auto &[id, downPt] : downPoint_) {
+        output << "(" << id << "," << downPt.time << "," << downPt.x
+               << "," << downPt.y << ")";
+    }
+    return std::move(output).str();
 }
 } // namespace MMI
 } // namespace OHOS
