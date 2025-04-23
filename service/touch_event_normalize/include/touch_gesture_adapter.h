@@ -37,10 +37,6 @@ private:
         PINCH,
     };
 
-    struct TouchItem {
-        bool cancelled_ { false };
-    };
-
     inline bool ShouldDeliverToNext() const
     {
         return shouldDeliverToNext_;
