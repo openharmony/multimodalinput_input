@@ -21,7 +21,6 @@
 #include "mmi_log.h"
 #include "input_manager.h"
 
-
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AniInputConsumer"
 
@@ -52,24 +51,59 @@ KeyEventMonitorInfo::~KeyEventMonitorInfo()
     keyOptionsObj = nullptr;
 }
 
-static ani_error CreateAniError(ani_env *env, std::string &&errMsg)
+bool KeyEventMonitorInfo::setCallback(ani_object callbackObj)
 {
-    static const char *errorClsName = "Lescompat/Error;";
+    if (ANI_OK != env->GlobalReference_Create(callbackObj, &callback)) {
+        MMI_HILOGE("Create global reference 'callback' failed");
+        return false;
+    }
+    return true;
+}
+
+bool KeyEventMonitorInfo::SetKeyOptionsObj(ani_object keyOptions)
+{
+    if (ANI_OK != env->GlobalReference_Create(keyOptions, &keyOptionsObj)) {
+        MMI_HILOGE("Create global reference 'keyOptionsObj' failed");
+        return false;
+    }
+    return true;
+}
+
+static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
+{
+    MMI_HILOGD("Begin ThrowBusinessError.");
+    static const char *errorClsName = "L@ohos/base/BusinessError;";
     ani_class cls {};
     if (ANI_OK != env->FindClass(errorClsName, &cls)) {
-        MMI_HILOGE("%{public}s: Not found namespace %{public}s.", __func__, errorClsName);
-        return nullptr;
+        MMI_HILOGE("find class BusinessError %{public}s failed", errorClsName);
+        return;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;:V", &ctor)) {
-        MMI_HILOGE("%{public}s: Not found <ctor> in %{public}s.", __func__, errorClsName);
-        return nullptr;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+        MMI_HILOGE("find method BusinessError.constructor failed");
+        return;
     }
-    ani_string error_msg;
-    env->String_NewUTF8(errMsg.c_str(), 17U, &error_msg);
     ani_object errorObject;
-    env->Object_New(cls, ctor, &errorObject, error_msg);
-    return static_cast<ani_error>(errorObject);
+    if (ANI_OK != env->Object_New(cls, ctor, &errorObject)) {
+        MMI_HILOGE("create BusinessError object failed");
+        return;
+    }
+    ani_double aniErrCode = static_cast<ani_double>(errCode);
+    ani_string errMsgStr;
+    if (ANI_OK != env->String_NewUTF8(errMsg.c_str(), errMsg.size(), &errMsgStr)) {
+        MMI_HILOGE("convert errMsg to ani_string failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetFieldByName_Double(errorObject, "code", aniErrCode)) {
+        MMI_HILOGE("set error code failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(errorObject, "message", errMsgStr)) {
+        MMI_HILOGE("set error message failed");
+        return;
+    }
+    env->ThrowError(static_cast<ani_error>(errorObject));
+    return;
 }
 
 static std::optional<bool> GetIsRepeat(ani_env *env, ani_object keyOptionsObj)
@@ -122,6 +156,7 @@ static bool GetPreKeys(ani_env *env, ani_object keyOptionsObj, std::set<int32_t>
     ani_ref ref;
     if (ANI_OK != env->Object_GetPropertyByName_Ref(keyOptionsObj, "preKeys", &ref)) {
         MMI_HILOGE("Object_GetPropertyByName_Ref Failed");
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "preKeys not found");
         return false;
     }
     ani_object arrayObj = static_cast<ani_object>(ref);
@@ -144,9 +179,8 @@ static bool GetPreKeys(ani_env *env, ani_object keyOptionsObj, std::set<int32_t>
             return false;
         }
         if (doubleEntry > INT32_MAX_D || doubleEntry < 0) {
-            ani_error error = CreateAniError(env, "preKeys must be between 0 and INT32_MAX");
-            env->ThrowError(error);
             MMI_HILOGE("preKey:%{public}f is less 0 or greater than INT32_MAX, can not process", doubleEntry);
+            ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
             return false;
         }
         if (!preKeys.insert(static_cast<int32_t>(doubleEntry)).second) {
@@ -177,10 +211,13 @@ static std::shared_ptr<KeyOption> ParseKeyOptions(ani_env *env, ani_object keyOp
     std::shared_ptr<KeyOption> keyOptionPtr = std::make_shared<KeyOption>();
 
     std::set<int32_t> preKeys;
-    if (!GetPreKeys(env, keyOptionsObj, preKeys) || preKeys.size() > PRE_KEYS_SIZE) {
-        MMI_HILOGE("PreKeys is invalid");
-        ani_error error = CreateAniError(env, "PreKeys is invalid");
-        env->ThrowError(error);
+    if (!GetPreKeys(env, keyOptionsObj, preKeys)) {
+        MMI_HILOGE("Get preKeys failed");
+        return nullptr;
+    }
+    if (preKeys.size() > PRE_KEYS_SIZE) {
+        MMI_HILOGE("PreKeys size invalid");
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
         return nullptr;
     }
     keyOptionPtr->SetPreKeys(preKeys);
@@ -192,8 +229,7 @@ static std::shared_ptr<KeyOption> ParseKeyOptions(ani_env *env, ani_object keyOp
     }
     if (finalKey > INT32_MAX_D || finalKey < 0) {
         MMI_HILOGE("finalKey:%{private}f is less 0 or greater than INT32_MAX, can not process", finalKey);
-        ani_error error = CreateAniError(env, "finalKey must be between 0 and INT32_MAX");
-        env->ThrowError(error);
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
         return nullptr;
     }
     keyOptionPtr->SetFinalKey(static_cast<int32_t>(finalKey));
@@ -212,8 +248,7 @@ static std::shared_ptr<KeyOption> ParseKeyOptions(ani_env *env, ani_object keyOp
     }
     if (finalKeyDownDuration > INT32_MAX_D || finalKeyDownDuration < 0) {
         MMI_HILOGE("finalKeyDownDuration:%{public}f is less 0 or greater INT32_MAX", finalKeyDownDuration);
-        ani_error error = CreateAniError(env, "finalKeyDownDuration must be between 0 and INT32_MAX");
-        env->ThrowError(error);
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration must be greater than or equal to 0");
         return nullptr;
     }
     keyOptionPtr->SetFinalKeyDownDuration(static_cast<int32_t>(finalKeyDownDuration));
@@ -287,24 +322,6 @@ static bool MatchCombinationKey(KeyOption &combinationKeyOption, KeyEvent &keyEv
     return count == infoSize;
 }
 
-static bool SendEventToMainThread(const std::function<void()> func)
-{
-    CALL_DEBUG_ENTER;
-    if (func == nullptr) {
-        MMI_HILOGE("%{public}s: func == nullptr", __func__);
-        return false;
-    }
-    auto runner = OHOS::AppExecFwk::EventRunner::GetMainEventRunner();
-    if (!runner) {
-        MMI_HILOGE("%{public}s: runner == nullptr", __func__);
-        return false;
-    }
-    auto handler = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner);
-    handler->PostTask(func, "", 0, OHOS::AppExecFwk::EventQueue::Priority::HIGH, {});
-    MMI_HILOGD("%{public}s: PostTask success", __func__);
-    return true;
-}
-
 static ani_boolean IsInstanceOf(ani_env *env, const std::string &cls_name, ani_object obj)
 {
     ani_class cls;
@@ -318,66 +335,66 @@ static ani_boolean IsInstanceOf(ani_env *env, const std::string &cls_name, ani_o
     return ret;
 }
 
-static void EmitAsyncCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
+static void EmitAsyncCallbackWork(const std::shared_ptr<KeyEventMonitorInfo> &reportEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
-    auto task = [reportEvent]() {
-        MMI_HILOGD("%{public}s: Begin to call task", __func__);
-        ani_size nrRefs = ANI_SCOPE_SIZE;
-        AniLocalScopeGuard aniLocalScopeGuard(reportEvent->env, nrRefs);
-        if (!aniLocalScopeGuard.IsStatusOK()) {
-            MMI_HILOGE("%{public}s: CreateLocalScope failed", __func__);
-            return;
-        }
-        auto fnObj = reinterpret_cast<ani_fn_object>(reportEvent->callback);
-        std::vector<ani_ref> args = {reportEvent->keyOptionsObj};
-        ani_ref result;
-        MMI_HILOGD("%{public}s: Begin to call FunctionalObject_Call", __func__);
-        if (fnObj == nullptr || args.size() == 0) {
-            MMI_HILOGE("%{public}s: fnObj == nullptr", __func__);
-            return;
-        }
-        if (IsInstanceOf(reportEvent->env, "Lstd/core/Function1;", fnObj) == 0) {
-            MMI_HILOGE("%{public}s: fnObj is not instance Of function  ", __func__);
-            return;
-        }
-        const std::string className = "L@ohos/multimodalInput/inputConsumer/inputConsumer/KeyOptions;";
-        if (IsInstanceOf(reportEvent->env, className, static_cast<ani_object>(reportEvent->keyOptionsObj)) == 0) {
-            MMI_HILOGE("%{public}s: keyOptionsObj is not instance Of KeyOptions class", __func__);
-            return;
-        }
-
-        if (ANI_OK != reportEvent->env->FunctionalObject_Call(fnObj, 1, args.data(), &result)) {
-            MMI_HILOGE("%{public}s: FunctionalObject_Call failed", __func__);
-            return;
-        }
-        MMI_HILOGD("%{public}s: FunctionalObject_Call success", __func__);
-    };
-    if (!SendEventToMainThread(task)) {
-        MMI_HILOGE("%{public}s: failed to send event", __func__);
+    auto envResult = ScopedAniEnv::Create(reportEvent->vm);
+    if (!envResult.has_value()) {
+        MMI_HILOGE("%{public}s: get env failed.", __func__);
+        return;
     }
+    std::unique_ptr<ScopedAniEnv> scopedAniEnv = std::move(envResult.value());
+    ani_env *workerEnv = scopedAniEnv->GetEnv();
+    reportEvent->env = workerEnv;
+
+    AniLocalScopeGuard aniLocalScopeGuard(workerEnv, ANI_SCOPE_SIZE);
+    if (!aniLocalScopeGuard.IsStatusOK()) {
+        MMI_HILOGE("%{public}s: CreateLocalScope failed", __func__);
+        return;
+    }
+    auto fnObj = reinterpret_cast<ani_fn_object>(reportEvent->callback);
+    std::vector<ani_ref> args = {reportEvent->keyOptionsObj};
+    ani_ref result;
+    MMI_HILOGD("%{public}s: Begin to call FunctionalObject_Call", __func__);
+    if (fnObj == nullptr || args.size() == 0) {
+        MMI_HILOGE("%{public}s: fnObj == nullptr", __func__);
+        return;
+    }
+    if (IsInstanceOf(workerEnv, "Lstd/core/Function1;", fnObj) == 0) {
+        MMI_HILOGE("%{public}s: fnObj is not instance Of function  ", __func__);
+        return;
+    }
+    const std::string className = "L@ohos/multimodalInput/inputConsumer/inputConsumer/KeyOptions;";
+    if (IsInstanceOf(workerEnv, className, static_cast<ani_object>(reportEvent->keyOptionsObj)) == 0) {
+        MMI_HILOGE("%{public}s: keyOptionsObj is not instance Of KeyOptions class", __func__);
+        return;
+    }
+
+    if (ANI_OK != workerEnv->FunctionalObject_Call(fnObj, 1, args.data(), &result)) {
+        MMI_HILOGE("%{public}s: FunctionalObject_Call failed", __func__);
+        return;
+    }
+    MMI_HILOGD("%{public}s: FunctionalObject_Call success", __func__);
 }
 
-static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
+static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent, const std::string& keyOptionKey)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     std::lock_guard guard(sCallBacksMutex);
-    auto iter = callbacks.begin();
-    while (iter != callbacks.end()) {
+    auto iter = callbacks.find(keyOptionKey);
+    if (iter != callbacks.end()) {
         auto &list = iter->second;
-        ++iter;
         MMI_HILOGD("list size:%{public}zu", list.size());
-        auto infoIter = list.begin();
-        while (infoIter != list.end()) {
-            auto monitorInfo = *infoIter;
+        for (auto monitorInfo : list) {
             if (MatchCombinationKey(*(monitorInfo->keyOption), *keyEvent)) {
                 MMI_HILOGD("MatchCombinationKey success");
                 EmitAsyncCallbackWork(monitorInfo);
             }
-            ++infoIter;
         }
+    } else {
+        MMI_HILOGE("No Matches found for SubKeyEventCallback");
     }
 }
 
@@ -408,7 +425,7 @@ static bool CheckCallbackEqual(ani_env *env, ani_ref fnRef, ani_env *iterEnv, an
     return isEquals;
 }
 
-static int32_t AddEventCallback(std::shared_ptr<KeyEventMonitorInfo> event)
+static int32_t AddEventCallback(const std::shared_ptr<KeyEventMonitorInfo> &event)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(sCallBacksMutex);
@@ -439,7 +456,8 @@ static int32_t SubscribeKey(ani_env *env, std::shared_ptr<KeyEventMonitorInfo> &
         return ERROR_CODE;
     }
     event->keyOption = keyOptionsPtr;
-    event->eventType = GenerateEventType(keyOptionsPtr);
+    auto keyOptionKey = GenerateEventType(keyOptionsPtr);
+    event->eventType = keyOptionKey;
 
     int32_t preSubscribeId = GetPreSubscribeId(event);
     if (preSubscribeId >= 0) {
@@ -449,7 +467,10 @@ static int32_t SubscribeKey(ani_env *env, std::shared_ptr<KeyEventMonitorInfo> &
 
     MMI_HILOGD("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
     int32_t subscribeId = -1;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(event->keyOption, SubKeyEventCallback);
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(event->keyOption,
+        [keyOptionKey](std::shared_ptr<KeyEvent> keyEvent) {
+            SubKeyEventCallback(keyEvent, keyOptionKey);
+        });
     if (subscribeId < 0) {
         MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
         return subscribeId;
@@ -464,12 +485,8 @@ static void On([[maybe_unused]] ani_env *env, ani_string strObj, ani_object keyO
     CALL_DEBUG_ENTER;
     std::shared_ptr<KeyEventMonitorInfo> event = std::make_shared<KeyEventMonitorInfo>();
     event->env = env;
-    if (ANI_OK != env->GlobalReference_Create(callback, &event->callback)) {
-        MMI_HILOGE("Create global reference 'callback' failed");
-        return;
-    }
-    if (ANI_OK != env->GlobalReference_Create(keyOptionsObj, &event->keyOptionsObj)) {
-        MMI_HILOGE("Create global reference 'keyOptionsObj' failed");
+    env->GetVM(&event->vm);
+    if (!event->setCallback(callback) || !event->SetKeyOptionsObj(keyOptionsObj)) {
         return;
     }
 
@@ -483,8 +500,7 @@ static void On([[maybe_unused]] ani_env *env, ani_string strObj, ani_object keyO
         MMI_HILOGD("%{public}s: Call SubscribeKey end ret = %{public}d", __func__, ret);
     } else {
         MMI_HILOGE("Type is not key or hotkey");
-        ani_error error = CreateAniError(env, "Type must be key or hotkeyChange");
-        env->ThrowError(error);
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "Type must be key or hotkeyChange");
     }
 }
 
@@ -555,8 +571,7 @@ static void Off([[maybe_unused]] ani_env *env, ani_string strObj, ani_object key
         MMI_HILOGD("%{public}s: callback is undefined", __func__);
         event->callback = nullptr;
     } else {
-        if (ANI_OK != env->GlobalReference_Create(callback, &event->callback)) {
-            MMI_HILOGE("%{public}s: Create global reference 'callback' failed", __func__);
+        if (!event->setCallback(callback)) {
             return;
         }
     }
@@ -583,8 +598,7 @@ static void Off([[maybe_unused]] ani_env *env, ani_string strObj, ani_object key
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     } else {
         MMI_HILOGE("Type is not key or hotkey");
-        ani_error error = CreateAniError(env, "Type must be key or hotkeyChange");
-        env->ThrowError(error);
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "Type must be key or hotkeyChange");
     }
 }
 
