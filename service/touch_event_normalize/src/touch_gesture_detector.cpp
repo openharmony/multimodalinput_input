@@ -202,7 +202,7 @@ void TouchGestureDetector::HandlePinchMoveEvent(std::shared_ptr<PointerEvent> ev
     if (!InDiverseDirections(directions)) {
         return;
     }
-    if (CalcMultiFingerMovement(movePoints) >
+    if (CalcMultiFingerMovement(movePoints) >=
         static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
         movePoint_ = movePoints;
         GestureMode type = JudgeOperationMode(movePoints);
@@ -212,10 +212,11 @@ void TouchGestureDetector::HandlePinchMoveEvent(std::shared_ptr<PointerEvent> ev
 
 bool TouchGestureDetector::InOppositeDirections(const std::unordered_set<SlideState> &directions) const
 {
-    return (((directions.find(SlideState::DIRECTION_DOWN) != directions.cend()) &&
-             (directions.find(SlideState::DIRECTION_UP) != directions.cend())) ||
-            ((directions.find(SlideState::DIRECTION_LEFT) != directions.cend()) &&
-             (directions.find(SlideState::DIRECTION_RIGHT) != directions.cend())));
+    bool up = directions.find(SlideState::DIRECTION_DOWN) != directions.cend();
+    bool down = directions.find(SlideState::DIRECTION_UP) != directions.cend();
+    bool left = directions.find(SlideState::DIRECTION_LEFT) != directions.cend();
+    bool right = directions.find(SlideState::DIRECTION_RIGHT) != directions.cend();
+    return (up && down) || (up && left) || (up && right) || (down && left) || (down && right) || (left && right);
 }
 
 bool TouchGestureDetector::InDiverseDirections(const std::unordered_set<SlideState> &directions) const
@@ -559,7 +560,7 @@ int32_t TouchGestureDetector::CalcMultiFingerMovement(std::map<int32_t, Point> &
     for (const auto &[id, point] : movePoint_) {
         auto movePoints = points.find(id);
         if (movePoints == points.end()) {
-            return 0;
+            continue;
         }
         if (CalcTwoPointsDistance(point, movePoints->second) >= MAXIMUM_SINGLE_SLIDE_DISTANCE) {
             ++movementCount;
