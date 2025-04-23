@@ -214,10 +214,12 @@ private:
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
     void SoftCursorRenderThreadLoop();
+    void MoveRetryThreadLoop();
     int32_t RequestNextVSync();
     void OnVsync(uint64_t timestamp);
     void PostTask(std::function<void()> task);
     void PostSoftCursorTask(std::function<void()> task);
+    void PostMoveRetryTask(std::function<void()> task);
     void DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
         int32_t px, int32_t py, ICON_TYPE align);
     int32_t FlushBuffer();
@@ -236,7 +238,9 @@ private:
     void HardwareCursorRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_TYPE align);
-    void HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
+    void MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align);
+    void ResetMoveRetryTimer();
+    int32_t HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void HideHardwareCursors();
     int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
         DisplayInfo &mainScreenDisplayInfo) const;
@@ -309,6 +313,11 @@ private:
     std::shared_ptr<AppExecFwk::EventRunner> softCursorRunner_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> softCursorHander_ { nullptr };
     std::unique_ptr<std::thread> softCursorRenderThread_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventRunner> moveRetryRunner_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> moveRetryHander_ { nullptr };
+    std::unique_ptr<std::thread> moveRetryThread_ { nullptr };
+    int32_t moveRetryTimerId_ { -1 };
+    int32_t moveRetryCount_ { 0 };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
