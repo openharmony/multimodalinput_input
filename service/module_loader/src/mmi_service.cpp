@@ -3786,6 +3786,13 @@ int32_t MMIService::SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t disp
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    if (knuckleDrawMgr_ == nullptr) {
+        knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    }
+    CHKPR(knuckleDrawMgr_, RET_ERR);
+    knuckleDrawMgr_->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+#endif OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
