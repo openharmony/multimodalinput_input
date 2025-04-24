@@ -3331,7 +3331,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 }
             }
             if (item.windowInputType == WindowInputType::TRANSMIT_ANTI_AXIS_MOVE) {
-                MMI_HILOG_DISPATCHW("Pointer enents do not respond to the window, windowInputType%{public}d",
+                MMI_HILOG_DISPATCHD("Pointer enents do not respond to the window, windowInputType%{public}d",
                     static_cast<int32_t>(item.windowInputType));
                 continue;
             }
