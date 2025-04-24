@@ -22,7 +22,7 @@
 #include "input_event_handler.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_manager.h"
-#endif OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
@@ -335,7 +335,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifndef OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
-#endif OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 } // namespace MMI
 } // namespace OHOS
