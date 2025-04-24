@@ -116,6 +116,35 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ScreenPointerTest_MoveSoft_002
+ * @tc.desc: Test MoveSoft
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    DisplayInfo di;
+    di.id = 1;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig,
+        Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE);
+    screenpointer->isCurrentOffScreenRendering_ = true;
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+
+    int32_t x = -1;
+    int32_t y = -1;
+    ICON_TYPE align = ICON_TYPE::ANGLE_N;
+    auto ret = screenpointer->MoveSoft(x, y, align);
+    EXPECT_TRUE(ret);
+}
+
+/**
  * @tc.name: ScreenPointerTest_Move_001
  * @tc.desc: Test Move
  * @tc.type: Function
@@ -336,6 +365,10 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_001, TestSize.Level1
     EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
     screenpointer->isCurrentOffScreenRendering_ = false;
     EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
+
+    di.uniqueId = 2;
+    screenpointer->screenId_ = 1;
+    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
 }
 
 /**
@@ -359,6 +392,122 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ScreenPointer_001, TestSize.Level1
     ScreenPointer(hwcmgr, handler, di);
     screenpointer->rotation_ = rotation_t::ROTATION_270;
     ScreenPointer(hwcmgr, handler, di);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_ScreenPointer_002
+ * @tc.desc: Test ScreenPointer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_ScreenPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = nullptr;
+    handler_ptr_t handler = nullptr;
+    DisplayInfo di;
+    di.width = 5;
+    di.height = 6;
+    di.direction = Direction::DIRECTION90;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+
+    EXPECT_EQ(screenpointer->width_, di.height);
+    EXPECT_EQ(screenpointer->height_, di.width);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_ScreenPointer_003
+ * @tc.desc: Test ScreenPointer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_ScreenPointer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = nullptr;
+    handler_ptr_t handler = nullptr;
+    DisplayInfo di;
+    di.width = 5;
+    di.height = 6;
+    di.direction = Direction::DIRECTION270;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+
+    EXPECT_EQ(screenpointer->width_, di.height);
+    EXPECT_EQ(screenpointer->height_, di.width);
+
+    ASSERT_TRUE(screenpointer->Init());
+}
+
+/**
+ * @tc.name: ScreenPointerTest_IsPositionOutScreen_001
+ * @tc.desc: Test IsPositionOutScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_IsPositionOutScreen_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    DisplayInfo di;
+    di.id = 1;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    screenpointer->isCurrentOffScreenRendering_ = false;
+
+    int32_t x = -1;
+    int32_t y = -1;
+    auto ret = screenpointer->IsPositionOutScreen(x, y);
+    EXPECT_TRUE(ret);
+
+    x = 1;
+    ret = screenpointer->IsPositionOutScreen(x, y);
+    EXPECT_TRUE(ret);
+
+    y = 1;
+    screenpointer->width_ = 0;
+    ret = screenpointer->IsPositionOutScreen(x, y);
+    EXPECT_TRUE(ret);
+
+    screenpointer->width_ = 2;
+    screenpointer->height_ = 0;
+    ret = screenpointer->IsPositionOutScreen(x, y);
+    EXPECT_TRUE(ret);
+
+    screenpointer->height_ = 2;
+    ret = screenpointer->IsPositionOutScreen(x, y);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_IsPositionOutScreen_002
+ * @tc.desc: Test IsPositionOutScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_IsPositionOutScreen_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    DisplayInfo di;
+    di.id = 1;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    screenpointer->isCurrentOffScreenRendering_ = true;
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+
+    int32_t x = -1;
+    int32_t y = -1;
+    auto ret = screenpointer->IsPositionOutScreen(x, y);
+    EXPECT_TRUE(ret);
+
+    screenpointer->mode_ = mode_t::SCREEN_MAIN;
+    screenpointer->offRenderScale_ = 2.0;
+    ret = screenpointer->IsPositionOutScreen(x, y);
+    EXPECT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS

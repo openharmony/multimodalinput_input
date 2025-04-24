@@ -30,6 +30,15 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr uint32_t TRACK_COLOR_BLUE { 0xFF1ED0EE };
+constexpr uint32_t TRACK_COLOR_PINK { 0xFFFF42D2 };
+constexpr uint32_t TRACK_COLOR_ORANGE_RED { 0xFFFF7B47 };
+constexpr uint32_t TRACK_COLOR_YELLOW { 0xFFFFC628 };
+constexpr int32_t TRACK_PATH_LENGTH_400 { 400 };
+constexpr int32_t TRACK_PATH_LENGTH_500 { 500 };
+constexpr int32_t TRACK_PATH_LENGTH_1000 { 1000 };
+constexpr int32_t TRACK_PATH_LENGTH_1500 { 1500 };
+constexpr int32_t TRACK_PATH_LENGTH_2000 { 2000 };
 } // namespace
 class KnuckleDrawingManagerTest : public testing::Test {
 public:
@@ -686,5 +695,193 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsSingleKnuckle_00
     ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
     EXPECT_FALSE(kceDrawMgr.IsSingleKnuckle(touchEvent));
 }
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_RotationCanvasNode_001
+ * @tc.desc: Test Overrides RotationCanvasNode function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RotationCanvasNode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    DisplayInfo displayInfo;
+    displayInfo.direction = Direction::DIRECTION90;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    auto canvasNode = Rosen::RSCanvasNode::Create();
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo));
+
+    displayInfo.direction = Direction::DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo));
+
+    displayInfo.direction = Direction::DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo));
+
+    displayInfo.direction = Direction::DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo));
+}
+
+#ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+/**
+ * @tc.name: KnuckleDrawingManagerTest_GetDeltaColor_001
+ * @tc.desc: Test Overrides GetDeltaColor function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_GetDeltaColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t deltaSource = 1;
+    uint32_t deltaTarget = 2;
+    KnuckleDrawingManager kceDrawMgr;
+    auto ret = kceDrawMgr.GetDeltaColor(deltaSource, deltaTarget);
+    EXPECT_EQ(ret, 0);
+
+    deltaTarget = 0;
+    ret = kceDrawMgr.GetDeltaColor(deltaSource, deltaTarget);
+    EXPECT_EQ(ret, (deltaSource - deltaTarget));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawTrackColorBlue_001
+ * @tc.desc: Test Overrides DrawTrackColorBlue function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackColorBlue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pathValue = 0;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.pathLength_ = TRACK_PATH_LENGTH_2000;
+    auto ret = kceDrawMgr.DrawTrackColorBlue(pathValue);
+    EXPECT_NE(ret, TRACK_COLOR_BLUE);
+
+    pathValue = TRACK_PATH_LENGTH_2000;
+    ret = kceDrawMgr.DrawTrackColorBlue(pathValue);
+    EXPECT_EQ(ret, TRACK_COLOR_BLUE);
+
+    kceDrawMgr.pathLength_ = TRACK_PATH_LENGTH_400;
+    ret = kceDrawMgr.DrawTrackColorBlue(pathValue);
+    EXPECT_EQ(ret, TRACK_COLOR_BLUE);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawTrackColorPink_001
+ * @tc.desc: Test Overrides DrawTrackColorPink function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackColorPink_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pathValue = 0;
+    KnuckleDrawingManager kceDrawMgr;
+    auto ret = kceDrawMgr.DrawTrackColorPink(pathValue);
+    EXPECT_NE(ret, TRACK_COLOR_PINK);
+
+    pathValue = TRACK_PATH_LENGTH_2000;
+    ret = kceDrawMgr.DrawTrackColorPink(pathValue);
+    EXPECT_EQ(ret, TRACK_COLOR_PINK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawTrackColorYellow_001
+ * @tc.desc: Test Overrides DrawTrackColorYellow function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackColorYellow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pathValue = 0;
+    KnuckleDrawingManager kceDrawMgr;
+    auto ret = kceDrawMgr.DrawTrackColorYellow(pathValue);
+    EXPECT_NE(ret, TRACK_COLOR_YELLOW);
+
+    pathValue = TRACK_PATH_LENGTH_2000;
+    ret = kceDrawMgr.DrawTrackColorYellow(pathValue);
+    EXPECT_EQ(ret, TRACK_COLOR_YELLOW);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawTrackColorOrangeRed_001
+ * @tc.desc: Test Overrides DrawTrackColorOrangeRed function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackColorOrangeRed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pathValue = 0;
+    KnuckleDrawingManager kceDrawMgr;
+    auto ret = kceDrawMgr.DrawTrackColorOrangeRed(pathValue);
+    EXPECT_NE(ret, TRACK_COLOR_ORANGE_RED);
+
+    pathValue = TRACK_PATH_LENGTH_2000;
+    ret = kceDrawMgr.DrawTrackColorOrangeRed(pathValue);
+    EXPECT_EQ(ret, TRACK_COLOR_ORANGE_RED);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawTrackCanvas_001
+ * @tc.desc: Test Overrides DrawTrackCanvas function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackCanvas_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.CreateTrackCanvasNode();
+    kceDrawMgr.pathLength_ = 0;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawTrackCanvas());
+
+    kceDrawMgr.pathLength_ = TRACK_PATH_LENGTH_500;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawTrackCanvas());
+
+    kceDrawMgr.pathLength_ = TRACK_PATH_LENGTH_1000;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawTrackCanvas());
+
+    kceDrawMgr.pathLength_ = TRACK_PATH_LENGTH_1500;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawTrackCanvas());
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_001
+ * @tc.desc: Test Overrides ProcessUpEvent function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_ERR);
+
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+
+    isNeedUpAnimation = false;
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+}
+#endif
 } // namespace MMI
 } // namespace OHOS
