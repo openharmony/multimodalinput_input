@@ -35,6 +35,16 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+class InputEventConsumerTest : public IInputEventConsumer {
+    public:
+        void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
+        void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            MMI_HILOGD("Report pointer event success");
+        };
+        void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+    };
+
 /**
  * @tc.name: PreMonitorManagerTest_FindHandler_001
  * @tc.desc: Test FindHandler
@@ -85,6 +95,30 @@ HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_AddHandler_001, TestSize.L
     std::shared_ptr<IInputEventConsumer> consumer = nullptr;
     int32_t ret = manager.AddHandler(consumer, eventType, keys);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: PreMonitorManagerTest_AddHandler_002
+ * @tc.desc: Test AddHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_AddHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PreMonitorManager manager;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_PRE_KEY;
+    std::vector<int32_t> keys = { KeyEvent::KEYCODE_POWER, KeyEvent::KEYCODE_VOLUME_DOWN};
+    auto consumer = std::make_shared<InputEventConsumerTest>();
+    ASSERT_NE(consumer, nullptr);
+
+    auto id = manager.nextId_;
+    int32_t ret = manager.AddHandler(consumer, eventType, keys);
+    EXPECT_EQ(ret, id);
+
+    manager.nextId_--;
+    ret = manager.AddHandler(consumer, eventType, keys);
+    EXPECT_EQ(ret, INVALID_HANDLER_ID);
 }
 
 /**
@@ -178,6 +212,7 @@ HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_RemoveFromServer_001, Test
     ASSERT_NO_FATAL_FAILURE(manager.RemoveFromServer(handlerId));
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 /**
  * @tc.name: PreMonitorManagerTest_OnPreKeyEvent_001
  * @tc.desc: Test OnPreKeyEvent
@@ -192,6 +227,34 @@ HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_OnPreKeyEvent_001, TestSiz
     int32_t handlerId = 1;
     ASSERT_NO_FATAL_FAILURE(PRE_MONITOR_MGR.OnPreKeyEvent(keyEvent, handlerId));
 }
+
+/**
+ * @tc.name: PreMonitorManagerTest_OnPreKeyEvent_002
+ * @tc.desc: Test OnPreKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PreMonitorManagerTest, PreMonitorManagerTest_OnPreKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t handlerId = -1;
+    PreMonitorManager manager;
+    ASSERT_NO_FATAL_FAILURE(manager.OnPreKeyEvent(keyEvent, handlerId));
+
+    handlerId = 1;
+    PreMonitorManager::Handler handle;
+    handle.eventType_ = HANDLE_EVENT_TYPE_NONE;
+    handle.callback_  = std::make_shared<InputEventConsumerTest>();
+    ASSERT_NE(handle.callback_, nullptr);
+    manager.monitorHandlers_.insert(std::make_pair(handlerId, handle));
+    ASSERT_NO_FATAL_FAILURE(manager.OnPreKeyEvent(keyEvent, handlerId));
+
+    handlerId = 2;
+    ASSERT_NO_FATAL_FAILURE(manager.OnPreKeyEvent(keyEvent, handlerId));
+}
+#endif
 
 /**
  * @tc.name: PreMonitorManagerTest_GetNextId_001
