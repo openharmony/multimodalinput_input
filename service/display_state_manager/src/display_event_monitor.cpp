@@ -43,12 +43,12 @@ static constexpr uint32_t MMI_OBJECT_MASK = 0xffffff;
 
 DisplayEventMonitor::DisplayEventMonitor()
 {
-    MMI_HILODI("DisplayEventMonitor constructor, addr:%{public}u",
+    MMI_HILOGI("DisplayEventMonitor constructor, addr:%{public}u",
         static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this) & MMI_OBJECT_MASK));
 }
 DisplayEventMonitor::~DisplayEventMonitor()
 {
-    MMI_HILODI("~DisplayEventMonitor destructor, addr:%{public}u",
+    MMI_HILOGI("~DisplayEventMonitor destructor, addr:%{public}u",
         static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this) & MMI_OBJECT_MASK));
 }
 
