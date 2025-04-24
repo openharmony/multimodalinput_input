@@ -29,6 +29,20 @@ namespace {
 using namespace testing::ext;
 } // namespace
 
+struct InputEventFilterMock : public IInputEventFilter {
+public:
+    InputEventFilterMock() = default;
+    virtual ~InputEventFilterMock() = default;
+    bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+    {
+        return true;
+    }
+    bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+    {
+        return true;
+    }
+};
+
 class InputManagerImplTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -857,6 +871,54 @@ HWTEST_F(InputManagerImplTest, SetMouseHotSpot_Test001, TestSize.Level1)
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name  : AddInputEventFilter_Test001
+ * @tc.desc  : Test AddInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, AddInputEventFilter_Test001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto filter = std::make_shared<InputEventFilterMock>();
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+
+    InputMgrImpl.eventFilterServices_.clear();
+    EventFilterService::filterIdSeed_ = 0;
+    int32_t filterId = EventFilterService::filterIdSeed_;
+    sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
+    ASSERT_NE(service, nullptr);
+
+    InputMgrImpl.eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
+    int32_t ret = InputMgrImpl.AddInputEventFilter(filter, priority, deviceTags);
+    EXPECT_EQ(ret, filterId);
+}
+
+/**
+ * @tc.name  : RemoveInputEventFilter_Test001
+ * @tc.desc  : Test RemoveInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, RemoveInputEventFilter_Test001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    InputMgrImpl.eventFilterServices_.clear();
+    auto filter = std::make_shared<InputEventFilterMock>();
+    sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
+    ASSERT_NE(service, nullptr);
+
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    int32_t filterId = 5;
+    InputMgrImpl.eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
+    filterId = 0;
+
+    int32_t ret = InputMgrImpl.RemoveInputEventFilter(filterId);
+    EXPECT_EQ(ret, RET_OK);
+}
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
 /**
  * @tc.name: InputManagerImplTest_UpdateDisplayXYInOneHandMode_001
@@ -922,5 +984,24 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+/**
+ * @tc.name: InputManagerImplTest_SetEnhanceConfig_001
+ * @tc.desc: Test SetEnhanceConfig
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetEnhanceConfig_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint8_t *cfg = nullptr;
+    uint32_t cfgLen = 0;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.SetEnhanceConfig(cfg, cfgLen));
+
+    uint8_t data = 1;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.SetEnhanceConfig(&data, cfgLen));
+}
+#endif
 } // namespace MMI
 } // namespace OHOS
