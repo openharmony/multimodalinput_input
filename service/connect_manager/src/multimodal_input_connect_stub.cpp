@@ -2631,7 +2631,9 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadRightClickType(MessageParcel&
     int32_t type = 1;
     READINT32(data, type, IPC_PROXY_DEAD_OBJECT_ERR);
     if (type != RightClickType::TOUCHPAD_RIGHT_BUTTON && type != RightClickType::TOUCHPAD_LEFT_BUTTON &&
-        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP) {
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP &&
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON &&
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON) {
         MMI_HILOGE("Invalid type:%{public}d", type);
         return RET_ERR;
     }

@@ -43,7 +43,7 @@ constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
 constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
-constexpr int32_t RIGHT_CLICK_TYPE_MAX { 3 };
+constexpr int32_t RIGHT_CLICK_TYPE_MAX { 5 };
 [[ maybe_unused ]] constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
 constexpr int32_t HARD_PC_PRO_DEVICE_WIDTH { 2880 };
@@ -1255,6 +1255,30 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
     }
 }
 
+void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrRightButton(struct libinput_event_pointer *data,
+    const int32_t evenType, uint32_t &button)
+{
+    uint32_t buttonTemp = button;
+    HandleTouchpadTwoFingerButton(data, evenType, buttonTemp);
+    if (buttonTemp == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+        button = buttonTemp;
+        return;
+    }
+    HandleTouchpadRightButton(data, evenType, button);
+}
+
+void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrLeftButton(struct libinput_event_pointer *data,
+    const int32_t evenType, uint32_t &button)
+{
+    uint32_t buttonTemp = button;
+    HandleTouchpadTwoFingerButton(data, evenType, buttonTemp);
+    if (buttonTemp == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+        button = buttonTemp;
+        return;
+    }
+    HandleTouchpadLeftButton(data, evenType, button);
+}
+
 void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
@@ -1281,13 +1305,17 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         case RightClickType::TP_RIGHT_BUTTON:
             HandleTouchpadRightButton(data, evenType, button);
             break;
-
         case RightClickType::TP_LEFT_BUTTON:
             HandleTouchpadLeftButton(data, evenType, button);
             break;
-
         case RightClickType::TP_TWO_FINGER_TAP:
             HandleTouchpadTwoFingerButton(data, evenType, button);
+            break;
+        case RightClickType::TP_TWO_FINGER_TAP_OR_RIGHT_BUTTON:
+            HandleTouchpadTwoFingerButtonOrRightButton(data, evenType, button);
+            break;
+        case RightClickType::TP_TWO_FINGER_TAP_OR_LEFT_BUTTON:
+            HandleTouchpadTwoFingerButtonOrLeftButton(data, evenType, button);
             break;
         default:
             MMI_HILOGD("Invalid type, switchType:%{public}d", switchType);
