@@ -1894,9 +1894,11 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
     pixelMap->Marshalling(*pixelMapData);
     cursor.pixelMap = pixelMapData;
     if (!GetFocusInfo(env, obj, "focusX", cursor.focusX, pixelMap->GetWidth())) {
+        delete static_cast<Parcel*>(cursor.pixelMap);
         return false;
     }
     if (!GetFocusInfo(env, obj, "focusY", cursor.focusY, pixelMap->GetHeight())) {
+        delete static_cast<Parcel*>(cursor.pixelMap);
         return false;
     }
     return true;
@@ -1946,6 +1948,7 @@ napi_value JsPointerContext::SetCustomCursorEx(napi_env env, std::shared_ptr<JsP
     }
     if (!GetCursorOptions(env, argv[INPUT_PARAMETER], options)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "options", "CursorOptions");
+        delete static_cast<Parcel*>(cursor.pixelMap);
         return nullptr;
     }
     return jsPointerMgr->SetCustomCursor(env, windowId, cursor, options);
