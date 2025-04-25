@@ -16,32 +16,22 @@
 #ifndef ANI_UTIL_H
 #define ANI_UTIL_H
 #include <ani.h>
+
 #include "input_device.h"
 
 namespace OHOS {
 namespace MMI {
 class AniUtil {
 public:
-    struct CallbackData {
-        std::vector<int32_t> ids;
-        std::shared_ptr<InputDevice> device { nullptr };
-        std::vector<bool> keystrokeAbility;
-        int32_t deviceId { 0 };
-        int32_t keyboardType { 0 };
-        int32_t keyboardRepeatDelay { 0 };
-        int32_t keyboardRepeatRate { 0 };
-        int64_t IntervalSinceLastInput { 0 };
-    };
     struct ReportData {
         ani_ref ref { nullptr };
         int32_t deviceId { 0 };
     };
     struct CallbackInfo {
-        ani_env *env { nullptr };
-        ani_ref ref { nullptr };
-        int32_t errCode { -1 };
-        CallbackData data;
-        // UserData uData;
+        ani_env *env_ { nullptr };
+        ani_ref callback_ { nullptr };
+        bool SetCallback(ani_object handle);
+        ~CallbackInfo();
     };
     struct DeviceType {
         std::string sourceTypeName;
@@ -50,7 +40,6 @@ public:
 
     static bool IsSameHandle(ani_env *env, ani_ref handle, ani_env *iterEnv, ani_ref iterhandle);
     static ani_string StdStringToANIString(ani_env* env, const std::string& str);
-    static bool SendEventToMainThread(const std::function<void()> func);
     static ani_boolean IsInstanceOf(ani_env *env, const std::string &cls_name, ani_object obj);
     static ani_object CreateAniObject(ani_env *env, const char *nsName, const char *className);
 };
