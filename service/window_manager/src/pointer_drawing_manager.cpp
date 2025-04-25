@@ -52,7 +52,6 @@
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "display_event_monitor.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -425,11 +424,6 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     if (lastDirection_ != direction) {
         RotateDegree(direction);
         lastDirection_ = direction;
-    }
-    if (DISPLAY_MONITOR->GetScreenLocked() &&
-        displayInfo_.screenCombination != OHOS::MMI::ScreenCombination::SCREEN_MAIN) {
-        MMI_HILOGD("screen locked, secondary screen set pointer style MOUSE_ICON to default.");
-        pointerStyle.id = MOUSE_ICON::DEFAULT;
     }
     lastMouseStyle_ = pointerStyle;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -3380,6 +3374,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                 if (!sp->Init()) {
                     MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}u", sid);
                 }
+                UpdateDisplayInfo(displayInfo_);
             }
         }
 
