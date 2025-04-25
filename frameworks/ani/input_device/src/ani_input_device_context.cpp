@@ -36,6 +36,10 @@
 
 using namespace OHOS::MMI;
 
+enum AniErrorCode : int32_t {
+    COMMON_PARAMETER_ERROR = 401,
+};
+
 std::unordered_map<int32_t, std::string> axisType = {
     { ABS_MT_TOUCH_MAJOR, "touchmajor" }, { ABS_MT_TOUCH_MINOR, "touchminor" }, { ABS_MT_ORIENTATION, "orientation" },
     { ABS_MT_POSITION_X, "x" },           { ABS_MT_POSITION_Y, "y" },           { ABS_MT_PRESSURE, "pressure" },
@@ -56,24 +60,41 @@ AniUtil::DeviceType g_deviceType[] = {
     { "trackball", EVDEV_UDEV_TAG_TRACKBALL },
 };
 
-static ani_error CreateAniError(ani_env *env, std::string &&errMsg)
+static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 {
-    static const char *errorClsName = "Lescompat/Error;";
-    ani_class cls{};
+    MMI_HILOGD("Begin ThrowBusinessError.");
+    static const char *errorClsName = "L@ohos/base/BusinessError;";
+    ani_class cls {};
     if (ANI_OK != env->FindClass(errorClsName, &cls)) {
-        MMI_HILOGE("%{public}s: Not found namespace %{public}s.", __func__, errorClsName);
-        return nullptr;
+        MMI_HILOGE("find class BusinessError %{public}s failed", errorClsName);
+        return;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;:V", &ctor)) {
-        MMI_HILOGE("%{public}s: Not found <ctor> in %{public}s.", __func__, errorClsName);
-        return nullptr;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+        MMI_HILOGE("find method BusinessError.constructor failed");
+        return;
     }
-    ani_string error_msg;
-    env->String_NewUTF8(errMsg.c_str(), 17U, &error_msg);
     ani_object errorObject;
-    env->Object_New(cls, ctor, &errorObject, error_msg);
-    return static_cast<ani_error>(errorObject);
+    if (ANI_OK != env->Object_New(cls, ctor, &errorObject)) {
+        MMI_HILOGE("create BusinessError object failed");
+        return;
+    }
+    ani_double aniErrCode = static_cast<ani_double>(errCode);
+    ani_string errMsgStr;
+    if (ANI_OK != env->String_NewUTF8(errMsg.c_str(), errMsg.size(), &errMsgStr)) {
+        MMI_HILOGE("convert errMsg to ani_string failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetFieldByName_Double(errorObject, "code", aniErrCode)) {
+        MMI_HILOGE("set error code failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(errorObject, "message", errMsgStr)) {
+        MMI_HILOGE("set error message failed");
+        return;
+    }
+    env->ThrowError(static_cast<ani_error>(errorObject));
+    return;
 }
 
 static bool SetID(ani_env *env, ani_object obj, std::shared_ptr<InputDevice> &inputDevice)
@@ -181,7 +202,7 @@ static bool SetDeviceProduct(ani_env *env, ani_object obj, std::shared_ptr<Input
     return true;
 }
 
-static bool SetDeviceVersion(ani_env *env, ani_object obj, std::shared_ptr<InputDevice> &inputDevice)
+static bool SetDeviceVersion(ani_env *env, ani_object obj, std::shared_ptr<InputDevice> inputDevice)
 {
     if (obj == nullptr) {
         MMI_HILOGE("obj is nullptr");
@@ -729,14 +750,12 @@ void AniInputDeviceContext::On(ani_env *env, ani_string aniStr, ani_object callb
     std::string type = AniStringToString(env, aniStr);
     if (type != CHANGED_TYPE) {
         MMI_HILOGE("%{public}s: Type is not change", __func__);
-        ani_error error = CreateAniError(env, "type must be change");
-        env->ThrowError(error);
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "type must be change");
         return;
     }
     if (mgr_ == nullptr) {
         MMI_HILOGE("%{public}s: aniInputDeviceMgr is nullptr", __func__);
-        ani_error error = CreateAniError(env, "aniInputDeviceMgr must be created");
-        env->ThrowError(error);
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "aniInputDeviceMgr is nullptr");
         return;
     }
     mgr_->RegisterDevListener(env, type, callback);
