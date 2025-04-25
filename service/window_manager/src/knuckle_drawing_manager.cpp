@@ -124,6 +124,8 @@ constexpr float TRACK_WIDTH_THIRTY { 30.0f };
 constexpr float COLOR_TRANSITIONS_LENGTH { 400.0f };
 constexpr int32_t PROTOCOL_DURATION { 200 };
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+static uint64_t g_WindowScreenId { 0 };
+static uint64_t g_DisplayNodeScreenId { 0 };
 } // namespace
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -367,10 +369,11 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     CreateTrackCanvasNode();
     surfaceNode_->AddChild(trackCanvasNode_, DEFAULT_VALUE);
     surfaceNode_->AddChild(brushCanvasNode_, DEFAULT_VALUE);
-    if (displayInfo_.displayMode == DisplayMode::MAIN) {
-        screenId_ = FOLD_SCREEN_MAIN_ID;
+    if (g_WindowScreenId == screenId_) {
+        screenId_ = g_DisplayNodeScreenId;
     }
-    MMI_HILOGI("The screenId_:%{public}" PRIu64, screenId_);
+    MMI_HILOGI("g_WindowScreenId:%{public}" PRIu64 ", g_DisplayNodeScreenId:%{public}" PRIu64
+        ", screenId_:%{public}" PRIu64, g_WindowScreenId, g_DisplayNodeScreenId, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     RotationCanvasNode(brushCanvasNode_, displayInfo_);
     RotationCanvasNode(trackCanvasNode_, displayInfo_);
@@ -408,10 +411,11 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     surfaceNode_->SetRotation(0);
     CreateCanvasNode();
     surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
-    if (displayInfo_.displayMode == DisplayMode::MAIN) {
-        screenId_ = FOLD_SCREEN_MAIN_ID;
+    if (g_WindowScreenId == screenId_) {
+        screenId_ = g_DisplayNodeScreenId;
     }
-    MMI_HILOGI("The screenId_:%{public}" PRIu64, screenId_);
+    MMI_HILOGI("g_WindowScreenId:%{public}" PRIu64 ", g_DisplayNodeScreenId:%{public}" PRIu64
+        ", screenId_:%{public}" PRIu64, g_WindowScreenId, g_DisplayNodeScreenId, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     RotationCanvasNode(canvasNode_, displayInfo_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
@@ -956,6 +960,12 @@ void KnuckleDrawingManager::CreateScreenReadObserver(T &item)
 std::string KnuckleDrawingManager::GetScreenReadState()
 {
     return screenReadState_.state;
+}
+
+void KnuckleDrawingManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+{
+    g_WindowScreenId = screenId;
+    g_DisplayNodeScreenId = displayNodeScreenId;
 }
 } // namespace MMI
 } // namespace OHOS
