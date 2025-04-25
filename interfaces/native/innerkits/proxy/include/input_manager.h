@@ -1167,6 +1167,9 @@ public:
     */
     void UnsubscribeInputActive(int32_t subscribeId);
 
+    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceName,
+        std::shared_ptr<IInputEventConsumer> consumer);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
