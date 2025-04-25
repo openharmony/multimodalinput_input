@@ -366,6 +366,7 @@ ohos_unittest("InputManagerImplTest") {
     "${mmi_path}/service/filter/src/event_filter_stub.cpp",
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
+    "event_handler/src/input_active_subscribe_manager.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/key_event_input_subscribe_manager.cpp",

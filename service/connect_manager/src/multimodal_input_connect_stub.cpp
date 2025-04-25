@@ -502,6 +502,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubUnsubscribeKeyMonitor(data, reply);
             break;
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_INPUT_ACTIVE):
+            ret = StubSubscribeInputActive(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_INPUT_ACTIVE):
+            ret = StubUnsubscribeInputActive(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -3458,6 +3464,53 @@ int32_t MultimodalInputConnectStub::StubSetMultiWindowScreenId(MessageParcel &da
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSubscribeInputActive(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t subscribeId = 0;
+    int64_t interval = 0;
+    READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT64(data, interval, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SubscribeInputActive(subscribeId, interval);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeInputActive failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubUnsubscribeInputActive(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t subscribeId = 0;
+    READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribeId");
+        return RET_ERR;
+    }
+    int32_t ret = UnsubscribeInputActive(subscribeId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnsubscribeInputActive failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

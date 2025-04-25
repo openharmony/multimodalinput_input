@@ -1142,6 +1142,31 @@ public:
 
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
+    /**
+     * @brief Subscribes to the input active that mmets a specific condition. When such an event occurs,
+     * the <b>callback</b> specified is invoked to process the event.
+     * @param inputEventConsumer Indicates the callback.
+     * @param interval Indicate the interval time.
+     * When the interval value is less than 0, the value is invalid.
+     * When it is equal to 0, no filtering is performed.
+     * The effective range of filtering values is greater than or equal to 500ms and less than or equal to 2000ms.
+     * If the filtering value is greater than 0 and less than 500ms, the filtering interval is 500ms.
+     * If the filtering value is greater than 2000ms, the filtering interval is 2000ms.
+     * @return Returns the subscribe ID, which uniquely identifies a subscribe id in the process.
+     * If the value is greater than or equal to <b>0</b>
+     * the subscription is successful. Otherwise, the subscription fails.
+     * @since 16
+    */
+    int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
+
+    /**
+     * @brief Unsubscribes from input active.
+     * @param subscribeId. Indicates the subscription ID, which is the return value of <b>SubscribeInputActive</b>.
+     * @return void.
+     * @since 16
+    */
+    void UnsubscribeInputActive(int32_t subscribeId);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

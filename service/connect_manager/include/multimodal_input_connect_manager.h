@@ -172,6 +172,8 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
+    int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval);
+    int32_t UnsubscribeInputActive(int32_t subscribeId);
 
 private:
     MultimodalInputConnectManager() = default;
