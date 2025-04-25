@@ -18,6 +18,7 @@
             OHOS::MMI::*;
             "vtable for OHOS::MMI::EventDispatchHandler";
             "vtable for OHOS::MMI::UDSServer";
+            "vtable for OHOS::MMI::InputActiveSubscriberHandler";
             "vtable for OHOS::MMI::InputDeviceManager";
             "vtable for OHOS::MMI::EventFilterHandler";
             "vtable for OHOS::MMI::DelegateInterface";
