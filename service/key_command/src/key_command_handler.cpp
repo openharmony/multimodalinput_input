@@ -1632,7 +1632,6 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
         return false;
     }
 
-    bool isLaunched = false;
     bool waitRepeatKey = false;
 
     for (RepeatKey& item : repeatKeys_) {
@@ -1652,14 +1651,13 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     }
 
     for (RepeatKey& item : repeatKeys_) {
-        bool isRepeatKey = HandleRepeatKey(item, isLaunched, keyEvent);
+        bool isRepeatKey = HandleRepeatKey(item, keyEvent);
         if (isRepeatKey) {
             waitRepeatKey = true;
         }
     }
-    MMI_HILOGI("Handle repeat key, isLaunched:%{public}d, waitRepeatKey:%{public}d",
-        isLaunched, waitRepeatKey);
-    return isLaunched || waitRepeatKey;
+    MMI_HILOGI("Handle repeat key, waitRepeatKey:%{public}d", waitRepeatKey);
+    return waitRepeatKey;
 }
 
 bool KeyCommandHandler::IsMusicActivate()
@@ -1678,8 +1676,7 @@ void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)
     }
 }
 
-bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
-    const std::shared_ptr<KeyEvent> keyEvent)
+bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -1728,9 +1725,9 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         if (repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end()) {
             launchAbilityCount_ = count_;
             if (item.times < repeatKeyMaxTimes_[item.keyCode]) {
-                return HandleRepeatKeyAbility(item, isLaunched, keyEvent, false);
+                return HandleRepeatKeyAbility(item, keyEvent, false);
             }
-            return HandleRepeatKeyAbility(item, isLaunched, keyEvent, true);
+            return HandleRepeatKeyAbility(item, keyEvent, true);
         }
     }
     if (count_ > item.times && repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end() &&
@@ -1744,14 +1741,14 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     return true;
 }
 
-bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item,
     const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes)
 {
     if (!isMaxTimes) {
         int64_t delaytime = intervalTime_ - (downActionTime_ - upActionTime_);
         int32_t timerId = TimerMgr->AddTimer(
-            delaytime / SECONDS_SYSTEM, 1, [this, item, &isLaunched, keyEvent] () {
-            LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
+            delaytime / SECONDS_SYSTEM, 1, [this, item, keyEvent] () {
+            LaunchRepeatKeyAbility(item, keyEvent);
             auto it = repeatKeyTimerIds_.find(item.ability.bundleName);
             if (it != repeatKeyTimerIds_.end()) {
                 repeatKeyTimerIds_.erase(it);
@@ -1774,12 +1771,11 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
         repeatKeyTimerIds_[item.ability.bundleName] = timerId;
         return true;
     }
-    LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
+    LaunchRepeatKeyAbility(item, keyEvent);
     return true;
 }
 
-void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
-    const std::shared_ptr<KeyEvent> keyEvent)
+void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
 {
     BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
     DfxHisysevent::ReportKeyEvent(item.ability.bundleName);
@@ -1794,7 +1790,6 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
     }
     BytraceAdapter::StopLaunchAbility();
     repeatKeyCountMap_.clear();
-    isLaunched = true;
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPV(subscriberHandler);
     auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
