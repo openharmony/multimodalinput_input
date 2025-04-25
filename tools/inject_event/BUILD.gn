@@ -17,6 +17,15 @@ import("../../multimodalinput_mini.gni")
 
 ohos_source_set("input-manager") {
   sources = [ "src/input_manager_command.cpp" ]
+  if (input_feature_event_recorder) {
+    sources += [
+      "src/device_manager.cpp",
+      "src/event_recorder.cpp",
+      "src/event_replayer.cpp",
+      "src/input_device.cpp",
+      "src/input_replay_command.cpp",
+    ]
+  }
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -50,6 +59,7 @@ ohos_source_set("input-manager") {
 }
 
 ohos_executable("uinput") {
+  defines = input_default_defines
   sources = [ "src/main.cpp" ]
   configs = [ "${mmi_path}:coverage_flags" ]
   include_dirs = [
@@ -78,12 +88,25 @@ ohos_unittest("InjectEventTest") {
   include_dirs = [ "include" ]
 
   sources = [ "test/inject_event_test.cpp" ]
+  if (input_feature_event_recorder) {
+    sources += [
+      "test/device_manager_test.cpp",
+      "test/event_recorder_test.cpp",
+      "test/event_replayer_test.cpp",
+      "test/input_device_test.cpp",
+      "test/input_replay_command_test.cpp",
+    ]
+  }
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/tools/inject_event:input-manager",
     "${mmi_path}/util:libmmi-util",
   ]
+
+  if (input_feature_event_recorder) {
+    defines = [ "private = public" ]
+  }
 
   external_deps = [
     "c_utils:utils",

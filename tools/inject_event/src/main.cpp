@@ -14,9 +14,17 @@
  */
 
 #include "input_manager_command.h"
+#ifdef OHOS_BUILD_ENABLE_EVENT_RECORDER
+#include "input_replay_command.h"
+#endif // OHOS_BUILD_ENABLE_EVENT_RECORDER
 
 int32_t main(int32_t argc, char** argv)
 {
+#ifdef OHOS_BUILD_ENABLE_EVENT_RECORDER
+    if (argc > 1 && (std::string(argv[1]) == "replay" || std::string(argv[1]) == "record")) {
+        return OHOS::MMI::InputReplayCommand::HandleRecordReplayCommand(argc, argv);
+    }
+#endif // OHOS_BUILD_ENABLE_EVENT_RECORDER
     OHOS::MMI::InputManagerCommand command;
     return command.ParseCommand(argc, argv);
 }
