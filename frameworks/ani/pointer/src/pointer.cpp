@@ -41,29 +41,46 @@ constexpr int32_t OCCUPIED_BY_OTHER = -4;
 const double INT32_MAX_D = static_cast<double>(std::numeric_limits<int32_t>::max());
 } // namespace
 
-enum NapiErrorCode : int32_t {
+enum AniErrorCode : int32_t {
     COMMON_PARAMETER_ERROR = 401,
     COMMON_USE_SYSAPI_ERROR = 202,
 };
 
-static ani_error CreateAniError(ani_env *env, std::string&& errMsg)
+static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 {
-    static const char *errorClsName = "Lescompat/Error;";
+    MMI_HILOGD("Begin ThrowBusinessError.");
+    static const char *errorClsName = "L@ohos/base/BusinessError;";
     ani_class cls {};
     if (ANI_OK != env->FindClass(errorClsName, &cls)) {
-        MMI_HILOGE("%{public}s: Not found namespace %{public}s.", __func__, errorClsName);
-        return nullptr;
+        MMI_HILOGE("find class BusinessError %{public}s failed", errorClsName);
+        return;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;:V", &ctor)) {
-        MMI_HILOGE("%{public}s: Not found <ctor> in %{public}s.", __func__, errorClsName);
-        return nullptr;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+        MMI_HILOGE("find method BusinessError.constructor failed");
+        return;
     }
-    ani_string error_msg;
-    env->String_NewUTF8(errMsg.c_str(), errMsg.size(), &error_msg);
     ani_object errorObject;
-    env->Object_New(cls, ctor, &errorObject, error_msg);
-    return static_cast<ani_error>(errorObject);
+    if (ANI_OK != env->Object_New(cls, ctor, &errorObject)) {
+        MMI_HILOGE("create BusinessError object failed");
+        return;
+    }
+    ani_double aniErrCode = static_cast<ani_double>(errCode);
+    ani_string errMsgStr;
+    if (ANI_OK != env->String_NewUTF8(errMsg.c_str(), errMsg.size(), &errMsgStr)) {
+        MMI_HILOGE("convert errMsg to ani_string failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetFieldByName_Double(errorObject, "code", aniErrCode)) {
+        MMI_HILOGE("set error code failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(errorObject, "message", errMsgStr)) {
+        MMI_HILOGE("set error message failed");
+        return;
+    }
+    env->ThrowError(static_cast<ani_error>(errorObject));
+    return;
 }
 
 int32_t ToInt32ECMAScript(double value)
@@ -94,17 +111,15 @@ static int SetPointerStyleInner(ani_env *env, ani_double windowid, ani_enum_item
     int32_t windowID = ToInt32ECMAScript(static_cast<double>(windowid));
     if (windowID < 0 && windowID != GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowid");
-        ani_error err = CreateAniError(env, "Windowid is invalid");
-        env->ThrowError(err);
-        return COMMON_PARAMETER_ERROR;
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
+        return 0;
     }
 
     int32_t pointerStyleID = ParseEnumToInt(env, pointerStyle);
     if ((pointerStyleID < DEFAULT && pointerStyleID != DEVELOPER_DEFINED_ICON) || pointerStyleID > RUNNING) {
         MMI_HILOGE("Undefined pointer style");
-        ani_error err = CreateAniError(env, "Pointer style does not exist");
-        env->ThrowError(err);
-        return COMMON_PARAMETER_ERROR;
+        ThrowBusinessError(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
+        return 0;
     }
 
     PointerStyle style;
@@ -112,9 +127,9 @@ static int SetPointerStyleInner(ani_env *env, ani_double windowid, ani_enum_item
     int32_t errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, style);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("The windowId is negative number and no system applications use system API");
-        ani_error err = CreateAniError(env, "windowId is negative number and no system applications use system API");
-        env->ThrowError(err);
-        return COMMON_USE_SYSAPI_ERROR;
+        ThrowBusinessError(env, COMMON_USE_SYSAPI_ERROR,
+            "windowId is negative number and no system applications use system API");
+        return 0;
     }
     MMI_HILOGD(" SetPointerStyleInner end.");
     return 0;
