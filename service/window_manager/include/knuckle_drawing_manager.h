@@ -43,6 +43,7 @@ public:
     ~KnuckleDrawingManager() = default;
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const DisplayInfo& displayInfo);
     std::string GetScreenReadState();
+    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 private:
     bool IsValidAction(int32_t action);
     void CreateTouchWindow(int32_t displayId);
