@@ -83,6 +83,8 @@ protected:
     int32_t StubGetKeyboardRepeatDelay(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetKeyboardRepeatRate(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddInputHandler(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetInputDeviceConsumer(MessageParcel& data, MessageParcel& reply);
+    int32_t StubClearInputDeviceConsumer(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddPreInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemovePreInputHandler(MessageParcel& data, MessageParcel& reply);

@@ -19,6 +19,7 @@
 #include "crown_transform_processor.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
+#include "input_device_consumer_handler.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 #include "event_resample.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -727,6 +728,21 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             nextHandler_->HandlePointerEvent(pointerEvent);
         } else {
+            auto toolType = GetToolType(event);
+            if (toolType == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+                auto touch = libinput_event_get_touch_event(event);
+                CHKPR(touch, ERROR_NULL_POINTER);
+                auto orientation = libinput_event_touch_get_orientation(touch);
+                item.SetOrientation(orientation);
+                item.SetToolType(toolType);
+                pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+                CHKPF(event);
+                auto device = libinput_event_get_device(event);
+                CHKPF(device);
+                std::string name = libinput_device_get_name(device);
+                DEVICEHANDLER->HandleDeviceConsumerEvent(name, pointerEvent);
+                return RET_OK;
+            }
             nextHandler_->HandleTouchEvent(pointerEvent);
         }
     }
@@ -1157,6 +1173,15 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return false;
+}
+
+int32_t EventNormalizeHandler::GetToolType(libinput_event* event)
+{
+    auto touch = libinput_event_get_touch_event(event);
+    if (touch == nullptr) {
+        return RET_ERR;
+    }
+    return libinput_event_touch_get_tool_type(touch);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -103,6 +103,7 @@ ohos_shared_library("libmmi-client") {
   innerapi_tags = [ "platformsdk" ]
   branch_protector_ret = "pac_ret"
 
+  sources += [ "event_handler/src/input_device_consumer.cpp" ]
   sources += [ "event_handler/src/tablet_event_input_subscribe_manager.cpp" ]
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]

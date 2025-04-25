@@ -186,6 +186,8 @@ public:
     virtual int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) = 0;
     virtual int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) = 0;
     virtual int32_t UnsubscribeInputActive(int32_t subscribeId) = 0;
+    virtual int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames) = 0;
+    virtual int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
