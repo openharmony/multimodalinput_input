@@ -83,6 +83,8 @@ void ClientMsgHandler::Init()
             return this->NotifyWindowStateError(client, pkt); }},
         { MmiMessageId::SET_INPUT_DEVICE_ENABLED, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->OnSetInputDeviceAck(client, pkt); }},
+        { MmiMessageId::DEVICE_CONSUMER_HANDLER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->ReportDeviceConsumer(client, pkt); }},
         { MmiMessageId::ON_SUBSCRIBE_INPUT_ACTIVE, [this] (const UDSClient &client, NetPacket &pkt) {
             return this->OnSubscribeInputActiveCallback(client, pkt); }},
     };
@@ -539,6 +541,32 @@ int32_t ClientMsgHandler::OnSubscribeInputActiveCallback(const UDSClient& client
     return handleEventType == HANDLE_EVENT_TYPE_KEY ?
         INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, subscribeId) :
         INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, subscribeId);
+}
+
+int32_t ClientMsgHandler::ReportDeviceConsumer(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_HILOGD("start");
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read Pointer data failed");
+        return RET_ERR;
+    }
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize pointer event");
+        return RET_ERR;
+    }
+    for (const auto &item : pointerEvent->GetPointerIds()) {
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(item, pointerItem)) {
+            MMI_HILOGE("Get pointer item failed");
+            return RET_ERR;
+        }
+        MMI_HILOGD("orientation:%{public}" PRId64 ",blodid:%{public}d, toolType:%{public}d",
+            pointerItem.GetOrientation(), pointerItem.GetBlobId(), pointerItem.GetToolType());
+    }
+    InputMgrImpl.OnDeviceConsumerEvent(pointerEvent);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

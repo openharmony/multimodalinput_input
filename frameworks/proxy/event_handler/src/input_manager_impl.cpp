@@ -2790,5 +2790,30 @@ void InputManagerImpl::UnsubscribeInputActive(int32_t subscribeId)
     CHK_PID_AND_TID();
     INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscribeId);
 }
+
+int32_t InputManagerImpl::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
+    std::shared_ptr<IInputEventConsumer> consumer)
+{
+    MMI_HILOGD("start");
+    CALL_DEBUG_ENTER;
+    CHKPR(consumer, INVALID_HANDLER_ID);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return DEVICE_CONSUMER.SetInputDeviceConsumer(deviceNames, consumer);
+}
+
+void InputManagerImpl::OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
+    CHKPV(pointerEvent);
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    CHKPV(DEVICE_CONSUMER.deviceConsumer_);
+    inputConsumer = DEVICE_CONSUMER.deviceConsumer_;
+    inputConsumer->OnInputEvent(pointerEvent);
+    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
+}
 } // namespace MMI
 } // namespace OHOS

@@ -44,6 +44,7 @@ constexpr int32_t MAX_SPEED { 20 };
 constexpr int32_t MIN_SPEED { 1 };
 constexpr int32_t KEY_MAX_LIST_SIZE { 5 };
 constexpr int32_t CALL_MANAGER_UID { 5523 };
+constexpr int32_t MAX_DEVICE_NUM { 10 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -507,6 +508,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_INPUT_ACTIVE):
             ret = StubUnsubscribeInputActive(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INPUT_DEVICE_CONSUMER):
+            ret = StubSetInputDeviceConsumer(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_DEVICE_CONSUMER):
+            ret = StubClearInputDeviceConsumer(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
@@ -3511,6 +3518,52 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeInputActive(MessageParcel& da
         MMI_HILOGE("UnsubscribeInputActive failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetInputDeviceConsumer(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t size = 0;
+    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (size < 0 || size > MAX_DEVICE_NUM) {
+        MMI_HILOGE("Invalid size:%{public}d", size);
+        return RET_ERR;
+    }
+    std::vector<std::string> deviceNames;
+    std::string deviceName;
+    for (int32_t i = 0; i < size; ++i) {
+        READSTRING(data, deviceName, IPC_PROXY_DEAD_OBJECT_ERR);
+        deviceNames.push_back(deviceName);
+    }
+    int32_t ret = SetInputDeviceConsumer(deviceNames);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call AddInputConsumerHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubClearInputDeviceConsumer(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t size = 0;
+    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (size < 0 || size > MAX_DEVICE_NUM) {
+        MMI_HILOGE("Invalid size:%{public}d", size);
+        return RET_ERR;
+    }
+    std::vector<std::string> deviceNames;
+    std::string deviceName;
+    for (int32_t i = 0; i < size; ++i) {
+        READSTRING(data, deviceName, IPC_PROXY_DEAD_OBJECT_ERR);
+        deviceNames.push_back(deviceName);
+    }
+    int32_t ret = ClearInputDeviceConsumer(deviceNames);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call ClearInputDeviceConsumer failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

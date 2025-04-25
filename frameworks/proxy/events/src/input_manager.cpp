@@ -900,5 +900,11 @@ void InputManager::UnsubscribeInputActive(int32_t subscribeId)
 {
     InputMgrImpl.UnsubscribeInputActive(subscribeId);
 }
+
+int32_t InputManager::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
+    std::shared_ptr<IInputEventConsumer> consumer)
+{
+    return InputMgrImpl.SetInputDeviceConsumer(deviceNames, consumer);
+}
 } // namespace MMI
 } // namespace OHOS
