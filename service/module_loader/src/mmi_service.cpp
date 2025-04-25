@@ -3800,5 +3800,42 @@ int32_t MMIService::UnsubscribeInputActive(int32_t subscribeId)
     }
     return RET_OK;
 }
+
+int32_t MMIService::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+{
+    MMI_HILOGD("start");
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &deviceNames, &sess] {
+            return DEVICEHANDLER->SetDeviceConsumerHandler(deviceNames, sess);
+        }
+    );
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetDeviceConsumerHandler failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+{
+    MMI_HILOGD("start");
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &deviceNames, &sess] {
+            return DEVICEHANDLER->ClearDeviceConsumerHandler(deviceNames, sess);
+        }
+    );
+    if (ret != RET_OK) {
+        MMI_HILOGE("ClearInputDeviceConsumer failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

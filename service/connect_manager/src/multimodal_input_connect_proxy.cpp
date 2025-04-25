@@ -1046,6 +1046,56 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+{
+    MMI_HILOGD("start");
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, static_cast<int64_t>(deviceNames.size()), ERR_INVALID_VALUE);
+    for (const auto &item : deviceNames) {
+        WRITESTRING(data, item, ERR_INVALID_VALUE);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INPUT_DEVICE_CONSUMER), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+{
+    MMI_HILOGD("start");
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, static_cast<int64_t>(deviceNames.size()), ERR_INVALID_VALUE);
+    for (const auto &item : deviceNames) {
+        WRITESTRING(data, item, ERR_INVALID_VALUE);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_DEVICE_CONSUMER), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType)
 {

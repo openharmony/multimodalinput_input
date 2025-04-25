@@ -112,6 +112,7 @@ declare_args() {
   libmmi_service_sources = [
     "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "$mmi_path/frameworks/proxy/event_handler/src/scene_board_judgement.cpp",
+    "$mmi_path/service/touch_event_normalize/src/input_device_consumer_handler.cpp",
     "app_state_manager/src/app_state_observer.cpp",
     "delegate_task/src/delegate_interface.cpp",
     "delegate_task/src/delegate_tasks.cpp",
