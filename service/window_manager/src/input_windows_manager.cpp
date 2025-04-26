@@ -4984,8 +4984,26 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
         return;
     }
     PointerEvent::PointerItem currentPointerItem;
-    currentPointerItem.SetWindowX(lastTouchLogicX_ - lastTouchWindowInfo_.area.x);
-    currentPointerItem.SetWindowY(lastTouchLogicY_ - lastTouchWindowInfo_.area.y);
+    int32_t windowX = lastTouchLogicX_ - lastTouchWindowInfo_.area.x;
+    int32_t windowY = lastTouchLogicY_ - lastTouchWindowInfo_.area.y;
+    if (lastTouchEvent_->GetFixedMode() == PointerEvent::FixedMode::AUTO) {
+        WindowInputType windowInputType = lastTouchWindowInfo_.windowInputType;
+        if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+            windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
+            if (!(lastTouchWindowInfo_.transform.empty())) {
+                auto windowXY = TransformWindowXY(lastTouchWindowInfo_, lastTouchLogicX_, lastTouchLogicY_);
+                windowX = static_cast<int32_t>(windowXY.first);
+                windowY = static_cast<int32_t>(windowXY.second);
+            }
+            currentPointerItem.SetFixedDisplayX(lastPointerItem.GetFixedDisplayX());
+            currentPointerItem.SetFixedDisplayY(lastPointerItem.GetFixedDisplayY());
+            pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
+        }
+    }
+    currentPointerItem.SetWindowX(windowY);
+    currentPointerItem.SetWindowY(windowY);
+    currentPointerItem.SetWindowXPos(static_cast<double>(windowY));
+    currentPointerItem.SetWindowYPos(static_cast<double>(windowY));
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
     currentPointerItem.SetPointerId(lastPointerId);
@@ -5006,12 +5024,6 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
     pointerEvent->SetDeviceId(lastTouchEvent_->GetDeviceId());
-    auto fd = udsServer_->GetClientFd(lastTouchWindowInfo_.pid);
-    auto sess = udsServer_->GetSession(fd);
-    if (sess == nullptr) {
-        MMI_HILOGI("The last window has disappeared");
-        return;
-    }
 
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
     auto filter = InputHandler->GetFilterHandler();
