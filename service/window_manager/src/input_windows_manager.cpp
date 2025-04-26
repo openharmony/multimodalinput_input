@@ -3051,7 +3051,14 @@ bool InputWindowsManager::HasMouseHideFlag()
 {
     auto lastPointerEventCopy = GetlastPointerEvent();
     CHKPF(lastPointerEventCopy);
-    return lastPointerEventCopy->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
+    int32_t pointerId = lastPointerEventCopy->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!lastPointerEventCopy->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return false;
+    }
+    return (lastPointerEventCopy->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER) ||
+        pointerItem.GetMoveFlag() == POINTER_MOVEFLAG);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
