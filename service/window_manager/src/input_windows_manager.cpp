@@ -3717,9 +3717,11 @@ std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(std::shared_ptr<D
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = static_cast<Direction>((((physicalDisplayInfo->direction -
         physicalDisplayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         if (IsSupported()) {
             direction = physicalDisplayInfo->direction;
         }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
     }
