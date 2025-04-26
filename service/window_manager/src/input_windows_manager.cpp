@@ -3709,6 +3709,43 @@ bool InputWindowsManager::GetHoverScrollState() const
     return state;
 }
 
+///////
+vector<int32_t> GetCour(std::shared_ptr<DisplayInfo> &physicalDisplayInfo, int32_t physicalX, int physicalY)
+{
+        Direction direction = DIRECTION0;
+        if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            direction = static_cast<Direction>((((physicalDisplayInfo->direction -
+            physicalDisplayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+            if (IsSupported()) {
+                direction = physicalDisplayInfo->direction;
+            }
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+            TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
+                physicalDisplayInfo->validHeight, physicalX, physicalY);
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
+            }
+    return {physicalX, physicalY};
+}
+
+vector<int32_t> HandleHardwareCursor(std::shared_ptr<DisplayInfo> &physicalDisplayInfo, int32_t physicalX, int32_t physicalY)
+{
+    vector<int32_t> cursorPos = {physicalX, physicalY};
+    Direction direction = DIRECTION0;
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        direction = static_cast<Direction>((((physicalDisplayInfo->direction -
+        physicalDisplayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        if (IsSupported()) {
+            direction = physicalDisplayInfo->direction;
+        }
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+        TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
+            physicalDisplayInfo->validHeight, physicalX, physicalY);
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    return cursorPos;
+}
+
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -3771,20 +3808,15 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
             }
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            Direction direction = DIRECTION0;
-            if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-                direction = static_cast<Direction>((((physicalDisplayInfo->direction -
-                physicalDisplayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-                if (IsSupported()) {
-                    direction = physicalDisplayInfo->direction;
-                }
-#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
-                TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
-                    physicalDisplayInfo->validHeight, physicalX, physicalY);
-#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
+            vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
+            if (cursorPos.empty()) {
+                MMI_HILOGW("cursorPos is empty");
+                return RET_ERR;
             }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+            IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, cursorPos[0], cursorPos[1]);
+#else
             IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             MMI_HILOGI("UpdateMouseTarget id:%{public}d, logicalX:%{public}d, logicalY:%{public}d,"
                 "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->uniqueId, logicalX, logicalY,
                 pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
