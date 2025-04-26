@@ -1956,6 +1956,7 @@ void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
     auto filter = InputHandler->GetFilterHandler();
     CHKPV(filter);
     filter->HandlePointerEvent(pointerEvent);
+    InitMouseDownInfo();
 }
 
 void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
@@ -4018,6 +4019,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
+        InitMouseDownInfo();
+        mouseDownEventId_ = -1;
         ClearExtraData();
     }
     if (pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
