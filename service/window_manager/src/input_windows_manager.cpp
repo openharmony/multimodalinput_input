@@ -3723,7 +3723,7 @@ std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(std::shared_ptr<D
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
     }
-    cursorPos = {physicalX, physicalY}
+    cursorPos = {physicalX, physicalY};
     (void)direction;
     return cursorPos;
 }
