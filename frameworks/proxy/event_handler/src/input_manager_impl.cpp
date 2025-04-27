@@ -637,6 +637,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
             MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
         }
     }
+    MMI_HILOG_FREEZEE("zhf###03 id:%{public}d recv, action:%{public}d", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
         if (!eventHandler->PostTask([this, inputConsumer, pointerEvent] {
