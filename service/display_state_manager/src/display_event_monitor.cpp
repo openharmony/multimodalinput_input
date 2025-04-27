@@ -35,8 +35,22 @@
 
 namespace OHOS {
 namespace MMI {
-DisplayEventMonitor::DisplayEventMonitor() {}
-DisplayEventMonitor::~DisplayEventMonitor() {}
+#ifdef __aarch64__
+static constexpr uint32_t MMI_OBJECT_MASK = 0xffffffff;
+#else
+static constexpr uint32_t MMI_OBJECT_MASK = 0xffffff;
+#endif
+
+DisplayEventMonitor::DisplayEventMonitor()
+{
+    MMI_HILOGI("DisplayEventMonitor constructor, addr:%{public}u",
+        static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this) & MMI_OBJECT_MASK));
+}
+DisplayEventMonitor::~DisplayEventMonitor()
+{
+    MMI_HILOGI("~DisplayEventMonitor destructor, addr:%{public}u",
+        static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this) & MMI_OBJECT_MASK));
+}
 
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 class DisplyChangedReceiver : public EventFwk::CommonEventSubscriber {
