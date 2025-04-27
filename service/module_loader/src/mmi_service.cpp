@@ -1806,7 +1806,9 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
     sleep(sleepSeconds);
+#ifdef OHOS_BUILD_PC_PRIORITY
     SetMmiServicePriority(tid);
+#endif // OHOS_BUILD_PC_PRIORITY
 }
 #endif // OHOS_RSS_CLIENT
 
