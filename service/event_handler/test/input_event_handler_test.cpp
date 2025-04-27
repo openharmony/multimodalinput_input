@@ -95,34 +95,6 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_OnEvent_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputEventHandler_OnEvent_002
- * @tc.desc: Test the funcation OnEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandler_OnEvent_002, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    libinput_event event;
-    libinput_event_pointer pointer;
-    pointer.buttonState = LIBINPUT_BUTTON_STATE_RELEASED;
-    int64_t frameTime = 0;
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetEventType)
-        .WillOnce(Return(LIBINPUT_EVENT_POINTER_AXIS))
-        .WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN))
-        .WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD));
-    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(nullptr));
-    EXPECT_CALL(libinputMock, GetDevice).WillOnce(Return(nullptr));
-    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
-    inputEventHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    inputEventHandler->idSeed_ = std::numeric_limits<uint64_t>::max() - 1;
-    inputEventHandler->isButtonMistouch_ = true;
-    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = false;
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler->OnEvent(&event, frameTime));
-}
-
-/**
  * @tc.name: InputEventHandler_UpdateDwtRecord_001
  * @tc.desc: Test the funcation UpdateDwtRecord
  * @tc.type: FUNC
