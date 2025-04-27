@@ -702,11 +702,21 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     if (displayId < 0) {
         MMI_HILOGD("Target display is -1");
         int32_t groupId = FindDisplayGroupId(displayId);
-        auto DisplaysInfo = GetDisplayInfoVector(groupId);
-        if (DisplaysInfo.empty()) {
-            return displayId;
+        {
+            std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+            const auto iter = displayGroupInfoMap_.find(groupId);
+            if (iter != displayGroupInfoMap_.end()) {
+                if (iter->second.displaysInfo.empty()) {
+                    return displayId;
+                }
+                displayId = iter->second.displaysInfo[0].id;
+            } else {
+                if (displayGroupInfo_.displaysInfo.empty()) {
+                    return displayId;
+                }
+                displayId = displayGroupInfo_.displaysInfo[0].id;
+            }
         }
-        displayId = DisplaysInfo[0].id;
         inputEvent->SetTargetDisplayId(displayId);
     }
     return displayId;
@@ -1678,10 +1688,8 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
         PrintDisplayGroupInfo(displayGroupInfoMap_[groupId]);
     }
-    auto DisplaysInfo = GetDisplayInfoVector(groupId);
-    if (!DisplaysInfo.empty()) {
-        UpdateDisplayIdAndName();
-    }
+
+    UpdateDisplayIdAndName();
     UpdateDisplayMode(displayGroupInfo.groupId);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1796,12 +1804,25 @@ DisplayMode InputWindowsManager::GetDisplayMode() const
 void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 {
     CALL_DEBUG_ENTER;
-    auto DisplaysInfo = GetDisplayInfoVector(groupId);
-    if (DisplaysInfo.empty()) {
-        MMI_HILOGE("DisplaysInfo is empty");
-        return;
+    DisplayMode mode;
+    {
+        std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+        const auto iter = displayGroupInfoMap_.find(groupId);
+        if (iter != displayGroupInfoMap_.end()) {
+            if (iter->second.displaysInfo.empty()) {
+                MMI_HILOGE("DisplaysInfo is empty");
+                return;
+            }
+            mode = iter->second.displaysInfo[0].displayMode;
+        } else {
+            if (displayGroupInfo_.displaysInfo.empty()) {
+                MMI_HILOGE("DisplaysInfo is empty");
+                return;
+            }
+            mode = displayGroupInfo_.displaysInfo[0].displayMode;
+        }
     }
-    DisplayMode mode = DisplaysInfo[0].displayMode;
+    
     if (mode == displayModeMap_[groupId]) {
         MMI_HILOGD("Displaymode not change, mode:%{public}d, diaplayMode_:%{public}d", mode, displayModeMap_[groupId]);
         return;
@@ -1836,12 +1857,28 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
     int32_t groupId = displayGroupInfo.groupId;
-    auto DisplaysInfo = GetDisplayInfoVector(groupId);
-    if (DisplaysInfo.empty()) {
-        MMI_HILOGE("DisplayGroup is empty.");
-        return;
+    int32_t newDpi = 0;
+    int32_t newId = 0;
+    {
+        std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+        const auto iter = displayGroupInfoMap_.find(groupId);
+        if (iter != displayGroupInfoMap_.end()) {
+            if (iter->second.displaysInfo.empty()) {
+                MMI_HILOGE("DisplayGroup is empty.");
+                return;
+            }
+            newDpi = iter->second.displaysInfo[0].dpi;
+            newId = iter->second.displaysInfo[0].id;
+        } else {
+            if (displayGroupInfo_.displaysInfo.empty()) {
+                MMI_HILOGE("DisplayGroup is empty.");
+                return;
+            }
+            newDpi = displayGroupInfo_.displaysInfo[0].dpi;
+            newId = displayGroupInfo_.displaysInfo[0].id;
+        }
     }
-    if (lastDpiMap_[groupId] != DEFAULT_DPI && lastDpiMap_[groupId] != DisplaysInfo[0].dpi) {
+    if (lastDpiMap_[groupId] != DEFAULT_DPI && lastDpiMap_[groupId] != newDpi) {
         auto drawNewDpiRes = IPointerDrawingManager::GetInstance()->DrawNewDpiPointer();
         if (drawNewDpiRes != RET_OK) {
             MMI_HILOGE("Draw New Dpi pointer failed.");
@@ -1852,7 +1889,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
     if (INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice()) {
         MouseLocation mouseLocation = GetMouseInfo();
         int32_t displayId = MouseEventHdr->GetDisplayId();
-        displayId = displayId < 0 ? DisplaysInfo[0].id : displayId;
+        displayId = displayId < 0 ? newId : displayId;
         auto displayInfo = GetPhysicalDisplay(displayId);
         CHKPV(displayInfo);
         int32_t DisplayInfoX = GetLogicalPositionX(displayId);
@@ -1966,12 +2003,25 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
     MouseLocation mouseLocation = GetMouseInfo();
     int32_t displayId = MouseEventHdr->GetDisplayId();
     int32_t groupId = FindDisplayGroupId(displayId);
-    auto DisplaysInfo = GetDisplayInfoVector(groupId);
-    if (DisplaysInfo.empty()) {
-        MMI_HILOGW("DisplaysInfo is empty");
-        return;
+    int32_t newId = 0;
+    {
+        std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+        const auto iter = displayGroupInfoMap_.find(groupId);
+        if (iter != displayGroupInfoMap_.end()) {
+            if (iter->second.displaysInfo.empty()) {
+                MMI_HILOGW("DisplaysInfo is empty");
+                return;
+            }
+            newId = iter->second.displaysInfo[0].id;
+        } else {
+            if (displayGroupInfo_.displaysInfo.empty()) {
+                MMI_HILOGW("DisplaysInfo is empty");
+                return;
+            }
+            newId = displayGroupInfo_.displaysInfo[0].id;
+        }
     }
-    displayId = displayId < 0 ? DisplaysInfo[0].id : displayId;
+    displayId = displayId < 0 ? newId : displayId;
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
     int32_t DisplayInfoX = GetLogicalPositionX(displayId);
@@ -2441,10 +2491,19 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
 const std::shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
     int32_t groupId = FindDisplayGroupId(id);
-    auto displayInfo = GetDisplayInfoVector(groupId);
-    for (auto &it : displayInfo) {
-        if (it.id == id) {
-            return std::make_shared<DisplayInfo>(it);
+    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        for (auto &it : iter->second.displaysInfo) {
+            if (it.id == id) {
+                return std::make_shared<DisplayInfo>(it);
+            }
+        }
+    } else {
+        for (auto &it : displayGroupInfo_.displaysInfo) {
+            if (it.id == id) {
+                return std::make_shared<DisplayInfo>(it);
+            }
         }
     }
     MMI_HILOGW("Failed to obtain physical(%{public}d) display", id);
@@ -2806,10 +2865,19 @@ int32_t InputWindowsManager::GetFocusWindowId(int32_t groupId) const
 int32_t InputWindowsManager::GetLogicalPositionX(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    auto displaysInfo = GetDisplayInfoVector(groupId);
-    for (auto &it : displaysInfo) {
-        if (it.id == id) {
-            return it.x;
+    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        for (auto &it : iter->second.displaysInfo) {
+            if (it.id == id) {
+                return it.x;
+            }
+        }
+    } else {
+        for (auto &it : displayGroupInfo_.displaysInfo) {
+            if (it.id == id) {
+                return it.x;
+            }
         }
     }
     MMI_HILOGW("Failed to LogicalPosition");
@@ -2819,10 +2887,19 @@ int32_t InputWindowsManager::GetLogicalPositionX(int32_t id)
 int32_t InputWindowsManager::GetLogicalPositionY(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    auto displaysInfo = GetDisplayInfoVector(groupId);
-    for (auto &it : displaysInfo) {
-        if (it.id == id) {
-            return it.y;
+    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        for (auto &it : iter->second.displaysInfo) {
+            if (it.id == id) {
+                return it.y;
+            }
+        }
+    } else {
+        for (auto &it : displayGroupInfo_.displaysInfo) {
+            if (it.id == id) {
+                return it.y;
+            }
         }
     }
     MMI_HILOGW("Failed to LogicalPosition");
@@ -2832,10 +2909,19 @@ int32_t InputWindowsManager::GetLogicalPositionY(int32_t id)
 Direction InputWindowsManager::GetLogicalPositionDirection(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    auto displaysInfo = GetDisplayInfoVector(groupId);
-    for (auto &it : displaysInfo) {
-        if (it.id == id) {
-            return it.direction;
+    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        for (auto &it : iter->second.displaysInfo) {
+            if (it.id == id) {
+                return it.direction;
+            }
+        }
+    } else {
+        for (auto &it : displayGroupInfo_.displaysInfo) {
+            if (it.id == id) {
+                return it.direction;
+            }
         }
     }
     MMI_HILOGW("Failed to get direction");
@@ -2845,10 +2931,19 @@ Direction InputWindowsManager::GetLogicalPositionDirection(int32_t id)
 Direction InputWindowsManager::GetPositionDisplayDirection(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    auto displaysInfo = GetDisplayInfoVector(groupId);
-    for (auto &it : displaysInfo) {
-        if (it.id == id) {
-            return it.displayDirection;
+    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        for (auto &it : iter->second.displaysInfo) {
+            if (it.id == id) {
+                return it.displayDirection;
+            }
+        }
+    } else {
+        for (auto &it : displayGroupInfo_.displaysInfo) {
+            if (it.id == id) {
+                return it.displayDirection;
+            }
         }
     }
     MMI_HILOGW("Failed to get direction");
@@ -2865,13 +2960,26 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
     MouseLocation mouseLocation = GetMouseInfo();
     int32_t displayId = MouseEventHdr->GetDisplayId();
     int32_t groupId = FindDisplayGroupId(displayId);
-    auto DisplaysInfo = GetDisplayInfoVector(groupId);
-    if (DisplaysInfo.empty()) {
-        MMI_HILOGW("DisplaysInfo is empty");
-        return false;
+    int32_t newId = 0;
+    {
+        std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+        const auto iter = displayGroupInfoMap_.find(groupId);
+        if (iter != displayGroupInfoMap_.end()) {
+            if (iter->second.displaysInfo.empty()) {
+                MMI_HILOGW("DisplaysInfo is empty");
+                return false;
+            }
+            newId = iter->second.displaysInfo[0].id;
+        } else {
+            if (displayGroupInfo_.displaysInfo.empty()) {
+                MMI_HILOGW("DisplaysInfo is empty");
+                return false;
+            }
+            newId = displayGroupInfo_.displaysInfo[0].id;
+        }
     }
     if (displayId < 0) {
-        displayId = DisplaysInfo[0].id;
+        displayId = newId;
     }
     int32_t DisplayInfoX = GetLogicalPositionX(displayId);
     int32_t DisplayInfoY = GetLogicalPositionY(displayId);
