@@ -28,7 +28,7 @@ namespace MMI {
 class AniEventTarget : public IInputDeviceListener, public std::enable_shared_from_this<AniEventTarget> {
 public:
     AniEventTarget();
-    virtual ~AniEventTarget() = default;
+    virtual ~AniEventTarget();
     DISALLOW_COPY_AND_MOVE(AniEventTarget);
     void AddListener(ani_env *env, const std::string &type, ani_object handle);
     void ResetEnv();
@@ -36,14 +36,17 @@ public:
     void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
 
 private:
-    static void EmitAddedDeviceEvent(std::shared_ptr<AniUtil::ReportData> reportData);
-    static void EmitRemoveDeviceEvent(std::shared_ptr<AniUtil::ReportData> reportData);
-    static bool EmitCallbackWork(ani_env *env, std::shared_ptr<AniUtil::ReportData> &reportData,
+    static void EmitAddedDeviceEvent(const std::shared_ptr<AniUtil::ReportData> &reportData);
+    static void EmitRemoveDeviceEvent(const std::shared_ptr<AniUtil::ReportData> &reportData);
+    static bool EmitCallbackWork(ani_env *env, const std::shared_ptr<AniUtil::ReportData> &reportData,
         const std::string &type);
+    void GetMainEventHandler();
+    void PostMainThreadTask(const std::function<void()> task);
 
 private:
     inline static std::map<std::string, std::vector<std::unique_ptr<AniUtil::CallbackInfo>>> devListener_ {};
     bool isListeningProcess_ { false };
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
