@@ -30,16 +30,10 @@ TouchGestureAdapter::TouchGestureAdapter(TouchGestureType type, std::shared_ptr<
 
 void TouchGestureAdapter::SetGestureCondition(bool flag, TouchGestureType type, int32_t fingers)
 {
-    static bool isAll = false;
-    if (gestureDetector_ != nullptr &&
-        (type == gestureType_ || type == TOUCH_GESTURE_TYPE_ALL)) {
-        if (type == TOUCH_GESTURE_TYPE_ALL) {
-            isAll = flag;
-        }
+    if ((gestureDetector_ != nullptr) && ((type & gestureType_) == gestureType_)) {
         if (flag) {
             gestureDetector_->AddGestureFingers(fingers);
-        }
-        if (!flag && !isAll) {
+        } else {
             gestureDetector_->RemoveGestureFingers(fingers);
         }
     }
@@ -95,10 +89,6 @@ void TouchGestureAdapter::OnTouchEvent(std::shared_ptr<PointerEvent> event)
     }
     shouldDeliverToNext_ = true;
 
-    if (!gestureStarted_ && (event->GetPointerAction() == PointerEvent::POINTER_ACTION_UP)) {
-        gestureDetector_->OnTouchEvent(event);
-        return;
-    }
     if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
         OnSwipeGesture(event);
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
@@ -112,7 +102,7 @@ void TouchGestureAdapter::OnTouchEvent(std::shared_ptr<PointerEvent> event)
 void TouchGestureAdapter::OnSwipeGesture(std::shared_ptr<PointerEvent> event)
 {
     CHKPV(gestureDetector_);
-    if (state_ == GestureState::PINCH) {
+    if ((state_ == GestureState::PINCH) && (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE)) {
         return;
     }
     gestureStarted_ = gestureDetector_->OnTouchEvent(event);
@@ -122,7 +112,7 @@ void TouchGestureAdapter::OnSwipeGesture(std::shared_ptr<PointerEvent> event)
 void TouchGestureAdapter::OnPinchGesture(std::shared_ptr<PointerEvent> event)
 {
     CHKPV(gestureDetector_);
-    if (state_ == GestureState::SWIPE) {
+    if ((state_ == GestureState::SWIPE) && (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE)) {
         return;
     }
     gestureStarted_ = gestureDetector_->OnTouchEvent(event);
