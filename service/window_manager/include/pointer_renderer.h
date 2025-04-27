@@ -27,9 +27,9 @@ constexpr int32_t DEFAULT_IMG_SIZE{ 10 };
 
 class RenderConfig {
 public:
-    MOUSE_ICON style;
-    ICON_TYPE align;
-    std::string path;
+    MOUSE_ICON style_;
+    ICON_TYPE align_;
+    std::string path_;
     uint32_t color { 0 };
     uint32_t size { 0 };
     uint32_t direction { 0 };
@@ -52,12 +52,12 @@ public:
 
     bool operator == (const RenderConfig& rhs) const
     {
-        return style == rhs.style && GetImageSize() == rhs.GetImageSize() && color == rhs.color;
+        return style_ == rhs.style_ && GetImageSize() == rhs.GetImageSize() && color == rhs.color;
     }
 
     bool operator != (const RenderConfig& rhs) const
     {
-        return style != rhs.style || GetImageSize() != rhs.GetImageSize() || color != rhs.color;
+        return style_ != rhs.style_ || GetImageSize() != rhs.GetImageSize() || color != rhs.color;
     }
 };
 

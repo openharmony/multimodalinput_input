@@ -874,6 +874,10 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
         Rosen::RSTransaction::FlushImplicitTransaction();
         return;
     }
+    if (canvasWidth_ == 0) {
+        MMI_HILOGE("The divisor cannot be 0");
+        return;
+    }
     float ratio = imageWidth_ * 1.0 / canvasWidth_;
     surfaceNodePtr->SetPivot({LOADING_CENTER_RATIO * ratio, LOADING_CENTER_RATIO * ratio});
     protocol.SetDuration(ANIMATION_DURATION);
@@ -1024,7 +1028,7 @@ void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rose
 
     uint32_t addrSize = static_cast<uint32_t>(buffer->GetWidth()) *
         static_cast<uint32_t>(buffer->GetHeight()) * CURSOR_STRIDE;
-    auto ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), addrSize);
+    auto ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), bitmap->ComputeByteSize());
     if (ret != EOK) {
         MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
         return;
@@ -1034,7 +1038,7 @@ void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rose
         CHKPC(buf);
         auto addr = static_cast<uint8_t*>(buf->GetVirAddr());
         CHKPC(addr);
-        ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), addrSize);
+        ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), bitmap->ComputeByteSize());
         if (ret != EOK) {
             MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
             return;
@@ -1699,7 +1703,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
     // suface node init
     std::shared_ptr<ScreenPointer> sp = nullptr;
     {
-        if (screenPointers_.count(displayId)) {
+        if (screenPointers_.count(static_cast<size_t>(displayId))) {
             sp = screenPointers_[displayId];
             if (!g_isRsRestart) {
                 for (auto it : screenPointers_) {
@@ -1707,6 +1711,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
                     it.second->Init();
                 }
                 if (displayId == displayInfo_.uniqueId) {
+                    CHKPR(sp, RET_ERR);
                     SetSurfaceNode(sp->GetSurfaceNode());
                 }
                 Rosen::RSTransaction::FlushImplicitTransaction();
@@ -1715,8 +1720,8 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
         } else {
             g_isRsRestart = true;
             sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
-            screenPointers_[displayInfo_.uniqueId] = sp;
             CHKPR(sp, RET_ERR);
+            screenPointers_[displayInfo_.uniqueId] = sp;
             if (!sp->Init()) {
                 MMI_HILOGE("ScreenPointer %{public}d init failed", displayInfo_.uniqueId);
                 return RET_ERR;
@@ -1932,7 +1937,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     DrawImage(canvas, mouseStyle);
-    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
+    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), bitmap.ComputeByteSize());
     if (ret != EOK) {
         MMI_HILOGE("Memcpy data is error, ret:%{public}d", ret);
         return;
@@ -2281,7 +2286,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
         hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
     if (hardwareCursorPointerManager_->IsSupported()) {
-        if (screenPointers_.count(displayInfo.uniqueId)) {
+        if (screenPointers_.count(static_cast<size_t>(displayInfo.uniqueId))) {
             auto sp = screenPointers_[displayInfo.uniqueId];
             CHKPV(sp);
             if (sp->IsMain()) {
@@ -3331,12 +3336,13 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
 
 bool PointerDrawingManager::IsSupported()
 {
+    CHKPF(hardwareCursorPointerManager_);
     return hardwareCursorPointerManager_->IsSupported();
 }
 
 void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
 {
-    MMI_HILOGI("OnScreenModeChange enter, screen size:%{public}lu", screens.size());
+    MMI_HILOGI("OnScreenModeChange enter, screen size:%{public}zu", screens.size());
     std::set<uint32_t> sids;
     uint32_t mainWidth = 0;
     uint32_t mainHeight = 0;
@@ -3609,7 +3615,7 @@ void PointerDrawingManager::SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     CHKPV(sp);
     sp->MoveSoft(x, y, align);
 
-    for (auto msp : GetMirrorScreenPointers()) {
+    for (auto& msp : GetMirrorScreenPointers()) {
         msp->MoveSoft(x, y, align);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();

@@ -47,7 +47,7 @@ int32_t RenderConfig::GetImageSize() const
 std::string RenderConfig::ToString() const
 {
     std::ostringstream oss;
-    oss << "{style=" << style << ", align=" << align << ", color=" << color
+    oss << "{style=" << style_ << ", align=" << align_ << ", color=" << color
         << ", size=" << size << ", direction=" << direction
         <<", dpi=" << dpi
         << ", isHard=" << isHard << ", ImageSize=" << GetImageSize() << "}";
@@ -57,25 +57,21 @@ std::string RenderConfig::ToString() const
 int32_t RenderConfig::GetOffsetX() const
 {
     int32_t width = this->GetImageSize();
-    switch (this->align) {
+    switch (this->align_) {
         case ANGLE_E:
             return FOCUS_POINT;
-        case ANGLE_S:
-            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_W:
-            return FOCUS_POINT - width;
-        case ANGLE_N:
-            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
-        case ANGLE_SE:
-            return FOCUS_POINT - width;
-        case ANGLE_NE:
+        case ANGLE_S:       // fall-though
+        case ANGLE_N:       // fall-though
+        case ANGLE_CENTER:  // fall-though
+            return static_cast<int32_t>(FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE);
+        case ANGLE_W:       // fall-though
+        case ANGLE_SE:      // fall-though
+        case ANGLE_NE:      // fall-though
             return FOCUS_POINT - width;
         case ANGLE_SW:
             return FOCUS_POINT;
         case ANGLE_NW:
             return FOCUS_POINT - this->userIconHotSpotX;
-        case ANGLE_CENTER:
-            return FOCUS_POINT - width / CALCULATE_IMAGE_MIDDLE;
         case ANGLE_NW_RIGHT:
             return FOCUS_POINT - width * CALCULATE_MOUSE_ICON_BIAS;
         default:
@@ -87,7 +83,7 @@ int32_t RenderConfig::GetOffsetX() const
 int32_t RenderConfig::GetOffsetY() const
 {
     int32_t height = this->GetImageSize();
-    switch (this->align) {
+    switch (this->align_) {
         case ANGLE_E:
             return FOCUS_POINT - height / CALCULATE_IMAGE_MIDDLE;
         case ANGLE_S:
@@ -127,7 +123,7 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     MMI_HILOGI("Render %{public}s", cfg.ToString().c_str());
 
     uint32_t addrSize = width * height * RENDER_STRIDE;
-    if (cfg.style == MOUSE_ICON::TRANSPARENT_ICON) {
+    if (cfg.style_ == MOUSE_ICON::TRANSPARENT_ICON) {
         memset_s(addr, addrSize, 0, addrSize);
         return RET_OK;
     }
@@ -159,7 +155,7 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     //Draw image on canvas
     canvas.DrawImage(*image, cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
 
-    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
+    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), bitmap.ComputeByteSize());
     if (ret != EOK) {
         return RET_ERR;
     }
@@ -186,33 +182,34 @@ static void ChangeSvgCursorColor(std::string& str, int32_t color)
 void SetCursorColorBaseOnStyle(const RenderConfig &cfg, OHOS::Media::DecodeOptions &decodeOpts)
 {
     const bool isHandColor =
-        (cfg.style == HAND_GRABBING) ||(cfg.style == HAND_OPEN) || (cfg.style == HAND_POINTING);
-    if (isHandColor) {
-        if (cfg.color == MAX_POINTER_COLOR ||
-            cfg.color == MIN_POINTER_COLOR ||
-            cfg.color == OTHER_POINTER_COLOR) {
-            decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
-            decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
-        } else {
-            decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = cfg.color};
-            if (cfg.color == MAX_POINTER_COLOR) {
-                decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
-            } else {
-                decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
-            }
-        }
+        (cfg.style_ == HAND_GRABBING) || (cfg.style_ == HAND_OPEN) || (cfg.style_ == HAND_POINTING);
+    if (!isHandColor) {
+        return;
+    }
+
+    if ((cfg.color == MAX_POINTER_COLOR) || (cfg.color == MIN_POINTER_COLOR) || (cfg.color == OTHER_POINTER_COLOR)) {
+        decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
+        decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
+        return;
+    }
+
+    decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = cfg.color};
+    if (cfg.color == MAX_POINTER_COLOR) {
+        decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MIN_POINTER_COLOR};
+    } else {
+        decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
     }
 }
 
 pixelmap_ptr_t PointerRenderer::LoadCursorSvgWithColor(const RenderConfig &cfg)
 {
     std::string svgContent;
-    if (!ReadFile(cfg.path, svgContent)) {
+    if (!ReadFile(cfg.path_, svgContent)) {
         MMI_HILOGE("read file failed");
         return nullptr;
     }
 
-    const bool isPartColor = (cfg.style == CURSOR_COPY) || (cfg.style == CURSOR_FORBID) || (cfg.style == HELP);
+    const bool isPartColor = (cfg.style_ == CURSOR_COPY) || (cfg.style_ == CURSOR_FORBID) || (cfg.style_ == HELP);
     if (isPartColor) {
         ChangeSvgCursorColor(svgContent, cfg.color);
     }
@@ -221,7 +218,7 @@ pixelmap_ptr_t PointerRenderer::LoadCursorSvgWithColor(const RenderConfig &cfg)
     uint32_t ret = 0;
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(std::move(isp), opts, ret);
     if (!imageSource || ret != ERR_OK) {
-        MMI_HILOGE("Get ImageSource failed, ret=%{public}d", ret);
+        MMI_HILOGE("Get ImageSource failed, ret=%{public}u", ret);
     }
     CHKPP(imageSource);
 
@@ -276,12 +273,12 @@ static Rosen::Drawing::ColorType PixelFormatToColorType(Media::PixelFormat pixel
             return Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8;
         case Media::PixelFormat::RGBA_F16:
             return Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16;
-        case Media::PixelFormat::UNKNOWN:
-        case Media::PixelFormat::ARGB_8888:
-        case Media::PixelFormat::RGB_888:
-        case Media::PixelFormat::NV21:
-        case Media::PixelFormat::NV12:
-        case Media::PixelFormat::CMYK:
+        case Media::PixelFormat::UNKNOWN:       // fall-though
+        case Media::PixelFormat::ARGB_8888:     // fall-though
+        case Media::PixelFormat::RGB_888:       // fall-though
+        case Media::PixelFormat::NV21:          // fall-though
+        case Media::PixelFormat::NV12:          // fall-though
+        case Media::PixelFormat::CMYK:          // fall-though
         default:
             return Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN;
     }
@@ -341,10 +338,10 @@ image_ptr_t PointerRenderer::ExtractDrawingImage(pixelmap_ptr_t pixelMap)
     }
     return image;
 }
- 
+
 int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg)
 {
-    if (cfg.style == MOUSE_ICON::LOADING) {
+    if (cfg.style_ == MOUSE_ICON::LOADING) {
         auto loadingImg = FindImg(cfg);
         if (loadingImg == nullptr) {
             loadingImg = LoadPointerImage(cfg);
@@ -355,9 +352,9 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
         canvas.DrawImage(*loadingImg, cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
     } else {
         RenderConfig runingLCfg = cfg;
-        runingLCfg.style = MOUSE_ICON::RUNNING_LEFT;
-        runingLCfg.align = ANGLE_NW;
-        runingLCfg.path = IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg";
+        runingLCfg.style_ = MOUSE_ICON::RUNNING_LEFT;
+        runingLCfg.align_ = ANGLE_NW;
+        runingLCfg.path_ = IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg";
         auto runningImgLeft = FindImg(runingLCfg);
         if (runningImgLeft == nullptr) {
             runningImgLeft = LoadPointerImage(runingLCfg);
@@ -367,11 +364,11 @@ int32_t PointerRenderer::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const R
         CHKPR(runningImgLeft, RET_ERR);
         canvas.DrawImage(*runningImgLeft, runingLCfg.GetOffsetX(), runingLCfg.GetOffsetY(),
             Rosen::Drawing::SamplingOptions());
-        
+
         RenderConfig runingRCfg = cfg;
-        runingRCfg.style = MOUSE_ICON::RUNNING_RIGHT;
-        runingRCfg.align = ANGLE_NW;
-        runingRCfg.path = IMAGE_POINTER_DEFAULT_PATH + "Loading_Right.svg";
+        runingRCfg.style_ = MOUSE_ICON::RUNNING_RIGHT;
+        runingRCfg.align_ = ANGLE_NW;
+        runingRCfg.path_ = IMAGE_POINTER_DEFAULT_PATH + "Loading_Right.svg";
         auto runningImgRight = FindImg(runingRCfg);
         if (runningImgRight == nullptr) {
             runningImgRight = LoadPointerImage(runingRCfg);
@@ -390,7 +387,7 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
 {
     CHKPR(addr, RET_ERR);
     uint32_t addrSize = width * height * RENDER_STRIDE;
-    if (cfg.style == MOUSE_ICON::TRANSPARENT_ICON) {
+    if (cfg.style_ == MOUSE_ICON::TRANSPARENT_ICON) {
         memset_s(addr, addrSize, 0, addrSize);
         return RET_OK;
     }
@@ -399,7 +396,7 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(width, height, format);
-    
+
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
@@ -410,21 +407,21 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
     OHOS::Rosen::Drawing::scalar penWidth = 1;
     pen.SetWidth(penWidth);
     canvas.AttachPen(pen);
-    
+
     OHOS::Rosen::Drawing::Brush brush;
     brush.SetColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
     canvas.DrawBackground(brush);
- 
+
     if (cfg.direction) {
         int32_t directionFlag = cfg.isHard ? -1 : 0;
         int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
         canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
     }
- 
+
     if (DrawImage(canvas, cfg) != RET_OK) {
         return RET_ERR;
     }
-    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
+    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), bitmap.ComputeByteSize());
     if (ret != EOK) {
         return RET_ERR;
     }

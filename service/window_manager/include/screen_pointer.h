@@ -17,9 +17,10 @@
 #define SCREEN_POINTER_H
 
 #include "screen_info.h"
+
 #include "hardware_cursor_pointer_manager.h"
-#include "window_info.h"
 #include "pointer_renderer.h"
+#include "window_info.h"
 
 namespace OHOS::MMI {
 using hwcmgr_ptr_t = std::shared_ptr<HardwareCursorPointerManager>;
@@ -57,7 +58,7 @@ public:
     {
         return screenId_;
     }
-    
+
     uint32_t GetScreenWidth() const
     {
         return width_;
@@ -112,7 +113,7 @@ public:
         return offRenderScale_;
     }
 
-    float GetScreenRealDPI() const
+    int32_t GetScreenRealDPI() const
     {
         return screenRealDPI_;
     }
