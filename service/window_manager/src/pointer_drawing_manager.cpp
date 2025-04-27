@@ -3834,5 +3834,10 @@ void PointerDrawingManager::SetSurfaceNode(std::shared_ptr<Rosen::RSSurfaceNode>
     std::unique_lock<std::mutex> lockGuard(surfaceNodeMutex_);
     surfaceNode_ = ptr;
 }
+
+DisplayInfo PointerDrawingManager::GetCurrentDisplayInfo()
+{
+    return displayInfo_;
+}
 } // namespace MMI
 } // namespace OHOS

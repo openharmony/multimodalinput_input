@@ -1635,7 +1635,6 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         lastPointerEventforWindowChangeMap_[displayGroupInfo.groupId] = lastPointerEventforWindowChange_;
         displayModeMap_[displayGroupInfo.groupId] = displayMode_;
         windowsHotAreasMap_[displayGroupInfo.groupId] = windowsHotAreas_;
-        lastDpiMap_[displayGroupInfo.groupId] = lastDpi_;
     }
 
     DisplayGroupInfo &curDisplayGroupInfo = displayGroupInfoMap_[displayGroupInfo.groupId];
@@ -1711,13 +1710,8 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
-    if (curDisplayGroupInfo.displaysInfo.empty()) {
-        lastDpiMap_[groupId] = DEFAULT_DPI;
-    } else {
-        lastDpiMap_[groupId] = curDisplayGroupInfo.displaysInfo[0].dpi;
-    }
-    if (INPUT_DEV_MGR->HasPointerDevice() && pointerDrawFlagMap_[groupId]) {
-        NotifyPointerToWindow(groupId);
+    if (INPUT_DEV_MGR->HasPointerDevice() && pointerDrawFlag_) {
+        NotifyPointerToWindow();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1855,9 +1849,9 @@ void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
 void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
     bool isDisplayRemoved)
 {
+    auto currentDisplayInfo = IPointerDrawingManager::GetInstance()->GetCurrentDisplayInfo();
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
     int32_t groupId = displayGroupInfo.groupId;
-    int32_t newDpi = 0;
     int32_t newId = 0;
     {
         std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
@@ -1867,21 +1861,25 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
                 MMI_HILOGE("DisplayGroup is empty.");
                 return;
             }
-            newDpi = iter->second.displaysInfo[0].dpi;
             newId = iter->second.displaysInfo[0].id;
         } else {
             if (displayGroupInfo_.displaysInfo.empty()) {
                 MMI_HILOGE("DisplayGroup is empty.");
                 return;
             }
-            newDpi = displayGroupInfo_.displaysInfo[0].dpi;
             newId = displayGroupInfo_.displaysInfo[0].id;
         }
     }
-    if (lastDpiMap_[groupId] != DEFAULT_DPI && lastDpiMap_[groupId] != newDpi) {
-        auto drawNewDpiRes = IPointerDrawingManager::GetInstance()->DrawNewDpiPointer();
-        if (drawNewDpiRes != RET_OK) {
-            MMI_HILOGE("Draw New Dpi pointer failed.");
+    for (auto displayInfo : displayGroupInfo.displaysInfo) {
+        if (displayInfo.uniqueId == currentDisplayInfo.uniqueId && displayInfo.dpi != currentDisplayInfo.dpi) {
+            MMI_HILOGD("dpi changed, current displayId: %{public}d, dpi: %{public}d, "
+            "latest displayId: %{public}d, dpi: %{public}d",
+            currentDisplayInfo.uniqueId, currentDisplayInfo.dpi, displayInfo.uniqueId, displayInfo.dpi);
+            auto drawNewDpiRes = IPointerDrawingManager::GetInstance()->DrawNewDpiPointer();
+            if (drawNewDpiRes != RET_OK) {
+                MMI_HILOGE("Draw New Dpi pointer failed.");
+            }
+            break;
         }
     }
     auto lastPointerEventCopy = GetlastPointerEvent();
