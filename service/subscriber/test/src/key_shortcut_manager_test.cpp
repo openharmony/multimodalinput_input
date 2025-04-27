@@ -34,7 +34,6 @@ constexpr int32_t TWICE_LONG_PRESS_TIME { DEFAULT_LONG_PRESS_TIME + DEFAULT_LONG
 constexpr int32_t BASE_SHORTCUT_ID { 1 };
 constexpr int32_t DEFAULT_SAMPLING_PERIOD { 8 }; // 8ms
 }
-
 using namespace testing;
 using namespace testing::ext;
 
@@ -1966,6 +1965,223 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_IsValid, TestSize.Level1
         KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP };
     bool ret = shortcutMgr.IsValid(triggerType);
     EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_RegisterHotKey_01
+ * @tc.desc: Test the funcation RegisterHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RegisterHotKey_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::HotKey globalKey1 {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_META_LEFT },
+        .finalKey = KeyEvent::KEYCODE_M,
+        .session = 1,
+    };
+    KeyShortcutManager shortcutMgr;
+    int32_t result = shortcutMgr.RegisterHotKey(globalKey1);
+    KeyShortcutManager::HotKey globalKey2 {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_META_LEFT },
+        .finalKey = KeyEvent::KEYCODE_M,
+        .session = 2,
+    };
+    result = shortcutMgr.RegisterHotKey(globalKey2);
+    EXPECT_FALSE(result >= BASE_SHORTCUT_ID);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_RegisterHotKey_02
+ * @tc.desc: Test the funcation RegisterHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RegisterHotKey_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::HotKey validKey {
+        .modifiers = { KeyEvent::KEYCODE_F1 },
+        .finalKey = 10,
+        .session = 1,
+    };
+    KeyShortcutManager shortcutMgr;
+    int32_t result = shortcutMgr.RegisterHotKey(validKey);
+    ASSERT_EQ(result, KEY_SHORTCUT_ERROR_COMBINATION_KEY);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKeys
+ * @tc.desc: Test the funcation RegisterHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKeys, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager manager;
+    std::string cfgPath = "not a json string";
+    ASSERT_NO_FATAL_FAILURE(manager.ReadSystemKeys(cfgPath));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_AddHotkey
+ * @tc.desc: Test the funcation AddHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_AddHotkey, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyOption shortcut;
+    std::set<int32_t> preKeys;
+    preKeys.insert(1);
+    preKeys.insert(2);
+    preKeys.insert(3);
+    preKeys.insert(4);
+    preKeys.insert(5);
+    int32_t finalKey = KeyEvent::KEYCODE_M;
+    shortcut.SetPreKeys(preKeys);
+    shortcut.SetFinalKey(KeyEvent::KEYCODE_M);
+    auto result = shortcutMgr.AddHotkey(preKeys, finalKey);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKey_004
+ * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON* jsonSysKey = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToObject(jsonSysKey, "preKey", preKey);
+
+    int32_t ret = shortcutMgr.ReadSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKey_005
+ * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonSysKey, "keyDownDuration", 1);
+    int32_t ret = shortcutMgr.ReadSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_AddSystemKey_001
+ * @tc.desc: Test the funcation AddSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_AddSystemKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::set<int32_t> preKeys;
+    preKeys.insert(1);
+    preKeys.insert(2);
+    preKeys.insert(3);
+    preKeys.insert(4);
+    preKeys.insert(5);
+    int32_t finalKey = KeyEvent::KEYCODE_M;
+    auto result = shortcutMgr.AddSystemKey(preKeys, finalKey);
+    EXPECT_EQ(result, KEY_SHORTCUT_ERROR_COMBINATION_KEY);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKeys_001
+ * @tc.desc: Test the funcation ReadExceptionalSystemKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+
+    cJSON* root = cJSON_CreateObject();
+    cJSON* sysKeys = cJSON_CreateArray();
+
+    // 构造缺失必要字段的对象
+    cJSON* invalidItem1 = cJSON_CreateObject();
+    cJSON_AddStringToObject(invalidItem1, "action", "disable");
+
+    // 构造包含错误类型字段的对象
+    cJSON* invalidItem2 = cJSON_CreateObject();
+    cJSON_AddStringToObject(invalidItem2, "keyCode", "invalid_number");
+
+    cJSON_AddItemToArray(sysKeys, invalidItem1);
+    cJSON_AddItemToArray(sysKeys, invalidItem2);
+    cJSON_AddItemToObject(root, "ExceptionalSystemKeys", sysKeys);
+    ASSERT_NO_FATAL_FAILURE(shortcutMgr.ReadExceptionalSystemKeys("dummy_path"));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_006
+ * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcutMgr.shortcuts_[1] = shortcut;
+    for (int i = 0; i < 5; ++i) {
+        cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
+    }
+    cJSON_AddItemToObject(jsonSysKey, "triggerType", preKey);
+    int32_t ret = shortcutMgr.ReadExceptionalSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_FormatModifiers
+ * @tc.desc: Test the funcation FormatModifiers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatModifiers, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::set<int32_t> modifiers;
+    modifiers.insert(KeyEvent::KEYCODE_CTRL_LEFT);
+    modifiers.insert(KeyEvent::KEYCODE_SHIFT_RIGHT);
+    modifiers.insert(KeyEvent::KEYCODE_ENTER);
+    modifiers.insert(KeyEvent::KEYCODE_ALT_LEFT);
+    modifiers.insert(KeyEvent::KEYCODE_ALT_RIGHT);
+    auto ret = shortcutMgr.FormatModifiers(modifiers) ;
+    EXPECT_EQ(ret, "2045,2046,2048,2054,...");
 }
 } // namespace MMI
 } // namespace OHOS
