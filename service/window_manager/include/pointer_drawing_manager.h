@@ -121,6 +121,7 @@ public:
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
     void SubscribeScreenModeChange() override;
+    DisplayInfo GetCurrentDisplayInfo() override;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
