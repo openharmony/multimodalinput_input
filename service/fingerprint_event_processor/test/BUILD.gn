@@ -60,11 +60,13 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "${mmi_path}/util/common/src/input_event_data_transformation.cpp",
     "${mmi_path}/util/network/src/stream_buffer.cpp",
     "src/fingerprint_event_processor_test.cpp",
+    "src/x_key_event_processor_test.cpp",
   ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
