@@ -105,6 +105,7 @@ private:
     void CheckGestureTrend(std::shared_ptr<PointerEvent> event) const;
     bool IsLastTouchUp(std::shared_ptr<PointerEvent> event) const;
     void OnGestureSendEvent(std::shared_ptr<PointerEvent> event) const;
+    std::string DumpTouches() const;
 
 private:
     std::set<int32_t> fingers_;
