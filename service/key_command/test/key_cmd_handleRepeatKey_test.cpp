@@ -63,11 +63,10 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -85,12 +84,11 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    bool isLaunched = false;
     handler.isDownStart_ = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 
     handler.isDownStart_ = true;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -111,8 +109,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     handler.isDownStart_ = true;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -135,8 +132,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     handler.count_ = 5;
     handler.maxCount_ = 0;
     handler.isDownStart_ = true;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -159,8 +155,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     handler.count_ = 0;
     handler.maxCount_ = 0;
     handler.isDownStart_ = true;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -180,8 +175,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     handler.isDownStart_ = true;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -201,8 +195,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     handler.isDownStart_ = true;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -225,8 +218,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     handler.isDownStart_ = true;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -249,8 +241,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     handler.isDownStart_ = true;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -275,8 +266,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.isDownStart_ = true;
     handler.downActionTime_ = 400000;
     handler.lastVolumeDownActionTime_ = 0;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -301,8 +291,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.isDownStart_ = true;
     handler.downActionTime_ = 0;
     handler.lastVolumeDownActionTime_ = 0;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -328,8 +317,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.isDownStart_ = true;
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -355,8 +343,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.isDownStart_ = true;
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -382,8 +369,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.isDownStart_ = true;
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -410,8 +396,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.isDownStart_ = true;
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -438,8 +423,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.isDownStart_ = true;
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -466,8 +450,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.isDownStart_ = true;
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -495,8 +478,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
     handler.repeatKeyMaxTimes_.clear();
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -524,8 +506,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_01
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 2);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -553,8 +534,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 2);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -582,8 +562,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.downActionTime_ = 10;
     handler.lastDownActionTime_ = 0;
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 3);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -615,8 +594,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.maxCount_ = 100;
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 3);
     handler.repeatKeyTimerIds_.emplace(repeatKey.ability.bundleName, 1);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -648,8 +626,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.maxCount_ = 100;
     handler.repeatKeyMaxTimes_.clear();
     handler.repeatKeyTimerIds_.clear();
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -681,8 +658,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.maxCount_ = 100;
     handler.repeatKeyMaxTimes_.clear();
     handler.repeatKeyTimerIds_.emplace(repeatKey.ability.bundleName, 1);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -714,8 +690,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.maxCount_ = 100;
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 3);
     handler.repeatKeyTimerIds_.clear();
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -746,8 +721,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.maxCount_ = 100;
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 4);
     handler.repeatKeyTimerIds_.emplace(repeatKey.ability.bundleName, 1);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -778,8 +752,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.maxCount_ = 100;
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 3);
     handler.repeatKeyTimerIds_.emplace(repeatKey.ability.bundleName, 1);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 
 /**
@@ -810,8 +783,7 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_02
     handler.maxCount_ = 100;
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 3);
     handler.repeatKeyTimerIds_.emplace(repeatKey.ability.bundleName, -1);
-    bool isLaunched = false;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
 }
 } // namespace MMI
 } // namespace OHOS
