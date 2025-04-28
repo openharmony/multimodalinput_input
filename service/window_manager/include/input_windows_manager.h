@@ -525,8 +525,6 @@ private:
     static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
-    int32_t lastDpi_ { 0 };
-    std::map<int32_t, int32_t> lastDpiMap_;
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
     std::mutex mtx_;
     std::atomic_bool isHPR_ { false };
