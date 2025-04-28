@@ -399,7 +399,7 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
     bool IsValidDisplayChange(const DisplayInfo &displayInfo);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = -1);
-    bool OnDisplayRemovedOrCombiantionChanged(const DisplayGroupInfo &displayGroupInfo);
+    bool OnDisplayRemovedOrCombinationChanged(const DisplayGroupInfo &displayGroupInfo);
     void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
     void ResetPointerPosition(const DisplayGroupInfo &displayGroupInfo);
     int32_t GetMainScreenDisplayInfo(const std::vector<DisplayInfo> &displaysInfo,

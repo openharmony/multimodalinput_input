@@ -6361,24 +6361,24 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateKeyEventDisplayI
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_OnDisplayRemovedOrCombiantionChanged_001
- * @tc.desc: Test the funcation OnDisplayRemovedOrCombiantionChanged
+ * @tc.name: InputWindowsManagerTest_OnDisplayRemovedOrCombinationChanged_001
+ * @tc.desc: Test the funcation OnDisplayRemovedOrCombinationChanged
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemovedOrCombiantionChanged_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemovedOrCombinationChanged_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     DisplayGroupInfo displayGroupInfo {};
-    bool ret = inputWindowsManager.OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
+    bool ret = inputWindowsManager.OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
     EXPECT_FALSE(ret);
 
     DisplayInfo info1 = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200};
     DisplayInfo info2 = {.id = 1, .x = 100, .y = 0, .width = 100, .height = 200};
     inputWindowsManager.displayGroupInfo_.displaysInfo = {info1, info2};
     displayGroupInfo.displaysInfo = {info2};
-    ret = inputWindowsManager.OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
+    ret = inputWindowsManager.OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
     EXPECT_TRUE(ret);
 }
 
@@ -6455,7 +6455,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_Poin
     displayGroupInfo.displaysInfo.push_back(displayInfo1);
 
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
-   
+
     displayGroupInfo.displaysInfo.erase(displayGroupInfo.displaysInfo.begin());
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
     CursorPosition pointerPos = WIN_MGR->GetCursorPos();
@@ -7265,7 +7265,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_010, TestS
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     int32_t id = 1;
     pointerEvent->SetTargetWindowId(id);
-    
+
     WindowInfo windowInfo1;
     windowInfo1.id = 1;
     windowInfo1.uiExtentionWindowInfo.push_back(windowInfo1);
@@ -7289,7 +7289,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_011, TestS
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     int32_t id = 2;
     pointerEvent->SetTargetWindowId(id);
-    
+
     WindowInfo windowInfo1;
     windowInfo1.id = 1;
     windowInfo1.uiExtentionWindowInfo.push_back(windowInfo1);
@@ -7604,7 +7604,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPositionIf
     displayInfo.width = 1920;
     displayInfo.height = 1080;
     displayGroupInfo.displaysInfo.push_back(displayInfo);
-    
+
     InputWindowsManager inputWindowsManager;
     inputWindowsManager.cursorPos_.displayId = 1;
     inputWindowsManager.cursorPos_.cursorPos.x = -1;
@@ -7680,7 +7680,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPositionOutValidDisp
     // isOut = false, isChange = true, currentDisplay.fixedDirection = DIRECTION270
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.IsPositionOutValidDisplay(position, displayInfo, isPhysicalPos));
 }
- 
+
 /**
  * @tc.name: InputWindowsManagerTest_CancelTouchScreenEventIfValidDisplayChange_001
  * @tc.desc: Test if (lastPointerEventforGesture_->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN)
