@@ -90,7 +90,7 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
     int32_t eventType = libinput_event_get_type(lpEvent);
     int64_t beginTime = GetSysClockTime();
     lastEventBeginTime_ = beginTime;
-    MMI_HILOGE("zhf###01 Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
+    MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     
     UpdateDwtRecord(lpEvent);
@@ -106,7 +106,7 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
         MMI_HILOGE("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
     }
-    MMI_HILOGE("zhf###02 Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
+    MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
