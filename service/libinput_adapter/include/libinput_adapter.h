@@ -37,6 +37,7 @@ typedef std::function<void()> ClearKeyMessage;
 typedef std::function<void(const std::string &keyName)> HardwareKeyEventDetected;
 typedef std::function<int32_t()> GetKeyboardActivationState;
 typedef std::function<bool()> IsFloatingKeyboard;
+typedef std::function<bool()> IsVKeyboardShown;
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 enum VTPSwipeStateType {
@@ -117,7 +118,8 @@ public:
         ClearKeyMessage clearKeyMessage,
         HardwareKeyEventDetected hardwareKeyEventDetected,
         GetKeyboardActivationState getKeyboardActivationState,
-        IsFloatingKeyboard isFloatingKeyboard
+        IsFloatingKeyboard isFloatingKeyboard,
+        IsVKeyboardShown isVKeyboardShown
         );
 
 private:
@@ -131,6 +133,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void HandleVFullKeyboardMessages(
         libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch);
+    bool IsVKeyboardActivationDropEvent(libinput_event_touch* touch, libinput_event_type eventType);
     void HandleVKeyTouchpadMessages(libinput_event_touch* touch);
     void OnVKeyTrackPadMessage(libinput_event_touch* touch,
         const std::vector<std::vector<int32_t>>& msgList);
@@ -202,6 +205,7 @@ private:
     bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, int32_t keyCode);
     void StartVKeyboardDelayTimer(int32_t delayMs);
     bool GetIsCaptureMode();
+    void UpdateBootFlag();
     VTPSwipeStateType vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
 
     libinput_event *vkbDelayedEvent_ = nullptr;
@@ -223,11 +227,11 @@ private:
     HardwareKeyEventDetected hardwareKeyEventDetected_ { nullptr };
     GetKeyboardActivationState getKeyboardActivationState_ { nullptr };
     IsFloatingKeyboard isFloatingKeyboard_ { nullptr };
+    IsVKeyboardShown isVKeyboardShown_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
     std::unordered_map<int32_t, double> touchPointPressureCache_;
-    std::unordered_map<int32_t, bool> skipTouchMoveCache_;
 
     HotplugDetector hotplugDetector_;
     std::unordered_map<std::string, libinput_device*> devices_;
