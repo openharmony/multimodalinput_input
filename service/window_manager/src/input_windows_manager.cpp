@@ -4598,6 +4598,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) && item.windowType == SCREEN_CONTROL_WINDOW_TYPE) {
             continue;
         }
+        
         bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
             ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
             pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
