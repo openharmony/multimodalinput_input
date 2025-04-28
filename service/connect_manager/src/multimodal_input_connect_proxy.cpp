@@ -1813,7 +1813,6 @@ int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData& extraData)
     for (const auto &item : extraData.buffer) {
         WRITEUINT8(data, item);
     }
-    WRITEINT32(data, extraData.toolType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pointerId, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pullId, ERR_INVALID_VALUE);
