@@ -1782,7 +1782,7 @@ int32_t MMIService::InjectTouchPadEvent(const std::shared_ptr<PointerEvent> poin
     return RET_OK;
 }
 
-#if defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
+#ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     int sleepSeconds = 1;
@@ -1805,18 +1805,22 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+    sleep(sleepSeconds);
+#ifdef OHOS_BUILD_PC_PRIORITY
+    SetMmiServicePriority(tid);
+#endif // OHOS_BUILD_PC_PRIORITY
 }
-#endif // defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
+#endif // OHOS_RSS_CLIENT
 
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
     MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);
-#if defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
+#ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         OnAddResSchedSystemAbility(systemAbilityId, deviceId);
     }
-#endif // defined(OHOS_RSS_CLIENT) && !defined(OHOS_BUILD_PC_PRIORITY)
+#endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         isCesStart_ = true;
@@ -2299,7 +2303,7 @@ void MMIService::OnThread()
     delegateTasks_.SetWorkerThreadId(tid);
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 #ifdef OHOS_BUILD_PC_PRIORITY
-    SetMmiServicePriority();
+    SetMmiServicePriority(0);
 #endif // OHOS_BUILD_PC_PRIORITY
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
@@ -2347,11 +2351,11 @@ void MMIService::OnThread()
 }
 
 #ifdef OHOS_BUILD_PC_PRIORITY
-void MMIService::SetMmiServicePriority()
+void MMIService::SetMmiServicePriority(int32_t tid)
 {
     struct sched_param param = {0};
     param.sched_priority = PC_PRIORITY;
-    int32_t schRet = sched_setscheduler(0, SCHED_FIFO, &param);
+    int32_t schRet = sched_setscheduler(tid, SCHED_FIFO, &param);
     if (schRet != 0) {
         MMI_HILOGE("mmi_service Couldn't set SCHED_FIFO, schRet:%{public}d", schRet);
     } else {
