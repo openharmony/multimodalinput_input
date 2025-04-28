@@ -4891,7 +4891,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         pointerEvent->SetBuffer(extraData_.buffer);
         pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
-        PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
+        if (pointerAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW &&
+            pointerAction != PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
+            PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
+        }
     }
     isHPR_ = PRODUCT_TYPE_HPR == DEVICE_TYPE_HPR;
     if (isHPR_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
@@ -5140,6 +5143,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     currentPointerItem.SetWindowYPos(static_cast<double>(windowY));
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+    currentPointerItem.SetPressed(lastPointerItem.IsPressed());
     currentPointerItem.SetPointerId(lastPointerId);
 
     pointerEvent->UpdateId();
@@ -5158,6 +5162,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
     pointerEvent->SetDeviceId(lastTouchEvent_->GetDeviceId());
+    if (lastTouchEvent_->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    }
 
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
     auto filter = InputHandler->GetFilterHandler();
