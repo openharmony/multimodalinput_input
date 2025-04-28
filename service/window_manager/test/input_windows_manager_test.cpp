@@ -8632,7 +8632,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerO
     displayInfo.dpi++;
     displayInfo.x = 300;
     displayInfo.y = 300;
-    inputWindowsManager->lastDpi_ = displayInfo.dpi + 1;
     inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));

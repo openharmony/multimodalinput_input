@@ -139,6 +139,10 @@ public:
     {
         return 0;
     }
+    virtual DisplayInfo GetCurrentDisplayInfo()
+    {
+        return {};
+    }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual int32_t GetPointerSnapshot(void *pixelMapPtr)
     {
