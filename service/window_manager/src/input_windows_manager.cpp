@@ -1660,7 +1660,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    bool isDisplayChanged = OnDisplayRemovedOrCombiantionChanged(displayGroupInfo);
+    bool isDisplayChanged = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     {
         std::lock_guard<std::mutex> lock(tmpInfoMutex_);
@@ -4335,6 +4335,11 @@ void InputWindowsManager::UpdateDisplayXYInOneHandMode(double &physicalX, double
 {
     double virtualY = physicalY - displayInfo.oneHandY;
     double virtualX = physicalX - displayInfo.oneHandX;
+
+    if (oneHandScale == 0) {
+        MMI_HILOGE("The divisor cannot be 0");
+        return;
+    }
     physicalX = virtualX / oneHandScale;
     physicalY = virtualY / oneHandScale;
 }
@@ -6466,7 +6471,7 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
     }
 }
 
-bool InputWindowsManager::OnDisplayRemovedOrCombiantionChanged(const DisplayGroupInfo &displayGroupInfo)
+bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const DisplayGroupInfo &displayGroupInfo)
 {
     auto displaysInfoVector = GetDisplayInfoVector(displayGroupInfo.groupId);
     if (displayGroupInfo.displaysInfo.empty() || displaysInfoVector.empty()) {

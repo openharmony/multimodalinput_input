@@ -38,8 +38,6 @@ constexpr int32_t DEFAULT_CURSOR_SIZE{512};
 constexpr uint32_t FOCUS_POINT = DEFAULT_CURSOR_SIZE / NUM_TWO;
 constexpr int32_t BUFFER_TIMEOUT{150};
 constexpr int32_t STRIDE_ALIGNMENT{8};
-constexpr float CALCULATE_MOUSE_ICON_BIAS{5.0f};
-constexpr float INCREASE_RATIO{1.22f};
 constexpr uint32_t RENDER_STRIDE{4};
 
 uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
@@ -131,7 +129,7 @@ bool ScreenPointer::InitSurface()
     surfaceNodeConfig.SurfaceNodeName = RS_SURFACE_NODE_NAME;
     surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, Rosen::RSSurfaceNodeType::CURSOR_NODE);
     CHKPF(surfaceNode_);
-    MMI_HILOGE("SurfaceNode::Create success");
+    MMI_HILOGI("SurfaceNode::Create success");
 
     // set soft cursor buffer size
     auto surface = surfaceNode_->GetSurface();
@@ -166,6 +164,7 @@ bool ScreenPointer::InitSurface()
 
 void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
 {
+    CHKPV(si);
     auto id = si->GetRsId();
     if (screenId_ != id) {
         surfaceNode_->AttachToDisplay(id);
@@ -199,8 +198,12 @@ void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
     if (isCurrentOffScreenRendering_) {
         screenRealDPI_ = di.screenRealDPI;
+        if (di.width == 0) {
+            MMI_HILOGE("The divisor cannot be 0");
+            return;
+        }
         offRenderScale_ = float(di.screenRealWidth) / di.width;
-        MMI_HILOGD("Update with DisplayInfo, screenRealDPI=%{public}u, offRenderScale_=(%{public}f ",
+        MMI_HILOGD("Update with DisplayInfo, screenRealDPI=%{public}d, offRenderScale_=(%{public}f ",
             screenRealDPI_, offRenderScale_);
     }
 }
@@ -240,7 +243,7 @@ sptr<OHOS::SurfaceBuffer> ScreenPointer::RequestBuffer()
 
     bufferId_++;
     bufferId_ %= buffers_.size();
-    
+
     return buffers_[bufferId_];
 }
 
@@ -267,7 +270,7 @@ void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y)
     if (IsMirror() && (rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
         std::swap(width, height);
     }
- 
+
     if (rotation == rotation_t(DIRECTION90)) {
         x = height - tmpY;
         y = tmpX;
@@ -285,11 +288,11 @@ void ScreenPointer::CalculateHwcPositionForMirror(int32_t& x, int32_t& y)
     x = x * scale_;
     y = y * scale_;
     Rotate(rotation_, x, y);
- 
+
     x += paddingLeft_;
     y += paddingTop_;
 }
- 
+
 void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
 {
     x = x * offRenderScale_;
@@ -350,7 +353,7 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     } else {
         surfaceNode_->SetBounds(px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     }
-    
+
     return true;
 }
 
@@ -358,7 +361,7 @@ bool ScreenPointer::SetInvisible()
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
-    
+
     auto buffer = RequestBuffer();
     CHKPF(buffer);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
