@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -4620,13 +4620,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             winMap.insert({item.id, item});
             continue;
         }
-        if (transparentWins_.find(item.id) != transparentWins_.end()) {
-            if (IsTransparentWin(transparentWins_[item.id], logicalX - item.area.x, logicalY - item.area.y)) {
-                MMI_HILOG_DISPATCHE("It's an abnormal window and touchscreen find the next window");
-                winMap.insert({item.id, item});
-                continue;
-            }
-        }
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
             winMap.insert({item.id, item});
             continue;
@@ -4655,6 +4648,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         checkToolType = checkToolType || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
         if (checkToolType) {
             MMI_HILOG_DISPATCHD("Enter checkToolType");
+            if (transparentWins_.find(item.id) != transparentWins_.end()) {
+                if (IsTransparentWin(transparentWins_[item.id], logicalX - item.area.x, logicalY - item.area.y)) {
+                    MMI_HILOG_DISPATCHE("It's an abnormal window:%{public}d and touchscreen find the next window",
+                        item.id);
+                    winMap.insert({item.id, item});
+                    continue;
+                }
+            }
             if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
                 item.defaultHotAreas, item)) {
                 if (item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
@@ -4687,6 +4688,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
         } else if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
             item.defaultHotAreas, item)) {
+            if (transparentWins_.find(item.id) != transparentWins_.end()) {
+                if (IsTransparentWin(transparentWins_[item.id], logicalX - item.area.x, logicalY - item.area.y)) {
+                    MMI_HILOG_DISPATCHE("It's an abnormal window:%{public}d and touchscreen find the next window",
+                        item.id);
+                    winMap.insert({item.id, item});
+                    continue;
+                }
+            }
             touchWindow = &item;
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
@@ -5140,9 +5149,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
             pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
         }
     }
-    currentPointerItem.SetWindowX(windowY);
+    currentPointerItem.SetWindowX(windowX);
     currentPointerItem.SetWindowY(windowY);
-    currentPointerItem.SetWindowXPos(static_cast<double>(windowY));
+    currentPointerItem.SetWindowXPos(static_cast<double>(windowX));
     currentPointerItem.SetWindowYPos(static_cast<double>(windowY));
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
