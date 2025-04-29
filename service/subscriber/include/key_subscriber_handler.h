@@ -44,6 +44,7 @@ public:
     int32_t UnsubscribeHotkey(SessionPtr sess, int32_t subscribeId);
     void RemoveSubscriberKeyUpTimer(int32_t keyCode);
     int32_t EnableCombineKey(bool enable);
+    void ResetSkipPowerKeyUpFlag();
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
@@ -138,7 +139,7 @@ private:
     bool enableCombineKey_ { true };
     std::set<int32_t> foregroundPids_ {};
     bool isForegroundExits_ { false };
-    bool needSkipPowerKeyUp_ { false };
+    std::atomic_bool needSkipPowerKeyUp_ { false };
     bool callBahaviorState_ { false };
     std::set<int32_t> pendingKeys_;
 };

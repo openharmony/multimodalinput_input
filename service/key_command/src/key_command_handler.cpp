@@ -1679,6 +1679,11 @@ void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)
 bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
+    auto powerKeyLogger = [keyEvent, &item] () {
+        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+            MMI_HILOGI("Add ability, bundleName:%{public}s", item.ability.bundleName.c_str());
+        }
+    };
     CHKPF(keyEvent);
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
@@ -1700,6 +1705,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, const std::shared
         if (item.ability.bundleName != SOS_BUNDLE_NAME ||
             downActionTime_ - lastVolumeDownActionTime_ > SOS_INTERVAL_TIMES) {
             repeatKeyCountMap_.emplace(item.ability.bundleName, 1);
+            powerKeyLogger();
             return true;
         }
         return false;
@@ -1707,6 +1713,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, const std::shared
     HandleRepeatKeyOwnCount(item);
     lastDownActionTime_ = downActionTime_;
     if (repeatKeyCountMap_[item.ability.bundleName] == item.times) {
+        powerKeyLogger();
         if (!item.statusConfig.empty()) {
             bool statusValue = true;
             auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -1735,6 +1742,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, const std::shared
         if (count_ < repeatKeyMaxTimes_[item.keyCode] && repeatKeyTimerIds_[item.ability.bundleName] >= 0) {
             TimerMgr->RemoveTimer(repeatKeyTimerIds_[item.ability.bundleName]);
             repeatKeyTimerIds_.erase(item.ability.bundleName);
+            powerKeyLogger();
             return true;
         }
     }

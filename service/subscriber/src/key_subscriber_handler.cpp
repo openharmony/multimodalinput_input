@@ -446,6 +446,12 @@ int32_t KeySubscriberHandler::EnableCombineKey(bool enable)
     return RET_OK;
 }
 
+void KeySubscriberHandler::ResetSkipPowerKeyUpFlag()
+{
+    MMI_HILOGI("Reset needSkipPowerKeyUp when hang up.");
+    needSkipPowerKeyUp_ = false;
+}
+
 bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Is Funciton Key In");
@@ -635,6 +641,11 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
+    auto powerKeyLogger = [keyEvent] (const std::string &log) {
+        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+            MMI_HILOGI("Power key, action:%{public}d; %{public}s", keyEvent->GetKeyAction(), log.c_str());
+        }
+    };
     CHKPF(keyEvent);
     if (HandleRingMute(keyEvent)) {
         MMI_HILOGI("Mute Ring in subscribe keyEvent");
@@ -651,17 +662,20 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     }
     if (keyGestureMgr_.Intercept(keyEvent)) {
         MMI_HILOGD("Key gesture recognized");
+        powerKeyLogger("keyGestureMgr::Intercept");
         return true;
     }
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     if (KEY_MONITOR_MGR->Intercept(keyEvent)) {
         MMI_HILOGD("Key monitor intercept (KC:%{private}d, KA:%{public}d)",
             keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        powerKeyLogger("KEY_MONITOR_MGR::Intercept");
         return true;
     }
 #endif // #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     if (IsRepeatedKeyEvent(keyEvent)) {
         MMI_HILOGD("Repeat KeyEvent, skip");
+        powerKeyLogger("IsRepeatedKeyEvent");
         return true;
     }
     return ProcessKeyEvent(keyEvent);
@@ -679,7 +693,7 @@ bool KeySubscriberHandler::ProcessKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
         && keyAction == KeyEvent::KEY_ACTION_UP) {
-        MMI_HILOGD("Skip power key up");
+        MMI_HILOGI("Skip power key up");
         needSkipPowerKeyUp_ = false;
         return true;
     }

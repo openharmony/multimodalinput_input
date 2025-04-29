@@ -104,6 +104,11 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
         hasHandleRingMute_ = false;
     }
     callState_ = callState;
+    if (callState_ == StateType::CALL_STATUS_DISCONNECTED) {
+        auto subscriberHandler = InputHandler->GetSubscriberHandler();
+        CHKPV(subscriberHandler);
+        subscriberHandler->ResetSkipPowerKeyUpFlag();
+    }
 }
 
 int32_t DeviceEventMonitor::GetCallState()
