@@ -296,7 +296,8 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     ClearKeyMessage clearKeyMessage,
     HardwareKeyEventDetected hardwareKeyEventDetected,
     GetKeyboardActivationState getKeyboardActivationState,
-    IsFloatingKeyboard isFloatingKeyboard)
+    IsFloatingKeyboard isFloatingKeyboard,
+    IsVKeyboardShown isVKeyboardShown)
 {
     handleTouchPoint_ = handleTouchPoint;
     getMessage_ = getMessage;
@@ -307,6 +308,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     hardwareKeyEventDetected_ = hardwareKeyEventDetected;
     getKeyboardActivationState_ = getKeyboardActivationState;
     isFloatingKeyboard_ = isFloatingKeyboard;
+    isVKeyboardShown_ = isVKeyboardShown;
 
     // init touch device Id.
     deviceId = -1;
@@ -1603,27 +1605,58 @@ double LibinputAdapter::GetAccumulatedPressure(int touchId, int32_t eventType, d
     return accumulatedPressure;
 }
 
-bool LibinputAdapter::SkipTouchMove(int touchId, int32_t eventType)
+bool LibinputAdapter::IsVKeyboardActivationDropEvent(libinput_event_touch* touch, libinput_event_type eventType)
 {
-    if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
-        skipTouchMoveCache_[touchId] = true;
-    } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
-        auto pos = skipTouchMoveCache_.find(touchId);
-        if (pos != skipTouchMoveCache_.end()) {
-            skipTouchMoveCache_.erase(pos);
-        }
-    } else if (eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
-        auto pos = skipTouchMoveCache_.find(touchId);
-        if (pos != skipTouchMoveCache_.end()) {
-            return pos->second;
-        }
-    } else if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
-        auto pos = skipTouchMoveCache_.find(touchId);
-        if (pos != skipTouchMoveCache_.end()) {
-            skipTouchMoveCache_[touchId] = !pos->second;
+    bool bDropEventFlag = false;
+    if (getKeyboardActivationState_ != nullptr) {
+        VKeyboardActivation activateState = (VKeyboardActivation)getKeyboardActivationState_();
+        switch (activateState) {
+            case VKeyboardActivation::INACTIVE: {
+                break;
+            }
+            case VKeyboardActivation::ACTIVATED: {
+                MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
+                break;
+            }
+            case VKeyboardActivation::TOUCH_CANCEL: {
+                MMI_HILOGI(
+                    "activation state: %{public}d, sending touch cancel event", static_cast<int32_t>(activateState));
+                if (eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
+                    libinput_set_touch_event_type(touch, LIBINPUT_EVENT_TOUCH_CANCEL);
+                }
+                if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
+                    bDropEventFlag = true;
+                }
+                break;
+            }
+            case VKeyboardActivation::TOUCH_DROP: {
+                MMI_HILOGI("activation state: %{public}d, dropping event", static_cast<int32_t>(activateState));
+                if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
+                    bDropEventFlag = true;
+                }
+                break;
+            }
+            case VKeyboardActivation::EIGHT_FINGERS_UP: {
+                MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
+                break;
+            }
+            default:
+                break;
         }
     }
-    return false;
+    return bDropEventFlag;
+}
+
+void LibinputAdapter::UpdateBootFlag()
+{
+    if (!isBootCompleted_ && isVKeyboardShown_ != nullptr) {
+        isBootCompleted_ = isVKeyboardShown_();
+        if (isBootCompleted_) {
+            MMI_HILOGI("backend booted from outside (mainly due to process restart)=%{public}d",
+                static_cast<int32_t>(isBootCompleted_));
+        }
+    }
+    // could also check SA status here.
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
@@ -1668,6 +1701,9 @@ void LibinputAdapter::OnEventHandler()
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
         static int32_t downCount = 0;
+
+        // confirm boot completed msg in case of mmi restart.
+        UpdateBootFlag();
 
         // add the logic of screen capture window conuming touch point in high priority
         bool isCaptureMode = GetIsCaptureMode();
@@ -1733,46 +1769,7 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                 MMI_HILOGD("Inside vkeyboard area");
                 HandleVFullKeyboardMessages(event, frameTime, eventType, touch);
             } else {
-                bool bDropEventFlag = false;
-
-                if (getKeyboardActivationState_ != nullptr) {
-                    VKeyboardActivation activateState = (VKeyboardActivation)getKeyboardActivationState_();
-                    switch (activateState) {
-                        case VKeyboardActivation::INACTIVE : {
-                            break;
-                        }
-                        case VKeyboardActivation::ACTIVATED : {
-                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
-                            break;
-                        }
-                        case VKeyboardActivation::TOUCH_CANCEL : {
-                            MMI_HILOGI("activation state: %{public}d, sending touch cancel event",
-                                static_cast<int32_t>(activateState));
-                            if (eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
-                                libinput_set_touch_event_type(touch, LIBINPUT_EVENT_TOUCH_CANCEL);
-                            }
-                            if (eventType == LIBINPUT_EVENT_TOUCH_DOWN) {
-                                bDropEventFlag = true;
-                            }
-                            break;
-                        }
-                        case VKeyboardActivation::TOUCH_DROP : {
-                            MMI_HILOGI("activation state: %{public}d, dropping event",
-                                static_cast<int32_t>(activateState));
-                            if (eventType != LIBINPUT_EVENT_TOUCH_UP) {
-                                bDropEventFlag = true;
-                            }
-                            break;
-                        }
-                        case VKeyboardActivation::EIGHT_FINGERS_UP : {
-                            MMI_HILOGI("activation state: %{public}d", static_cast<int32_t>(activateState));
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-
+                bool bDropEventFlag = IsVKeyboardActivationDropEvent(touch, eventType);
                 if (!bDropEventFlag) {
                     funInputEvent_(event, frameTime);
                 }
