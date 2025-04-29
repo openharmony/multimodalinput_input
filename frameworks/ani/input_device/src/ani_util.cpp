@@ -18,7 +18,6 @@
 #include <unordered_map>
 #include <linux/input.h>
 
-#include "event_handler.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 
@@ -42,6 +41,27 @@ AniUtil::DeviceType g_deviceType[] = {
     { "trackball", EVDEV_UDEV_TAG_TRACKBALL },
 };
 } // namespace
+
+bool AniUtil::CallbackInfo::SetCallback(ani_object handle)
+{
+    if (ANI_OK != env_->GlobalReference_Create(handle, &callback_)) {
+        MMI_HILOGE("%{public}s: Create global callback failed", __func__);
+        return false;
+    }
+    return true;
+}
+
+AniUtil::CallbackInfo::~CallbackInfo()
+{
+    CALL_DEBUG_ENTER;
+    if (env_ == nullptr) {
+        return;
+    }
+    if (callback_ != nullptr) {
+        env_->GlobalReference_Delete(callback_);
+    }
+    callback_ = nullptr;
+}
 
 bool AniUtil::IsSameHandle(ani_env *env, ani_ref handle, ani_env *iterEnv, ani_ref iterhandle)
 {
@@ -77,24 +97,6 @@ ani_boolean AniUtil::IsInstanceOf(ani_env *env, const std::string &cls_name, ani
     ani_boolean ret;
     env->Object_InstanceOf(obj, cls, &ret);
     return ret;
-}
-
-bool AniUtil::SendEventToMainThread(const std::function<void()> func)
-{
-    CALL_DEBUG_ENTER;
-    if (func == nullptr) {
-        MMI_HILOGE("%{public}s: func == nullptr", __func__);
-        return false;
-    }
-    std::shared_ptr<OHOS::AppExecFwk::EventRunner> runner = OHOS::AppExecFwk::EventRunner::GetMainEventRunner();
-    if (!runner) {
-        MMI_HILOGE("%{public}s: runner == nullptr", __func__);
-        return false;
-    }
-    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner);
-    handler->PostTask(func, "", 0, OHOS::AppExecFwk::EventQueue::Priority::HIGH, {});
-    MMI_HILOGD("%{public}s: PostTask success", __func__);
-    return true;
 }
 
 ani_object AniUtil::CreateAniObject(ani_env *env, const char *nsName, const char *className)
