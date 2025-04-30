@@ -2794,9 +2794,7 @@ void InputManagerImpl::UnsubscribeInputActive(int32_t subscribeId)
 int32_t InputManagerImpl::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
-    MMI_HILOGD("start");
     CALL_DEBUG_ENTER;
-    CHKPR(consumer, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
