@@ -1048,7 +1048,6 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
 
 int32_t MultimodalInputConnectProxy::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
 {
-    MMI_HILOGD("start");
     CALL_DEBUG_ENTER;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
@@ -1073,7 +1072,6 @@ int32_t MultimodalInputConnectProxy::SetInputDeviceConsumer(const std::vector<st
 
 int32_t MultimodalInputConnectProxy::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
 {
-    MMI_HILOGD("start");
     CALL_DEBUG_ENTER;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
