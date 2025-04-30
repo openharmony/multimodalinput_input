@@ -31,7 +31,6 @@ namespace MMI {
 int32_t InputDeviceConsumerHandler::SetDeviceConsumerHandler(const std::vector<std::string>& deviceNames,
     SessionPtr sess)
 {
-    MMI_HILOGD("start");
     CALL_INFO_TRACE;
     CHKPR(sess, ERROR_NULL_POINTER);
     for (auto& name : deviceNames) {
@@ -55,7 +54,6 @@ int32_t InputDeviceConsumerHandler::ClearDeviceConsumerHandler(const std::vector
 void InputDeviceConsumerHandler::DeviceHandler::HandleEvent(std::string name,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGD("start");
     CHKPV(pointerEvent);
     auto it = deviceHandler_.find(name);
     if (it == deviceHandler_.end()) {
@@ -81,9 +79,10 @@ void InputDeviceConsumerHandler::DeviceHandler::HandleEvent(std::string name,
         return;
     }
     for (const auto& [deviceName, handlers] : deviceHandler_) {
-        MMI_HILOGD("HandleEvent, deviceName:%{public}s", deviceName.c_str());
-        for (const auto& handler : handlers) {
-            handler.SendToClient(pointerEvent, pkt);
+        if (deviceName == name) {
+            for (const auto& handler : handlers) {
+                handler.SendToClient(pointerEvent, pkt);
+            }
         }
     }
 }
@@ -91,7 +90,6 @@ void InputDeviceConsumerHandler::DeviceHandler::HandleEvent(std::string name,
 int32_t InputDeviceConsumerHandler::DeviceHandler::RemoveDeviceHandler(const std::vector<std::string>& deviceNames,
     SessionPtr sess)
 {
-    MMI_HILOGD("start");
     for (const auto& name : deviceNames) {
         auto it = deviceHandler_.find(name);
         if (it != deviceHandler_.end()) {
