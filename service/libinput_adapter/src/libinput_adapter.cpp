@@ -1217,7 +1217,8 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     return true;
 }
 
-void LibinputAdapter::InjectEventForTwoFingerOnTouchpad(libinput_event_touch* touch, libinput_event_type eventType, int64_t frameTime)
+void LibinputAdapter::InjectEventForTwoFingerOnTouchpad(libinput_event_touch* touch,
+    libinput_event_type eventType, int64_t frameTime)
 {
     event_touch tEvent;
     tEvent.event_type = eventType;
