@@ -173,6 +173,8 @@ private:
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
+    void InjectEventForTwoFingerOnTouchpad(libinput_event_touch* touch,
+        libinput_event_type eventType, int64_t frameTime);
     void InjectEventForCastWindow(libinput_event_touch* touch);
     bool HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);

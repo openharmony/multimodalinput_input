@@ -1134,18 +1134,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchBegin(libinput_event_touch* touch,
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
 	
-    event_touch tEvent;
-    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN;
-    tEvent.seat_slot = VKEY_PINCH_FIRST_FINGER_ID;
-    libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
-    funInputEvent_((libinput_event*)ltEvent, frameTime);
-    free(ltEvent);
-
-    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN;
-    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
-    ltEvent = libinput_create_touch_event(touch, tEvent);
-    funInputEvent_((libinput_event*)ltEvent, frameTime);
-    free(ltEvent);
+    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN, frameTime);
 	
     return true;
 }
@@ -1184,18 +1173,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchUpdate(libinput_event_touch* touch,
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
 	
-    event_touch tEvent;
-    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION;
-    tEvent.seat_slot = VKEY_PINCH_FIRST_FINGER_ID;
-    libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
-    funInputEvent_((libinput_event*)ltEvent, frameTime);
-    free(ltEvent);
-
-    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION;
-    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
-    ltEvent = libinput_create_touch_event(touch, tEvent);
-    funInputEvent_((libinput_event*)ltEvent, frameTime);
-    free(ltEvent);
+    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION, frameTime);
 	
     return true;
 }
@@ -1234,9 +1212,28 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
 	
-    InjectEventForCastWindow(touch);
+    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP, frameTime);
 	
     return true;
+}
+
+void LibinputAdapter::InjectEventForTwoFingerOnTouchpad(libinput_event_touch* touch, libinput_event_type eventType, int64_t frameTime)
+{
+    event_touch tEvent;
+    tEvent.event_type = eventType;
+    tEvent.seat_slot = VKEY_PINCH_FIRST_FINGER_ID;
+    libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
+    if (ltEvent != nullptr) {
+        funInputEvent_((libinput_event*)ltEvent, frameTime);
+        free(ltEvent);
+    }
+
+    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
+    ltEvent = libinput_create_touch_event(touch, tEvent);
+    if (ltEvent != nullptr) {
+        funInputEvent_((libinput_event*)ltEvent, frameTime);
+        free(ltEvent);
+    }
 }
 
 void LibinputAdapter::InjectEventForCastWindow(libinput_event_touch* touch)
