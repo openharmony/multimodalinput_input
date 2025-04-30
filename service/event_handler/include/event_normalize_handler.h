@@ -80,6 +80,8 @@ private:
     void PointerEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
     bool TouchPadKnuckleDoubleClickHandle(libinput_event* event);
     int32_t GetToolType(libinput_event* event);
+    void HandleDeviceConsumerEvent(int32_t toolType, libinput_event* event, PointerEvent::PointerItem &item,
+        std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     int32_t timerId_ { -1 };

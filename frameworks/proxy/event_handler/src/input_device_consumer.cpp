@@ -29,7 +29,6 @@ InputDeviceConsumer::~InputDeviceConsumer() {}
 int32_t InputDeviceConsumer::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
-    MMI_HILOGD("start");
     CALL_DEBUG_ENTER;
     if (consumer == nullptr) {
         MULTIMODAL_INPUT_CONNECT_MGR->ClearInputDeviceConsumer(deviceNames);

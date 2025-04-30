@@ -3803,7 +3803,6 @@ int32_t MMIService::UnsubscribeInputActive(int32_t subscribeId)
 
 int32_t MMIService::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
 {
-    MMI_HILOGD("start");
     CALL_INFO_TRACE;
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
@@ -3822,7 +3821,6 @@ int32_t MMIService::SetInputDeviceConsumer(const std::vector<std::string>& devic
 
 int32_t MMIService::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
 {
-    MMI_HILOGD("start");
     CALL_INFO_TRACE;
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);

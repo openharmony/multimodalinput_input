@@ -545,7 +545,6 @@ int32_t ClientMsgHandler::OnSubscribeInputActiveCallback(const UDSClient& client
 
 int32_t ClientMsgHandler::ReportDeviceConsumer(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_HILOGD("start");
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read Pointer data failed");
         return RET_ERR;
