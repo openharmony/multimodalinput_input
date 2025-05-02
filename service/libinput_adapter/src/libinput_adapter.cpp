@@ -1277,8 +1277,8 @@ bool LibinputAdapter::IsCursorInCastWindow()
 {
     InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
     if (inputWindowsManager == nullptr) {
-       return false;
-	}
+        return false;
+    }
     DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
     for (auto &windowInfo : displayGroupInfo.windowsInfo) {
         if (windowInfo.windowType == CAST_WINDOW_TYPE) {
