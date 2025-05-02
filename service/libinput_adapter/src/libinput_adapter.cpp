@@ -1212,8 +1212,12 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
 	
-    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP, frameTime);
-	
+    if (IsCursorInCastWindow()){
+        InjectEventForCastWindow(touch);
+    } else {
+        InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP, frameTime);
+    }
+
     return true;
 }
 
@@ -1240,22 +1244,12 @@ void LibinputAdapter::InjectEventForTwoFingerOnTouchpad(libinput_event_touch* to
 void LibinputAdapter::InjectEventForCastWindow(libinput_event_touch* touch)
 {
     int64_t frameTime = GetSysClockTime();
+    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP, frameTime);
 
     event_touch tEvent;
-    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP;
     tEvent.seat_slot = VKEY_PINCH_FIRST_FINGER_ID;
-    libinput_event_touch* ltEvent = libinput_create_touch_event(touch, tEvent);
-    funInputEvent_((libinput_event*)ltEvent, frameTime);
-    free(ltEvent);
-
-    tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP;
-    tEvent.seat_slot = VKEY_PINCH_SECOND_FINGER_ID;
-    ltEvent = libinput_create_touch_event(touch, tEvent);
-    funInputEvent_((libinput_event*)ltEvent, frameTime);
-    free(ltEvent);
 
     auto mouseInfo = WIN_MGR->GetMouseInfo();
-
     tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCH_DOWN;
     tEvent.x = mouseInfo.physicalX * VKEY_RAW_COORDINATE_RATIO;
     tEvent.y = mouseInfo.physicalY * VKEY_RAW_COORDINATE_RATIO;
@@ -1277,6 +1271,28 @@ void LibinputAdapter::InjectEventForCastWindow(libinput_event_touch* touch)
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     funInputEvent_((libinput_event*)lpEvent, frameTime);
     free(lpEvent);
+}
+
+bool LibinputAdapter::IsCursorInCastWindow()
+{
+    InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
+    if (inputWindowsManager != nullptr) {
+        DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
+        bool isFloating = false;
+        for (auto &windowInfo : displayGroupInfo.windowsInfo) {
+            if (windowInfo.windowType == CAST_WINDOW_TYPE) {
+                auto mouseInfo = WIN_MGR->GetMouseInfo();
+                int32_t x = mouseInfo.physicalX;
+                int32_t y = mouseInfo.physicalY;
+                if ((x > windowInfo.area.x && x < (windowInfo.area.x + windowInfo.area.width)) &&
+                    (y > windowInfo.area.y && y < (windowInfo.area.y + windowInfo.area.height))) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 bool LibinputAdapter::HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
