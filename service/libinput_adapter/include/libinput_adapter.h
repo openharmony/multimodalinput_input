@@ -176,7 +176,7 @@ private:
     void InjectEventForTwoFingerOnTouchpad(libinput_event_touch* touch,
         libinput_event_type eventType, int64_t frameTime);
     void InjectEventForCastWindow(libinput_event_touch* touch);
-	bool IsCursorInCastWindow();
+    bool IsCursorInCastWindow();
     bool HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadPanUpdate(libinput_event_touch* touch,

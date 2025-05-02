@@ -1212,7 +1212,7 @@ bool LibinputAdapter::HandleVKeyTrackPadPinchEnd(libinput_event_touch* touch,
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
 	
-    if (IsCursorInCastWindow()){
+    if (IsCursorInCastWindow()) {
         InjectEventForCastWindow(touch);
     } else {
         InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP, frameTime);
@@ -1276,18 +1276,18 @@ void LibinputAdapter::InjectEventForCastWindow(libinput_event_touch* touch)
 bool LibinputAdapter::IsCursorInCastWindow()
 {
     InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
-    if (inputWindowsManager != nullptr) {
-        DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
-        bool isFloating = false;
-        for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-            if (windowInfo.windowType == CAST_WINDOW_TYPE) {
-                auto mouseInfo = WIN_MGR->GetMouseInfo();
-                int32_t x = mouseInfo.physicalX;
-                int32_t y = mouseInfo.physicalY;
-                if ((x > windowInfo.area.x && x < (windowInfo.area.x + windowInfo.area.width)) &&
-                    (y > windowInfo.area.y && y < (windowInfo.area.y + windowInfo.area.height))) {
-                    return true;
-                }
+    if (inputWindowsManager == nullptr) {
+       return false;
+	}
+    DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
+    for (auto &windowInfo : displayGroupInfo.windowsInfo) {
+        if (windowInfo.windowType == CAST_WINDOW_TYPE) {
+            auto mouseInfo = WIN_MGR->GetMouseInfo();
+            int32_t x = mouseInfo.physicalX;
+            int32_t y = mouseInfo.physicalY;
+            if ((x > windowInfo.area.x && x < (windowInfo.area.x + windowInfo.area.width)) &&
+                (y > windowInfo.area.y && y < (windowInfo.area.y + windowInfo.area.height))) {
+                return true;
             }
         }
     }
