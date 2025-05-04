@@ -2821,5 +2821,11 @@ int32_t InputManagerImpl::LaunchAiScreenAbility()
     CALL_INFO_TRACE;
     return MULTIMODAL_INPUT_CONNECT_MGR->LaunchAiScreenAbility();
 }
+
+int32_t InputManagerImpl::GetMaxMultiTouchPointNum(int32_t &pointNum)
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->GetMaxMultiTouchPointNum(pointNum);
+}
 } // namespace MMI
 } // namespace OHOS
