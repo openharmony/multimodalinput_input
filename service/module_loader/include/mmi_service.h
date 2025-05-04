@@ -207,6 +207,7 @@ public:
     int32_t SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch) override;
     int32_t LaunchAiScreenAbility() override;
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

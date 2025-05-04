@@ -175,6 +175,7 @@ public:
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
     int32_t LaunchAiScreenAbility();
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
 
 private:
     MultimodalInputConnectManager() = default;
