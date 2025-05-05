@@ -94,13 +94,13 @@ private:
     std::vector<std::pair<int32_t, Point>> SortPoints(std::map<int32_t, Point> &points);
 
     bool HandleFingerDown();
-    int64_t GetMaxDownInterval();
-    float GetMaxFingerSpacing();
+    int64_t GetMaxDownInterval() const;
+    float GetMaxFingerSpacing() const;
     GestureMode ChangeToGestureMode(SlideState state);
     SlideState GetSlidingDirection(double angle);
     void HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> event);
     bool IsFingerMove(const Point &downPt, const Point &movePt) const;
-    double GetAngle(float startX, float startY, float endX, float endY);
+    double GetAngle(float startX, float startY, float endX, float endY) const;
     SlideState ClacFingerMoveDirection(std::shared_ptr<PointerEvent> event);
     void CheckGestureTrend(std::shared_ptr<PointerEvent> event) const;
     bool IsLastTouchUp(std::shared_ptr<PointerEvent> event) const;

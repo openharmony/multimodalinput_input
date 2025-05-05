@@ -44,6 +44,7 @@ void TouchGestureAdapter::SetGestureCondition(bool flag, TouchGestureType type, 
 
 void TouchGestureAdapter::process(std::shared_ptr<PointerEvent> event)
 {
+    LogTouchEvent(event);
     OnTouchEvent(event);
     if (ShouldDeliverToNext() && nextAdapter_ != nullptr) {
         nextAdapter_->process(event);
@@ -68,6 +69,39 @@ void TouchGestureAdapter::Init()
     if (nextAdapter_ != nullptr) {
         nextAdapter_->Init();
     }
+}
+
+void TouchGestureAdapter::LogTouchEvent(std::shared_ptr<PointerEvent> event) const
+{
+    CHKPV(event);
+    if (event->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return;
+    }
+    switch (event->GetPointerAction()) {
+        case PointerEvent::POINTER_ACTION_DOWN:
+        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
+            break;
+        }
+        default: {
+            return;
+        }
+    }
+    auto pointers = event->GetPointerIds();
+    std::ostringstream sTouches;
+    sTouches << "(";
+
+    if (auto iter = pointers.cbegin(); iter != pointers.cend()) {
+        sTouches << *iter;
+        for (++iter; iter != pointers.cend(); ++iter) {
+            sTouches << "," << *iter;
+        }
+    }
+    sTouches << ")";
+    MMI_HILOGI("GestureType:%{public}u,No:%{public}d,PA:%{public}s,PI:%{public}d,Touches:%{public}s",
+        gestureType_, event->GetId(), event->DumpPointerAction(), event->GetPointerId(),
+        std::move(sTouches).str().c_str());
 }
 
 std::shared_ptr<TouchGestureAdapter> TouchGestureAdapter::GetGestureFactory()
