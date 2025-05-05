@@ -417,7 +417,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGD("The last repeat button, keyCode:%d", lastPressedKey);
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
-    EventStatistic::PushEvent(keyEvent);
+    EventStatistic::PushKeyEvent(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -816,7 +816,7 @@ int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
     BytraceAdapter::StopPackageEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(keyEvent);
-    EventStatistic::PushEvent(keyEvent);
+    EventStatistic::PushKeyEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -839,7 +839,7 @@ int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
 #endif // OHOS_BUILD_ENABLE_POINTER
     joystick_.CheckIntention(pointerEvent, [this](std::shared_ptr<KeyEvent> keyEvent) {
         BytraceAdapter::StartBytrace(keyEvent);
-        EventStatistic::PushEvent(keyEvent);
+        EventStatistic::PushKeyEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -869,7 +869,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
         RestoreTouchPadStatus();
     }
     swEvent->SetSwitchType(switchStatus);
-    EventStatistic::PushEvent(std::move(swEvent));
+    EventStatistic::PushSwitchEvent(std::move(swEvent));
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
     MMI_HILOGW("Switch device does not support");
