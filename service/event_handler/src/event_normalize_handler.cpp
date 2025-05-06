@@ -44,6 +44,7 @@
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #include "touchpad_transform_processor.h"
 #include "touchpad_settings_handler.h"
+#include "account_manager.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -116,6 +117,10 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
 constexpr int32_t MAX_N_PRESSED_KEYS { 10 };
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
 }
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+int32_t EventNormalizeHandler::tpRegisterTryCount_ = 10;
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
 {
@@ -1039,6 +1044,14 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
 bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
     enum libinput_event_type type, libinput_event* event)
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    if (tpRegisterTryCount_ > 0 && type == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
+        tpRegisterTryCount_--;
+        if (TOUCHPAD_MGR->GetCommonEventStatus()) {
+            TOUCHPAD_MGR->RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
     static int32_t angleTolerance = 0;
     static int32_t lastDirection = 0;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);

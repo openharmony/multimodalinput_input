@@ -16,6 +16,7 @@
 #define TOUCHPAD_SETTINGS_HANDLER_H
 
 #include <dlfcn.h>
+#include <atomic>
 #include "setting_observer.h"
 
 namespace OHOS {
@@ -29,12 +30,15 @@ static std::shared_ptr<TouchpadSettingsObserver> GetInstance();
     bool UnregisterTpObserver(const int32_t accountId);
     void RegisterUpdateFunc();
     void SyncTouchpadSettingsData();
+    void SetCommonEventReady();
+    bool GetCommonEventStatus();
 private:
     static std::shared_ptr<TouchpadSettingsObserver> instance_;
     static std::mutex mutex_;
     std::mutex lock_;
     SettingObserver::UpdateFunc updateFunc_ = nullptr;
     bool hasRegistered_ = false;
+    std::atomic<bool> isCommonEventReady_ {false};
     int32_t currentAccountId_ = -1;
     sptr<SettingObserver> pressureObserver_ {nullptr};
     sptr<SettingObserver> vibrationObserver_ {nullptr};
