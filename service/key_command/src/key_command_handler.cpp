@@ -266,6 +266,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
+            CheckAndUpdateTappingCountAtDown(touchEvent);
             DfxHisysevent::ReportKnuckleClickEvent();
             HandleKnuckleGestureDownEvent(touchEvent);
             break;
@@ -276,7 +277,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
     }
-    CheckAndUpdateTappingCountAtDown(touchEvent);
 }
 
 void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -473,6 +473,10 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    if (tappingCount_ > MAX_TAP_COUNT) {
+        MMI_HILOGI("Knuckle tapping count more than twice:%{public}d", tappingCount_);
+        return;
+    }
     if (knuckleGesture.lastPointerDownEvent == nullptr) {
         MMI_HILOGI("Knuckle gesture first down Event");
         knuckleGesture.lastPointerDownEvent = touchEvent;
