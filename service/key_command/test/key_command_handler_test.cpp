@@ -423,7 +423,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_002, Test
     EXPECT_TRUE(delay >= MIN_SHORT_KEY_DOWN_DURATION);
     EXPECT_TRUE(delay <= MAX_SHORT_KEY_DOWN_DURATION);
     EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
-
     delay = 5000;
     shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
     EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
@@ -6371,5 +6370,265 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAiScreenAbility_001,
     ret = handler.LaunchAiScreenAbility(pid);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_002
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_003
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    // Set up menu key event
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_MENU);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MENU);
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_004
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    // Set up key event that would make OnHandleEvent return true
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    // Set screen status to off
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_005
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    // Set up key event that would make OnHandleEvent return true
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    // Set screen status to on
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_006
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_OnHandleTouchEvent001
+ * @tc.desc: Test OnHandleTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleTouchEvent001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.isParseConfig_ = false;
+    handler.isDistanceConfig_ = false;
+    handler.isKnuckleSwitchConfig_ = true;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PENCIL);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    ASSERT_NO_FATAL_FAILURE(handler.OnHandleTouchEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureDownEvent_005
+ * @tc.desc: Test HandleKnuckleGestureDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEvent_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+
+    PointerEvent::PointerItem firstItem;
+    firstItem.SetPointerId(1);
+    firstItem.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    firstItem.SetDownTime(1000);
+
+    PointerEvent::PointerItem secondItem;
+    secondItem.SetPointerId(2);
+    secondItem.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    secondItem.SetDownTime(1000 + TWO_FINGERS_TIME_LIMIT);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(firstItem);
+    KeyCommandHandler keyCommandHandler;
+    ASSERT_NO_FATAL_FAILURE(keyCommandHandler.HandleKnuckleGestureDownEvent(pointerEvent));
+
+    pointerEvent->SetPointerId(2);
+    pointerEvent->RemovePointerItem(1);
+    pointerEvent->AddPointerItem(secondItem);
+    ASSERT_NO_FATAL_FAILURE(keyCommandHandler.HandleKnuckleGestureDownEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureDownEvent_006
+ * @tc.desc: Test HandleKnuckleGestureDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEvent_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    KeyCommandHandler keyCommandHandler;
+    PointerEvent::PointerItem firstItem;
+    firstItem.SetPointerId(1);
+    firstItem.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    firstItem.SetDownTime(1000);
+
+    PointerEvent::PointerItem secondItem;
+    secondItem.SetPointerId(2);
+    secondItem.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    secondItem.SetDownTime(1100);
+
+    PointerEvent::PointerItem thirdItem;
+    thirdItem.SetPointerId(3);
+    thirdItem.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    thirdItem.SetDownTime(1200);
+
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(firstItem);
+    pointerEvent->SetPointerId(2);
+    pointerEvent->AddPointerItem(secondItem);
+    pointerEvent->SetPointerId(3);
+    pointerEvent->AddPointerItem(thirdItem);
+    ASSERT_NO_FATAL_FAILURE(keyCommandHandler.HandleKnuckleGestureDownEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_KnuckleGestureProcessor_001
+ * @tc.desc: Test KnuckleGestureProcessor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureProcessor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KnuckleGesture knuckleGesture;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    knuckleGesture.lastPointerDownEvent = touchEvent;
+    knuckleGesture.lastPointerUpTime = 10;
+    knuckleGesture.ability.bundleName = SCREENRECORDER_BUNDLE_NAME;
+    touchEvent->SetActionTime(20);
+    handler.knuckleCount_ = 1;
+    ASSERT_NO_FATAL_FAILURE(handler.KnuckleGestureProcessor(touchEvent,
+        knuckleGesture, KnuckleType::KNUCKLE_TYPE_DOUBLE));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportKnuckleScreenCapture
+ * @tc.desc: Test KnuckleGestureProcessor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportKnuckleScreenCapture, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KnuckleGesture knuckleGesture;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    touchEvent->SetPointerId(0);
+    touchEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.ReportKnuckleScreenCapture(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportKnuckleScreenCapture_001
+ * @tc.desc: Test KnuckleGestureProcessor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportKnuckleScreenCapture_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KnuckleGesture knuckleGesture;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    PointerEvent::PointerItem item;
+    PointerEvent::PointerItem item2;
+    item.SetPointerId(0);
+    touchEvent->SetPointerId(0);
+    touchEvent->AddPointerItem(item);
+    item2.SetPointerId(1);
+    touchEvent->SetPointerId(1);
+    touchEvent->AddPointerItem(item2);
+    ASSERT_NO_FATAL_FAILURE(handler.ReportKnuckleScreenCapture(touchEvent));
+}
+
+
 } // namespace MMI
 } // namespace OHOS
