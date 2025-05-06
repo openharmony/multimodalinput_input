@@ -1170,6 +1170,14 @@ public:
     int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceName,
         std::shared_ptr<IInputEventConsumer> consumer);
 
+    /**
+     * @brief Get max Multi-Touch Points Num Supported.
+     * @param pointNum the value which Indicates the max Multi-Touch point num supported.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 20
+    */
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
