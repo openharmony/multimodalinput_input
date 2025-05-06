@@ -56,6 +56,7 @@ constexpr int32_t INVAID_VALUE = -1;
 constexpr uint32_t MAX_WINDOW_NUMS = 15;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr int32_t DEFAULT_SAMPLING_PERIOD { 8 }; // 8ms
+constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr uint32_t SHELL_FLAGS_VALUE = 2;
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -5580,6 +5581,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_CheckKnuckleEvent_001, TestSize.Leve
     bool isKnuckleType = true;
     int32_t ret = InputManager::GetInstance()->CheckKnuckleEvent(pointX, pointY, isKnuckleType);
     EXPECT_EQ(ret, -2);
+}
+
+/*
+ * @tc.name: InputManagerTest_GetMaxMultiTouchPointNum_001
+ * @tc.desc: GetMaxMultiTouchPointNum
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetMaxMultiTouchPointNum_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pointNum { -1 };
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetMaxMultiTouchPointNum(pointNum));
+    std::string productType = system::GetParameter("const.product.devicetype", "unknown");
+    std::string productPC = "2in1";
+    if (productType == productPC) {
+        ASSERT_EQ(MAX_MULTI_TOUCH_POINT_NUM, pointNum);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

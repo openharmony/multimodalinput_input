@@ -174,6 +174,7 @@ public:
     int32_t UnsubscribeInputActive(int32_t subscribeId) override;
     int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
     int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
