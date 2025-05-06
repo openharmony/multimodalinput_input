@@ -176,6 +176,7 @@ public:
     int32_t UnsubscribeInputActive(int32_t subscribeId);
     int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames);
     int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames);
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
 
 private:
     MultimodalInputConnectManager() = default;

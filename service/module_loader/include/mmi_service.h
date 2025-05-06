@@ -204,6 +204,7 @@ public:
     int32_t SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) override;
     int32_t UnsubscribeInputActive(int32_t subscribeId) override;
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

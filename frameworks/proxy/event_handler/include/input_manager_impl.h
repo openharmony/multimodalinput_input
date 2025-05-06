@@ -244,6 +244,7 @@ public:
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
     int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
     void UnsubscribeInputActive(int32_t subscribeId);
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

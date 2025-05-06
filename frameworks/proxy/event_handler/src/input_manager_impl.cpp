@@ -2813,5 +2813,11 @@ void InputManagerImpl::OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> point
     inputConsumer->OnInputEvent(pointerEvent);
     MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
+
+int32_t InputManagerImpl::GetMaxMultiTouchPointNum(int32_t &pointNum)
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->GetMaxMultiTouchPointNum(pointNum);
+}
 } // namespace MMI
 } // namespace OHOS
