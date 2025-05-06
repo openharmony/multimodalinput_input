@@ -125,7 +125,7 @@ void TouchpadSettingsObserver::RegisterUpdateFunc()
 
 bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
 {
-    if (hasRegistered_) { return false; }
+    if (!isCommonEventReady_.load() || hasRegistered_) { return false; }
     std::lock_guard<std::mutex> lock(lock_);
     ErrCode ret = 0;
 
@@ -136,20 +136,6 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
     RegisterUpdateFunc();
     TP_CHECK_FALSE_RETURN(updateFunc_ != nullptr, false, "Update function is null");
 
-    if (pressureObserver_ == nullptr) {
-        pressureObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .CreateObserver(g_pressureKey, updateFunc_);
-        TP_CHECK_FALSE_RETURN(pressureObserver_ != nullptr, false, "PressureObserver fail");
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .RegisterObserver(pressureObserver_, datashareUri_);
-    }
-    if (vibrationObserver_ == nullptr) {
-        vibrationObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .CreateObserver(g_vibrationKey, updateFunc_);
-        TP_CHECK_FALSE_RETURN(vibrationObserver_ != nullptr, false, "VibrationObserver fail");
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .RegisterObserver(vibrationObserver_, datashareUri_);
-    }
     if (touchpadSwitchesObserver_ == nullptr) {
         touchpadSwitchesObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .CreateObserver(g_touchpadSwitchesKey, updateFunc_);
@@ -163,6 +149,20 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
         TP_CHECK_FALSE_RETURN(knuckleSwitchesObserver_ != nullptr, false, "KnuckleSwitchesObserver fail");
         ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .RegisterObserver(knuckleSwitchesObserver_, datashareUri_);
+    }
+    if (pressureObserver_ == nullptr) {
+        pressureObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .CreateObserver(g_pressureKey, updateFunc_);
+        TP_CHECK_FALSE_RETURN(pressureObserver_ != nullptr, false, "PressureObserver fail");
+        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .RegisterObserver(pressureObserver_, datashareUri_);
+    }
+    if (vibrationObserver_ == nullptr) {
+        vibrationObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .CreateObserver(g_vibrationKey, updateFunc_);
+        TP_CHECK_FALSE_RETURN(vibrationObserver_ != nullptr, false, "VibrationObserver fail");
+        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .RegisterObserver(vibrationObserver_, datashareUri_);
     }
     if (ret) {
         pressureObserver_ = nullptr;
@@ -217,18 +217,32 @@ bool TouchpadSettingsObserver::UnregisterTpObserver(const int32_t accountId)
 
 void TouchpadSettingsObserver::SyncTouchpadSettingsData()
 {
-    if (!hasRegistered_ && !RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId())) {
+    if (!isCommonEventReady_.load()) {
+        return;
+    }
+    if (!hasRegistered_) {
+        RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
         return;
     }
     std::lock_guard<std::mutex> lock { lock_ };
     if (updateFunc_ == nullptr) {
         return;
     }
-    updateFunc_(g_pressureKey);
-    updateFunc_(g_vibrationKey);
     updateFunc_(g_touchpadSwitchesKey);
     updateFunc_(g_knuckleSwitchesKey);
+    updateFunc_(g_pressureKey);
+    updateFunc_(g_vibrationKey);
     MMI_HILOGI("Sync touchpad settings end");
+}
+
+void TouchpadSettingsObserver::SetCommonEventReady()
+{
+    isCommonEventReady_.store(true);
+}
+
+bool TouchpadSettingsObserver::GetCommonEventStatus()
+{
+    return isCommonEventReady_.load();
 }
 } // namespace MMI
 } // namespace OHOS

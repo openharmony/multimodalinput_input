@@ -92,6 +92,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     JoystickEventNormalize joystick_;
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    static int32_t tpRegisterTryCount_;
+#endif // OHOS_BUILD_ENABLE_POINTER
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
     bool ProcessNullEvent(libinput_event *event, int64_t frameTime);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
