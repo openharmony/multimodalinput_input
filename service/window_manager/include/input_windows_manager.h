@@ -370,6 +370,8 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
         const WindowInfo** touchWindow);
     void GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
         WindowInfo **touchWindow, bool &isUiExtentionWindow);
+    void TouchEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
+        const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -530,6 +532,8 @@ private:
     std::atomic_bool isHPR_ { false };
     std::mutex oneHandMtx_;
     int32_t scalePercent_ = 100;
+    mutable int32_t lastWinX_ { 0 };
+    mutable int32_t lastWinY_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
