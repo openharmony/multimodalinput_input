@@ -79,6 +79,9 @@ enum class VTPStateMachineMessageType : int32_t {
     SWIPE_BEGIN = 22,
     SWIPE_UPDATE = 23,
     SWIPE_END = 24,
+    SWIPE_FOUR_BEGIN = 25,
+    SWIPE_FOUR_UPDATE = 26,
+    SWIPE_FOUR_END = 27,
 };
 
 enum class VKeyboardActivation : int32_t {
@@ -192,6 +195,12 @@ private:
     bool HandleVKeyTrackPadRotateBegin(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRotateUpdate(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadSwipeFourEnd(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRotateFourBegin(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem);
+    bool HandleVKeyTrackPadRotateFourUpdate(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadRotateEnd(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
