@@ -290,9 +290,11 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     CHKPR(device, ERROR_NULL_POINTER);
     INPUT_DEV_MGR->OnInputDeviceAdded(device);
 #if OHOS_BUILD_ENABLE_POINTER
-    bool switchFlag = false;
-    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
-    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
+    if (INPUT_DEV_MGR->IsTouchPadDevice(device)) {
+        bool switchFlag = false;
+        TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
+        TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
+    }
 #endif
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
