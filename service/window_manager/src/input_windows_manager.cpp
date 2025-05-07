@@ -6739,8 +6739,10 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
     if (lastTouchWindowInfo_.id != touchWindow->id) {
         if (lastTouchWindowInfo_.id != -1 &&
             lastTouchWindowInfo_.windowInputType == WindowInputType::SLID_TOUCH_WINDOW) {
-            MMI_HILOG_DISPATCHI("Send cancel to slid touch window, lastWindowType:%{public}d, nowWindowType:%{public}d",
-                static_cast<int32_t>(lastTouchWindowInfo_.windowInputType), static_cast<int32_t>(touchWindow->windowInputType));
+            MMI_HILOG_DISPATCHI("Send cancel to slid touch window, "
+                "lastWindowType:%{public}d, nowWindowType:%{public}d",
+                static_cast<int32_t>(lastTouchWindowInfo_.windowInputType),
+                static_cast<int32_t>(touchWindow->windowInputType));
             DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL);
         }
         MMI_HILOG_DISPATCHI("Send down-action to the new window, (lastWId:%{public}d, LastPId:%{public}d), "
