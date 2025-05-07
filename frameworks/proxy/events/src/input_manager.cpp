@@ -913,5 +913,10 @@ int32_t InputManager::LaunchAiScreenAbility()
 {
     return InputMgrImpl.LaunchAiScreenAbility();
 }
+
+int32_t InputManager::GetMaxMultiTouchPointNum(int32_t &pointNum)
+{
+    return InputMgrImpl.GetMaxMultiTouchPointNum(pointNum);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -1173,6 +1173,14 @@ public:
      */
     int32_t LaunchAiScreenAbility();
 
+    /**
+     * @brief Get max Multi-Touch Points Num Supported.
+     * @param pointNum the value which Indicates the max Multi-Touch point num supported.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 18
+    */
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

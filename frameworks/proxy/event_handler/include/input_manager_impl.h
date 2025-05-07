@@ -242,6 +242,7 @@ public:
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
     int32_t LaunchAiScreenAbility();
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);

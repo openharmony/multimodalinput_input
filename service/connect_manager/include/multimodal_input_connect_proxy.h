@@ -173,6 +173,7 @@ public:
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     int32_t SetKnuckleSwitch(bool knuckleSwitch) override;
     int32_t LaunchAiScreenAbility() override;
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
