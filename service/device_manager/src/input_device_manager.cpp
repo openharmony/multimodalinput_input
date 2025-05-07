@@ -539,6 +539,13 @@ bool InputDeviceManager::IsTouchDevice(struct libinput_device *device) const
     return libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_TOUCH);
 }
 
+bool InputDeviceManager::IsTouchPadDevice(struct libinput_device *device) const
+{
+    CHKPF(device);
+    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
+    return udevTags & EVDEV_UDEV_TAG_TOUCHPAD;
+}
+
 void InputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
 {
     CALL_DEBUG_ENTER;
@@ -1020,10 +1027,10 @@ std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
     return ids;
 }
 
-struct libinput_device *InputDeviceManager::GetTouchPadDeviceOrigin()
+std::vector<libinput_device*> InputDeviceManager::GetTouchPadDeviceOrigins()
 {
     CALL_DEBUG_ENTER;
-    struct libinput_device *touchPadDevice = nullptr;
+    std::vector<libinput_device*> touchPadDevices;
     for (const auto &item : inputDevice_) {
         auto inputDevice = item.second.inputDeviceOrigin;
         if (inputDevice == nullptr) {
@@ -1031,11 +1038,11 @@ struct libinput_device *InputDeviceManager::GetTouchPadDeviceOrigin()
         }
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
         if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
-            touchPadDevice = inputDevice;
-            break;
+            touchPadDevices.push_back(inputDevice);
+            continue;
         }
     }
-    return touchPadDevice;
+    return touchPadDevices;
 }
 
 bool InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const

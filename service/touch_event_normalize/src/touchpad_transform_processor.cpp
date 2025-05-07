@@ -659,9 +659,8 @@ int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(bool switch
         return RET_ERR;
     }
 
-    auto originDevice = INPUT_DEV_MGR->GetTouchPadDeviceOrigin();
-    if (originDevice == nullptr) {
-        MMI_HILOGW("Not touchpad device");
+    auto originDevices = INPUT_DEV_MGR->GetTouchPadDeviceOrigins();
+    if (originDevices.empty()) {
         return RET_OK;
     }
 
@@ -669,12 +668,14 @@ int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(bool switch
     if (switchFlag) {
         state = LIBINPUT_CONFIG_DRAG_ENABLED;
     }
-    auto ret = libinput_device_config_tap_set_drag_enabled(originDevice, state);
-    if (ret != LIBINPUT_CONFIG_STATUS_SUCCESS) {
-        MMI_HILOGE("Set drag failed");
-        return RET_ERR;
+    for (const auto &originDevice : originDevices) {
+        if (originDevice == nullptr) {
+            continue;
+        }
+        auto ret = libinput_device_config_tap_set_drag_enabled(originDevice, state);
+        MMI_HILOGI("Touchpad set double tap and drag state successfully, "
+            "state:%{public}d, ret:%{public}d", state, ret);
     }
-    MMI_HILOGI("Touchpad set double tap and drag state successfully, state:%{public}d", state);
 
     DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_DOUBLE_TAP_DRAG_SETTING,
         switchFlag);

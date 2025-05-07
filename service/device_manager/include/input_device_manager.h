@@ -67,6 +67,7 @@ public:
     bool IsKeyboardDevice(struct libinput_device* device) const;
     bool IsPointerDevice(struct libinput_device* device) const;
     bool IsTouchDevice(struct libinput_device* device) const;
+    bool IsTouchPadDevice(struct libinput_device *device) const;
     struct libinput_device* GetKeyboardDevice() const;
     void GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -94,7 +95,7 @@ public:
     VendorConfig GetVendorConfig(int32_t deviceId) const;
     int32_t OnEnableInputDevice(bool enable);
     std::vector<int32_t> GetTouchPadIds();
-    struct libinput_device *GetTouchPadDeviceOrigin();
+    std::vector<libinput_device*> GetTouchPadDeviceOrigins();
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session);
     static std::shared_ptr<InputDeviceManager> GetInstance();
     bool IsInputDeviceEnable(int32_t deviceId);
