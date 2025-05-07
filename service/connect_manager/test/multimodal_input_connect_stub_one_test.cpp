@@ -23,6 +23,7 @@
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "i_anco_channel.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
+#include "accesstoken_kit.h"
 #include "i_event_filter.h"
 #include "infrared_frequency_info.h"
 #include "input_device.h"
@@ -35,15 +36,24 @@
 #include "shift_info.h"
 #include "token_setproc.h"
 
-namespace OHOS {
-namespace MMI {
 using namespace testing;
 using namespace testing::ext;
 
-constexpr int32_t KEY_MAX_LIST_SIZE{ 5 };
 static bool g_mockCheckMonitorReturnBooleanValue = false;
 static bool g_mockReadFromParcelReturnBooleanValue = false;
 static bool g_mockPointerEventReadFromParcelReturnBooleanValue = false;
+static int g_mockGetHapTokenInfoReturnIntValue = -1;
+static std::string g_bundleName = "";
+
+namespace OHOS {
+int Security::AccessToken::AccessTokenKit::GetHapTokenInfo(AccessTokenID callerToken, HapTokenInfo &hapTokenInfoRes)
+{
+    hapTokenInfoRes.bundleName = g_bundleName;
+    return g_mockGetHapTokenInfoReturnIntValue;
+}
+
+namespace MMI {
+constexpr int32_t KEY_MAX_LIST_SIZE{ 5 };
 
 bool PermissionHelper::CheckMonitor()
 {
@@ -69,12 +79,16 @@ public:
         g_mockCheckMonitorReturnBooleanValue = false;
         g_mockReadFromParcelReturnBooleanValue = false;
         g_mockPointerEventReadFromParcelReturnBooleanValue = false;
+        g_mockGetHapTokenInfoReturnIntValue = -1;
+        g_bundleName = "";
     }
     void TearDown()
     {
         g_mockCheckMonitorReturnBooleanValue = false;
         g_mockReadFromParcelReturnBooleanValue = false;
         g_mockPointerEventReadFromParcelReturnBooleanValue = false;
+        g_mockGetHapTokenInfoReturnIntValue = -1;
+        g_bundleName = "";
     }
 };
 
@@ -846,6 +860,694 @@ HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_St
     g_mockPointerEventReadFromParcelReturnBooleanValue = true;
     data.WriteBool(true);
     int32_t ret = stub->StubInjectPointerEvent(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetFunctionKeyState_001
+ * @tc.desc: Test the function StubSetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetFunctionKeyState_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetFunctionKeyState).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t funcKey = KeyEvent::CAPS_LOCK_FUNCTION_KEY;
+    data.WriteInt32(funcKey);
+    bool enable = false;
+    data.WriteBool(enable);
+    int32_t ret = stub->StubSetFunctionKeyState(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetFunctionKeyState_002
+ * @tc.desc: Test the function StubSetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetFunctionKeyState_002,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetFunctionKeyState).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t funcKey = KeyEvent::SCROLL_LOCK_FUNCTION_KEY;
+    data.WriteInt32(funcKey);
+    bool enable = false;
+    data.WriteBool(enable);
+    int32_t ret = stub->StubSetFunctionKeyState(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetMouseCaptureMode_001
+ * @tc.desc: Test the function StubSetMouseCaptureMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetMouseCaptureMode_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, SetMouseCaptureMode).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t windowId = 1;
+    data.WriteInt32(windowId);
+    bool isCaptureMode = false;
+    data.WriteBool(isCaptureMode);
+    int32_t ret = stub->StubSetMouseCaptureMode(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetMouseCaptureMode_002
+ * @tc.desc: Test the function StubSetMouseCaptureMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetMouseCaptureMode_002,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, SetMouseCaptureMode).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t windowId = 1;
+    data.WriteInt32(windowId);
+    bool isCaptureMode = false;
+    data.WriteBool(isCaptureMode);
+    int32_t ret = stub->StubSetMouseCaptureMode(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubAppendExtraData_001
+ * @tc.desc: Test the function StubAppendExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubAppendExtraData_001, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    MessageParcel data;
+    MessageParcel reply;
+    bool appended = false;
+    data.WriteBool(appended);
+    int32_t size = 0;
+    data.WriteInt32(size);
+    int32_t toolType = 0;
+    data.WriteInt32(toolType);
+    int32_t sourceType = InputEvent::SOURCE_TYPE_MOUSE;
+    data.WriteInt32(sourceType);
+    int32_t pointerId = -1;
+    data.WriteInt32(pointerId);
+    int32_t pullId = 0;
+    data.WriteInt32(pullId);
+    int32_t eventId = 0;
+    data.WriteInt32(eventId);
+    bool drawCursor = false;
+    data.WriteBool(drawCursor);
+    int32_t ret = stub->StubAppendExtraData(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubAppendExtraData_002
+ * @tc.desc: Test the function StubAppendExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubAppendExtraData_002, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    MessageParcel data;
+    MessageParcel reply;
+    bool appended = false;
+    data.WriteBool(appended);
+    int32_t size = 0;
+    data.WriteInt32(size);
+    int32_t toolType = 0;
+    data.WriteInt32(toolType);
+    int32_t sourceType = InputEvent::SOURCE_TYPE_TOUCHSCREEN;
+    data.WriteInt32(sourceType);
+    int32_t pointerId = 0;
+    data.WriteInt32(pointerId);
+    int32_t pullId = -1;
+    data.WriteInt32(pullId);
+    int32_t eventId = 0;
+    data.WriteInt32(eventId);
+    bool drawCursor = false;
+    data.WriteBool(drawCursor);
+    int32_t ret = stub->StubAppendExtraData(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubAppendExtraData_003
+ * @tc.desc: Test the function StubAppendExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubAppendExtraData_003, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, AppendExtraData).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    bool appended = false;
+    data.WriteBool(appended);
+    int32_t size = 0;
+    data.WriteInt32(size);
+    int32_t toolType = 0;
+    data.WriteInt32(toolType);
+    int32_t sourceType = InputEvent::SOURCE_TYPE_TOUCHSCREEN;
+    data.WriteInt32(sourceType);
+    int32_t pointerId = 0;
+    data.WriteInt32(pointerId);
+    int32_t pullId = 0;
+    data.WriteInt32(pullId);
+    int32_t eventId = 0;
+    data.WriteInt32(eventId);
+    bool drawCursor = false;
+    data.WriteBool(drawCursor);
+    int32_t ret = stub->StubAppendExtraData(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubAppendExtraData_004
+ * @tc.desc: Test the function StubAppendExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubAppendExtraData_004, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, AppendExtraData).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    bool appended = false;
+    data.WriteBool(appended);
+    int32_t size = 0;
+    data.WriteInt32(size);
+    int32_t toolType = 0;
+    data.WriteInt32(toolType);
+    int32_t sourceType = InputEvent::SOURCE_TYPE_TOUCHSCREEN;
+    data.WriteInt32(sourceType);
+    int32_t pointerId = 0;
+    data.WriteInt32(pointerId);
+    int32_t pullId = 0;
+    data.WriteInt32(pullId);
+    int32_t eventId = 0;
+    data.WriteInt32(eventId);
+    bool drawCursor = false;
+    data.WriteBool(drawCursor);
+    int32_t ret = stub->StubAppendExtraData(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetTouchpadPointerSpeed_001
+ * @tc.desc: Test the function StubSetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetTouchpadPointerSpeed_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetTouchpadPointerSpeed).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t speed = 21;
+    data.WriteInt32(speed);
+    int32_t ret = stub->StubSetTouchpadPointerSpeed(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetTouchpadPointerSpeed_001
+ * @tc.desc: Test the function StubGetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubGetTouchpadPointerSpeed_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, GetTouchpadPointerSpeed).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetTouchpadPointerSpeed(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetTouchpadRightClickType_001
+ * @tc.desc: Test the function StubSetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetTouchpadRightClickType_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetTouchpadRightClickType).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t type = RightClickType::TOUCHPAD_TWO_FINGER_TAP;
+    data.WriteInt32(type);
+    int32_t ret = stub->StubSetTouchpadRightClickType(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetTouchpadRightClickType_002
+ * @tc.desc: Test the function StubSetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetTouchpadRightClickType_002,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetTouchpadRightClickType).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t type = RightClickType::TOUCHPAD_LEFT_BUTTON;
+    data.WriteInt32(type);
+    int32_t ret = stub->StubSetTouchpadRightClickType(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetTouchpadRightClickType_003
+ * @tc.desc: Test the function StubSetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetTouchpadRightClickType_003,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetTouchpadRightClickType).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t type = RightClickType::TOUCHPAD_RIGHT_BUTTON;
+    data.WriteInt32(type);
+    int32_t ret = stub->StubSetTouchpadRightClickType(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetTouchpadRightClickType_001
+ * @tc.desc: Test the function StubGetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubGetTouchpadRightClickType_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, GetTouchpadRightClickType).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetTouchpadRightClickType(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetCurrentUser_001
+ * @tc.desc: Test the function StubSetCurrentUser
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetCurrentUser_001, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    MessageParcel data;
+    MessageParcel reply;
+    g_mockGetHapTokenInfoReturnIntValue = 0;
+    g_bundleName = "";
+    int32_t userId = -1;
+    data.WriteInt32(userId);
+    int32_t ret = stub->StubSetCurrentUser(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetTouchpadScrollRows_001
+ * @tc.desc: Test the function StubSetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetTouchpadScrollRows_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetTouchpadScrollRows).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t rows = 0;
+    data.WriteInt32(rows);
+    int32_t ret = stub->StubSetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetTouchpadScrollRows_001
+ * @tc.desc: Test the function StubGetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubGetTouchpadScrollRows_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true)).WillOnce(Return(true)).WillOnce(Return(true));
+    EXPECT_CALL(*mock, GetTouchpadScrollRows)
+        .WillOnce(DoAll(SetArgReferee<0>(0), Return(RET_OK)))
+        .WillOnce(DoAll(SetArgReferee<0>(101), Return(RET_ERR)))
+        .WillOnce(DoAll(SetArgReferee<0>(1), Return(RET_OK)));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+    ret = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+    ret = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the function StubSetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetTouchpadThreeFingersTapSwitch_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, SetTouchpadThreeFingersTapSwitch).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteBool(false);
+    int32_t ret = stub->StubSetTouchpadThreeFingersTapSwitch(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the function StubGetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubGetTouchpadThreeFingersTapSwitch_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, GetTouchpadThreeFingersTapSwitch).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteBool(false);
+    int32_t ret = stub->StubGetTouchpadThreeFingersTapSwitch(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubRemoveVirtualInputDevice_001
+ * @tc.desc: Test the function StubRemoveVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubRemoveVirtualInputDevice_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, RemoveVirtualInputDevice).WillOnce(Return(-2));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t deviceId = 1;
+    data.WriteInt32(deviceId);
+    int32_t ret = stub->StubRemoveVirtualInputDevice(data, reply);
+    EXPECT_EQ(ret, -2);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSkipPointerLayer_001
+ * @tc.desc: Test the function StubSkipPointerLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSkipPointerLayer_001, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, SkipPointerLayer).WillOnce(Return(-2));
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteBool(false);
+    int32_t ret = stub->StubSkipPointerLayer(data, reply);
+    EXPECT_EQ(ret, -2);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetIntervalSinceLastInput_001
+ * @tc.desc: Test the function StubGetIntervalSinceLastInput
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubGetIntervalSinceLastInput_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, GetIntervalSinceLastInput).WillOnce(Return(-2));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetIntervalSinceLastInput(data, reply);
+    EXPECT_EQ(ret, -2);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetAllSystemHotkeys_001
+ * @tc.desc: Test the function StubGetAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubGetAllSystemHotkeys_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, GetAllSystemHotkeys).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetAllSystemHotkeys(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetAllSystemHotkeys_002
+ * @tc.desc: Test the function StubGetAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubGetAllSystemHotkeys_002,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, GetAllSystemHotkeys)
+        .WillOnce(testing::Invoke([](std::vector<std::unique_ptr<KeyOption>> &keyOptions) {
+            std::unique_ptr<KeyOption> keyOption = std::make_unique<KeyOption>();
+            for (int32_t i = 0; i < 5; ++i) {
+                keyOption->preKeys_.insert(i);
+            }
+            keyOptions.push_back(std::move(keyOption));
+            return RET_OK;
+        }));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetAllSystemHotkeys(data, reply);
+    EXPECT_EQ(ret, IPC_STUB_WRITE_PARCEL_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetAllSystemHotkeys_003
+ * @tc.desc: Test the function StubGetAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubGetAllSystemHotkeys_003,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, GetAllSystemHotkeys)
+        .WillOnce(testing::Invoke([](std::vector<std::unique_ptr<KeyOption>> &keyOptions) {
+            std::unique_ptr<KeyOption> keyOption = std::make_unique<KeyOption>();
+            keyOptions.push_back(std::move(keyOption));
+            return RET_OK;
+        }));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetAllSystemHotkeys(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetClientInfo_001
+ * @tc.desc: Test the function StubSetClientInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetClientInfo_001, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetClientInfo).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    uint64_t readThreadId = 1;
+    data.WriteUint64(readThreadId);
+    int32_t ret = stub->StubSetClientInfo(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetClientInfo_002
+ * @tc.desc: Test the function StubSetClientInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetClientInfo_002, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetClientInfo).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    uint64_t readThreadId = 1;
+    data.WriteUint64(readThreadId);
+    int32_t ret = stub->StubSetClientInfo(data, reply);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetInputDeviceInputEnable_001
+ * @tc.desc: Test the function StubSetInputDeviceInputEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetInputDeviceInputEnable_001,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t deviceId = -1;
+    data.WriteInt32(deviceId);
+    bool enable = true;
+    data.WriteBool(enable);
+    int32_t index = 0;
+    data.WriteInt32(index);
+    int32_t ret = stub->StubSetInputDeviceInputEnable(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetInputDeviceInputEnable_002
+ * @tc.desc: Test the function StubSetInputDeviceInputEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetInputDeviceInputEnable_002,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetInputDeviceEnabled).WillOnce(Return(RET_ERR));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t deviceId = 1;
+    data.WriteInt32(deviceId);
+    bool enable = true;
+    data.WriteBool(enable);
+    int32_t index = 0;
+    data.WriteInt32(index);
+    int32_t ret = stub->StubSetInputDeviceInputEnable(data, reply);
+    EXPECT_EQ(ret, ERROR_DEVICE_NOT_EXIST);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubSetInputDeviceInputEnable_003
+ * @tc.desc: Test the function StubSetInputDeviceInputEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_StubSetInputDeviceInputEnable_003,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillOnce(Return(true));
+    EXPECT_CALL(*mock, SetInputDeviceEnabled).WillOnce(Return(RET_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t deviceId = 1;
+    data.WriteInt32(deviceId);
+    bool enable = true;
+    data.WriteBool(enable);
+    int32_t index = 0;
+    data.WriteInt32(index);
+    int32_t ret = stub->StubSetInputDeviceInputEnable(data, reply);
     EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
