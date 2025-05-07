@@ -44,12 +44,10 @@ int32_t GetPointSize()
     const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
     if (PRODUCT_TYPE == "HPR") {
         return POINTER_SIZE_HPR;
-    } else {
-        return POINTER_SIZE_DEFAULT;
     }
+    return POINTER_SIZE_DEFAULT;
 }
 
-int32_t POINTER_SIZE = GetPointSize();
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MAGIC_POINTER_SIZE { 1 };
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -112,7 +110,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     std::shared_ptr<NativePreferences::Preferences> touchpadPref =
         NativePreferences::PreferencesHelper::GetPreferences(PATH + TOUCHPAD_FILE_NAME, errCode);
     CHKPR(touchpadPref, errno);
-    pointerSize_ = mousePref->GetInt(strPointerSize_, POINTER_SIZE);
+    pointerSize_ = mousePref->GetInt(strPointerSize_, GetPointSize());
     pointerSpeed_ = mousePref->GetInt(strPointerSpeed_,
         OHOS::system::GetIntParameter(DEFAULT_MOUSE_SPEED_NAME, POINTER_SPEED));
     pointerColor_ = mousePref->GetInt(strPointerColor_, POINTER_COLOR);
