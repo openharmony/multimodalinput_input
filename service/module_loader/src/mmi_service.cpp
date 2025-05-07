@@ -62,6 +62,10 @@
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "util_ex.h"
 #include "xcollie/xcollie.h"
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#include "touchpad_settings_handler.h"
+#include "account_manager.h"
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -1874,6 +1878,12 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);
     }
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
+        TOUCHPAD_MGR->SetCommonEventReady();
+        TOUCHPAD_MGR->RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
+    }
+#endif
 }
 
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
