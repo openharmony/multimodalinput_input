@@ -3284,6 +3284,8 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
         }
         if (((windowX >= item.x) && (windowX < displayMaxX)) &&
             (windowY >= item.y) && (windowY < displayMaxY)) {
+            lastWinX_ = windowX;
+            lastWinY_ = windowY;
             return true;
         }
     }
@@ -4669,6 +4671,18 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 continue;
             }
         }
+        bool isSlidTouch = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER  &&
+            pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+            pointerEvent->GetPointerIds().size() == 1 && !checkToolType) ||
+            (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
+        if (isSlidTouch) {
+            if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
+                item.defaultHotAreas, item)) {
+                UpdateTargetTouchWinIds(item, pointerItem, pointerEvent, pointerId, displayId);
+                touchWindow = &item;
+                break;
+            }
+        }
         if (targetWindowId >= 0 && pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
             (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_PEN || pointerItem.GetPressure() > 0)) {
             bool isUiExtentionWindow = false;
@@ -4908,6 +4922,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
         }
     }
+    TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     isHPR_ = PRODUCT_TYPE_HPR == DEVICE_TYPE_HPR;
     if (isHPR_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent);
@@ -5138,8 +5153,8 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
         return;
     }
     PointerEvent::PointerItem currentPointerItem;
-    int32_t windowX = lastTouchLogicX_ - lastTouchWindowInfo_.area.x;
-    int32_t windowY = lastTouchLogicY_ - lastTouchWindowInfo_.area.y;
+    int32_t windowX = lastWinX_;
+    int32_t windowY = lastWinY_;
     if (lastTouchEvent_->GetFixedMode() == PointerEvent::FixedMode::AUTO) {
         WindowInputType windowInputType = lastTouchWindowInfo_.windowInputType;
         if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
@@ -6718,6 +6733,38 @@ std::pair<int32_t, int32_t> InputWindowsManager::CalcDrawCoordinate(const Displa
         physicalY = displayXY.second;
     }
     return {static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY)};
+}
+
+void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
+    const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
+    CHKPV(touchWindow);
+    if (lastTouchWindowInfo_.id != touchWindow->id) {
+        if (lastTouchWindowInfo_.id != -1 &&
+            lastTouchWindowInfo_.windowInputType == WindowInputType::SLID_TOUCH_WINDOW) {
+            MMI_HILOG_DISPATCHI("Send cancel to slid touch window, "
+                "lastWindowType:%{public}d, nowWindowType:%{public}d",
+                static_cast<int32_t>(lastTouchWindowInfo_.windowInputType),
+                static_cast<int32_t>(touchWindow->windowInputType));
+            DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL);
+        }
+        MMI_HILOG_DISPATCHI("Send down-action to the new window, (lastWId:%{public}d, LastPId:%{public}d), "
+            "(newWId:%{public}d, newWId:%{public}d)",
+            lastTouchWindowInfo_.id, lastTouchWindowInfo_.pid, touchWindow->id, touchWindow->pid);
+        lastTouchLogicX_ = logicalX;
+        lastTouchLogicY_ = logicalY;
+        lastTouchEvent_ = pointerEvent;
+        lastTouchEvent_->SetFixedMode(PointerEvent::FixedMode::AUTO);
+        lastTouchWindowInfo_ = *touchWindow;
+        DispatchTouch(PointerEvent::POINTER_ACTION_DOWN);
+        return;
+    }
+    lastTouchLogicX_ = logicalX;
+    lastTouchLogicY_ = logicalY;
+    lastTouchEvent_ = pointerEvent;
+    lastTouchWindowInfo_ = *touchWindow;
 }
 } // namespace MMI
 } // namespace OHOS
