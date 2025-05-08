@@ -19,9 +19,11 @@
 #include <chrono>
 #include <fstream>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 #include "common.h"
+#include "device_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -41,6 +43,14 @@ EventReplayer::EventReplayer(const std::string& inputPath, const std::map<uint16
 {
     for (const auto &[sourceId, targetId] : deviceMapping) {
         deviceMapping_[sourceId] = "/dev/input/event" + std::to_string(targetId);
+    }
+    DeviceManager deviceManager;
+    auto devices = deviceManager.DiscoverDevices();
+    for (const InputDevice& device : devices) {
+        hashToDevicePath_[device.GetHash()] = device.GetPath();
+    }
+    if (devices.size() != hashToDevicePath_.size()) {
+        PrintWarning("Device hashVal is not unique!");
     }
 }
 
@@ -145,6 +155,15 @@ bool EventReplayer::ProcessDeviceLines(std::ifstream& inputFile,
             PrintInfo("Mapping device %u to %s", deviceId, mappingIt->second.c_str());
             device->SetPath(mappingIt->second);
         }
+        if (deviceMapping_.empty()) {
+            std::string path = device->GetPath();
+            std::string hash = device->GetHash();
+            auto hashIt = hashToDevicePath_.find(hash);
+            if (hashIt != hashToDevicePath_.end() && hashToDevicePath_[hash] != path) {
+                PrintInfo("Validate and correct path using hash verification");
+                device->SetPath(hashToDevicePath_[hash]);
+            }
+        }
         if (device->OpenForWriting()) {
             PrintInfo("Using device %u: %s", device->GetId(), device->GetName().c_str());
             outputDevices[device->GetId()] = std::move(device);
@@ -235,7 +254,7 @@ bool EventReplayer::ReplayEvents(std::ifstream& inputFile,
         ApplyEventDelay(event);
         auto& currentDeviceBuffer = deviceEventBuffers_[deviceId];
         currentDeviceBuffer.push_back(event);
-        if (event.type == EV_SYN) {
+        if (event.type == EV_SYN && event.code == SYN_REPORT) {
             if (!deviceIt->second->WriteEvents(currentDeviceBuffer)) {
                 PrintError("Failed to write events for device %u", deviceId);
                 return false;
