@@ -88,6 +88,11 @@ public:
         }
     }
 
+    uint32_t GetMode() const
+    {
+        return static_cast<uint32_t>(mode_);
+    }
+
     bool IsMain() const
     {
         return mode_ == mode_t::SCREEN_MAIN;
