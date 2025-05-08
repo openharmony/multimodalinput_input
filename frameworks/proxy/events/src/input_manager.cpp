@@ -911,5 +911,10 @@ int32_t InputManager::GetMaxMultiTouchPointNum(int32_t &pointNum)
 {
     return InputMgrImpl.GetMaxMultiTouchPointNum(pointNum);
 }
+
+int32_t InputManager::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
+{
+    return InputMgrImpl.SwitchScreenCapturePermission(permissionType, enable);
+}
 } // namespace MMI
 } // namespace OHOS
