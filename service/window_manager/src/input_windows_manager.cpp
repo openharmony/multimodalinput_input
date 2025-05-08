@@ -1719,7 +1719,6 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
-}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
