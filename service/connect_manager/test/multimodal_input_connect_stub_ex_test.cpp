@@ -9265,5 +9265,116 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetMaxMultiTouchPointNum_001, TestS
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubGetMaxMultiTouchPointNum(data, reply));
 }
+
+/**
+ * @tc.name: StubSubscribeInputActive_001
+ * @tc.desc: Test the function StubSubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeInputActive_001, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSubscribeInputActive(data, reply));
+}
+
+/**
+ * @tc.name: StubSubscribeInputActive_002
+ * @tc.desc: Test the function StubSubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeInputActive_002, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSubscribeInputActive(data, reply));
+}
+
+/**
+ * @tc.name: StubSubscribeInputActive_003
+ * @tc.desc: Test the function StubSubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeInputActive_003, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt64(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSubscribeInputActive(data, reply));
+}
+
+/**
+ * @tc.name: StubUnsubscribeInputActive_001
+ * @tc.desc: Test the function StubUnsubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeInputActive_001, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubUnsubscribeInputActive(data, reply));
+}
+
+/**
+ * @tc.name: StubUnsubscribeInputActive_002
+ * @tc.desc: Test the function StubUnsubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeInputActive_002, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubUnsubscribeInputActive(data, reply));
+}
+
+/**
+ * @tc.name: StubUnsubscribeInputActive_003
+ * @tc.desc: Test the function StubUnsubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeInputActive_003, TestSize.Level1)
+{
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubUnsubscribeInputActive(data, reply));
+}
 } // namespace MMI
 } // namespace OHOS
