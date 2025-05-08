@@ -49,6 +49,22 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+class TestInputEventConsumer : public IInputEventConsumer {
+public:
+    TestInputEventConsumer() = default;
+    ~TestInputEventConsumer() = default;
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
+    {
+        MMI_HILOGI("OnInputEvent KeyEvent enter");
+    }
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    {
+        MMI_HILOGI("OnInputEvent PointerEvent enter");
+    }
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override
+    {}
+};
+
 /**
  * @tc.name: InputManagerImplTest_IsValiadWindowAreas
  * @tc.desc: Test IsValiadWindowAreas
@@ -1019,6 +1035,58 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetInputDeviceConsumer, Test
     std::shared_ptr<IInputEventConsumer> consumer = nullptr;
     auto ret = InputMgrImpl.SetInputDeviceConsumer(deviceNames, consumer);
     ASSERT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name  : SubscribeInputActive_Test001
+ * @tc.desc  : Test SubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, SubscribeInputActive_Test001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = -1; // ms
+    int32_t subscriberId = InputMgrImpl.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_LT(subscriberId, 0);
+
+    interval = 0; // ms
+    subscriberId = InputMgrImpl.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberId, 0);
+    InputMgrImpl.UnsubscribeInputActive(subscriberId);
+    interval = 1; // ms
+    subscriberId = InputMgrImpl.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberId, 0);
+    InputMgrImpl.UnsubscribeInputActive(subscriberId);
+
+    interval = 499; // ms
+    subscriberId = InputMgrImpl.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberId, 0);
+    InputMgrImpl.UnsubscribeInputActive(subscriberId);
+
+    interval = 500; // ms
+    subscriberId = InputMgrImpl.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberId, 0);
+    InputMgrImpl.UnsubscribeInputActive(subscriberId);
+
+    interval = 2000; // ms
+    subscriberId = InputMgrImpl.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberId, 0);
+    InputMgrImpl.UnsubscribeInputActive(subscriberId);
+
+    interval = 2001; // ms
+    subscriberId = InputMgrImpl.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberId, 0);
+    InputMgrImpl.UnsubscribeInputActive(subscriberId);
 }
 } // namespace MMI
 } // namespace OHOS
