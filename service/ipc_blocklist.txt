@@ -16,3 +16,4 @@ src:*third_party/googletest/*
 src:*third_party/cJSON/*
 src:*foundation/multimodalinput/input/service/window_manager/test/*
 src:*foundation/multimodalinput/input/service/touch_event_normalize/test/*
+src:*foundation/multimodalinput/input/service/event_handler/test/*
