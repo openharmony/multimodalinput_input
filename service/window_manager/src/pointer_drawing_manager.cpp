@@ -2289,10 +2289,10 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
         if (screenPointers_.count(static_cast<size_t>(displayInfo.uniqueId))) {
             auto sp = screenPointers_[displayInfo.uniqueId];
             CHKPV(sp);
+            sp->OnDisplayInfo(displayInfo);
             if (sp->IsMain()) {
                 UpdateMirrorScreens(sp, displayInfo);
             }
-            sp->OnDisplayInfo(displayInfo);
         }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -3380,7 +3380,6 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                 if (!sp->Init()) {
                     MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}u", sid);
                 }
-                UpdateDisplayInfo(displayInfo_);
             }
         }
 
@@ -3402,6 +3401,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             }
         }
     }
+    UpdateDisplayInfo(displayInfo_);
     UpdatePointerVisible();
 }
 
@@ -3527,15 +3527,22 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
 
 void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, DisplayInfo displayInfo)
 {
-    if (sp->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
-        uint32_t mainWidth = sp->GetScreenWidth();
-        uint32_t mainHeight = sp->GetScreenHeight();
-        auto mirrorScreens = GetMirrorScreenPointers();
-        for (auto mirrorScreen : mirrorScreens) {
-            if (mirrorScreen != nullptr) {
+    uint32_t mainWidth = sp->GetScreenWidth();
+    uint32_t mainHeight = sp->GetScreenHeight();
+    std::lock_guard<std::mutex> lock(mtx_);
+    for (auto it : screenPointers_) {
+        if (it.second == nullptr) {
+            continue;
+        }
+        if (it.second->IsMirror()) {
+            auto& mirrorScreen = it.second;
+            if (sp->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
                 mirrorScreen->SetRotation(static_cast<rotation_t>(displayInfo.direction));
                 mirrorScreen->UpdatePadding(mainWidth, mainHeight);
             }
+            MMI_HILOGD("update mirror screen dpi, mainScreen dpi: %{public}f, original mirrorScreen dpi: %{public}f",
+                sp->GetDPI(), mirrorScreen->GetDPI());
+            mirrorScreen->SetDPI(sp->GetDPI());
         }
     }
 }
