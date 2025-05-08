@@ -814,6 +814,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeEnd(libinput_event_touch* touch,
 bool LibinputAdapter::HandleVKeyTrackPadSwipeFourBegin(libinput_event_touch* touch,
     const std::vector<int32_t>& msgItem)
 {
+    CHKPF(funInputEvent_);
     if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
         MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
             static_cast<int32_t>(msgItem.size()));
@@ -824,6 +825,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeFourBegin(libinput_event_touch* tou
     gEvent.finger_count = VKEY_TP_GSE_FOUR_FINGERS;
     PrintVKeyTPGestureLog(gEvent);
     libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    CHKPF(lgEvent);
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
     vtpSwipeState_ = VTPSwipeStateType::SWIPE_BEGIN;
@@ -833,6 +835,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeFourBegin(libinput_event_touch* tou
 bool LibinputAdapter::HandleVKeyTrackPadSwipeFourUpdate(libinput_event_touch* touch,
     const std::vector<int32_t>& msgItem)
 {
+    CHKPF(funInputEvent_);
     if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
         MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
             static_cast<int32_t>(msgItem.size()));
@@ -846,6 +849,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeFourUpdate(libinput_event_touch* to
     gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE;
     gEvent.finger_count = VKEY_TP_GSE_FOUR_FINGERS;
     libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    CHKPF(lgEvent);
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
     vtpSwipeState_ = VTPSwipeStateType::SWIPE_UPDATE;
@@ -855,6 +859,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeFourUpdate(libinput_event_touch* to
 bool LibinputAdapter::HandleVKeyTrackPadSwipeFourEnd(libinput_event_touch* touch,
     const std::vector<int32_t>& msgItem)
 {
+    CHKPF(funInputEvent_);
     if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
         MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
             static_cast<int32_t>(msgItem.size()));
@@ -864,6 +869,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeFourEnd(libinput_event_touch* touch
     gEvent.event_type = libinput_event_type::LIBINPUT_EVENT_GESTURE_SWIPE_END;
     gEvent.finger_count = VKEY_TP_GSE_FOUR_FINGERS;
     libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
+    CHKPF(lgEvent);
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
     vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
