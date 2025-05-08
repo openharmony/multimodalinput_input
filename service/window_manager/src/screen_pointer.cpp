@@ -238,6 +238,7 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
 sptr<OHOS::SurfaceBuffer> ScreenPointer::RequestBuffer()
 {
     if (!buffers_.size()) {
+        MMI_HILOGE("The buffer size is incorrect, size:%{public}u", static_cast<uint32_t>(buffers_.size()));
         return nullptr;
     }
 
@@ -250,6 +251,7 @@ sptr<OHOS::SurfaceBuffer> ScreenPointer::RequestBuffer()
 sptr<OHOS::SurfaceBuffer> ScreenPointer::GetCurrentBuffer()
 {
     if (bufferId_ >= buffers_.size()) {
+        MMI_HILOGE("BufferId_:%{public}u is incorrect", bufferId_);
         return nullptr;
     }
     return buffers_[bufferId_];
