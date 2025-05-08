@@ -159,6 +159,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastWindowInfo_.area = { 0, 0, 0, 0 };
     lastWindowInfo_.flags = -1;
     lastWindowInfo_.windowType = 0;
+    lastWindowInfo_.windowNameType = 0;
     mouseDownInfo_.id = -1;
     mouseDownInfo_.pid = -1;
     mouseDownInfo_.uid = -1;
@@ -166,6 +167,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     mouseDownInfo_.area = { 0, 0, 0, 0 };
     mouseDownInfo_.flags = -1;
     mouseDownInfo_.windowType = 0;
+    mouseDownInfo_.windowNameType = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     lastTouchWindowInfo_.id = -1;
@@ -175,6 +177,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastTouchWindowInfo_.area = { 0, 0, 0, 0 };
     lastTouchWindowInfo_.flags = -1;
     lastTouchWindowInfo_.windowType = 0;
+    lastTouchWindowInfo_.windowNameType = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     {
         std::lock_guard<std::mutex> lock(tmpInfoMutex_);

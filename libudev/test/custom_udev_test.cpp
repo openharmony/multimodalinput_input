@@ -20,7 +20,11 @@
 
 #include "test_device.h"
 
+namespace OHOS {
+namespace MMI {
+namespace {
 using ::testing::ext::TestSize;
+} // namespace
 
 class UdevTestDevice : public TestDevice {
 public:
@@ -528,3 +532,5 @@ HWTEST_F(CustomUdevTest, udev_device_new_from_syspath, TestSize.Level1)
     std::string subSys("test");
     EXPECT_EQ(udev_device_new_from_syspath(udev, subSys.c_str()), nullptr);
 }
+} // namespace MMI
+} // namespace OHOS
