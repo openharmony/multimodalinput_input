@@ -73,6 +73,11 @@ public:
     {
         return surfaceNode_;
     }
+    
+    void SetDPI(float dpi)
+    {
+        dpi_ = dpi;
+    }
 
     float GetDPI() const
     {
