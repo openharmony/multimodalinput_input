@@ -534,6 +534,8 @@ private:
     int32_t scalePercent_ = 100;
     mutable int32_t lastWinX_ { 0 };
     mutable int32_t lastWinY_ { 0 };
+    int32_t currentDisplayX_ { 0 };
+    int32_t currentDisplayY_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
