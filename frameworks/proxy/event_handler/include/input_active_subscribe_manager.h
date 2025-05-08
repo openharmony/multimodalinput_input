@@ -52,11 +52,7 @@ public:
     void OnConnected();
 
 private:
-    int32_t GenerateSubscribeId();
-
-private:
-    std::map<int32_t, SubscribeInputActiveInfo> subscribeInfos_;
-    static int32_t subscribeManagerId_;
+    std::shared_ptr<SubscribeInputActiveInfo> subscribeInfo_ = nullptr;
     std::mutex mtx_;
 };
 #define INPUT_ACTIVE_SUBSCRIBE_MGR ::OHOS::Singleton<InputActiveSubscribeManager>::GetInstance()
