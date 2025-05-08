@@ -62,6 +62,10 @@
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "util_ex.h"
 #include "xcollie/xcollie.h"
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#include "touchpad_settings_handler.h"
+#include "account_manager.h"
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -110,6 +114,9 @@ constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 constexpr int32_t RETRY_CHECK_TIMES { 5 };
 constexpr int32_t CHECK_EEVENT_INTERVAL_TIME { 4000 };
+constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
+const std::string PRODUCT_DEVICE_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_TYPE_PC = "2in1";
 const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 const std::set<int32_t> g_keyCodeValueSet = {
 #ifndef OHOS_BUILD_ENABLE_WATCH
@@ -1874,6 +1881,12 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);
     }
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
+        TOUCHPAD_MGR->SetCommonEventReady();
+        TOUCHPAD_MGR->RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
+    }
+#endif
 }
 
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
@@ -3852,6 +3865,22 @@ int32_t MMIService::LaunchAiScreenAbility()
     });
     if (ret != RET_OK) {
         MMI_HILOGE("LaunchAiScreenAbility failed, return:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::GetMaxMultiTouchPointNum(int32_t &pointNum)
+{
+    int ret = delegateTasks_.PostSyncTask(
+        [&pointNum] () {
+            auto productDeviceType = PRODUCT_DEVICE_TYPE;
+            MMI_HILOGI("ProductDeviceType:%{public}s", productDeviceType.c_str());
+            pointNum = MAX_MULTI_TOUCH_POINT_NUM;
+            return RET_OK;
+        }
+    );
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetMaxMultiTouchPointNum failed, return:%{public}d", ret);
     }
     return ret;
 }

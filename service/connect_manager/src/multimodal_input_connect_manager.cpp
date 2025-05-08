@@ -1073,5 +1073,12 @@ int32_t MultimodalInputConnectManager::LaunchAiScreenAbility()
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->LaunchAiScreenAbility();
 }
+
+int32_t MultimodalInputConnectManager::GetMaxMultiTouchPointNum(int32_t &pointNum)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetMaxMultiTouchPointNum(pointNum);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -510,6 +510,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::QUERY_SWITCH_STATE_EVENT):
             ret = StubQuerySwitchStatus(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MAX_MULTI_TOUCH_POINT_NUM):
+            ret = StubGetMaxMultiTouchPointNum(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -3513,6 +3516,20 @@ int32_t MultimodalInputConnectStub::StubLaunchAiScreenAbility(MessageParcel& dat
         MMI_HILOGE("Call LaunchAiScreenAbility failed ret:%{public}d", ret);
         return ret;
     }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetMaxMultiTouchPointNum(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pointNum { -1 };
+    int32_t ret = GetMaxMultiTouchPointNum(pointNum);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetMaxMultiTouchPointNum failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, pointNum, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("maxMultiTouchPointNum :%{public}d", pointNum);
     return RET_OK;
 }
 } // namespace MMI

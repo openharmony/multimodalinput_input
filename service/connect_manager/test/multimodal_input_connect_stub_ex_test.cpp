@@ -386,6 +386,8 @@ public:
     };
     int32_t LaunchAiScreenAbility() override { return RET_OK; }
 
+    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override { return RET_OK; }
+
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;
@@ -9234,6 +9236,22 @@ HWTEST_F(MultimodalInputConnectStubTest, StubLaunchAiScreenAbility_001, TestSize
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubLaunchAiScreenAbility(data, reply));
+}
+
+/**
+ * @tc.name: StubGetMaxMultiTouchPointNum_001
+ * @tc.desc: Test the function StubGetMaxMultiTouchPointNum
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetMaxMultiTouchPointNum_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetMaxMultiTouchPointNum(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS
