@@ -175,6 +175,7 @@ public:
     int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
     int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override;
+    int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
