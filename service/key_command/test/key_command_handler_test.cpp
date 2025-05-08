@@ -63,7 +63,7 @@ constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string EXTENSION_ABILITY_ABNORMAL = "extensionAbilityAbnormal";
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
-const char* SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const vector<float> CIRCLE_COORDINATES = {
     328.0f, 596.0f, 328.0f, 597.0f, 322.0f, 606.0f,
     306.0f, 635.0f, 291.0f, 665.0f, 283.0f, 691.0f,
