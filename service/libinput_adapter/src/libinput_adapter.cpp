@@ -826,6 +826,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeFourBegin(libinput_event_touch* tou
     libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
+    vtpSwipeState_ = VTPSwipeStateType::SWIPE_BEGIN;
     return true;
 }
 
@@ -837,8 +838,8 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeFourUpdate(libinput_event_touch* to
             static_cast<int32_t>(msgItem.size()));
         return false;
     }
-    int32_t msgPPosX = msg[VKEY_TP_SM_MSG_POS_X_IDX];
-    int32_t msgPPosY = msg[VKEY_TP_SM_MSG_POS_Y_IDX];
+    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
+    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
     event_gesture gEvent;
     gEvent.device_coords_x[0] = msgPPosX;
     gEvent.device_coords_y[0] = msgPPosY;
@@ -851,7 +852,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeFourUpdate(libinput_event_touch* to
     return true;
 }
 
-bool LibinputAdapter::HandleVKeyTrackPadSwipeEnd(libinput_event_touch* touch,
+bool LibinputAdapter::HandleVKeyTrackPadSwipeFourEnd(libinput_event_touch* touch,
     const std::vector<int32_t>& msgItem)
 {
     if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
@@ -865,6 +866,7 @@ bool LibinputAdapter::HandleVKeyTrackPadSwipeEnd(libinput_event_touch* touch,
     libinput_event_gesture* lgEvent = libinput_create_gesture_event(touch, gEvent);
     funInputEvent_((libinput_event*)lgEvent, frameTime);
     free(lgEvent);
+    vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
     return true;
 }
 
