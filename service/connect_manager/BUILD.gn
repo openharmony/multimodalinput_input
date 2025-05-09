@@ -69,6 +69,7 @@ ohos_source_set("mmi_connect_manager_service") {
   if (input_feature_product != "watch") {
     external_deps += [
       "bounds_checking_function:libsec_shared",
+      "cJSON:cjson",
       "c_utils:utilsbase",
       "graphic_2d:2d_graphics",
       "hilog:libhilog",
