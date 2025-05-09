@@ -3277,16 +3277,16 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
     for (const auto &item : rects) {
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
-        if (!AddInt32(item.x, item.width, displayMaxX)) {
+        if (!AddInt32(item.x - currentDisplayX_, item.width, displayMaxX)) {
             MMI_HILOGE("The addition of displayMaxX overflows");
             return false;
         }
-        if (!AddInt32(item.y, item.height, displayMaxY)) {
+        if (!AddInt32(item.y - currentDisplayY_, item.height, displayMaxY)) {
             MMI_HILOGE("The addition of displayMaxY overflows");
             return false;
         }
-        if (((windowX >= item.x) && (windowX < displayMaxX)) &&
-            (windowY >= item.y) && (windowY < displayMaxY)) {
+        if (((windowX >= (item.x - currentDisplayX_)) && (windowX < displayMaxX)) &&
+            (windowY >= (item.y - currentDisplayY_)) && (windowY < displayMaxY)) {
             lastWinX_ = windowX;
             lastWinY_ = windowY;
             return true;
@@ -3862,6 +3862,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t groupId = FindDisplayGroupId(displayId);
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
+    currentDisplayX_ = physicalDisplayInfo->x;
+    currentDisplayY_ = physicalDisplayInfo->y;
     int32_t DisplayInfoX = GetLogicalPositionX(displayId);
     int32_t DisplayInfoY = GetLogicalPositionY(displayId);
     int32_t pointerId = pointerEvent->GetPointerId();
@@ -4080,8 +4082,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
-        auto windowXY = TransformWindowXY(
-            *touchWindow, logicalX - physicalDisplayInfo->x, logicalY - physicalDisplayInfo->y);
+        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
@@ -6019,11 +6020,13 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInfo &window,
     double logicX, double logicY) const
 {
+    int32_t currX = logicX - currentDisplayX_;
+    int32_t currY = logicY - currentDisplayY_;
     Matrix3f transform(window.transform);
     if (window.transform.size() != MATRIX3_SIZE || transform.IsIdentity()) {
-        return {logicX, logicY};
+        return {currX, currY};
     }
-    Vector3f logicXY(logicX, logicY, 1.0);
+    Vector3f logicXY(currX, currY, 1.0);
     Vector3f windowXY = transform * logicXY;
     return {round(windowXY[0]), round(windowXY[1])};
 }
