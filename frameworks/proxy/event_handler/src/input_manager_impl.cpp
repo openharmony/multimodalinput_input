@@ -2825,7 +2825,7 @@ int32_t InputManagerImpl::LaunchAiScreenAbility()
 int32_t InputManagerImpl::GetMaxMultiTouchPointNum(int32_t &pointNum)
 {
     CALL_INFO_TRACE;
-    return MULTIMODAL_INPUT_CONNECT_MGR->GetMaxMultiTouchPointNum(pointNum);
+    return MultimodalEventHandler::GetMaxMultiTouchPointNum(pointNum);
 }
 
 int32_t InputManagerImpl::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
