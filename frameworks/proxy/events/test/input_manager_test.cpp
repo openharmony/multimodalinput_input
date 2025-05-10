@@ -5620,5 +5620,52 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetMaxMultiTouchPointNum_001, TestSi
         ASSERT_EQ(MAX_MULTI_TOUCH_POINT_NUM, pointNum);
     }
 }
+
+/*
+ * @tc.name: InputManagerTest_SwitchTouchTracking_001
+ * @tc.desc: SwitchTouchTracking
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SwitchTouchTracking_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    constexpr uid_t accessibility { 1103 };
+    ASSERT_EQ(::setuid(accessibility), RET_OK);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SwitchTouchTracking(true));
+    auto ret = InputManager::GetInstance()->SwitchTouchTracking(true);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_SwitchTouchTracking_002
+ * @tc.desc: SwitchTouchTracking
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SwitchTouchTracking_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    constexpr uid_t accessibility { 1103 };
+    ASSERT_EQ(::setuid(accessibility), RET_OK);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SwitchTouchTracking(false));
+    auto ret = InputManager::GetInstance()->SwitchTouchTracking(false);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_SwitchTouchTracking_003
+ * @tc.desc: Only `accessibility` is allowed to call SwitchTouchTracking.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SwitchTouchTracking_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    constexpr uid_t root { 0 };
+    ASSERT_EQ(::setuid(root), RET_OK);
+    auto ret = InputManager::GetInstance()->SwitchTouchTracking(true);
+    EXPECT_EQ(ret, PERMISSION_DENIED);
+}
 } // namespace MMI
 } // namespace OHOS

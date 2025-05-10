@@ -392,6 +392,8 @@ public:
         return RET_OK;
     };
 
+    int32_t SwitchTouchTracking(bool touchTracking) override { return RET_OK; }
+
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override { return RET_OK; }
 
     int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override
