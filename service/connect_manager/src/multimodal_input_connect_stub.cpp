@@ -3543,7 +3543,15 @@ int32_t MultimodalInputConnectStub::StubSetInputDeviceConsumer(MessageParcel& da
         READSTRING(data, deviceName, IPC_PROXY_DEAD_OBJECT_ERR);
         deviceNames.push_back(deviceName);
     }
-    int32_t ret = SetInputDeviceConsumer(deviceNames);
+    bool flag = ParseDeviceConsumerConfig();
+    if (!flag) {
+        return ERROR_NO_PERMISSION;
+    }
+    auto nameVec = FilterConsumers(deviceNames);
+    if (nameVec.empty()) {
+        return ERROR_NO_PERMISSION;
+    }
+    auto ret = SetInputDeviceConsumer(nameVec);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputConsumerHandler failed ret:%{public}d", ret);
         return ret;
@@ -3566,7 +3574,15 @@ int32_t MultimodalInputConnectStub::StubClearInputDeviceConsumer(MessageParcel& 
         READSTRING(data, deviceName, IPC_PROXY_DEAD_OBJECT_ERR);
         deviceNames.push_back(deviceName);
     }
-    int32_t ret = ClearInputDeviceConsumer(deviceNames);
+    bool flag = ParseDeviceConsumerConfig();
+    if (!flag) {
+        return ERROR_NO_PERMISSION;
+    }
+    auto nameVec = FilterConsumers(deviceNames);
+    if (nameVec.empty()) {
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t ret = ClearInputDeviceConsumer(nameVec);
     if (ret != RET_OK) {
         MMI_HILOGE("Call ClearInputDeviceConsumer failed ret:%{public}d", ret);
         return ret;
@@ -3611,6 +3627,72 @@ int32_t MultimodalInputConnectStub::StubSwitchScreenCapturePermission(
         return ret;
     }
     return RET_OK;
+}
+
+bool MultimodalInputConnectStub::ParseDeviceConsumerConfig()
+{
+    CALL_DEBUG_ENTER;
+    consumersData_.consumers.clear();
+    std::string defaultConfig = "/system/etc/multimodalinput/input_device_consumers.json";
+    std::string jsonStr = ReadJsonFile(defaultConfig);
+    if (jsonStr.empty()) {
+        MMI_HILOGE("Read configFile failed");
+        return false;
+    }
+    JsonParser jsonData;
+    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.json_)) {
+        MMI_HILOGE("The json data is not object");
+        return false;
+    }
+    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "consumers");
+    if (!cJSON_IsArray(consumers)) {
+        MMI_HILOGE("consumers number must be array");
+        return false;
+    }
+    cJSON* consumer;
+    cJSON_ArrayForEach(consumer, consumers) {
+        if (cJSON_IsObject(consumer)) {
+            DeviceConsumer deviceConsumer;
+            cJSON* name = cJSON_GetObjectItemCaseSensitive(consumer, "name");
+            if (name != nullptr && cJSON_IsString(name)) {
+                char *nameString = cJSON_Print(name);
+                std::string nameStr(nameString);
+                if (!nameStr.empty() && nameStr.front() == '"' && nameStr.back() == '"') {
+                    nameStr = nameStr.substr(1, nameStr.size() - 2);
+                }
+                deviceConsumer.name = nameStr;
+                cJSON_free(nameString);
+            }
+            cJSON* uid_array = cJSON_GetObjectItemCaseSensitive(consumer, "uids");
+            if (uid_array != nullptr && cJSON_IsArray(uid_array)) {
+                cJSON* uid;
+                cJSON_ArrayForEach(uid, uid_array) {
+                    if (cJSON_IsNumber(uid)) {
+                        deviceConsumer.uids.push_back(cJSON_GetNumberValue(uid));
+                    }
+                }
+            }
+            consumersData_.consumers.push_back(deviceConsumer);
+        }
+    }
+    return true;
+}
+
+std::vector<std::string> MultimodalInputConnectStub::FilterConsumers(std::vector<std::string> &deviceNames)
+{
+    std::vector<std::string> filterNames;
+    int32_t callingUid = GetCallingUid();
+    for (const auto& consumer : consumersData_.consumers) {
+        if (std::find(deviceNames.begin(), deviceNames.end(), consumer.name) != deviceNames.end()) {
+            for (const auto& uid : consumer.uids) {
+                if (uid == callingUid) {
+                    filterNames.push_back(consumer.name);
+                }
+            }
+        }
+    }
+    return filterNames;
 }
 } // namespace MMI
 } // namespace OHOS

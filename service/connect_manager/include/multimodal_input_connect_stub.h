@@ -17,6 +17,7 @@
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "iremote_stub.h"
+#include "cJSON.h"
 
 #include "i_multimodal_input_connect.h"
 #include "multimodalinput_ipc_interface_code.h"
@@ -38,6 +39,31 @@ struct ParseData {
         deviceTags = 0;
     }
 };
+
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json_ != nullptr) {
+            cJSON_Delete(json_);
+        }
+    }
+    operator cJSON *()
+    {
+        return json_;
+    }
+    cJSON *json_ { nullptr };
+};
+
+struct DeviceConsumer {
+    std::string name {};
+    std::vector<int32_t> uids {};
+};
+
+struct ConsumersData {
+    std::vector<DeviceConsumer> consumers {};
+};
+
 class MultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
     MultimodalInputConnectStub() = default;
@@ -195,6 +221,11 @@ private:
     int32_t VerifyTouchPadSetting(void);
     int32_t HandleGestureMonitor(MultimodalinputConnectInterfaceCode code,
         MessageParcel& data, MessageParcel& reply);
+    
+    bool ParseDeviceConsumerConfig();
+    std::vector<std::string> FilterConsumers(std::vector<std::string> &deviceNames);
+    
+    ConsumersData consumersData_;
 };
 } // namespace MMI
 } // namespace OHOS

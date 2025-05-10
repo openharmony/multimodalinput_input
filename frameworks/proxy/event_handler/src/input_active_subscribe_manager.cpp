@@ -26,8 +26,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
+constexpr int32_t CURRENT_SUBSCRIBE_ID { 0 };
 }
-int32_t InputActiveSubscribeManager::subscribeManagerId_ = 0;
 
 InputActiveSubscribeManager::InputActiveSubscribeManager() {}
 InputActiveSubscribeManager::~InputActiveSubscribeManager() {}
@@ -42,46 +42,53 @@ int32_t InputActiveSubscribeManager::SubscribeInputActive(
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t subscribeId = GenerateSubscribeId();
-    if (subscribeId == INVALID_SUBSCRIBE_ID) {
-        return INVALID_SUBSCRIBE_ID;
+    std::shared_ptr<SubscribeInputActiveInfo> subscribeInfo = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        if (subscribeInfo_) {
+            MMI_HILOGE("A process only supports one interface call");
+            return ERROR_ONE_PROCESS_ONLY_SUPPORT_ONE;
+        }
+        subscribeInfo = std::make_shared<SubscribeInputActiveInfo>(inputEventConsumer, interval);
+        CHKPR(subscribeInfo, ERROR_ALLOC_SUBSCRIBEINFO_FAILED);
     }
-    subscribeInfos_.emplace(std::make_pair(subscribeId, SubscribeInputActiveInfo(inputEventConsumer, interval)));
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SubscribeInputActive(subscribeId, interval);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SubscribeInputActive(CURRENT_SUBSCRIBE_ID, interval);
     if (ret != RET_OK) {
         MMI_HILOGE("Subscribing input active failed, ret:%{public}d", ret);
-        subscribeInfos_.erase(subscribeId);
-        return INVALID_SUBSCRIBE_ID;
+        return ERROR_SUBSCRIBE_SERVER_FAILED;
     }
-    MMI_HILOGI("The subscribeId:%{public}d, inputActiveInterval:%{public}" PRId64, subscribeId, interval);
-    return subscribeId;
+    std::lock_guard<std::mutex> guard(mtx_);
+    subscribeInfo_ = subscribeInfo;
+    MMI_HILOGI("The subscribeId:%{public}d, inputActiveInterval:%{public}" PRId64, CURRENT_SUBSCRIBE_ID, interval);
+    return CURRENT_SUBSCRIBE_ID;
 }
 
 int32_t InputActiveSubscribeManager::UnsubscribeInputActive(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
-    if (subscribeId < 0) {
-        MMI_HILOGE("The subscribeId(%{public}d) is less then 0", subscribeId);
-        return INVALID_SUBSCRIBE_ID;
+    if (subscribeId != CURRENT_SUBSCRIBE_ID) {
+        MMI_HILOGE("The subscribeId(%{public}d) is invalid", subscribeId);
+        return ERROR_INVALID_SUBSCRIBE_ID;
     }
 
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto it = subscribeInfos_.find(subscribeId);
-    if (it == subscribeInfos_.end()) {
-        MMI_HILOGE("subscribeId(%{public}d) is not exist", subscribeId);
-        return RET_ERR;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        if (!subscribeInfo_) {
+            MMI_HILOGE("no SubscribeInputActive");
+            return ERROR_NO_SUBSCRIBE_INPUT_ACTIVE;
+        }
     }
     if (MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeInputActive(subscribeId) != RET_OK) {
         MMI_HILOGE("Leave, unsubscribe input active failed");
-        return RET_ERR;
+        return ERROR_UNSUBSCRIBE_SERVER_FAILED;
     }
-    subscribeInfos_.erase(it);
+    std::lock_guard<std::mutex> guard(mtx_);
+    subscribeInfo_ = nullptr;
     return RET_OK;
 }
 
@@ -90,19 +97,18 @@ int32_t InputActiveSubscribeManager::OnSubscribeInputActiveCallback(
 {
     CHK_PID_AND_TID();
     CHKPR(keyEvent, RET_ERR);
-    if (subscribeId < 0) {
-        MMI_HILOGE("The subscribeId(%{public}d) is less then 0", subscribeId);
-        return RET_ERR;
+    if (subscribeId != CURRENT_SUBSCRIBE_ID) {
+        MMI_HILOGE("The subscribeId(%{public}d) is invalid", subscribeId);
+        return ERROR_INVALID_SUBSCRIBE_ID;
     }
     std::shared_ptr<IInputEventConsumer> inputEventConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(mtx_);
-        auto it = subscribeInfos_.find(subscribeId);
-        if (it == subscribeInfos_.end()) {
-            MMI_HILOGE("The subscribeId(%{public}d) is not found", subscribeId);
-            return RET_ERR;
+        if (!subscribeInfo_) {
+            MMI_HILOGE("had UnsubscribeInputActive");
+            return ERROR_HAD_UNSUBSCRIBE_INPUT_ACTIVE;
         }
-        inputEventConsumer = it->second.GetCallback();
+        inputEventConsumer = subscribeInfo_->GetCallback();
     }
     CHKPR(inputEventConsumer, RET_ERR);
     inputEventConsumer->OnInputEvent(keyEvent);
@@ -115,19 +121,18 @@ int32_t InputActiveSubscribeManager::OnSubscribeInputActiveCallback(
 {
     CHK_PID_AND_TID();
     CHKPR(pointerEvent, RET_ERR);
-    if (subscribeId < 0) {
-        MMI_HILOGE("The subscribeId(%{public}d) is less then 0", subscribeId);
-        return RET_ERR;
+    if (subscribeId != CURRENT_SUBSCRIBE_ID) {
+        MMI_HILOGE("The subscribeId(%{public}d) is invalid", subscribeId);
+        return ERROR_INVALID_SUBSCRIBE_ID;
     }
     std::shared_ptr<IInputEventConsumer> inputEventConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(mtx_);
-        auto it = subscribeInfos_.find(subscribeId);
-        if (it == subscribeInfos_.end()) {
-            MMI_HILOGE("The subscribeId(%{public}d) is not found", subscribeId);
-            return RET_ERR;
+        if (!subscribeInfo_) {
+            MMI_HILOGE("had UnsubscribeInputActive");
+            return ERROR_HAD_UNSUBSCRIBE_INPUT_ACTIVE;
         }
-        inputEventConsumer = it->second.GetCallback();
+        inputEventConsumer = subscribeInfo_->GetCallback();
     }
     CHKPR(inputEventConsumer, RET_ERR);
     inputEventConsumer->OnInputEvent(pointerEvent);
@@ -138,31 +143,20 @@ int32_t InputActiveSubscribeManager::OnSubscribeInputActiveCallback(
 void InputActiveSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (subscribeInfos_.empty()) {
-        MMI_HILOGD("subscribeInfos_ is empty");
-        return;
-    }
     CHKPV(MULTIMODAL_INPUT_CONNECT_MGR);
-    for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); it++) {
-        SubscribeInputActiveInfo& subscribeInfo = it->second;
-        int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SubscribeInputActive(
-            it->first, subscribeInfo.GetInputActiveInterval());
-        if (ret != RET_OK) {
-            MMI_HILOGE("Subscribe input active failed, ret:%{public}d", ret);
+    std::shared_ptr<SubscribeInputActiveInfo> subscribeInfo = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        if (!subscribeInfo_) {
+            return;
         }
+        subscribeInfo = subscribeInfo_;
     }
-}
-
-int32_t InputActiveSubscribeManager::GenerateSubscribeId()
-{
-    if (InputActiveSubscribeManager::subscribeManagerId_ >= (INT_MAX - 1)) {
-        MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
-        return INVALID_SUBSCRIBE_ID;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SubscribeInputActive(
+        CURRENT_SUBSCRIBE_ID, subscribeInfo->GetInputActiveInterval());
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeInputActive failed, subscribeId_:%{public}d, ret:%{public}d", CURRENT_SUBSCRIBE_ID, ret);
     }
-    int32_t subscribeId = InputActiveSubscribeManager::subscribeManagerId_;
-    ++InputActiveSubscribeManager::subscribeManagerId_;
-    return subscribeId;
 }
 } // namespace MMI
 } // namespace OHOS
