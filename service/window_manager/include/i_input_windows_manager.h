@@ -180,6 +180,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    virtual void SwitchTouchTracking(bool touchTracking) = 0;
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();

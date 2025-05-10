@@ -136,6 +136,8 @@ enum {
     SESSION_NOT_FOUND,
     // 监听增加失败
     INVALID_MONITOR_MON,
+    // 权限校验失败
+    PERMISSION_DENIED,
     // 功能不支持
     CAPABILITY_NOT_SUPPORTED
 };
