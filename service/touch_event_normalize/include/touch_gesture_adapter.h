@@ -42,6 +42,7 @@ private:
         return shouldDeliverToNext_;
     }
     void Init();
+    void LogTouchEvent(std::shared_ptr<PointerEvent> event) const;
     void OnTouchEvent(std::shared_ptr<PointerEvent> event);
     void OnSwipeGesture(std::shared_ptr<PointerEvent> event);
     void OnPinchGesture(std::shared_ptr<PointerEvent> event);
