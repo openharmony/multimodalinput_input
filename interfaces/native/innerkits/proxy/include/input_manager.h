@@ -181,7 +181,7 @@ public:
      * @param switchType Indicates the type of switch to query.
      * @param state Indicates the state of switch with given type.
      * @return Returns <b>0<b/> if success; returns a non-0 value otherwise.
-     * @since 16
+     * @since 18
      */
     int32_t QuerySwitchStatus(SwitchEvent::SwitchType switchType, SwitchEvent::SwitchState &state);
 
