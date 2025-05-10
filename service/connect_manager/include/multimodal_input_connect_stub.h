@@ -215,6 +215,7 @@ protected:
     int32_t StubSubscribeInputActive(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeInputActive(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetMaxMultiTouchPointNum(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSwitchScreenCapturePermission(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

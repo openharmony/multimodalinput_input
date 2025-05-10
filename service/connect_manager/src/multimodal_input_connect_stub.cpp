@@ -45,6 +45,8 @@ constexpr int32_t MIN_SPEED { 1 };
 constexpr int32_t KEY_MAX_LIST_SIZE { 5 };
 constexpr int32_t CALL_MANAGER_UID { 5523 };
 constexpr int32_t MAX_DEVICE_NUM { 10 };
+constexpr int32_t GAME_UID { 7011 };
+constexpr int32_t PENGLAI_UID { 7655 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -494,6 +496,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MUILT_WINDOW_SCREEN_ID):
             ret = StubSetMultiWindowScreenId(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SWITCH_TEMPORARY_SCREEN_CAPTURE_PERMISSION):
+            ret = StubSwitchScreenCapturePermission(data, reply);
             break;
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_MONITOR):
@@ -3599,6 +3604,30 @@ int32_t MultimodalInputConnectStub::StubGetMaxMultiTouchPointNum(MessageParcel& 
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubSwitchScreenCapturePermission(
+    MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t callingUid = GetCallingUid();
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (callingUid != PENGLAI_UID && callingUid != GAME_UID) {
+        MMI_HILOGE("Verify specified system APP failed");
+        return ERROR_NO_PERMISSION;
+    }
+    uint32_t permissionType = 0xFF;
+    bool enable = true;
+    READUINT32(data, permissionType, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SwitchScreenCapturePermission(permissionType, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SwitchScreenCapturePermission failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 
 bool MultimodalInputConnectStub::ParseDeviceConsumerConfig()
 {

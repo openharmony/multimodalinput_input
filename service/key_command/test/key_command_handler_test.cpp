@@ -6519,5 +6519,49 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount_001, 
     handler.walletLaunchDelayTimes_ = 1;
     ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKeyCount(repeatKey, keyEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SwitchScreenCapturePermission
+ * @tc.desc: Test SwitchScreenCapturePermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SwitchScreenCapturePermission, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::uint32_t permissions = DEFAULT_PERMISSIONS;
+    bool enable = false;
+    ASSERT_NO_FATAL_FAILURE(handler.SwitchScreenCapturePermission(permissions, enable));
+    EXPECT_EQ(handler.screenCapturePermission_, 0);
+
+    enable = true;
+    ASSERT_NO_FATAL_FAILURE(handler.SwitchScreenCapturePermission(permissions, enable));
+    EXPECT_EQ(handler.screenCapturePermission_, DEFAULT_PERMISSIONS);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HasScreenCapturePermission
+ * @tc.desc: Test HasScreenCapturePermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HasScreenCapturePermission, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.gameForbidFingerKnuckle_ = false;
+    handler.screenshotSwitch_.statusConfigValue = true;
+    handler.recordSwitch_.statusConfigValue = true;
+    EXPECT_EQ(handler.HasScreenCapturePermission(KNUCKLE_SCREENSHOT), 1);
+    EXPECT_EQ(handler.HasScreenCapturePermission(KNUCKLE_SCROLL_SCREENSHOT), 1);
+    EXPECT_EQ(handler.HasScreenCapturePermission(KNUCKLE_ENABLE_AI_BASE), 1);
+    EXPECT_EQ(handler.HasScreenCapturePermission(KNUCKLE_SCREEN_RECORDING), 1);
+    EXPECT_EQ(handler.HasScreenCapturePermission(TOUCHPAD_KNUCKLE_SCREENSHOT), 1);
+    EXPECT_EQ(handler.HasScreenCapturePermission(TOUCHPAD_KNUCKLE_SCREEN_RECORDING), 1);
+    EXPECT_EQ(handler.HasScreenCapturePermission(SHORTCUT_KEY_SCREENSHOT), 1);
+    EXPECT_EQ(handler.HasScreenCapturePermission(SHORTCUT_KEY_SCREEN_RECORDING), 1);
+    EXPECT_EQ(handler.HasScreenCapturePermission(DEFAULT_PERMISSIONS), 1);
+}
 } // namespace MMI
 } // namespace OHOS

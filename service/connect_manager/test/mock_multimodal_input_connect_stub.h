@@ -203,6 +203,7 @@ public:
     MOCK_METHOD(int32_t, UnsubscribeInputActive, (int32_t subscribeId), (override));
     MOCK_METHOD(bool, IsRunning, (), (const override));
     MOCK_METHOD(int32_t, GetMaxMultiTouchPointNum, (int32_t &pointNum), (override));
+    MOCK_METHOD(int32_t, SwitchScreenCapturePermission, (uint32_t permissionType, bool enable), (override));
 };
 
 }  // namespace MMI

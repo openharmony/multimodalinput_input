@@ -1178,6 +1178,15 @@ public:
     */
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
 
+    /**
+    * @brief Temporarily enables or disables screen capture and screen recording permissions.
+    * @param permissionType The type of permission to switch (e.g., SCREENSHOT or SCREENRECORD).
+    * @param enable Set to true to enable the permission, false to disable it.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 20
+    */
+    int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

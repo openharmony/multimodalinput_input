@@ -89,6 +89,7 @@ public:
     int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceName,
         std::shared_ptr<IInputEventConsumer> consumer);
     void OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
