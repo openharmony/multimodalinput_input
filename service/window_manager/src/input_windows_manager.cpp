@@ -4675,9 +4675,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 continue;
             }
         }
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
         bool isSlidTouch = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER  &&
             pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            pointerEvent->GetPointerIds().size() == 1 && !checkToolType) ||
+            pointerEvent->GetPointerIds().size() == 1 && !checkToolType &&
+            pointerEvent->GetFixedMode() == PointerEvent::FixedMode::AUTO) ||
             (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
         if (isSlidTouch) {
             if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
@@ -4687,6 +4689,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 break;
             }
         }
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
         if (targetWindowId >= 0 && pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
             (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_PEN || pointerItem.GetPressure() > 0)) {
             bool isUiExtentionWindow = false;
@@ -4926,7 +4929,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
         }
     }
-    TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    bool isSlidData = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER  &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        pointerEvent->GetPointerIds().size() == 1 && !checkExtraData &&
+        pointerEvent->GetFixedMode() == PointerEvent::FixedMode::AUTO) ||
+        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
+    if (isSlidData) {
+        TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
+    }
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     isHPR_ = PRODUCT_TYPE_HPR == DEVICE_TYPE_HPR;
     if (isHPR_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent);
@@ -5157,9 +5169,10 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
         return;
     }
     PointerEvent::PointerItem currentPointerItem;
-    int32_t windowX = lastWinX_;
-    int32_t windowY = lastWinY_;
-    if (lastTouchEvent_->GetFixedMode() == PointerEvent::FixedMode::AUTO) {
+    bool isOneHand = lastTouchEvent_->GetFixedMode() == PointerEvent::FixedMode::AUTO;
+    int32_t windowX = isOneHand ? lastWinX_ : (lastTouchLogicX_ - lastTouchWindowInfo_.area.x);
+    int32_t windowY = isOneHand ? lastWinY_ : (lastTouchLogicY_ - lastTouchWindowInfo_.area.y);
+    if (isOneHand) {
         WindowInputType windowInputType = lastTouchWindowInfo_.windowInputType;
         if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
@@ -6741,6 +6754,7 @@ std::pair<int32_t, int32_t> InputWindowsManager::CalcDrawCoordinate(const Displa
     return {static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY)};
 }
 
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
 void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow)
 {
@@ -6756,21 +6770,24 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
                 static_cast<int32_t>(touchWindow->windowInputType));
             DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL);
         }
-        MMI_HILOG_DISPATCHI("Send down-action to the new window, (lastWId:%{public}d, LastPId:%{public}d), "
-            "(newWId:%{public}d, newWId:%{public}d)",
-            lastTouchWindowInfo_.id, lastTouchWindowInfo_.pid, touchWindow->id, touchWindow->pid);
-        lastTouchLogicX_ = logicalX;
-        lastTouchLogicY_ = logicalY;
-        lastTouchEvent_ = pointerEvent;
-        lastTouchEvent_->SetFixedMode(PointerEvent::FixedMode::AUTO);
-        lastTouchWindowInfo_ = *touchWindow;
-        DispatchTouch(PointerEvent::POINTER_ACTION_DOWN);
-        return;
+        if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE ||
+            lastTouchWindowInfo_.windowInputType == WindowInputType::SLID_TOUCH_WINDOW) {
+            MMI_HILOG_DISPATCHI("Send down-action to the new window, (lastWId:%{public}d, LastPId:%{public}d), "
+                "(newWId:%{public}d, newWId:%{public}d)",
+                lastTouchWindowInfo_.id, lastTouchWindowInfo_.pid, touchWindow->id, touchWindow->pid);
+            lastTouchLogicX_ = logicalX;
+            lastTouchLogicY_ = logicalY;
+            lastTouchEvent_ = pointerEvent;
+            lastTouchWindowInfo_ = *touchWindow;
+            DispatchTouch(PointerEvent::POINTER_ACTION_DOWN);
+            return;
+        }
     }
     lastTouchLogicX_ = logicalX;
     lastTouchLogicY_ = logicalY;
     lastTouchEvent_ = pointerEvent;
     lastTouchWindowInfo_ = *touchWindow;
 }
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 } // namespace MMI
 } // namespace OHOS
