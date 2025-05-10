@@ -140,8 +140,8 @@ void TouchTransformProcessor::UpdatePointerItemProperties(PointerEvent::PointerI
     CALL_DEBUG_ENTER;
     item.SetDisplayX(touchInfo.point.x);
     item.SetDisplayY(touchInfo.point.y);
-    item.SetDisplayXPos(touchInfo.point.x);
-    item.SetDisplayYPos(touchInfo.point.y);
+    item.SetDisplayXPos(touchInfo.coordF.x);
+    item.SetDisplayYPos(touchInfo.coordF.y);
     item.SetRawDisplayX(touchInfo.point.x);
     item.SetRawDisplayY(touchInfo.point.y);
     item.SetToolDisplayX(touchInfo.toolRect.point.x);
@@ -223,8 +223,8 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     item.SetShortAxis(shortAxis);
     item.SetDisplayX(touchInfo.point.x);
     item.SetDisplayY(touchInfo.point.y);
-    item.SetDisplayXPos(touchInfo.point.x);
-    item.SetDisplayYPos(touchInfo.point.y);
+    item.SetDisplayXPos(touchInfo.coordF.x);
+    item.SetDisplayYPos(touchInfo.coordF.y);
     item.SetRawDisplayX(touchInfo.point.x);
     item.SetRawDisplayY(touchInfo.point.y);
     item.SetToolDisplayX(touchInfo.toolRect.point.x);
