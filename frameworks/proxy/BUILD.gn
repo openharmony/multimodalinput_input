@@ -146,6 +146,8 @@ ohos_shared_library("libmmi-client") {
   subsystem_name = "multimodalinput"
   external_deps = [
     "c_utils:utils",
+    "cJSON:cjson",
+    "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
@@ -341,6 +343,8 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
+    "cJSON:cjson",
+    "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -413,6 +417,8 @@ ohos_unittest("InputMonitorManagerTest") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
+    "cJSON:cjson",
+    "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "hilog:libhilog",
@@ -479,6 +485,8 @@ ohos_unittest("InputManagerImplTest") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
+    "cJSON:cjson",
+    "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock_main",
@@ -536,6 +544,8 @@ ohos_unittest("InputManagerTest") {
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
+    "cJSON:cjson",
+    "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",

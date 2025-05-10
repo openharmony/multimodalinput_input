@@ -247,6 +247,8 @@ typedef enum Input_Result {
     INPUT_DEVICE_NOT_SUPPORTED = 801,
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
+    /** No product config of specific parameter */
+    INPUT_NO_PRODUCT_CONFIG = 3800002,
     /** Interceptor repeatedly created for an application */
     INPUT_REPEAT_INTERCEPTOR = 4200001,
     /** @error Already occupied by the system */
@@ -1814,6 +1816,19 @@ Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **addr
  * @since 15
  */
 Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state);
+
+/**
+ * @brief Queries the maximum number of touch points supported by the current device.
+ *      If -1 is returned, the number is unknown.
+ * @param count Maximum number of touch points supported.
+ * @return one of result code:
+ *         {@link INPUT_SUCCESS} if the operation is successful.
+ *         {@link INPUT_PARAMETER_ERROR} if count is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+*/
+Input_Result OH_Input_QueryMaxTouchPoints(int32_t *count);
+
 #ifdef __cplusplus
 }
 #endif
