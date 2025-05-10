@@ -3854,5 +3854,24 @@ int32_t MMIService::GetMaxMultiTouchPointNum(int32_t &pointNum)
     }
     return ret;
 }
+
+int32_t MMIService::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
+{
+    CALL_INFO_TRACE;
+    int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPR(eventKeyCommandHandler, RET_ERR);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [permissionType, enable, eventKeyCommandHandler] {
+            return eventKeyCommandHandler->SwitchScreenCapturePermission(permissionType, enable);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("SwitchScreenCapturePermission failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
