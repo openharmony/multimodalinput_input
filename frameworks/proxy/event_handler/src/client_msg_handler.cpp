@@ -230,6 +230,15 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         processedCount_ = 0;
         lastEventId_ = pointerEvent->GetId();
     }
+    PointerEvent::PointerItem pointerItem {};
+    if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGD("Report pointer event, No:%{public}d,PA:%{public}s,DX:%{private}d,DY:%{private}d"
+            ",DXP:%{private}f,DYP:%{private}f,WXP:%{private}f,WYP:%{private}f",
+            pointerEvent->GetId(), pointerEvent->DumpPointerAction(),
+            pointerItem.GetDisplayX(), pointerItem.GetDisplayY(),
+            pointerItem.GetDisplayXPos(), pointerItem.GetDisplayYPos(),
+            pointerItem.GetWindowXPos(), pointerItem.GetWindowYPos());
+    }
     InputMgrImpl.OnPointerEvent(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
         pointerEvent->MarkProcessed();

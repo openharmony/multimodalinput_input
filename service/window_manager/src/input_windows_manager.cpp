@@ -1317,22 +1317,23 @@ void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const DisplayGro
 bool InputWindowsManager::IsPositionOutValidDisplay(
     Coordinate2D &position, const DisplayInfo &currentDisplay, bool isPhysicalPos)
 {
-    int32_t posX = static_cast<int32_t>(position.x);
-    int32_t posY = static_cast<int32_t>(position.y);
-    int32_t posWidth = currentDisplay.width;
-    int32_t posHeight = currentDisplay.height;
-    int32_t rotateX = posX;
-    int32_t rotateY = posY;
-    int32_t validW = currentDisplay.validWidth;
-    int32_t validH = currentDisplay.validHeight;
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
+    double posX = position.x;
+    double posY = position.y;
+    double posWidth = currentDisplay.width;
+    double posHeight = currentDisplay.height;
+    double rotateX = posX;
+    double rotateY = posY;
+    double validW = currentDisplay.validWidth;
+    double validH = currentDisplay.validHeight;
+    double offsetX = 0;
+    double offsetY = 0;
+
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     MMI_HILOGD("Start checking vtp cursor active area");
     if (IsPointerActiveRectValid(currentDisplay) && !isPhysicalPos) {
         validW = currentDisplay.pointerActiveWidth;
         validH = currentDisplay.pointerActiveHeight;
-        MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", validW, validH);
+        MMI_HILOGD("vtp cursor active area w:%{private}f, h:%{private}f", validW, validH);
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     if (isPhysicalPos) {
@@ -1363,8 +1364,8 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     bool isOut = (rotateX < offsetX) || (rotateX > offsetX + validW) ||
                  (rotateY < offsetY) || (rotateY > offsetY + validH);
     PrintDisplayInfo(currentDisplay);
-    MMI_HILOGD("isOut=%{public}d,isPhysicalPos=%{public}d Position={%{private}d %{private}d}"
-               "->{%{private}d %{private}d} RealValidWH={w:%{private}d h:%{private}d}",
+    MMI_HILOGD("isOut=%{public}d,isPhysicalPos=%{public}d Position={%{private}f %{private}f}"
+               "->{%{private}f %{private}f} RealValidWH={w:%{private}f h:%{private}f}",
         static_cast<int32_t>(isOut),
         static_cast<int32_t>(isPhysicalPos),
         posX,
@@ -1375,8 +1376,9 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
         validH);
 
     if (!isOut && isPhysicalPos) {
-        int32_t rotateX1 = rotateX - currentDisplay.offsetX;
-        int32_t rotateY1 = rotateY - currentDisplay.offsetY;
+        double rotateX1 = rotateX - currentDisplay.offsetX;
+        double rotateY1 = rotateY - currentDisplay.offsetY;
+
         if (currentDisplay.fixedDirection == DIRECTION0) {
             position.x = rotateX1;
             position.y = rotateY1;
@@ -1392,8 +1394,8 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
         } else {
             MMI_HILOGD("Invalid fixedDirection:%{public}d", currentDisplay.fixedDirection);
         }
-        MMI_HILOGD("rerotate={%{private}d %{private}d}->{%{private}f %{private}f} RealValidWH = "
-                   "{w:%{private}d h:%{private}d} RealWH{w:%{private}d h:%{private}d}",
+        MMI_HILOGD("rerotate={%{private}f %{private}f}->{%{private}f %{private}f} RealValidWH = "
+                   "{w:%{private}f h:%{private}f} RealWH{w:%{private}f h:%{private}f}",
             rotateX1,
             rotateY1,
             position.x,
@@ -2661,6 +2663,7 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     coord.x = pos.x;
     coord.y = pos.y;
     RotateScreen(info, coord);
+    touchInfo.coordF = coord;
     touchInfo.point.x = static_cast<int32_t>(coord.x);
     touchInfo.point.y = static_cast<int32_t>(coord.y);
     touchInfo.toolRect.point.x = static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, width));
