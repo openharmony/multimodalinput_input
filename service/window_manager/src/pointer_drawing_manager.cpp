@@ -560,8 +560,11 @@ void PointerDrawingManager::UpdateMouseStyle()
     GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (curPointerStyle.id == CURSOR_CIRCLE_STYLE || curPointerStyle.id == AECH_DEVELOPER_DEFINED_STYLE) {
         lastMouseStyle_.id = curPointerStyle.id;
-        return;
+        if (WIN_MGR->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, lastMouseStyle_) != RET_OK) {
+            MMI_HILOGE("Set pointer style failed");
+        }
     }
+    MMI_HILOGI("LastMouseStyle_.id:%{public}d, curPointerStyle.id:%{public}d", lastMouseStyle_.id, curPointerStyle.id);
 }
 
 int32_t PointerDrawingManager::SwitchPointerStyle()
@@ -2546,10 +2549,10 @@ void PointerDrawingManager::DrawManager()
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (hasDisplay_ && hasPointerDevice_ && (surfaceNodePtr == nullptr)) {
-        MMI_HILOGI("Draw pointer begin");
         PointerStyle pointerStyle;
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
-        MMI_HILOGD("Get pid %{public}d with pointerStyle %{public}d", pid_, pointerStyle.id);
+        MMI_HILOGI("Pid_:%{public}d, windowId_:%{public}d, pointerStyle.id:%{public}d", pid_,
+            windowId_, pointerStyle.id);
         Direction direction = static_cast<Direction>((
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         lastDrawPointerStyle_ = pointerStyle;
