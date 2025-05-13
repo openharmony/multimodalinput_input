@@ -2208,7 +2208,6 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
         READUINT8(data, buffer, IPC_PROXY_DEAD_OBJECT_ERR);
         extraData.buffer.push_back(buffer);
     }
-    READINT32(data, extraData.toolType, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.sourceType, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.pointerId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.pullId, IPC_PROXY_DEAD_OBJECT_ERR);

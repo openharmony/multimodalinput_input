@@ -241,7 +241,6 @@ private:
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayGroupInfo(const DisplayGroupInfo displayGroupInfo);
     void PrintDisplayInfo(const DisplayInfo displayInfo);
-    int32_t ConvertToolType(int32_t toolType);
     void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
     void PrintWindowNavbar(int32_t groupId = -1);
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
@@ -526,7 +525,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
