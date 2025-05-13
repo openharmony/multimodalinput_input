@@ -1769,6 +1769,13 @@ public:
     double GetFingerprintDistanceY() const;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    // SetAncoDeal接口和GetAncoDeal接口,使用时需要和多模对齐使用场景
+    void SetAncoDeal(bool ancoDeal);
+ 
+    bool GetAncoDeal() const;
+#endif // OHOS_BUILD_ENABLE_ANCO
+
     void SetScrollRows(int32_t scrollRows);
     int32_t GetScrollRows() const;
     void SetAutoToVirtualScreen(bool autoToVirtualScreen);
