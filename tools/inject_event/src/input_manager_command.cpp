@@ -257,6 +257,22 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py = 0;
                 int32_t buttonId;
                 int32_t scrollValue;
+
+                int32_t ppx = 0;
+                int32_t ppy = 0;
+                auto simulateMouseEvent = [&ppx, &ppy](std::shared_ptr<PointerEvent> pointerEvent)
+                {
+                    PointerEvent::PointerItem item;
+                    pointerEvent->GetPointerItem(0, item);
+                    int32_t x = item.GetDisplayX();
+                    int32_t y = item.GetDisplayY();
+                    item.SetRawDx(x - ppx);
+                    item.SetRawDy(y - ppy);
+                    pointerEvent->UpdatePointerItem(0, item);
+                    ppx = x;
+                    ppy = y;
+                    return InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                };
                 while ((c = getopt_long(argc, argv, "m:d:u:c:b:s:g:i:", mouseSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
@@ -303,7 +319,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetPointerId(0);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                simulateMouseEvent(pointerEvent);
                                 optind++;
                             } else {
                                 int32_t px1 = 0;
@@ -380,7 +396,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                simulateMouseEvent(pointerEvent);
 
                                 int64_t startTimeUs = GetSysClockTime();
                                 int64_t startTimeMs = startTimeUs / TIME_TRANSITION;
@@ -396,7 +412,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                     pointerEvent->UpdatePointerItem(0, item);
                                     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                                    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                    simulateMouseEvent(pointerEvent);
                                     SleepAndUpdateTime(currentTimeMs);
                                 }
 
@@ -407,7 +423,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                simulateMouseEvent(pointerEvent);
                             }
                             break;
                         }
@@ -434,7 +450,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             break;
                         }
                         case 'u': {
@@ -460,7 +476,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             break;
                         }
                         case 's': {
@@ -485,7 +501,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
                                 scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
 
                             time = pointerEvent->GetActionStartTime();
                             pointerEvent->SetActionTime(time + ACTION_TIME);
@@ -496,7 +512,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
                                 scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
 
                             time = pointerEvent->GetActionStartTime();
                             pointerEvent->SetActionTime(time + ACTION_TIME);
@@ -507,7 +523,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
                                 scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             break;
                         }
                         case 'c': {
@@ -533,7 +549,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerId(0);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             item.SetPointerId(0);
                             item.SetPressed(false);
                             item.SetDisplayX(px);
@@ -544,7 +560,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             break;
                         }
                         case 'b': {
@@ -619,23 +635,23 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
                             pointerEvent->AddPointerItem(item);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(clickIntervalTimeMs));
 
                             item.SetPressed(true);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             break;
                         }
                         case 'g': {
@@ -694,7 +710,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerId(0);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
 
                             int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
                             int64_t endTimeMs = 0;
@@ -709,7 +725,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                simulateMouseEvent(pointerEvent);
                                 SleepAndUpdateTime(currentTimeMs);
                             }
                             item.SetDisplayY(py2);
@@ -717,7 +733,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
 
                             item.SetPressed(true);
@@ -726,7 +742,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            simulateMouseEvent(pointerEvent);
                             break;
                         }
                         case 'i': {
