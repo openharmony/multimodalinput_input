@@ -378,14 +378,15 @@ public:
      * @brief Convert mouse events to touch events.
      * @param pointerEvent PointerEvent object.
      * @return bool
-     * @since 9
+     * @since 20
      */
     bool TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
-        /**
+
+    /**
      * @brief Convert touch events to mouse events.
      * @param pointerEvent PointerEvent object.
      * @return bool
-     * @since 9
+     * @since 20
      */
     bool TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
