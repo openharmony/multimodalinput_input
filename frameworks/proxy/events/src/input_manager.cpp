@@ -320,6 +320,7 @@ void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEv
 
 bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI_HILOGD("It's not MouseEvent, don't need to transform");
         return true;
@@ -360,8 +361,9 @@ bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent>
 
 bool InputManager::TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGD("It's not MouseEvent, don't need to transform");
+        MMI_HILOGD("It's not TouchEvent, don't need to transform");
         return true;
     }
 
