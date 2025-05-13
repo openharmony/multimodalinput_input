@@ -2769,7 +2769,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
 {
     CHKPF(touch);
     std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
-    if (screenId.empty()) {
+    if (screenId.empty() || (PRODUCT_TYPE == PRODUCT_TYPE_PC)) {
         screenId = "default0";
     }
     auto info = FindPhysicalDisplayInfo(screenId);
