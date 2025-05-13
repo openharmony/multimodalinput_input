@@ -1057,6 +1057,11 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
     MMI_HILOGI("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u, style = %{public}d",
         sp->GetScreenId(), cfg.style);
+    auto sret = buffer->FlushCache();
+    if (sret != RET_OK) {
+        MMI_HILOGE("FlushCache ret: %{public}d", sret);
+        return sret;
+    }
     return RET_OK;
 }
 
@@ -3509,7 +3514,7 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg)
+int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg)
 {
     CHKPR(sp, RET_ERR);
 
@@ -3522,6 +3527,11 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
 
     MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u, style=%{public}d",
         sp->GetScreenId(), cfg.style);
+    auto sret = buffer->FlushCache();
+    if (sret != RET_OK) {
+        MMI_HILOGE("FlushCache ret: %{public}d", sret);
+        return sret;
+    }
     return RET_OK;
 }
 
