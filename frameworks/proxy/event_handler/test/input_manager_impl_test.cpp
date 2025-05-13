@@ -921,6 +921,23 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXYInOneHandMode
     pointerEvent->pointers_.push_back(pointerItem);
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
 }
+
+/**
+ * @tc.name: InputManagerImplTest_SetInputDeviceConsumer
+ * @tc.desc: Test SetInputDeviceConsumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetInputDeviceConsumer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> deviceNames;
+    deviceNames.push_back("test1");
+    deviceNames.push_back("test2");
+    std::shared_ptr<IInputEventConsumer> consumer = nullptr;
+    auto ret = InputMgrImpl.SetInputDeviceConsumer(deviceNames, consumer);
+    ASSERT_EQ(ret, RET_OK);
+}
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 } // namespace MMI
 } // namespace OHOS

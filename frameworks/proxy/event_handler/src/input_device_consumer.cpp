@@ -31,8 +31,7 @@ int32_t InputDeviceConsumer::SetInputDeviceConsumer(const std::vector<std::strin
 {
     CALL_DEBUG_ENTER;
     if (consumer == nullptr) {
-        MULTIMODAL_INPUT_CONNECT_MGR->ClearInputDeviceConsumer(deviceNames);
-        return RET_OK;
+        return MULTIMODAL_INPUT_CONNECT_MGR->ClearInputDeviceConsumer(deviceNames);
     }
     deviceConsumer_ = consumer;
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetInputDeviceConsumer(deviceNames);
