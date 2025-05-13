@@ -260,7 +260,7 @@ void InputActiveSubscriberHandler::NotifySubscriber(
         return;
     }
     int32_t fd = subscriber->sess_->GetFd();
-    pkt << fd << subscriber->id_;
+    pkt << subscriber->id_;
     MMI_HILOGI("Notify subscriber id: %{public}d, keycode:%{private}d, pid: %{public}d",
         subscriber->id_, keyEvent->GetKeyCode(), subscriber->sess_->GetPid());
     if (pkt.ChkRWError()) {
