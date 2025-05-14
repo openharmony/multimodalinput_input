@@ -60,6 +60,7 @@ const char* DEVICE_TYPE_PC_PRO { "PC_PRO" };
 const char* DEVICE_TYPE_M_PC { "M_PC" };
 const char* DEVICE_TYPE_M_TABLET1 { "MRDI" };
 const char* DEVICE_TYPE_M_TABLET2 { "MRO" };
+const char* DEVICE_TYPE_M_TABLET3 { "MRDIL" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
@@ -749,7 +750,8 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     if (PRODUCT_TYPE == DEVICE_TYPE_M_PC) {
         deviceType = DeviceType::DEVICE_M_PC;
     }
-    if (PRODUCT_TYPE == DEVICE_TYPE_M_TABLET1 || PRODUCT_TYPE == DEVICE_TYPE_M_TABLET2) {
+    if (PRODUCT_TYPE == DEVICE_TYPE_M_TABLET1 || PRODUCT_TYPE == DEVICE_TYPE_M_TABLET2 || 
+        PRODUCT_TYPE == DEVICE_TYPE_M_TABLET3) {
         deviceType = DeviceType::DEVICE_M_TABLET;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
