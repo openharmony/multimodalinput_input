@@ -424,6 +424,21 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGD("The last repeat button, keyCode:%d", lastPressedKey);
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+    uint32_t flag = 0;
+    if (INPUT_DEV_MGR->IsAddKeyboardExtFlag(keyEvent->GetDeviceId(), flag)) {
+        MMI_HILOGD("Add keyboard ext flag: [%{public}u]", flag);
+        if (flag == InputEvent::EVENT_FLAG_KEYBOARD_ENTER_FOCUS) {
+            keyEvent->ClearFlag(InputEvent::EVENT_FLAG_KEYBOARD_EXIT_FOCUS);
+            keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_ENTER_FOCUS);
+        } else if (flag == InputEvent::EVENT_FLAG_KEYBOARD_EXIT_FOCUS) {
+            keyEvent->ClearFlag(InputEvent::EVENT_FLAG_KEYBOARD_ENTER_FOCUS);
+            keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_EXIT_FOCUS);
+        }
+    }
+    +#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+
     EventStatistic::PushKeyEvent(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
