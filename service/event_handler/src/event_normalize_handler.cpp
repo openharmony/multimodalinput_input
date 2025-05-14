@@ -437,7 +437,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
             keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_EXIT_FOCUS);
         }
     }
-    +#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
 
     EventStatistic::PushKeyEvent(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
