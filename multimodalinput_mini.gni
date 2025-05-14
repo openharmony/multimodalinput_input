@@ -59,6 +59,7 @@ declare_args() {
   input_feature_touch_drawing = true
   input_feature_key_pressed_handler = true
   input_feature_event_recorder = true
+  input_ext_feature_keyboard_ext_flag = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -297,6 +298,7 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
+print("input_ext_feature_keyboard_ext_flag = ${input_ext_feature_keyboard_ext_flag}")
 print(
     "input_feature_one_hand_mode_enable = ${input_feature_one_hand_mode_enable}")
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
@@ -392,6 +394,15 @@ if (input_ext_feature_anco) {
   if (input_feature_product != "pc") {
     libmmi_service_sources += [ "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp" ]
   }
+}
+
+if (input_ext_feature_keyboard_ext_flag) {
+  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
+  input_default_defines += [ "OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG" ]
+
+  libmmi_service_sources += [
+    "${mmi_ext_path}/keyboard_ext_flag/src/input_device_manager_ext.cpp",
+  ]
 }
 
 if (input_feature_product == "pc") {
