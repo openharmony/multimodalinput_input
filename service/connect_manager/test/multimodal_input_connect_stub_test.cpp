@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 #include <libinput.h>
+#include <iostream>
+#include <fstream>
 
 #include "multimodal_input_connect_stub.h"
 #include "mmi_service.h"
@@ -31,6 +33,11 @@ using namespace testing::ext;
 uint64_t g_tokenID { 0 };
 const std::string SYSTEM_BASIC { "system_basic" };
 const char* g_basics[] = { "ohos.permission.COOPERATE_MANAGER" };
+
+const std::string FILE_PATH = "/system/variant/pc/china/etc/multimodalinput/input_device_consumers.json";
+nlohmann::json device_file;
+constexpr int32_t PERMISSION_CHECK_ERROR { 201 };
+constexpr int32_t INDENTATION_LENGTH { 4 };
 } // namespace
 
 class MultimodalInputConnectStubTest : public testing::Test {
@@ -40,6 +47,7 @@ public:
     void SetUp() {}
     void TearDown() {}
     static void SetPermission(const std::string &level, const char** perms, size_t permAmount);
+    static void ResetDeviceConsumers();
 };
 
 void MultimodalInputConnectStubTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
@@ -61,6 +69,13 @@ void MultimodalInputConnectStubTest::SetPermission(const std::string &level, con
     g_tokenID = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(g_tokenID);
     OHOS::Security::AccessToken::AccessTokenKit::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
+void MultimodalInputConnectStubTest::ResetDeviceConsumers()
+{
+    std::ofstream outputFile(FILE_PATH);
+    outputFile << device_file.dump(INDENTATION_LENGTH);
+    outputFile.close();
 }
 
 /**
@@ -2871,6 +2886,132 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetClientInfo_001, TestSize.Level1)
     service->state_ = ServiceRunningState::STATE_RUNNING;
     int32_t ret = stub->StubSetClientInfo(data, reply);
     EXPECT_EQ(ret, returnCode);
+}
+
+
+/**
+ * @tc.name: StubSetInputDeviceConsumer_001
+ * @tc.desc: Test the function StubSetInputDeviceConsumer deviceName size Greater than 10
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceConsumer_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t size = 11;
+    data.WriteInt32(size);
+    auto ret = stub->StubSetInputDeviceConsumer(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: StubSetInputDeviceConsumer_002
+ * @tc.desc: Test the function StubSetInputDeviceConsumer invalid deviceName.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceConsumer_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t size = 2;
+    std::string deviceName1 = "test1";
+    std::string deviceName2 = "test2";
+    data.WriteInt32(size);
+    data.WriteString(deviceName1);
+    data.WriteString(deviceName2);
+    auto ret = stub->StubSetInputDeviceConsumer(data, reply);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: StubSetInputDeviceConsumer_003
+ * @tc.desc: Test the function StubSetInputDeviceConsumer of one device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceConsumer_003, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t size = 2;
+    std::string deviceName1 = "thp_extra_object_dev";
+    data.WriteInt32(size);
+    data.WriteString(deviceName1);
+    auto ret = stub->StubSetInputDeviceConsumer(data, reply);
+    EXPECT_EQ(ret, PERMISSION_CHECK_ERROR);
+}
+
+
+/**
+ * @tc.name: StubSetInputDeviceConsumer_004
+ * @tc.desc: Test the function StubSetInputDeviceConsumer of multiple device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceConsumer_004, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t size = 2;
+    std::string deviceName1 = "thp_extra_object_dev";
+    std::string deviceName2 = "thp_extra_object_dev1";
+    data.WriteInt32(size);
+    data.WriteString(deviceName1);
+    data.WriteString(deviceName2);
+    auto ret = stub->StubSetInputDeviceConsumer(data, reply);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: StubSetInputDeviceConsumer_005
+ * @tc.desc: Test the function StubSetInputDeviceConsumer of normal scene
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetInputDeviceConsumer_005, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142786;
+    int32_t size = 1;
+
+    std::ifstream deviceFile(FILE_PATH);
+    if (!deviceFile.is_open()) {
+        auto ret = stub->StubSetInputDeviceConsumer(data, reply);
+        EXPECT_EQ(ret, PERMISSION_CHECK_ERROR);
+    } else {
+        deviceFile >> device_file;
+        deviceFile.close();
+
+        std::string deviceName1 = "thp_extra_object_dev";
+        data.WriteInt32(size);
+        data.WriteString(deviceName1);
+        nlohmann::json json_data;
+        json_data["consumers"] = nlohmann::json::array();
+
+        nlohmann::json consumer;
+        consumer["name"] = "thp_extra_object_dev";
+        consumer["uids"] = nlohmann::json::array({0});
+
+        json_data["consumers"].push_back(consumer);
+
+        std::string jsonString = json_data.dump(INDENTATION_LENGTH);
+        std::FILE* file = std::fopen(FILE_PATH.c_str(), "w");
+        if (file) {
+            std::fwrite(jsonString.c_str(), jsonString.size(), 1, file);
+            std::fclose(file);
+            auto ret = stub->StubSetInputDeviceConsumer(data, reply);
+            ResetDeviceConsumers();
+            EXPECT_EQ(ret, returnCode);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS
