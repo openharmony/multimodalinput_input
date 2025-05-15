@@ -3342,7 +3342,7 @@ int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, Messa
     uint64_t readThreadId = 0;
     READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
     if (readThreadId < 0) {
-        MMI_HILOGE("invalid readThreadId :%{public}llu", readThreadId);
+        MMI_HILOGE("invalid readThreadId :%{public}" PRIu64, readThreadId);
         return RET_ERR;
     }
     int32_t ret = SetClientInfo(pid, readThreadId);
