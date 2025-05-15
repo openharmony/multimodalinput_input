@@ -2746,7 +2746,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
-    PhysicalCoordinate& coord, int32_t& displayId) const
+    PhysicalCoordinate& coord, int32_t& displayId)
 {
     CHKPF(tip);
     auto displayInfo = FindPhysicalDisplayInfo("default0");
@@ -2765,15 +2765,24 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
         .x = libinput_event_tablet_tool_get_x_transformed(tip, width),
         .y = libinput_event_tablet_tool_get_y_transformed(tip, height),
     };
-    RotateScreen(*displayInfo, phys);
-    coord.x = phys.x;
-    coord.y = phys.y;
-    MMI_HILOGD("physicalX:%{private}f, physicalY:%{private}f, displayId:%{public}d", phys.x, phys.y, displayId);
+    MMI_HILOGD("width:%{private}d, height:%{private}d, physicalX:%{private}f, physicalY:%{private}f",
+        width, height, phys.x, phys.y);
+    Coordinate2D pos = { .x = phys.x, .y = phys.y };
+    if (IsPositionOutValidDisplay(pos, *displayInfo, true)) {
+        MMI_HILOGD("The position is out of the valid display");
+        return false;
+    }
+    MMI_HILOGD("IsPositionOutValidDisplay physicalXY:{%{private}f %{private}f}->{%{private}f %{private}f}",
+        phys.x, phys.y, pos.x, pos.y);
+    coord.x = pos.x;
+    coord.y = pos.y;
+    RotateScreen(*displayInfo, coord);
+    MMI_HILOGD("physicalX:%{private}f, physicalY:%{private}f, displayId:%{public}d", pos.x, pos.y, displayId);
     return true;
 }
 
 bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-    int32_t& targetDisplayId, PhysicalCoordinate& coord) const
+    int32_t& targetDisplayId, PhysicalCoordinate& coord)
 {
     CHKPF(tip);
     if (!TransformTipPoint(tip, coord, targetDisplayId)) {

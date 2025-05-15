@@ -157,9 +157,9 @@ public:
     void RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId);
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord);
     const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
