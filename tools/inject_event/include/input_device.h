@@ -44,6 +44,7 @@ public:
     const std::string& GetPath() const;
     const std::string& GetName() const;
     uint32_t GetId() const;
+    std::string GetHash() const;
 
     void SetId(uint32_t id);
     void SetPath(const std::string& path);
@@ -57,9 +58,11 @@ private:
     bool VerifyDeviceMatch() const;
     bool OpenDevice(int32_t flags);
     void QueryDeviceInfo();
+    void CalculateDeviceHash();
 
     std::string path_;
     std::string name_;
+    std::string hash_;
     uint32_t id_;
     int32_t fd_;
     std::map<int32_t, int32_t> deviceMapping_;
