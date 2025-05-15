@@ -25,6 +25,7 @@
 #include "if_mmi_client.h"
 #include "infrared_frequency_info.h"
 #include "input_device_impl.h"
+#include "input_device_consumer.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 #include "input_interceptor_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -88,6 +89,9 @@ public:
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
+    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceName,
+        std::shared_ptr<IInputEventConsumer> consumer);
+    void OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
