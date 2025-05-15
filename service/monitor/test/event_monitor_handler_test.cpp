@@ -1134,6 +1134,60 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFingerprint, TestSiz
     ret = monitorCollection.IsFingerprint(pointerEvent);
     ASSERT_TRUE(ret);
 }
+
+/**
+ * @tc.name: EventMonitorHandlerTest_FingerprintEventMonitorHandle_001
+ * @tc.desc: Test FingerprintEventMonitorHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_FingerprintEventMonitorHandle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KP;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler monitor { handlerType, eventType, session };
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
+    std::unordered_set<int32_t> fingerFocusPidSet;
+    ASSERT_FALSE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_FingerprintEventMonitorHandle_002
+ * @tc.desc: Test FingerprintEventMonitorHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_FingerprintEventMonitorHandle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_FINGERPRINT;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler monitor { handlerType, eventType, session };
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK);
+    std::unordered_set<int32_t> fingerFocusPidSet;
+    ASSERT_TRUE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
+    ASSERT_TRUE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+
+    fingerFocusPidSet.insert(g_pid);
+    ASSERT_TRUE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+
+    fingerFocusPidSet.clear();
+    fingerFocusPidSet.insert(g_moduleType);
+    ASSERT_FALSE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+}
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 /**
  * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendToClient_01
@@ -1155,38 +1209,39 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClien
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
     bool ret = false;
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    std::unordered_set<int32_t> fingerFocusPidSet;
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_SWIPEINWARD;
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_MOUSE;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_PINCH;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_THREEFINGERSSWIP;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
     pointerEvent->SetFingerCount(THREE_FINGERS);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 }
 
@@ -1212,20 +1267,21 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClien
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
     pointerEvent->SetFingerCount(FOUR_FINGERS);
     bool ret = false;
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    std::unordered_set<int32_t> fingerFocusPidSet;
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_ROTATE;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_THREEFINGERSTAP;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
     pointerEvent->SetFingerCount(THREE_FINGERS);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
 }
 
