@@ -2734,6 +2734,7 @@ ohos_unittest("ConnectManagerTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
+    "config_policy:configpolicy_util",
     "cJSON:cjson",
     "c_utils:utilsbase",
     "data_share:datashare_consumer",
@@ -2929,6 +2930,7 @@ ohos_unittest("ConnectManagerEXTest") {
   external_deps = [
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
+    "config_policy:configpolicy_util",
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",

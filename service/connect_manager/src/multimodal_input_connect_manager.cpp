@@ -367,6 +367,20 @@ int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerT
     return multimodalInputConnectService_->AddInputHandler(handlerType, eventType, priority, deviceTags, actionsType);
 }
 
+int32_t MultimodalInputConnectManager::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetInputDeviceConsumer(deviceNames);
+}
+
+int32_t MultimodalInputConnectManager::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->ClearInputDeviceConsumer(deviceNames);
+}
+
 int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType)
 {

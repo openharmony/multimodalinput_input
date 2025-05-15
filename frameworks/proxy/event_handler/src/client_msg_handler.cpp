@@ -80,7 +80,9 @@ void ClientMsgHandler::Init()
         { MmiMessageId::WINDOW_STATE_ERROR_NOTIFY, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->NotifyWindowStateError(client, pkt); }},
         { MmiMessageId::SET_INPUT_DEVICE_ENABLED, [this] (const UDSClient& client, NetPacket& pkt) {
-            return this->OnSetInputDeviceAck(client, pkt); }} };
+            return this->OnSetInputDeviceAck(client, pkt); }},
+        { MmiMessageId::DEVICE_CONSUMER_HANDLER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->ReportDeviceConsumer(client, pkt); }}, };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
@@ -500,6 +502,31 @@ int32_t ClientMsgHandler::OnSetInputDeviceAck(const UDSClient& client, NetPacket
         return RET_ERR;
     }
     INPUT_DEVICE_IMPL.OnSetInputDeviceAck(index, result);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::ReportDeviceConsumer(const UDSClient& client, NetPacket& pkt)
+{
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read Pointer data failed");
+        return RET_ERR;
+    }
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize pointer event");
+        return RET_ERR;
+    }
+    for (const auto &item : pointerEvent->GetPointerIds()) {
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(item, pointerItem)) {
+            MMI_HILOGE("Get pointer item failed");
+            return RET_ERR;
+        }
+        MMI_HILOGD("orientation:%{public}d, blodid:%{public}d, toolType:%{public}d",
+            pointerItem.GetOrientation(), pointerItem.GetBlobId(), pointerItem.GetToolType());
+    }
+    InputMgrImpl.OnDeviceConsumerEvent(pointerEvent);
     return RET_OK;
 }
 } // namespace MMI

@@ -920,5 +920,11 @@ int32_t InputManager::GetMaxMultiTouchPointNum(int32_t &pointNum)
 {
     return InputMgrImpl.GetMaxMultiTouchPointNum(pointNum);
 }
+
+int32_t InputManager::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
+    std::shared_ptr<IInputEventConsumer> consumer)
+{
+    return InputMgrImpl.SetInputDeviceConsumer(deviceNames, consumer);
+}
 } // namespace MMI
 } // namespace OHOS

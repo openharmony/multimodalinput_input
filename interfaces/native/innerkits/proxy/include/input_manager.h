@@ -1182,6 +1182,17 @@ public:
     */
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
 
+    /**
+     * @brief Allows the service party to specify the input event of the specified touchscreen input device.
+     * @param deviceName List of supported device names.
+     * @param consumer Indicates the input event consumer. After an input event is generated,
+     * the functions of the consumer object will be called.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 20
+    */
+    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceName,
+        std::shared_ptr<IInputEventConsumer> consumer);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

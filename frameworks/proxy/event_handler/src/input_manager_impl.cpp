@@ -2827,5 +2827,28 @@ int32_t InputManagerImpl::GetMaxMultiTouchPointNum(int32_t &pointNum)
     CALL_INFO_TRACE;
     return MULTIMODAL_INPUT_CONNECT_MGR->GetMaxMultiTouchPointNum(pointNum);
 }
+
+int32_t InputManagerImpl::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
+    std::shared_ptr<IInputEventConsumer> consumer)
+{
+    CALL_DEBUG_ENTER;
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return DEVICE_CONSUMER.SetInputDeviceConsumer(deviceNames, consumer);
+}
+ 
+void InputManagerImpl::OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
+    CHKPV(pointerEvent);
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    CHKPV(DEVICE_CONSUMER.deviceConsumer_);
+    inputConsumer = DEVICE_CONSUMER.deviceConsumer_;
+    inputConsumer->OnInputEvent(pointerEvent);
+    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
+}
 } // namespace MMI
 } // namespace OHOS
