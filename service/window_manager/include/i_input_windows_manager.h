@@ -136,7 +136,7 @@ public:
     virtual bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord) = 0;
     virtual const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
     virtual void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent) = 0;
