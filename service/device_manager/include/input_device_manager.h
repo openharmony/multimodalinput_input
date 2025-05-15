@@ -99,6 +99,9 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session);
     static std::shared_ptr<InputDeviceManager> GetInstance();
     bool IsInputDeviceEnable(int32_t deviceId);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+    bool IsAddKeyboardExtFlag(int32_t deviceId, uint32_t &flag);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
@@ -119,6 +122,10 @@ private:
     bool IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const;
     void RecoverInputDeviceEnabled(SessionPtr session);
     int32_t NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+    void NotifyDevCallbackExt(int32_t deviceId, struct libinput_device *inputDevice);
+    void NotifyDevRemoveCallbackExt(int32_t deviceId);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
 
 private:
     std::mutex inputDeviceMutex_;
