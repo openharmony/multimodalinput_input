@@ -176,29 +176,24 @@ public:
 
     static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 32;
 
-    static constexpr int32_t POINTER_ACTION_HOVER_CANCEL = 33;
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CANCEL = 33;
 
-    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CANCEL = 34;
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_HOLD = 34;
 
-    /**
-     * Indicates extra fingerprint action.
-     *
-     * @since 16
-     */
-    static constexpr int32_t POINTER_ACTION_FINGERPRINT_HOLD = 38;
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_TOUCH = 35;
 
-    static constexpr int32_t POINTER_ACTION_FINGERPRINT_TOUCH = 39;
+    static constexpr int32_t POINTER_ACTION_HOVER_CANCEL = 36;
 
     /**
      * Indicates that the pen proximity action.
      *
      * @since 12
      */
-    static constexpr int32_t POINTER_ACTION_PROXIMITY_IN = 35;
+    static constexpr int32_t POINTER_ACTION_PROXIMITY_IN = 37;
 
-    static constexpr int32_t POINTER_ACTION_PROXIMITY_OUT = 36;
+    static constexpr int32_t POINTER_ACTION_PROXIMITY_OUT = 38;
 
-    static constexpr int32_t POINTER_ACTION_PULL_CANCEL = 37;
+    static constexpr int32_t POINTER_ACTION_PULL_CANCEL = 39;
 
     static constexpr int32_t POINTER_ACTION_PULL_THROW = 40;
 

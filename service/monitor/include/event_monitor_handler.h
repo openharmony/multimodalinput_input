@@ -16,6 +16,8 @@
 #ifndef EVENT_MONITOR_HANDLER_H
 #define EVENT_MONITOR_HANDLER_H
 
+#include <unordered_set>
+
 #include "gesture_monitor_handler.h"
 #include "i_input_event_collection_handler.h"
 #include "i_input_event_handler.h"
@@ -155,7 +157,8 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         void OnSessionLost(SessionPtr session);
         void Dump(int32_t fd, const std::vector<std::string> &args);
-        bool CheckIfNeedSendToClient(SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent);
+        bool CheckIfNeedSendToClient(SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent,
+            std::unordered_set<int32_t> fingerFocusPidSet);
         bool IsPinch(std::shared_ptr<PointerEvent> pointerEvent);
         bool IsRotate(std::shared_ptr<PointerEvent> pointerEvent);
         bool IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent);
@@ -164,6 +167,8 @@ private:
         bool IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
         bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
+        bool FingerprintEventMonitorHandle(SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent,
+            std::unordered_set<int32_t> fingerFocusPidSet);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_X_KEY
         bool IsXKey(std::shared_ptr<PointerEvent> pointerEvent);
