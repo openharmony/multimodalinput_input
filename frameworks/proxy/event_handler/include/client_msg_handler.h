@@ -68,6 +68,7 @@ protected:
     int32_t OnAnr(const UDSClient &client, NetPacket &pkt);
     int32_t NotifyWindowStateError(const UDSClient& client, NetPacket& pkt);
     int32_t OnSetInputDeviceAck(const UDSClient& client, NetPacket& pkt);
+    int32_t ReportDeviceConsumer(const UDSClient& client, NetPacket& pkt);
 private:
     static void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
 

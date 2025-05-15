@@ -1003,5 +1003,22 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetEnhanceConfig_001, TestSi
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.SetEnhanceConfig(&data, cfgLen));
 }
 #endif
+
+/**
+ * @tc.name: InputManagerImplTest_SetInputDeviceConsumer
+ * @tc.desc: Test SetInputDeviceConsumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetInputDeviceConsumer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> deviceNames;
+    deviceNames.push_back("test1");
+    deviceNames.push_back("test2");
+    std::shared_ptr<IInputEventConsumer> consumer = nullptr;
+    auto ret = InputMgrImpl.SetInputDeviceConsumer(deviceNames, consumer);
+    ASSERT_NE(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
