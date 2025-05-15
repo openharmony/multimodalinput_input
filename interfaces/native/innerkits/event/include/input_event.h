@@ -123,7 +123,7 @@ public:
     static constexpr uint32_t EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH = 0x00000600;
 
     static constexpr uint32_t EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER = 0x00001000;
- #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+
       /**
      * The multimodal input event for device enter focus flag.
      *
@@ -136,7 +136,6 @@ public:
      * @since 19
      */
     static constexpr uint32_t EVENT_FLAG_KEYBOARD_EXIT_FOCUS = 0x00004000;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
 
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
