@@ -176,6 +176,8 @@ public:
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
     int32_t LaunchAiScreenAbility();
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames);
+    int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames);
 
 private:
     MultimodalInputConnectManager() = default;
