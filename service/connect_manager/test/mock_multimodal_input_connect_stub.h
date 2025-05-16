@@ -200,6 +200,8 @@ public:
     MOCK_METHOD(int32_t, SetKnuckleSwitch, (bool knuckleSwitch), (override));
     MOCK_METHOD(int32_t, LaunchAiScreenAbility, (), (override));
     MOCK_METHOD(int32_t, GetMaxMultiTouchPointNum, (int32_t &pointNum), (override));
+    MOCK_METHOD(int32_t, SubscribeInputActive, (int32_t subscribeId, int64_t interval), (override));
+    MOCK_METHOD(int32_t, UnsubscribeInputActive, (int32_t subscribeId), (override));
     MOCK_METHOD(bool, IsRunning, (), (const override));
     MOCK_METHOD(int32_t, SetInputDeviceConsumer, (const std::vector<std::string>& deviceNames), (override));
     MOCK_METHOD(int32_t, ClearInputDeviceConsumer, (const std::vector<std::string>& deviceNames), (override));

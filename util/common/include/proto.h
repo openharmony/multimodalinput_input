@@ -44,6 +44,7 @@ enum class MmiMessageId : int32_t {
     ON_PRE_KEY_EVENT,
     ON_SUBSCRIBE_TABLET,
     DEVICE_CONSUMER_HANDLER_EVENT,
+    ON_SUBSCRIBE_INPUT_ACTIVE,
 };
 
 enum TokenType : int32_t {

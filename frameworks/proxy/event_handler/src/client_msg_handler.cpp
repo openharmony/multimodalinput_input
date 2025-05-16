@@ -16,6 +16,7 @@
 #include "anr_handler.h"
 #include "bytrace_adapter.h"
 #include "event_log_helper.h"
+#include "input_active_subscribe_manager.h"
 #include "input_event_data_transformation.h"
 #include "input_manager_impl.h"
 #ifdef OHOS_BUILD_ENABLE_MONITOR
@@ -36,6 +37,7 @@ namespace MMI {
 namespace {
 constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
 } // namespace
+
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
@@ -82,7 +84,10 @@ void ClientMsgHandler::Init()
         { MmiMessageId::SET_INPUT_DEVICE_ENABLED, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->OnSetInputDeviceAck(client, pkt); }},
         { MmiMessageId::DEVICE_CONSUMER_HANDLER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
-            return this->ReportDeviceConsumer(client, pkt); }}, };
+            return this->ReportDeviceConsumer(client, pkt); }},
+        { MmiMessageId::ON_SUBSCRIBE_INPUT_ACTIVE, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnSubscribeInputActiveCallback(client, pkt); }},
+    };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
@@ -528,6 +533,39 @@ int32_t ClientMsgHandler::ReportDeviceConsumer(const UDSClient& client, NetPacke
     }
     InputMgrImpl.OnDeviceConsumerEvent(pointerEvent);
     return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnSubscribeInputActiveCallback(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    HandleEventType handleEventType = HANDLE_EVENT_TYPE_NONE;
+    auto keyEvent = KeyEvent::Create();
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(keyEvent, RET_ERR);
+    CHKPR(pointerEvent, RET_ERR);
+    pkt >> handleEventType;
+    int32_t ret = RET_ERR;
+    if (handleEventType == HANDLE_EVENT_TYPE_KEY) {
+        ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
+    } else if (handleEventType == HANDLE_EVENT_TYPE_POINTER) {
+        ret = InputEventDataTransformation::Unmarshalling(pkt, pointerEvent);
+    } else {
+        MMI_HILOGE("handleEventType(%{public}d) error", handleEventType);
+        return RET_ERR;
+    }
+    if (ret != RET_OK) {
+        MMI_HILOGE("Read net packet failed, ret = %{%public}d", ret);
+        return RET_ERR;
+    }
+    int32_t subscribeId = -1;
+    pkt >> subscribeId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read subscribeId failed");
+        return RET_ERR;
+    }
+    return handleEventType == HANDLE_EVENT_TYPE_KEY ?
+        INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, subscribeId) :
+        INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, subscribeId);
 }
 } // namespace MMI
 } // namespace OHOS
