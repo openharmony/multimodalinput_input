@@ -270,15 +270,16 @@ void InputReplayCommand::PrintUsage() const
               << "  -h, --help       Show this help message" << std::endl
               << "  -l, --list       List available input devices" << std::endl
               << "  -a, --all        Record from all available input devices" << std::endl
-              << "  -m, --map    Specify device mapping for replay (e.g., \"0:0,1:2,4:2\")" << std::endl
+              << "  -m, --map        Specify device mapping for replay (e.g., \"0:0,1:2,4:2\")" << std::endl
               << "                   Format: sourceDeviceId:targetDeviceId,..." << std::endl
               << std::endl
               << "Examples:" << std::endl
               << "  " << programName_ << " record -a events.bin           # Record from all devices" << std::endl
-              << "  " << programName_ << " record events.bin /dev/input/event0 /dev/input/event1" << std::endl
+              << "  " << programName_ << " record events.bin /dev/input/event0 /dev/input/event1  "
+                                         "# Record from specific devices" << std::endl
               << "  " << programName_ << " replay events.bin              # Replay to original devices" << std::endl
               << "  " << programName_
-              << " replay -m \"0:1,1:0\" events.bin  # Replay with custom device mapping" << std::endl;
+              << " replay -m \"0:1,1:0\" events.bin # Replay with custom device mapping" << std::endl;
 }
 } // namespace MMI
 } // namespace OHOS
