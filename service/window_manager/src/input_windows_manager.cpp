@@ -6711,6 +6711,21 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     CHKPV(touchWindow);
+    PointerEvent::PointerItem pointerItem;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
+        return;
+    }
+    int32_t windowX = pointerItem.GetWindowX();
+    int32_t windowY = pointerItem.GetWindowY();
+    windowX = std::max(touchWindow->area.x, std::min(windowX, touchWindow->area.width));
+    windowY = std::max(touchWindow->area.y, std::min(windowY, touchWindow->area.height));
+    if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
+        pointerItem.SetWindowX(windowX);
+        pointerItem.SetWindowY(windowY);
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    }
     if (lastTouchWindowInfo_.id != touchWindow->id) {
         if (lastTouchWindowInfo_.id != -1 &&
             lastTouchWindowInfo_.windowInputType == WindowInputType::SLID_TOUCH_WINDOW) {
