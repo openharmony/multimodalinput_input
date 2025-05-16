@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -106,6 +106,8 @@ private:
     void TerminateRotate(libinput_event* event);
     void TerminateAxis(libinput_event* event);
     void CancelTwoFingerAxis(libinput_event* event);
+    bool IsAccessibilityEventWithZOrder(std::shared_ptr<PointerEvent> pointerEvent);
+    void BypassChainAndDispatchDirectly(std::shared_ptr<PointerEvent> pointerEvent);
 };
 } // namespace MMI
 } // namespace OHOS

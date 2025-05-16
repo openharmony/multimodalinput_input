@@ -503,11 +503,8 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_MOVE) {
             int32_t pointerAction = pointerEvent->GetPointerAction();
-            if (pointerAction == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
-                pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
-                pointerAction == PointerEvent::POINTER_ACTION_HOVER_EXIT ||
-                pointerAction == PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
-                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
+            if (IsAccessibilityFocusEvent(pointerEvent)) {
+                    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
             } else {
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             }
@@ -3436,6 +3433,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching, "
                     "window:%{public}d, flags:%{public}d, pid:%{public}d", item.id, item.flags, item.pid);
                 continue;
+            }
+            if (IsAccessibilityEventWithZorderInjected(pointerEvent) && pointerEvent->GetZOrder() > item.zOrder) {
+                winId2ZorderMap.insert({item.id, item.zOrder});
+                continue;
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
@@ -3910,10 +3911,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             touchWindow = axisBeginWindowInfo_;
         }
         int32_t pointerAction = pointerEvent->GetPointerAction();
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
-            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
-            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT ||
-            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
+        if (IsAccessibilityFocusEvent(pointerEvent)) {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
         } else {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -4607,6 +4605,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             continue;
         }
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) && item.windowType == SCREEN_CONTROL_WINDOW_TYPE) {
+            winMap.insert({item.id, item});
+            continue;
+        }
+        if (IsAccessibilityEventWithZorderInjected(pointerEvent)) {
+            winMap.insert({item.id, item});
             continue;
         }
         
@@ -4744,10 +4747,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         touchWindow = &it->second.window;
         if (it->second.flag) {
-            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
-                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
-                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT ||
-                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
+            if (IsAccessibilityFocusEvent(pointerEvent)) {
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
             } else {
                 int32_t originPointerAction = pointerEvent->GetPointerAction();
@@ -6754,5 +6754,28 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
     lastTouchWindowInfo_ = *touchWindow;
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
+
+bool InputWindowsManager::IsAccessibilityFocusEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, false);
+    static std::unordered_set<int32_t> accessibilityEventAction {
+        PointerEvent::POINTER_ACTION_HOVER_MOVE,
+        PointerEvent::POINTER_ACTION_HOVER_ENTER,
+        PointerEvent::POINTER_ACTION_HOVER_EXIT,
+        PointerEvent::POINTER_ACTION_HOVER_CANCEL
+    };
+    auto pointerAction = pointerEvent->GetPointerAction();
+    return accessibilityEventAction.find(pointerAction) != accessibilityEventAction.end();
+}
+
+bool InputWindowsManager::IsAccessibilityEventWithZorderInjected(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, false);
+    if (IsAccessibilityFocusEvent(pointerEvent) && pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+        pointerEvent->GetZOrder() > 0) {
+        return true;
+    }
+    return false;
+}
 } // namespace MMI
 } // namespace OHOS
