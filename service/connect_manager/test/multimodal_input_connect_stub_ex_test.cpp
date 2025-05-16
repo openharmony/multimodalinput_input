@@ -385,6 +385,8 @@ public:
         return static_cast<int32_t>(knuckleSwitch);
     };
     int32_t LaunchAiScreenAbility() override { return RET_OK; }
+    int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) override { return 0; }
+    int32_t UnsubscribeInputActive(int32_t subscribeId) override { return 0; }
 
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override { return RET_OK; }
 

@@ -209,6 +209,8 @@ public:
     int32_t SetKnuckleSwitch(bool knuckleSwitch) override;
     int32_t LaunchAiScreenAbility() override;
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override;
+    int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) override;
+    int32_t UnsubscribeInputActive(int32_t subscribeId) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

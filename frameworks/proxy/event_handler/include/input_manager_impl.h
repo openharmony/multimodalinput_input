@@ -247,6 +247,8 @@ public:
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
     int32_t LaunchAiScreenAbility();
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+    int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
+    void UnsubscribeInputActive(int32_t subscribeId);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
