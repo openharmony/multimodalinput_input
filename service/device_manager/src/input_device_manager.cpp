@@ -444,6 +444,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     AddPhysicalInputDeviceInner(deviceId, info);
+    MMI_HILOGI("OnInputDeviceAdded successfully, deviceId:%{public}d, info.sysUid:%{pubulic}s, info.enable:%{public}d",
+        deviceId, info.sysUid.c_str(), info.enable);
     if (info.enable) {
         NotifyAddDeviceListeners(deviceId);
     }
@@ -832,6 +834,8 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
             DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "Device removed successfully");
 #endif
+            MMI_HILOGI("Device removed successfully, deviceId:%{public}d, sys uid:%{public}s", deviceId,
+                it->second.sysUid.c_str());
             inputDevice_.erase(it);
             break;
         }
@@ -861,6 +865,8 @@ bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
     for (const auto &item : inputDevice_) {
         if ((!item.second.isRemote && item.second.isPointerDevice) ||
             (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
+            MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
+                item.second.isRemote, item.second.sysUid.c_str());
             return true;
         }
     }
@@ -885,6 +891,8 @@ void InputDeviceManager::NotifyRemoveDeviceListeners(int32_t deviceId)
 
 void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice)
 {
+    MMI_HILOGI("AddNewPointerDevice:%{public}d, existEnabledPointerDevice:%{public}d", addNewPointerDevice,
+        existEnabledPointerDevice);
     if (addNewPointerDevice && !existEnabledPointerDevice) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         if (HasTouchDevice()) {
