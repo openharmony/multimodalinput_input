@@ -40,7 +40,7 @@ enum AniErrorCode : int32_t {
     COMMON_PARAMETER_ERROR = 401,
 };
 
-std::unordered_map<int32_t, std::string> axisType = {
+static std::unordered_map<int32_t, std::string> axisType = {
     { ABS_MT_TOUCH_MAJOR, "touchmajor" }, { ABS_MT_TOUCH_MINOR, "touchminor" }, { ABS_MT_ORIENTATION, "orientation" },
     { ABS_MT_POSITION_X, "x" },           { ABS_MT_POSITION_Y, "y" },           { ABS_MT_PRESSURE, "pressure" },
     { ABS_MT_WIDTH_MAJOR, "toolmajor" },  { ABS_MT_WIDTH_MINOR, "toolminor" },
@@ -51,7 +51,7 @@ constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
 constexpr uint32_t EVDEV_UDEV_TAG_JOYSTICK = (1 << 6);
 constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
 
-AniUtil::DeviceType g_deviceType[] = {
+static AniUtil::DeviceType g_deviceType[] = {
     { "keyboard", EVDEV_UDEV_TAG_KEYBOARD },
     { "mouse", EVDEV_UDEV_TAG_MOUSE },
     { "touchpad", EVDEV_UDEV_TAG_TOUCHPAD },
