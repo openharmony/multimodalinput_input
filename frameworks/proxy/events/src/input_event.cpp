@@ -257,6 +257,11 @@ bool InputEvent::HasFlag(uint32_t flag)
     return (bitwise_ & flag) != 0;
 }
 
+bool InputEvent::IsFlag(uint32_t flag)
+{
+    return (bitwise_ & flag) == flag;
+}
+
 void InputEvent::AddFlag(uint32_t flag)
 {
     bitwise_ |= flag;

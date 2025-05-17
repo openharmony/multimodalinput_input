@@ -40,12 +40,6 @@ struct ExtraData {
      */
     std::vector<uint8_t> buffer;
     /*
-     * 拖拽工具类型
-     *
-     * @since 9
-     */
-    int32_t toolType{ 0 };
-    /*
      * 事件类型
      *
      * @since 9

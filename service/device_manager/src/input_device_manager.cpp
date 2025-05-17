@@ -385,6 +385,9 @@ std::string InputDeviceManager::GetInputIdentification(struct libinput_device *i
 
 void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice)
 {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+    NotifyDevCallbackExt(deviceId, inDevice.inputDeviceOrigin);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     if (!inDevice.isTouchableDevice || (deviceId < 0)) {
         MMI_HILOGI("The device is not touchable device already existent");
         return;
@@ -475,6 +478,9 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     RemovePhysicalInputDeviceInner(inputDevice, deviceId, enable);
     std::string sysUid = GetInputIdentification(inputDevice);
     if (!sysUid.empty()) {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+        NotifyDevRemoveCallbackExt(deviceId);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG  
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, sysUid, "remove");
         MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%s, status:remove",
@@ -828,6 +834,8 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
             DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "Device removed successfully");
 #endif
+            MMI_HILOGI("Device removed successfully, deviceId:%{public}d, sys uid:%{public}s", deviceId,
+                it->second.sysUid.c_str());
             inputDevice_.erase(it);
             break;
         }
@@ -857,6 +865,8 @@ bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
     for (const auto &item : inputDevice_) {
         if ((!item.second.isRemote && item.second.isPointerDevice) ||
             (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
+            MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
+                item.second.isRemote, item.second.sysUid.c_str());
             return true;
         }
     }
@@ -881,6 +891,8 @@ void InputDeviceManager::NotifyRemoveDeviceListeners(int32_t deviceId)
 
 void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice)
 {
+    MMI_HILOGI("AddNewPointerDevice:%{public}d, existEnabledPointerDevice:%{public}d", addNewPointerDevice,
+        existEnabledPointerDevice);
     if (addNewPointerDevice && !existEnabledPointerDevice) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         if (HasTouchDevice()) {

@@ -70,7 +70,7 @@ bool TouchGestureDetector::OnTouchEvent(std::shared_ptr<PointerEvent> event)
             break;
         }
         default: {
-            MMI_HILOGW("action:%{public}s is invalid", event->DumpPointerAction());
+            MMI_HILOGD("action:%{public}s is invalid", event->DumpPointerAction());
             break;
         }
     }
@@ -245,8 +245,6 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
         }
         if (!haveGestureWinEmerged_) {
             MMI_HILOGI("Touch-up while touch gesture is pending");
-            isRecognized_ = false;
-
             if (lastTouchEvent_ != nullptr) {
                 auto now = GetSysClockTime();
                 lastTouchEvent_->SetActionTime(now);
@@ -337,7 +335,7 @@ bool TouchGestureDetector::HandleFingerDown()
     return true;
 }
 
-int64_t TouchGestureDetector::GetMaxDownInterval()
+int64_t TouchGestureDetector::GetMaxDownInterval() const
 {
     int64_t earliestTime = std::numeric_limits<int64_t>::max();
     int64_t latestTime = std::numeric_limits<int64_t>::min();
@@ -355,25 +353,28 @@ int64_t TouchGestureDetector::GetMaxDownInterval()
     return latestTime - earliestTime;
 }
 
-float TouchGestureDetector::GetMaxFingerSpacing()
+float TouchGestureDetector::GetMaxFingerSpacing() const
 {
     float maxSpacing = 0.0f;
-    for (size_t i = 0; i < downPoint_.size(); ++i) {
-        for (size_t j = i + 1; j < downPoint_.size(); ++j) {
-            float pX = downPoint_[i].x;
-            float pY = downPoint_[i].y;
-            float nX = downPoint_[j].x;
-            float nY = downPoint_[j].y;
-            maxSpacing = std::max(maxSpacing, (float)hypot(pX - nX, pY - nY));
+
+    for (auto iter = downPoint_.cbegin(); iter != downPoint_.cend(); ++iter) {
+        auto innerIter = iter;
+        float pX = iter->second.x;
+        float pY = iter->second.y;
+
+        for (++innerIter; innerIter != downPoint_.cend(); ++innerIter) {
+            float nX = innerIter->second.x;
+            float nY = innerIter->second.y;
+            maxSpacing = std::max<float>(maxSpacing, std::hypot(pX - nX, pY - nY));
         }
     }
     MMI_HILOGI("Down max spacing:%{public}.2f", maxSpacing);
     return maxSpacing;
 }
 
-double TouchGestureDetector::GetAngle(float startX, float startY, float endX, float endY)
+double TouchGestureDetector::GetAngle(float startX, float startY, float endX, float endY) const
 {
-    return atan2((endY - startY), (endX - startX)) * (ANGLE_PI / M_PI);
+    return std::atan2((endY - startY), (endX - startX)) * (ANGLE_PI / M_PI);
 }
 
 bool TouchGestureDetector::IsFingerMove(const Point &downPt, const Point &movePt) const
@@ -647,6 +648,7 @@ void TouchGestureDetector::AddGestureFingers(int32_t fingers)
     }
     if (!fingers_.empty()) {
         gestureEnable_ = true;
+        MMI_HILOGI("Start detection of touch-gesture(%{public}u)", gestureType_);
     }
 }
 
@@ -657,6 +659,7 @@ void TouchGestureDetector::RemoveGestureFingers(int32_t fingers)
         fingers_.erase(iter);
     }
     if (fingers_.empty()) {
+        MMI_HILOGI("Stop detection of touch-gesture(%{public}u)", gestureType_);
         gestureEnable_ = false;
         ReleaseData();
     }

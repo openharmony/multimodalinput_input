@@ -181,7 +181,7 @@ public:
      * @param switchType Indicates the type of switch to query.
      * @param state Indicates the state of switch with given type.
      * @return Returns <b>0<b/> if success; returns a non-0 value otherwise.
-     * @since 16
+     * @since 18
      */
     int32_t QuerySwitchStatus(SwitchEvent::SwitchType switchType, SwitchEvent::SwitchState &state);
 
@@ -394,14 +394,15 @@ public:
      * @brief Convert mouse events to touch events.
      * @param pointerEvent PointerEvent object.
      * @return bool
-     * @since 9
+     * @since 20
      */
     bool TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
-        /**
+
+    /**
      * @brief Convert touch events to mouse events.
      * @param pointerEvent PointerEvent object.
      * @return bool
-     * @since 9
+     * @since 20
      */
     bool TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
@@ -1180,6 +1181,43 @@ public:
      * @since 18
     */
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+
+    /**
+     * @brief Allows the service party to specify the input event of the specified touchscreen input device.
+     * @param deviceName List of supported device names.
+     * @param consumer Indicates the input event consumer. After an input event is generated,
+     * the functions of the consumer object will be called.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 20
+    */
+    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceName,
+        std::shared_ptr<IInputEventConsumer> consumer);
+
+    /**
+     * @brief Subscribes to the input active that meets a specific condition. When such an event occurs,
+     * the <b>callback</b> specified is invoked to process the event.
+     * A process can only support a maximum of one interface call.
+     * @param inputEventConsumer Indicates the callback.
+     * @param interval Indicate the interval time.
+     * When the interval value is less than 0, the value is invalid.
+     * When it is equal to 0, no filtering is performed.
+     * The effective range of filtering values is greater than or equal to 500ms and less than or equal to 2000ms.
+     * If the filtering value is greater than 0 and less than 500ms, the filtering interval is 500ms.
+     * If the filtering value is greater than 2000ms, the filtering interval is 2000ms.
+     * @return Returns the subscribe ID, which uniquely identifies a subscribe id in the process.
+     * If the value is greater than or equal to <b>0</b>
+     * the subscription is successful. Otherwise, the subscription fails.
+     * @since 20
+    */
+    int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
+
+    /**
+     * @brief Unsubscribes from input active.
+     * @param subscribeId. Indicates the subscription ID, which is the return value of <b>SubscribeInputActive</b>.
+     * @return void.
+     * @since 20
+    */
+    void UnsubscribeInputActive(int32_t subscribeId);
 
 private:
     InputManager() = default;

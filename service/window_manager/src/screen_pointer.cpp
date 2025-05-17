@@ -103,7 +103,8 @@ bool ScreenPointer::Init()
         .height = DEFAULT_CURSOR_SIZE,
         .strideAlignment = STRIDE_ALIGNMENT,
         .format = GRAPHIC_PIXEL_FMT_RGBA_8888,
-        .usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA | BUFFER_USAGE_HW_COMPOSER,
+        .usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA | BUFFER_USAGE_HW_COMPOSER
+            | BUFFER_USAGE_MEM_MMZ_CACHE,
         .timeout = BUFFER_TIMEOUT,
     };
     for (int32_t i = 0; i < DEFAULT_BUFFER_SIZE && buffers_.size() < DEFAULT_BUFFER_SIZE; i++) {
@@ -375,6 +376,11 @@ bool ScreenPointer::SetInvisible()
     } else {
         MMI_HILOGI("The input data is negative, and the data is incorrect.");
         return false;
+    }
+    auto sret = buffer->FlushCache();
+    if (sret != RET_OK) {
+        MMI_HILOGE("FlushCache ret: %{public}d", sret);
+        return sret;
     }
 
     auto bh = buffer->GetBufferHandle();

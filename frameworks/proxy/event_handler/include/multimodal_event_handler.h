@@ -16,6 +16,7 @@
 #define MULTIMODAL_EVENT_HANDLER_H
 
 #include "if_mmi_client.h"
+#include "input_active_subscribe_manager.h"
 #include "key_event_input_subscribe_manager.h"
 #include "long_press_event.h"
 #include "pointer_event.h"

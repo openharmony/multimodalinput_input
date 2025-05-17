@@ -21,6 +21,7 @@
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
 #include "event_normalize_handler.h"
+#include "input_active_subscriber_handler.h"
 #include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -54,6 +55,7 @@ public:
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
     std::shared_ptr<EventDispatchHandler> GetEventDispatchHandler() const;
     std::shared_ptr<EventPreMonitorHandler> GetEventPreMonitorHandler() const;
+    std::shared_ptr<InputActiveSubscriberHandler> GetInputActiveSubscriberHandler() const;
 private:
     int32_t BuildInputHandlerChain();
 
@@ -80,6 +82,7 @@ private:
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
     std::shared_ptr<EventDispatchHandler> eventDispatchHandler_ { nullptr };
     std::shared_ptr<EventPreMonitorHandler> eventPreMonitorHandler_ { nullptr };
+    std::shared_ptr<InputActiveSubscriberHandler> inputActiveSubscriberHandler_ { nullptr };
 
     uint64_t idSeed_ { 0 };
     

@@ -1046,6 +1046,54 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, static_cast<int64_t>(deviceNames.size()), ERR_INVALID_VALUE);
+    for (const auto &item : deviceNames) {
+        WRITESTRING(data, item, ERR_INVALID_VALUE);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INPUT_DEVICE_CONSUMER), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, static_cast<int64_t>(deviceNames.size()), ERR_INVALID_VALUE);
+    for (const auto &item : deviceNames) {
+        WRITESTRING(data, item, ERR_INVALID_VALUE);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_DEVICE_CONSUMER), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
@@ -1839,7 +1887,6 @@ int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData& extraData)
     for (const auto &item : extraData.buffer) {
         WRITEUINT8(data, item);
     }
-    WRITEINT32(data, extraData.toolType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pointerId, ERR_INVALID_VALUE);
     WRITEINT32(data, extraData.pullId, ERR_INVALID_VALUE);
@@ -3074,6 +3121,53 @@ int32_t MultimodalInputConnectProxy::GetMaxMultiTouchPointNum(int32_t &pointNum)
     if (!reply.ReadInt32(pointNum)) {
         MMI_HILOGE("Read pointNum failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::SubscribeInputActive(int32_t subscribeId, int64_t interval)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
+    WRITEINT64(data, interval, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_INPUT_ACTIVE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::UnsubscribeInputActive(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_INPUT_ACTIVE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }

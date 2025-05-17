@@ -59,6 +59,7 @@ declare_args() {
   input_feature_touch_drawing = true
   input_feature_key_pressed_handler = true
   input_feature_event_recorder = true
+  input_ext_feature_keyboard_ext_flag = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -97,6 +98,7 @@ declare_args() {
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/client_msg_handler.cpp",
+    "event_handler/src/input_active_subscribe_manager.cpp",
     "event_handler/src/input_device_impl.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
@@ -112,6 +114,7 @@ declare_args() {
   libmmi_service_sources = [
     "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "$mmi_path/frameworks/proxy/event_handler/src/scene_board_judgement.cpp",
+    "$mmi_path/service/touch_event_normalize/src/input_device_consumer_handler.cpp",
     "app_state_manager/src/app_state_observer.cpp",
     "delegate_task/src/delegate_interface.cpp",
     "delegate_task/src/delegate_tasks.cpp",
@@ -147,6 +150,7 @@ declare_args() {
     "module_loader/src/watchdog_task.cpp",
     "nap_process/src/nap_process.cpp",
     "permission_helper/src/permission_helper.cpp",
+    "subscriber/src/input_active_subscriber_handler.cpp",
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
@@ -297,6 +301,7 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
+print("input_ext_feature_keyboard_ext_flag = ${input_ext_feature_keyboard_ext_flag}")
 print(
     "input_feature_one_hand_mode_enable = ${input_feature_one_hand_mode_enable}")
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
@@ -392,6 +397,15 @@ if (input_ext_feature_anco) {
   if (input_feature_product != "pc") {
     libmmi_service_sources += [ "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp" ]
   }
+}
+
+if (input_ext_feature_keyboard_ext_flag) {
+  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
+  input_default_defines += [ "OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG" ]
+
+  libmmi_service_sources += [
+    "${mmi_ext_path}/keyboard_ext_flag/src/input_device_manager_ext.cpp",
+  ]
 }
 
 if (input_feature_product == "pc") {

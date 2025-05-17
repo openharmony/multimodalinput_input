@@ -489,6 +489,7 @@ public:
      * @since 10
      */
     static constexpr int32_t TOOL_TYPE_PALM = 10;
+    static constexpr int32_t TOOL_TYPE_THP_FEATURE = 11;
 
     /**
      * Indicates the TL2 key on the joystick.
@@ -1267,6 +1268,19 @@ public:
          * @return void
          */
         void SetFixedDisplayY(int32_t fixedDisplayY);
+
+        /**
+         * @brief Sets the orientation of the physical display.
+         * @param orientation Indicates the orientation coordinate to set.
+         * @return void
+         */
+        void SetOrientation(int32_t orientation);
+
+        /**
+         * @brief Obtains the orientation of the physical display.
+         * @return Returns the orientation
+         */
+        int32_t GetOrientation();
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
@@ -1306,6 +1320,7 @@ public:
         int32_t blobId_ {};
         int32_t twist_ {};
         bool canceled_ { false };
+        int32_t orientation_ {-1};
     };
 
 public:

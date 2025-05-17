@@ -17,6 +17,7 @@
 
 #include <charconv>
 #include <cstring>
+#include <sstream>
 #include <unistd.h>
 
 #include <fcntl.h>
@@ -28,6 +29,8 @@ namespace {
 constexpr char DEVICE_PREFIX[] = "DEVICE:";
 constexpr char FIELD_SEPARATOR = '|';
 constexpr int32_t MAX_DEVICE_NAME = 128;
+constexpr int32_t UINT_BIT_COUNT = 8;
+constexpr int32_t DEVICE_DESCRIPTION_FILED_COUNT = 4;
 }
 
 InputDevice::InputDevice() : id_(0), fd_(-1)
@@ -46,6 +49,7 @@ InputDevice::InputDevice(const std::string& path, uint32_t id)
 InputDevice::InputDevice(InputDevice&& other) noexcept
     : path_(std::move(other.path_)),
       name_(std::move(other.name_)),
+      hash_(std::move(other.hash_)),
       id_(other.id_),
       fd_(other.fd_)
 {
@@ -63,6 +67,7 @@ InputDevice& InputDevice::operator=(InputDevice&& other) noexcept
         Close();
         path_ = std::move(other.path_);
         name_ = std::move(other.name_);
+        hash_ = std::move(other.hash_);
         id_ = other.id_;
         fd_ = other.fd_;
         other.fd_ = -1;
@@ -114,6 +119,11 @@ const std::string& InputDevice::GetName() const
 uint32_t InputDevice::GetId() const
 {
     return id_;
+}
+
+std::string InputDevice::GetHash() const
+{
+    return hash_;
 }
 
 void InputDevice::SetId(uint32_t id)
@@ -194,6 +204,34 @@ void InputDevice::QueryDeviceInfo()
     if (ioctl(fd_, EVIOCGNAME(sizeof(name)), name) >= 0) {
         name_ = name;
     }
+    CalculateDeviceHash();
+}
+
+void InputDevice::CalculateDeviceHash()
+{
+    std::ostringstream hashInput;
+    hashInput << "Name:" << name_ << "|";
+    struct input_id device_id;
+    if (ioctl(fd_, EVIOCGID, &device_id) >= 0) {
+        hashInput << "BusType:" << std::hex << device_id.bustype << "|"
+                   << "Vendor:" << std::hex << device_id.vendor << "|"
+                   << "Product:" << std::hex << device_id.product << "|"
+                   << "Version:" << std::hex << device_id.version << "|";
+    }
+    unsigned long eventBits[EV_MAX/UINT_BIT_COUNT + 1] = {0};
+    if (ioctl(fd_, EVIOCGBIT(0, sizeof(eventBits)), eventBits) >= 0) {
+        hashInput << "Events:";
+        for (int i = 0; i <= EV_MAX; i++) {
+            if (eventBits[i / UINT_BIT_COUNT] & (1UL << (i % UINT_BIT_COUNT))) {
+                hashInput << std::hex << i << ",";
+            }
+        }
+    }
+    std::string hashStr = hashInput.str();
+    if (hashStr.back() == ',') {
+        hashStr.pop_back();
+    }
+    hash_ = std::to_string(std::hash<std::string>{}(hashStr));
 }
 
 bool InputDevice::InitFromTextLine(const std::string& line)
@@ -203,31 +241,35 @@ bool InputDevice::InitFromTextLine(const std::string& line)
         PrintError("Invalid device line format: %s", line.c_str());
         return false;
     }
-    size_t firstSep = workLine.find(FIELD_SEPARATOR);
-    if (firstSep == std::string::npos) {
-        PrintError("Missing first separator in device line: %s", line.c_str());
+    std::vector<std::string> fields;
+    size_t pos = 0;
+    while ((pos = workLine.find(FIELD_SEPARATOR)) != std::string::npos) {
+        fields.push_back(workLine.substr(0, pos));
+        workLine.erase(0, pos + 1);
+    }
+    fields.push_back(workLine);
+    if (fields.size() != DEVICE_DESCRIPTION_FILED_COUNT) {
+        PrintError("Device line must have exactly 4 fields: %s", line.c_str());
         return false;
     }
-    std::string idStr = workLine.substr(0, firstSep);
-    TrimString(idStr);
-    uint32_t deviceId = 0;
-    auto result = std::from_chars(idStr.data(), idStr.data() + idStr.size(), deviceId);
+    int32_t index = -1;
+    TrimString(fields[++index]);
+    uint32_t deviceId;
+    auto result = std::from_chars(fields[index].data(), fields[index].data() + fields[index].size(), deviceId);
     if (result.ec != std::errc()) {
-        PrintError("Invalid device ID: %s", idStr.c_str());
+        PrintError("Invalid device ID: %s", fields[0].c_str());
         return false;
     }
-    size_t secondSep = workLine.find(FIELD_SEPARATOR, firstSep + 1);
-    if (secondSep == std::string::npos) {
-        PrintError("Missing second separator in device line: %s", line.c_str());
-        return false;
-    }
-    std::string path = workLine.substr(firstSep + 1, secondSep - firstSep - 1);
-    std::string name = workLine.substr(secondSep + 1);
-    TrimString(path);
-    TrimString(name);
+    TrimString(fields[++index]);
+    std::string devicePath = fields[index];
+    TrimString(fields[++index]);
+    std::string deviceName = fields[index];
+    TrimString(fields[++index]);
+    std::string deviceHash  = fields[index];
     id_ = deviceId;
-    path_ = path;
-    name_ = name;
+    path_ = devicePath;
+    name_ = deviceName;
+    hash_ = deviceHash;
     return true;
 }
 } // namespace MMI

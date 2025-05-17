@@ -60,6 +60,8 @@ ohos_source_set("mmi_connect_manager_service") {
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "config_policy:configpolicy_util",
+    "cJSON:cjson",
     "eventhandler:libeventhandler",
     "image_framework:image_native",
     "ipc:ipc_single",

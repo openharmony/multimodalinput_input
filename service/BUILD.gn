@@ -101,6 +101,15 @@ config("libmmi_server_config") {
     ]
   }
 
+  if (input_ext_feature_keyboard_ext_flag) {
+    ohos_prebuilt_etc("keyboard_ext_flag.json") {
+      source = "${mmi_ext_path}/keyboard_ext_flag/etc/keyboard_ext_flag.json"
+      part_name = "input"
+      subsystem_name = "multimodalinput"
+      relative_install_dir = "multimodalinput"
+    }
+  }
+
   if (input_feature_fingerprint) {
     include_dirs += [ "fingerprint_event_processor/include" ]
   }
@@ -286,6 +295,14 @@ ohos_shared_library("libmmi-server") {
 
   if (input_ext_feature_anco) {
     deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
+  }
+
+  if (input_ext_feature_keyboard_ext_flag) {
+    include_dirs += [
+      "${mmi_ext_path}/keyboard_ext_flag/inc",
+    ]
+
+    deps += [ ":keyboard_ext_flag.json" ]
   }
 
   external_deps = [
@@ -2717,6 +2734,7 @@ ohos_unittest("ConnectManagerTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
+    "config_policy:configpolicy_util",
     "cJSON:cjson",
     "c_utils:utilsbase",
     "data_share:datashare_consumer",
@@ -2912,6 +2930,7 @@ ohos_unittest("ConnectManagerEXTest") {
   external_deps = [
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
+    "config_policy:configpolicy_util",
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
