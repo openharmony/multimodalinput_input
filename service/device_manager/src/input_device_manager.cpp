@@ -444,7 +444,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     AddPhysicalInputDeviceInner(deviceId, info);
-    MMI_HILOGI("OnInputDeviceAdded successfully, deviceId:%{public}d, info.sysUid:%{pubulic}s, info.enable:%{public}d",
+    MMI_HILOGI("OnInputDeviceAdded successfully, deviceId:%{public}d, info.sysUid:%{public}s, info.enable:%{public}d",
         deviceId, info.sysUid.c_str(), info.enable);
     if (info.enable) {
         NotifyAddDeviceListeners(deviceId);
