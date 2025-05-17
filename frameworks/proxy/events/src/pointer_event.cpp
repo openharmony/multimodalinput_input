@@ -428,6 +428,16 @@ void PointerEvent::PointerItem::SetCanceled(bool canceled)
     canceled_ = canceled;
 }
 
+void PointerEvent::PointerItem::SetOrientation(int32_t orientation)
+{
+    orientation_ = orientation;
+}
+
+int32_t PointerEvent::PointerItem::GetOrientation()
+{
+    return orientation_;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (

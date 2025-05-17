@@ -60,6 +60,7 @@ const char* DEVICE_TYPE_PC_PRO { "PC_PRO" };
 const char* DEVICE_TYPE_M_PC { "M_PC" };
 const char* DEVICE_TYPE_M_TABLET1 { "MRDI" };
 const char* DEVICE_TYPE_M_TABLET2 { "MRO" };
+const char* DEVICE_TYPE_M_TABLET3 { "MRDIL" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
@@ -749,7 +750,8 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     if (PRODUCT_TYPE == DEVICE_TYPE_M_PC) {
         deviceType = DeviceType::DEVICE_M_PC;
     }
-    if (PRODUCT_TYPE == DEVICE_TYPE_M_TABLET1 || PRODUCT_TYPE == DEVICE_TYPE_M_TABLET2) {
+    if (PRODUCT_TYPE == DEVICE_TYPE_M_TABLET1 || PRODUCT_TYPE == DEVICE_TYPE_M_TABLET2 || 
+        PRODUCT_TYPE == DEVICE_TYPE_M_TABLET3) {
         deviceType = DeviceType::DEVICE_M_TABLET;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1246,8 +1248,9 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
     }
 
     // touchpad right click 273 -> 272
+    uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
-        evenType != LIBINPUT_EVENT_POINTER_TAP) {
+        evenType != LIBINPUT_EVENT_POINTER_TAP && fingerCount != TP_RIGHT_CLICK_FINGER_CNT) {
         button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
         return;
     }
@@ -1259,13 +1262,13 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
         return;
     }
 
-    // touchpad two finger button 272 -> 273
-    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
         uint32_t buttonArea = libinput_event_pointer_get_button_area(data);
         if (buttonArea == BTN_RIGHT_MENUE_CODE && fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
             button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
+        } else if (buttonArea != BTN_RIGHT_MENUE_CODE && fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+            button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
         }
         return;
     }
