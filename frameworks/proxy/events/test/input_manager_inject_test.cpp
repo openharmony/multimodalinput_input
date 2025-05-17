@@ -1762,5 +1762,189 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchscreenEvent_013, TestSi
     ASSERT_NE(ret, RET_OK);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
+
+/*
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_009
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_009, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_MOVE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(20.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_010
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_010, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(20.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_011
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_011, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_EXIT);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(20.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_012
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_012, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(20.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_013
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_013, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_MOVE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(20.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_014
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_014, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(20.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_015
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_015, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_EXIT);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(20.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_016
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_016, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(20.0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0, false);
+}
 } // namespace MMI
 } // namespace OHOS
