@@ -253,6 +253,63 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ScreenPointerTest_GetDefaultBuffer_001
+ * @tc.desc: Test GetDefaultBuffer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetDefaultBufferr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    DisplayInfo di;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    ASSERT_NE(screenpointer->GetDefaultBuffer(), nullptr);
+    delete screenpointer;
+}
+
+/**
+ * @tc.name: ScreenPointerTest_GetTransparentBuffer_001
+ * @tc.desc: Test GetTransparentBuffer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetTransparentBuffer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    DisplayInfo di;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    ASSERT_NE(screenpointer->GetTransparentBuffer(), nullptr);
+    delete screenpointer;
+}
+
+/**
+ * @tc.name: ScreenPointerTest_GetCommonBuffer_001
+ * @tc.desc: Test GetCommonBuffer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetCommonBuffer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    DisplayInfo di;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    ASSERT_NE(screenpointer->GetCommonBuffer(), nullptr);
+    delete screenpointer;
+}
+
+/**
  * @tc.name: ScreenPointerTest_GetCurrentBuffer_001
  * @tc.desc: Test GetCurrentBuffer
  * @tc.type: Function
@@ -267,11 +324,10 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetCurrentBuffer_001, TestSize.Lev
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->bufferId_ = 0;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->GetCurrentBuffer());
-    sptr<OHOS::SurfaceBuffer> buffer = OHOS::SurfaceBuffer::Create();
-    screenpointer->buffers_.push_back(buffer);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->GetCurrentBuffer());
+    ASSERT_NE(screenpointer->GetCurrentBuffer(), nullptr);
+    ASSERT_NE(screenpointer->GetTransparentBuffer(), nullptr);
+    ASSERT_NE(screenpointer->GetCurrentBuffer(), nullptr);
+    delete screenpointer;
 }
 
 /**
@@ -289,11 +345,15 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_001, TestSize.Level1
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->bufferId_ = 1;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->RequestBuffer());
-    sptr<OHOS::SurfaceBuffer> buffer = OHOS::SurfaceBuffer::Create();
-    screenpointer->buffers_.push_back(buffer);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->RequestBuffer());
+    screenpointer->bufferId_ = 5;
+    bool isCommonBuffer;
+    const RenderConfig cfg = {
+        .style_ = TRANSPARENT_ICON,
+    };
+    ASSERT_NE(screenpointer->RequestBuffer(cfg, isCommonBuffer), nullptr);
+    ASSERT_FALSE(isCommonBuffer);
+    ASSERT_NE(screenpointer->GetCurrentBuffer(), nullptr);
+    delete screenpointer;
 }
 
 /**
@@ -437,7 +497,9 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ScreenPointer_003, TestSize.Level1
     EXPECT_EQ(screenpointer->width_, di.height);
     EXPECT_EQ(screenpointer->height_, di.width);
 
-    ASSERT_TRUE(screenpointer->Init());
+    PointerRenderer render;
+    ASSERT_TRUE(screenpointer->Init(render));
+    delete screenpointer;
 }
 
 /**
