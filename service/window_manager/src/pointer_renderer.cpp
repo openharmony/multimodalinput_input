@@ -239,6 +239,9 @@ pixelmap_ptr_t PointerRenderer::LoadCursorSvgWithColor(const RenderConfig &cfg)
     }
 
     pixelmap_ptr_t pmap = imageSource->CreatePixelMap(decodeOpts, ret);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("CreatePixelMap failed, ret=%{public}u", ret);
+    }
     return pmap;
 }
 
@@ -331,7 +334,7 @@ image_ptr_t PointerRenderer::ExtractDrawingImage(pixelmap_ptr_t pixelMap)
         ConvertToColorSpace(imageInfo.colorSpace),
     };
     Rosen::Drawing::Pixmap imagePixmap(drawingImageInfo, reinterpret_cast<const void*>(pixelMap->GetPixels()),
-        pixelMap->GetRowBytes());
+        pixelMap->GetRowStride());
     PixelMapContext *releaseContext = new (std::nothrow) PixelMapContext(pixelMap);
     CHKPP(releaseContext);
     auto image = Rosen::Drawing::Image::MakeFromRaster(imagePixmap, PixelMapReleaseProc, releaseContext);
