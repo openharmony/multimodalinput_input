@@ -120,7 +120,7 @@ constexpr int32_t POINTER_MOVEFLAG = { 7 };
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t EventNormalizeHandler::tpRegisterTryCount_ = 10;
+int32_t EventNormalizeHandler::tpRegisterTryCount_ = 30;
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
