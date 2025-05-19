@@ -406,7 +406,9 @@ float ScreenPointer::GetRenderDPI() const
 
 bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
 {
-    if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
+    if (IsMirror()) {
+        CalculateHwcPositionForMirror(x, y);
+    } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
         CalculateHwcPositionForExtend(x, y);
     }
     int32_t width = static_cast<int32_t>(width_);
