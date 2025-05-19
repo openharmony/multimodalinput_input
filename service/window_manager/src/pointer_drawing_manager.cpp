@@ -3505,9 +3505,11 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
     CHKPR(buffer->GetVirAddr(), RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
+    BytraceAdapter::StartSoftPointerRender(buffer->GetWidth(), buffer->GetHeight(), cfg.style_);
     if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
         MMI_HILOGE("Render failed");
     }
+    BytraceAdapter::StopSoftPointerRender();
 
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -3534,9 +3536,12 @@ int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp,
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
+    BytraceAdapter::StartHardPointerRender(buffer->GetWidth(), buffer->GetHeight(), sp->GetBufferId(),
+        sp->GetScreenId(), cfg.style_);
     if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
         MMI_HILOGE("Render failed");
     }
+    BytraceAdapter::StopHardPointerRender();
 
     MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u, style=%{public}d",
         sp->GetScreenId(), cfg.style);
