@@ -3673,7 +3673,7 @@ void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align
             if (HardwareCursorMove(x, y, align) == RET_OK) {
                 int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
                 MMI_HILOGI("Move retry success, cancel timer, TimerId:%{public}d, ret:%{public}d",
-                        moveRetryTimerId_, ret);
+                    moveRetryTimerId_, ret);
                 moveRetryTimerId_ = DEFAULT_VALUE;
                 moveRetryCount_ = 0;
                 return;
