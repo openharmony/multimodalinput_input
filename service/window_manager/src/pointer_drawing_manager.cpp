@@ -3672,16 +3672,13 @@ void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align
             }
             if (HardwareCursorMove(x, y, align) == RET_OK) {
                 int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
-                if (ret != RET_OK) {
-                    MMI_HILOGE("Move retry success, cancel timer failed, TimerId:%{public}d, ret:%{public}d",
+                MMI_HILOGI("Move retry success, cancel timer, TimerId:%{public}d, ret:%{public}d",
                         moveRetryTimerId_, ret);
-                } else {
-                    MMI_HILOGI("Move retry success, cancel timer success, TimerId:%{public}d", moveRetryTimerId_);
-                }
                 moveRetryTimerId_ = DEFAULT_VALUE;
                 moveRetryCount_ = 0;
                 return;
             }
+            MMI_HILOGE("Move retry failed, TimerId:%{public}d", moveRetryTimerId_);
             if (moveRetryCount_ == MAX_MOVE_RETRY_COUNT) {
                 MMI_HILOGI("Move retry execeed max count, stop retry");
                 moveRetryTimerId_ = DEFAULT_VALUE;
@@ -3696,11 +3693,7 @@ void PointerDrawingManager::ResetMoveRetryTimer()
 {
     if (moveRetryTimerId_ != DEFAULT_VALUE) {
         int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Cancel moveRetry Timer failed, TimerId:%{public}d, ret:%{public}d", moveRetryTimerId_, ret);
-        } else {
-            MMI_HILOGI("Cancel moveRetry Timer success, TimerId:%{public}d", moveRetryTimerId_);
-        }
+        MMI_HILOGI("Cancel moveRetry Timer, TimerId:%{public}d, ret:%{public}d", moveRetryTimerId_, ret);
         moveRetryTimerId_ = DEFAULT_VALUE;
     }
     if (moveRetryCount_ > 0) {
