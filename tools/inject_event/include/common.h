@@ -93,7 +93,6 @@ inline bool RemovePrefix(std::string& str, const std::string& prefix)
 {
     if (str.find(prefix) == 0) {
         str.erase(0, prefix.length());
-        TrimString(str);
         return true;
     }
     return false;

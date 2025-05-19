@@ -422,5 +422,43 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPoi
     EXPECT_EQ(proxy.GetPointerSnapshot((void *)pixelMapPtr.get()), ERR_INVALID_VALUE);
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_SetInputDeviceConsumer
+ * @tc.desc: Test the function SetInputDeviceConsumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SetInputDeviceConsumer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    std::vector<std::string> deviceNames;
+    deviceNames.push_back("test1");
+    deviceNames.push_back("test2");
+    auto ret = proxy.SetInputDeviceConsumer(deviceNames);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_ClearInputDeviceConsumer
+ * @tc.desc: Test the function ClearInputDeviceConsumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_ClearInputDeviceConsumer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    std::vector<std::string> deviceNames;
+    deviceNames.push_back("test1");
+    deviceNames.push_back("test2");
+    auto ret = proxy.ClearInputDeviceConsumer(deviceNames);
+    EXPECT_NE(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

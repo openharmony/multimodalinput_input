@@ -17,6 +17,7 @@
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "iremote_stub.h"
+#include "cJSON.h"
 
 #include "i_multimodal_input_connect.h"
 #include "multimodalinput_ipc_interface_code.h"
@@ -37,6 +38,30 @@ struct ParseData {
         priority = 0;
         deviceTags = 0;
     }
+};
+
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json_ != nullptr) {
+            cJSON_Delete(json_);
+        }
+    }
+    operator cJSON *()
+    {
+        return json_;
+    }
+    cJSON *json_ { nullptr };
+};
+
+struct DeviceConsumer {
+    std::string name {};
+    std::vector<int32_t> uids {};
+};
+
+struct ConsumersData {
+    std::vector<DeviceConsumer> consumers {};
 };
 class MultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
@@ -83,6 +108,8 @@ protected:
     int32_t StubGetKeyboardRepeatDelay(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetKeyboardRepeatRate(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddInputHandler(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetInputDeviceConsumer(MessageParcel& data, MessageParcel& reply);
+    int32_t StubClearInputDeviceConsumer(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddPreInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemovePreInputHandler(MessageParcel& data, MessageParcel& reply);
@@ -188,11 +215,20 @@ protected:
     int32_t StubSetKnuckleSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubLaunchAiScreenAbility(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetMaxMultiTouchPointNum(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSubscribeInputActive(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnsubscribeInputActive(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);
     int32_t HandleGestureMonitor(MultimodalinputConnectInterfaceCode code,
         MessageParcel& data, MessageParcel& reply);
+    
+    bool ParseDeviceConsumerConfig();
+    std::vector<std::string> FilterConsumers(std::vector<std::string> &deviceNames);
+    void UpdateConsumers(const cJSON* consumer);
+    void DealConsumers(std::vector<std::string>& filterNames, const DeviceConsumer &consumer);
+    
+    ConsumersData consumersData_;
 };
 } // namespace MMI
 } // namespace OHOS

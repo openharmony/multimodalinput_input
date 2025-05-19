@@ -157,9 +157,9 @@ public:
     void RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId);
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord);
     const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -241,7 +241,6 @@ private:
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayGroupInfo(const DisplayGroupInfo displayGroupInfo);
     void PrintDisplayInfo(const DisplayInfo displayInfo);
-    int32_t ConvertToolType(int32_t toolType);
     void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
     void PrintWindowNavbar(int32_t groupId = -1);
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
@@ -424,7 +423,8 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool IsPointerActiveRectValid(const DisplayInfo &currentDisplay);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-
+    bool IsAccessibilityFocusEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsAccessibilityEventWithZorderInjected(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     DisplayGroupInfo& FindTargetDisplayGroupInfo(int32_t displayId);
     int32_t FindDisplayGroupId(int32_t displayId) const;
@@ -526,7 +526,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
     std::shared_ptr<PointerEvent> GetlastPointerEvent();

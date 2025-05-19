@@ -333,6 +333,7 @@ void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEv
 
 bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI_HILOGD("It's not MouseEvent, don't need to transform");
         return true;
@@ -373,8 +374,9 @@ bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent>
 
 bool InputManager::TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGD("It's not MouseEvent, don't need to transform");
+        MMI_HILOGD("It's not TouchEvent, don't need to transform");
         return true;
     }
 
@@ -917,6 +919,22 @@ int32_t InputManager::LaunchAiScreenAbility()
 int32_t InputManager::GetMaxMultiTouchPointNum(int32_t &pointNum)
 {
     return InputMgrImpl.GetMaxMultiTouchPointNum(pointNum);
+}
+
+int32_t InputManager::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
+    std::shared_ptr<IInputEventConsumer> consumer)
+{
+    return InputMgrImpl.SetInputDeviceConsumer(deviceNames, consumer);
+}
+
+int32_t InputManager::SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval)
+{
+    return InputMgrImpl.SubscribeInputActive(inputEventConsumer, interval);
+}
+
+void InputManager::UnsubscribeInputActive(int32_t subscribeId)
+{
+    InputMgrImpl.UnsubscribeInputActive(subscribeId);
 }
 } // namespace MMI
 } // namespace OHOS

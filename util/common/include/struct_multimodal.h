@@ -401,9 +401,10 @@ struct EventTouch {
     int64_t time {};
     int32_t slot {};
     int32_t seatSlot {};
-    LogicalCoordinate point;
-    LogicalRectangle toolRect;
-    DEVICE_TYPE deviceType;
+    PhysicalCoordinate coordF {};
+    LogicalCoordinate point {};
+    LogicalRectangle toolRect {};
+    DEVICE_TYPE deviceType { DEVICE_TYPE::DEVICE_TYPE_UNKNOWN };
     double pressure {};
     double area {};
 };

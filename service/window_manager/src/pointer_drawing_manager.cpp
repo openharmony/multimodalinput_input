@@ -476,6 +476,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (GetSurfaceNode() != nullptr) {
         if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
+            MMI_HILOGE("SetCursorLocation failed");
             return;
         }
         MMI_HILOGD("Move pointer, physicalX:%d, physicalY:%d", physicalX, physicalY);
@@ -560,8 +561,11 @@ void PointerDrawingManager::UpdateMouseStyle()
     GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (curPointerStyle.id == CURSOR_CIRCLE_STYLE || curPointerStyle.id == AECH_DEVELOPER_DEFINED_STYLE) {
         lastMouseStyle_.id = curPointerStyle.id;
-        return;
+        if (WIN_MGR->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, lastMouseStyle_) != RET_OK) {
+            MMI_HILOGE("Set pointer style failed");
+        }
     }
+    MMI_HILOGI("LastMouseStyle_.id:%{public}d, curPointerStyle.id:%{public}d", lastMouseStyle_.id, curPointerStyle.id);
 }
 
 int32_t PointerDrawingManager::SwitchPointerStyle()
@@ -783,20 +787,18 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPR(hardwareCursorPointerManager_, RET_ERR);
     if (hardwareCursorPointerManager_->IsSupported()) {
+        MMI_HILOGI("mouseStyle:%{public}u", static_cast<uint32_t>(mouseStyle));
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
             return InitVsync(mouseStyle);
-        } else {
-            GetCanvasSize();
-            GetFocusCoordinates();
-            hardwareCanvasSize_ = g_hardwareCanvasSize;
-            // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
-            // repeatedly obtain the surfaceBuffer.
-            PostSoftCursorTask([this, mouseStyle]() {
-                SoftwareCursorRender(mouseStyle);
-            });
-            HardwareCursorRender(mouseStyle);
-            return RET_OK;
         }
+        hardwareCanvasSize_ = g_hardwareCanvasSize;
+        // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
+        // repeatedly obtain the surfaceBuffer.
+        PostSoftCursorTask([this, mouseStyle]() {
+            SoftwareCursorRender(mouseStyle);
+        });
+        HardwareCursorRender(mouseStyle);
+        return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return DrawCursor(mouseStyle);
@@ -1054,9 +1056,16 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    if (pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+        MMI_HILOGE("DynamicRender failed");
+    };
     MMI_HILOGI("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u, style = %{public}d",
         sp->GetScreenId(), cfg.style);
+    auto sret = buffer->FlushCache();
+    if (sret != RET_OK) {
+        MMI_HILOGE("FlushCache ret: %{public}d", sret);
+        return sret;
+    }
     return RET_OK;
 }
 
@@ -1111,8 +1120,9 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
-
+    if (pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+        MMI_HILOGE("DynamicRender failed");
+    }
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
             .w = buffer->GetWidth(),
@@ -2546,10 +2556,10 @@ void PointerDrawingManager::DrawManager()
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (hasDisplay_ && hasPointerDevice_ && (surfaceNodePtr == nullptr)) {
-        MMI_HILOGI("Draw pointer begin");
         PointerStyle pointerStyle;
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
-        MMI_HILOGD("Get pid %{public}d with pointerStyle %{public}d", pid_, pointerStyle.id);
+        MMI_HILOGI("Pid_:%{public}d, windowId_:%{public}d, pointerStyle.id:%{public}d", pid_,
+            windowId_, pointerStyle.id);
         Direction direction = static_cast<Direction>((
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         lastDrawPointerStyle_ = pointerStyle;
@@ -2634,8 +2644,8 @@ void PointerDrawingManager::UpdatePointerVisible()
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         surfaceNodePtr->SetVisible(false);
-        MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s",
-            mouseDisplayState_ ? "true" : "false");
+        MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}d",
+            mouseDisplayState_ ? "true" : "false", displayId_);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -3441,15 +3451,19 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         RenderConfig cfg;
         CreateRenderConfig(cfg, it.second, mouseStyle, true);
-        MMI_HILOGI("HardwareCursorRender, screen:%{public}u, dpi:%{public}f, screenId_:%{public}" PRIu64,
-            it.first, cfg.dpi, screenId_);
+        MMI_HILOGI("screen:%{public}u, mode:%{public}u, dpi:%{public}f, screenId_:%{public}" PRIu64,
+            it.first, it.second->GetMode(), cfg.dpi, screenId_);
         if (it.second->IsMirror() || it.first == screenId_) {
-            DrawHardCursor(it.second, cfg);
+            if (DrawHardCursor(it.second, cfg) != RET_OK) {
+                MMI_HILOGE("DrawHardCursor failed");
+            }
         } else {
-            it.second->SetInvisible();
+            if (!it.second->SetInvisible()) {
+                MMI_HILOGE("SetInvisible failed");
+            }
         }
     }
-    MMI_HILOGD("HardwareCursorRender success");
+    MMI_HILOGD("HardwareCursorRender completed");
 }
 
 void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
@@ -3464,8 +3478,8 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         RenderConfig cfg;
         CreateRenderConfig(cfg, it.second, mouseStyle, false);
-        MMI_HILOGI("SoftwareCursorRender, screen:%{public}u, dpi:%{public}f, direction:%{public}d,"
-            "screenId_:%{public}" PRIu64, it.first, cfg.dpi, cfg.direction, screenId_);
+        MMI_HILOGI("SoftwareCursorRender, screen:%{public}u, mode:%{public}u, dpi:%{public}f, direction:%{public}d,"
+            "screenId_:%{public}" PRIu64, it.first, it.second->GetMode(), cfg.dpi, cfg.direction, screenId_);
         if (!it.second->IsMirror() && it.first != screenId_) {
             cfg.style = MOUSE_ICON::TRANSPARENT_ICON;
             cfg.align = MouseIcon2IconType(cfg.style);
@@ -3491,7 +3505,9 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
     CHKPR(buffer->GetVirAddr(), RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+        MMI_HILOGE("Render failed");
+    }
 
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -3509,7 +3525,7 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg)
+int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg)
 {
     CHKPR(sp, RET_ERR);
 
@@ -3518,10 +3534,17 @@ int32_t PointerDrawingManager::DrawCursor(std::shared_ptr<ScreenPointer> sp, con
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+        MMI_HILOGE("Render failed");
+    }
 
     MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u, style=%{public}d",
         sp->GetScreenId(), cfg.style);
+    auto sret = buffer->FlushCache();
+    if (sret != RET_OK) {
+        MMI_HILOGE("FlushCache ret: %{public}d", sret);
+        return sret;
+    }
     return RET_OK;
 }
 

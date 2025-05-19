@@ -19,6 +19,7 @@
 #include "string_ex.h"
 
 #include "bytrace_adapter.h"
+#include "config_policy_utils.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
 #include "pixel_map.h"
@@ -44,6 +45,9 @@ constexpr int32_t MAX_SPEED { 20 };
 constexpr int32_t MIN_SPEED { 1 };
 constexpr int32_t KEY_MAX_LIST_SIZE { 5 };
 constexpr int32_t CALL_MANAGER_UID { 5523 };
+constexpr int32_t MAX_DEVICE_NUM { 10 };
+const size_t QUOTES_BEGIN = 1;
+const size_t QUOTES_END = 2;
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -513,6 +517,18 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MAX_MULTI_TOUCH_POINT_NUM):
             ret = StubGetMaxMultiTouchPointNum(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INPUT_DEVICE_CONSUMER):
+            ret = StubSetInputDeviceConsumer(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_DEVICE_CONSUMER):
+            ret = StubClearInputDeviceConsumer(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_INPUT_ACTIVE):
+            ret = StubSubscribeInputActive(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_INPUT_ACTIVE):
+            ret = StubUnsubscribeInputActive(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
@@ -2214,7 +2230,6 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
         READUINT8(data, buffer, IPC_PROXY_DEAD_OBJECT_ERR);
         extraData.buffer.push_back(buffer);
     }
-    READINT32(data, extraData.toolType, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.sourceType, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.pointerId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, extraData.pullId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -3349,7 +3364,7 @@ int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, Messa
     uint64_t readThreadId = 0;
     READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
     if (readThreadId < 0) {
-        MMI_HILOGE("invalid readThreadId :%{public}llu", readThreadId);
+        MMI_HILOGE("invalid readThreadId :%{public}" PRIu64, readThreadId);
         return RET_ERR;
     }
     int32_t ret = SetClientInfo(pid, readThreadId);
@@ -3537,6 +3552,199 @@ int32_t MultimodalInputConnectStub::StubGetMaxMultiTouchPointNum(MessageParcel& 
     WRITEINT32(reply, pointNum, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("maxMultiTouchPointNum :%{public}d", pointNum);
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetInputDeviceConsumer(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t size = 0;
+    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (size < 0 || size > MAX_DEVICE_NUM) {
+        MMI_HILOGE("Invalid size:%{public}d", size);
+        return RET_ERR;
+    }
+    std::vector<std::string> deviceNames;
+    std::string deviceName;
+    for (int32_t i = 0; i < size; ++i) {
+        READSTRING(data, deviceName, IPC_PROXY_DEAD_OBJECT_ERR);
+        deviceNames.push_back(deviceName);
+    }
+    bool flag = ParseDeviceConsumerConfig();
+    if (!flag) {
+        return ERROR_NO_PERMISSION;
+    }
+    auto nameVec = FilterConsumers(deviceNames);
+    if (nameVec.empty()) {
+        return ERROR_NO_PERMISSION;
+    }
+    auto ret = SetInputDeviceConsumer(nameVec);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call AddInputConsumerHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubClearInputDeviceConsumer(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t size = 0;
+    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (size < 0 || size > MAX_DEVICE_NUM) {
+        MMI_HILOGE("Invalid size:%{public}d", size);
+        return RET_ERR;
+    }
+    std::vector<std::string> deviceNames;
+    std::string deviceName;
+    for (int32_t i = 0; i < size; ++i) {
+        READSTRING(data, deviceName, IPC_PROXY_DEAD_OBJECT_ERR);
+        deviceNames.push_back(deviceName);
+    }
+    bool flag = ParseDeviceConsumerConfig();
+    if (!flag) {
+        return ERROR_NO_PERMISSION;
+    }
+    auto nameVec = FilterConsumers(deviceNames);
+    if (nameVec.empty()) {
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t ret = ClearInputDeviceConsumer(nameVec);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call ClearInputDeviceConsumer failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+bool MultimodalInputConnectStub::ParseDeviceConsumerConfig()
+{
+    CALL_DEBUG_ENTER;
+    consumersData_.consumers.clear();
+    const char configName[] { "/etc/multimodalinput/input_device_consumers.json" };
+    char buf[MAX_PATH_LEN] {};
+
+    char *filePath = GetOneCfgFile(configName, buf, sizeof(buf));
+    if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
+        MMI_HILOGE("Can not get customization config file");
+        return false;
+    }
+    std::string defaultConfig = filePath;
+    std::string jsonStr = ReadJsonFile(defaultConfig);
+    if (jsonStr.empty()) {
+        MMI_HILOGE("Read configFile failed");
+        return false;
+    }
+    JsonParser jsonData;
+    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.json_)) {
+        MMI_HILOGE("The json data is not object");
+        return false;
+    }
+    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "consumers");
+    if (!cJSON_IsArray(consumers)) {
+        MMI_HILOGE("consumers number must be array");
+        return false;
+    }
+    cJSON* consumer;
+    cJSON_ArrayForEach(consumer, consumers) {
+        if (cJSON_IsObject(consumer)) {
+            UpdateConsumers(consumer);
+        }
+    }
+    return true;
+}
+
+std::vector<std::string> MultimodalInputConnectStub::FilterConsumers(std::vector<std::string> &deviceNames)
+{
+    std::vector<std::string> filterNames;
+    for (const auto& consumer : consumersData_.consumers) {
+        if (std::find(deviceNames.begin(), deviceNames.end(), consumer.name) != deviceNames.end()) {
+            DealConsumers(filterNames, consumer);
+        }
+    }
+    return filterNames;
+}
+
+void MultimodalInputConnectStub::UpdateConsumers(const cJSON* consumer)
+{
+    DeviceConsumer deviceConsumer;
+    cJSON* name = cJSON_GetObjectItemCaseSensitive(consumer, "name");
+    if (name != nullptr && cJSON_IsString(name)) {
+        char *nameString = cJSON_Print(name);
+        std::string nameStr(nameString);
+        if (!nameStr.empty() && nameStr.front() == '"' && nameStr.back() == '"') {
+            nameStr = nameStr.substr(QUOTES_BEGIN, nameStr.size() - QUOTES_END);
+        }
+        deviceConsumer.name = nameStr;
+        cJSON_free(nameString);
+    }
+    cJSON* uid_array = cJSON_GetObjectItemCaseSensitive(consumer, "uids");
+    if (uid_array != nullptr && cJSON_IsArray(uid_array)) {
+        cJSON* uid;
+        cJSON_ArrayForEach(uid, uid_array) {
+            if (cJSON_IsNumber(uid)) {
+                deviceConsumer.uids.push_back(cJSON_GetNumberValue(uid));
+            }
+        }
+    }
+    consumersData_.consumers.push_back(deviceConsumer);
+}
+
+void MultimodalInputConnectStub::DealConsumers(std::vector<std::string>& filterNames, const DeviceConsumer &consumer)
+{
+    int32_t callingUid = GetCallingUid();
+    for (const auto& uid : consumer.uids) {
+        if (uid == callingUid) {
+            filterNames.push_back(consumer.name);
+        }
+    }
+}
+
+int32_t MultimodalInputConnectStub::StubSubscribeInputActive(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t subscribeId = 0;
+    int64_t interval = 0;
+    READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT64(data, interval, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SubscribeInputActive(subscribeId, interval);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeInputActive failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubUnsubscribeInputActive(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t subscribeId = 0;
+    READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribeId");
+        return RET_ERR;
+    }
+    int32_t ret = UnsubscribeInputActive(subscribeId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnsubscribeInputActive failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -103,6 +103,7 @@ ohos_shared_library("libmmi-client") {
   innerapi_tags = [ "platformsdk" ]
   branch_protector_ret = "pac_ret"
 
+  sources += [ "event_handler/src/input_device_consumer.cpp" ]
   sources += [ "event_handler/src/tablet_event_input_subscribe_manager.cpp" ]
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
@@ -312,6 +313,7 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
+    "event_handler/src/input_active_subscribe_manager.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
@@ -446,6 +448,7 @@ ohos_unittest("InputManagerImplTest") {
     "${mmi_path}/service/filter/src/event_filter_stub.cpp",
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
+    "event_handler/src/input_active_subscribe_manager.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/key_event_input_subscribe_manager.cpp",
