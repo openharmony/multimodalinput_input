@@ -136,20 +136,6 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
     RegisterUpdateFunc();
     TP_CHECK_FALSE_RETURN(updateFunc_ != nullptr, false, "Update function is null");
 
-    if (touchpadSwitchesObserver_ == nullptr) {
-        touchpadSwitchesObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .CreateObserver(g_touchpadSwitchesKey, updateFunc_);
-        TP_CHECK_FALSE_RETURN(touchpadSwitchesObserver_ != nullptr, false, "TouchpadSwitchesObserver fail");
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .RegisterObserver(touchpadSwitchesObserver_, datashareUri_);
-    }
-    if (knuckleSwitchesObserver_ == nullptr) {
-        knuckleSwitchesObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .CreateObserver(g_knuckleSwitchesKey, updateFunc_);
-        TP_CHECK_FALSE_RETURN(knuckleSwitchesObserver_ != nullptr, false, "KnuckleSwitchesObserver fail");
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .RegisterObserver(knuckleSwitchesObserver_, datashareUri_);
-    }
     if (pressureObserver_ == nullptr) {
         pressureObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .CreateObserver(g_pressureKey, updateFunc_);
@@ -163,6 +149,20 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
         TP_CHECK_FALSE_RETURN(vibrationObserver_ != nullptr, false, "VibrationObserver fail");
         ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .RegisterObserver(vibrationObserver_, datashareUri_);
+    }
+    if (touchpadSwitchesObserver_ == nullptr) {
+        touchpadSwitchesObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .CreateObserver(g_touchpadSwitchesKey, updateFunc_);
+        TP_CHECK_FALSE_RETURN(touchpadSwitchesObserver_ != nullptr, false, "TouchpadSwitchesObserver fail");
+        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .RegisterObserver(touchpadSwitchesObserver_, datashareUri_);
+    }
+    if (knuckleSwitchesObserver_ == nullptr) {
+        knuckleSwitchesObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .CreateObserver(g_knuckleSwitchesKey, updateFunc_);
+        TP_CHECK_FALSE_RETURN(knuckleSwitchesObserver_ != nullptr, false, "KnuckleSwitchesObserver fail");
+        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .RegisterObserver(knuckleSwitchesObserver_, datashareUri_);
     }
     if (ret) {
         pressureObserver_ = nullptr;
@@ -228,10 +228,10 @@ void TouchpadSettingsObserver::SyncTouchpadSettingsData()
     if (updateFunc_ == nullptr) {
         return;
     }
-    updateFunc_(g_touchpadSwitchesKey);
-    updateFunc_(g_knuckleSwitchesKey);
     updateFunc_(g_pressureKey);
     updateFunc_(g_vibrationKey);
+    updateFunc_(g_touchpadSwitchesKey);
+    updateFunc_(g_knuckleSwitchesKey);
     MMI_HILOGI("Sync touchpad settings end");
 }
 
