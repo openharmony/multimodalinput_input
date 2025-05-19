@@ -3662,8 +3662,6 @@ void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align
 {
     moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, MAX_MOVE_RETRY_COUNT, [this, x, y, align]() {
         PostMoveRetryTask([this, x, y, align]() {
-            MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, align:%{public}d, Timer Id:%{public}d,"
-                "move retry count:%{public}d", x, y, align, moveRetryTimerId_, moveRetryCount_);
             moveRetryCount_++;
             MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, align:%{public}d, Timer Id:%{public}d,"
                 "move retry count:%{public}d", x, y, align, moveRetryTimerId_, moveRetryCount_);
