@@ -61,13 +61,13 @@ ohos_fuzztest("GetTpRightClickTypeFuzzTest") {
 
   external_deps = [
     "ability_runtime:app_manager",
+    "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
-    "ipc:ipc_single",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",

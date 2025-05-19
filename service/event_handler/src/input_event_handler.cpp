@@ -385,6 +385,13 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
 
     std::shared_ptr<IInputEventHandler> handler = eventNormalizeHandler_;
+    inputActiveSubscriberHandler_ = std::make_shared<InputActiveSubscriberHandler>();
+    if (inputActiveSubscriberHandler_) {
+        handler->SetNext(inputActiveSubscriberHandler_);
+        handler = inputActiveSubscriberHandler_;
+    } else {
+        MMI_HILOGE("failed to alloc InputActiveSubscriberHandler");
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     eventFilterHandler_ = std::make_shared<EventFilterHandler>();
     handler->SetNext(eventFilterHandler_);
@@ -492,6 +499,11 @@ int32_t InputEventHandler::SetMoveEventFilters(bool flag)
     MMI_HILOGW("Set move event filters does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+}
+
+std::shared_ptr<InputActiveSubscriberHandler> InputEventHandler::GetInputActiveSubscriberHandler() const
+{
+    return inputActiveSubscriberHandler_;
 }
 } // namespace MMI
 } // namespace OHOS
