@@ -166,6 +166,7 @@ enum class MultimodalinputConnectInterfaceCode {
     UNSUBSCRIBE_KEY_MONITOR = 352,
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     QUERY_SWITCH_STATE_EVENT = 353,
+    SWITCH_TOUCH_TRACKING,
 };
 
 enum class MultimodalinputEventObserverCode {

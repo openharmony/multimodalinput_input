@@ -529,6 +529,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_INPUT_ACTIVE):
             ret = StubUnsubscribeInputActive(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SWITCH_TOUCH_TRACKING):
+            ret = StubSwitchTouchTracking(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -3739,6 +3742,21 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeInputActive(MessageParcel& da
         MMI_HILOGE("UnsubscribeInputActive failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSwitchTouchTracking(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    constexpr int32_t accessibilityUid { 1103 };
+    int32_t callingUid = GetCallingUid();
+    if ((callingUid != accessibilityUid) || !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return PERMISSION_DENIED;
+    }
+    bool touchTracking { false };
+    READBOOL(data, touchTracking, IPC_PROXY_DEAD_OBJECT_ERR);
+    SwitchTouchTracking(touchTracking);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

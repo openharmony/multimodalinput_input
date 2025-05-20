@@ -249,6 +249,7 @@ public:
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
     int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
     void UnsubscribeInputActive(int32_t subscribeId);
+    int32_t SwitchTouchTracking(bool touchTracking);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);

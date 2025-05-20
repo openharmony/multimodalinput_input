@@ -1219,6 +1219,8 @@ public:
     */
     void UnsubscribeInputActive(int32_t subscribeId);
 
+    int32_t SwitchTouchTracking(bool touchTracking);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
