@@ -745,15 +745,19 @@ bool EventMonitorHandler::MonitorCollection::IsFingerprint(std::shared_ptr<Point
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
-        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
-        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH)) {
+        (((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) ||
+        ((PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH)) ||
+        (PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL == pointerEvent->GetPointerAction()))
+        ) {
             return true;
     }
     MMI_HILOGD("not fingerprint event");
     return false;
 }
 
-bool EventMonitorHandler::MonitorCollection::FingerprintEventMonitorHandle(
+bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendFingerprintEvent(
     SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent, std::unordered_set<int32_t> fingerFocusPidSet)
 {
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT) {
@@ -797,7 +801,7 @@ bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(
     CHKPF(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     if (IsFingerprint(pointerEvent)) {
-        return FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet);
+        return CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_X_KEY

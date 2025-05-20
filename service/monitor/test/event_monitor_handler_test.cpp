@@ -1136,12 +1136,12 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFingerprint, TestSiz
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_FingerprintEventMonitorHandle_001
- * @tc.desc: Test FingerprintEventMonitorHandle
+ * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendFingerprintEvent_001
+ * @tc.desc: Test CheckIfNeedSendFingerprintEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_FingerprintEventMonitorHandle_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendFingerprintEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventMonitorHandler::MonitorCollection monitorCollection;
@@ -1154,16 +1154,16 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_FingerprintEventMonito
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
     std::unordered_set<int32_t> fingerFocusPidSet;
-    ASSERT_FALSE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+    ASSERT_FALSE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_FingerprintEventMonitorHandle_002
- * @tc.desc: Test FingerprintEventMonitorHandle
+ * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendFingerprintEvent_002
+ * @tc.desc: Test CheckIfNeedSendFingerprintEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_FingerprintEventMonitorHandle_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendFingerprintEvent_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventMonitorHandler::MonitorCollection monitorCollection;
@@ -1176,17 +1176,17 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_FingerprintEventMonito
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK);
     std::unordered_set<int32_t> fingerFocusPidSet;
-    ASSERT_TRUE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+    ASSERT_TRUE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
-    ASSERT_TRUE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+    ASSERT_TRUE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
 
     fingerFocusPidSet.insert(g_pid);
-    ASSERT_TRUE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+    ASSERT_TRUE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
 
     fingerFocusPidSet.clear();
     fingerFocusPidSet.insert(g_moduleType);
-    ASSERT_FALSE(monitorCollection.FingerprintEventMonitorHandle(monitor, pointerEvent, fingerFocusPidSet));
+    ASSERT_FALSE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 /**
