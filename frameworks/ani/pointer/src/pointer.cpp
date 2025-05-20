@@ -83,7 +83,7 @@ static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
     return;
 }
 
-int32_t ToInt32ECMAScript(double value)
+static int32_t ToInt32ECMAScript(double value)
 {
     if (std::isnan(value) || std::isinf(value)) {
         return 0;

@@ -35,7 +35,7 @@ const double INT32_MAX_D = static_cast<double>(std::numeric_limits<int32_t>::max
 } // namespace
 
 static Callbacks callbacks = {};
-std::mutex sCallBacksMutex;
+static std::mutex sCallBacksMutex;
 
 KeyEventMonitorInfo::~KeyEventMonitorInfo()
 {
