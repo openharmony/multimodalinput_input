@@ -143,8 +143,9 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 
 bool KeyCommandHandler::SkipKnuckleDetect()
 {
-    return !HasScreenCapturePermission(
-        KNUCKLE_SCREENSHOT | KNUCKLE_SCROLL_SCREENSHOT | KNUCKLE_ENABLE_AI_BASE | KNUCKLE_SCREEN_RECORDING);
+    return ((screenCapturePermission_ & (KNUCKLE_SCREENSHOT | KNUCKLE_SCROLL_SCREENSHOT | KNUCKLE_ENABLE_AI_BASE |
+                                           KNUCKLE_SCREEN_RECORDING)) == 0) ||
+           !(screenshotSwitch_.statusConfigValue || recordSwitch_.statusConfigValue) || gameForbidFingerKnuckle_;
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -3011,20 +3012,24 @@ int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType
  
 bool KeyCommandHandler::HasScreenCapturePermission(uint32_t permissionType)
 {
-    bool hasScreenCapturePermission = ((screenCapturePermission_ & permissionType) != 0);
-    if (((permissionType & KNUCKLE_SCREENSHOT) != 0) || ((permissionType & KNUCKLE_SCROLL_SCREENSHOT) != 0) ||
-        ((permissionType & KNUCKLE_ENABLE_AI_BASE) != 0)) {
+    bool hasScreenCapturePermission = ((screenCapturePermission_ & permissionType) == permissionType);
+    if ((permissionType & (KNUCKLE_SCREENSHOT | KNUCKLE_SCROLL_SCREENSHOT | KNUCKLE_ENABLE_AI_BASE)) != 0) {
         hasScreenCapturePermission =
             hasScreenCapturePermission && !gameForbidFingerKnuckle_ && screenshotSwitch_.statusConfigValue;
     }
-    if (((permissionType & KNUCKLE_SCREEN_RECORDING) != 0)) {
+    if ((permissionType & KNUCKLE_SCREEN_RECORDING) != 0) {
         hasScreenCapturePermission =
             hasScreenCapturePermission && !gameForbidFingerKnuckle_ && recordSwitch_.statusConfigValue;
     }
     MMI_HILOGD("HasScreenCapturePermission is successful in keyCommand handler, screenCapturePermission_:%{public}d, "
-               "permissionType:%{public}d, hasScreenCapturePermission:%{public}d ",
+               "permissionType:%{public}d, gameForbidFingerKnuckle_:%{public}d, screenshotSwitch_:%{public}d, "
+               "recordSwitch_:%{public}d, "
+               "hasScreenCapturePermission:%{public}d ",
         screenCapturePermission_,
         permissionType,
+        gameForbidFingerKnuckle_,
+        screenshotSwitch_.statusConfigValue,
+        recordSwitch_.statusConfigValue,
         hasScreenCapturePermission);
     return hasScreenCapturePermission;
 }
