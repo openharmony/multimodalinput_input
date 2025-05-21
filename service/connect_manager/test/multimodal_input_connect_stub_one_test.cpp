@@ -1550,5 +1550,113 @@ HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_St
     int32_t ret = stub->StubSetInputDeviceInputEnable(data, reply);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_OnRemoteRequest_002
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_OnRemoteRequest_002,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, GetMaxMultiTouchPointNum).WillRepeatedly(Return(0));
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MAX_MULTI_TOUCH_POINT_NUM);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    int32_t temp = stub->StubGetMaxMultiTouchPointNum(data, reply);
+    EXPECT_EQ(ret, temp);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_OnRemoteRequest_003
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_OnRemoteRequest_003,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INPUT_DEVICE_CONSUMER);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    int32_t temp = stub->StubSetInputDeviceConsumer(data, reply);
+    EXPECT_EQ(ret, temp);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_OnRemoteRequest_004
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_OnRemoteRequest_004,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_DEVICE_CONSUMER);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    int32_t temp = stub->StubClearInputDeviceConsumer(data, reply);
+    EXPECT_EQ(ret, temp);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_OnRemoteRequest_005
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_OnRemoteRequest_005,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillRepeatedly(Return(true));
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_INPUT_ACTIVE);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    int32_t temp = stub->StubSubscribeInputActive(data, reply);
+    EXPECT_EQ(ret, temp);
+}
+
+/* *
+ * @tc.name: MultimodalInputConnectStubOneTest_OnRemoteRequest_006
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_OnRemoteRequest_006,
+    TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, IsRunning).WillRepeatedly(Return(true));
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_INPUT_ACTIVE);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    int32_t temp = stub->StubUnsubscribeInputActive(data, reply);
+    EXPECT_EQ(ret, temp);
+}
 } // namespace MMI
 } // namespace OHOS
