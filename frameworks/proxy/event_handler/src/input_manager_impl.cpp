@@ -435,7 +435,7 @@ int32_t InputManagerImpl::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
         return -CAPABILITY_NOT_SUPPORTED;
     }
@@ -452,7 +452,7 @@ int32_t InputManagerImpl::UnsubscribeKeyMonitor(int32_t subscriberId)
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
         return -CAPABILITY_NOT_SUPPORTED;
     }
@@ -2825,7 +2825,7 @@ int32_t InputManagerImpl::LaunchAiScreenAbility()
 int32_t InputManagerImpl::GetMaxMultiTouchPointNum(int32_t &pointNum)
 {
     CALL_INFO_TRACE;
-    return MULTIMODAL_INPUT_CONNECT_MGR->GetMaxMultiTouchPointNum(pointNum);
+    return MultimodalEventHandler::GetMaxMultiTouchPointNum(pointNum);
 }
 
 int32_t InputManagerImpl::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,

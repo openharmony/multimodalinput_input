@@ -78,6 +78,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+
+constexpr int32_t MIN_MULTI_TOUCH_POINT_NUM { 0 };
+constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
+constexpr int32_t UNKNOWN_MULTI_TOUCH_POINT_NUM { -1 };
 } // namespace
 
 class OHInputManagerTest : public testing::Test {
@@ -1924,6 +1928,35 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_004,
     event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW);
     ret = OH_Input_AddMouseEventMonitor(callback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_QueryMaxTouchPoints_001
+ * @tc.desc: GetMaxMultiTouchPointNum
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_QueryMaxTouchPoints_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = OH_Input_QueryMaxTouchPoints(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_QueryMaxTouchPoints_002
+ * @tc.desc: GetMaxMultiTouchPointNum
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_QueryMaxTouchPoints_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pointNum { UNKNOWN_MULTI_TOUCH_POINT_NUM };
+    auto ret = OH_Input_QueryMaxTouchPoints(&pointNum);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_TRUE((pointNum == UNKNOWN_MULTI_TOUCH_POINT_NUM) ||
+        ((pointNum >= MIN_MULTI_TOUCH_POINT_NUM) && (pointNum <= MAX_MULTI_TOUCH_POINT_NUM)));
 }
 } // namespace MMI
 } // namespace OHOS

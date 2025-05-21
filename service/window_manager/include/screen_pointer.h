@@ -145,6 +145,11 @@ public:
 
     bool IsPositionOutScreen(int32_t x, int32_t y);
 
+    uint32_t GetBufferId()
+    {
+        return bufferId_;
+    }
+
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();
