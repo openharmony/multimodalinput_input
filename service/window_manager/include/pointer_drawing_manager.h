@@ -221,8 +221,6 @@ private:
     void PostTask(std::function<void()> task);
     void PostSoftCursorTask(std::function<void()> task);
     void PostMoveRetryTask(std::function<void()> task);
-    void DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
-        int32_t px, int32_t py, ICON_TYPE align);
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
     void UpdateBindDisplayId(int32_t displayId);
