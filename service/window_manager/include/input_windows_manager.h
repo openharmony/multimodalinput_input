@@ -409,6 +409,7 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
     int32_t ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown);
+    int32_t ShiftAppTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo);
     CursorPosition GetCursorPos(const DisplayGroupInfo &displayGroupInfo);
     CursorPosition ResetCursorPos(const DisplayGroupInfo &displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

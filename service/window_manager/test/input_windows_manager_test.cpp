@@ -7590,6 +7590,153 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_ShiftAppPointerEvent_007
+ * @tc.desc: Test ShiftAppPointerEvent failed for null lastPointerEvent_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastTouchEvent_ = nullptr;
+    int32_t sourceWindowId = 50;
+    int32_t targetWindowId = 51;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    .sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
+    };
+    bool autoGenDown = true;
+    int32_t displayId = 0;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = sourceWindowId;
+    windowInfo.displayId = displayId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.id = targetWindowId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ShiftAppPointerEvent_008
+ * @tc.desc: Test ShiftAppPointerEvent failed for null lastPointerEvent_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastTouchEvent_ = nullptr;
+    int32_t sourceWindowId = 50;
+    int32_t targetWindowId = 51;
+    int32_t fingerId = -1;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    .sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
+    .fingerId = fingerId,
+    };
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    inputWindowsManager.lastTouchEvent_ = pointerEvent;
+    bool autoGenDown = true;
+    int32_t displayId = 0;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = sourceWindowId;
+    windowInfo.displayId = displayId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.id = targetWindowId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ShiftAppPointerEvent_009
+ * @tc.desc: Test ShiftAppPointerEvent failed for null lastPointerEvent_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastTouchEvent_ = nullptr;
+    int32_t sourceWindowId = 50;
+    int32_t targetWindowId = 51;
+    int32_t fingerId = 1;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    .sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
+    .fingerId = fingerId,
+    };
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    inputWindowsManager.lastTouchEvent_ = pointerEvent;
+    bool autoGenDown = true;
+    int32_t displayId = 0;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = sourceWindowId;
+    windowInfo.displayId = displayId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.id = targetWindowId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ShiftAppPointerEvent_010
+ * @tc.desc: Test ShiftAppPointerEvent failed for null lastPointerEvent_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.lastTouchEvent_ = nullptr;
+    int32_t sourceWindowId = 50;
+    int32_t targetWindowId = 51;
+    int32_t fingerId = 0;
+    ShiftWindowParam param {
+	.sourceWindowId = sourceWindowId,
+	.targetWindowId = targetWindowId,
+    .sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
+    .fingerId = fingerId,
+    };
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    bool autoGenDown = true;
+    int32_t displayId = 0;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = sourceWindowId;
+    windowInfo.displayId = displayId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.id = targetWindowId;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    inputWindowsManager.lastTouchEvent_ = pointerEvent;
+    int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_ResetPointerPositionIfOutValidDisplay_001
  * @tc.desc: Test if (isOut && isChange)
  * @tc.type: FUNC

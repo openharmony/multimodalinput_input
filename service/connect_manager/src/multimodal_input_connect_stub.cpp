@@ -3432,6 +3432,8 @@ int32_t MultimodalInputConnectStub::StubShiftAppPointerEvent(MessageParcel& data
     READINT32(data, param.targetWindowId, ERR_INVALID_VALUE);
     READINT32(data, param.x, ERR_INVALID_VALUE);
     READINT32(data, param.y, ERR_INVALID_VALUE);
+    READINT32(data, param.fingerId, ERR_INVALID_VALUE);
+    READINT32(data, param.sourceType, ERR_INVALID_VALUE);
     bool autoGenDown = true;
     READBOOL(data, autoGenDown, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = ShiftAppPointerEvent(param, autoGenDown);
