@@ -40,13 +40,16 @@ public:
     ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, screen_info_ptr_t si);
     ~ScreenPointer() = default;
 
-    bool Init();
+    bool Init(PointerRenderer &render);
     bool InitSurface();
     void UpdateScreenInfo(screen_info_ptr_t si);
     bool UpdatePadding(uint32_t mainWidth, uint32_t mainHeight);
     void OnDisplayInfo(const DisplayInfo &di);
 
-    buffer_ptr_t RequestBuffer();
+    buffer_ptr_t GetDefaultBuffer();
+    buffer_ptr_t GetTransparentBuffer();
+    buffer_ptr_t GetCommonBuffer();
+    buffer_ptr_t RequestBuffer(const RenderConfig &cfg, bool &isCommonBuffer);
     buffer_ptr_t GetCurrentBuffer();
 
     bool Move(int32_t x, int32_t y, ICON_TYPE align);
@@ -73,7 +76,7 @@ public:
     {
         return surfaceNode_;
     }
-    
+
     void SetDPI(float dpi)
     {
         dpi_ = dpi;
@@ -153,6 +156,10 @@ private:
     void Rotate(rotation_t rotation, int32_t& x, int32_t& y);
     void CalculateHwcPositionForMirror(int32_t& x, int32_t& y);
     void CalculateHwcPositionForExtend(int32_t& x, int32_t& y);
+    bool InitDefaultBuffer(const OHOS::BufferRequestConfig &bufferCfg, PointerRenderer &render);
+    bool InitTransparentBuffer(const OHOS::BufferRequestConfig &bufferCfg);
+    bool InitCommonBuffer(const OHOS::BufferRequestConfig &bufferCfg);
+    buffer_ptr_t CreateSurfaceBuffer(const OHOS::BufferRequestConfig &bufferCfg);
 
 private:
     std::mutex mtx_;
@@ -176,7 +183,11 @@ private:
     std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode_{nullptr};
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_{nullptr};
 
-    std::vector<buffer_ptr_t> buffers_;
+    RenderConfig defaultCursorCfg_;
+    buffer_ptr_t transparentBuffer_{nullptr};
+    buffer_ptr_t defaultBuffer_{nullptr};
+    buffer_ptr_t currentBuffer_{nullptr};
+    std::vector<buffer_ptr_t> commonBuffers_;
     uint32_t bufferId_ {0};
 
     // isCurrentOffScreenRendering

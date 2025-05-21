@@ -91,12 +91,24 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
 
-bool ScreenPointer::Init()
+bool ScreenPointer::Init(PointerRenderer &render)
 {
     if (!InitSurface()) {
         MMI_HILOGE("ScreenPointer InitSurface failed");
         return false;
     }
+
+    RenderConfig defaultCursorCfg {
+        .style_ = MOUSE_ICON::DEFAULT,
+        .align_ = ICON_TYPE::ANGLE_NW,
+        .path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg",
+        .color = 0,
+        .size = 1,
+        .direction = Direction::DIRECTION0,
+        .dpi = this->GetDPI() * this->GetScale(),
+        .isHard = true,
+    };
+    defaultCursorCfg_ = defaultCursorCfg;
 
     // Init buffers
     OHOS::BufferRequestConfig bufferCfg = {
@@ -108,20 +120,120 @@ bool ScreenPointer::Init()
             | BUFFER_USAGE_MEM_MMZ_CACHE,
         .timeout = BUFFER_TIMEOUT,
     };
-    for (int32_t i = 0; i < DEFAULT_BUFFER_SIZE && buffers_.size() < DEFAULT_BUFFER_SIZE; i++) {
-        sptr<OHOS::SurfaceBuffer> buffer = OHOS::SurfaceBuffer::Create();
-        if (buffer == nullptr) {
-            MMI_HILOGE("SurfaceBuffer Create failed");
-            return false;
-        }
-        OHOS::GSError ret = buffer->Alloc(bufferCfg);
-        if (ret != OHOS::GSERROR_OK) {
-            MMI_HILOGE("SurfaceBuffer Alloc failed, %{public}s", GSErrorStr(ret).c_str());
-            return false;
-        }
-        buffers_.push_back(buffer);
+    if (!InitDefaultBuffer(bufferCfg, render)) {
+        MMI_HILOGE("ScreenPointer InitDefaultBuffer failed");
+        return false;
+    }
+    if (!InitTransparentBuffer(bufferCfg)) {
+        MMI_HILOGE("ScreenPointer InitTransparentBuffer failed");
+        return false;
+    }
+    if (!InitCommonBuffer(bufferCfg)) {
+        MMI_HILOGE("ScreenPointer InitCommonBuffer failed");
+        return false;
+    }
+    currentBuffer_ = GetCommonBuffer();
+    return true;
+}
+
+bool ScreenPointer::InitDefaultBuffer(const OHOS::BufferRequestConfig &bufferCfg, PointerRenderer &render)
+{
+    buffer_ptr_t buffer = CreateSurfaceBuffer(bufferCfg);
+    CHKPF(buffer);
+    auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
+    CHKPF(addr);
+    int32_t ret = render.Render(addr, buffer->GetWidth(), buffer->GetHeight(), defaultCursorCfg_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Render failed, ret:%{public}d.", ret);
+        defaultBuffer_ = nullptr;
+        return false;
+    }
+    defaultBuffer_ = buffer;
+    return true;
+}
+
+bool ScreenPointer::InitTransparentBuffer(const OHOS::BufferRequestConfig &bufferCfg)
+{
+    buffer_ptr_t buffer = CreateSurfaceBuffer(bufferCfg);
+    CHKPF(buffer);
+    auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
+    CHKPF(addr);
+
+    uint32_t addrSize = static_cast<uint32_t>(buffer->GetWidth() * buffer->GetHeight()) * RENDER_STRIDE;
+    (void)memset_s(addr, addrSize, 0, addrSize);
+    transparentBuffer_ = buffer;
+    return true;
+}
+
+bool ScreenPointer::InitCommonBuffer(const OHOS::BufferRequestConfig &bufferCfg)
+{
+    for (int32_t i = 0; (i < DEFAULT_BUFFER_SIZE) && (commonBuffers_.size() < DEFAULT_BUFFER_SIZE); i++) {
+        buffer_ptr_t buffer = CreateSurfaceBuffer(bufferCfg);
+        CHKPF(buffer);
+        commonBuffers_.push_back(buffer);
     }
     return true;
+}
+
+buffer_ptr_t ScreenPointer::GetDefaultBuffer()
+{
+    currentBuffer_ = defaultBuffer_;
+    return defaultBuffer_;
+}
+
+buffer_ptr_t ScreenPointer::GetTransparentBuffer()
+{
+    currentBuffer_ = transparentBuffer_;
+    return transparentBuffer_;
+}
+
+buffer_ptr_t ScreenPointer::GetCommonBuffer()
+{
+    uint32_t bufferSize = static_cast<uint32_t>(commonBuffers_.size());
+    if (bufferSize != DEFAULT_BUFFER_SIZE) {
+        MMI_HILOGE("The buffer size is incorrect, size:%{public}u", bufferSize);
+        return nullptr;
+    }
+
+    bufferId_++;
+    bufferId_ %= bufferSize;
+    currentBuffer_ = commonBuffers_[bufferId_];
+    return commonBuffers_[bufferId_];
+}
+
+buffer_ptr_t ScreenPointer::RequestBuffer(const RenderConfig &cfg, bool &isCommonBuffer)
+{
+    if (cfg.style_ == MOUSE_ICON::TRANSPARENT_ICON) {
+        MMI_HILOGD("The buffer transparent buffer.");
+        isCommonBuffer = false;
+        return GetTransparentBuffer();
+    } else if (cfg == defaultCursorCfg_) {
+        MMI_HILOGD("The buffer default buffer.");
+        isCommonBuffer = false;
+        return GetDefaultBuffer();
+    }
+    isCommonBuffer = true;
+    return GetCommonBuffer();
+}
+
+buffer_ptr_t ScreenPointer::GetCurrentBuffer()
+{
+    return currentBuffer_;
+}
+
+buffer_ptr_t ScreenPointer::CreateSurfaceBuffer(const OHOS::BufferRequestConfig &bufferCfg)
+{
+    buffer_ptr_t buffer = OHOS::SurfaceBuffer::Create();
+    if (buffer == nullptr) {
+        MMI_HILOGE("SurfaceBuffer Create failed");
+        return nullptr;
+    }
+    OHOS::GSError ret = buffer->Alloc(bufferCfg);
+    if (ret != OHOS::GSERROR_OK) {
+        MMI_HILOGE("SurfaceBuffer Alloc failed, %{public}s", GSErrorStr(ret).c_str());
+        return nullptr;
+    }
+    return buffer;
 }
 
 bool ScreenPointer::InitSurface()
@@ -237,28 +349,6 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
     return true;
 }
 
-sptr<OHOS::SurfaceBuffer> ScreenPointer::RequestBuffer()
-{
-    if (!buffers_.size()) {
-        MMI_HILOGE("The buffer size is incorrect, size:%{public}u", static_cast<uint32_t>(buffers_.size()));
-        return nullptr;
-    }
-
-    bufferId_++;
-    bufferId_ %= buffers_.size();
-
-    return buffers_[bufferId_];
-}
-
-sptr<OHOS::SurfaceBuffer> ScreenPointer::GetCurrentBuffer()
-{
-    if (bufferId_ >= buffers_.size()) {
-        MMI_HILOGE("BufferId_:%{public}u is incorrect", bufferId_);
-        return nullptr;
-    }
-    return buffers_[bufferId_];
-}
-
 void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y)
 {
     // 坐标轴绕原点旋转 再平移
@@ -368,16 +458,12 @@ bool ScreenPointer::SetInvisible()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
 
-    auto buffer = RequestBuffer();
+    auto buffer = GetTransparentBuffer();
     CHKPF(buffer);
-    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
-    CHKPF(addr);
-    if (buffer->GetWidth() >= 0 && buffer->GetHeight() >= 0) {
-        uint32_t addrSize = static_cast<uint32_t>(buffer->GetWidth()) *
-            static_cast<uint32_t>(buffer->GetHeight()) * RENDER_STRIDE;
-        memset_s(addr, addrSize, 0, addrSize);
-    } else {
-        MMI_HILOGI("The input data is negative, and the data is incorrect.");
+    int32_t width = buffer->GetWidth();
+    int32_t height = buffer->GetHeight();
+    if ((width < 0) || (height < 0)) {
+        MMI_HILOGI("The input data is incorrect, width:%{public}d, height:%{public}d.", width, height);
         return false;
     }
     auto sret = buffer->FlushCache();

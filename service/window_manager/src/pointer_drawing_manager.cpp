@@ -1018,47 +1018,21 @@ void PointerDrawingManager::PostMoveRetryTask(std::function<void()> task)
     }
 }
 
-void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
-    int32_t px, int32_t py, ICON_TYPE align)
-{
-    auto sp = GetScreenPointer(screenId_);
-    CHKPV(sp);
-    auto buffer = sp->RequestBuffer();
-    CHKPV(buffer);
-    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
-    CHKPV(addr);
-
-    uint32_t addrSize = static_cast<uint32_t>(buffer->GetWidth()) *
-        static_cast<uint32_t>(buffer->GetHeight()) * CURSOR_STRIDE;
-    auto ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), bitmap->ComputeByteSize());
-    if (ret != EOK) {
-        MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
-        return;
-    }
-    for (auto &sp : GetMirrorScreenPointers()) {
-        auto buf = sp->RequestBuffer();
-        CHKPC(buf);
-        auto addr = static_cast<uint8_t*>(buf->GetVirAddr());
-        CHKPC(addr);
-        ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), bitmap->ComputeByteSize());
-        if (ret != EOK) {
-            MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
-            return;
-        }
-    }
-}
-
 int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenPointer> sp,
     const RenderConfig &cfg)
 {
     CHKPR(sp, RET_ERR);
-    auto buffer = sp->RequestBuffer();
+    bool isCommonBuffer;
+    auto buffer = sp->RequestBuffer(cfg, isCommonBuffer);
     CHKPR(buffer, RET_ERR);
-    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
-    CHKPR(addr, RET_ERR);
-    if (pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
-        MMI_HILOGE("DynamicRender failed");
-    };
+    if (isCommonBuffer) {
+        auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
+        CHKPR(addr, RET_ERR);
+        if (pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+            MMI_HILOGE("DynamicRender failed");
+        };
+    }
+
     MMI_HILOGI("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u, style = %{public}d",
         sp->GetScreenId(), cfg.style);
     auto sret = buffer->FlushCache();
@@ -1718,7 +1692,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
             if (!g_isRsRestart) {
                 for (auto it : screenPointers_) {
                     CHKPR(it.second, RET_ERR);
-                    it.second->Init();
+                    it.second->Init(pointerRenderer_);
                 }
                 if (displayId == displayInfo_.uniqueId) {
                     CHKPR(sp, RET_ERR);
@@ -1732,7 +1706,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
             sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
             CHKPR(sp, RET_ERR);
             screenPointers_[displayInfo_.uniqueId] = sp;
-            if (!sp->Init()) {
+            if (!sp->Init(pointerRenderer_)) {
                 MMI_HILOGE("ScreenPointer %{public}d init failed", displayInfo_.uniqueId);
                 return RET_ERR;
             }
@@ -3387,7 +3361,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                 MMI_HILOGI("OnScreenModeChange got new screen %{public}u", sid);
                 auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, si);
                 screenPointers_[sid] = sp;
-                if (!sp->Init()) {
+                if (!sp->Init(pointerRenderer_)) {
                     MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}u", sid);
                 }
             }
@@ -3531,15 +3505,17 @@ int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp,
 {
     CHKPR(sp, RET_ERR);
 
-    auto buffer = sp->RequestBuffer();
+    bool isCommonBuffer;
+    auto buffer = sp->RequestBuffer(cfg, isCommonBuffer);
     CHKPR(buffer, RET_ERR);
-
-    auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-    CHKPR(addr, RET_ERR);
-    BytraceAdapter::StartHardPointerRender(buffer->GetWidth(), buffer->GetHeight(), sp->GetBufferId(),
+    if (isCommonBuffer) {
+        auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
+        CHKPR(addr, RET_ERR);
+            BytraceAdapter::StartHardPointerRender(buffer->GetWidth(), buffer->GetHeight(), sp->GetBufferId(),
         sp->GetScreenId(), cfg.style_);
-    if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
-        MMI_HILOGE("Render failed");
+        if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+            MMI_HILOGE("Render failed");
+        }
     }
     BytraceAdapter::StopHardPointerRender();
 
