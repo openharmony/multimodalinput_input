@@ -144,6 +144,7 @@ static int32_t g_keyMonitorId = INVALID_MONITOR_ID;
 static int32_t g_pointerMonitorId = INVALID_MONITOR_ID;
 static int32_t g_keyInterceptorId = INVALID_INTERCEPTOR_ID;
 static int32_t g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
+static int32_t UNKNOWN_MAX_TOUCH_POINTS { -1 };
 
 static const std::vector<int32_t> g_pressKeyCodes = {
     OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
@@ -2600,6 +2601,17 @@ Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state)
     if (napiCode == INPUT_KEYBOARD_DEVICE_NOT_EXIST) {
         MMI_HILOGE("GetFunctionKeyState fail, no keyboard device connected");
         return INPUT_KEYBOARD_DEVICE_NOT_EXIST;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_QueryMaxTouchPoints(int32_t *count)
+{
+    CHKPR(count, INPUT_PARAMETER_ERROR);
+    auto ret = OHOS::MMI::InputManager::GetInstance()->GetMaxMultiTouchPointNum(*count);
+    if (ret != RET_OK) {
+        *count = UNKNOWN_MAX_TOUCH_POINTS;
+        MMI_HILOGE("GetMaxMultiTouchPointNum fail, error:%{public}d", ret);
     }
     return INPUT_SUCCESS;
 }

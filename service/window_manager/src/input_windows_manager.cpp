@@ -3438,7 +3438,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     "window:%{public}d, flags:%{public}d, pid:%{public}d", item.id, item.flags, item.pid);
                 continue;
             }
-            if (IsAccessibilityEventWithZorderInjected(pointerEvent) && pointerEvent->GetZOrder() > item.zOrder) {
+            if (IsAccessibilityEventWithZorderInjected(pointerEvent) && pointerEvent->GetZOrder() <= item.zOrder) {
                 winId2ZorderMap.insert({item.id, item.zOrder});
                 continue;
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
@@ -4612,7 +4612,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             winMap.insert({item.id, item});
             continue;
         }
-        if (IsAccessibilityEventWithZorderInjected(pointerEvent)) {
+        if (IsAccessibilityEventWithZorderInjected(pointerEvent) && pointerEvent->GetZOrder() <= item.zOrder) {
             winMap.insert({item.id, item});
             continue;
         }

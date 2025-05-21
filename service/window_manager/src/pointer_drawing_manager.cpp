@@ -3479,9 +3479,11 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
     CHKPR(buffer->GetVirAddr(), RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
+    BytraceAdapter::StartSoftPointerRender(buffer->GetWidth(), buffer->GetHeight(), cfg.style_);
     if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
         MMI_HILOGE("Render failed");
     }
+    BytraceAdapter::StopSoftPointerRender();
 
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -3509,10 +3511,13 @@ int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp,
     if (isCommonBuffer) {
         auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
         CHKPR(addr, RET_ERR);
+            BytraceAdapter::StartHardPointerRender(buffer->GetWidth(), buffer->GetHeight(), sp->GetBufferId(),
+        sp->GetScreenId(), cfg.style_);
         if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
             MMI_HILOGE("Render failed");
         }
     }
+    BytraceAdapter::StopHardPointerRender();
 
     MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u, style=%{public}d",
         sp->GetScreenId(), cfg.style);
@@ -3636,29 +3641,40 @@ void PointerDrawingManager::SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_T
 
 void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align)
 {
-    moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, REPEAT_ONCE, [this, x, y, align]() {
+    moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, MAX_MOVE_RETRY_COUNT, [this, x, y, align]() {
         PostMoveRetryTask([this, x, y, align]() {
+            moveRetryCount_++;
             MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, align:%{public}d, Timer Id:%{public}d,"
                 "move retry count:%{public}d", x, y, align, moveRetryTimerId_, moveRetryCount_);
-            moveRetryTimerId_ = DEFAULT_VALUE;
-            if (moveRetryCount_ > MAX_MOVE_RETRY_COUNT) {
-                MMI_HILOGI("Move retry count exceeds limit");
+            if (moveRetryTimerId_ == DEFAULT_VALUE) {
+                moveRetryCount_ = 0;
+                MMI_HILOGI("MoveRetryAsync timer id is invalid, stop retry");
                 return;
             }
-            if (HardwareCursorMove(x, y, align) != RET_OK) {
-                MoveRetryAsync(x, y, align);
+            if (HardwareCursorMove(x, y, align) == RET_OK) {
+                int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
+                MMI_HILOGI("Move retry success, cancel timer, TimerId:%{public}d, ret:%{public}d",
+                    moveRetryTimerId_, ret);
+                moveRetryTimerId_ = DEFAULT_VALUE;
+                moveRetryCount_ = 0;
+                return;
+            }
+            MMI_HILOGE("Move retry failed, TimerId:%{public}d", moveRetryTimerId_);
+            if (moveRetryCount_ == MAX_MOVE_RETRY_COUNT) {
+                MMI_HILOGI("Move retry execeed max count, stop retry");
+                moveRetryTimerId_ = DEFAULT_VALUE;
+                moveRetryCount_ = 0;
             }
         });
     });
-    moveRetryCount_++;
     MMI_HILOGI("Create MoveRetry Timer, timerId: %{public}d", moveRetryTimerId_);
 }
 
 void PointerDrawingManager::ResetMoveRetryTimer()
 {
     if (moveRetryTimerId_ != DEFAULT_VALUE) {
-        TimerMgr->RemoveTimer(moveRetryTimerId_);
-        MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
+        int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
+        MMI_HILOGI("Cancel moveRetry Timer, TimerId:%{public}d, ret:%{public}d", moveRetryTimerId_, ret);
         moveRetryTimerId_ = DEFAULT_VALUE;
     }
     if (moveRetryCount_ > 0) {

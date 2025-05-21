@@ -14,6 +14,7 @@
  */
 #include "screen_pointer.h"
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
@@ -415,7 +416,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     CHKPF(buffer);
     auto bh = buffer->GetBufferHandle();
     CHKPF(bh);
+    BytraceAdapter::StartHardPointerMove(buffer->GetWidth(), buffer->GetHeight(), bufferId_, screenId_);
     auto ret = hwcMgr_->SetPosition(screenId_, px, py, bh);
+    BytraceAdapter::StopHardPointerMove();
     if (ret != RET_OK) {
         MMI_HILOGE("SetPosition failed, screenId=%{public}u, pos=(%{public}d, %{public}d)", screenId_, px, py);
         return false;
@@ -492,7 +495,9 @@ float ScreenPointer::GetRenderDPI() const
 
 bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
 {
-    if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
+    if (IsMirror()) {
+        CalculateHwcPositionForMirror(x, y);
+    } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
         CalculateHwcPositionForExtend(x, y);
     }
     int32_t width = static_cast<int32_t>(width_);
