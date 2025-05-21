@@ -15,6 +15,9 @@
 
 #include "multimodal_event_handler.h"
 
+#include <cJSON.h>
+#include <config_policy_utils.h>
+
 #include "event_log_helper.h"
 #include "input_manager_impl.h"
 #include "mmi_client.h"
@@ -30,6 +33,12 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t MIN_MULTI_TOUCH_POINT_NUM { 0 };
+constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
+constexpr int32_t UNKNOWN_MULTI_TOUCH_POINT_NUM { -1 };
+}
+
 void OnConnected(const IfMMIClient& client)
 {
     CALL_DEBUG_ENTER;
@@ -285,6 +294,71 @@ int32_t MultimodalEventHandler::SetClientInfo(int32_t pid, uint64_t readThreadId
     CALL_DEBUG_ENTER;
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     return MULTIMODAL_INPUT_CONNECT_MGR->SetClientInfo(pid, readThreadId);
+}
+
+static void ReadMaxMultiTouchPointNum(cJSON *productCfg, int32_t &maxMultiTouchPointNum)
+{
+    if (!cJSON_IsObject(productCfg)) {
+        MMI_HILOGE("Not json format");
+        return;
+    }
+    cJSON *jsonTouchscreen = cJSON_GetObjectItemCaseSensitive(productCfg, "touchscreen");
+    if (!cJSON_IsObject(jsonTouchscreen)) {
+        MMI_HILOGE("The jsonTouchscreen is not object");
+        return;
+    }
+    cJSON *jsonMaxNumOfTouches = cJSON_GetObjectItemCaseSensitive(jsonTouchscreen, "MaxTouchPoints");
+    if (!cJSON_IsNumber(jsonMaxNumOfTouches)) {
+        MMI_HILOGE("The jsonMaxNumOfTouches is not number");
+        return;
+    }
+    auto num = static_cast<int32_t>(cJSON_GetNumberValue(jsonMaxNumOfTouches));
+    if ((num < MIN_MULTI_TOUCH_POINT_NUM) || (num > MAX_MULTI_TOUCH_POINT_NUM)) {
+        MMI_HILOGW("Invalid config: MaxTouchPoints(%{public}d) is out of range[%{public}d, %{public}d]",
+            num, MIN_MULTI_TOUCH_POINT_NUM, MAX_MULTI_TOUCH_POINT_NUM);
+        return;
+    }
+    maxMultiTouchPointNum = num;
+    MMI_HILOGI("touchscreen.MaxTouchPoints:%{public}d", maxMultiTouchPointNum);
+}
+
+static void ReadMaxMultiTouchPointNum(const std::string &cfgPath, int32_t &maxMultiTouchPointNum)
+{
+    std::string cfg = ReadJsonFile(cfgPath);
+    cJSON *jsonProductCfg = cJSON_Parse(cfg.c_str());
+    CHKPV(jsonProductCfg);
+    ReadMaxMultiTouchPointNum(jsonProductCfg, maxMultiTouchPointNum);
+    cJSON_Delete(jsonProductCfg);
+}
+
+static void ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum)
+{
+    maxMultiTouchPointNum = -1;
+    char cfgName[] { "etc/input/input_product_config.json" };
+    char buf[MAX_PATH_LEN] {};
+    char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
+    if (cfgPath == nullptr) {
+        MMI_HILOGE("No '%{public}s' was found", cfgName);
+        return;
+    }
+    MMI_HILOGI("Input product config:%{public}s", cfgPath);
+    ReadMaxMultiTouchPointNum(std::string(cfgPath), maxMultiTouchPointNum);
+}
+
+int32_t MultimodalEventHandler::GetMaxMultiTouchPointNum(int32_t &pointNum)
+{
+    static int32_t maxMultiTouchPointNum { UNKNOWN_MULTI_TOUCH_POINT_NUM };
+    static std::once_flag flag;
+
+    std::call_once(flag, []() {
+        ReadMaxMultiTouchPointNum(maxMultiTouchPointNum);
+    });
+    if (maxMultiTouchPointNum < 0) {
+        pointNum = UNKNOWN_MULTI_TOUCH_POINT_NUM;
+        return MMI_ERR_NO_PRODUCT_CONFIG;
+    }
+    pointNum = maxMultiTouchPointNum;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

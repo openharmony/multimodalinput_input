@@ -136,7 +136,9 @@ enum {
     // 监听增加失败
     INVALID_MONITOR_MON,
     // 功能不支持
-    CAPABILITY_NOT_SUPPORTED
+    CAPABILITY_NOT_SUPPORTED,
+    // 无相应产品配置或产品配置不合法
+    MMI_ERR_NO_PRODUCT_CONFIG,
 };
 } // namespace MMI
 } // namespace OHOS

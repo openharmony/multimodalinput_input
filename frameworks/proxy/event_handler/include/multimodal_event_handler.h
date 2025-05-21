@@ -73,8 +73,11 @@ public:
     int32_t Authorize(bool isAuthorize);
     int32_t CancelInjection();
 
+    static int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+
 private:
     int32_t SetClientInfo(int32_t pid, uint64_t readThreadId);
+
     std::mutex mtx_;
     MMIClientPtr client_ { nullptr };
 };
