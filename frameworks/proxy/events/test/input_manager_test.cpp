@@ -16,6 +16,9 @@
 #include <cinttypes>
 #include <semaphore.h>
 
+#include <cJSON.h>
+#include <config_policy_utils.h>
+
 #include "event_log_helper.h"
 #include "event_util_test.h"
 #include "input_manager.h"
@@ -57,7 +60,9 @@ constexpr int32_t INVAID_VALUE = -1;
 constexpr uint32_t MAX_WINDOW_NUMS = 15;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr int32_t DEFAULT_SAMPLING_PERIOD { 8 }; // 8ms
+constexpr int32_t MIN_MULTI_TOUCH_POINT_NUM { 0 };
 constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
+constexpr int32_t UNKNOWN_MULTI_TOUCH_POINT_NUM { -1 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr uint32_t SHELL_FLAGS_VALUE = 2;
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -76,6 +81,9 @@ public:
 protected:
     void InjectAltTabs(size_t nTriggers);
     void InjectAltL(size_t nTriggers);
+    void ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum);
+    void ReadMaxMultiTouchPointNum(const std::string &cfgPath, int32_t &maxMultiTouchPointNum);
+    void ReadMaxMultiTouchPointNum(cJSON *productCfg, int32_t &maxMultiTouchPointNum);
 
 private:
     int32_t keyboardRepeatRate_ { 50 };
@@ -5684,6 +5692,55 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKnuckleSwitch_001, TestSize.Level
     ASSERT_NO_FATAL_FAILURE(inputManager->SetKnuckleSwitch(knuckleSwitch));
 }
 
+void InputManagerTest::ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum)
+{
+    maxMultiTouchPointNum = -1;
+    char cfgName[] { "etc/input/input_product_config.json" };
+    char buf[MAX_PATH_LEN] {};
+    char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
+    if (cfgPath == nullptr) {
+        MMI_HILOGE("No '%{public}s' was found", cfgName);
+        return;
+    }
+    std::cout << "Input product config:%{public}s" << cfgPath << std::endl;
+    ReadMaxMultiTouchPointNum(std::string(cfgPath), maxMultiTouchPointNum);
+}
+
+void InputManagerTest::ReadMaxMultiTouchPointNum(const std::string &cfgPath, int32_t &maxMultiTouchPointNum)
+{
+    std::string cfg = ReadJsonFile(cfgPath);
+    cJSON *jsonProductCfg = cJSON_Parse(cfg.c_str());
+    CHKPV(jsonProductCfg);
+    ReadMaxMultiTouchPointNum(jsonProductCfg, maxMultiTouchPointNum);
+    cJSON_Delete(jsonProductCfg);
+}
+
+void InputManagerTest::ReadMaxMultiTouchPointNum(cJSON *productCfg, int32_t &maxMultiTouchPointNum)
+{
+    if (!cJSON_IsObject(productCfg)) {
+        MMI_HILOGE("Not json format");
+        return;
+    }
+    cJSON *jsonTouchscreen = cJSON_GetObjectItemCaseSensitive(productCfg, "touchscreen");
+    if (!cJSON_IsObject(jsonTouchscreen)) {
+        MMI_HILOGE("The jsonTouchscreen is not object");
+        return;
+    }
+    cJSON *jsonMaxNumOfTouches = cJSON_GetObjectItemCaseSensitive(jsonTouchscreen, "MaxTouchPoints");
+    if (!cJSON_IsNumber(jsonMaxNumOfTouches)) {
+        MMI_HILOGE("The jsonMaxNumOfTouches is not number");
+        return;
+    }
+    auto num = static_cast<int32_t>(cJSON_GetNumberValue(jsonMaxNumOfTouches));
+    if ((num < MIN_MULTI_TOUCH_POINT_NUM) || (num > MAX_MULTI_TOUCH_POINT_NUM)) {
+        MMI_HILOGW("Invalid config: MaxTouchPoints(%{public}d) is out of range[%{public}d, %{public}d]",
+            num, MIN_MULTI_TOUCH_POINT_NUM, MAX_MULTI_TOUCH_POINT_NUM);
+        return;
+    }
+    maxMultiTouchPointNum = num;
+    MMI_HILOGI("touchscreen.MaxTouchPoints:%{public}d", maxMultiTouchPointNum);
+}
+
 /*
  * @tc.name: InputManagerTest_GetMaxMultiTouchPointNum_001
  * @tc.desc: GetMaxMultiTouchPointNum
@@ -5693,13 +5750,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKnuckleSwitch_001, TestSize.Level
 HWTEST_F(InputManagerTest, InputManagerTest_GetMaxMultiTouchPointNum_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t pointNum { -1 };
-    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
-    ASSERT_NO_FATAL_FAILURE(inputManager->GetMaxMultiTouchPointNum(pointNum));
-    std::string productType = system::GetParameter("const.product.devicetype", "unknown");
-    std::string productPC = "2in1";
-    if (productType == productPC) {
-        ASSERT_EQ(MAX_MULTI_TOUCH_POINT_NUM, pointNum);
+    int32_t pointNum { UNKNOWN_MULTI_TOUCH_POINT_NUM };
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetMaxMultiTouchPointNum(pointNum));
+
+    int32_t multiTouchPointNum { UNKNOWN_MULTI_TOUCH_POINT_NUM };
+    ReadMaxMultiTouchPointNum(multiTouchPointNum);
+    std::cout << "MaxTouchPoints:" << multiTouchPointNum << std::endl;
+
+    auto ret = InputManager::GetInstance()->GetMaxMultiTouchPointNum(pointNum);
+    if ((multiTouchPointNum >= MIN_MULTI_TOUCH_POINT_NUM) && (multiTouchPointNum <= MAX_MULTI_TOUCH_POINT_NUM)) {
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(pointNum, multiTouchPointNum);
+    } else {
+        EXPECT_EQ(ret, MMI_ERR_NO_PRODUCT_CONFIG);
+        EXPECT_EQ(pointNum, UNKNOWN_MULTI_TOUCH_POINT_NUM);
     }
 }
 } // namespace MMI
