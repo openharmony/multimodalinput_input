@@ -85,6 +85,7 @@ constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
 constexpr size_t POINTER_STYLE_WINDOW_NUM = { 10 };
+constexpr size_t SINGLE_TOUCH { 1 };
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr int32_t DEFAULT_DPI { 0 };
@@ -4580,7 +4581,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     double logicalX = physicalX + DisplayInfoX;
     double logicalY = physicalY + DisplayInfoY;
     const WindowInfo *touchWindow = nullptr;
-    auto targetWindowId = pointerItem.GetTargetWindowId();
+    auto targetWindowId = (NeedTouchTracking(*pointerEvent)? GLOBAL_WINDOW_ID : pointerItem.GetTargetWindowId());
     bool isHotArea = false;
     bool isFirstSpecialWindow = false;
     static std::unordered_map<int32_t, WindowInfo> winMap;
@@ -4763,6 +4764,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     winMap.clear();
+    ProcessTouchTracking(pointerEvent, *touchWindow);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerItem.SetTargetWindowId(touchWindow->id);
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -6780,6 +6782,52 @@ bool InputWindowsManager::IsAccessibilityEventWithZorderInjected(std::shared_ptr
         return true;
     }
     return false;
+}
+
+void InputWindowsManager::SwitchTouchTracking(bool touchTracking)
+{
+    MMI_HILOGI("Switch touch tracking:%{public}d", touchTracking);
+    touchTracking_ = touchTracking;
+}
+
+bool InputWindowsManager::NeedTouchTracking(PointerEvent &event) const
+{
+    if (!touchTracking_) {
+        return false;
+    }
+    if (event.HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        return false;
+    }
+    if (event.GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+        return false;
+    }
+    return (event.GetPointerCount() == SINGLE_TOUCH);
+}
+
+void InputWindowsManager::ProcessTouchTracking(std::shared_ptr<PointerEvent> event, const WindowInfo &targetWindow)
+{
+    if (!NeedTouchTracking(*event)) {
+        return;
+    }
+    if (event->GetTargetWindowId() == targetWindow.id) {
+        return;
+    }
+    PointerEvent::PointerItem pointerItem {};
+    if (!event->GetPointerItem(event->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Corrupted pointer event, No:%{public}d,PI:%{public}d", event->GetId(), event->GetPointerId());
+        return;
+    }
+    pointerItem.SetPressed(false);
+    event->UpdatePointerItem(event->GetPointerId(), pointerItem);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+
+    auto normalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(normalizeHandler);
+    normalizeHandler->HandleTouchEvent(event);
+
+    pointerItem.SetPressed(true);
+    event->UpdatePointerItem(event->GetPointerId(), pointerItem);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 }
 } // namespace MMI
 } // namespace OHOS

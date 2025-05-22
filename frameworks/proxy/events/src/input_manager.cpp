@@ -936,5 +936,10 @@ void InputManager::UnsubscribeInputActive(int32_t subscribeId)
 {
     InputMgrImpl.UnsubscribeInputActive(subscribeId);
 }
+
+int32_t InputManager::SwitchTouchTracking(bool touchTracking)
+{
+    return InputMgrImpl.SwitchTouchTracking(touchTracking);
+}
 } // namespace MMI
 } // namespace OHOS

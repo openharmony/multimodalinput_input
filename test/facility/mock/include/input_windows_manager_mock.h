@@ -150,6 +150,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
+    void SwitchTouchTracking(bool touchTracking) override {}
 
 private:
     static std::mutex mutex_;

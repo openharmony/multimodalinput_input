@@ -230,8 +230,11 @@ public:
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    void SwitchTouchTracking(bool touchTracking);
 
 private:
+    bool NeedTouchTracking(PointerEvent &event) const;
+    void ProcessTouchTracking(std::shared_ptr<PointerEvent> event, const WindowInfo &targetWindow);
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
@@ -527,6 +530,7 @@ private:
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool IsFoldable_ { false };
+    bool touchTracking_ { false };
     int32_t timerId_ { -1 };
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
     std::mutex mtx_;
