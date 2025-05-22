@@ -1564,10 +1564,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = displayInfo_.direction;
     }
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (!hardwareCursorPointerManager_->IsSupported()) {
-        return;
-    }
+    
     if (direction == DIRECTION0) {
         if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
             physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
@@ -1597,23 +1594,6 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
             physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
         }
     }
-#else
-    if (direction == DIRECTION0 || direction == DIRECTION180) {
-        if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
-            physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
-            physicalY = displayInfo_.validHeight - imageHeight_ / cursorUnit;
-        }
-    } else {
-        if (physicalX > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
-            physicalX = displayInfo_.validHeight - imageHeight_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
-            physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
-        }
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::AttachToDisplay()
