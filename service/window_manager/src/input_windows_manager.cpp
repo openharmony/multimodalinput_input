@@ -6206,7 +6206,7 @@ bool InputWindowsManager::IsTransparentWin(
     }
 
     uint32_t dst = 0;
-    OHOS::Media::Position pos { logicalY, logicalX };
+    OHOS::Media::Position pos { logicalX, logicalY };
     uint32_t result = pixelMap->ReadPixel(pos, dst);
     if (result != RET_OK) {
         MMI_HILOGE("Failed to read pixelmap");
