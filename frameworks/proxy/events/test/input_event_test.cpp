@@ -196,6 +196,12 @@ HWTEST_F(InputEventTest, InputEventTest_operator_001, TestSize.Level1)
     destination = std::move(source1);
     LogTracer source2(400, 7, 8);
     destination = std::move(source2);
+    auto InputEvent = InputEvent::Create();
+    ASSERT_NE(InputEvent, nullptr);
+    Parcel in;
+    InputEvent->extraDataLength_ = 0;
+    bool ret = InputEvent->ReadFromParcel(in);
+    ASSERT_FALSE(ret);
 }
 } // namespace MMI
 } // namespace OHOS
