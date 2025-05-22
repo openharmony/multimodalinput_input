@@ -158,6 +158,7 @@ public:
     void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
 #endif // OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
@@ -211,6 +212,7 @@ public:
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override;
     int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) override;
     int32_t UnsubscribeInputActive(int32_t subscribeId) override;
+    int32_t SwitchTouchTracking(bool touchTracking) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
@@ -305,6 +307,7 @@ private:
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void SetupTouchGestureHandler();
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    void OnRemoveAccessibility();
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };

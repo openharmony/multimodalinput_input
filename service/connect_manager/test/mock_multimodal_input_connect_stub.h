@@ -205,8 +205,8 @@ public:
     MOCK_METHOD(bool, IsRunning, (), (const override));
     MOCK_METHOD(int32_t, SetInputDeviceConsumer, (const std::vector<std::string>& deviceNames), (override));
     MOCK_METHOD(int32_t, ClearInputDeviceConsumer, (const std::vector<std::string>& deviceNames), (override));
+    MOCK_METHOD(int32_t, SwitchTouchTracking, (bool touchTracking), (override));
 };
-
 }  // namespace MMI
 }  // namespace OHOS
 #endif  // MOCK_MULTIMODAL_INPUT_CONNECT_STUB_H

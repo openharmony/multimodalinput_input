@@ -1889,6 +1889,13 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #endif
 }
 
+void MMIService::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    if (systemAbilityId == ACCESSIBILITY_MANAGER_SERVICE_ID) {
+        OnRemoveAccessibility();
+    }
+}
+
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
 void MMIService::ScreenCaptureCallback(int32_t pid, bool isStart)
 {
@@ -3958,6 +3965,37 @@ int32_t MMIService::UnsubscribeInputActive(int32_t subscribeId)
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MMIService::SwitchTouchTracking(bool touchTracking)
+{
+    if (touchTracking) {
+        if (!AddSystemAbilityListener(ACCESSIBILITY_MANAGER_SERVICE_ID)) {
+            MMI_HILOGE("AddSystemAbilityListener(%{public}d) fail", ACCESSIBILITY_MANAGER_SERVICE_ID);
+        }
+    } else {
+        if (!RemoveSystemAbilityListener(ACCESSIBILITY_MANAGER_SERVICE_ID)) {
+            MMI_HILOGE("RemoveSystemAbilityListener(%{public}d) fail", ACCESSIBILITY_MANAGER_SERVICE_ID);
+        }
+    }
+    auto ret = delegateTasks_.PostSyncTask([this, touchTracking] {
+        return sMsgHandler_.SwitchTouchTracking(touchTracking);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask-SwitchTouchTracking fail, error:%{public}d", ret);
+    }
+    return ret;
+}
+
+void MMIService::OnRemoveAccessibility()
+{
+    auto ret = delegateTasks_.PostSyncTask([this] {
+        MMI_HILOGI("Reset touch-tracking on removal of Accessibility");
+        return sMsgHandler_.SwitchTouchTracking(false);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask-SwitchTouchTracking fail, error:%{public}d", ret);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
