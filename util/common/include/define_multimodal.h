@@ -124,6 +124,13 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define CHKCC(cond) \
+    { \
+        if (!(cond)) { \
+            continue; \
+        } \
+    }
+
 #define CHK_PID_AND_TID() \
     do { \
         MMI_HILOGD("%{public}s, (%{public}d), pid:%{public}d threadId:%{public}" PRIu64, \
@@ -266,6 +273,13 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define CHKCC(cond) \
+    { \
+        if (!(cond)) { \
+            continue; \
+        } \
+    }
+    
 #define CHK_PID_AND_TID() \
     do { \
         MMI_HILOGD("pid:%{public}d threadId:%{public}" PRIu64, GetPid(), GetThisThreadId()); \
