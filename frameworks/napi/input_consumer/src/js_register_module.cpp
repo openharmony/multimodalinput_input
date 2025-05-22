@@ -574,9 +574,8 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         JsInputConsumer::GetInstance()->SubscribeKeyMonitor(env, info);
         return nullptr;
     }
-    sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
+    sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo(env);
     CHKPP(event);
-    event->env = env;
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
     size_t argc = 3;
@@ -617,9 +616,8 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         JsInputConsumer::GetInstance()->UnsubscribeKeyMonitor(env, info);
         return nullptr;
     }
-    sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
+    sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo(env);
     CHKPP(event);
-    event->env = env;
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
     if (!GetEventType(env, info, event, keyType)) {
@@ -763,7 +761,7 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
     return exports;
 }
 
-KeyEventMonitorInfo::KeyEventMonitorInfo()
+KeyEventMonitorInfo::KeyEventMonitorInfo(napi_env env):env(env)
 {
     (void)napi_add_env_cleanup_hook(env, EnvCleanUp, this);
 }
