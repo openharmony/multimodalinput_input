@@ -77,6 +77,8 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetInvisible_001, TestSize.Level1)
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
     bool ret = screenpointer->SetInvisible();
     EXPECT_TRUE(ret);
 }
@@ -159,6 +161,8 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_001, TestSize.Level1)
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig,
@@ -267,6 +271,8 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetDefaultBufferr_001, TestSize.Le
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
     ASSERT_NE(screenpointer->GetDefaultBuffer(), nullptr);
     delete screenpointer;
 }
@@ -286,6 +292,8 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetTransparentBuffer_001, TestSize
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
     ASSERT_NE(screenpointer->GetTransparentBuffer(), nullptr);
     delete screenpointer;
 }
@@ -305,6 +313,8 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetCommonBuffer_001, TestSize.Leve
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
     ASSERT_NE(screenpointer->GetCommonBuffer(), nullptr);
     delete screenpointer;
 }
@@ -324,6 +334,8 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetCurrentBuffer_001, TestSize.Lev
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
     ASSERT_NE(screenpointer->GetCurrentBuffer(), nullptr);
     ASSERT_NE(screenpointer->GetTransparentBuffer(), nullptr);
     ASSERT_NE(screenpointer->GetCurrentBuffer(), nullptr);
@@ -345,6 +357,8 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_001, TestSize.Level1
     DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
     screenpointer->bufferId_ = 5;
     bool isCommonBuffer;
     const RenderConfig cfg = {
