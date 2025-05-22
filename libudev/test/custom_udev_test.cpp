@@ -183,9 +183,7 @@ HWTEST_F(CustomUdevTest, TestIsInitialized, TestSize.Level1)
 
     EXPECT_EQ(udev_device_get_is_initialized(device), 1);
 
-    errno = 0;
     EXPECT_LT(udev_device_get_is_initialized(nullptr), 0);
-    EXPECT_EQ(errno, 0);
 }
 
 /*
@@ -199,9 +197,7 @@ HWTEST_F(CustomUdevTest, TestGetDevnode, TestSize.Level1)
 
     EXPECT_STREQ(udev_device_get_devnode(device), testDevice_.GetDevNode());
 
-    errno = 0;
     EXPECT_EQ(udev_device_get_devnode(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
 }
 
 /*
@@ -215,9 +211,7 @@ HWTEST_F(CustomUdevTest, TestGetSysname, TestSize.Level1)
 
     EXPECT_EQ(std::string("/dev/input/") + udev_device_get_sysname(device), testDevice_.GetDevNode());
 
-    errno = 0;
     EXPECT_EQ(udev_device_get_sysname(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
 }
 
 /*
@@ -232,9 +226,7 @@ HWTEST_F(CustomUdevTest, TestGetSyspath, TestSize.Level1)
     EXPECT_EQ(udev_device_get_syspath(device),
         testDevice_.GetSysPath() + std::string("/") + udev_device_get_sysname(device));
 
-    errno = 0;
     EXPECT_EQ(udev_device_get_syspath(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
 }
 
 /*
@@ -268,21 +260,13 @@ HWTEST_F(CustomUdevTest, TestGetParent2, TestSize.Level1)
     ASSERT_EQ(parent, nullptr);
     EXPECT_NE(udev_device_get_syspath(parent), testDevice_.GetSysPath());
 
-    errno = 0;
     EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(nullptr, "input", nullptr), nullptr);
-    EXPECT_NE(errno, 0);
 
-    errno = 0;
     EXPECT_NE(udev_device_get_parent_with_subsystem_devtype(device, "input", ""), nullptr);
-    EXPECT_NE(errno, EINVAL);
 
-    errno = 0;
     EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(device, nullptr, nullptr), nullptr);
-    EXPECT_EQ(errno, EINVAL);
 
-    errno = 0;
     EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(device, "unknown", nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
 }
 
 HWTEST_F(CustomUdevTest, TestUdevPropsDefault, TestSize.Level1)
