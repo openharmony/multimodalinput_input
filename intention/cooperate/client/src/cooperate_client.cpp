@@ -308,6 +308,7 @@ int32_t CooperateClient::RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaLis
         for (auto it = devHotAreaListener_.begin(); it != devHotAreaListener_.end(); ++it) {
             if (*it == listener) {
                 devHotAreaListener_.erase(it);
+                break;
             }
         }
     }
