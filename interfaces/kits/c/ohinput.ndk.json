@@ -502,5 +502,9 @@
     {
         "first_introduced": "20",
         "name": "OH_Input_GetMaxMultiTouchPointNum"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_TouchEventToPointerEvent"
     }
 ]
