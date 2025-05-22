@@ -22,6 +22,7 @@
 #include "oh_input_interceptor.h"
 #include "oh_key_code.h"
 #include "permission_helper.h"
+#include "pointer_event_ndk.h"
 #ifdef PLAYER_FRAMEWORK_EXISTS
 #include "screen_capture_monitor.h"
 #include "ipc_skeleton.h"
@@ -2614,4 +2615,118 @@ Input_Result OH_Input_QueryMaxTouchPoints(int32_t *count)
         MMI_HILOGE("GetMaxMultiTouchPointNum fail, error:%{public}d", ret);
     }
     return INPUT_SUCCESS;
+}
+
+static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
+    OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
+{
+    CALL_INFO_TRACE;
+    auto pointIds = pointerEvent->GetPointerIds();
+    if (pointIds.empty()) {
+        pointerEvent->SetActionStartTime(time);
+        pointerEvent->SetTargetDisplayId(0);
+    }
+    pointerEvent->SetActionTime(time);
+    pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
+    item.SetDownTime(time);
+    item.SetPressed(true);
+}
+
+static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
+    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
+{
+    CALL_INFO_TRACE;
+    int64_t time = touchEvent->actionTime;
+    if (time < 0) {
+        time = OHOS::MMI::GetSysClockTime();
+    }
+    switch (touchEvent->action) {
+        case TOUCH_ACTION_CANCEL:{
+            pointerEvent->SetActionTime(time);
+            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL);
+            if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
+                MMI_HILOGE("Invalid parameter for the touchEventId");
+                return INPUT_PARAMETER_ERROR;
+            }
+            item.SetPressed(false);
+            break;
+        }
+        case TOUCH_ACTION_DOWN: {
+            TransformTouchActionDown(pointerEvent, item, time);
+            break;
+        }
+        case TOUCH_ACTION_MOVE: {
+            pointerEvent->SetActionTime(time);
+            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
+            if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
+                MMI_HILOGE("Invalid parameter for the touchEventId");
+                return INPUT_PARAMETER_ERROR;
+            }
+            break;
+        }
+        case TOUCH_ACTION_UP: {
+            pointerEvent->SetActionTime(time);
+            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_UP);
+            if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
+                MMI_HILOGE("Invalid parameter for the touchEventId");
+                return INPUT_PARAMETER_ERROR;
+            }
+            item.SetPressed(false);
+            break;
+        }
+        default: {
+            MMI_HILOGE("action:%{public}d is invalid", touchEvent->action);
+            return INPUT_PARAMETER_ERROR;
+        }
+    }
+    return INPUT_SUCCESS;
+}
+
+static int32_t TransformTouchProperty(const struct Input_TouchEvent* touchEvent,
+    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
+{
+    CALL_INFO_TRACE;
+    int32_t id = touchEvent->id;
+    int32_t screenX = touchEvent->displayX;
+    int32_t screenY = touchEvent->displayY;
+    if (screenX < 0 || screenY < 0) {
+        MMI_HILOGE("touchEvent parameter is less 0, can not process");
+        return INPUT_PARAMETER_ERROR;
+    }
+    item.SetDisplayX(screenX);
+    item.SetDisplayY(screenY);
+    item.SetPointerId(id);
+    item.SetTargetWindowId(touchEvent->windowId);
+    pointerEvent->SetPointerId(id);
+    pointerEvent->SetTargetDisplayId(touchEvent->displayId);
+    pointerEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    if (touchEvent->action == TOUCH_ACTION_DOWN) {
+        pointerEvent->AddPointerItem(item);
+    } else if ((touchEvent->action == TOUCH_ACTION_MOVE) || (touchEvent->action == TOUCH_ACTION_UP)) {
+        pointerEvent->UpdatePointerItem(id, item);
+    }
+    return INPUT_SUCCESS;
+}
+
+std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(
+    struct Input_TouchEvent* touchEvent)
+{
+    CALL_INFO_TRACE;
+    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent = OHOS::MMI::PointerEvent::Create();
+    if (pointerEvent == nullptr || touchEvent == nullptr) {
+        MMI_HILOGE("pointerEvent is null");
+        return nullptr;
+    }
+    OHOS::MMI::PointerEvent::PointerItem item;
+    int32_t ret = TransformTouchAction(touchEvent, pointerEvent, item);
+    if (ret != 0) {
+        return nullptr;
+    }
+
+    ret = TransformTouchProperty(touchEvent, pointerEvent, item);
+    if (ret != 0) {
+        return nullptr;
+    }
+    pointerEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
+    return pointerEvent;
 }
