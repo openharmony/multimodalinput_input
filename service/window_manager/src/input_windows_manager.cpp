@@ -3840,8 +3840,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t groupId = FindDisplayGroupId(displayId);
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
-    currentDisplayX_ = physicalDisplayInfo->x;
-    currentDisplayY_ = physicalDisplayInfo->y;
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        currentDisplayX_ = physicalDisplayInfo->x;
+        currentDisplayY_ = physicalDisplayInfo->y;
+    }
     int32_t DisplayInfoX = GetLogicalPositionX(displayId);
     int32_t DisplayInfoY = GetLogicalPositionY(displayId);
     int32_t pointerId = pointerEvent->GetPointerId();
