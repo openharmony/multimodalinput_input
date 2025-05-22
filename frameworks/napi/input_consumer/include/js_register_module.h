@@ -54,7 +54,7 @@ struct KeyEventMonitorInfo : RefBase {
     napi_ref callback{ nullptr };
     int32_t subscribeId{ 0 };
     std::shared_ptr<KeyOption> keyOption{ nullptr };
-    KeyEventMonitorInfo();
+    KeyEventMonitorInfo(napi_env env);
     ~KeyEventMonitorInfo();
 };
 typedef std::map<std::string, std::list<sptr<KeyEventMonitorInfo>>> Callbacks;
