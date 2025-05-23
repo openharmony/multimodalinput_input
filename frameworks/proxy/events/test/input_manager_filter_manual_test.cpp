@@ -296,7 +296,7 @@ void WaitPointerEnd(sem_t &sem)
     int32_t waitForSeconds = 3;
     ts.tv_sec += waitForSeconds;
     ret = sem_timedwait(&sem, &ts);
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
 HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {

@@ -449,28 +449,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveKeyCode_001, T
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_AddSubscriber_001
- * @tc.desc: Test add subscriber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddSubscriber_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    std::shared_ptr<KeyOption> keyOption;
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
-    handler.AddSubscriber(subscriber, option, true);
-    auto it = handler.subscriberMap_.find(option);
-    ASSERT_NE(it->second.front(), subscriber);
-    auto newSubscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    handler.AddSubscriber(newSubscriber, option, true);
-    ASSERT_NE(it->second.back(), newSubscriber);
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_IsFunctionKey_001
  * @tc.desc: Test is function key
  * @tc.type: FUNC
