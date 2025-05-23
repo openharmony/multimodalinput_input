@@ -6608,6 +6608,68 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
     return RET_OK;
 }
 
+int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo)
+{
+    CHKPR(lastTouchEvent_, RET_ERR);
+    if (shiftWindowInfo.fingerId == -1) {
+        MMI_HILOGE("Failed shift pointerEvent, fingerId is invalid");
+        return RET_ERR;
+    }
+    const WindowInfo &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
+    const WindowInfo &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
+    PointerEvent::PointerItem item;
+    if (!lastTouchEvent_->GetPointerItem(shiftWindowInfo.fingerId, item)) {
+        MMI_HILOGE("Get pointer item failed");
+        return RET_ERR;
+    }
+    if (!item.IsPressed()) {
+        MMI_HILOGE("Failed shift pointerEvent, fingerId:%{public}d is not pressed", shiftWindowInfo.fingerId);
+        return RET_ERR;
+    }
+    item.SetWindowX(lastTouchLogicX_ - sourceWindowInfo.area.x);
+    item.SetWindowY(lastTouchLogicY_ - sourceWindowInfo.area.y);
+    item.SetPressed(false);
+    item.SetTargetWindowId(sourceWindowInfo.id);
+    item.SetPointerId(shiftWindowInfo.fingerId);
+    lastTouchEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    lastTouchEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    lastTouchEvent_->SetPointerId(shiftWindowInfo.fingerId);
+    lastTouchEvent_->SetTargetDisplayId(sourceWindowInfo.displayId);
+    lastTouchEvent_->SetTargetWindowId(sourceWindowInfo.id);
+    lastTouchEvent_->SetAgentWindowId(sourceWindowInfo.agentWindowId);
+    int64_t time = GetSysClockTime();
+    lastTouchEvent_->SetActionTime(time);
+    lastTouchEvent_->SetActionStartTime(time);
+    LogTracer lt(lastTouchEvent_->GetId(), lastTouchEvent_->GetEventType(), lastTouchEvent_->GetPointerAction());
+    lastTouchEvent_->UpdateId();
+    ClearTargetWindowId(shiftWindowInfo.fingerId);
+    lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
+    InputHandler->GetFilterHandler()->HandlePointerEvent(lastTouchEvent_);
+    item.SetWindowX(shiftWindowInfo.x);
+    item.SetWindowY(shiftWindowInfo.y);
+    if (shiftWindowInfo.x == -1 && shiftWindowInfo.y == -1) {
+        item.SetWindowX(lastTouchLogicX_ - targetWindowInfo.area.x);
+        item.SetWindowY(lastTouchLogicY_ - targetWindowInfo.area.y);
+    }
+    item.SetPressed(true);
+    item.SetTargetWindowId(targetWindowInfo.id);
+    item.SetPointerId(shiftWindowInfo.fingerId);
+    lastTouchEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    lastTouchEvent_->SetTargetDisplayId(targetWindowInfo.displayId);
+    lastTouchEvent_->SetPointerId(shiftWindowInfo.fingerId);//？？？
+    lastTouchEvent_->SetTargetWindowId(targetWindowInfo.id);
+    lastTouchEvent_->SetAgentWindowId(targetWindowInfo.agentWindowId);
+    lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
+    HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift touch event dispatch down event");
+    
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.window = targetWindowInfo;
+    windowInfoEX.flag = true;
+    touchItemDownInfos_[shiftWindowInfo.fingerId] = windowInfoEX;
+    InputHandler->GetFilterHandler()->HandlePointerEvent(lastTouchEvent_);
+    return RET_OK;
+}
+
 int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     MMI_HILOGI("Start shift pointer event, sourceWindowId:%{public}d, targetWindowId:%{public}d,"
@@ -6625,7 +6687,14 @@ int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param,
     shiftWindowInfo.targetWindowInfo = *targetWindowInfo;
     shiftWindowInfo.x = param.x;
     shiftWindowInfo.y = param.y;
-    return ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown);
+    shiftWindowInfo.fingerId = param.fingerId;
+    shiftWindowInfo.sourceType = param.sourceType;
+    if (shiftWindowInfo.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return ShiftAppTouchPointerEvent(shiftWindowInfo);
+    }
+    else {
+        return ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown);
+    }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
