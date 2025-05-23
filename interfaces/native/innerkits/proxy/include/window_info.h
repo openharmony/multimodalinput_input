@@ -24,7 +24,7 @@ namespace MMI {
 inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
 
 inline constexpr int32_t DEFAULT_DISPLAY_ID = -1;
-inline constexpr int32_t DEFAULT_GROUP_ID = -1;
+inline constexpr int32_t DEFAULT_GROUP_ID = 0;
 
 enum SecureFlag {
     DEFAULT_MODE = 0,
@@ -564,7 +564,7 @@ struct DisplayGroupInfo {
      *
      * @since 16
      */
-    bool isMainGroup { true };
+    bool isMainGroup { false };
 
     /**
      * Width of the logical display
