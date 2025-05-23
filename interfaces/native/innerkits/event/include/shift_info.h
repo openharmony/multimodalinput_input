@@ -25,6 +25,8 @@ struct ShiftWindowParam {
     int32_t targetWindowId { -1 };
     int32_t x { -1 };
     int32_t y { -1 };
+    int32_t fingerId  { -1 };
+    int32_t sourceType { PointerEvent::SOURCE_TYPE_UNKNOWN };
 };
 
 struct ShiftWindowInfo {
@@ -32,6 +34,8 @@ struct ShiftWindowInfo {
     WindowInfo targetWindowInfo;
     int32_t x { -1 };
     int32_t y { -1 };
+    int32_t fingerId  { -1 };
+    int32_t sourceType { PointerEvent::SOURCE_TYPE_UNKNOWN };
 };
 } // namespace MMI
 } // namespace OHOS

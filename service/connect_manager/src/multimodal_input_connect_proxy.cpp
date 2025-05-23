@@ -2980,6 +2980,8 @@ int32_t MultimodalInputConnectProxy::ShiftAppPointerEvent(const ShiftWindowParam
     WRITEINT32(data, param.targetWindowId, ERR_INVALID_VALUE);
     WRITEINT32(data, param.x, ERR_INVALID_VALUE);
     WRITEINT32(data, param.y, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.fingerId, ERR_INVALID_VALUE);
+    WRITEINT32(data, param.sourceType, ERR_INVALID_VALUE);
     WRITEBOOL(data, autoGenDown, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
