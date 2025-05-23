@@ -167,7 +167,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_001, TestS
     auto pointerEvent = PointerEvent::Create();
     UDSServer udsServer;
     WIN_MGR->Init(udsServer);
-    WIN_MGR->GetDisplayGroupInfo();
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+    WIN_MGR->GetDisplayGroupInfo(displayGroupInfo);
     int32_t idNames = -1;
     ASSERT_EQ(WIN_MGR->GetClientFd(pointerEvent), idNames);
 }
@@ -722,12 +726,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintDisplayInfo_001, 
 {
     CALL_TEST_DEBUG;
     InputWindowsManager manager;
-    manager.displayGroupInfo_.width = 1920;
-    manager.displayGroupInfo_.height = 1080;
-    manager.displayGroupInfo_.focusWindowId = 1;
-    manager.displayGroupInfo_.windowsInfo.push_back(WindowInfo());
-    manager.displayGroupInfo_.displaysInfo.push_back(DisplayInfo());
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->PrintDisplayGroupInfo(manager.displayGroupInfo_));
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = manager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != manager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.width = 1920;
+    displayGroupInfoRef.height = 1080;
+    displayGroupInfoRef.focusWindowId = 1;
+    displayGroupInfoRef.windowsInfo.push_back(WindowInfo());
+    displayGroupInfoRef.displaysInfo.push_back(DisplayInfo());
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->PrintDisplayGroupInfo(displayGroupInfoRef));
 }
 
 /**
@@ -772,11 +781,16 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplayInf
     ASSERT_EQ(manager.FindPhysicalDisplayInfo("test"), nullptr);
     DisplayInfo info1;
     info1.id = 123;
-    manager.displayGroupInfo_.displaysInfo.push_back(info1);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = manager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != manager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(info1);
     ASSERT_NE(manager.FindPhysicalDisplayInfo("test"), nullptr);
     DisplayInfo info2;
     info2.id = 456;
-    manager.displayGroupInfo_.displaysInfo.push_back(info2);
+    displayGroupInfoRef.displaysInfo.push_back(info2);
     ASSERT_NE(manager.FindPhysicalDisplayInfo("test"), nullptr);
     ASSERT_NE(manager.FindPhysicalDisplayInfo("not_matching"), nullptr);
     ASSERT_NE(manager.FindPhysicalDisplayInfo("nonexistent"), nullptr);
@@ -897,7 +911,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost_001, Tes
     CALL_TEST_DEBUG;
     SessionPtr session = std::shared_ptr<UDSSession>();
     WIN_MGR->OnSessionLost(session);
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo());
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo(displayGroupInfo));
 }
 
 /**
@@ -2141,13 +2159,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_001, Test
     CALL_TEST_DEBUG;
     InputWindowsManager manager;
     manager.cursorPos_.displayId = -1;
-    manager.displayGroupInfo_.displaysInfo.push_back({0, 800, 600});
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = manager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != manager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back({0, 800, 600});
     CursorPosition result = WIN_MGR->GetCursorPos();
     EXPECT_EQ(result.displayId, 1);
     EXPECT_EQ(result.cursorPos.x, 1);
     EXPECT_EQ(result.cursorPos.y, 1);
     manager.cursorPos_.displayId = 1;
-    manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
+    displayGroupInfoRef.displaysInfo.push_back({1, 800, 600});
     result = WIN_MGR->GetCursorPos();
     EXPECT_EQ(result.displayId, 1);
     EXPECT_EQ(result.cursorPos.x, 1);
@@ -2164,12 +2187,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_001, Te
 {
     CALL_TEST_DEBUG;
     InputWindowsManager manager;
-    manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = manager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != manager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back({1, 800, 600});
     CursorPosition result = WIN_MGR->ResetCursorPos();
     EXPECT_EQ(result.displayId, 1);
     EXPECT_EQ(result.cursorPos.x, 1);
     EXPECT_EQ(result.cursorPos.y, 1);
-    manager.displayGroupInfo_.displaysInfo.clear();
+    displayGroupInfoRef.displaysInfo.clear();
     result = WIN_MGR->ResetCursorPos();
     EXPECT_EQ(result.displayId, 1);
     EXPECT_EQ(result.cursorPos.x, 1);
@@ -2772,7 +2800,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckFocusWindowChange
     InputWindowsManager inputWindowsManager;
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
-    inputWindowsManager.displayGroupInfo_.focusWindowId = 1;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = -1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CheckFocusWindowChange(displayGroupInfo));
 }
 
@@ -2804,10 +2837,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCaptureMode, Tes
     DisplayGroupInfo displayGroupInfo;
     WindowInfo windowInfo;
     inputWindowsManager.captureModeInfo_.isCaptureMode = true;
-    inputWindowsManager.displayGroupInfo_.focusWindowId = 25;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = 25;
     displayGroupInfo.focusWindowId = 25;
     windowInfo.id = 10;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     windowInfo.id = 11;
     displayGroupInfo.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateCaptureMode(displayGroupInfo));
@@ -2856,7 +2894,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayMode, Tes
     DisplayInfo displayInfo;
     displayInfo.displayMode = DisplayMode::FULL;
     inputWindowsManager.displayMode_ = DisplayMode::FULL;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayMode());
     inputWindowsManager.displayMode_ = DisplayMode::MAIN;
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ = nullptr;
@@ -2878,10 +2921,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay, Te
     InputWindowsManager inputWindowsManager;
     int32_t id = 1;
     DisplayInfo displayInfo;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
     displayInfo.id = 0;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     displayInfo.id = 1;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NE(inputWindowsManager.GetPhysicalDisplay(id), nullptr);
 }
 
@@ -2898,7 +2946,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplayInf
     DisplayInfo displayInfo;
     std::string uniq = "uniq_test";
     displayInfo.uniq = "uniq_test";
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NE(inputWindowsManager.FindPhysicalDisplayInfo(uniq), nullptr);
 }
 
@@ -2957,10 +3010,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle, Tes
     WindowInfo windowInfo;
     windowInfo.id = 3;
     windowInfo.pid = 6;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     windowInfo.id = 2;
     windowInfo.pid = 1;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePoinerStyle(pid, windowId, pointerStyle));
 }
 
@@ -3099,7 +3157,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId, TestS
     int32_t displayId = -1;
     DisplayInfo displayInfo;
     displayInfo.id = 10;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_TRUE(inputWindowsManager.UpdateDisplayId(displayId));
     EXPECT_TRUE(inputWindowsManager.UpdateDisplayId(displayId));
     displayId = 15;
@@ -3150,7 +3213,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo, TestSiz
     int32_t logicalY = 200;
     WindowInfo windowInfo;
     windowInfo.flags = 1;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_EQ(inputWindowsManager.GetWindowInfo(logicalX, logicalY), std::nullopt);
 }
 
@@ -3231,7 +3299,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget, Tes
 
     DisplayInfo displayInfo;
     displayInfo.id = 1;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     pointerEvent->SetPointerId(5);
     PointerEvent::PointerItem item;
     item.SetPointerId(10);
@@ -3272,14 +3345,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateJoystickTarget, 
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    inputWindowsManager.displayGroupInfo_.focusWindowId = 150;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = 150;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetTargetDisplayId(-1);
     WindowInfo windowInfo;
     windowInfo.id = 150;
     windowInfo.agentWindowId = 200;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateJoystickTarget(pointerEvent));
 }
 
@@ -3302,7 +3380,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
     displayInfo.width = 500;
     displayInfo.height = 500;
     displayInfo.displayDirection = DIRECTION0;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateAndAdjustMouseLocation(displayId, x, y, isRealData));
     isRealData = false;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateAndAdjustMouseLocation(displayId, x, y, isRealData));
@@ -3323,7 +3406,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo, TestSize
     displayInfo.id = 1;
     displayInfo.width = 600;
     displayInfo.height = 600;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_EQ(inputWindowsManager.GetMouseInfo().displayId, displayInfo.id);
 }
 
@@ -3342,7 +3430,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos, TestSize
     displayInfo.id = 1;
     displayInfo.width = 300;
     displayInfo.height = 300;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_EQ(inputWindowsManager.GetCursorPos().displayId, displayInfo.id);
 }
 
@@ -3360,7 +3453,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos, TestSi
     displayInfo.id = 1;
     displayInfo.width = 300;
     displayInfo.height = 300;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_EQ(inputWindowsManager.ResetCursorPos().displayId, displayInfo.id);
 }
 
@@ -3396,7 +3494,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckWindowIdPermissio
     WindowInfo windowInfo;
     windowInfo.id = 300;
     windowInfo.pid = 500;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_EQ(inputWindowsManager.CheckWindowIdPermissionByPid(windowId, pid), RET_OK);
 }
 
@@ -3429,7 +3532,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     EXPECT_EQ(logicalY, physicalY + displayInfo.y);
     displaysInfo.x = 100;
     displaysInfo.width = INT32_MAX;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
 }
 
@@ -3460,16 +3568,21 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     EXPECT_EQ(logicalY, physicalY + displayInfo.y);
     displaysInfo.x = 200;
     displaysInfo.width = 100;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(displayMaxX, displaysInfo.x + displaysInfo.width);
     displaysInfo.y = 100;
     displaysInfo.height = INT32_MAX;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
     displaysInfo.y = 200;
     displaysInfo.height = 200;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(displayMaxY, displaysInfo.y + displaysInfo.height);
 }
@@ -3565,7 +3678,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer, TestS
     WindowInfo windowInfo;
     windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
     windowInfo.pointerHotAreas.push_back({ 100, 0, INT32_MAX, 0 });
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager.lastLogicX_ = 200;
     inputWindowsManager.lastLogicY_ = 200;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
@@ -3597,7 +3715,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer_002, T
     inputWindowsManager.lastPointerEvent_->SetTargetDisplayId(-1);
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager.lastWindowInfo_.id = 2;
     inputWindowsManager.lastWindowInfo_.agentWindowId = 2;
     inputWindowsManager.lastWindowInfo_.area.x = 100;
@@ -3633,13 +3756,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow,
     WindowInfo windowInfo;
     windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
     windowInfo.pointerHotAreas.push_back({ 100, 100, INT32_MAX, 100 });
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
     windowInfo.id = 10;
     windowInfo.pointerHotAreas.clear();
     windowInfo.pointerHotAreas.push_back({ 150, 250, 300, 500 });
-    inputWindowsManager.displayGroupInfo_.windowsInfo.insert(
-        inputWindowsManager.displayGroupInfo_.windowsInfo.begin(), windowInfo);
+    displayGroupInfoRef.windowsInfo.insert(
+        displayGroupInfoRef.windowsInfo.begin(), windowInfo);
     inputWindowsManager.lastWindowInfo_.id = 10;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
     inputWindowsManager.lastWindowInfo_.id = 20;
@@ -3652,7 +3780,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow,
     inputWindowsManager.lastWindowInfo_.id = 30;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
     windowInfo.id = 50;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager.lastWindowInfo_.id = 50;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
 }
@@ -3677,7 +3805,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo_002, Test
     displaysInfo.validHeight = displaysInfo.height;
     displaysInfo.name = "name1";
     displaysInfo.uniq = "uniq1";
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     MouseLocation result = inputWindowsManager.GetMouseInfo();
     EXPECT_EQ(result.displayId, 2);
     EXPECT_EQ(result.physicalX, 10);
@@ -3704,7 +3837,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_002, Test
     displaysInfo.validHeight = displaysInfo.height;
     displaysInfo.name = "name2";
     displaysInfo.uniq = "uniq2";
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     CursorPosition result = inputWindowsManager.GetCursorPos();
     EXPECT_EQ(result.displayId, 2);
     EXPECT_EQ(result.cursorPos.x, 15);
@@ -3731,7 +3869,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_002, Te
     displaysInfo.validHeight = displaysInfo.height;
     displaysInfo.name = "name3";
     displaysInfo.uniq = "uniq3";
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     result = inputWindowsManager.ResetCursorPos();
     EXPECT_EQ(result.displayId, 3);
     EXPECT_EQ(result.cursorPos.x, 20);
@@ -3751,7 +3894,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     DisplayInfo displaysInfo;
     displaysInfo.id = 1;
     displaysInfo.uniq = "abc";
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     inputWindowsManager.bindInfo_.AddDisplay(2, "cde");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayIdAndName());
 }
@@ -3769,7 +3917,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     DisplayInfo displaysInfo;
     displaysInfo.id = 1;
     displaysInfo.uniq = "abc";
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     inputWindowsManager.bindInfo_.AddDisplay(1, "abc");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayIdAndName());
 }
@@ -3789,7 +3942,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendPointerEvent, Test
     WindowInfo windowInfo;
     inputWindowsManager.udsServer_ = &udsServer;
     windowInfo.pointerHotAreas.push_back({ 100, 100, INT32_MAX, 100 });
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SendPointerEvent(pointerAction));
     windowInfo.pointerHotAreas.clear();
     windowInfo.pointerHotAreas.push_back({ 150, 250, 300, 500 });
@@ -3798,8 +3956,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendPointerEvent, Test
     windowInfo.id = 10;
     windowInfo.pid = 30;
     windowInfo.agentWindowId = 10;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.insert(
-        inputWindowsManager.displayGroupInfo_.windowsInfo.begin(), windowInfo);
+    displayGroupInfoRef.windowsInfo.insert(
+        displayGroupInfoRef.windowsInfo.begin(), windowInfo);
     inputWindowsManager.mouseLocation_.displayId = 1;
     inputWindowsManager.mouseLocation_.physicalX = 200;
     inputWindowsManager.mouseLocation_.physicalY = 300;
@@ -3826,7 +3984,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget001, 
     displayInfo.id = 1;
     displayInfo.x = 300;
     displayInfo.y = 500;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetDisplayX(INT32_MAX);
@@ -3882,7 +4045,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_002,
     displayInfo.height = 100;
     displayInfo.displayDirection = DIRECTION0;
     displayInfo.direction = DIRECTION180;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetDisplayX(150);
@@ -3938,7 +4106,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     displayInfo.width = 100;
     displayInfo.height = 100;
     displayInfo.displayDirection = DIRECTION180;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetDisplayX(150);
@@ -3993,7 +4166,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     displayInfo.displayDirection = DIRECTION0;
     displayInfo.x = INT32_MAX;
     displayInfo.y = 300;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetDisplayX(100);
@@ -4009,8 +4187,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     EXPECT_EQ(inputWindowsManager.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
 
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_NONE;
-    inputWindowsManager.displayGroupInfo_.displaysInfo[0].x = 300;
-    inputWindowsManager.displayGroupInfo_.displaysInfo[0].y = INT32_MAX;
+    displayGroupInfoRef.displaysInfo[0].x = 300;
+    displayGroupInfoRef.displaysInfo[0].y = INT32_MAX;
     EXPECT_EQ(inputWindowsManager.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
 }
 
@@ -4027,7 +4205,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetTargetDisplayId(10);
-    inputWindowsManager.displayGroupInfo_.focusWindowId = 52;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = 52;
     WindowGroupInfo windowGroupInfo;
     WindowInfo windowInfo;
     windowInfo.id = 2;
@@ -4060,14 +4243,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
     displayInfo.y = 600;
     displayInfo.width = 300;
     displayInfo.height = 300;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     displayInfo.id = 2;
     displayInfo.x = 500;
     displayInfo.y = 500;
     displayInfo.width = 600;
     displayInfo.height = 600;
     displayInfo.displayDirection = DIRECTION0;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateAndAdjustMouseLocation(displayId, x, y, isRealData));
 }
 
@@ -4092,9 +4280,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
     displayInfo.width = 400;
     displayInfo.height = 400;
     displayInfo.displayDirection = DIRECTION90;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateAndAdjustMouseLocation(displayId, x, y, isRealData));
-    inputWindowsManager.displayGroupInfo_.displaysInfo[0].displayDirection = DIRECTION0;
+    displayGroupInfoRef.displaysInfo[0].displayDirection = DIRECTION0;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateAndAdjustMouseLocation(displayId, x, y, isRealData));
 }
 
@@ -4206,7 +4399,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReverseXY, TestSize.Le
     displayInfo.direction = DIRECTION0;
     displayInfo.width = 200;
     displayInfo.height = 300;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ReverseXY(x, y));
 }
 
@@ -4254,7 +4452,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowBySy
     windowInfo.id = 1;
     windowInfo.pid = 50;
     windowInfo.zOrder = 60;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     windowInfo.id = 2;
     newDisplayInfo.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PrintChangedWindowBySync(newDisplayInfo));
@@ -4304,7 +4507,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_
     InputWindowsManager inputWindowsManager;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    inputWindowsManager.displayGroupInfo_.focusWindowId = 10;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = 10;
     std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
     EXPECT_NE(inputEvent, nullptr);
     inputEvent->targetDisplayId_ = 10;
@@ -4417,13 +4625,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCrownTarget_001,
     std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
     EXPECT_NE(inputEvent, nullptr);
     inputEvent->targetDisplayId_ = -1;
-    inputWindowsManager.displayGroupInfo_.focusWindowId = -1;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = -1;
     int32_t ret = inputWindowsManager.UpdateCrownTarget(pointerEvent);
     EXPECT_NE(ret, RET_OK);
     inputEvent->targetDisplayId_ = 5;
     ret = inputWindowsManager.UpdateCrownTarget(pointerEvent);
     EXPECT_NE(ret, RET_OK);
-    inputWindowsManager.displayGroupInfo_.focusWindowId = 5;
+    displayGroupInfoRef.focusWindowId = 5;
     ret = inputWindowsManager.UpdateCrownTarget(pointerEvent);
     EXPECT_NE(ret, RET_OK);
 }
@@ -5106,7 +5319,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     inputWindowsMgr.extraData_.pointerId = 150;
     inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5160,7 +5378,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     inputWindowsMgr.extraData_.appended = false;
     inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5236,7 +5459,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     inputWindowsMgr.isOpenAntiMisTakeObserver_ = false;
     inputWindowsMgr.antiMistake_.isOpen = true;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5283,7 +5511,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     inputWindowsMgr.isOpenAntiMisTakeObserver_ = true;
     inputWindowsMgr.antiMistake_.isOpen = false;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5326,7 +5559,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     winGroupInfo.windowsInfo.push_back(winInfo);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     inputWindowsMgr.extraData_.appended = false;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5371,7 +5609,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     winGroupInfo.windowsInfo.push_back(winInfo);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     inputWindowsMgr.extraData_.appended = false;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5414,7 +5657,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     winGroupInfo.windowsInfo.push_back(winInfo);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     inputWindowsMgr.extraData_.appended = false;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5460,7 +5708,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     inputWindowsMgr.extraData_.appended = false;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5506,7 +5759,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     inputWindowsMgr.extraData_.appended = false;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5552,7 +5810,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     inputWindowsMgr.extraData_.appended = false;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5598,7 +5861,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     inputWindowsMgr.extraData_.appended = false;
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
@@ -5737,17 +6005,22 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleKeyEventWindowId
     ASSERT_NE(keyEvent, nullptr);
     WindowInfo winInfo;
     keyEvent->SetTargetDisplayId(-1);
-    inputWindowsMgr.displayGroupInfo_.focusWindowId = 50;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = 50;
     winInfo.id = 50;
     winInfo.agentWindowId = 100;
     winInfo.privacyMode = SecureFlag::PRIVACY_MODE;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
 
-    inputWindowsMgr.displayGroupInfo_.windowsInfo[0].privacyMode = SecureFlag::DEFAULT_MODE;
+    displayGroupInfoRef.windowsInfo[0].privacyMode = SecureFlag::DEFAULT_MODE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
 
-    inputWindowsMgr.displayGroupInfo_.focusWindowId = 80;
+    displayGroupInfoRef.focusWindowId = 80;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
 }
 
@@ -5766,7 +6039,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayId, TestSize
     DisplayInfo displayInfo;
     displayInfo.id = 100;
     inputEvent->SetTargetDisplayId(-1);
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetDisplayId(inputEvent));
 }
 
@@ -5793,7 +6071,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_004, TestS
     winInfo.uiExtentionWindowInfo.push_back(winInfo);
     winInfo.pid = 50;
     winInfo.flags = 15;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetClientFd(pointerEvent, windowId));
     windowId = 100;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetClientFd(pointerEvent, windowId));
@@ -5819,11 +6102,16 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget,
     winInfo.privacyUIFlag = true;
     winInfo.uiExtentionWindowInfo.push_back(winInfo);
     keyEvent->SetTargetDisplayId(-1);
-    inputWindowsMgr.displayGroupInfo_.focusWindowId = 10;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = 10;
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetPidAndUpdateTarget(keyEvent));
 
-    inputWindowsMgr.displayGroupInfo_.windowsInfo[0].uiExtentionWindowInfo[0].privacyUIFlag = false;
+    displayGroupInfoRef.windowsInfo[0].uiExtentionWindowInfo[0].privacyUIFlag = false;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetPidAndUpdateTarget(keyEvent));
 }
 
@@ -5912,7 +6200,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchUIExtentionPoi
     winInfo.agentWindowId = 200;
     winInfo.uiExtentionWindowInfo.push_back(winInfo);
     winInfo.id = 300;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent));
 }
 
@@ -5959,13 +6252,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCrownTarget, Tes
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetTargetDisplayId(-1);
-    inputWindowsMgr.displayGroupInfo_.focusWindowId = 100;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = 100;
     winInfo.id = 200;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     winInfo.id = 100;
     winInfo.agentWindowId = 500;
     winInfo.privacyMode = SecureFlag::DEFAULT_MODE;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_EQ(inputWindowsMgr.UpdateCrownTarget(pointerEvent), RET_OK);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
@@ -6057,9 +6355,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReverseXY_001, TestSiz
     int32_t y = 100;
     DisplayInfo displayInfo;
     displayInfo.direction = static_cast<Direction>(-1);
-    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ReverseXY(x, y));
-    inputWindowsMgr.displayGroupInfo_.displaysInfo[0].direction = static_cast<Direction>(10);
+    displayGroupInfoRef.displaysInfo[0].direction = static_cast<Direction>(10);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ReverseXY(x, y));
 }
 
@@ -6110,11 +6413,16 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel,
     inputWindowsMgr.lastPointerEvent_ = PointerEvent::Create();
     ASSERT_NE(inputWindowsMgr.lastPointerEvent_, nullptr);
     winInfo.id = 10;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.clear();
+    displayGroupInfoRef.windowsInfo.clear();
     winInfo.id = 100;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
 }
 
@@ -6132,7 +6440,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidByWindowId, Test
     WindowInfo winInfo;
     winInfo.id = 100;
     winInfo.pid = 150;
-    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_EQ(inputWindowsMgr.GetPidByWindowId(id), winInfo.pid);
     id = 300;
     EXPECT_EQ(inputWindowsMgr.GetPidByWindowId(id), RET_ERR);
@@ -6355,7 +6668,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateKeyEventDisplayI
     EXPECT_EQ(keyEvent->GetTargetDisplayId(), 1);
 
     DisplayInfo info1 = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200};
-    inputWindowsManager.displayGroupInfo_.displaysInfo.emplace_back(info1);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.emplace_back(info1);
     inputWindowsManager.UpdateKeyEventDisplayId(keyEvent, focusWindowId);
     EXPECT_EQ(keyEvent->GetTargetDisplayId(), 0);
 }
@@ -6376,7 +6694,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemovedOrComb
 
     DisplayInfo info1 = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200};
     DisplayInfo info2 = {.id = 1, .x = 100, .y = 0, .width = 100, .height = 200};
-    inputWindowsManager.displayGroupInfo_.displaysInfo = {info1, info2};
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo = {info1, info2};
     displayGroupInfo.displaysInfo = {info2};
     ret = inputWindowsManager.OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
     EXPECT_TRUE(ret);
@@ -6620,7 +6943,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CleanInvalidPiexMap, T
     winInfo.id = 10;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CleanInvalidPiexMap());
 }
 
@@ -6639,7 +6967,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CleanInvalidPiexMap_00
     winInfo.id = 10;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CleanInvalidPiexMap());
 }
 
@@ -6807,9 +7140,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_004, 
     inputWindowsManager.extraData_.appended = true;
     inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     windowInfo.uiExtentionWindowInfo.push_back(windowInfo);
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     windowInfo.windowInputType = WindowInputType::NORMAL;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager.firstBtnDownWindowInfo_.first = 150;
     inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
     EXPECT_NE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
@@ -6850,7 +7188,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_005, 
     inputWindowsManager.extraData_.appended = false;
     inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
     windowInfo.uiExtentionWindowInfo.push_back(windowInfo);
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
     EXPECT_EQ(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
     pointerEvent->SetButtonPressed(2024);
@@ -6996,8 +7339,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgeCaramaInFore_001,
 
     WindowInfo windowInfo;
     windowInfo.id = 20;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
-    inputWindowsManager.displayGroupInfo_.focusWindowId = 20;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
+    displayGroupInfoRef.focusWindowId = 20;
     EXPECT_EQ(inputWindowsManager.JudgeCaramaInFore(), false);
 }
 
@@ -7269,7 +7617,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_010, TestS
     WindowInfo windowInfo1;
     windowInfo1.id = 1;
     windowInfo1.uiExtentionWindowInfo.push_back(windowInfo1);
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo1);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo1);
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
 }
@@ -7292,8 +7645,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_011, TestS
 
     WindowInfo windowInfo1;
     windowInfo1.id = 1;
-    windowInfo1.uiExtentionWindowInfo.push_back(windowInfo1);
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo1);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo1);
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo1);
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
 }
@@ -7354,7 +7712,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, Test
     WindowInfo windowInfo2;
     windowInfo2.id = 1;
     windowInfo1.uiExtentionWindowInfo.push_back(windowInfo2);
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo1);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo1);
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWindowPid(windowId));
 }
@@ -7375,7 +7738,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_003, Test
     WindowInfo windowInfo2;
     windowInfo2.id = 3;
     windowInfo1.uiExtentionWindowInfo.push_back(windowInfo2);
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo1);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo1);
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWindowPid(windowId));
 }
@@ -7755,7 +8123,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPositionIf
     InputWindowsManager inputWindowsManager;
     inputWindowsManager.cursorPos_.displayId = 1;
     inputWindowsManager.cursorPos_.cursorPos.x = -1;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
 
     // isOut = true, isChange = false
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ResetPointerPositionIfOutValidDisplay(displayGroupInfo));
@@ -7778,8 +8151,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPositionIf
     displayGroupInfo.displaysInfo.clear();
     displayInfo.offsetX = 0;
     displayGroupInfo.displaysInfo.push_back(displayInfo);
-    inputWindowsManager.displayGroupInfo_.displaysInfo.clear();
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    displayGroupInfoRef.displaysInfo.clear();
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     // isOut = false, isChange = false
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ResetPointerPositionIfOutValidDisplay(displayGroupInfo));
 }
@@ -7875,7 +8248,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEvent
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     inputWindowsManager.lastPointerEventforGesture_ = pointerEvent;
     inputWindowsManager.lastPointerEventforGesture_->SetTargetDisplayId(displayInfo.id);
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     // true false
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
 
@@ -8322,7 +8700,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelAllTouches_003, 
 
     WindowInfo windowInfo;
     windowInfo.id = 0;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelAllTouches(pointerEvent));
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -8716,10 +9099,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCaptureMode_003,
     DisplayGroupInfo displayGroupInfo;
     WindowInfo windowInfo;
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
-    inputWindowsManager->displayGroupInfo_.focusWindowId = 25;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.focusWindowId = 25;
     displayGroupInfo.focusWindowId = 26;
     windowInfo.id = 10;
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     displayGroupInfo.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateCaptureMode(displayGroupInfo));
 
@@ -8779,7 +9167,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerO
     displayInfo.dpi++;
     displayInfo.x = 300;
     displayInfo.y = 300;
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager->lastDpi_ = displayInfo.dpi + 1;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
 }
@@ -8801,7 +9195,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerDrawingMa
     DisplayInfo displaysInfo;
     inputWindowsManager->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     inputWindowsManager->lastPointerEvent_->SetButtonPressed(1);
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdatePointerDrawingManagerWindowInfo());
 }
 
@@ -8819,7 +9218,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerDrawingMa
     EXPECT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
     DisplayInfo displaysInfo;
     inputWindowsManager->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdatePointerDrawingManagerWindowInfo());
 }
 
@@ -8837,7 +9241,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerDrawingMa
     EXPECT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
     DisplayInfo displaysInfo;
     inputWindowsManager->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdatePointerDrawingManagerWindowInfo());
 }
 
@@ -8855,7 +9264,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerDrawingMa
     EXPECT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
     DisplayInfo displaysInfo;
     inputWindowsManager->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdatePointerDrawingManagerWindowInfo());
 }
 
@@ -8873,7 +9287,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerDrawingMa
     EXPECT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
     DisplayInfo displaysInfo;
     inputWindowsManager->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdatePointerDrawingManagerWindowInfo());
 }
 
@@ -8891,9 +9310,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     displaysInfo.id = 1;
     displaysInfo.uniqueId = 1;
     displaysInfo.uniq = "abc";
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     displaysInfo.uniqueId = 1000;
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
 
     inputWindowsManager->bindInfo_.AddDisplay(1, "abc");
     inputWindowsManager->bindInfo_.AddDisplay(1, "abc");
@@ -8912,7 +9336,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_003, Test
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->cursorPos_.displayId = -1;
+    CursorPosition cursorPosRef;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        cursorPosRef = it->second;
+    }
+    cursorPosRef.displayId = -1;
     DisplayInfo displaysInfo;
     displaysInfo.id = 2;
     displaysInfo.width = 30;
@@ -8921,9 +9350,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_003, Test
     displaysInfo.validHeight = displaysInfo.height;
     displaysInfo.name = "name2";
     displaysInfo.uniq = "uniq2";
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = iter->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetCursorPos());
-    EXPECT_EQ(inputWindowsManager->cursorPos_.displayId, displaysInfo.id);
+    EXPECT_EQ(cursorPosRef.displayId, displaysInfo.id);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetCursorPos());
 }
 
@@ -8937,7 +9371,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_004, Test
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->cursorPos_.displayId = -1;
+    CursorPosition cursorPosRef;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        cursorPosRef = it->second;
+    }
+    cursorPosRef.displayId = -1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetCursorPos());
 }
 
@@ -8961,9 +9400,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPositionIf
     displaysInfo.name = "name2";
     displaysInfo.uniq = "uniq2";
     displayGroupInfo.displaysInfo.push_back(displaysInfo);
-    inputWindowsManager->cursorPos_.displayId = displaysInfo.id;
-    inputWindowsManager->cursorPos_.cursorPos.x = 300;
-    inputWindowsManager->cursorPos_.cursorPos.y = 300;
+    CursorPosition cursorPosRef;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        cursorPosRef = it->second;
+    }
+    cursorPosRef.displayId = displaysInfo.id;
+    cursorPosRef.cursorPos.x = 300;
+    cursorPosRef.cursorPos.y = 300;
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ResetPointerPositionIfOutValidDisplay(displayGroupInfo));
 }
@@ -8989,7 +9433,12 @@ HWTEST_F(
     DisplayInfo displaysInfo;
     displaysInfo.id = 100;
     pointerEvent->SetTargetDisplayId(displaysInfo.id);
-    displayGroupInfo.displaysInfo.push_back(displaysInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
 }
@@ -9038,15 +9487,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouchScreenEvent
     displaysInfo.validHeight = displaysInfo.height;
     displaysInfo.name = "name2";
     displaysInfo.uniq = "uniq2";
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
     displayGroupInfo.displaysInfo.push_back(displaysInfo);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
     EXPECT_NE(pointerEvent, nullptr);
     inputWindowsManager->lastPointerEventforGesture_ = pointerEvent;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
-
     pointerEvent->SetTargetDisplayId(displaysInfo.id);
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    displayGroupInfoRef.displaysInfo.push_back(displaysInfo);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CancelTouchScreenEventIfValidDisplayChange(displayGroupInfo));
 }
@@ -9149,7 +9602,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowNavbar_001,
     WindowInfo windowInfo;
     windowInfo.id = 20;
     windowInfo.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PrintWindowNavbar());
 }
 
@@ -9340,15 +9798,20 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckAppFocused_001, T
     windowInfo.pid = pid;
     windowInfo.id = pid;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.clear();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.emplace_back(windowInfo);
-    inputWindowsManager->displayGroupInfo_.focusWindowId = pid;
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.clear();
+    displayGroupInfoRef.windowsInfo.emplace_back(windowInfo);
+    displayGroupInfoRef.focusWindowId = pid;
     EXPECT_TRUE(inputWindowsManager->CheckAppFocused(pid));
 
     pid++;
     EXPECT_FALSE(inputWindowsManager->CheckAppFocused(pid));
 
-    inputWindowsManager->displayGroupInfo_.focusWindowId = pid + 1;
+    displayGroupInfoRef.focusWindowId = pid + 1;
     EXPECT_FALSE(inputWindowsManager->CheckAppFocused(pid));
 }
 
