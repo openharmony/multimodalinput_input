@@ -274,12 +274,12 @@ bool PointerDrawingManager::GetMouseDisplayState() const
     }
     return DfsMessageParcel::messageParcel->GetMouseDisplayState();
 }
-int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId,
+int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap, int32_t pid, int32_t windowId,
     int32_t focusX, int32_t focusY)
 {
     return 0;
 }
-int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
 {
     return 0;
 }

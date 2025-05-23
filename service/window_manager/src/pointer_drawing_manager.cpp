@@ -31,7 +31,7 @@
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
-#include "i_multimodal_input_connect.h"
+#include "mmi_service.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
 #include "ipc_skeleton.h"
@@ -613,7 +613,8 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     // Listening enabling cursor deformation and color inversion
     SettingObserver::UpdateFunc func = [](const std::string& key) {
         bool statusValue = false;
-        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue);
+        auto ret = SettingDataShare::GetInstance(
+            MMIService::MULTIMODAL_INPUT_CONNECT_SERVICE_ID).GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
@@ -1935,21 +1936,21 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     }
 }
 
-int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX,
-    int32_t focusY)
+int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap,
+    int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY)
 {
     CALL_DEBUG_ENTER;
     followSystem_ = false;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     userIconFollowSystem_ = true;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPR(pixelMap, RET_ERR);
+    CHKPR(curPixelMap.pixelMap, RET_ERR);
     if (pid == -1) {
         MMI_HILOGE("The pid is invalid");
         return RET_ERR;
     }
     if (windowId < 0) {
-        int32_t ret = UpdateCursorProperty(pixelMap, focusX, focusY);
+        int32_t ret = UpdateCursorProperty(curPixelMap, focusX, focusY);
         if (ret != RET_OK) {
             MMI_HILOGE("UpdateCursorProperty is failed");
             return ret;
@@ -1970,7 +1971,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
         MMI_HILOGE("The windowId not in right pid");
         return RET_ERR;
     }
-    int32_t ret = UpdateCursorProperty(pixelMap, focusX, focusY);
+    int32_t ret = UpdateCursorProperty(curPixelMap, focusX, focusY);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
         return ret;
@@ -1990,13 +1991,20 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
 }
 
 
-int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY)
+int32_t PointerDrawingManager::UpdateCursorProperty(CursorPixelMap curPixelMap,
+    const int32_t &focusX, const int32_t &focusY)
 {
-    CHKPR(pixelMap, RET_ERR);
-    Media::PixelMap* newPixelMap = static_cast<Media::PixelMap*>(pixelMap);
+    CHKPR(curPixelMap.pixelMap, RET_ERR);
+    Media::PixelMap* newPixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
     CHKPR(newPixelMap, RET_ERR);
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
+    int32_t newFocusX = 0;
+    int32_t newFocusY = 0;
+    newFocusX = focusX < 0 ? 0 : focusX;
+    newFocusY = focusY < 0 ? 0 : focusY;
+    newFocusX = newFocusX > newPixelMap->GetWidth() ? newPixelMap->GetWidth() : newFocusX;
+    newFocusY = newFocusY > newPixelMap->GetHeight() ? newPixelMap->GetHeight() : newFocusY;
     int32_t cursorSize = GetPointerSize();
     cursorWidth_ =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
@@ -2011,16 +2019,16 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
         std::lock_guard<std::mutex> guard(mtx_);
         userIcon_.reset(newPixelMap);
     }
-    userIconHotSpotX_ = static_cast<int32_t>((float)focusX * xAxis);
-    userIconHotSpotY_ = static_cast<int32_t>((float)focusY * yAxis);
+    userIconHotSpotX_ = static_cast<int32_t>((float)newFocusX * xAxis);
+    userIconHotSpotY_ = static_cast<int32_t>((float)newFocusY * yAxis);
     MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
         "focusX:%{public}d, focuxY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"
         "userIconHotSpotY_:%{public}d", cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
-        focusX, focusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
+        newFocusX, newFocusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
     __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
@@ -2028,7 +2036,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         MMI_HILOGE("pid is invalid return -1");
         return RET_ERR;
     }
-    CHKPR(pixelMap, RET_ERR);
+    CHKPR(curPixelMap.pixelMap, RET_ERR);
     if (windowId < 0) {
         MMI_HILOGE("Get invalid windowId, %{public}d", windowId);
         return RET_ERR;
@@ -2037,7 +2045,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(curPixelMap.pixelMap);
     {
         std::lock_guard<std::mutex> guard(mtx_);
         userIcon_.reset(pixelMapPtr);
@@ -2126,7 +2134,6 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
             decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
         }
     }
-
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
     CHKPL(pixelMap);
     return pixelMap;
@@ -2549,7 +2556,9 @@ bool PointerDrawingManager::Init()
         std::lock_guard<std::mutex> guard(mousePixelMapMutex_);
         mousePixelMap_.clear();
     }
-    InitPixelMaps();
+    initLoadingAndLoadingRightPixelTimerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
+        InitPixelMaps();
+    });
     return true;
 }
 

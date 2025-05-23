@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,42 @@
 #ifndef I_INFRARED_MANAGER
 #define I_INFRARED_MANAGER
 
+#include "parcel.h"
+
 namespace OHOS {
 namespace MMI {
-struct InfraredFrequency {
+struct InfraredFrequency : public Parcelable {
     int64_t max_ { 0 };
     int64_t min_ { 0 };
+    bool ReadFromParcel(Parcel &parcel)
+    {
+        return (
+            parcel.ReadInt64(max_) &&
+            parcel.ReadInt64(min_)
+        );
+    }
+
+    bool Marshalling(Parcel &parcel) const
+    {
+        if (!parcel.WriteInt64(max_)) {
+            return false;
+        }
+        if (!parcel.WriteInt64(min_)) {
+            return false;
+        }
+        return true;
+    }
+
+    static struct InfraredFrequency* Unmarshalling(Parcel &parcel)
+    {
+        auto infraredFrequency = new (std::nothrow) struct InfraredFrequency();
+        if (infraredFrequency && !infraredFrequency->ReadFromParcel(parcel)) {
+            delete infraredFrequency;
+            infraredFrequency = nullptr;
+        }
+
+        return infraredFrequency;
+    }
 };
 } // namespace MMI
 } // namespace OHOS

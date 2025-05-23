@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,11 @@
 #ifndef MMI_SERVICE_H
 #define MMI_SERVICE_H
 
+#include <system_ability_definition.h>
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
+#include "cJSON.h"
 #include "input_event_handler.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_manager.h"
@@ -34,166 +36,193 @@ namespace MMI {
 class TouchGestureManager;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json_ != nullptr) {
+            cJSON_Delete(json_);
+        }
+    }
+    operator cJSON *()
+    {
+        return json_;
+    }
+    cJSON *json_ { nullptr };
+};
+
+struct DeviceConsumer {
+    std::string name {};
+    std::vector<int32_t> uids {};
+};
+
+struct ConsumersData {
+    std::vector<DeviceConsumer> consumers {};
+};
+
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_SYSTEM_ABILITY(MMIService);
 
 public:
+    static constexpr int32_t INVALID_SOCKET_FD = -1;
+    static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = MULTIMODAL_INPUT_SERVICE_ID;
     void OnStart() override;
     void OnStop() override;
     static MMIService* GetInstance();
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
-    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    ErrCode AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
+    ErrCode AddInputEventFilter(const sptr<IEventFilter>& filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
-    int32_t RemoveInputEventFilter(int32_t filterId) override;
-    int32_t SetPointerSize(int32_t size) override;
-    int32_t GetPointerSize(int32_t &size) override;
-    int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
-    int32_t SetMouseScrollRows(int32_t rows) override;
-    int32_t GetMouseScrollRows(int32_t &rows) override;
-    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
-    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options) override;
-    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
-    int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
-    int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
-    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napState) override;
-    int32_t SetMousePrimaryButton(int32_t primaryButton) override;
-    int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
-    int32_t SetHoverScrollState(bool state) override;
-    int32_t GetHoverScrollState(bool &state) override;
-    int32_t SetPointerVisible(bool visible, int32_t priority) override;
-    int32_t IsPointerVisible(bool &visible) override;
-    int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
-    int32_t SetPointerColor(int32_t color) override;
-    int32_t GetPointerColor(int32_t &color) override;
-    int32_t EnableCombineKey(bool enable) override;
-    int32_t SetPointerSpeed(int32_t speed) override;
-    int32_t GetPointerSpeed(int32_t &speed) override;
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false) override;
-    int32_t NotifyNapOnline() override;
-    int32_t RemoveInputEventObserver() override;
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false) override;
-    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
-    int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
-    int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) override;
-    int32_t RegisterDevListener() override;
-    int32_t UnregisterDevListener() override;
-    int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType) override;
-    int32_t SetKeyboardRepeatDelay(int32_t delay) override;
-    int32_t SetKeyboardRepeatRate(int32_t rate) override;
-    int32_t GetKeyboardRepeatDelay(int32_t &delay) override;
-    int32_t GetKeyboardRepeatRate(int32_t &rate) override;
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
-    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>()) override;
-    int32_t AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys) override;
-    int32_t RemovePreInputHandler(int32_t handlerId) override;
-    int32_t AddGestureMonitor(InputHandlerType handlerType,
-        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
-    int32_t RemoveGestureMonitor(InputHandlerType handlerType,
-        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
-    int32_t MarkEventConsumed(int32_t eventId) override;
-    int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
-    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
-    int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
-    int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
-    int32_t SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
-    int32_t UnsubscribeHotkey(int32_t subscribeId) override;
+    ErrCode RemoveInputEventFilter(int32_t filterId) override;
+    ErrCode SetPointerSize(int32_t size) override;
+    ErrCode GetPointerSize(int32_t &size) override;
+    ErrCode GetCursorSurfaceId(uint64_t &surfaceId) override;
+    ErrCode SetMouseScrollRows(int32_t rows) override;
+    ErrCode GetMouseScrollRows(int32_t &rows) override;
+    ErrCode SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, int32_t focusY,
+        const CursorPixelMap& curPixelMap) override;
+    ErrCode SetCustomCursor(int32_t windowId,
+        const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel) override;
+    ErrCode SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixelMap) override;
+    ErrCode ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
+    ErrCode SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    ErrCode SetNapStatus(int32_t pid, int32_t uid, const std::string& bundleName, int32_t napStatus) override;
+    ErrCode SetMousePrimaryButton(int32_t primaryButton) override;
+    ErrCode GetMousePrimaryButton(int32_t &primaryButton) override;
+    ErrCode SetHoverScrollState(bool state) override;
+    ErrCode GetHoverScrollState(bool &state) override;
+    ErrCode SetPointerVisible(bool visible, int32_t priority) override;
+    ErrCode IsPointerVisible(bool &visible) override;
+    ErrCode MarkProcessed(int32_t eventType, int32_t eventId) override;
+    ErrCode SetPointerColor(int32_t color) override;
+    ErrCode GetPointerColor(int32_t &color) override;
+    ErrCode EnableCombineKey(bool enable) override;
+    ErrCode SetPointerSpeed(int32_t speed) override;
+    ErrCode GetPointerSpeed(int32_t &speed) override;
+    ErrCode SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension = false) override;
+    ErrCode NotifyNapOnline() override;
+    ErrCode RemoveInputEventObserver() override;
+    ErrCode GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle, bool isUiExtension = false) override;
+    ErrCode SupportKeys(int32_t deviceId, const std::vector<int32_t>& keys, std::vector<bool>& keystroke) override;
+    ErrCode GetDeviceIds(std::vector<int32_t> &ids) override;
+    ErrCode GetDevice(int32_t deviceId, InputDevice& inputDevice) override;
+    ErrCode RegisterDevListener() override;
+    ErrCode UnregisterDevListener() override;
+    ErrCode GetKeyboardType(int32_t deviceId, int32_t &keyboardType) override;
+    ErrCode SetKeyboardRepeatDelay(int32_t delay) override;
+    ErrCode SetKeyboardRepeatRate(int32_t rate) override;
+    ErrCode GetKeyboardRepeatDelay(int32_t &delay) override;
+    ErrCode GetKeyboardRepeatRate(int32_t &rate) override;
+    ErrCode AddInputHandler(int32_t handlerType, uint32_t eventType, int32_t priority, uint32_t deviceTags,
+        const std::vector<int32_t>& actionsType = std::vector<int32_t>()) override;
+    ErrCode RemoveInputHandler(int32_t handlerType, uint32_t eventType, int32_t priority, uint32_t deviceTags,
+        const std::vector<int32_t>& actionsType = std::vector<int32_t>()) override;
+    ErrCode AddPreInputHandler(int32_t handlerId, uint32_t eventType, const std::vector<int32_t>& keys) override;
+    ErrCode RemovePreInputHandler(int32_t handlerId) override;
+    ErrCode AddGestureMonitor(int32_t handlerType, uint32_t eventType, uint32_t gestureType, int32_t fingers) override;
+    ErrCode RemoveGestureMonitor(int32_t handlerType, uint32_t eventType,
+        uint32_t gestureType, int32_t fingers) override;
+    ErrCode MarkEventConsumed(int32_t eventId) override;
+    ErrCode MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
+    ErrCode InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject) override;
+    ErrCode SubscribeKeyEvent(int32_t subscribeId, const KeyOption& keyOption) override;
+    ErrCode UnsubscribeKeyEvent(int32_t subscribeId) override;
+    ErrCode SubscribeHotkey(int32_t subscribeId, const KeyOption& keyOption) override;
+    ErrCode UnsubscribeHotkey(int32_t subscribeId) override;
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    int32_t SubscribeKeyMonitor(const KeyMonitorOption &keyOption) override;
-    int32_t UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption) override;
+    ErrCode SubscribeKeyMonitor(const KeyMonitorOption &keyOption) override;
+    ErrCode UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption) override;
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
-    int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
-    int32_t QuerySwitchStatus(int32_t switchType, int32_t& state) override;
-    int32_t SubscribeTabletProximity(int32_t subscribeId) override;
-    int32_t UnsubscribetabletProximity(int32_t subscribeId) override;
-    int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
-    int32_t UnsubscribeLongPressEvent(int32_t subscribeId) override;
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
-    int32_t InjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
-        const TouchpadCDG &touchpadCDG, bool isNativeInject) override;
-    int32_t SetAnrObserver() override;
-    int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
-    int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>,
-        int32_t> &datas) override;
-    int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
-    int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
-    int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
-    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
-    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
-    int32_t GetWindowPid(int32_t windowId) override;
-    int32_t AppendExtraData(const ExtraData& extraData) override;
-    int32_t EnableInputDevice(bool enable) override;
-    int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override;
-    int32_t SetTouchpadScrollSwitch(bool switchFlag) override;
-    int32_t GetTouchpadScrollSwitch(bool &switchFlag) override;
-    int32_t SetTouchpadScrollDirection(bool state) override;
-    int32_t GetTouchpadScrollDirection(bool &state) override;
-    int32_t SetTouchpadTapSwitch(bool switchFlag) override;
-    int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
-    int32_t SetTouchpadPointerSpeed(int32_t speed) override;
-    int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
-    int32_t GetTouchpadCDG(TouchpadCDG &touchpadCDG) override;
-    int32_t SetTouchpadPinchSwitch(bool switchFlag) override;
-    int32_t GetTouchpadPinchSwitch(bool &switchFlag) override;
-    int32_t SetTouchpadSwipeSwitch(bool switchFlag) override;
-    int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
-    int32_t SetTouchpadRightClickType(int32_t type) override;
-    int32_t GetTouchpadRightClickType(int32_t &type) override;
-    int32_t SetTouchpadRotateSwitch(bool rotateSwitch) override;
-    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) override;
-    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) override;
-    int32_t GetTouchpadDoubleTapAndDragState(bool &switchFlag) override;
-    int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
-    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
-    int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
-    int32_t Authorize(bool isAuthorize) override;
-    int32_t CancelInjection() override;
-    int32_t SetMoveEventFilters(bool flag) override;
+    ErrCode SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
+    ErrCode UnsubscribeSwitchEvent(int32_t subscribeId) override;
+    ErrCode QuerySwitchStatus(int32_t switchType, int32_t& state) override;
+    ErrCode SubscribeTabletProximity(int32_t subscribeId) override;
+    ErrCode UnsubscribetabletProximity(int32_t subscribeId) override;
+    ErrCode SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
+    ErrCode UnsubscribeLongPressEvent(int32_t subscribeId) override;
+    ErrCode InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject) override;
+    ErrCode InjectTouchPadEvent(const PointerEvent& pointerEvent, const TouchpadCDG& touchpadCDG,
+        bool isNativeInject) override;
+    ErrCode SetAnrObserver() override;
+    ErrCode GetDisplayBindInfo(std::vector<DisplayBindInfo>& infos) override;
+    ErrCode GetAllMmiSubscribedEvents(MmiEventMap& mmiEventMap) override;
+    ErrCode SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
+    ErrCode GetFunctionKeyState(int32_t funcKey, bool &state) override;
+    ErrCode SetFunctionKeyState(int32_t funcKey, bool enable) override;
+    ErrCode SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
+    ErrCode SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
+    ErrCode GetWindowPid(int32_t windowId, int32_t &windowPid) override;
+    ErrCode AppendExtraData(const ExtraData &extraData) override;
+    ErrCode EnableInputDevice(bool enable) override;
+    ErrCode SetKeyDownDuration(const std::string &businessId, int32_t delay) override;
+    ErrCode SetTouchpadScrollSwitch(bool switchFlag) override;
+    ErrCode GetTouchpadScrollSwitch(bool &switchFlag) override;
+    ErrCode SetTouchpadScrollDirection(bool state) override;
+    ErrCode GetTouchpadScrollDirection(bool &state) override;
+    ErrCode SetTouchpadTapSwitch(bool switchFlag) override;
+    ErrCode GetTouchpadTapSwitch(bool &switchFlag) override;
+    ErrCode SetTouchpadPointerSpeed(int32_t speed) override;
+    ErrCode GetTouchpadPointerSpeed(int32_t &speed) override;
+    ErrCode GetTouchpadCDG(TouchpadCDG &touchpadCDG) override;
+    ErrCode SetTouchpadPinchSwitch(bool switchFlag) override;
+    ErrCode GetTouchpadPinchSwitch(bool &switchFlag) override;
+    ErrCode SetTouchpadSwipeSwitch(bool switchFlag) override;
+    ErrCode GetTouchpadSwipeSwitch(bool &switchFlag) override;
+    ErrCode SetTouchpadRightClickType(int32_t type) override;
+    ErrCode GetTouchpadRightClickType(int32_t &type) override;
+    ErrCode SetTouchpadRotateSwitch(bool rotateSwitch) override;
+    ErrCode GetTouchpadRotateSwitch(bool &rotateSwitch) override;
+    ErrCode SetTouchpadDoubleTapAndDragState(bool switchFlag) override;
+    ErrCode GetTouchpadDoubleTapAndDragState(bool &switchFlag) override;
+    ErrCode SetShieldStatus(int32_t shieldMode, bool isShield) override;
+    ErrCode GetShieldStatus(int32_t shieldMode, bool &isShield) override;
+    ErrCode GetKeyState(std::vector<int32_t>& pressedKeys,
+        std::unordered_map<int32_t, int32_t>& specialKeysState) override;
+    ErrCode Authorize(bool isAuthorize) override;
+    ErrCode CancelInjection() override;
+    ErrCode SetMoveEventFilters(bool flag) override;
 #ifdef OHOS_RSS_CLIENT
     void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
 #endif // OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-    int32_t HasIrEmitter(bool &hasIrEmitter) override;
-    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
-    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
+    ErrCode HasIrEmitter(bool &hasIrEmitter) override;
+    ErrCode GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
+    ErrCode TransmitInfrared(int64_t number, const std::vector<int64_t>& pattern) override;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) override;
+    ErrCode CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) override;
     int32_t OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
-    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
-    int32_t SetCurrentUser(int32_t userId) override;
-    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override;
-    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
-    int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
-    int32_t EnableHardwareCursorStats(bool enable) override;
-    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+    ErrCode SetPixelMapData(int32_t infoId, const CursorPixelMap& curPixelMap) override;
+    ErrCode SetCurrentUser(int32_t userId) override;
+    ErrCode SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
+    ErrCode GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override;
+    ErrCode AddVirtualInputDevice(const InputDevice& device, int32_t& deviceId) override;
+    ErrCode RemoveVirtualInputDevice(int32_t deviceId) override;
+    ErrCode EnableHardwareCursorStats(bool enable) override;
+    ErrCode GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t GetPointerSnapshot(void *pixelMapPtr) override;
+    ErrCode GetPointerSnapshot(CursorPixelMap& pixelMap) override;
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
-    int32_t SetTouchpadScrollRows(int32_t rows) override;
-    int32_t GetTouchpadScrollRows(int32_t &rows) override;
-    int32_t SkipPointerLayer(bool isSkip) override;
+    ErrCode TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
+    ErrCode SetTouchpadScrollRows(int32_t rows) override;
+    ErrCode GetTouchpadScrollRows(int32_t &rows) override;
+    ErrCode SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
-    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override;
-    int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override;
+    ErrCode SetClientInfo(int32_t pid, uint64_t readThreadId) override;
+    ErrCode GetIntervalSinceLastInput(int64_t &timeInterval) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
     int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
     int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell);
-    int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
-    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
-    int32_t CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType) override;
+    ErrCode AncoAddChannel(const sptr<IAncoChannel>& channel) override;
+    ErrCode AncoRemoveChannel(const sptr<IAncoChannel>& channel) override;
+    ErrCode CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType) override;
     int32_t SyncKnuckleStatus();
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
@@ -202,24 +231,24 @@ public:
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
-    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
-    int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
-    int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
-    int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
+    ErrCode GetAllSystemHotkeys(std::vector<KeyOption>& keyOptions) override;
+    ErrCode SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
+    ErrCode ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
+    ErrCode SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     int32_t SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId);
-    int32_t SetKnuckleSwitch(bool knuckleSwitch) override;
-    int32_t LaunchAiScreenAbility() override;
-    int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override;
-    int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval) override;
-    int32_t UnsubscribeInputActive(int32_t subscribeId) override;
-    int32_t SwitchTouchTracking(bool touchTracking) override;
+    ErrCode SetKnuckleSwitch(bool knuckleSwitch) override;
+    ErrCode LaunchAiScreenAbility() override;
+    ErrCode GetMaxMultiTouchPointNum(int32_t &pointNum) override;
+    ErrCode SubscribeInputActive(int32_t subscribeId, int64_t interval) override;
+    ErrCode UnsubscribeInputActive(int32_t subscribeId) override;
+    ErrCode SwitchTouchTracking(bool touchTracking) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
     int32_t AddEpoll(EpollEventType type, int32_t fd, bool readOnly = false) override;
     int32_t DelEpoll(EpollEventType type, int32_t fd);
-    bool IsRunning() const override;
+    bool IsRunning() const;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t CheckPointerVisible(bool &visible);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -259,7 +288,7 @@ protected:
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
     int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
+    int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::unordered_map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, bool isNativeInject, bool isShell);
@@ -295,8 +324,8 @@ protected:
     void InitVKeyboardFuncHandler();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess);
-    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
-    int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
+    ErrCode SetInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
+    ErrCode ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
 private:
     MMIService();
     ~MMIService();
@@ -304,6 +333,13 @@ private:
     int32_t CheckPidPermission(int32_t pid);
     void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
     void OnSessionDelete(SessionPtr session);
+    bool IsValidType(int32_t type);
+    int32_t CheckInputHandlerVaild(InputHandlerType handlerType);
+    int32_t CheckRemoveInputHandlerVaild(InputHandlerType handlerType);
+    void DealConsumers(std::vector<std::string>& filterNames, const DeviceConsumer &consumer);
+    std::vector<std::string> FilterConsumers(const std::vector<std::string> &deviceNames);
+    void UpdateConsumers(const cJSON* consumer);
+    bool ParseDeviceConsumerConfig();
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void SetupTouchGestureHandler();
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -315,6 +351,7 @@ private:
     std::mutex mu_;
     std::thread t_;
     std::thread eventMonitorThread_;
+    ConsumersData consumersData_;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t shellAssitentPid_ { -1 };
 #endif // OHOS_BUILD_ENABLE_ANCO

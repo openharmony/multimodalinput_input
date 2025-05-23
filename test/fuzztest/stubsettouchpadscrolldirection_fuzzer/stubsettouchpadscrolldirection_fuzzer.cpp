@@ -38,7 +38,8 @@ bool StubSetTouchpadScrollDirectionFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SCROLL_DIRECT_SWITCH), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_TOUCHPAD_SCROLL_DIRECTION),
+        datas, reply, option);
     return true;
 }
 } // namespace OHOS

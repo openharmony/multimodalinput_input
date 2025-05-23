@@ -26,11 +26,15 @@ using SessionPtr = std::shared_ptr<UDSSession>;
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int64_t FREQ_TWO = 2;
+} // namespace
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 EpollEventType event_type = EPOLL_EVENT_SIGNAL;
 InputHandlerType handlerType = NONE;
 HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
 int32_t tmpfd = 1;
+int32_t tmpPid = 1;
 uint32_t tmp32 = 1;
 int32_t type = 1;
 int64_t number = 1;
@@ -45,8 +49,7 @@ std::vector<int32_t> vecInt = { 1, 2, 3 };
 std::vector<bool> vecBool = { 1 };
 std::vector<std::u16string> argString = { u"hello", u"worid" };
 std::vector<int64_t> patternInt = { 1, 2, 3 };
-std::map<int32_t, int32_t> mpInt = { { 1, 2 }, { 2, 2 }, { 3, 2 } };
-std::vector<InfraredFrequency> requencysInf = { { 1, 2 }, { 2, 2 } };
+std::unordered_map<int32_t, int32_t> mpInt = { { 1, 2 }, { 2, 2 }, { 3, 2 } };
 int32_t g_tmpDate = 1;
 void* g_pixelMapPtr = &g_tmpDate;
 bool g_isAuthorize = true;
@@ -73,13 +76,25 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
+    CursorPixelMap curPixelMap;
+    curPixelMap.pixelMap = g_pixelMapPtr;
+    InfraredFrequency freq1 {};
+    freq1.max_ = 1;
+    freq1.min_ = FREQ_TWO;
+    InfraredFrequency freq2 {};
+    freq2.max_ = FREQ_TWO;
+    freq2.min_ = FREQ_TWO;
+    std::vector<InfraredFrequency> requencysInf {};
+    requencysInf.push_back(freq1);
+    requencysInf.push_back(freq2);
+    std::vector<int32_t> actionsType {};
     MMIService::GetInstance()->AddEpoll(event_type, tmpfd);
     MMIService::GetInstance()->DelEpoll(event_type, tmpfd);
     MMIService::GetInstance()->InitLibinputService();
     MMIService::GetInstance()->InitDelegateTasks();
     MMIService::GetInstance()->AddAppDebugListener();
     MMIService::GetInstance()->SetMouseScrollRows(tmpfd);
-    MMIService::GetInstance()->SetMouseIcon(tmpfd, g_pixelMapPtr);
+    MMIService::GetInstance()->SetMouseIcon(tmpfd, curPixelMap);
     MMIService::GetInstance()->ReadMouseScrollRows(tmpfd);
     MMIService::GetInstance()->MarkProcessed(tmpfd, tmpfd);
     MMIService::GetInstance()->ReadPointerColor(tmpfd);
@@ -92,12 +107,12 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->RemoveInputHandler(handlerType, eventType, tmpfd, tmp32);
     MMIService::GetInstance()->MarkEventConsumed(tmpfd);
     MMIService::GetInstance()->MoveMouseEvent(tmpfd, tmpfd);
-    MMIService::GetInstance()->InjectKeyEvent(keyEvent, g_isNativeInject);
+    MMIService::GetInstance()->InjectKeyEvent(*keyEvent.get(), g_isNativeInject);
     MMIService::GetInstance()->CheckInjectKeyEvent(keyEvent, tmpfd, g_isNativeInject);
     MMIService::GetInstance()->OnGetKeyState(vecInt, mpInt);
-    MMIService::GetInstance()->InjectPointerEvent(pointerEvent, g_isNativeInject);
+    MMIService::GetInstance()->InjectPointerEvent(*pointerEvent.get(), g_isNativeInject);
     MMIService::GetInstance()->OnAddSystemAbility(tmpfd, "deviceId");
-    MMIService::GetInstance()->SubscribeKeyEvent(tmpfd, p_option);
+    MMIService::GetInstance()->SubscribeKeyEvent(tmpfd, *p_option.get());
     MMIService::GetInstance()->UnsubscribeKeyEvent(tmpfd);
     MMIService::GetInstance()->SubscribeSwitchEvent(tmpfd, tmpfd);
     MMIService::GetInstance()->SetDisplayBind(tmpfd, tmpfd, message);
@@ -106,7 +121,7 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->AddReloadDeviceTimer();
     MMIService::GetInstance()->Dump(tmpfd, argString);
     MMIService::GetInstance()->OnGetWindowPid(tmpfd, tmpfd);
-    MMIService::GetInstance()->GetWindowPid(tmpfd);
+    MMIService::GetInstance()->GetWindowPid(tmpfd, tmpPid);
     MMIService::GetInstance()->SetKeyDownDuration(businessId, tmpfd);
     MMIService::GetInstance()->ReadTouchpadScrollSwich(g_switchFlag);
     MMIService::GetInstance()->ReadTouchpadScrollDirection(g_switchFlag);
@@ -138,18 +153,18 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->OnCancelInjection();
     MMIService::GetInstance()->GetInfraredFrequencies(requencysInf);
     MMIService::GetInstance()->TransmitInfrared(number, patternInt);
-    MMIService::GetInstance()->SetPixelMapData(infoId, g_pixelMapPtr);
+    MMIService::GetInstance()->SetPixelMapData(infoId, curPixelMap);
     MMIService::GetInstance()->SetCurrentUser(userId);
-    MMIService::GetInstance()->AddVirtualInputDevice(device, deviceId);
+    MMIService::GetInstance()->AddVirtualInputDevice(*device.get(), deviceId);
     MMIService::GetInstance()->RemoveVirtualInputDevice(tmpfd);
     MMIService::GetInstance()->EnableHardwareCursorStats(g_enableFlag);
     MMIService::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MMIService::GetInstance()->GetPointerSnapshot(g_pixelMapPtr);
+    MMIService::GetInstance()->GetPointerSnapshot(*pixelMapPtr);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_ALLOC_SOCKET_FD), datas, reply, option);
     return true;
 }
 } // MMI

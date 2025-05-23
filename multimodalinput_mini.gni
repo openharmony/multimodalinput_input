@@ -92,6 +92,7 @@ declare_args() {
     "events/src/key_event.cpp",
     "events/src/key_option.cpp",
     "events/src/pointer_event.cpp",
+    "events/src/pointer_style.cpp",
   ]
 
   libmmi_client_sources = [

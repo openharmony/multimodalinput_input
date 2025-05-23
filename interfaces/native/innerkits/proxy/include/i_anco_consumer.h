@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,22 +72,24 @@ struct AncoWindowInfo {
     std::vector<Rect> ancoExcludedAreas;
 };
 
-struct AncoWindows {
+struct AncoWindows : public Parcelable {
     ANCO_WINDOW_UPDATE_TYPE updateType;
     int32_t focusWindowId;
     std::vector<AncoWindowInfo> windows;
 
-    static bool Marshalling(const AncoWindows &windows, Parcel &parcel);
-    static bool Unmarshalling(Parcel &parcel, AncoWindows &windows);
+    bool Marshalling(Parcel &out) const;
+    bool ReadFromParcel(Parcel &in);
+    static AncoWindows* Unmarshalling(Parcel &in);
 };
 
-struct AncoOneHandData {
+struct AncoOneHandData : public Parcelable {
     int32_t oneHandX;
     int32_t oneHandY;
     int32_t expandHeight;
     int32_t scalePercent;
-    static bool Marshalling(const AncoOneHandData &oneHandData, Parcel &parcel);
-    static bool Unmarshalling(Parcel &parcel, AncoOneHandData &oneHandData);
+    bool Marshalling(Parcel &parcel) const;
+    bool ReadFromParcel(Parcel &parcel);
+    static AncoOneHandData* Unmarshalling(Parcel &parcel);
 };
 
 class IAncoConsumer {

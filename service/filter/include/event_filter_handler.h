@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 #define EVENT_FILTER_HANDLER_H
 
 #include "event_filter_death_recipient.h"
-#include "i_event_filter.h"
+#include "ievent_filter.h"
 #include "i_input_event_handler.h"
 
 namespace OHOS {

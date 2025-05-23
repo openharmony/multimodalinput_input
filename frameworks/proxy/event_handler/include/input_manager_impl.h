@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 
 #include "event_filter_service.h"
 #include "extra_data.h"
-#include "i_anco_channel.h"
+#include "ianco_channel.h"
 #include "i_anr_observer.h"
 #include "i_input_service_watcher.h"
 #include "i_window_checker.h"
