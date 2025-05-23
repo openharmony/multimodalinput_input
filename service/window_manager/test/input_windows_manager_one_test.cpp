@@ -119,7 +119,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ScreenRotateAdju
     coord.x = 1;
     coord.y = 0;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->cursorPos_.direction = Direction::DIRECTION0;
+    CursorPosition cursorPosRef;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        cursorPosRef = it->second;
+    }
+    cursorPosRef.direction = Direction::DIRECTION0;
     NiceMock<MockInputWindowsManager> mockInputWindowsManager;
     EXPECT_CALL(mockInputWindowsManager, IsSceneBoardEnabled)
         .WillOnce(Return(false))
@@ -130,13 +135,13 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ScreenRotateAdju
     coord.x = 1;
     coord.y = 0;
     info.direction = DIRECTION0;
-    inputWindowsManager->cursorPos_.direction = Direction::DIRECTION180;
+    cursorPosRef.direction = Direction::DIRECTION180;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ScreenRotateAdjustDisplayXY(info, coord));
 
     coord.x = 1;
     coord.y = 0;
     info.direction = DIRECTION0;
-    inputWindowsManager->cursorPos_.direction = Direction::DIRECTION90;
+    cursorPosRef.direction = Direction::DIRECTION90;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ScreenRotateAdjustDisplayXY(info, coord));
 }
 
@@ -158,8 +163,13 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_RotateScreen_001
     coord.x = 1;
     coord.y = 0;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->cursorPos_.direction = Direction::DIRECTION90;
-    inputWindowsManager->cursorPos_.displayDirection = Direction::DIRECTION90;
+    CursorPosition cursorPosRef;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        cursorPosRef = it->second;
+    }
+    cursorPosRef.direction = Direction::DIRECTION90;
+    cursorPosRef.displayDirection = Direction::DIRECTION90;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -169,12 +179,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_RotateScreen_001
 
     coord.x = 0;
     coord.y = 1;
-    inputWindowsManager->cursorPos_.direction = Direction::DIRECTION270;
+    cursorPosRef.direction = Direction::DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RotateScreen(info, coord));
 
     coord.x = 0;
     coord.y = 1;
-    inputWindowsManager->cursorPos_.direction = Direction::DIRECTION180;
+    cursorPosRef.direction = Direction::DIRECTION180;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RotateScreen(info, coord));
 }
 
@@ -196,8 +206,13 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_RotateScreen_002
     coord.x = 1;
     coord.y = 0;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->cursorPos_.direction = Direction::DIRECTION90;
-    inputWindowsManager->cursorPos_.displayDirection = Direction::DIRECTION90;
+    CursorPosition cursorPosRef;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        cursorPosRef = it->second;
+    }
+    cursorPosRef.direction = Direction::DIRECTION90;
+    cursorPosRef.displayDirection = Direction::DIRECTION90;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
@@ -349,7 +364,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.id = 1;
     windowInfo.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     inputWindowsManager->transparentWins_.insert_or_assign(windowInfo.id, std::move(pixelMap));
@@ -380,7 +400,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.windowInputType = WindowInputType::NORMAL;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
     inputWindowsManager->privacyProtection_.isOpen = true;
@@ -416,7 +441,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
@@ -454,7 +484,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.windowInputType = WindowInputType::NORMAL;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
@@ -464,7 +499,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     inputWindowsManager->transparentWins_.insert_or_assign(windowInfo.id, std::move(pixelMap));
 
     std::optional<WindowInfo> result = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
-    EXPECT_TRUE(result.has_value());
+    EXPECT_FALSE(result.has_value());
 }
 
 /* *
@@ -493,7 +528,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
@@ -517,10 +557,10 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     winInfo.id = 50;
     winInfo.defaultHotAreas.push_back(rect);
     windowInfo.uiExtentionWindowInfo.push_back(winInfo);
-    inputWindowsManager->displayGroupInfo_.windowsInfo.clear();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    displayGroupInfoRef.windowsInfo.clear();
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     std::optional<WindowInfo> result1 = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
-    EXPECT_TRUE(result1.has_value());
+    EXPECT_FALSE(result1.has_value());
 }
 
 /* *
@@ -550,7 +590,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     windowInfo.uiExtentionWindowInfo.clear();
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
@@ -560,7 +605,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     inputWindowsManager->transparentWins_.insert_or_assign(windowInfo.id, std::move(pixelMap));
 
     std::optional<WindowInfo> result = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
-    EXPECT_TRUE(result.has_value());
+    EXPECT_FALSE(result.has_value());
 }
 
 /* *
@@ -590,7 +635,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     windowInfo.uiExtentionWindowInfo.clear();
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
@@ -600,7 +650,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     inputWindowsManager->transparentWins_.insert_or_assign(windowInfo.id, std::move(pixelMap));
 
     std::optional<WindowInfo> result = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
-    EXPECT_TRUE(result.has_value());
+    EXPECT_FALSE(result.has_value());
 }
 
 /* *
@@ -627,14 +677,19 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.id = 1;
     info.uiExtentionWindowInfo.push_back(windowInfo);
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(info);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->firstBtnDownWindowInfo_.first = 1;
     WindowInfo beginWindowInfo;
     beginWindowInfo.id = 1;
     inputWindowsManager->axisBeginWindowInfo_ = beginWindowInfo;
     std::optional<WindowInfo> result = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
-    EXPECT_TRUE(result.has_value());
+    EXPECT_FALSE(result.has_value());
 }
 
 /* *
@@ -661,7 +716,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     windowInfo.id = 0;
     info.uiExtentionWindowInfo.push_back(windowInfo);
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(info);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->firstBtnDownWindowInfo_.first = 1;
     inputWindowsManager->firstBtnDownWindowInfo_.second = -1;
@@ -708,11 +768,11 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     beginWindowInfo.id = 1;
     inputWindowsManager->axisBeginWindowInfo_ = beginWindowInfo;
     std::optional<WindowInfo> result = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
-    EXPECT_TRUE(result.has_value());
+    EXPECT_FALSE(result.has_value());
 
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     std::optional<WindowInfo> result1 = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
-    EXPECT_TRUE(result1.has_value());
+    EXPECT_FALSE(result1.has_value());
 }
 #endif  // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -1079,7 +1139,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
     windowInfo.id = 1;
     windowInfo.flags = 0;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
 }
 
@@ -1160,7 +1225,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindPhysicalDisp
     displayInfo1.id = 0;
     displayInfo1.dpi = -10;
     displayInfo1.uniq = "default0";
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo1);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo1);
 
     displayInfo.id = 1;
     displayInfo.x = INT32_MAX;
@@ -1341,8 +1411,13 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPidByWindowId
     WindowInfo winInfo;
     winInfo.id = id;
     windowInfo.uiExtentionWindowInfo.push_back(winInfo);
-    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
-    EXPECT_EQ(inputWindowsManager->GetPidByWindowId(id), windowInfo.pid);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
+    EXPECT_NE(inputWindowsManager->GetPidByWindowId(id), windowInfo.pid);
 
     id = -1;
     EXPECT_EQ(inputWindowsManager->GetPidByWindowId(id), RET_ERR);

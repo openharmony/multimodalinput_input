@@ -394,8 +394,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableCombineKey_02, TestSiz
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_01, TestSize.Level3)
 {
     CALL_TEST_DEBUG;
-    EXPECT_TRUE(InputMgrImpl.displayGroupInfo_.windowsInfo.empty());
-    EXPECT_TRUE(InputMgrImpl.displayGroupInfo_.displaysInfo.empty());
+    DisplayGroupInfo displayGroupInfo {};
+    InputMgrImpl.displayGroupInfoArray_.push_back(displayGroupInfo);
+    EXPECT_TRUE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.empty());
+    EXPECT_TRUE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
 
@@ -408,19 +410,21 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_01, TestSize.Lev
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_02, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
-    InputMgrImpl.displayGroupInfo_.width = 50;
-    InputMgrImpl.displayGroupInfo_.height = 60;
+    DisplayGroupInfo displayGroupInfo {};
+    InputMgrImpl.displayGroupInfoArray_.push_back(displayGroupInfo);
+    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].width = 50;
+    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].height = 60;
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.pid = 2;
-    InputMgrImpl.displayGroupInfo_.windowsInfo.push_back(windowInfo);
-    EXPECT_FALSE(InputMgrImpl.displayGroupInfo_.windowsInfo.empty());
+    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.push_back(windowInfo);
+    EXPECT_FALSE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.empty());
 
     DisplayInfo displayInfo;
     displayInfo.width = 10;
     displayInfo.height = 20;
-    InputMgrImpl.displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_FALSE(InputMgrImpl.displayGroupInfo_.displaysInfo.empty());
+    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.push_back(displayInfo);
+    EXPECT_FALSE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.empty());
 
     EXPECT_TRUE(InputMgrImpl.anrObservers_.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
@@ -438,8 +442,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_03, TestSize.Lev
     DisplayInfo displayInfo;
     displayInfo.width = 10;
     displayInfo.height = 20;
-    InputMgrImpl.displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_FALSE(InputMgrImpl.displayGroupInfo_.displaysInfo.empty());
+    DisplayGroupInfo displayGroupInfo {};
+    InputMgrImpl.displayGroupInfoArray_.push_back(displayGroupInfo);
+    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.push_back(displayInfo);
+    EXPECT_FALSE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
 
@@ -452,13 +458,15 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_03, TestSize.Lev
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_04, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
-    InputMgrImpl.displayGroupInfo_.width = 50;
-    InputMgrImpl.displayGroupInfo_.height = 60;
+    DisplayGroupInfo displayGroupInfo {};
+    InputMgrImpl.displayGroupInfoArray_.push_back(displayGroupInfo);
+    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].width = 50;
+    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].height = 60;
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.pid = 2;
-    InputMgrImpl.displayGroupInfo_.windowsInfo.push_back(windowInfo);
-    EXPECT_FALSE(InputMgrImpl.displayGroupInfo_.windowsInfo.empty());
+    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.push_back(windowInfo);
+    EXPECT_FALSE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
 

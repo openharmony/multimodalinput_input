@@ -99,7 +99,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    int32_t PackDisplayData(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
+    int32_t PackDisplayData(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
@@ -252,15 +252,15 @@ public:
     int32_t SwitchTouchTracking(bool touchTracking);
 
 private:
-    int32_t PackWindowInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
+    int32_t PackWindowInfo(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
     int32_t PackUiExtentionWindowInfo(const std::vector<WindowInfo>& windowsInfo, NetPacket &pkt);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo);
-    void PrintDisplayInfo(DisplayGroupInfo &displayGroupInfo);
+    void PrintDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     void PrintWindowGroupInfo();
-    int32_t SendDisplayInfo(DisplayGroupInfo &displayGroupInfo);
+    int32_t SendDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SendWindowInfo();
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
     bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);

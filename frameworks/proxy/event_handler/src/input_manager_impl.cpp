@@ -141,40 +141,49 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         MMI_HILOGE("Failed to initialize MMI client");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    displayGroupInfoArray_.clear();
-    if (displayGroupInfo.windowsInfo.size() < MAX_WINDOW_SIZE) {
-        windowGroupInfo_.windowsInfo.clear();
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        if (displayGroupInfo.windowsInfo.size() < MAX_WINDOW_SIZE) {
+            windowGroupInfo_.windowsInfo.clear();
+        }
+        displayGroupInfoArray_.clear();
+        displayGroupInfoArray_.emplace_back(displayGroupInfo);
     }
-    displayGroupInfo_ = displayGroupInfo;
-    int32_t ret = SendDisplayInfo(displayGroupInfo_);
-    displayGroupInfoArray_.emplace_back(displayGroupInfo_);
+    int32_t ret = SendDisplayInfo(displayGroupInfo);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to send display information to service");
         return ret;
     }
-    PrintDisplayInfo(displayGroupInfo_);
+    PrintDisplayInfo(displayGroupInfo);
     return RET_OK;
 }
 
-int32_t InputManagerImpl::UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfo)
+int32_t InputManagerImpl::UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfos)
 {
     CALL_DEBUG_ENTER;
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Failed to initialize MMI client");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    displayGroupInfoArray_.clear();
-    for (auto &item : displayGroupInfo) {
-        displayGroupInfo_ = item;
-        int32_t ret = SendDisplayInfo(displayGroupInfo_);
-        displayGroupInfoArray_.emplace_back(displayGroupInfo_);
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        displayGroupInfoArray_.clear();
+        size_t cnt = 0;
+        for (auto &it : displayGroupInfos) {
+            displayGroupInfoArray_.emplace_back(it);
+            cnt += it.windowsInfo.size();
+        }
+        if (cnt < MAX_WINDOW_SIZE) {
+            windowGroupInfo_.windowsInfo.clear();
+        }
+    }
+    for (const auto &item : displayGroupInfos) {
+        int32_t ret = SendDisplayInfo(item);
         if (ret != RET_OK) {
             MMI_HILOGE("Failed to send display information to service");
             return ret;
         }
-        PrintDisplayInfo(displayGroupInfo_);
+        PrintDisplayInfo(item);
     }
     return RET_OK;
 }
@@ -658,7 +667,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo)
+int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     pkt << displayGroupInfo.groupId << displayGroupInfo.isMainGroup << displayGroupInfo.width << displayGroupInfo.height
@@ -671,7 +680,7 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, DisplayGroupInfo &disp
         MMI_HILOGE("Packet write windows info failed");
         return RET_ERR;
     }
-    return PackDisplayInfo(pkt, displayGroupInfo);
+    return PackDisplayInfo(pkt, const_cast<DisplayGroupInfo &>(displayGroupInfo));
 }
 
 int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
@@ -744,7 +753,7 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
 }
 
 int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
-    DisplayGroupInfo &displayGroupInfo) __attribute__((no_sanitize("cfi")))
+    const DisplayGroupInfo &displayGroupInfo) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     uint32_t num = static_cast<uint32_t>(displayGroupInfo.windowsInfo.size());
@@ -859,8 +868,10 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
             << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
             << item.validWidth << item.validHeight << item.fixedDirection
-            << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight
-            << item.oneHandX << item.oneHandY << item.uniqueId;
+            << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight << item.uniqueId;
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+            pkt << item.oneHandX << item.oneHandY;
+#endif
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt << item.pointerActiveWidth << item.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -931,7 +942,7 @@ void InputManagerImpl::PrintForemostThreeWindowInfo(const std::vector<WindowInfo
     }
 }
 
-void InputManagerImpl::PrintDisplayInfo(DisplayGroupInfo &displayGroupInfo)
+void InputManagerImpl::PrintDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     MMI_HILOGD("displayGroupId:%{public}d,windowsInfos,num:%{public}zu,focusWindowId:%{public}d",
         displayGroupInfo.groupId, displayGroupInfo.windowsInfo.size(),
@@ -1728,7 +1739,7 @@ void InputManagerImpl::OnDisconnected()
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-int32_t InputManagerImpl::SendDisplayInfo(DisplayGroupInfo &displayGroupInfo)
+int32_t InputManagerImpl::SendDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
