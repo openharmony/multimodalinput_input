@@ -2621,7 +2621,7 @@ static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> po
     OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
 {
     CALL_INFO_TRACE;
-    CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
+    CHKPV(pointerEvent);
     auto pointIds = pointerEvent->GetPointerIds();
     if (pointIds.empty()) {
         pointerEvent->SetActionStartTime(time);
