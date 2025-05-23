@@ -590,7 +590,7 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler &monitor,
-    std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt)
+    std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt, std::unordered_set<int32_t> fingerFocusPidSet)
 {
     if (monitor.Expect(pointerEvent)) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
@@ -644,7 +644,7 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
         }
     }
     for (const auto &monitor : monitors_) {
-        IsSendToClient(monitor, pointerEvent, pkt);
+        IsSendToClient(monitor, pointerEvent, pkt, fingerFocusPidSet);
         PointerEvent::PointerItem pointerItem1;
         pointerEvent->GetPointerItem(pointerId, pointerItem1);
         int32_t displayX1 = pointerItem1.GetDisplayX();
