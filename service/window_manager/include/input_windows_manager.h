@@ -479,8 +479,8 @@ private:
     mutable std::shared_mutex displayGroupInfoMtx;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     std::map<int32_t, std::map<int32_t, WindowGroupInfo>> windowsPerDisplayMap_;
-    PointerStyle lastPointerStyle_ {.id = -1};
-    PointerStyle dragPointerStyle_ {.id = -1};
+    PointerStyle lastPointerStyle_ {-1, 0, -1, 0};
+    PointerStyle dragPointerStyle_ {-1, 0, -1, 0};
     MouseLocation mouseLocation_ = { -1, 0, 0 };
 
     std::map<int32_t, MouseLocation> mouseLocationMap_;
