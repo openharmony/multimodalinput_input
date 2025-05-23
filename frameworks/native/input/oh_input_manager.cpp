@@ -2621,6 +2621,7 @@ static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> po
     OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
 {
     CALL_INFO_TRACE;
+    CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     auto pointIds = pointerEvent->GetPointerIds();
     if (pointIds.empty()) {
         pointerEvent->SetActionStartTime(time);
@@ -2636,8 +2637,11 @@ static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     CALL_INFO_TRACE;
+    CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     int64_t time = touchEvent->actionTime;
     if (time < 0) {
+        MMI_HILOGW("Invalid parameter for the actionTime");
         time = OHOS::MMI::GetSysClockTime();
     }
     switch (touchEvent->action) {
@@ -2645,7 +2649,7 @@ static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
             pointerEvent->SetActionTime(time);
             pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL);
             if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
-                MMI_HILOGE("Invalid parameter for the touchEventId");
+                MMI_HILOGE("Action cancel, invalid parameter for the touchEventId");
                 return INPUT_PARAMETER_ERROR;
             }
             item.SetPressed(false);
@@ -2659,7 +2663,7 @@ static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
             pointerEvent->SetActionTime(time);
             pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
             if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
-                MMI_HILOGE("Invalid parameter for the touchEventId");
+                MMI_HILOGE("Action down, invalid parameter for the touchEventId");
                 return INPUT_PARAMETER_ERROR;
             }
             break;
@@ -2668,7 +2672,7 @@ static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
             pointerEvent->SetActionTime(time);
             pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_UP);
             if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
-                MMI_HILOGE("Invalid parameter for the touchEventId");
+                MMI_HILOGE("Action up, invalid parameter for the touchEventId");
                 return INPUT_PARAMETER_ERROR;
             }
             item.SetPressed(false);
@@ -2686,6 +2690,8 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent* touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     CALL_INFO_TRACE;
+    CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     int32_t id = touchEvent->id;
     int32_t screenX = touchEvent->displayX;
     int32_t screenY = touchEvent->displayY;
@@ -2719,12 +2725,12 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(
     }
     OHOS::MMI::PointerEvent::PointerItem item;
     int32_t ret = TransformTouchAction(touchEvent, pointerEvent, item);
-    if (ret != 0) {
+    if (ret != INPUT_SUCCESS) {
         return nullptr;
     }
 
     ret = TransformTouchProperty(touchEvent, pointerEvent, item);
-    if (ret != 0) {
+    if (ret != INPUT_SUCCESS) {
         return nullptr;
     }
     pointerEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
