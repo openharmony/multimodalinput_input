@@ -755,15 +755,17 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
             >> info.offsetX >> info.offsetY >> info.isCurrentOffScreenRendering >> info.screenRealWidth
             >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
             >> info.validWidth >> info.validHeight >> info.fixedDirection
-            >> info.physicalWidth >> info.physicalHeight >> info.scalePercent >> info.expandHeight
-            >> info.oneHandX >> info.oneHandY >> info.uniqueId;
+            >> info.physicalWidth >> info.physicalHeight >> info.scalePercent >> info.expandHeight >> info.uniqueId;
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        pkt >> info.oneHandX >> info.oneHandY;
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt >> info.pointerActiveWidth >> info.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-        pkt >> info.groupId;
         if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
             info.uniq = "default" + std::to_string(info.id);
         }
+        pkt >> info.groupId;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -1150,7 +1152,7 @@ int32_t ServerMsgHandler::OnSubscribeLongPressEvent(IUdsServer *server, int32_t 
     CHKPR(sess, ERROR_NULL_POINTER);
     return LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
 }
- 
+
 int32_t ServerMsgHandler::OnUnsubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
 {
     CALL_DEBUG_ENTER;
