@@ -104,9 +104,10 @@ public:
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
-    int32_t SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY) override;
+    int32_t SetCustomCursor(CursorPixelMap curPixelMap,
+        int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options) override;
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
     const std::map<MOUSE_ICON, IconStyle>& GetMouseIconPath() override;
@@ -175,7 +176,7 @@ private:
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     void UpdateMouseStyle();
-    int32_t UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY);
+    int32_t UpdateCursorProperty(CursorPixelMap curPixelMap, const int32_t &focusX, const int32_t &focusY);
     int32_t UpdateCursorProperty(CustomCursor cursor);
     void RotateDegree(Direction direction);
     int32_t DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,

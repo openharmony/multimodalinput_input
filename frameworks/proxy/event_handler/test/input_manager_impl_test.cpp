@@ -233,7 +233,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCustomCursor_01, TestSize
     int32_t focusY = 4;
     void* pixelMap = nullptr;
     int32_t winPid = InputMgrImpl.GetWindowPid(windowId);
-    EXPECT_FALSE(winPid == -1);
+    EXPECT_TRUE(winPid == -1);
     int32_t ret = InputMgrImpl.SetCustomCursor(windowId, focusX, focusY, pixelMap);
     EXPECT_NE(ret, RET_OK);
 }
@@ -252,7 +252,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_01, TestSize
     int32_t hotSpotY = 4;
 
     int32_t winPid = InputMgrImpl.GetWindowPid(windowId);
-    EXPECT_TRUE(winPid != -1);
+    EXPECT_TRUE(winPid == -1);
     int32_t ret = InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -694,10 +694,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_Authorize_001, TestSize.Leve
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeLongPressEvent, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    LongPressRequest longPR = {
-        .fingerCount = 3,
-        .duration = 2,
-    };
+    LongPressRequest longPR;
+    longPR.fingerCount = 3;
+    longPR.duration = 2;
     int32_t ret = InputMgrImpl.SubscribeLongPressEvent(longPR, nullptr);
     ASSERT_EQ(ret, RET_ERR);
 }

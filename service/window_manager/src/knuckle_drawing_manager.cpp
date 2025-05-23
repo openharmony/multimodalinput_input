@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,12 +23,14 @@
 #else
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
-#include "i_multimodal_input_connect.h"
+#include "imultimodal_input_connect.h"
 #include "input_windows_manager.h"
 #include "setting_datashare.h"
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 #include "timer_manager.h"
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+#include "touch_drawing_manager.h"
+#include <system_ability_definition.h>
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDrawingManager"

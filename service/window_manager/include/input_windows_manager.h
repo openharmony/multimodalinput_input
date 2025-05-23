@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -472,8 +472,8 @@ private:
     mutable std::shared_mutex displayGroupInfoMtx;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     std::map<int32_t, std::map<int32_t, WindowGroupInfo>> windowsPerDisplayMap_;
-    PointerStyle lastPointerStyle_ {.id = -1};
-    PointerStyle dragPointerStyle_ {.id = -1};
+    PointerStyle lastPointerStyle_;
+    PointerStyle dragPointerStyle_;
     MouseLocation mouseLocation_ = { -1, -1 };
     std::map<int32_t, MouseLocation> mouseLocationMap_;
     CursorPosition cursorPos_ {};

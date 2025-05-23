@@ -7394,10 +7394,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
     bool autoGenDown = true;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
@@ -7423,10 +7422,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7459,10 +7457,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
     bool autoGenDown = true;
     int32_t displayId = -1;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7495,10 +7492,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7533,10 +7529,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
     bool autoGenDown = true;
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -7571,10 +7566,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastPointerEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
     bool autoGenDown = true;
     int32_t displayId = 0;
     WindowGroupInfo windowGroupInfo;
@@ -7602,11 +7596,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     inputWindowsManager.lastTouchEvent_ = nullptr;
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    .sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
+    param.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     bool autoGenDown = true;
     int32_t displayId = 0;
     WindowGroupInfo windowGroupInfo;
@@ -7635,12 +7628,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
     int32_t fingerId = -1;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    .sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
-    .fingerId = fingerId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
+    param.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    param.fingerId = fingerId;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     inputWindowsManager.lastTouchEvent_ = pointerEvent;
@@ -7672,12 +7664,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
     int32_t fingerId = 1;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    .sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
-    .fingerId = fingerId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
+    param.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    param.fingerId = fingerId;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     inputWindowsManager.lastTouchEvent_ = pointerEvent;
@@ -7709,12 +7700,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
     int32_t fingerId = 0;
-    ShiftWindowParam param {
-	.sourceWindowId = sourceWindowId,
-	.targetWindowId = targetWindowId,
-    .sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
-    .fingerId = fingerId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
+    param.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    param.fingerId = fingerId;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;

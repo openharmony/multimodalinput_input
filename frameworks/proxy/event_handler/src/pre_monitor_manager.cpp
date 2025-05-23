@@ -18,6 +18,7 @@
 #include "bytrace_adapter.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PreMonitorManager"

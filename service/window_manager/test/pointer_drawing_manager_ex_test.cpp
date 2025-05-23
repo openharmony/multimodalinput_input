@@ -30,6 +30,7 @@
 #include "pixel_map.h"
 #include "pointer_drawing_manager.h"
 #include "pointer_event.h"
+#include "pointer_style.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerDrawingManagerExTest"
@@ -880,8 +881,8 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_01, T
     PointerDrawingManager pointerDrawingManager;
     int32_t pid = -1;
     int32_t windowId = -2;
-    void* pixelMap = nullptr;
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, pixelMap);
+    CursorPixelMap curPixelMap;
+    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, curPixelMap);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -897,8 +898,8 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_02, T
     PointerDrawingManager pointerDrawingManager;
     int32_t pid = 1;
     int32_t windowId = -2;
-    void* pixelMap = nullptr;
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, pixelMap);
+    CursorPixelMap curPixelMap;
+    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, curPixelMap);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -918,8 +919,8 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_03, T
     int32_t ret1 = pointerDrawingManager.SetPointerStyle(pid, windowId, style);
     EXPECT_EQ(ret1, RET_OK);
 
-    void* pixelMap = nullptr;
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, pixelMap);
+    CursorPixelMap curPixelMap;
+    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, curPixelMap);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -1127,7 +1128,9 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_00
     int32_t windowId = 1;
     int32_t focusX = 2;
     int32_t focusY = 3;
-    int32_t ret = pointerDrawingManager.SetCustomCursor((void *)pixelMap.get(), pid, windowId, focusX, focusY);
+    CursorPixelMap curPixelMap;
+    curPixelMap.pixelMap = (void *)pixelMap.get();
+    int32_t ret = pointerDrawingManager.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -1148,7 +1151,9 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_00
     int32_t windowId = 1;
     int32_t focusX = 2;
     int32_t focusY = 3;
-    int32_t ret = pointerDrawingManager.SetCustomCursor((void *)pixelMap.get(), pid, windowId, focusX, focusY);
+    CursorPixelMap curPixelMap;
+    curPixelMap.pixelMap = (void *)pixelMap.get();
+    int32_t ret = pointerDrawingManager.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1568,7 +1573,9 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetCustomCurso
     int32_t windowId = 100;
     int32_t focusX = 300;
     int32_t focusY = 300;
-    EXPECT_EQ(pointerDrawMgr.SetCustomCursor((void *)pixelMapPtr.get(), pid, windowId, focusX, focusY), RET_ERR);
+    CursorPixelMap curPixelMap;
+    curPixelMap.pixelMap = (void *)pixelMapPtr.get();
+    EXPECT_EQ(pointerDrawMgr.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY), RET_ERR);
     testing::Mock::AllowLeak(winmgrmock.get());
 }
 
@@ -1585,7 +1592,9 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseIcon, 
     std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
     int32_t pid = 50;
     int32_t windowId = -1;
-    EXPECT_EQ(pointerDrawMgr.SetMouseIcon(pid, windowId, (void *)pixelMapPtr.get()), RET_ERR);
+    CursorPixelMap curPixelMap;
+    curPixelMap.pixelMap = (void *)pixelMapPtr.get();
+    EXPECT_EQ(pointerDrawMgr.SetMouseIcon(pid, windowId, curPixelMap), RET_ERR);
 }
 
 /**

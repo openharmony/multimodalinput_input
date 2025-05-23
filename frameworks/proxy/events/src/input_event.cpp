@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -350,6 +350,11 @@ bool InputEvent::WriteToParcel(Parcel &out) const
     return true;
 }
 
+bool InputEvent::Marshalling(Parcel &out) const
+{
+    return WriteToParcel(out);
+}
+
 bool InputEvent::ReadFromParcel(Parcel &in)
 {
 #if defined(ANDROID_PLATFORM) || defined(IOS_PLATFORM)
@@ -387,6 +392,16 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     extraData_ = sp;
     return true;
 #endif // defined(ANDROID_PLATFORM) || defined(IOS_PLATFORM)
+}
+
+InputEvent *InputEvent::Unmarshalling(Parcel &parcel)
+{
+    InputEvent *data = new (std::nothrow) InputEvent(InputEvent::EVENT_TYPE_BASE);
+    if (data && !data->ReadFromParcel(parcel)) {
+        delete data;
+        data = nullptr;
+    }
+    return data;
 }
 
 std::string_view InputEvent::ActionToShortStr(int32_t action)

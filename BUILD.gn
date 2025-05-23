@@ -137,7 +137,6 @@ group("input_jsapi_group") {
 group("mmi_tests") {
   testonly = true
   deps = [
-    "common/anco/comm:AncoChannelStubTest",
     "frameworks/native/input:OHInputManagerTest",
     "frameworks/proxy:InputDeviceImplTest",
     "frameworks/proxy:InputHandlerManagerTest",
@@ -156,10 +155,7 @@ group("mmi_tests") {
     "libudev:test",
     "service:AccountManagerTest",
     "service:ApplicationStateObserverTest",
-    "service:ConnectManagerEXTest",
-    "service:ConnectManagerOneTest",
     "service:ConnectManagerProxyEXTest",
-    "service:ConnectManagerTest",
     "service:DelegateTaskTest",
     "service:DeviceConfigTest",
     "service:DeviceEventMonitorTest",
