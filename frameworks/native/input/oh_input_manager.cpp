@@ -2648,10 +2648,6 @@ static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
         case TOUCH_ACTION_CANCEL:{
             pointerEvent->SetActionTime(time);
             pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL);
-            if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
-                MMI_HILOGE("Action cancel, invalid parameter for the touchEventId");
-                return INPUT_PARAMETER_ERROR;
-            }
             item.SetPressed(false);
             break;
         }
@@ -2662,19 +2658,11 @@ static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
         case TOUCH_ACTION_MOVE: {
             pointerEvent->SetActionTime(time);
             pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
-            if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
-                MMI_HILOGE("Action down, invalid parameter for the touchEventId");
-                return INPUT_PARAMETER_ERROR;
-            }
             break;
         }
         case TOUCH_ACTION_UP: {
             pointerEvent->SetActionTime(time);
             pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_UP);
-            if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
-                MMI_HILOGE("Action up, invalid parameter for the touchEventId");
-                return INPUT_PARAMETER_ERROR;
-            }
             item.SetPressed(false);
             break;
         }
