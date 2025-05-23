@@ -1259,64 +1259,81 @@ void JsEventTarget::CallKeyboardRepeatRatePromise(uv_work_t *work, int32_t statu
 void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = devListener_.find(type);
-    if (iter == devListener_.end()) {
-        MMI_HILOGE("Find %{public}s failed", type.c_str());
-        return;
-    }
-
-    for (const auto &temp : iter->second) {
-        CHKPC(temp);
-        if (temp->env != env) {
-            continue;
-        }
-        if (JsUtil::IsSameHandle(env, handle, temp->ref)) {
-            MMI_HILOGW("The handle already exists");
+    bool isListening { false };
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        auto iter = devListener_.find(type);
+        if (iter == devListener_.end()) {
+            MMI_HILOGE("Find %{public}s failed", type.c_str());
             return;
         }
+        for (const auto &temp : iter->second) {
+            CHKPC(temp);
+            if (temp->env != env) {
+                continue;
+            }
+            if (JsUtil::IsSameHandle(env, handle, temp->ref)) {
+                MMI_HILOGW("The handle already exists");
+                return;
+            }
+        }
+        napi_ref ref = nullptr;
+        CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
+        auto monitor = std::make_unique<JsUtil::CallbackInfo>();
+        monitor->env = env;
+        monitor->ref = ref;
+        iter->second.push_back(std::move(monitor));
+        isListening = isListeningProcess_;
     }
-    napi_ref ref = nullptr;
-    CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
-    auto monitor = std::make_unique<JsUtil::CallbackInfo>();
-    monitor->env = env;
-    monitor->ref = ref;
-    iter->second.push_back(std::move(monitor));
-    if (!isListeningProcess_) {
-        isListeningProcess_ = true;
-        InputManager::GetInstance()->RegisterDevListener("change", shared_from_this());
+    if (!isListening) {
+        auto ret = InputManager::GetInstance()->RegisterDevListener("change", shared_from_this());
+        if (ret != RET_OK) {
+            MMI_HILOGE("RegisterDevListener fail, error:%{public}d", ret);
+        } else {
+            std::lock_guard<std::mutex> guard(mutex_);
+            isListeningProcess_ = true;
+        }
     }
 }
 
 void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = devListener_.find(type);
-    if (iter == devListener_.end()) {
-        MMI_HILOGE("Find %{public}s failed", type.c_str());
-        return;
-    }
-    if (handle == nullptr) {
-        iter->second.clear();
-        goto monitorLabel;
-    }
-    for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
-        if ((*it)->env != env) {
-            continue;
+    bool needStopListening { false };
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        auto iter = devListener_.find(type);
+        if (iter == devListener_.end()) {
+            MMI_HILOGE("Find %{public}s failed", type.c_str());
+            return;
         }
-        if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
-            MMI_HILOGD("Succeeded in removing monitor");
-            JsUtil::DeleteCallbackInfo(std::move(*it));
-            iter->second.erase(it);
+        if (handle == nullptr) {
+            iter->second.clear();
             goto monitorLabel;
         }
-    }
+        for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
+            if ((*it)->env != env) {
+                continue;
+            }
+            if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
+                MMI_HILOGD("Succeeded in removing monitor");
+                JsUtil::DeleteCallbackInfo(std::move(*it));
+                iter->second.erase(it);
+                goto monitorLabel;
+            }
+        }
 
-monitorLabel:
-    if (isListeningProcess_ && iter->second.empty()) {
-        isListeningProcess_ = false;
-        InputManager::GetInstance()->UnregisterDevListener("change", shared_from_this());
+    monitorLabel:
+        if (isListeningProcess_ && iter->second.empty()) {
+            needStopListening = true;
+            isListeningProcess_ = false;
+        }
+    }
+    if (needStopListening) {
+        auto ret = InputManager::GetInstance()->UnregisterDevListener("change", shared_from_this());
+        if (ret != RET_OK) {
+            MMI_HILOGE("UnregisterDevListener fail, error:%{public}d", ret);
+        }
     }
 }
 
@@ -1400,9 +1417,14 @@ void JsEventTarget::CallIntervalSinceLastInputPromise(uv_work_t *work, int32_t s
 void JsEventTarget::ResetEnv()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    devListener_.clear();
-    InputManager::GetInstance()->UnregisterDevListener("change", shared_from_this());
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        devListener_.clear();
+    }
+    auto ret = InputManager::GetInstance()->UnregisterDevListener("change", shared_from_this());
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnregisterDevListener fail, error:%{public}d", ret);
+    }
 }
 
 void JsEventTarget::CallSetInputDeviceEnabledPromise(uv_work_t *work, int32_t status)
