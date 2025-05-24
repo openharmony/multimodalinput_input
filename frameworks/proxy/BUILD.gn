@@ -805,6 +805,8 @@ ohos_unittest("PointerEventNdkTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/frameworks/proxy:libmmi_test_util",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   deps = [
