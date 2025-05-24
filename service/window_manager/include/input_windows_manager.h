@@ -75,7 +75,7 @@ public:
     void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    void DumpDisplayInfo(int32_t fd);
+    void DumpDisplayInfo(int32_t fd, const std::vector<DisplayInfo>& displaysInfo);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
@@ -87,7 +87,7 @@ public:
     bool IsWindowVisible(int32_t pid);
     void ClearExtraData();
     ExtraData GetExtraData() const;
-    const std::vector<WindowInfo> GetWindowGroupInfoByDisplayId(int32_t displayId) const;
+    const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
     std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
     int32_t GetCurrentUserId();
@@ -113,16 +113,7 @@ public:
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData = true);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    void GetDisplayGroupInfo(DisplayGroupInfo& displayGroupInfoCur, int32_t groupId = DEFAULT_GROUP_ID);
-    std::vector<DisplayInfo> GetDisplayInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
-    const std::vector<WindowInfo> GetWindowInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
-    int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
-
-
-    int32_t GetLogicalPositionX(int32_t id);
-    int32_t GetLogicalPositionY(int32_t id);
-    Direction GetLogicalPositionDirection(int32_t id);
-    Direction GetPositionDisplayDirection(int32_t id);
+    const DisplayGroupInfo GetDisplayGroupInfo(int32_t groupId = DEFAULT_GROUP_ID);
     int32_t SetHoverScrollState(bool state);
     bool GetHoverScrollState() const;
     bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
@@ -294,6 +285,14 @@ private:
     void NotifyPointerToWindow(int32_t groupId = DEFAULT_GROUP_ID);
     void OnSessionLost(SessionPtr session);
     void InitPointerStyle(int32_t groupId = DEFAULT_GROUP_ID);
+    const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
+    const std::vector<DisplayInfo>& GetDisplayInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
+    const std::vector<WindowInfo>& GetWindowInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
+    int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
+    int32_t GetLogicalPositionX(int32_t id);
+    int32_t GetLogicalPositionY(int32_t id);
+    Direction GetLogicalPositionDirection(int32_t id);
+    Direction GetPositionDisplayDirection(int32_t id);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t UpdatePoinerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
@@ -476,7 +475,6 @@ private:
     std::mutex tmpInfoMutex_;
     DisplayGroupInfo displayGroupInfo_;
     DisplayGroupInfo displayGroupInfoCurr_;
-    mutable std::shared_mutex displayGroupInfoMtx;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     std::map<int32_t, std::map<int32_t, WindowGroupInfo>> windowsPerDisplayMap_;
     PointerStyle lastPointerStyle_;

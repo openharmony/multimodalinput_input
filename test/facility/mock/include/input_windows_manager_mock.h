@@ -52,7 +52,7 @@ public:
     MOCK_METHOD(int32_t, AppendExtraData, (const ExtraData&));
     MOCK_METHOD(bool, IsWindowVisible, (int32_t));
     MOCK_METHOD(ExtraData, GetExtraData, (), (const));
-    MOCK_METHOD(const std::vector<WindowInfo>, GetWindowGroupInfoByDisplayId, (int32_t), (const));
+    MOCK_METHOD(const std::vector<WindowInfo>, GetWindowGroupInfoByDisplayIdCopy, (int32_t), (const));
     MOCK_METHOD((std::pair<double, double>), TransformWindowXY, (const WindowInfo&, double, double), (const));
     MOCK_METHOD((std::pair<double, double>), TransformDisplayXY, (const DisplayInfo&, double, double), (const));
     void ClearTargetWindowId(int32_t pointerId) override {}

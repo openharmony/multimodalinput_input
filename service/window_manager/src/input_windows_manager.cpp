@@ -155,7 +155,6 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastTouchWindowInfo_.windowType = 0;
     lastTouchWindowInfo_.windowNameType = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     displayGroupInfo_.groupId = MAIN_GROUPID;
     displayGroupInfo_.isMainGroup = true;
     displayGroupInfo_.focusWindowId = -1;
@@ -280,28 +279,56 @@ void InputWindowsManager::InitMouseDownInfo()
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-const std::vector<WindowInfo> InputWindowsManager::GetWindowGroupInfoByDisplayId(int32_t displayId) const
+const std::vector<WindowInfo> InputWindowsManager::GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const
 {
     CALL_DEBUG_ENTER;
     int32_t groupId = FindDisplayGroupId(displayId);
     if (displayId < 0) {
-        return GetWindowInfoVector(groupId);
+        const auto& windoInfo = GetWindowInfoVector(groupId);
+        return windoInfo;
     }
     std::map<int32_t, WindowGroupInfo>& windowsPerDisplay =
         const_cast<std::map<int32_t, WindowGroupInfo> &>(windowsPerDisplay_);
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto& iter = windowsPerDisplayMap_.find(groupId);
-        windowsPerDisplay = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
-    }
+    
+    const auto& iter = windowsPerDisplayMap_.find(groupId);
+    windowsPerDisplay = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
     const auto& it = windowsPerDisplay.find(displayId);
     if (it == windowsPerDisplay.end()) {
         MMI_HILOGD("GetWindowInfo displayId:%{public}d is null from windowGroupInfo_", displayId);
-        return GetWindowInfoVector(groupId);
+        const auto& windoInfo = GetWindowInfoVector(groupId);
+        return windoInfo;
     }
     if (it->second.windowsInfo.empty()) {
         MMI_HILOGW("GetWindowInfo displayId:%{public}d is empty", displayId);
-        return GetWindowInfoVector(groupId);
+        const auto& windoInfo = GetWindowInfoVector(groupId);
+        return windoInfo;
+    }
+    return it->second.windowsInfo;
+}
+
+const std::vector<WindowInfo>& InputWindowsManager::GetWindowGroupInfoByDisplayId(int32_t displayId) const
+{
+    CALL_DEBUG_ENTER;
+    int32_t groupId = FindDisplayGroupId(displayId);
+    if (displayId < 0) {
+        const auto& windoInfo = GetWindowInfoVector(groupId);
+        return windoInfo;
+    }
+    std::map<int32_t, WindowGroupInfo>& windowsPerDisplay =
+        const_cast<std::map<int32_t, WindowGroupInfo> &>(windowsPerDisplay_);
+    
+    const auto& iter = windowsPerDisplayMap_.find(groupId);
+    windowsPerDisplay = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
+    const auto& it = windowsPerDisplay.find(displayId);
+    if (it == windowsPerDisplay.end()) {
+        MMI_HILOGD("GetWindowInfo displayId:%{public}d is null from windowGroupInfo_", displayId);
+        const auto& windoInfo = GetWindowInfoVector(groupId);
+        return windoInfo;
+    }
+    if (it->second.windowsInfo.empty()) {
+        MMI_HILOGW("GetWindowInfo displayId:%{public}d is empty", displayId);
+        const auto& windoInfo = GetWindowInfoVector(groupId);
+        return windoInfo;
     }
     return it->second.windowsInfo;
 }
@@ -309,7 +336,6 @@ const std::vector<WindowInfo> InputWindowsManager::GetWindowGroupInfoByDisplayId
 bool InputWindowsManager::CheckAppFocused(int32_t pid)
 {
     int32_t focusWindowId = DEFAULT_VALUE;
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     for (const auto& item : displayGroupInfoMap_) {
         focusWindowId = item.second.focusWindowId;
         for (const auto& windowinfo : item.second.windowsInfo) {
@@ -535,13 +561,11 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
 
 DisplayGroupInfo& InputWindowsManager::FindTargetDisplayGroupInfo(int32_t displayId)
 {
-     {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        for (auto& it : displayGroupInfoMap_) {
-            for (const auto& item : it.second.displaysInfo) {
-                if (item.id == displayId) {
-                    return it.second;
-                }
+    
+    for (auto& it : displayGroupInfoMap_) {
+        for (const auto& item : it.second.displaysInfo) {
+            if (item.id == displayId) {
+                return it.second;
             }
         }
     }
@@ -550,7 +574,6 @@ DisplayGroupInfo& InputWindowsManager::FindTargetDisplayGroupInfo(int32_t displa
 
 int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
 {
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     for (const auto& it : displayGroupInfoMap_) {
         for (const auto& item : it.second.displaysInfo) {
             if (item.id == displayId) {
@@ -563,12 +586,9 @@ int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
 
 DisplayGroupInfo& InputWindowsManager::GetMainDisplayGroupInfo()
 {
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto& iter = displayGroupInfoMap_.find(MAIN_GROUPID);
-        if (iter != displayGroupInfoMap_.end()) {
-            return iter->second;
-        }
+    const auto& iter = displayGroupInfoMap_.find(MAIN_GROUPID);
+    if (iter != displayGroupInfoMap_.end()) {
+        return iter->second;
     }
     return displayGroupInfo_;
 }
@@ -681,8 +701,6 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     if (displayId < 0) {
         MMI_HILOGD("Target display is -1");
         int32_t groupId = FindDisplayGroupId(displayId);
-        {
-            std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
             const auto iter = displayGroupInfoMap_.find(groupId);
             if (iter != displayGroupInfoMap_.end()) {
                 if (iter->second.displaysInfo.empty()) {
@@ -695,7 +713,6 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
                 }
                 displayId = displayGroupInfo_.displaysInfo[0].id;
             }
-        }
         inputEvent->SetTargetDisplayId(displayId);
     }
     return displayId;
@@ -803,7 +820,6 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
 int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
 {
     CALL_DEBUG_ENTER;
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     for (const auto &groupItem : displayGroupInfoMap_) {
         for (const auto &item : groupItem.second.windowsInfo) {
             MMI_HILOGD("Get windowId:%{public}d", item.id);
@@ -813,8 +829,6 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
             for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
                 CHKCC(uiExtentionWindow.id == windowId);
                 return uiExtentionWindow.pid;
- 
- 
             }
         }
     }
@@ -922,28 +936,21 @@ void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroup
         return;
     }
     CaptureModeInfo captureModeInfo;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        auto itr = captureModeInfoMap_.find(displayGroupInfo.groupId);
-        if (itr != captureModeInfoMap_.end()) {
-            captureModeInfo = itr->second;
-        }
+    auto itr = captureModeInfoMap_.find(displayGroupInfo.groupId);
+    if (itr != captureModeInfoMap_.end()) {
+        captureModeInfo = itr->second;
     }
     if (captureModeInfo.isCaptureMode && !WindowInfo.empty() &&
         ((focusWindowId != displayGroupInfo.focusWindowId) ||
         (WindowInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
         CaptureModeInfo captureModeInfo;
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            captureModeInfoMap_[displayGroupInfo.groupId].isCaptureMode = false;
-        }
+        captureModeInfoMap_[displayGroupInfo.groupId].isCaptureMode = false;
     }
 }
 
 bool InputWindowsManager::IsFocusedSession(int32_t session) const
 {
     if (session >= 0) {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
         for (auto &curGroupInfo : displayGroupInfoMap_) {
             if (session == GetWindowPid(curGroupInfo.second.focusWindowId)) {
                 return true;
@@ -974,11 +981,8 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 #endif // OHOS_BUILD_ENABLE_ANCO
         int32_t groupId = FindDisplayGroupId(windowGroupInfoTmp.windowsInfo[0].displayId);
         DisplayGroupInfo displayGroupInfo;
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto &iter = displayGroupInfoMapTmp_.find(groupId);
-            displayGroupInfo = (iter != displayGroupInfoMapTmp_.end()) ? iter->second : GetMainDisplayGroupInfo();
-        }
+        const auto &iter = displayGroupInfoMapTmp_.find(groupId);
+        displayGroupInfo = (iter != displayGroupInfoMapTmp_.end()) ? iter->second : GetMainDisplayGroupInfo();
  
         for (const auto &item : windowGroupInfoTmp.windowsInfo) {
             UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
@@ -986,10 +990,8 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
  
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         bool pointDrawFlag = NeedUpdatePointDrawFlag(windowGroupInfoTmp.windowsInfo);
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            pointerDrawFlagMap_[displayGroupInfo.groupId] = pointDrawFlag;
-        }
+        pointerDrawFlagMap_[displayGroupInfo.groupId] = pointDrawFlag;
+        
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
  
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -1086,21 +1088,17 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
         });
     }
     std::map<int32_t, WindowGroupInfo>& windowsPerDisplayTmp = windowsPerDisplay_;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto& iter = windowsPerDisplayMap_.find(groupId);
-        windowsPerDisplayTmp = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
-    }
+   
+    const auto& iter = windowsPerDisplayMap_.find(groupId);
+    windowsPerDisplayTmp = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
     for (const auto &item : windowsPerDisplay) {
         int32_t displayId = item.first;
         if (windowsPerDisplayTmp.find(displayId) != windowsPerDisplayTmp.end()) {
             CheckZorderWindowChange(windowsPerDisplayTmp[displayId].windowsInfo, item.second.windowsInfo);
         }
     }
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        windowsPerDisplayMap_[groupId] = windowsPerDisplay;
-    }
+   
+    windowsPerDisplayMap_[groupId] = windowsPerDisplay;
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     for (const auto &window : displayGroupInfo.windowsInfo) {
         if (window.windowType == static_cast<int32_t>(Rosen::WindowType::WINDOW_TYPE_TRANSPARENT_VIEW)) {
@@ -1122,10 +1120,7 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
     }
     MMI_HILOGD("Current action is:%{public}d", action);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        pointerDrawFlagMap_[displayGroupInfo.groupId] = NeedUpdatePointDrawFlag(displayGroupInfo.windowsInfo);
-    }
+    pointerDrawFlagMap_[displayGroupInfo.groupId] = NeedUpdatePointDrawFlag(displayGroupInfo.windowsInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     std::sort(displayGroupInfo.windowsInfo.begin(), displayGroupInfo.windowsInfo.end(),
         [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
@@ -1301,7 +1296,6 @@ void InputWindowsManager::HandleValidDisplayChange(const DisplayGroupInfo &displ
 CursorPosition InputWindowsManager::GetCursorPos(const DisplayGroupInfo &displayGroupInfo)
 {
     int32_t groupId = displayGroupInfo.groupId;
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     if ((cursorPosMap_[groupId].displayId < 0) && !displayGroupInfoMap_[groupId].displaysInfo.empty()) {
         DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -1354,14 +1348,11 @@ void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const DisplayGro
                 int32_t displayId = -1;
                 double cursorPosx = 0.0;
                 double cursorPosy = 0.0;
-                {
-                    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-                    const auto iter = cursorPosMap_.find(groupId);
-                    if (iter != cursorPosMap_.end()) {
-                        displayId = iter->second.displayId;
-                        cursorPosx = iter->second.cursorPos.x;
-                        cursorPosy = iter->second.cursorPos.y;
-                    }
+                const auto iter = cursorPosMap_.find(groupId);
+                if (iter != cursorPosMap_.end()) {
+                    displayId = iter->second.displayId;
+                    cursorPosx = iter->second.cursorPos.x;
+                    cursorPosy = iter->second.cursorPos.y;
                 }
                 auto displayInfo = GetPhysicalDisplay(displayId);
                 CHKPV(displayInfo);
@@ -1620,12 +1611,10 @@ void InputWindowsManager::SendCancelEventWhenWindowChange(int32_t pointerId, int
 {
     MMI_HILOGI("Dispatch cancel event pointerId:%{public}d", pointerId);
     std::shared_ptr<PointerEvent> lastPointerEventforWindowChangeTmp = lastPointerEventforWindowChange_;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = lastPointerEventforWindowChangeMap_.find(groupId);
-        if (iter != lastPointerEventforWindowChangeMap_.end()) {
-            lastPointerEventforWindowChangeTmp = iter->second;
-        }
+    
+    const auto iter = lastPointerEventforWindowChangeMap_.find(groupId);
+    if (iter != lastPointerEventforWindowChangeMap_.end()) {
+        lastPointerEventforWindowChangeTmp = iter->second;
     }
     CHKPV(lastPointerEventforWindowChangeTmp);
     PointerEvent::PointerItem pointerItem;
@@ -1685,13 +1674,11 @@ bool InputWindowsManager::JudgeCaramaInFore()
 
 void InputWindowsManager::InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInfo)
 {
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        if (displayGroupInfoMap_.find(displayGroupInfo.groupId) != displayGroupInfoMap_.end()) {
-            return;
-        }
-        displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+    
+    if (displayGroupInfoMap_.find(displayGroupInfo.groupId) != displayGroupInfoMap_.end()) {
+        return;
     }
+    displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
     captureModeInfoMap_[displayGroupInfo.groupId] = captureModeInfo_;
     pointerDrawFlagMap_[displayGroupInfo.groupId] = pointerDrawFlag_;
     mouseLocationMap_[displayGroupInfo.groupId] = mouseLocation_;
@@ -1706,7 +1693,6 @@ void InputWindowsManager::InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInf
 
 void InputWindowsManager::UpdateGroupInfo()
 {
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     for (auto &curGroupInfo : displayGroupInfoMap_) {
         if (!(curGroupInfo.second.isMainGroup) 
             && !(displayGroupInfoMapTmp_.find(curGroupInfo.first) != displayGroupInfoMapTmp_.end())) {
@@ -1750,39 +1736,29 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     int32_t groupId = displayGroupInfo.groupId;
     DisplayGroupInfo displayGroupInfoTemp;
-    {
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
-        }
-        if ((!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
-            && ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfo.currentUserId))) {
-            for (auto &displayInfo : displayGroupInfoMapTmp_) {
-                groupId = displayInfo.first;
-                displayGroupInfo = displayInfo.second;
+    
+    displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
+    if ((!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
+        && ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfo.currentUserId))) {
+        for (auto &displayInfo : displayGroupInfoMapTmp_) {
+            groupId = displayInfo.first;
+            displayGroupInfo = displayInfo.second;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-                bool isDisplayUpdate = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
-                if (isDisplayUpdate) {
-                    ResetPointerPosition(displayGroupInfo);
-                }
-#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-                PrintChangedWindowBySync(displayGroupInfo);
-                CleanInvalidPiexMap(groupId);
-                HandleValidDisplayChange(displayGroupInfo);
-                {
-                    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-                    displayGroupInfoMap_[groupId] = displayGroupInfo;
-                }
-                UpdateWindowsInfoPerDisplay(displayGroupInfo);
-                HandleWindowPositionChange(displayGroupInfo);
-            };
-        }
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = displayGroupInfoMap_.find(groupId);
-            if (iter != displayGroupInfoMap_.end()) {
-                displayGroupInfoTemp = iter->second;
+            bool isDisplayUpdate = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
+            if (isDisplayUpdate) {
+                ResetPointerPosition(displayGroupInfo);
             }
+#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+            PrintChangedWindowBySync(displayGroupInfo);
+            CleanInvalidPiexMap(groupId);
+            HandleValidDisplayChange(displayGroupInfo);
+            displayGroupInfoMap_[groupId] = displayGroupInfo;
+            UpdateWindowsInfoPerDisplay(displayGroupInfo);
+            HandleWindowPositionChange(displayGroupInfo);
+        }
+        const auto iter = displayGroupInfoMap_.find(groupId);
+        if (iter != displayGroupInfoMap_.end()) {
+            displayGroupInfoTemp = iter->second;
         }
     }
     PrintDisplayGroupInfo(displayGroupInfoTemp);
@@ -1802,11 +1778,9 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     InitPointerStyle(displayGroupInfo.groupId);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool bFlag = false;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = pointerDrawFlagMap_.find(groupId);
-        bFlag = (iter != pointerDrawFlagMap_.end()) ? true : false;
-    }
+    
+    const auto iter = pointerDrawFlagMap_.find(groupId);
+    bFlag = (iter != pointerDrawFlagMap_.end()) ? true : false;
     if (!displayGroupInfo.displaysInfo.empty() && bFlag) {
         AdjustDisplayRotation(groupId);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -1815,11 +1789,9 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        lastDpiMap_[groupId] = displayGroupInfoTemp.displaysInfo.empty() ? DEFAULT_DPI :
-        displayGroupInfoTemp.displaysInfo[0].dpi;
-    }
+    
+    lastDpiMap_[groupId] = displayGroupInfoTemp.displaysInfo.empty() ? DEFAULT_DPI :
+    displayGroupInfoTemp.displaysInfo[0].dpi;
     if (INPUT_DEV_MGR->HasPointerDevice() && bFlag) {
         NotifyPointerToWindow(groupId);
     }
@@ -1831,12 +1803,10 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
 {
     CursorPosition cursorPosCur;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = cursorPosMap_.find(groupId);
-        if (iter == cursorPosMap_.end()) {
-            cursorPosMap_[groupId]  = cursorPosCur;
-        }
+   
+    const auto iter = cursorPosMap_.find(groupId);
+    if (iter == cursorPosMap_.end()) {
+        cursorPosMap_[groupId]  = cursorPosCur;
     }
     PhysicalCoordinate coord {
         .x = cursorPosCur.cursorPos.x,
@@ -1858,13 +1828,11 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
         if (cursorPosCur.direction == displayInfo->direction) {
             ScreenRotateAdjustDisplayXY(*displayInfo, coord);
         }
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = cursorPosMap_.find(groupId);
-            if (iter != cursorPosMap_.end()) {
-                cursorPosMap_[groupId].direction = displayInfo->direction;
-                cursorPosMap_[groupId].displayDirection = displayInfo->displayDirection;
-            }
+        
+        const auto iter = cursorPosMap_.find(groupId);
+        if (iter != cursorPosMap_.end()) {
+            cursorPosMap_[groupId].direction = displayInfo->direction;
+            cursorPosMap_[groupId].displayDirection = displayInfo->displayDirection;
         }
         UpdateAndAdjustMouseLocation(cursorPosCur.displayId, coord.x, coord.y);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -1874,12 +1842,9 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*displayInfo);
         int32_t displayId = -1;
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = cursorPosMap_.find(groupId);
-            if (iter != cursorPosMap_.end()) {
-                displayId = iter->second.displayId;
-            }
+       
+        if (iter != cursorPosMap_.end()) {
+            displayId = iter->second.displayId;
         }
         auto displayInfoTmp = GetPhysicalDisplay(displayId);
         CHKPV(displayInfoTmp);
@@ -1895,14 +1860,12 @@ void InputWindowsManager::AdjustDragPosition(int32_t groupId)
     int32_t displayId = -1;
     int32_t physicalX = 0;
     int32_t physicalY = 0;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        auto iter = mouseLocationMap_.find(groupId);
-        if (iter != mouseLocationMap_.end()) {
-            displayId = iter->second.displayId;
-            physicalX = iter->second.physicalX;
-            physicalY = iter->second.physicalY;
-        }
+  
+    auto iter = mouseLocationMap_.find(groupId);
+    if (iter != mouseLocationMap_.end()) {
+        displayId = iter->second.displayId;
+        physicalX = iter->second.physicalX;
+        physicalY = iter->second.physicalY;
     }
     std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent);
     pointerEvent->SetTargetDisplayId(displayId);
@@ -1932,7 +1895,6 @@ void InputWindowsManager::AdjustDragPosition(int32_t groupId)
 
 DisplayMode InputWindowsManager::GetDisplayMode() const
 {
-    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     const auto iter = displayModeMap_.find(MAIN_GROUPID);
     if (iter != displayModeMap_.end()) {
         return iter->second;
@@ -1944,32 +1906,26 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 {
     CALL_DEBUG_ENTER;
      DisplayMode mode;
-    {
-        std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = displayGroupInfoMap_.find(groupId);
-        if (iter != displayGroupInfoMap_.end()) {
-            if (iter->second.displaysInfo.empty()) {
-                MMI_HILOGE("DisplaysInfo is empty");
-                return;
-            }
-            mode = iter->second.displaysInfo[0].displayMode;
-        } else {
-            if (displayGroupInfo_.displaysInfo.empty()) {
-                MMI_HILOGE("DisplaysInfo is empty");
-                return;
-            }
-            mode = displayGroupInfo_.displaysInfo[0].displayMode;
-        }
-    }
-    DisplayMode& displayMode = displayMode_;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = displayModeMap_.find(groupId);
-        if (iter == displayModeMap_.end()) {
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        if (iter->second.displaysInfo.empty()) {
+            MMI_HILOGE("DisplaysInfo is empty");
             return;
         }
-        displayMode = iter->second;
+        mode = iter->second.displaysInfo[0].displayMode;
+    } else {
+        if (displayGroupInfo_.displaysInfo.empty()) {
+            MMI_HILOGE("DisplaysInfo is empty");
+            return;
+        }
+        mode = displayGroupInfo_.displaysInfo[0].displayMode;
     }
+    DisplayMode& displayMode = displayMode_;
+    const auto tempMode = displayModeMap_.find(groupId);
+    if (tempMode == displayModeMap_.end()) {
+        return;
+    }
+    displayMode = tempMode->second;
     if (mode == displayMode) {
         MMI_HILOGD("Displaymode not change, mode:%{public}d, diaplayMode_:%{public}d", mode, displayMode);
         return;
@@ -2007,25 +1963,23 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
     int32_t groupId = displayGroupInfo.groupId;
     int32_t newId = 0;
     int32_t &lastDpiTmp = lastDpi_;
-    {
-        std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = displayGroupInfoMap_.find(groupId);
-        if (iter != displayGroupInfoMap_.end()) {
-            if (iter->second.displaysInfo.empty()) {
-                MMI_HILOGE("DisplayGroup is empty.");
-                return;
-            }
-            newId = iter->second.displaysInfo[0].id;
-        } else {
-            if (displayGroupInfo_.displaysInfo.empty()) {
-                MMI_HILOGE("DisplayGroup is empty.");
-                return;
-            }
-            newId = displayGroupInfo_.displaysInfo[0].id;
+
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        if (iter->second.displaysInfo.empty()) {
+            MMI_HILOGE("DisplayGroup is empty.");
+            return;
         }
-        if (lastDpiMap_.find(groupId) == lastDpiMap_.end()) {
-            lastDpiMap_[groupId]  = lastDpiTmp;
+        newId = iter->second.displaysInfo[0].id;
+    } else {
+        if (displayGroupInfo_.displaysInfo.empty()) {
+            MMI_HILOGE("DisplayGroup is empty.");
+            return;
         }
+        newId = displayGroupInfo_.displaysInfo[0].id;
+    }
+    if (lastDpiMap_.find(groupId) == lastDpiMap_.end()) {
+        lastDpiMap_[groupId]  = lastDpiTmp;
     }
     for (auto displayInfo : displayGroupInfo.displaysInfo) {
         if (displayInfo.uniqueId == currentDisplayInfo.uniqueId && displayInfo.dpi != currentDisplayInfo.dpi) {
@@ -2068,18 +2022,15 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             double cursorPosy = 0.0;
             Direction direction = Direction::DIRECTION0;
             Direction displayDirection = Direction::DIRECTION0;
-            {
-                std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-                const auto iter = cursorPosMap_.find(groupId);
-                if (iter == cursorPosMap_.end()) {
-                    cursorPosMap_[groupId] = cursorPosRef;
-                }
-                else {
-                    direction = iter->second.direction;
-                    displayDirection = iter->second.displayDirection;
-                    cursorPosx = iter->second.cursorPos.x;;
-                    cursorPosy = iter->second.cursorPos.y;
-                }
+            const auto iter = cursorPosMap_.find(groupId);
+            if (iter == cursorPosMap_.end()) {
+                cursorPosMap_[groupId] = cursorPosRef;
+            }
+            else {
+                direction = iter->second.direction;
+                displayDirection = iter->second.displayDirection;
+                cursorPosx = iter->second.cursorPos.x;;
+                cursorPosy = iter->second.cursorPos.y;
             }
             if (direction != DirectionCopy &&
                 displayDirection == DisplayDirection) {
@@ -2177,22 +2128,20 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
     int32_t displayId = MouseEventHdr->GetDisplayId();
     int32_t groupId = FindDisplayGroupId(displayId);
     int32_t newId = 0;
-    {
-        std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = displayGroupInfoMap_.find(groupId);
-        if (iter != displayGroupInfoMap_.end()) {
-            if (iter->second.displaysInfo.empty()) {
-                MMI_HILOGW("DisplaysInfo is empty");
-                return;
-            }
-            newId = iter->second.displaysInfo[0].id;
-        } else {
-            if (displayGroupInfo_.displaysInfo.empty()) {
-                MMI_HILOGW("DisplaysInfo is empty");
-                return;
-            }
-            newId = displayGroupInfo_.displaysInfo[0].id;
+    
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        if (iter->second.displaysInfo.empty()) {
+            MMI_HILOGW("DisplaysInfo is empty");
+            return;
         }
+        newId = iter->second.displaysInfo[0].id;
+    } else {
+        if (displayGroupInfo_.displaysInfo.empty()) {
+            MMI_HILOGW("DisplaysInfo is empty");
+            return;
+        }
+        newId = displayGroupInfo_.displaysInfo[0].id;
     }
     displayId = displayId < 0 ? newId : displayId;
     auto displayInfo = GetPhysicalDisplay(displayId);
@@ -2217,15 +2166,13 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
         Direction displayDirection = Direction::DIRECTION0;
         double cursorPosx = 0.0;
         double cursorPosy = 0.0;
-        {
-            std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = cursorPosMap_.find(groupId);
-            if (iter != cursorPosMap_.end()) {
-                direction = iter->second.direction;
-                displayDirection = iter->second.displayDirection;
-                cursorPosx = iter->second.cursorPos.x;
-                cursorPosy = iter->second.cursorPos.y;
-            }
+        
+        const auto iter = cursorPosMap_.find(groupId);
+        if (iter != cursorPosMap_.end()) {
+            direction = iter->second.direction;
+            displayDirection = iter->second.displayDirection;
+            cursorPosx = iter->second.cursorPos.x;
+            cursorPosy = iter->second.cursorPos.y;
         }
         if (direction != DirectionCopy &&
             displayDirection == DisplayDirection) {
@@ -2403,14 +2350,12 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         int32_t displayId = 0;
         double cursorPosx = 0.0;
         double cursorPosy = 0.0;
-        {
-            std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
-            if (iter != mouseLocationMap_.end()) {
-                displayId = iter->second.displayId;
-                cursorPosx = iter->second.physicalX;
-                cursorPosy = iter->second.physicalY;
-            }
+        
+        const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+        if (iter != mouseLocationMap_.end()) {
+            displayId = iter->second.displayId;
+            cursorPosx = iter->second.physicalX;
+            cursorPosy = iter->second.physicalY;
         }
         currentPointerItem.SetDisplayX(cursorPosx);
         currentPointerItem.SetDisplayY(cursorPosy);
@@ -2689,7 +2634,6 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
 const std::shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
     int32_t groupId = FindDisplayGroupId(id);
-    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     const auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         for (auto &it : iter->second.displaysInfo) {
@@ -2788,15 +2732,12 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordina
         int32_t groupId = FindDisplayGroupId(info.id);
         Direction directiontemp = Direction::DIRECTION0 ;
         Direction displaydirectiontemp = Direction::DIRECTION0 ;
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = cursorPosMap_.find(groupId);
-            if (iter != cursorPosMap_.end()) {
-                directiontemp = iter->second.direction;
-                displaydirectiontemp = iter->second.displayDirection;
-            }
+        
+        const auto iter = cursorPosMap_.find(groupId);
+        if (iter != cursorPosMap_.end()) {
+            directiontemp = iter->second.direction;
+            displaydirectiontemp = iter->second.displayDirection;
         }
-
         if (displaydirectiontemp != info.displayDirection && directiontemp != info.direction) {
             if (directiontemp == Direction::DIRECTION90) {
                 double temp = coord.y;
@@ -3049,19 +2990,17 @@ bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* t
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void InputWindowsManager::GetDisplayGroupInfo(DisplayGroupInfo& displayGroupInfoCur, int32_t groupId)
+const DisplayGroupInfo InputWindowsManager::GetDisplayGroupInfo(int32_t groupId)
 {
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
-        return;
+        return iter->second;
     }
-    displayGroupInfoCur = iter->second;
+    return displayGroupInfo_;
 }
 
-std::vector<DisplayInfo> InputWindowsManager::GetDisplayInfoVector(int32_t groupId) const
+const std::vector<DisplayInfo>& InputWindowsManager::GetDisplayInfoVector(int32_t groupId) const
 {
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         return iter->second.displaysInfo;
@@ -3073,27 +3012,24 @@ std::vector<DisplayInfo> InputWindowsManager::GetDisplayInfoVector(int32_t group
     return displayGroupInfo_.displaysInfo;
 }
 
-const std::vector<WindowInfo> InputWindowsManager::GetWindowInfoVector(int32_t groupId) const
+const std::vector<WindowInfo>& InputWindowsManager::GetWindowInfoVector(int32_t groupId) const
 {
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     auto iter = displayGroupInfoMap_.find(groupId);
-        if (iter != displayGroupInfoMap_.end()) {
-            return iter->second.windowsInfo;
-        }
+    if (iter != displayGroupInfoMap_.end()) {
+        return iter->second.windowsInfo;
+    }
     iter = displayGroupInfoMap_.find(MAIN_GROUPID);
-        if (iter != displayGroupInfoMap_.end()) {
-            return iter->second.windowsInfo;
-        }
+    if (iter != displayGroupInfoMap_.end()) {
+        return iter->second.windowsInfo;
+    }
     return displayGroupInfo_.windowsInfo;
 }
 
 int32_t InputWindowsManager::GetFocusWindowId(int32_t groupId) const
 {
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         return iter->second.focusWindowId;
-        
     }
     iter = displayGroupInfoMap_.find(MAIN_GROUPID);
     if (iter != displayGroupInfoMap_.end()) {
@@ -3105,7 +3041,6 @@ int32_t InputWindowsManager::GetFocusWindowId(int32_t groupId) const
 int32_t InputWindowsManager::GetLogicalPositionX(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     const auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         for (auto &it : iter->second.displaysInfo) {
@@ -3127,7 +3062,6 @@ int32_t InputWindowsManager::GetLogicalPositionX(int32_t id)
 int32_t InputWindowsManager::GetLogicalPositionY(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     const auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         for (auto &it : iter->second.displaysInfo) {
@@ -3149,7 +3083,6 @@ int32_t InputWindowsManager::GetLogicalPositionY(int32_t id)
 Direction InputWindowsManager::GetLogicalPositionDirection(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     const auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         for (auto &it : iter->second.displaysInfo) {
@@ -3171,7 +3104,6 @@ Direction InputWindowsManager::GetLogicalPositionDirection(int32_t id)
 Direction InputWindowsManager::GetPositionDisplayDirection(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     const auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         for (auto &it : iter->second.displaysInfo) {
@@ -3201,22 +3133,19 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
     int32_t displayId = MouseEventHdr->GetDisplayId();
     int32_t groupId = FindDisplayGroupId(displayId);
     int32_t newId = 0;
-    {
-        std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = displayGroupInfoMap_.find(groupId);
-        if (iter != displayGroupInfoMap_.end()) {
-            if (iter->second.displaysInfo.empty()) {
-                MMI_HILOGW("DisplaysInfo is empty");
-                return false;
-            }
-            newId = iter->second.displaysInfo[0].id;
-        } else {
-            if (displayGroupInfo_.displaysInfo.empty()) {
-                MMI_HILOGW("DisplaysInfo is empty");
-                return false;
-            }
-            newId = displayGroupInfo_.displaysInfo[0].id;
+    const auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        if (iter->second.displaysInfo.empty()) {
+            MMI_HILOGW("DisplaysInfo is empty");
+            return false;
         }
+        newId = iter->second.displaysInfo[0].id;
+    } else {
+        if (displayGroupInfo_.displaysInfo.empty()) {
+            MMI_HILOGW("DisplaysInfo is empty");
+            return false;
+        }
+        newId = displayGroupInfo_.displaysInfo[0].id;
     }
     if (displayId < 0) {
         displayId = newId;
@@ -3905,7 +3834,6 @@ void InputWindowsManager::UpdatePointerChangeAreas()
 {
     CALL_DEBUG_ENTER;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-         std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
         const auto iter = displayGroupInfoMapTmp_.find(MAIN_GROUPID);
         if(iter == displayGroupInfoMapTmp_.end()) {
             return;
@@ -4313,25 +4241,21 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     Direction lastRotation;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        auto iter = cursorPosMap_.find(groupId);
-        if (iter != cursorPosMap_.end()) {
-            cursorPosMap_[groupId].direction = physicalDisplayInfo->direction;
-            cursorPosMap_[groupId].displayDirection = physicalDisplayInfo->displayDirection;
-        }
+  
+    auto iter = cursorPosMap_.find(groupId);
+    if (iter != cursorPosMap_.end()) {
+        cursorPosMap_[groupId].direction = physicalDisplayInfo->direction;
+        cursorPosMap_[groupId].displayDirection = physicalDisplayInfo->displayDirection;
     }
     int64_t endTime = GetSysClockTime();
     if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
         MMI_HILOGW("Rs process timeout");
     }
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        auto itr = captureModeInfoMap_.find(groupId);
-        if (itr != captureModeInfoMap_.end()) {
-            if (itr->second.isCaptureMode&& (touchWindow->id != itr->second.windowId)) {
-                captureModeInfoMap_[groupId].isCaptureMode = false;
-            }
+    
+    auto itr = captureModeInfoMap_.find(groupId);
+    if (itr != captureModeInfoMap_.end()) {
+        if (itr->second.isCaptureMode&& (touchWindow->id != itr->second.windowId)) {
+            captureModeInfoMap_[groupId].isCaptureMode = false;
         }
     }
     SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
@@ -4467,17 +4391,14 @@ int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptur
         return RET_ERR;
     }
     MMI_HILOGI("SetMouseCaptureMode In.");
-	{
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
-        if (itr != captureModeInfoMap_.end()) {
-            if (itr->second.isCaptureMode == isCaptureMode && !isCaptureMode) {
-                MMI_HILOGE("Windowid:(%{public}d) is not capture mode", windowId);
-                return RET_OK;
-            }
-		    captureModeInfoMap_[MAIN_GROUPID].windowId = windowId;
-            captureModeInfoMap_[MAIN_GROUPID].isCaptureMode = isCaptureMode;
+    auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
+    if (itr != captureModeInfoMap_.end()) {
+        if (itr->second.isCaptureMode == isCaptureMode && !isCaptureMode) {
+            MMI_HILOGE("Windowid:(%{public}d) is not capture mode", windowId);
+            return RET_OK;
         }
+        captureModeInfoMap_[MAIN_GROUPID].windowId = windowId;
+        captureModeInfoMap_[MAIN_GROUPID].isCaptureMode = isCaptureMode;
     }
     MMI_HILOGI("Windowid:(%{public}d) is (%{public}d)", windowId, isCaptureMode);
     return RET_OK;
@@ -4486,7 +4407,6 @@ int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptur
 bool InputWindowsManager::GetMouseIsCaptureMode() const
 {
     MMI_HILOGI("GetMouseIsCaptureMode In.");
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
     if (itr != captureModeInfoMap_.end()) {
         return itr->second.isCaptureMode;
@@ -6027,16 +5947,13 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = mouseLocationMap_.find(groupId);
-        if (iter != mouseLocationMap_.end()) {
-            mouseLocationMap_[groupId].displayId = displayId;
-        }
-        const auto it = cursorPosMap_.find(groupId);
-        if (it != cursorPosMap_.end()) {
-            cursorPosMap_[groupId].displayId = displayId;
-        }
+    const auto iter = mouseLocationMap_.find(groupId);
+    if (iter != mouseLocationMap_.end()) {
+        mouseLocationMap_[groupId].displayId = displayId;
+    }
+    const auto it = cursorPosMap_.find(groupId);
+    if (it != cursorPosMap_.end()) {
+        cursorPosMap_[groupId].displayId = displayId;
     }
     if (isRealData) {
         PhysicalCoordinate coord {
@@ -6044,58 +5961,42 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
             .y = integerY,
         };
         RotateDisplayScreen(*displayInfo, coord);
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = mouseLocationMap_.find(groupId);
-            if (iter != mouseLocationMap_.end()) {
-                mouseLocationMap_[groupId].physicalX = coord.x;
-                mouseLocationMap_[groupId].physicalY = coord.y;
-            }
-            const auto it = cursorPosMap_.find(groupId);
-            if (it != cursorPosMap_.end()) {
-                cursorPosMap_[groupId].cursorPos.x = x;
-                cursorPosMap_[groupId].cursorPos.y = y;
-            }
+        const auto iter = mouseLocationMap_.find(groupId);
+        if (iter != mouseLocationMap_.end()) {
+            mouseLocationMap_[groupId].physicalX = coord.x;
+            mouseLocationMap_[groupId].physicalY = coord.y;
+        }
+        const auto it = cursorPosMap_.find(groupId);
+        if (it != cursorPosMap_.end()) {
+            cursorPosMap_[groupId].cursorPos.x = x;
+            cursorPosMap_[groupId].cursorPos.y = y;
         }
     } else {
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = mouseLocationMap_.find(groupId);
-            if (iter != mouseLocationMap_.end()) {
-                mouseLocationMap_[groupId].physicalX = integerX;
-                mouseLocationMap_[groupId].physicalY = integerY;
-            }
+        const auto iter = mouseLocationMap_.find(groupId);
+        if (iter != mouseLocationMap_.end()) {
+            mouseLocationMap_[groupId].physicalX = integerX;
+            mouseLocationMap_[groupId].physicalY = integerY;
         }
- 
         CursorPosition cursorPosCur = {};
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = cursorPosMap_.find(groupId);
-            if (iter != cursorPosMap_.end()) {
-                cursorPosCur = iter->second;
-            }
+        
+        const auto it = cursorPosMap_.find(groupId);
+        if (it != cursorPosMap_.end()) {
+            cursorPosCur = it->second;
         }
         ReverseRotateDisplayScreen(*displayInfo, x, y, cursorPosCur.cursorPos);
- 
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            cursorPosMap_[groupId] = cursorPosCur;
-        }
+        cursorPosMap_[groupId] = cursorPosCur;
     }
     MouseLocation mouseLocationTmp;
     double physicalX = 0.0;
     double physicalY = 0.0;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto& iter = mouseLocationMap_.find(groupId);
-        if (iter != mouseLocationMap_.end()) {
-            mouseLocationTmp = iter->second;
-        }
-        const auto& it = cursorPosMap_.find(groupId);
-        if (it != cursorPosMap_.end()) {
-            physicalX = it->second.cursorPos.x;
-            physicalY = it->second.cursorPos.y;
-        }
+    const auto& locationMap = mouseLocationMap_.find(groupId);
+    if (locationMap != mouseLocationMap_.end()) {
+        mouseLocationTmp = locationMap->second;
+    }
+    const auto& posMap = cursorPosMap_.find(groupId);
+    if (posMap != cursorPosMap_.end()) {
+        physicalX = posMap->second.cursorPos.x;
+        physicalY = posMap->second.cursorPos.y;
     }
     MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{public}d, %{public}d}, "
                "cursorPosXY: {%{public}.2f, %{public}.2f} -> {%{public}.2f %{private}.2f}",
@@ -6107,12 +6008,9 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 {
     auto displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
     MouseLocation curMouseLocation;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
-        if (iter != mouseLocationMap_.end()) {
-            curMouseLocation = iter->second;
-        }
+    const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+    if (iter != mouseLocationMap_.end()) {
+        curMouseLocation = iter->second;
     }
     MMI_HILOGI("Mouselocation start: displayId:%{public}d, X:%{public}d, Y:%{public}d",
         curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY);
@@ -6121,15 +6019,12 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
-            if (iter != mouseLocationMap_.end()) {
-                mouseLocationMap_[MAIN_GROUPID].displayId = displayInfo.id;
-                mouseLocationMap_[MAIN_GROUPID].physicalX = displayInfo.validWidth / TWOFOLD;
-                mouseLocationMap_[MAIN_GROUPID].physicalY = displayInfo.validHeight / TWOFOLD;
-                curMouseLocation = iter->second;
-            }
+        const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+        if (iter != mouseLocationMap_.end()) {
+            mouseLocationMap_[MAIN_GROUPID].displayId = displayInfo.id;
+            mouseLocationMap_[MAIN_GROUPID].physicalX = displayInfo.validWidth / TWOFOLD;
+            mouseLocationMap_[MAIN_GROUPID].physicalY = displayInfo.validHeight / TWOFOLD;
+            curMouseLocation = iter->second;
         }
         MMI_HILOGI("Mouselocation displayinfo: displayId:%{public}d, W:%{public}d, H:%{public}d",
         displayInfo.id, displayInfo.validWidth, displayInfo.validHeight);
@@ -6145,26 +6040,20 @@ CursorPosition InputWindowsManager::GetCursorPos()
     MMI_HILOGI("GetCursorPos In");
     auto displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
     CursorPosition cursorPos;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
-        if (iter != cursorPosMap_.end()) {
-            cursorPos = iter->second;
-        }
+    const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+    if (iter != cursorPosMap_.end()) {
+        cursorPos = iter->second;
     }
     if ((cursorPos.displayId < 0) && !displaysInfoVector.empty()) {
         DisplayInfo displayInfo = displaysInfoVector[0];
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = cursorPosMap_.find(MAIN_GROUPID);
-            if (iter != cursorPosMap_.end()) {
-                cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
-                cursorPosMap_[MAIN_GROUPID].cursorPos.x = displayInfo.validWidth * HALF_RATIO;
-                cursorPosMap_[MAIN_GROUPID].cursorPos.y = displayInfo.validHeight * HALF_RATIO;
-            }
+        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        if (iter != cursorPosMap_.end()) {
+            cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
+            cursorPosMap_[MAIN_GROUPID].cursorPos.x = displayInfo.validWidth * HALF_RATIO;
+            cursorPosMap_[MAIN_GROUPID].cursorPos.y = displayInfo.validHeight * HALF_RATIO;
         }
     }
     return cursorPos;
@@ -6188,33 +6077,24 @@ CursorPosition InputWindowsManager::ResetCursorPos()
             }
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = cursorPosMap_.find(MAIN_GROUPID);
-            if (iter != cursorPosMap_.end()) {
-                cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
-                cursorPosMap_[MAIN_GROUPID].cursorPos.x = x;
-                cursorPosMap_[MAIN_GROUPID].cursorPos.y = y;
-            }
+        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        if (iter != cursorPosMap_.end()) {
+            cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
+            cursorPosMap_[MAIN_GROUPID].cursorPos.x = x;
+            cursorPosMap_[MAIN_GROUPID].cursorPos.y = y;
         }
     } else {
-        {
-            std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-            const auto iter = cursorPosMap_.find(MAIN_GROUPID);
-            if (iter != cursorPosMap_.end()) {
-                cursorPosMap_[MAIN_GROUPID].displayId = -1;
-                cursorPosMap_[MAIN_GROUPID].cursorPos.x = 0;
-                cursorPosMap_[MAIN_GROUPID].cursorPos.y = 0;
-            }
+        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        if (iter != cursorPosMap_.end()) {
+            cursorPosMap_[MAIN_GROUPID].displayId = -1;
+            cursorPosMap_[MAIN_GROUPID].cursorPos.x = 0;
+            cursorPosMap_[MAIN_GROUPID].cursorPos.y = 0;
         }
     }
     CursorPosition cursorPos;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
-        if (iter != cursorPosMap_.end()) {
-            cursorPos = iter->second;
-        }
+    const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+    if (iter != cursorPosMap_.end()) {
+        cursorPos = iter->second;
     }
     MMI_HILOGI("ResetCursorPos cursorPosMap_[mainGroupId].displayId:%{public}d",
         cursorPos.displayId);
@@ -6312,12 +6192,11 @@ void InputWindowsManager::UpdatePointerAction(std::shared_ptr<PointerEvent> poin
     MMI_HILOG_DISPATCHD("pointerAction:%{public}s", pointerEvent->DumpPointerAction());
 }
 
-void InputWindowsManager::DumpDisplayInfo(int32_t fd)
+void InputWindowsManager::DumpDisplayInfo(int32_t fd, const std::vector<DisplayInfo>& displaysInfo)
 {
     mprintf(fd, "Displays information:\t");
-    auto DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
-    mprintf(fd, "displayInfos,num:%zu", DisplaysInfo.size());
-    for (const auto &item : DisplaysInfo) {
+    mprintf(fd, "displayInfos,num:%zu", displaysInfo.size());
+    for (const auto &item : displaysInfo) {
         mprintf(fd, "\t displayInfos: uniqueId:%d | screenCombination:%d id:%d | x:%d"
                     "| y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d"
                     "| displayDirection:%d | displayMode:%u \t",
@@ -6335,10 +6214,25 @@ void InputWindowsManager::DumpDisplayInfo(int32_t fd)
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    std::shared_ptr<DelegateInterface> delegateProxy =
+        IPointerDrawingManager::GetInstance()->GetDelegateProxy();
+    CHKPV(delegateProxy);
+    std::vector<DisplayInfo> displaysInfo;
+    std::vector<WindowInfo> windowsInfo;
+    delegateProxy->OnPostSyncTask([this, &displaysInfo, &windowsInfo] {
+        const auto& iter = displayGroupInfoMap_.find(MAIN_GROUPID);
+        if (iter != displayGroupInfoMap_.end()) {
+            displaysInfo = iter->second.displaysInfo;
+            windowsInfo = iter->second.windowsInfo;
+            return RET_OK;
+        }
+        displaysInfo = displayGroupInfo_.displaysInfo;
+        windowsInfo = displayGroupInfo_.windowsInfo;
+        return RET_OK;
+    });
     mprintf(fd, "Windows information:\t");
-    auto WindowsInfo = GetWindowInfoVector(MAIN_GROUPID);
-    mprintf(fd, "windowsInfos,num:%zu", WindowsInfo.size());
-    for (const auto &item : WindowsInfo) {
+    mprintf(fd, "windowsInfos,num:%zu", windowsInfo.size());
+    for (const auto &item : windowsInfo) {
         mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
                 "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
                 "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
@@ -6370,7 +6264,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
             mprintf(fd, "%s", line.c_str());
         }
     }
-    DumpDisplayInfo(fd);
+    DumpDisplayInfo(fd, displaysInfo);
     mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
 #ifdef OHOS_BUILD_ENABLE_ANCO
     std::string ancoWindows;
@@ -6855,12 +6749,9 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
     CHKPV(keyEvent);
     bool hasFound = false;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplayTmp = windowsPerDisplay_;
-    {
-        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
-        const auto iter = windowsPerDisplayMap_.find(groupId);
-        if (iter != windowsPerDisplayMap_.end()) {
-            windowsPerDisplayTmp = iter->second;
-        }
+    const auto iter = windowsPerDisplayMap_.find(groupId);
+    if (iter != windowsPerDisplayMap_.end()) {
+        windowsPerDisplayTmp = iter->second;
     }
     for (const auto &item : windowsPerDisplayTmp) {
     
@@ -6938,7 +6829,6 @@ const std::shared_ptr<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowId) const
 {
-    std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     for (const auto &it : windowsPerDisplayMap_) {
         for (auto iter = it.second.begin(); iter != it.second.end(); ++iter) {
             int32_t displayId = iter->first;
