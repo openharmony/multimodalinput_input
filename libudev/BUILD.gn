@@ -57,7 +57,7 @@ ohos_unittest("libudev-test") {
   module_out_path = output_path
   include_dirs = [
     "${mmi_path}/util/common/include",
-    "//third_party/libevdev",
+    "${third_party_path}/libevdev",
   ]
 
   configs = [
@@ -81,7 +81,7 @@ ohos_unittest("libudev-test") {
 
 ohos_unittest("e2e-libudev-test") {
   module_out_path = output_path
-  include_dirs = [ "//third_party/libevdev" ]
+  include_dirs = [ "${third_party_path}/libevdev" ]
 
   sources = [ "test/e2e_udev_test.cpp" ]
 
