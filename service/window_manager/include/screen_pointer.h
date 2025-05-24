@@ -160,6 +160,7 @@ private:
     bool InitTransparentBuffer(const OHOS::BufferRequestConfig &bufferCfg);
     bool InitCommonBuffer(const OHOS::BufferRequestConfig &bufferCfg);
     buffer_ptr_t CreateSurfaceBuffer(const OHOS::BufferRequestConfig &bufferCfg);
+    bool IsDefaultCfg(const RenderConfig &cfg);
 
 private:
     std::mutex mtx_;

@@ -40,6 +40,9 @@ constexpr uint32_t FOCUS_POINT = DEFAULT_CURSOR_SIZE / NUM_TWO;
 constexpr int32_t BUFFER_TIMEOUT{150};
 constexpr int32_t STRIDE_ALIGNMENT{8};
 constexpr uint32_t RENDER_STRIDE{4};
+constexpr uint32_t POINTER_SIZE_DEFAULT { 1 };
+constexpr uint32_t POINTER_SIZE_HPR { 2 };
+
 
 uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
 {
@@ -103,11 +106,14 @@ bool ScreenPointer::Init(PointerRenderer &render)
         .align_ = ICON_TYPE::ANGLE_NW,
         .path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg",
         .color = 0,
-        .size = 1,
+        .size = POINTER_SIZE_DEFAULT,
         .direction = Direction::DIRECTION0,
         .dpi = this->GetDPI() * this->GetScale(),
         .isHard = true,
     };
+    if (OHOS::system::GetParameter("const.build.product", "HYM") == "HPR") {
+        defaultCursorCfg.size = POINTER_SIZE_HPR;
+    }
     defaultCursorCfg_ = defaultCursorCfg;
 
     // Init buffers
@@ -207,13 +213,19 @@ buffer_ptr_t ScreenPointer::RequestBuffer(const RenderConfig &cfg, bool &isCommo
         MMI_HILOGD("The buffer transparent buffer.");
         isCommonBuffer = false;
         return GetTransparentBuffer();
-    } else if (cfg == defaultCursorCfg_) {
+    } else if (IsDefaultCfg(cfg)) {
         MMI_HILOGD("The buffer default buffer.");
         isCommonBuffer = false;
         return GetDefaultBuffer();
     }
     isCommonBuffer = true;
     return GetCommonBuffer();
+}
+
+bool ScreenPointer::IsDefaultCfg(const RenderConfig &cfg)
+{
+    return (cfg == defaultCursorCfg_) && (cfg.direction == defaultCursorCfg_.direction)
+        && (cfg.align_ == defaultCursorCfg_.align_) && (cfg.isHard == defaultCursorCfg_.isHard);
 }
 
 buffer_ptr_t ScreenPointer::GetCurrentBuffer()
