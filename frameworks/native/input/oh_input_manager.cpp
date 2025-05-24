@@ -114,6 +114,7 @@ static constexpr int32_t INVALID_MONITOR_ID = -1;
 static constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
 static constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
 static constexpr int32_t OCCUPIED_BY_OTHER = -4;
+static constexpr int32_t SIMULATE_POINTER_EVENT_START_ID { 10000 };
 static std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_mouseEvent = OHOS::MMI::PointerEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_touchEvent = OHOS::MMI::PointerEvent::Create();
@@ -2633,7 +2634,7 @@ static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> po
     item.SetPressed(true);
 }
 
-static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
+static int32_t TransformTouchAction(const struct Input_TouchEvent *touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     CALL_INFO_TRACE;
@@ -2674,7 +2675,7 @@ static int32_t TransformTouchAction(const struct Input_TouchEvent* touchEvent,
     return INPUT_SUCCESS;
 }
 
-static int32_t TransformTouchProperty(const struct Input_TouchEvent* touchEvent,
+static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     CALL_INFO_TRACE;
@@ -2689,10 +2690,17 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent* touchEvent,
     }
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
-    item.SetPointerId(id);
+    item.SetOriginPointerId(id);
+    if (id < SIMULATE_POINTER_EVENT_START_ID) {
+        item.SetPointerId(id + SIMULATE_POINTER_EVENT_START_ID);
+        pointerEvent->SetPointerId(id + SIMULATE_POINTER_EVENT_START_ID);
+    } else {
+        item.SetPointerId(id);
+        pointerEvent->SetPointerId(id);
+    }
     item.SetTargetWindowId(touchEvent->windowId);
-    pointerEvent->SetPointerId(id);
     pointerEvent->SetTargetDisplayId(touchEvent->displayId);
+    pointerEvent->UpdateId();
     pointerEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     if (touchEvent->action == TOUCH_ACTION_DOWN) {
         pointerEvent->AddPointerItem(item);
@@ -2702,13 +2710,16 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent* touchEvent,
     return INPUT_SUCCESS;
 }
 
-std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(
-    struct Input_TouchEvent* touchEvent)
+std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input_TouchEvent *touchEvent)
 {
     CALL_INFO_TRACE;
+    if (touchEvent == nullptr) {
+        MMI_HILOGE("touchEvent is null");
+        return nullptr;
+    }
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent = OHOS::MMI::PointerEvent::Create();
-    if (pointerEvent == nullptr || touchEvent == nullptr) {
-        MMI_HILOGE("pointerEvent is null");
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("pointerEventis null");
         return nullptr;
     }
     OHOS::MMI::PointerEvent::PointerItem item;
