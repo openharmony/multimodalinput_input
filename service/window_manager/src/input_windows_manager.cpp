@@ -4014,6 +4014,27 @@ void InputWindowsManager::UpdateInnerAngleArea(const Rect &windowArea, std::vect
     windowHotAreas.push_back(newBottomLeftRect);
     windowHotAreas.push_back(newBottomRightRect);
 }
+
+void InputWindowsManager::HandleEventsWithPointerIdCausedPullCancel(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_CANCEL) {
+        return;
+    }
+    auto pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGW("GetPointerItem of pointerId:%{public}d failed", pointerId);
+        return;
+    }
+    pointerItem.SetCanceled(true);
+    pointerItem.SetPressed(false);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    MMI_HILOGI("SetCanceled true, SetPressed false, pointerId:%{public}d", pointerId);
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    }
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -4807,6 +4828,7 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
         }
     }
 }
+
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -5653,36 +5675,45 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
         MMI_HILOG_DISPATCHD("Ignore touch event, pointerAction:%{public}d", pointerActionFlag_);
         return RET_OK;
     };
+    int32_t ret { RET_ERR };
     switch (source) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
-            return UpdateTouchScreenTarget(pointerEvent);
+            ret = UpdateTouchScreenTarget(pointerEvent);
+            break;
         }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
         case PointerEvent::SOURCE_TYPE_MOUSE: {
-            return UpdateMouseTarget(pointerEvent);
+            ret =  UpdateMouseTarget(pointerEvent);
+            break;
         }
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
-            return UpdateTouchPadTarget(pointerEvent);
+            ret = UpdateTouchPadTarget(pointerEvent);
+            break;
         }
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
         case PointerEvent::SOURCE_TYPE_JOYSTICK: {
-            return UpdateJoystickTarget(pointerEvent);
+            ret = UpdateJoystickTarget(pointerEvent);
+            break;
         }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_CROWN)
         case PointerEvent::SOURCE_TYPE_CROWN: {
-            return UpdateCrownTarget(pointerEvent);
+            ret = UpdateCrownTarget(pointerEvent);
+            break;
         }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
         default: {
             MMI_HILOG_DISPATCHE("Source type is unknown, source:%{public}d", source);
-            break;
+            return ret;
         }
     }
-    return RET_ERR;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    HandleEventsWithPointerIdCausedPullCancel(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    return ret;
 }
 
 bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, double physicalX, double physicalY)
