@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define KEY_EVENT_H
 
 #include <optional>
+#include "parcel.h"
 
 #include "input_event.h"
 
@@ -3508,6 +3509,7 @@ public:
      * @since 9
      */
     bool WriteToParcel(Parcel &out) const;
+    bool Marshalling(Parcel &out) const override;
 
     /**
      * @brief Reads data from a <b>Parcel</b> object.
@@ -3516,6 +3518,7 @@ public:
      * @since 9
      */
     bool ReadFromParcel(Parcel &in);
+    static KeyEvent *Unmarshalling(Parcel &in);
 
     /**
      * @brief Converts a key event action into a short string.

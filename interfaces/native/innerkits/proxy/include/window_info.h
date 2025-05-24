@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #ifndef DISPLAY_INFO_H
 #define DISPLAY_INFO_H
 
+#include "parcel.h"
 #include <string>
 
 namespace OHOS {
@@ -626,11 +627,48 @@ struct WindowGroupInfo {
     std::vector<WindowInfo> windowsInfo;
 };
 
-struct DisplayBindInfo {
+struct DisplayBindInfo : public Parcelable {
     int32_t inputDeviceId { -1 };
     std::string inputDeviceName;
     int32_t displayId { -1 };
     std::string displayName;
+
+    bool Marshalling(Parcel &parcel) const
+    {
+        if (!parcel.WriteInt32(inputDeviceId)) {
+            return false;
+        }
+        if (!parcel.WriteString(inputDeviceName)) {
+            return false;
+        }
+        if (!parcel.WriteInt32(displayId)) {
+            return false;
+        }
+        if (!parcel.WriteString(displayName)) {
+            return false;
+        }
+        return true;
+    };
+
+    bool ReadFromParcel(Parcel &parcel)
+    {
+        return (
+            parcel.ReadInt32(inputDeviceId) &&
+            parcel.ReadString(inputDeviceName) &&
+            parcel.ReadInt32(displayId) &&
+            parcel.ReadString(displayName)
+        );
+    }
+
+    static DisplayBindInfo* Unmarshalling(Parcel &parcel)
+    {
+        auto obj = new (std::nothrow) DisplayBindInfo();
+        if (obj && !obj->ReadFromParcel(parcel)) {
+            delete obj;
+            obj = nullptr;
+        }
+        return obj;
+    };
 };
 enum class WindowArea: int32_t {
     ENTER = 0,

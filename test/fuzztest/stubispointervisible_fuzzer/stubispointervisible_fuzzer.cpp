@@ -38,7 +38,7 @@ bool StubIsPointerVisibleFuzzTest(const uint8_t *data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::IS_POINTER_VISIBLE), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_IS_POINTER_VISIBLE), datas, reply, option);
     return true;
 }
 } // MMI

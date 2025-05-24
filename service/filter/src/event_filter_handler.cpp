@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -175,7 +175,9 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
         if (!inputDevice->HasCapability(i.deviceTags)) {
             continue;
         }
-        if (i.filter->HandleKeyEvent(event)) {
+        bool resultValue = false;
+        i.filter->HandleKeyEvent(event, resultValue);
+        if (resultValue) {
             MMI_HILOGD("Call HandleKeyEventFilter return true");
             return true;
         }
@@ -199,7 +201,9 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
         if (inputDevice == nullptr && !CheckCapability(i.deviceTags, event)) {
             continue;
         }
-        if (i.filter->HandlePointerEvent(event)) {
+        bool resultValue = false;
+        i.filter->HandlePointerEvent(event, resultValue);
+        if (resultValue) {
             int32_t action = event->GetPointerAction();
             if (action == PointerEvent::POINTER_ACTION_MOVE ||
                 action == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||

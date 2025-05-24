@@ -38,7 +38,7 @@ bool StubUnregisterInputDeviceMonitorFuzzTest(const uint8_t *data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNREGISTER_DEV_MONITOR), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_UNREGISTER_DEV_LISTENER), datas, reply, option);
     return true;
 }
 } // namespace MMI

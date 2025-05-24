@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@
 #include "libinput.h"
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
-#include "i_anco_channel.h"
+#include "ianco_channel.h"
 #endif
 #include "key_event.h"
 #include "pointer_event.h"

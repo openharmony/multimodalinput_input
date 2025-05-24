@@ -38,7 +38,7 @@ bool StubSetTouchpadTapSwitchFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::SET_TP_TAP_SWITCH), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_TOUCHPAD_TAP_SWITCH), datas, reply, option);
     return true;
 }
 } // namespace OHOS

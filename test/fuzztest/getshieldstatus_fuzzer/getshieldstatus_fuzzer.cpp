@@ -37,7 +37,7 @@ bool GetShieldStatusFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::GET_SHIELD_STATUS), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_SHIELD_STATUS), datas, reply, option);
     return true;
 }
 } // namespace OHOS

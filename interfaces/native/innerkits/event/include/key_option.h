@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,10 +25,9 @@ enum SubscribePriority {
     PRIORITY_0 = 0,
     PRIORITY_100 = 100,
 };
-class KeyOption {
+class KeyOption : public Parcelable {
 public:
     KeyOption() = default;
-    DISALLOW_COPY_AND_MOVE(KeyOption);
 
 public:
     /**
@@ -144,6 +143,21 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+    bool Marshalling(Parcel &out) const
+    {
+        return WriteToParcel(out);
+    }
+
+    static KeyOption* Unmarshalling(Parcel &in)
+    {
+        auto keyOption = new (std::nothrow) KeyOption();
+        if (keyOption && !keyOption->ReadFromParcel(in)) {
+            delete keyOption;
+            keyOption = nullptr;
+        }
+        return keyOption;
+    }
+
 private:
     std::set<int32_t> preKeys_ {};
     int32_t finalKey_ { -1 };
@@ -154,7 +168,7 @@ private:
     int32_t priority_ = SubscribePriority::PRIORITY_0;
 };
 
-class KeyMonitorOption final {
+class KeyMonitorOption final : public Parcelable {
 public:
     KeyMonitorOption() = default;
     ~KeyMonitorOption() = default;
@@ -167,8 +181,31 @@ public:
     void SetAction(int32_t action);
     void SetRepeat(bool repeat);
 
-    bool Marshalling(Parcel &parcel) const;
-    bool Unmarshalling(Parcel &parcel);
+    bool Marshalling(Parcel &parcel) const
+    {
+        return (parcel.WriteInt32(key_) &&
+        parcel.WriteInt32(action_) &&
+        parcel.WriteBool(isRepeat_));
+    }
+
+    bool ReadFromParcel(Parcel &parcel)
+    {
+        return (
+            parcel.ReadInt32(key_) &&
+            parcel.ReadInt32(action_) &&
+            parcel.ReadBool(isRepeat_)
+        );
+    }
+
+    static KeyMonitorOption* Unmarshalling(Parcel &parcel)
+    {
+        auto data = new (std::nothrow) KeyMonitorOption();
+        if (data && !data->ReadFromParcel(parcel)) {
+            delete data;
+            data = nullptr;
+        }
+        return data;
+    }
 
 private:
     int32_t key_ {};

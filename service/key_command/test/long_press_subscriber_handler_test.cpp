@@ -162,10 +162,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_SubscribeL
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = -1;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret < 0);
 }
@@ -182,10 +181,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_SubscribeL
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
     ret = LONG_PRESS_EVENT_HANDLER->UnsubscribeLongPressEvent(sess, subscribeId);
@@ -220,10 +218,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_Unsubscrib
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
     subscribeId = -1;
@@ -243,10 +240,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_Unsubscrib
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
     sess = nullptr;
@@ -266,10 +262,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_Unsubscrib
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
     sess = nullptr;
@@ -290,18 +285,16 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_Unsubscrib
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     int32_t subscribeId2 = 1;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 1,
-        .duration = 900,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 1;
+    longPressRequest2.duration = 900;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -321,18 +314,16 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_AddDuratio
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     int32_t subscribeId2 = 1;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 2,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 2;
+    longPressRequest2.duration = 300;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -352,18 +343,16 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_RemoveDura
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     int32_t subscribeId2 = 1;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 2,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 2;
+    longPressRequest2.duration = 300;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -383,18 +372,16 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_RemoveDura
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     int32_t subscribeId2 = 1;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 1;
+    longPressRequest2.duration = 300;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -414,18 +401,16 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_RemoveDura
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     int32_t subscribeId2 = 1;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 1,
-        .duration = 900,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 1;
+    longPressRequest2.duration = 900;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -459,10 +444,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_OnSubscrib
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
     int32_t fingerCount = 1;
@@ -484,18 +468,16 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_InsertSubS
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     int32_t subscribeId2 = 0;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 1,
-        .duration = 900,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 1;
+    longPressRequest2.duration = 900;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -515,20 +497,18 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_InsertSubS
     SessionPtr sess1 = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess1, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     SessionPtr sess2 = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId2 = 0;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 1,
-        .duration = 900,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 1;
+    longPressRequest2.duration = 900;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess2, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -548,20 +528,18 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_InsertSubS
     SessionPtr sess1 = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess1, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     SessionPtr sess2 = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId2 = 1;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 1,
-        .duration = 900,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 1;
+    longPressRequest2.duration = 900;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess2, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -581,10 +559,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_OnSessionD
     SessionPtr sess1 = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess1, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
@@ -605,20 +582,18 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_OnSessionD
     SessionPtr sess1 = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId1 = 0;
-    LongPressRequest longPressRequest1 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest1;
+    longPressRequest1.fingerCount = 1;
+    longPressRequest1.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess1, subscribeId1, longPressRequest1);
     EXPECT_TRUE(ret >= 0);
 
     SessionPtr sess2 = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId2 = 1;
-    LongPressRequest longPressRequest2 {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 1;
+    longPressRequest2.duration = 300;
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess2, subscribeId2, longPressRequest2);
     EXPECT_TRUE(ret >= 0);
 
@@ -874,10 +849,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
 
@@ -917,11 +891,17 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest { .fingerCount = 1, .duration = 300, };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t subscribeId2 = 0;
-    LongPressRequest longPressRequest2 { .fingerCount = 1, .duration = 900, };
+    LongPressRequest longPressRequest2;
+    longPressRequest2.fingerCount = 1;
+    longPressRequest2.duration = 900;
     int32_t subscribeId3 = 0;
-    LongPressRequest longPressRequest3 { .fingerCount = 1, .duration = 1500, };
+    LongPressRequest longPressRequest3;
+    longPressRequest3.fingerCount = 1;
+    longPressRequest3.duration = 1500;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
     ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId2, longPressRequest2);
@@ -987,10 +967,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_OnSubscrib
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
 
@@ -1027,10 +1006,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_StartFinge
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
 
@@ -1054,10 +1032,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_StartFinge
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
 
@@ -1345,10 +1322,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_NotifySubs
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, longPressRequest.fingerCount,
         longPressRequest.duration);
     auto pair = std::make_pair(longPressRequest.fingerCount, longPressRequest.duration);
@@ -1373,10 +1349,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_NotifySubs
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, longPressRequest.fingerCount,
         longPressRequest.duration);
     auto pair = std::make_pair(longPressRequest.fingerCount, longPressRequest.duration);
@@ -1401,10 +1376,9 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_NotifySubs
     SessionPtr sess = std::make_shared<UDSSession>("LongPressSubscribeHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID,
         UDS_PID);
     int32_t subscribeId = 0;
-    LongPressRequest longPressRequest {
-        .fingerCount = 1,
-        .duration = 300,
-    };
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 300;
 
     WindowInfo windowInfo;
     windowInfo.id = 10000;

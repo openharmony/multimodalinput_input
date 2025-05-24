@@ -64,10 +64,17 @@ ohos_source_set("libmmi-common") {
   public_configs = [ ":libmmi_client_config" ]
   visibility = [ "${mmi_path}/*" ]
   branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   external_deps = [
     "c_utils:utils",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "image_framework:image_native",
     "init:libbegetutil",
   ]
 
@@ -127,6 +134,7 @@ ohos_shared_library("libmmi-client") {
     "${mmi_path}/util:libmmi_util_public_config",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   public_configs = [ ":libmmi_public_client_config" ]
@@ -138,9 +146,7 @@ ohos_shared_library("libmmi-client") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  if (input_ext_feature_anco) {
-    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_stub" ]
-  }
+  deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_stub" ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -243,6 +249,9 @@ ohos_unittest("InputHandlerManagerTest") {
     "${mmi_path}:coverage_flags",
     ":libmmi_client_config",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -326,6 +335,9 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_test_util",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
   ]
 
   cflags = [
@@ -333,8 +345,17 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/util:libmmi-util",
   ]
   external_deps = [
@@ -369,15 +390,10 @@ ohos_unittest("InputMonitorManagerTest") {
   ]
 
   sources = [
-    "${mmi_path}/common/anco/comm/src/anco_channel.cpp",
-    "${mmi_path}/common/anco/comm/src/anco_channel_stub.cpp",
-    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
-    "${mmi_path}/service/filter/src/event_filter_service.cpp",
-    "${mmi_path}/service/filter/src/event_filter_stub.cpp",
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/input_handler_manager.cpp",
@@ -402,6 +418,8 @@ ohos_unittest("InputMonitorManagerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_test_util",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
   ]
 
   cflags = [
@@ -410,7 +428,10 @@ ohos_unittest("InputMonitorManagerTest") {
   ]
 
   deps = [
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_stub",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -443,15 +464,10 @@ ohos_unittest("InputManagerImplTest") {
   ]
 
   sources = [
-    "${mmi_path}/common/anco/comm/src/anco_channel.cpp",
-    "${mmi_path}/common/anco/comm/src/anco_channel_stub.cpp",
-    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
-    "${mmi_path}/service/filter/src/event_filter_service.cpp",
-    "${mmi_path}/service/filter/src/event_filter_stub.cpp",
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/input_active_subscribe_manager.cpp",
@@ -470,6 +486,8 @@ ohos_unittest("InputManagerImplTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_test_util",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
   ]
 
   cflags = [
@@ -478,7 +496,10 @@ ohos_unittest("InputManagerImplTest") {
   ]
 
   deps = [
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_stub",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -534,8 +555,17 @@ ohos_unittest("InputManagerTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/util:libmmi-util",
   ]
   external_deps = [
@@ -678,6 +708,7 @@ ohos_unittest("KeyEventInputSubscribeManagerTest") {
   ]
   external_deps = [
     "ability_runtime:abilitykit_native",
+    "c_utils:utils",
     "hilog:libhilog",
   ]
 }
@@ -707,6 +738,7 @@ ohos_unittest("LongPressEventSubscribeManagerTest") {
   ]
   external_deps = [
     "ability_runtime:abilitykit_native",
+    "c_utils:utils",
     "hilog:libhilog",
   ]
 }

@@ -1828,7 +1828,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetDisplayBind_001, TestSize.Level1)
     int32_t displayId = INVAID_VALUE;
     std::string msg;
     int32_t ret = InputManager::GetInstance()->SetDisplayBind(deviceId, displayId, msg);
-    ASSERT_TRUE(ret == RET_OK);
+    ASSERT_TRUE(ret != RET_OK);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetDisplayBind failed, ret:%{public}d", ret);
     }
@@ -4636,10 +4636,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level
     CALL_TEST_DEBUG;
     bool isSkip = true;
     int32_t ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
-    EXPECT_EQ(ret, 305);
+    EXPECT_EQ(ret, RET_OK);
     isSkip = false;
     ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
-    EXPECT_EQ(ret, 305);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -4923,10 +4923,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_001, TestSize.L
     CALL_TEST_DEBUG;
     int32_t sourceWindowId = 99;
     int32_t targetWindowId = 99;
-    ShiftWindowParam param {
-      .sourceWindowId = sourceWindowId,
-      .targetWindowId = targetWindowId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
     bool autoGenDown = true;
     int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(param, autoGenDown);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -4947,10 +4946,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_002, TestSize.L
     CALL_TEST_DEBUG;
     int32_t sourceWindowId = -150;
     int32_t targetWindowId = -99;
-    ShiftWindowParam param {
-      .sourceWindowId = sourceWindowId,
-      .targetWindowId = targetWindowId,
-    };
+    ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
     bool autoGenDown = true;
     int32_t ret = InputManager::GetInstance()->ShiftAppPointerEvent(param, autoGenDown);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

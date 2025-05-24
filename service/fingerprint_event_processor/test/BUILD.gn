@@ -26,6 +26,8 @@ ohos_unittest("FingerprintEventProcessorTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -52,6 +54,7 @@ ohos_unittest("FingerprintEventProcessorTest") {
   ]
 
   sources = [
+    "${mmi_path}/frameworks/proxy/events/src/input_event.cpp",
     "${mmi_path}/frameworks/proxy/events/src/pointer_event.cpp",
     "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
     "${mmi_path}/service/fingerprint_event_processor/src/fingerprint_event_processor.cpp",

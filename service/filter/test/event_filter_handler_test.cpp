@@ -42,13 +42,15 @@ public:
 
 class MyEventFilter : public IRemoteStub<IEventFilter> {
 public:
-    bool HandleKeyEvent(const std::shared_ptr<KeyEvent> event) override
+    ErrCode HandleKeyEvent(const std::shared_ptr<KeyEvent>& event, bool &resultValue) override
     {
-        return true;
+        resultValue = true;
+        return ERR_OK;
     }
-    bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override
+    ErrCode HandlePointerEvent(const std::shared_ptr<PointerEvent>& event, bool &resultValue) override
     {
-        return true;
+        resultValue = true;
+        return ERR_OK;
     }
 };
 
