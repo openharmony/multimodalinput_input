@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,11 +29,11 @@ public:
     ~AncoChannel() = default;
     DISALLOW_COPY_AND_MOVE(AncoChannel);
 
-    int32_t SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-    int32_t SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-    int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) override;
-    int32_t SyncKnuckleStatus(bool isKnuckleEnable) override;
-    int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) override;
+    ErrCode SyncInputPointEvent(const PointerEvent& pointerEvent) override;
+    ErrCode SyncInputKeyEvent(const KeyEvent& keyEvent) override;
+    ErrCode UpdateWindowInfo(const AncoWindows& windows) override;
+    ErrCode SyncKnuckleStatus(bool isKnuckleEnable) override;
+    ErrCode UpdateOneHandData(const AncoOneHandData &oneHandData) override;
 
 private:
     std::shared_ptr<IAncoConsumer> consumer_;

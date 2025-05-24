@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,6 +85,7 @@
 #include "input_screen_capture_agent.h"
 #endif // PLAYER_FRAMEWORK_EXISTS
 #include "tablet_subscriber_handler.h"
+#include "config_policy_utils.h"
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -115,9 +116,19 @@ constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 constexpr int32_t RETRY_CHECK_TIMES { 5 };
 constexpr int32_t CHECK_EEVENT_INTERVAL_TIME { 4000 };
 constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
+const int32_t DEFAULT_POINTER_COLOR { 0x000000 };
+constexpr int32_t MAX_SPEED { 20 };
+constexpr int32_t MIN_SPEED { 1 };
+constexpr int32_t MIN_ROWS { 1 };
+constexpr int32_t MAX_ROWS { 100 };
+constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
+constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 const std::string PRODUCT_DEVICE_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_PC = "2in1";
 const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
+constexpr int32_t MAX_DEVICE_NUM { 10 };
+const size_t QUOTES_BEGIN = 1;
+const size_t QUOTES_END = 2;
 const std::set<int32_t> g_keyCodeValueSet = {
 #ifndef OHOS_BUILD_ENABLE_WATCH
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
@@ -216,7 +227,7 @@ static void CheckDefine()
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
-MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
+MMIService::MMIService() : SystemAbility(MMIService::MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
 MMIService::~MMIService()
 {
@@ -460,7 +471,6 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
     AddSystemAbilityListener(SENSOR_SERVICE_ABILITY_ID);
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
-
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -545,12 +555,21 @@ void MMIService::RemoveAppDebugListener()
     }
 }
 
-int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
+ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
     int32_t &tokenType)
 {
-    toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
-    int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (programName.empty()) {
+        MMI_HILOGE("Invalid programName");
+        return RET_ERR;
+    }
+    tokenType = PER_HELPER->GetTokenType();
+    toReturnClientFd = MMIService::INVALID_SOCKET_FD;
+    int32_t serverFd = MMIService::INVALID_SOCKET_FD;
     int32_t uid = GetCallingUid();
     MMI_HILOGI("Enter, programName:%{public}s, moduleType:%{public}d, pid:%{public}d",
         programName.c_str(), moduleType, pid);
@@ -569,6 +588,9 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddSocketPairInfo failed, return:%{public}d", ret);
         DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+        if (toReturnClientFd >= 0) {
+            fdsan_close_with_tag(toReturnClientFd, TAG);
+        }
         return ret;
     }
     MMI_HILOGIK("Leave, programName:%{public}s, moduleType:%{public}d, alloc success", programName.c_str(),
@@ -577,16 +599,25 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     return RET_OK;
 }
 
-int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
+ErrCode MMIService::AddInputEventFilter(const sptr<IEventFilter>& filter, int32_t filterId, int32_t priority,
     uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputEventFilter()) {
+        MMI_HILOGE("Filter permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
-    CHKPR(filter, ERROR_NULL_POINTER);
+    sptr<IEventFilter> filterPtr = filter;
+    CHKPR(filterPtr, ERROR_NULL_POINTER);
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, filter, filterId, priority, deviceTags, clientPid] {
-            return sMsgHandler_.AddInputEventFilter(filter, filterId, priority, deviceTags, clientPid);
+        [this, filterPtr, filterId, priority, deviceTags, clientPid] {
+            return sMsgHandler_.AddInputEventFilter(filterPtr, filterId, priority, deviceTags, clientPid);
         }
         );
     if (ret != RET_OK) {
@@ -597,9 +628,17 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filte
     return RET_OK;
 }
 
-int32_t MMIService::RemoveInputEventFilter(int32_t filterId)
+ErrCode MMIService::RemoveInputEventFilter(int32_t filterId)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputEventFilter()) {
+        MMI_HILOGE("Filter permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -671,9 +710,17 @@ void MMIService::OnDisconnected(SessionPtr s)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t MMIService::SetMouseScrollRows(int32_t rows)
+ErrCode MMIService::SetMouseScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [rows] {
@@ -688,9 +735,19 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
-int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
+ErrCode MMIService::SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, int32_t focusY,
+    const CursorPixelMap& curPixelMap)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (windowId <= 0) {
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
+        return RET_ERR;
+    }
+    CHKPR(curPixelMap.pixelMap, ERROR_NULL_POINTER);
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId] {
@@ -710,15 +767,16 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t fo
         return RET_ERR;
     }
     if (windowId >= 0) {
-        int32_t ret = CheckPidPermission(pid);
-        if (ret != RET_OK) {
+        int32_t res = CheckPidPermission(pid);
+        if (res != RET_OK) {
             MMI_HILOGE("Check pid permission failed");
-            return ret;
+            return res;
         }
     }
     ret = delegateTasks_.PostSyncTask(std::bind(
-        [pixelMap, pid, windowId, focusX, focusY] {
-            return IPointerDrawingManager::GetInstance()->SetCustomCursor(pixelMap, pid, windowId, focusX, focusY);
+        [curPixelMap, pid, windowId, focusX, focusY] {
+            return IPointerDrawingManager::GetInstance()->SetCustomCursor(curPixelMap,
+                pid, windowId, focusX, focusY);
         }
         ));
     if (ret != RET_OK) {
@@ -729,9 +787,18 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t fo
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
+ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixelMap)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    CHKPR(curPixelMap.pixelMap, ERROR_NULL_POINTER);
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t pid = GetCallingPid();
     int32_t ret = CheckPidPermission(pid);
@@ -740,8 +807,8 @@ int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
         return ret;
     }
     ret = delegateTasks_.PostSyncTask(std::bind(
-        [pid, windowId, pixelMap] {
-            return IPointerDrawingManager::GetInstance()->SetMouseIcon(pid, windowId, pixelMap);
+        [pid, windowId, curPixelMap] {
+            return IPointerDrawingManager::GetInstance()->SetMouseIcon(pid, windowId, curPixelMap);
         }
         ));
     if (ret != RET_OK) {
@@ -752,9 +819,21 @@ int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+ErrCode MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (windowId <= 0) {
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
+        return RET_ERR;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
@@ -774,9 +853,17 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
     return RET_OK;
 }
 
-int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
+ErrCode MMIService::SetNapStatus(int32_t pid, int32_t uid, const std::string& bundleName, int32_t napStatus)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
         MMI_HILOGE("Check pid permission failed");
@@ -794,9 +881,18 @@ int32_t MMIService::ReadMouseScrollRows(int32_t &rows)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-int32_t MMIService::GetMouseScrollRows(int32_t &rows)
+ErrCode MMIService::GetMouseScrollRows(int32_t &rows)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    rows = TOUCHPAD_SCROLL_ROWS;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &rows] {
@@ -811,9 +907,17 @@ int32_t MMIService::GetMouseScrollRows(int32_t &rows)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerSize(int32_t size)
+ErrCode MMIService::SetPointerSize(int32_t size)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [size] {
@@ -836,9 +940,18 @@ int32_t MMIService::ReadPointerSize(int32_t &size)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t MMIService::GetPointerSize(int32_t &size)
+ErrCode MMIService::GetPointerSize(int32_t &size)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    size = 1;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &size] {
@@ -853,9 +966,18 @@ int32_t MMIService::GetPointerSize(int32_t &size)
     return RET_OK;
 }
 
-int32_t MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
+ErrCode MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    surfaceId = 0;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     auto ret = delegateTasks_.PostSyncTask(
         [&surfaceId] {
@@ -869,9 +991,13 @@ int32_t MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
     return RET_OK;
 }
 
-int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
+ErrCode MMIService::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [primaryButton] {
@@ -894,9 +1020,14 @@ int32_t MMIService::ReadMousePrimaryButton(int32_t &primaryButton)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
+ErrCode MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    primaryButton = -1;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &primaryButton] {
@@ -911,9 +1042,13 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
+ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_INFO_TRACE;
+    if (priority < 0) {
+        MMI_HILOGE("Invalid priority:%{public}d", priority);
+        return RET_ERR;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
@@ -944,9 +1079,10 @@ int32_t MMIService::CheckPointerVisible(bool &visible)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t MMIService::IsPointerVisible(bool &visible)
+ErrCode MMIService::IsPointerVisible(bool &visible)
 {
     CALL_DEBUG_ENTER;
+    visible = false;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &visible] {
@@ -961,9 +1097,13 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
-int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
+ErrCode MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     CHKPR(ANRMgr, RET_ERR);
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -978,9 +1118,17 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerColor(int32_t color)
+ErrCode MMIService::SetPointerColor(int32_t color)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [color] {
@@ -1003,9 +1151,18 @@ int32_t MMIService::ReadPointerColor(int32_t &color)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t MMIService::GetPointerColor(int32_t &color)
+ErrCode MMIService::GetPointerColor(int32_t &color)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    color = DEFAULT_POINTER_COLOR;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &color] {
@@ -1020,9 +1177,13 @@ int32_t MMIService::GetPointerColor(int32_t &color)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerSpeed(int32_t speed)
+ErrCode MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [speed] {
@@ -1045,9 +1206,14 @@ int32_t MMIService::ReadPointerSpeed(int32_t &speed)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-int32_t MMIService::GetPointerSpeed(int32_t &speed)
+ErrCode MMIService::GetPointerSpeed(int32_t &speed)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    speed = 0;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &speed] {
@@ -1062,23 +1228,37 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
-int32_t MMIService::NotifyNapOnline()
+ErrCode MMIService::NotifyNapOnline()
 {
     CALL_DEBUG_ENTER;
     NapProcess::GetInstance()->NotifyNapOnline();
     return RET_OK;
 }
 
-int32_t MMIService::RemoveInputEventObserver()
+ErrCode MMIService::RemoveInputEventObserver()
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     NapProcess::GetInstance()->RemoveInputEventObserver();
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
+ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        if (windowId < 0) {
+            MMI_HILOGE("windowId is negative number and not system hap, set pointerStyle failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
+    if (windowId == -1 && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Can not set global winid, because this is not sys app");
+        return ERROR_NOT_SYSAPI;
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -1095,9 +1275,13 @@ int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle,
     return RET_OK;
 }
 
-int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+ErrCode MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
+    if (windowId <= 0) {
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
+        return RET_ERR;
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
@@ -1117,7 +1301,7 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
     return RET_OK;
 }
 
-int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
+ErrCode MMIService::GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle, bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1136,9 +1320,13 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle
     return RET_OK;
 }
 
-int32_t MMIService::SetHoverScrollState(bool state)
+ErrCode MMIService::SetHoverScrollState(bool state)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [state] {
@@ -1161,9 +1349,14 @@ int32_t MMIService::ReadHoverScrollState(bool &state)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-int32_t MMIService::GetHoverScrollState(bool &state)
+ErrCode MMIService::GetHoverScrollState(bool &state)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    state = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &state] {
@@ -1193,12 +1386,24 @@ int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, 
     return RET_OK;
 }
 
-int32_t MMIService::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
+ErrCode MMIService::SupportKeys(int32_t deviceId, const std::vector<int32_t>& keys, std::vector<bool>& keystroke)
 {
     CALL_DEBUG_ENTER;
+    if (deviceId < 0) {
+        MMI_HILOGE("invalid deviceId :%{public}d", deviceId);
+        return RET_ERR;
+    }
+    if (keys.size() < 0 || keys.size() > ExtraData::MAX_BUFFER_SIZE) {
+        MMI_HILOGE("Invalid size:%{public}d", keys.size());
+        return RET_ERR;
+    }
+    std::vector<int32_t> keyCode {};
+    for (auto &item : keys) {
+        keyCode.push_back(item);
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, deviceId, &keys, &keystroke] {
-            return this->OnSupportKeys(deviceId, keys, keystroke);
+        [this, deviceId, &keyCode, &keystroke] {
+            return this->OnSupportKeys(deviceId, keyCode, keystroke);
         }
         );
     if (ret != RET_OK) {
@@ -1215,7 +1420,7 @@ int32_t MMIService::OnGetDeviceIds(std::vector<int32_t> &ids)
     return RET_OK;
 }
 
-int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
+ErrCode MMIService::GetDeviceIds(std::vector<int32_t> &ids)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -1254,18 +1459,21 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
     return RET_OK;
 }
 
-int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
+ErrCode MMIService::GetDevice(int32_t deviceId, InputDevice& inputDevice)
 {
     CALL_DEBUG_ENTER;
+    auto inputDeviceInfo = std::make_shared<InputDevice>(inputDevice);
+    CHKPR(inputDeviceInfo, ERROR_NULL_POINTER);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, deviceId, inputDevice] {
-            return this->OnGetDevice(deviceId, inputDevice);
+        [this, deviceId, inputDeviceInfo] {
+            return this->OnGetDevice(deviceId, inputDeviceInfo);
         }
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Get input device info failed, ret:%{public}d", ret);
         return ret;
     }
+    inputDevice = *inputDeviceInfo;
     return RET_OK;
 }
 
@@ -1277,7 +1485,7 @@ int32_t MMIService::OnRegisterDevListener(int32_t pid)
     return RET_OK;
 }
 
-int32_t MMIService::RegisterDevListener()
+ErrCode MMIService::RegisterDevListener()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
@@ -1300,7 +1508,7 @@ int32_t MMIService::OnUnregisterDevListener(int32_t pid)
     return RET_OK;
 }
 
-int32_t MMIService::UnregisterDevListener()
+ErrCode MMIService::UnregisterDevListener()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
@@ -1327,9 +1535,14 @@ int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
     return RET_OK;
 }
 
-int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
+ErrCode MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
+    if (deviceId < 0) {
+        MMI_HILOGE("invalid deviceId :%{public}d", deviceId);
+        return RET_ERR;
+    }
+    keyboardType = 0;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, deviceId, &keyboardType] {
             return this->OnGetKeyboardType(deviceId, keyboardType);
@@ -1342,9 +1555,17 @@ int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
     return ret;
 }
 
-int32_t MMIService::SetKeyboardRepeatDelay(int32_t delay)
+ErrCode MMIService::SetKeyboardRepeatDelay(int32_t delay)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         [delay] {
@@ -1359,9 +1580,17 @@ int32_t MMIService::SetKeyboardRepeatDelay(int32_t delay)
     return RET_OK;
 }
 
-int32_t MMIService::SetKeyboardRepeatRate(int32_t rate)
+ErrCode MMIService::SetKeyboardRepeatRate(int32_t rate)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         [rate] {
@@ -1376,9 +1605,18 @@ int32_t MMIService::SetKeyboardRepeatRate(int32_t rate)
     return RET_OK;
 }
 
-int32_t MMIService::GetKeyboardRepeatDelay(int32_t &delay)
+ErrCode MMIService::GetKeyboardRepeatDelay(int32_t &delay)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    delay = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         [&delay] {
@@ -1393,9 +1631,18 @@ int32_t MMIService::GetKeyboardRepeatDelay(int32_t &delay)
     return RET_OK;
 }
 
-int32_t MMIService::GetKeyboardRepeatRate(int32_t &rate)
+ErrCode MMIService::GetKeyboardRepeatRate(int32_t &rate)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    rate = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         [&rate] {
@@ -1421,26 +1668,68 @@ int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, Han
 
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags, std::vector<int32_t> actionsType)
+int32_t MMIService::CheckInputHandlerVaild(InputHandlerType handlerType)
+{
+    if (!PER_HELPER->VerifySystemApp()) {
+        if (handlerType == InputHandlerType::MONITOR) {
+#ifdef PLAYER_FRAMEWORK_EXISTS
+            int32_t pid = GetCallingPid();
+            bool ret = InputScreenCaptureAgent::GetInstance().IsScreenCaptureWorking(pid);
+            if (!ret) {
+                MMI_HILOGE("Calling pid is:%{public}d", pid);
+                return ERROR_NO_PERMISSION;
+            }
+#else
+            return ERROR_NOT_SYSAPI;
+#endif
+        } else if (handlerType != InputHandlerType::INTERCEPTOR) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
+        MMI_HILOGE("Interceptor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if ((handlerType == InputHandlerType::MONITOR) && (!PER_HELPER->CheckMonitor())) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::AddInputHandler(int32_t handlerType, uint32_t eventType, int32_t priority,
+    uint32_t deviceTags, const std::vector<int32_t>& actionsType)
 {
     CALL_INFO_TRACE;
     bool isRegisterCaptureCb = false;
+    InputHandlerType hType = static_cast<InputHandlerType>(handlerType);
+    HandleEventType eType = static_cast<HandleEventType>(eventType);
+    int32_t res = CheckInputHandlerVaild(hType);
+    if (res != RET_OK) {
+        MMI_HILOGE("CheckInputHandlerVaild failed, ret:%{public}d", res);
+        return res;
+    }
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
-    if (!PER_HELPER->VerifySystemApp() && handlerType == InputHandlerType::MONITOR) {
+    if (!PER_HELPER->VerifySystemApp() && hType == InputHandlerType::MONITOR) {
         isRegisterCaptureCb = true;
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, handlerType, eventType, priority, deviceTags, isRegisterCaptureCb] {
+        [this, pid, hType, eType, priority, deviceTags, isRegisterCaptureCb] {
             if (isRegisterCaptureCb) {
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
                 RegisterScreenCaptureCallback();
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
             }
-            return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
+            return this->CheckAddInput(pid, hType, eType, priority, deviceTags);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
@@ -1455,17 +1744,29 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
     return RET_OK;
 }
 
-int32_t MMIService::AddPreInputHandler(int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys)
+ErrCode MMIService::AddPreInputHandler(int32_t handlerId, uint32_t eventType, const std::vector<int32_t>& keys)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    HandleEventType eType = static_cast<HandleEventType>(eventType);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask([this, pid, handlerId, eventType, keys] () -> int32_t {
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, handlerId, eType, keys] () -> int32_t {
         auto sess = GetSessionByPid(pid);
         CHKPR(sess, ERROR_NULL_POINTER);
         auto preMonitorHandler = InputHandler->GetEventPreMonitorHandler();
         CHKPR(preMonitorHandler, RET_ERR);
-        return preMonitorHandler->AddInputHandler(sess, handlerId, eventType, keys);
+        return preMonitorHandler->AddInputHandler(sess, handlerId, eType, keys);
     });
     if (ret != RET_OK) {
         MMI_HILOGE("The AddPreInputHandler key event processed failed, ret:%{public}d", ret);
@@ -1475,9 +1776,20 @@ int32_t MMIService::AddPreInputHandler(int32_t handlerId, HandleEventType eventT
     return RET_OK;
 }
 
-int32_t MMIService::RemovePreInputHandler(int32_t handlerId)
+ErrCode MMIService::RemovePreInputHandler(int32_t handlerId)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask([this, pid, handlerId] () -> int32_t {
@@ -1526,15 +1838,45 @@ int32_t MMIService::ObserverAddInputHandler(int32_t pid)
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags, std::vector<int32_t> actionsType)
+int32_t MMIService::CheckRemoveInputHandlerVaild(InputHandlerType handlerType)
+{
+    if (!PER_HELPER->VerifySystemApp()) {
+        if (handlerType != InputHandlerType::MONITOR && handlerType != InputHandlerType::INTERCEPTOR) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
+        MMI_HILOGE("Interceptor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if ((handlerType == InputHandlerType::MONITOR) && (!PER_HELPER->CheckMonitor())) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::RemoveInputHandler(int32_t handlerType, uint32_t eventType, int32_t priority,
+    uint32_t deviceTags, const std::vector<int32_t>& actionsType)
 {
     CALL_INFO_TRACE;
+    InputHandlerType hType = static_cast<InputHandlerType>(handlerType);
+    HandleEventType eType = static_cast<HandleEventType>(eventType);
+    int32_t res = CheckRemoveInputHandlerVaild(hType);
+    if (res != RET_OK) {
+        MMI_HILOGE("CheckRemoveInputHandlerVaild failed, ret:%{public}d", res);
+        return res;
+    }
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, handlerType, eventType, priority, deviceTags] {
-            return this->CheckRemoveInput(pid, handlerType, eventType, priority, deviceTags);
+        [this, pid, hType, eType, priority, deviceTags] {
+            return this->CheckRemoveInput(pid, hType, eType, priority, deviceTags);
         }
         );
     if (ret != RET_OK) {
@@ -1560,30 +1902,48 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
     return RET_OK;
 }
 
-int32_t MMIService::AddGestureMonitor(InputHandlerType handlerType,
-    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+ErrCode MMIService::AddGestureMonitor(int32_t handlerType, uint32_t eventType, uint32_t gestureType, int32_t fingers)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    InputHandlerType hType = static_cast<InputHandlerType>(handlerType);
+    HandleEventType eType = static_cast<HandleEventType>(eventType);
+    TouchGestureType gType = static_cast<TouchGestureType>(gestureType);
+    if (hType != InputHandlerType::MONITOR) {
+        MMI_HILOGE("Illegal type:%{public}d", hType);
+        return RET_ERR;
+    }
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, handlerType, eventType, gestureType, fingers]() -> int32_t {
-            if (((eventType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
-                MMI_HILOGE("Illegal type:%{public}d", eventType);
+        [this, pid, hType, eType, gType, fingers]() -> int32_t {
+            if (((eType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
+                MMI_HILOGE("Illegal type:%{public}d", eType);
                 return RET_ERR;
             }
-            if (!GestureMonitorHandler::CheckMonitorValid(gestureType, fingers)) {
+            if (!GestureMonitorHandler::CheckMonitorValid(gType, fingers)) {
                 MMI_HILOGE("Wrong number of fingers:%{public}d", fingers);
                 return RET_ERR;
             }
             if (touchGestureMgr_ == nullptr) {
                 touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
             }
-            touchGestureMgr_->AddHandler(pid, gestureType, fingers);
+            touchGestureMgr_->AddHandler(pid, gType, fingers);
 
             auto sess = GetSessionByPid(pid);
             CHKPR(sess, ERROR_NULL_POINTER);
-            return sMsgHandler_.OnAddGestureMonitor(sess, handlerType, eventType, gestureType, fingers);
+            return sMsgHandler_.OnAddGestureMonitor(sess, hType, eType, gType, fingers);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("Add gesture handler failed, ret:%{public}d", ret);
@@ -1593,23 +1953,41 @@ int32_t MMIService::AddGestureMonitor(InputHandlerType handlerType,
     return RET_OK;
 }
 
-int32_t MMIService::RemoveGestureMonitor(InputHandlerType handlerType,
-    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+ErrCode MMIService::RemoveGestureMonitor(int32_t handlerType, uint32_t eventType, uint32_t gestureType, int32_t fingers)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    InputHandlerType hType = static_cast<InputHandlerType>(handlerType);
+    HandleEventType eType = static_cast<HandleEventType>(eventType);
+    TouchGestureType gType = static_cast<TouchGestureType>(gestureType);
+    if (hType != InputHandlerType::MONITOR) {
+        MMI_HILOGE("Illegal type:%{public}d", hType);
+        return RET_ERR;
+    }
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, handlerType, eventType, gestureType, fingers]() -> int32_t {
+        [this, pid, hType, eType, gType, fingers]() -> int32_t {
             auto sess = GetSessionByPid(pid);
             CHKPR(sess, ERROR_NULL_POINTER);
-            int32_t ret = sMsgHandler_.OnRemoveGestureMonitor(sess, handlerType, eventType, gestureType, fingers);
+            int32_t ret = sMsgHandler_.OnRemoveGestureMonitor(sess, hType, eType, gType, fingers);
             if (ret != RET_OK) {
                 MMI_HILOGE("Failed to remove gesture recognizer, ret:%{public}d", ret);
                 return ret;
             }
             if (touchGestureMgr_ != nullptr) {
-                touchGestureMgr_->RemoveHandler(pid, gestureType, fingers);
+                touchGestureMgr_->RemoveHandler(pid, gType, fingers);
             }
             return RET_OK;
         });
@@ -1630,9 +2008,17 @@ int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t eventId)
 }
 #endif // OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::MarkEventConsumed(int32_t eventId)
+ErrCode MMIService::MarkEventConsumed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -1648,9 +2034,21 @@ int32_t MMIService::MarkEventConsumed(int32_t eventId)
     return RET_OK;
 }
 
-int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+ErrCode MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckMouseCursor()) {
+        MMI_HILOGE("Mouse cursor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret =
         delegateTasks_.PostSyncTask(
@@ -1666,18 +2064,28 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 
-int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
+ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret;
     int32_t pid = GetCallingPid();
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    ret = InjectKeyEventExt(keyEvent, pid, isNativeInject);
+    ret = InjectKeyEventExt(keyEventPtr, pid, isNativeInject);
 #else
     ret = delegateTasks_.PostSyncTask(
-        [this, keyEvent, pid, isNativeInject] {
-            return this->CheckInjectKeyEvent(keyEvent, pid, isNativeInject);
+        [this, keyEventPtr, pid, isNativeInject] {
+            return this->CheckInjectKeyEvent(keyEventPtr, pid, isNativeInject);
         }
         );
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1701,7 +2109,8 @@ int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
+int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys,
+    std::unordered_map<int32_t, int32_t> &specialKeysState)
 {
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -1747,19 +2156,29 @@ int32_t MMIService::CheckTouchPadEvent(const std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
+ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
+    CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret;
     int32_t pid = GetCallingPid();
     bool isShell = PER_HELPER->RequestFromShell();
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject, isShell);
+    ret = InjectPointerEventExt(pointerEventPtr, pid, isNativeInject, isShell);
 #else
     ret = delegateTasks_.PostSyncTask(
-        [this, pointerEvent, pid, isNativeInject, isShell] {
-            return this->CheckInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell);
+        [this, pointerEventPtr, pid, isNativeInject, isShell] {
+            return this->CheckInjectPointerEvent(pointerEventPtr, pid, isNativeInject, isShell);
         }
         );
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1771,17 +2190,27 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     return RET_OK;
 }
 
-int32_t MMIService::InjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
-    const TouchpadCDG &touchpadCDG, bool isNativeInject)
+ErrCode MMIService::InjectTouchPadEvent(const PointerEvent& pointerEvent,
+    const TouchpadCDG& touchpadCDG, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
+    CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret;
     int32_t pid = GetCallingPid();
     bool isShell = PER_HELPER->RequestFromShell();
     ret = delegateTasks_.PostSyncTask(
-        [this, pointerEvent, pid, touchpadCDG, isNativeInject, isShell] {
-            return sMsgHandler_.OnInjectTouchPadEvent(pointerEvent, pid, touchpadCDG, isNativeInject, isShell);
+        [this, pointerEventPtr, pid, touchpadCDG, isNativeInject, isShell] {
+            return sMsgHandler_.OnInjectTouchPadEvent(pointerEventPtr, pid, touchpadCDG, isNativeInject, isShell);
         }
         );
     if (ret != RET_OK) {
@@ -1920,14 +2349,24 @@ void MMIService::RegisterScreenCaptureCallback()
 }
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 
-int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+ErrCode MMIService::SubscribeKeyEvent(int32_t subscribeId, const KeyOption& keyOption)
 {
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     CALL_DEBUG_ENTER;
+    auto keyOptionPtr = std::make_shared<KeyOption>(keyOption);
+    CHKPR(keyOptionPtr, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, subscribeId, option] {
-            return sMsgHandler_.OnSubscribeKeyEvent(this, pid, subscribeId, option);
+        [this, pid, subscribeId, keyOptionPtr] {
+            return sMsgHandler_.OnSubscribeKeyEvent(this, pid, subscribeId, keyOptionPtr);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("The subscribe key event processed failed, ret:%{public}d", ret);
@@ -1952,9 +2391,21 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
     return RET_OK;
 }
 
-int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
+ErrCode MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribe");
+        return RET_ERR;
+    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -1984,14 +2435,24 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+ErrCode MMIService::SubscribeHotkey(int32_t subscribeId, const KeyOption& keyOption)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribe");
+        return RET_ERR;
+    }
+    auto keyOptionPtr = std::make_shared<KeyOption>(keyOption);
+    CHKPR(keyOptionPtr, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, subscribeId, option] {
-            return sMsgHandler_.OnSubscribeHotkey(this, pid, subscribeId, option);
+        [this, pid, subscribeId, keyOptionPtr] {
+            return sMsgHandler_.OnSubscribeHotkey(this, pid, subscribeId, keyOptionPtr);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("ServerMsgHandler::OnSubscribeHotkey fail, error:%{public}d", ret);
@@ -2016,9 +2477,17 @@ int32_t MMIService::SubscribeHotkey(int32_t subscribeId, const std::shared_ptr<K
     return RET_OK;
 }
 
-int32_t MMIService::UnsubscribeHotkey(int32_t subscribeId)
+ErrCode MMIService::UnsubscribeHotkey(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribe");
+        return RET_ERR;
+    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -2049,9 +2518,13 @@ int32_t MMIService::UnsubscribeHotkey(int32_t subscribeId)
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-int32_t MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+ErrCode MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, keyOption] {
@@ -2063,8 +2536,12 @@ int32_t MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
     return ret;
 }
 
-int32_t MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
+ErrCode MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
 {
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, keyOption] {
@@ -2077,9 +2554,17 @@ int32_t MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
 }
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
-int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
+ErrCode MMIService::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -2095,9 +2580,21 @@ int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType
     return RET_OK;
 }
 
-int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
+ErrCode MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribeId");
+        return RET_ERR;
+    }
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -2113,9 +2610,19 @@ int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::QuerySwitchStatus(int32_t switchType, int32_t& state)
+ErrCode MMIService::QuerySwitchStatus(int32_t switchType, int32_t& state)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    state = 0;
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, switchType, &state] {
@@ -2130,9 +2637,17 @@ int32_t MMIService::QuerySwitchStatus(int32_t switchType, int32_t& state)
     return RET_OK;
 }
 
-int32_t MMIService::SubscribeTabletProximity(int32_t subscribeId)
+ErrCode MMIService::SubscribeTabletProximity(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
@@ -2148,9 +2663,21 @@ int32_t MMIService::SubscribeTabletProximity(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::UnsubscribetabletProximity(int32_t subscribeId)
+ErrCode MMIService::UnsubscribetabletProximity(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribeId");
+        return RET_ERR;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
@@ -2166,9 +2693,17 @@ int32_t MMIService::UnsubscribetabletProximity(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest)
+ErrCode MMIService::SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId, longPressRequest] {
@@ -2182,9 +2717,17 @@ int32_t MMIService::SubscribeLongPressEvent(int32_t subscribeId, const LongPress
     return RET_OK;
 }
  
-int32_t MMIService::UnsubscribeLongPressEvent(int32_t subscribeId)
+ErrCode MMIService::UnsubscribeLongPressEvent(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
@@ -2198,9 +2741,17 @@ int32_t MMIService::UnsubscribeLongPressEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::SetAnrObserver()
+ErrCode MMIService::SetAnrObserver()
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [pid] {
@@ -2214,9 +2765,18 @@ int32_t MMIService::SetAnrObserver()
     return RET_OK;
 }
 
-int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
+ErrCode MMIService::GetDisplayBindInfo(std::vector<DisplayBindInfo>& infos)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    infos.clear();
     int32_t ret = delegateTasks_.PostSyncTask(
         [&infos] {
             return ::OHOS::MMI::IInputWindowsManager::GetInstance()->GetDisplayBindInfo(infos);
@@ -2229,16 +2789,33 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
-int32_t MMIService::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas)
+ErrCode MMIService::GetAllMmiSubscribedEvents(MmiEventMap& mmiEventMap)
 {
     CALL_INFO_TRACE;
-    NapProcess::GetInstance()->GetAllMmiSubscribedEvents(datas);
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    mmiEventMap.datas.clear();
+    NapProcess::GetInstance()->GetAllMmiSubscribedEvents(mmiEventMap.datas);
     return RET_OK;
 }
 
-int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+ErrCode MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [deviceId, displayId, &msg] {
             return ::OHOS::MMI::IInputWindowsManager::GetInstance()->SetDisplayBind(deviceId, displayId, msg);
@@ -2251,9 +2828,14 @@ int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
     return RET_OK;
 }
 
-int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
+ErrCode MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    state = false;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, funcKey, &state] {
@@ -2268,9 +2850,22 @@ int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
     return RET_OK;
 }
 
-int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
+ErrCode MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->CheckFunctionKeyEnabled()) {
+        MMI_HILOGE("Set function key state permission check failed");
+        return ERROR_KEYBOARD_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (funcKey != KeyEvent::NUM_LOCK_FUNCTION_KEY && funcKey != KeyEvent::CAPS_LOCK_FUNCTION_KEY &&
+        funcKey != KeyEvent::SCROLL_LOCK_FUNCTION_KEY) {
+        MMI_HILOGE("Invalid funcKey:%{public}d", funcKey);
+        return RET_ERR;
+    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -2286,9 +2881,21 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
+ErrCode MMIService::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetPointerLocation Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckMouseCursor()) {
+        MMI_HILOGE("Mouse cursor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [x, y, displayId] {
@@ -2491,9 +3098,17 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+ErrCode MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (windowId <= 0) {
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
+        return RET_ERR;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [windowId, isCaptureMode] {
             return ::OHOS::MMI::IInputWindowsManager::GetInstance()->SetMouseCaptureMode(windowId, isCaptureMode);
@@ -2518,10 +3133,14 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
     return RET_OK;
 }
 
-int32_t MMIService::GetWindowPid(int32_t windowId)
+ErrCode MMIService::GetWindowPid(int32_t windowId, int32_t &windowPid)
 {
     CALL_INFO_TRACE;
-    int32_t windowPid = INVALID_PID;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    windowPid = INVALID_PID;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, windowId, &windowPid] {
             return this->OnGetWindowPid(windowId, windowPid);
@@ -2532,12 +3151,34 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
         return ret;
     }
     MMI_HILOGD("The windowpid is:%{public}d", windowPid);
-    return windowPid;
+    return RET_OK;
 }
 
-int32_t MMIService::AppendExtraData(const ExtraData &extraData)
+ErrCode MMIService::AppendExtraData(const ExtraData &extraData)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (extraData.buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
+        MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", extraData.buffer.size());
+        return ERROR_OVER_SIZE_BUFFER;
+    }
+    if (extraData.sourceType != InputEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        extraData.sourceType != InputEvent::SOURCE_TYPE_MOUSE) {
+        MMI_HILOGE("Invalid extraData.sourceType:%{public}d", extraData.sourceType);
+        return RET_ERR;
+    }
+    if (extraData.pointerId < 0 || extraData.pullId < 0) {
+        MMI_HILOGE("Invalid extraData.pointerId or extraData.pullId or extraData.eventId, pointerId:%{public}d,"
+            "pullId:%{public}d, eventId:%{public}d", extraData.pointerId, extraData.pullId, extraData.eventId);
+        return RET_ERR;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [extraData] {
             return ::OHOS::MMI::IInputWindowsManager::GetInstance()->AppendExtraData(extraData);
@@ -2549,7 +3190,7 @@ int32_t MMIService::AppendExtraData(const ExtraData &extraData)
     return ret;
 }
 
-int32_t MMIService::EnableInputDevice(bool enable)
+ErrCode MMIService::EnableInputDevice(bool enable)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -2594,9 +3235,17 @@ int32_t MMIService::CheckPidPermission(int32_t pid)
     return RET_OK;
 }
 
-int32_t MMIService::EnableCombineKey(bool enable)
+ErrCode MMIService::EnableCombineKey(bool enable)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, enable] {
@@ -2620,9 +3269,17 @@ int32_t MMIService::UpdateSettingsXml(const std::string &businessId, int32_t del
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
 
-int32_t MMIService::SetKeyDownDuration(const std::string &businessId, int32_t delay)
+ErrCode MMIService::SetKeyDownDuration(const std::string &businessId, int32_t delay)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, businessId, delay] {
@@ -2700,9 +3357,17 @@ int32_t MMIService::ReadTouchpadDoubleTapAndDragState(bool &switchFlag)
 
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
+ErrCode MMIService::SetTouchpadScrollSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -2719,9 +3384,18 @@ int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
+ErrCode MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
@@ -2736,9 +3410,17 @@ int32_t MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadScrollDirection(bool state)
+ErrCode MMIService::SetTouchpadScrollDirection(bool state)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [state] {
@@ -2753,9 +3435,18 @@ int32_t MMIService::SetTouchpadScrollDirection(bool state)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadScrollDirection(bool &state)
+ErrCode MMIService::GetTouchpadScrollDirection(bool &state)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    state = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &state] {
@@ -2770,9 +3461,17 @@ int32_t MMIService::GetTouchpadScrollDirection(bool &state)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadTapSwitch(bool switchFlag)
+ErrCode MMIService::SetTouchpadTapSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
@@ -2787,9 +3486,18 @@ int32_t MMIService::SetTouchpadTapSwitch(bool switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
+ErrCode MMIService::GetTouchpadTapSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
@@ -2804,9 +3512,22 @@ int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadPointerSpeed(int32_t speed)
+ErrCode MMIService::SetTouchpadPointerSpeed(int32_t speed)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (speed < MIN_SPEED) {
+        speed = MIN_SPEED;
+    } else if (speed > MAX_SPEED) {
+        speed = MAX_SPEED;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [speed] {
@@ -2821,9 +3542,18 @@ int32_t MMIService::SetTouchpadPointerSpeed(int32_t speed)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
+ErrCode MMIService::GetTouchpadPointerSpeed(int32_t &speed)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    speed = 1;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &speed] {
@@ -2838,9 +3568,21 @@ int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
+ErrCode MMIService::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    touchpadCDG.ppi = 0.0;
+    touchpadCDG.size = 0.0;
+    touchpadCDG.speed = 0;
+    touchpadCDG.frequency = 0;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &touchpadCDG] {
@@ -2855,9 +3597,17 @@ int32_t MMIService::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
+ErrCode MMIService::SetTouchpadPinchSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
@@ -2872,9 +3622,18 @@ int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
+ErrCode MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
@@ -2889,9 +3648,17 @@ int32_t MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
+ErrCode MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
@@ -2906,9 +3673,18 @@ int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
+ErrCode MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
@@ -2923,9 +3699,33 @@ int32_t MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadRightClickType(int32_t type)
+bool MMIService::IsValidType(int32_t type)
+{
+    if (type != RightClickType::TOUCHPAD_RIGHT_BUTTON &&
+        type != RightClickType::TOUCHPAD_LEFT_BUTTON &&
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP &&
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON &&
+        type != RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON) {
+        return false;
+    }
+    return true;
+}
+
+ErrCode MMIService::SetTouchpadRightClickType(int32_t type)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsValidType(type)) {
+        MMI_HILOGE("Invalid type:%{public}d", type);
+        return RET_ERR;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [type] {
@@ -2940,9 +3740,18 @@ int32_t MMIService::SetTouchpadRightClickType(int32_t type)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
+ErrCode MMIService::GetTouchpadRightClickType(int32_t &type)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    type = 1;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &type] {
@@ -2957,9 +3766,17 @@ int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
+ErrCode MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [rotateSwitch] {
@@ -2974,9 +3791,18 @@ int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
+ErrCode MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    rotateSwitch = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &rotateSwitch] {
@@ -2991,9 +3817,17 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+ErrCode MMIService::SetTouchpadDoubleTapAndDragState(bool switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
@@ -3009,9 +3843,18 @@ int32_t MMIService::SetTouchpadDoubleTapAndDragState(bool switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+ErrCode MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
@@ -3026,9 +3869,21 @@ int32_t MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::SetShieldStatus(int32_t shieldMode, bool isShield)
+ErrCode MMIService::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckDispatchControl()) {
+        MMI_HILOGE("Input dispatch control permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, shieldMode, isShield] {
@@ -3043,9 +3898,22 @@ int32_t MMIService::SetShieldStatus(int32_t shieldMode, bool isShield)
     return RET_OK;
 }
 
-int32_t MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
+ErrCode MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckDispatchControl()) {
+        MMI_HILOGE("Input dispatch control permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    isShield = false;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, shieldMode, &isShield] {
@@ -3060,7 +3928,8 @@ int32_t MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
     return RET_OK;
 }
 
-int32_t MMIService::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
+ErrCode MMIService::GetKeyState(std::vector<int32_t>& pressedKeys,
+    std::unordered_map<int32_t, int32_t>& specialKeysState)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -3077,9 +3946,17 @@ int32_t MMIService::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int3
     return RET_OK;
 }
 
-int32_t MMIService::Authorize(bool isAuthorize)
+ErrCode MMIService::Authorize(bool isAuthorize)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckAuthorize()) {
+        MMI_HILOGE("Input authorize permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, isAuthorize] {
             return this->OnAuthorize(isAuthorize);
@@ -3097,7 +3974,7 @@ int32_t MMIService::OnAuthorize(bool isAuthorize)
     return sMsgHandler_.OnAuthorize(isAuthorize);
 }
 
-int32_t MMIService::CancelInjection()
+ErrCode MMIService::CancelInjection()
 {
     CALL_DEBUG_ENTER;
     int32_t callPid = GetCallingPid();
@@ -3118,9 +3995,14 @@ int32_t MMIService::OnCancelInjection(int32_t callPid)
     return sMsgHandler_.OnCancelInjection(callPid);
 }
 
-int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
+ErrCode MMIService::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    hasIrEmitter = false;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &hasIrEmitter] {
             return this->OnHasIrEmitter(hasIrEmitter);
@@ -3133,9 +4015,13 @@ int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
     return RET_OK;
 }
 
-int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies)
+ErrCode MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->CheckInfraredEmmit()) {
+        MMI_HILOGE("Infrared permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
 #ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGI("Start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
@@ -3160,9 +4046,13 @@ int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
     return RET_OK;
 }
 
-int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+ErrCode MMIService::TransmitInfrared(int64_t number, const std::vector<int64_t>& pattern)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->CheckInfraredEmmit()) {
+        MMI_HILOGE("StubTransmitInfrared permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
+        return ERROR_NO_PERMISSION;
+    }
 #ifndef OHOS_BUILD_ENABLE_WATCH
     std::string context = "infraredFrequency:" + std::to_string(number) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
@@ -3179,9 +4069,14 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-int32_t MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
+ErrCode MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubCreateVKeyboardDevice Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    vkeyboardDevice = nullptr;
     isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
     if (!isHPR_) {
         MMI_HILOGE("Failed to create vkeyboard device, feature not support");
@@ -3285,10 +4180,23 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
     return RET_OK;
 }
 
-int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
+ErrCode MMIService::SetPixelMapData(int32_t infoId, const CursorPixelMap& curPixelMap)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pixelMap, ERROR_NULL_POINTER);
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (infoId <= 0) {
+        MMI_HILOGE("Invalid infoId:%{public}d", infoId);
+        return RET_ERR;
+    }
+    CHKPR(curPixelMap.pixelMap, ERROR_NULL_POINTER);
+    void* pixelMap = curPixelMap.pixelMap;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, infoId, pixelMap] {
             return sMsgHandler_.SetPixelMapData(infoId, pixelMap);
@@ -3312,9 +4220,17 @@ void MMIService::InitPreferences()
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 }
 
-int32_t MMIService::SetMoveEventFilters(bool flag)
+ErrCode MMIService::SetMoveEventFilters(bool flag)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetMoveEventFilters Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&InputEventHandler::SetMoveEventFilters, InputHandler, flag));
@@ -3326,9 +4242,22 @@ int32_t MMIService::SetMoveEventFilters(bool flag)
     return RET_OK;
 }
 
-int32_t MMIService::SetCurrentUser(int32_t userId)
+ErrCode MMIService::SetCurrentUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetCurrentUser Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t callingUid = GetCallingUid();
+    if (callingUid < UID_TRANSFORM_DIVISOR) {
+        MMI_HILOGE("CallingUid is not within the range:%{public}d", callingUid);
+        return RET_ERR;
+    }
+    if (callingUid / UID_TRANSFORM_DIVISOR != userId) {
+        MMI_HILOGE("Invalid CallingUid:%{public}d", callingUid);
+        return RET_ERR;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [userId] {
             return ::OHOS::MMI::IInputWindowsManager::GetInstance()->SetCurrentUser(userId);
@@ -3352,9 +4281,13 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
     return RET_OK;
 }
 
-int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+ErrCode MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetTouchpadThreeFingersTapSwitch Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
@@ -3370,9 +4303,14 @@ int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+ErrCode MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [&switchFlag] {
@@ -3388,13 +4326,19 @@ int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
     return RET_OK;
 }
 
-int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+ErrCode MMIService::AddVirtualInputDevice(const InputDevice& device, int32_t& deviceId)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(device, ERROR_NULL_POINTER);
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    deviceId = -1;
+    auto devicePtr = std::make_shared<InputDevice>(device);
+    CHKPR(devicePtr, ERROR_NULL_POINTER);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [device, &deviceId] {
-            return ::OHOS::MMI::InputDeviceManager::GetInstance()->AddVirtualInputDevice(device, deviceId);
+        [devicePtr, &deviceId] {
+            return ::OHOS::MMI::InputDeviceManager::GetInstance()->AddVirtualInputDevice(devicePtr, deviceId);
         }
         );
     if (ret != RET_OK) {
@@ -3403,9 +4347,17 @@ int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, i
     return ret;
 }
 
-int32_t MMIService::RemoveVirtualInputDevice(int32_t deviceId)
+ErrCode MMIService::RemoveVirtualInputDevice(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (deviceId < 0) {
+        MMI_HILOGE("invalid deviceId :%{public}d", deviceId);
+        return RET_ERR;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [deviceId] {
             return ::OHOS::MMI::InputDeviceManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
@@ -3417,9 +4369,13 @@ int32_t MMIService::RemoveVirtualInputDevice(int32_t deviceId)
     return ret;
 }
 
-int32_t MMIService::EnableHardwareCursorStats(bool enable)
+ErrCode MMIService::EnableHardwareCursorStats(bool enable)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -3435,9 +4391,15 @@ int32_t MMIService::EnableHardwareCursorStats(bool enable)
     return RET_OK;
 }
 
-int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+ErrCode MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    frameCount = 0;
+    vsyncCount = 0;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -3454,29 +4416,50 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
 }
 
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
+ErrCode MMIService::GetPointerSnapshot(CursorPixelMap& pixelMapPtr)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap;
 #if defined OHOS_BUILD_ENABLE_POINTER
     MMI_HILOGI("Get pointer snapshot from process(%{public}d)", GetCallingPid());
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(
-        std::bind(&IPointerDrawingManager::GetPointerSnapshot, IPointerDrawingManager::GetInstance(), pixelMapPtr)));
+        std::bind(&IPointerDrawingManager::GetPointerSnapshot,
+            IPointerDrawingManager::GetInstance(), &pixelMap)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get the pointer snapshot failed, ret:%{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    CHKPR(pixelMap, ERR_INVALID_VALUE);
+    pixelMapPtr.pixelMap = static_cast<void*>(&pixelMap);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
-int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
+ErrCode MMIService::SetTouchpadScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
-        [rows] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(rows);
+        [newRows] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(newRows);
         }
         );
     if (ret != RET_OK) {
@@ -3495,9 +4478,18 @@ int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
+ErrCode MMIService::GetTouchpadScrollRows(int32_t &rows)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    rows = TOUCHPAD_SCROLL_ROWS;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &rows] {
@@ -3510,14 +4502,22 @@ int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    if (rows < MIN_ROWS || rows > MAX_ROWS) {
+        MMI_HILOGD("Invalid touchpad scroll rows:%{public}d", rows);
+    }
     return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
-int32_t MMIService::AncoAddChannel(sptr<IAncoChannel> channel)
+ErrCode MMIService::AncoAddChannel(const sptr<IAncoChannel>& channel)
 {
-    int32_t ret = delegateTasks_.PostSyncTask([channel]() {
-        return WIN_MGR->AncoAddChannel(channel);
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    sptr<IAncoChannel> ancoChannel = channel;
+    int32_t ret = delegateTasks_.PostSyncTask([ancoChannel]() {
+        return WIN_MGR->AncoAddChannel(ancoChannel);
     });
     if (ret != RET_OK) {
         MMI_HILOGE("AncoAddChannel fail, error:%{public}d", ret);
@@ -3526,10 +4526,15 @@ int32_t MMIService::AncoAddChannel(sptr<IAncoChannel> channel)
     return ret;
 }
 
-int32_t MMIService::AncoRemoveChannel(sptr<IAncoChannel> channel)
+ErrCode MMIService::AncoRemoveChannel(const sptr<IAncoChannel>& channel)
 {
-    int32_t ret = delegateTasks_.PostSyncTask([channel]() {
-        return WIN_MGR->AncoRemoveChannel(channel);
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    sptr<IAncoChannel> ancoChannel = channel;
+    int32_t ret = delegateTasks_.PostSyncTask([ancoChannel]() {
+        return WIN_MGR->AncoRemoveChannel(ancoChannel);
     });
     if (ret != RET_OK) {
         MMI_HILOGE("AncoRemoveChannel fail, error:%{public}d", ret);
@@ -3538,7 +4543,7 @@ int32_t MMIService::AncoRemoveChannel(sptr<IAncoChannel> channel)
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 
-int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject)
+ErrCode MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject)
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
@@ -3578,9 +4583,13 @@ void MMIService::PrintLog(const std::string &flag, int32_t duration, int32_t pid
     MMI_HILOGW("BlockMsg:%{public}s", dfxThreadBlockMsg.c_str());
 }
 
-int32_t MMIService::SkipPointerLayer(bool isSkip)
+ErrCode MMIService::SkipPointerLayer(bool isSkip)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [isSkip] {
@@ -3608,9 +4617,17 @@ void MMIService::OnSessionDelete(SessionPtr session)
     }
 }
 
-int32_t MMIService::SetClientInfo(int32_t pid, uint64_t readThreadId)
+ErrCode MMIService::SetClientInfo(int32_t pid, uint64_t readThreadId)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (readThreadId < 0) {
+        MMI_HILOGE("invalid readThreadId :%{public}llu", readThreadId);
+        return RET_ERR;
+    }
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     std::string programName = sess->GetProgramName();
@@ -3656,9 +4673,10 @@ void MMIService::InitPrintClientInfo()
     AddSessionDeletedCallback(callback);
 }
 
-int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
+ErrCode MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     CALL_INFO_TRACE;
+    timeInterval = 0;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetIntervalSinceLastInput,
         InputHandler, std::ref(timeInterval)));
     MMI_HILOGD("timeInterval:%{public}" PRId64, timeInterval);
@@ -3668,17 +4686,22 @@ int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
     return ret;
 }
 
-int32_t MMIService::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+ErrCode MMIService::GetAllSystemHotkeys(std::vector<KeyOption>& keyOptions)
 {
     CALL_DEBUG_ENTER;
+    std::vector<std::unique_ptr<KeyOption>> options {};
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &keyOptions] {
-            return this->OnGetAllSystemHotkey(keyOptions);
+        [this, &options] {
+            return this->OnGetAllSystemHotkey(options);
         }
         );
     if (ret != RET_OK) {
         MMI_HILOGD("Get all system hot key, ret:%{public}d", ret);
         return ret;
+    }
+    keyOptions.clear();
+    for (const auto &item : options) {
+        keyOptions.push_back(std::move(*item));
     }
     return RET_OK;
 }
@@ -3713,8 +4736,24 @@ int32_t MMIService::SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t 
     return RET_OK;
 }
 
-int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index)
+ErrCode MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index)
 {
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputDeviceController()) {
+        MMI_HILOGE("Controller permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (deviceId < 0) {
+        MMI_HILOGE("invalid deviceId :%{public}d", deviceId);
+        return RET_ERR;
+    }
     CALL_INFO_TRACE;
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
@@ -3730,9 +4769,17 @@ int32_t MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t
     return RET_OK;
 }
 
-int32_t MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
+ErrCode MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
         [param, autoGenDown]() {
@@ -3747,9 +4794,14 @@ int32_t MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool aut
     return RET_OK;
 }
 
-int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+ErrCode MMIService::SetCustomCursor(int32_t windowId,
+    const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel)
 {
     CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId] {
@@ -3760,6 +4812,12 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, Curso
         MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
         return ERROR_WINDOW_ID_PERMISSION_DENIED;
     }
+    CustomCursor cursor;
+    cursor.pixelMap = curParcel.pixelMap;
+    cursor.focusX = curParcel.focusX;
+    cursor.focusY = curParcel.focusY;
+    CursorOptions options;
+    options.followSystem = cOptionParcel.followSystem;
 #if defined OHOS_BUILD_ENABLE_POINTER
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, cursor, options] {
@@ -3775,9 +4833,14 @@ int32_t MMIService::SetCustomCursor(int32_t windowId, CustomCursor cursor, Curso
 }
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
-int32_t MMIService::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
+ErrCode MMIService::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    isKnuckleType = false;
 #if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
     int tryTimes = RETRY_CHECK_TIMES;
     int32_t ret = RET_ERR;
@@ -3826,8 +4889,12 @@ int32_t MMIService::SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t disp
     return RET_OK;
 }
 
-int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
+ErrCode MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
 {
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &screenId, &displayNodeScreenId] {
             return this->SetMultiWindowScreenIdInner(screenId, displayNodeScreenId);
@@ -3840,9 +4907,15 @@ int32_t MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNo
     return RET_OK;
 }
 
-int32_t MMIService::SetKnuckleSwitch(bool knuckleSwitch)
+ErrCode MMIService::SetKnuckleSwitch(bool knuckleSwitch)
 {
     CALL_INFO_TRACE;
+    int32_t callingUid = GetCallingUid();
+    int32_t gameUid = 7011;
+    if (callingUid != gameUid || !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
     auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
@@ -3859,7 +4932,7 @@ int32_t MMIService::SetKnuckleSwitch(bool knuckleSwitch)
     return RET_OK;
 }
 
-int32_t MMIService::LaunchAiScreenAbility()
+ErrCode MMIService::LaunchAiScreenAbility()
 {
     int32_t pid = GetCallingPid();
     int ret = delegateTasks_.PostSyncTask(
@@ -3876,8 +4949,9 @@ int32_t MMIService::LaunchAiScreenAbility()
     return ret;
 }
 
-int32_t MMIService::GetMaxMultiTouchPointNum(int32_t &pointNum)
+ErrCode MMIService::GetMaxMultiTouchPointNum(int32_t &pointNum)
 {
+    pointNum = -1;
     int ret = delegateTasks_.PostSyncTask(
         [&pointNum] () {
             auto productDeviceType = PRODUCT_DEVICE_TYPE;
@@ -3892,15 +4966,111 @@ int32_t MMIService::GetMaxMultiTouchPointNum(int32_t &pointNum)
     return ret;
 }
 
-int32_t MMIService::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+void MMIService::DealConsumers(std::vector<std::string>& filterNames, const DeviceConsumer &consumer)
+{
+    int32_t callingUid = GetCallingUid();
+    for (const auto& uid : consumer.uids) {
+        if (uid == callingUid) {
+            filterNames.push_back(consumer.name);
+        }
+    }
+}
+
+std::vector<std::string> MMIService::FilterConsumers(const std::vector<std::string> &deviceNames)
+{
+    std::vector<std::string> filterNames;
+    for (const auto& consumer : consumersData_.consumers) {
+        if (std::find(deviceNames.begin(), deviceNames.end(), consumer.name) != deviceNames.end()) {
+            DealConsumers(filterNames, consumer);
+        }
+    }
+    return filterNames;
+}
+
+void MMIService::UpdateConsumers(const cJSON* consumer)
+{
+    DeviceConsumer deviceConsumer;
+    cJSON* name = cJSON_GetObjectItemCaseSensitive(consumer, "name");
+    if (name != nullptr && cJSON_IsString(name)) {
+        char *nameString = cJSON_Print(name);
+        std::string nameStr(nameString);
+        if (!nameStr.empty() && nameStr.front() == '"' && nameStr.back() == '"') {
+            nameStr = nameStr.substr(QUOTES_BEGIN, nameStr.size() - QUOTES_END);
+        }
+        deviceConsumer.name = nameStr;
+        cJSON_free(nameString);
+    }
+    cJSON* uid_array = cJSON_GetObjectItemCaseSensitive(consumer, "uids");
+    if (uid_array != nullptr && cJSON_IsArray(uid_array)) {
+        cJSON* uid;
+        cJSON_ArrayForEach(uid, uid_array) {
+            if (cJSON_IsNumber(uid)) {
+                deviceConsumer.uids.push_back(cJSON_GetNumberValue(uid));
+            }
+        }
+    }
+    consumersData_.consumers.push_back(deviceConsumer);
+}
+
+bool MMIService::ParseDeviceConsumerConfig()
+{
+    CALL_DEBUG_ENTER;
+    consumersData_.consumers.clear();
+    const char configName[] { "/etc/multimodalinput/input_device_consumers.json" };
+    char buf[MAX_PATH_LEN] {};
+
+    char *filePath = GetOneCfgFile(configName, buf, sizeof(buf));
+    if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
+        MMI_HILOGE("Can not get customization config file");
+        return false;
+    }
+    std::string defaultConfig = filePath;
+    std::string jsonStr = ReadJsonFile(defaultConfig);
+    if (jsonStr.empty()) {
+        MMI_HILOGE("Read configFile failed");
+        return false;
+    }
+    JsonParser jsonData;
+    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.json_)) {
+        MMI_HILOGE("The json data is not object");
+        return false;
+    }
+    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "consumers");
+    if (!cJSON_IsArray(consumers)) {
+        MMI_HILOGE("consumers number must be array");
+        return false;
+    }
+    cJSON* consumer;
+    cJSON_ArrayForEach(consumer, consumers) {
+        if (cJSON_IsObject(consumer)) {
+            UpdateConsumers(consumer);
+        }
+    }
+    return true;
+}
+
+ErrCode MMIService::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
 {
     CALL_INFO_TRACE;
+    if (deviceNames.size() < 0 || deviceNames.size() > MAX_DEVICE_NUM) {
+        MMI_HILOGE("Invalid size:%{public}d", static_cast<int32_t>(deviceNames.size()));
+        return RET_ERR;
+    }
+    bool flag = ParseDeviceConsumerConfig();
+    if (!flag) {
+        return ERROR_NO_PERMISSION;
+    }
+    auto nameVec = FilterConsumers(deviceNames);
+    if (nameVec.empty()) {
+        return ERROR_NO_PERMISSION;
+    }
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &deviceNames, &sess] {
-            return DEVICEHANDLER->SetDeviceConsumerHandler(deviceNames, sess);
+        [this, &nameVec, &sess] {
+            return DEVICEHANDLER->SetDeviceConsumerHandler(nameVec, sess);
         }
     );
     if (ret != RET_OK) {
@@ -3909,15 +5079,27 @@ int32_t MMIService::SetInputDeviceConsumer(const std::vector<std::string>& devic
     }
     return RET_OK;
 }
- 
-int32_t MMIService::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
+
+ErrCode MMIService::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
 {
     CALL_INFO_TRACE;
+    if (deviceNames.size() < 0 || deviceNames.size() > MAX_DEVICE_NUM) {
+        MMI_HILOGE("Invalid size:%{public}d", static_cast<int32_t>(deviceNames.size()));
+        return RET_ERR;
+    }
+    bool flag = ParseDeviceConsumerConfig();
+    if (!flag) {
+        return ERROR_NO_PERMISSION;
+    }
+    auto nameVec = FilterConsumers(deviceNames);
+    if (nameVec.empty()) {
+        return ERROR_NO_PERMISSION;
+    }
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &deviceNames, &sess] {
-            return DEVICEHANDLER->ClearDeviceConsumerHandler(deviceNames, sess);
+        [this, &nameVec, &sess] {
+            return DEVICEHANDLER->ClearDeviceConsumerHandler(nameVec, sess);
         }
     );
     if (ret != RET_OK) {
@@ -3927,9 +5109,18 @@ int32_t MMIService::ClearInputDeviceConsumer(const std::vector<std::string>& dev
     return RET_OK;
 }
 
-int32_t MMIService::SubscribeInputActive(int32_t subscribeId, int64_t interval)
+ErrCode MMIService::SubscribeInputActive(int32_t subscribeId, int64_t interval)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId, interval] {
@@ -3947,9 +5138,21 @@ int32_t MMIService::SubscribeInputActive(int32_t subscribeId, int64_t interval)
     return RET_OK;
 }
 
-int32_t MMIService::UnsubscribeInputActive(int32_t subscribeId)
+ErrCode MMIService::UnsubscribeInputActive(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (subscribeId < 0) {
+        MMI_HILOGE("Invalid subscribeId");
+        return RET_ERR;
+    }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
@@ -3967,8 +5170,14 @@ int32_t MMIService::UnsubscribeInputActive(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::SwitchTouchTracking(bool touchTracking)
+ErrCode MMIService::SwitchTouchTracking(bool touchTracking)
 {
+    constexpr int32_t accessibilityUid { 1103 };
+    int32_t callingUid = GetCallingUid();
+    if ((callingUid != accessibilityUid) || !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return PERMISSION_DENIED;
+    }
     if (touchTracking) {
         if (!AddSystemAbilityListener(ACCESSIBILITY_MANAGER_SERVICE_ID)) {
             MMI_HILOGE("AddSystemAbilityListener(%{public}d) fail", ACCESSIBILITY_MANAGER_SERVICE_ID);

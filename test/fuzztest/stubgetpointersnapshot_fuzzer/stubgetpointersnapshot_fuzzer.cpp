@@ -56,7 +56,7 @@ bool StubGetPointerSnapshotFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::GET_POINTER_SNAPSHOT), datas, reply, option);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return true;
 }

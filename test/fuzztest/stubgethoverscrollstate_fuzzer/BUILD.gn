@@ -51,6 +51,13 @@ ohos_fuzztest("StubGetHoverScrollStateFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  configs = [
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
   sources = [ "stubgethoverscrollstate_fuzzer.cpp" ]
 
   deps = [

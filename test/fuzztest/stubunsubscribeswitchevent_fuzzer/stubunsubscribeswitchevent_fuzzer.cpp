@@ -37,7 +37,7 @@ bool StubUnsubscribeSwitchEventFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_SWITCH_EVENT), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_UNSUBSCRIBE_SWITCH_EVENT), datas, reply, option);
     return true;
 }
 
@@ -53,7 +53,7 @@ bool StubQuerySwitchStatusFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::QUERY_SWITCH_STATE_EVENT), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_QUERY_SWITCH_STATUS), datas, reply, option);
     return true;
 }
 
@@ -69,7 +69,8 @@ bool StubSetTouchpadRotateSwitchFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_ROTATE_SWITCH), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_TOUCHPAD_ROTATE_SWITCH),
+        datas, reply, option);
     return true;
 }
 
@@ -85,7 +86,8 @@ bool StubGetTouchpadRotateSwitchFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_ROTATE_SWITCH), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_TOUCHPAD_ROTATE_SWITCH),
+        datas, reply, option);
     return true;
 }
 
@@ -101,7 +103,7 @@ bool StubGetKeyStateFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEY_STATE), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_KEY_STATE), datas, reply, option);
     return true;
 }
 
@@ -117,7 +119,7 @@ bool StubAuthorizeFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_AUTHORIZE), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_AUTHORIZE), datas, reply, option);
     return true;
 }
 
@@ -133,7 +135,7 @@ bool StubCancelInjectionFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_CANCEL_INJECTION), datas, reply, option);
     return true;
 }
 
@@ -149,7 +151,7 @@ bool StubHasIrEmitterFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_HAS_IR_EMITTER), datas, reply, option);
     return true;
 }
 
@@ -165,7 +167,7 @@ bool StubGetInfraredFrequenciesFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_FREQUENCY), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_INFRARED_FREQUENCIES), datas, reply, option);
     return true;
 }
 
@@ -181,7 +183,7 @@ bool StubTransmitInfraredFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_TRANSMIT_INFRARED), datas, reply, option);
     return true;
 }
 
@@ -197,7 +199,7 @@ bool StubSetPixelMapDataFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_PIXEL_MAP_DATA), datas, reply, option);
     return true;
 }
 
@@ -213,7 +215,7 @@ bool StubSetCurrentUserFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_CURRENT_USER), datas, reply, option);
     return true;
 }
 
@@ -229,7 +231,7 @@ bool StubEnableHardwareCursorStatsFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_HARDWARE_CURSOR_STATS),
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_ENABLE_HARDWARE_CURSOR_STATS),
         datas, reply, option);
     return true;
 }
@@ -246,7 +248,7 @@ bool StubGetHardwareCursorStatsFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_HARDWARE_CURSOR_STATS), datas, reply, option);
     return true;
 }
 
@@ -262,7 +264,7 @@ bool StubAddVirtualInputDeviceFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_ADD_VIRTUAL_INPUT_DEVICE), datas, reply, option);
     return true;
 }
 
@@ -278,7 +280,8 @@ bool StubRemoveVirtualInputDeviceFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_REMOVE_VIRTUAL_INPUT_DEVICE),
+        datas, reply, option);
     return true;
 }
 
@@ -294,7 +297,7 @@ bool StubTransferBinderClientServiceFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE),
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_TRANSFER_BINDER_CLIENT_SRV),
         datas, reply, option);
     return true;
 }
@@ -312,7 +315,7 @@ bool StubGetPointerSnapshotFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::GET_POINTER_SNAPSHOT), datas, reply, option);
     return true;
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -329,7 +332,7 @@ bool StubSkipPointerLayerFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SKIP_POINTER_LAYER), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SKIP_POINTER_LAYER), datas, reply, option);
     return true;
 }
 
@@ -345,7 +348,7 @@ bool StubMarkEventConsumedFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_MARK_EVENT_CONSUMED), datas, reply, option);
     return true;
 }
 
@@ -361,7 +364,7 @@ bool StubGetDeviceFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_DEVICE), datas, reply, option);
     return true;
 }
 
@@ -377,7 +380,8 @@ bool StubSetTouchpadThreeFingersTapSwitchFuzzTest(const uint8_t* data, size_t si
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_TOUCHPAD_THREE_FINGERS_TAP_SWITCH),
+        datas, reply, option);
     return true;
 }
 
@@ -393,7 +397,8 @@ bool StubGetTouchpadThreeFingersTapSwitchFuzzTest(const uint8_t* data, size_t si
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_TOUCHPAD_THREE_FINGERS_TAP_SWITCH),
+        datas, reply, option);
     return true;
 }
 
@@ -410,7 +415,7 @@ bool StubAncoAddChannelFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_ANCO_CHANNEL), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_ANCO_ADD_CHANNEL), datas, reply, option);
     return true;
 }
 
@@ -426,7 +431,7 @@ bool StubAncoRemoveChannelFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_ANCO_CHANNEL), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_ANCO_REMOVE_CHANNEL), datas, reply, option);
     return true;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO

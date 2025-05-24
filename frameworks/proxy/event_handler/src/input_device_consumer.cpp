@@ -17,6 +17,7 @@
 
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "define_multimodal.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputDeviceConsumer"

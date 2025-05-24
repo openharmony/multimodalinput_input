@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -559,12 +559,12 @@ int32_t InputDisplayBindHelper::GetDisplayBindInfo(DisplayBindInfos &infos)
     CALL_DEBUG_ENTER;
     CHKPR(infos_, RET_ERR);
     for (const auto &item : infos_->GetInfos()) {
-        infos.push_back({
-            .inputDeviceId = item.GetInputDeviceId(),
-            .inputDeviceName = item.GetInputDeviceName(),
-            .displayId = item.GetDisplayId(),
-            .displayName = item.GetDisplayName(),
-        });
+        DisplayBindInfo info;
+        info.inputDeviceId = item.GetInputDeviceId();
+        info.inputDeviceName = item.GetInputDeviceName();
+        info.displayId = item.GetDisplayId();
+        info.displayName = item.GetDisplayName();
+        infos.push_back(info);
     }
     return RET_OK;
 }

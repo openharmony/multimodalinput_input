@@ -853,6 +853,8 @@ ohos_unittest("TouchGestureAdapterTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [

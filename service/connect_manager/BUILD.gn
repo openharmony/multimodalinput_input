@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,9 +11,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
 import("../../multimodalinput_mini.gni")
 mmi_connect_manager_path = "${mmi_path}/service/connect_manager"
+
+idl_gen_interface("multimodal_input_interface") {
+  sources = [ "IMultimodalInputConnect.idl" ]
+  log_domainid = "0xD002801"
+  log_tag = "MultimodalInputConnect"
+}
 
 config("mmi_connect_manager_config") {
   include_dirs = [
@@ -32,6 +39,7 @@ config("mmi_connect_manager_config") {
     "${mmi_path}/service/permission_helper/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_connect_manager_path}/include",
+    "${target_gen_dir}",
   ]
 }
 
@@ -41,12 +49,14 @@ ohos_source_set("mmi_connect_manager_service") {
 
   sources = [
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
   ]
 
   sources += [
     "${mmi_connect_manager_path}/src/input_binder_client_death_recipient.cpp",
   ]
+
+  output_values = get_target_outputs(":multimodal_input_interface")
+  sources += filter_include(output_values, [ "*_stub.cpp" ])
 
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -56,7 +66,16 @@ ohos_source_set("mmi_connect_manager_service") {
   }
   defines = input_default_defines
 
-  configs = [ ":mmi_connect_manager_config" ]
+  configs = [
+    ":mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
+
+  deps = [
+    ":multimodal_input_interface",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -117,7 +136,6 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_death_recipient.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_manager.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
   ]
 
   sources += [
@@ -125,8 +143,19 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "${mmi_connect_manager_path}/src/input_binder_client_stub.cpp",
   ]
 
-  configs = [ ":mmi_connect_manager_config" ]
+  output_values = get_target_outputs(":multimodal_input_interface")
+  sources += filter_include(output_values, [ "*_proxy.cpp" ])
 
+  configs = [
+    ":mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
+
+  deps = [
+    ":multimodal_input_interface",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+  ]
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "c_utils:utilsbase",

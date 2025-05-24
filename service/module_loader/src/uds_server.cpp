@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
+#include "uds_server.h"
+
 #include "dfx_hisysevent.h"
-#include "i_multimodal_input_connect.h"
+#include "imultimodal_input_connect.h"
+#include "multimodal_input_connect_manager.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
@@ -137,9 +140,9 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 
     CLOSE_SOCK:
     fdsan_close_with_tag(sockFds[0], TAG);
-    serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    serverFd = MultimodalInputConnectManager::INVALID_SOCKET_FD;
     fdsan_close_with_tag(sockFds[1], TAG);
-    toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    toReturnClientFd = MultimodalInputConnectManager::INVALID_SOCKET_FD;
     return RET_ERR;
 }
 

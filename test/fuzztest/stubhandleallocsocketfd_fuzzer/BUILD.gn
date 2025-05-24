@@ -53,10 +53,18 @@ ohos_fuzztest("StubHandleAllocSocketFdFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  configs = [
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
   sources = [ "stubhandleallocsocketfd_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]

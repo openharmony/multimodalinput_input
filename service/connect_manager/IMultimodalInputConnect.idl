@@ -1,0 +1,180 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+sequenceable input_device..OHOS.MMI.InputDevice;
+sequenceable key_event..OHOS.MMI.KeyEvent;
+sequenceable key_option..OHOS.MMI.KeyOption;
+sequenceable long_press_event..OHOS.MMI.LongPressRequest;
+sequenceable pointer_event..OHOS.MMI.PointerEvent;
+sequenceable pixel_map..OHOS.Media.PixelMap;
+sequenceable shift_info..OHOS.MMI.ShiftWindowParam;
+sequenceable extra_data..OHOS.MMI.ExtraData;
+sequenceable mmi_event_map..OHOS.MMI.MmiEventMap;
+sequenceable OHOS.IRemoteObject;
+sequenceable touchpad_control_display_gain..OHOS.MMI.TouchpadCDG;
+sequenceable infrared_frequency_info..OHOS.MMI.InfraredFrequency;
+sequenceable pointer_style..OHOS.MMI.CustomCursorParcel;
+sequenceable pointer_style..OHOS.MMI.CursorOptionsParcel;
+sequenceable pointer_style..OHOS.MMI.CursorPixelMap;
+sequenceable window_info..OHOS.MMI.DisplayBindInfo;
+sequenceable pointer_style..OHOS.MMI.PointerStyle;
+sequenceable key_option..OHOS.MMI.KeyMonitorOption;
+
+interface OHOS.MMI.IAncoChannel;
+interface OHOS.MMI.IEventFilter;
+
+interface OHOS.MMI.IMultimodalInputConnect {
+    void AllocSocketFd([in] String programName, [in] int moduleType,
+        [out] FileDescriptorSan socketFd, [out] int tokenType);
+    void AddInputEventFilter([in] IEventFilter filter, [in]int filterId, [in] int priority,
+        [in] unsigned int deviceTags);
+    void NotifyNapOnline();
+    void RemoveInputEventObserver();
+    void RemoveInputEventFilter([in] int filterId);
+    void SetMouseScrollRows([in] int rows);
+    void GetMouseScrollRows([out] int rows);
+    void SetCustomCursorPixelMap([in] int windowId, [in] int focusX, [in] int focusY, [in] CursorPixelMap pixelMap);
+    void SetCustomCursor([in] int windowId, [in] CustomCursorParcel curParcel, [in] CursorOptionsParcel cOptionParcel);
+    void SetMouseIcon([in] int windowId, [in] CursorPixelMap pixelMap);
+    void SetPointerSize([in] int size);
+    void SetNapStatus([in] int pid, [in] int uid, [in] String bundleName, [in] int napStatus);
+    void GetPointerSize([out] int size);
+    void GetCursorSurfaceId([out] unsigned long surfaceId);
+    void SetMouseHotSpot([in] int pid, [in] int windowId, [in] int hotSpotX, [in] int hotSpotY);
+    void SetMousePrimaryButton([in] int primaryButton);
+    void GetMousePrimaryButton([out] int primaryButton);
+    void SetHoverScrollState([in] boolean state);
+    void GetHoverScrollState([out] boolean state);
+    void SetPointerVisible([in] boolean visible, [in] int priority);
+    void IsPointerVisible([out] boolean visible);
+    void MarkProcessed([in] int eventType, [in] int eventId);
+    void SetPointerColor([in] int color);
+    void GetPointerColor([out] int color);
+    void EnableCombineKey([in] boolean enable);
+    void SetPointerSpeed([in] int speed);
+    void GetPointerSpeed([out] int speed);
+    void SetPointerStyle([in] int windowId, [in] PointerStyle pointerStyle, [in] boolean isUiExtension);
+    void GetPointerStyle([in] int windowId, [out] PointerStyle pointerStyle, [in] boolean isUiExtension);
+    void SupportKeys([in] int deviceId, [in] int[] keys, [out] boolean[] keystroke);
+    void GetDeviceIds([out] int[] ids);
+    void GetDevice([in] int deviceId, [out] InputDevice inputDevice);
+    void RegisterDevListener();
+    void UnregisterDevListener();
+    void GetKeyboardType([in] int deviceId, [out] int keyboardType);
+    void SetKeyboardRepeatDelay([in] int delay);
+    void SetKeyboardRepeatRate([in] int rate);
+    void GetKeyboardRepeatDelay([out] int delay);
+    void GetKeyboardRepeatRate([out] int rate);
+    void AddInputHandler([in] int handlerType, [in] unsigned int eventType,
+        [in] int priority, [in] unsigned int deviceTags, [in] int[] actionsType);
+    void RemoveInputHandler([in] int handlerType, [in] unsigned int eventType,
+        [in] int priority, [in] unsigned int deviceTags, [in] int[] actionsType);
+    void AddPreInputHandler([in] int handlerId, [in] unsigned int eventType, [in] int[] keys);
+    void RemovePreInputHandler([in] int handlerId);
+    void AddGestureMonitor([in] int handlerType, [in] unsigned int eventType,
+        [in] unsigned int gestureType, [in] int fingers);
+    void RemoveGestureMonitor([in] int handlerType, [in] unsigned int eventType,
+        [in] unsigned int gestureType, [in] int fingers);
+    void MarkEventConsumed([in] int eventId);
+    void MoveMouseEvent([in] int offsetX, [in] int offsetY);
+    void InjectKeyEvent([in] KeyEvent keyEvent, [in] boolean isNativeInject);
+    void SubscribeKeyEvent([in] int subscribeId, [in] KeyOption keyOption);
+    void UnsubscribeKeyEvent([in] int subscribeId);
+    void SubscribeHotkey([in] int subscribeId, [in] KeyOption keyOption);
+    void UnsubscribeHotkey([in] int subscribeId);
+    void SubscribeKeyMonitor([in] KeyMonitorOption keyOption);
+    void UnsubscribeKeyMonitor([in] KeyMonitorOption keyOption);
+    void SubscribeSwitchEvent([in] int subscribeId, [in] int switchType);
+    void UnsubscribeSwitchEvent([in] int subscribeId);
+    void SubscribeTabletProximity([in] int subscribeId);
+    void UnsubscribetabletProximity([in] int subscribeId);
+    void SubscribeLongPressEvent([in] int subscribeId, [in] LongPressRequest longPressRequest);
+    void UnsubscribeLongPressEvent([in] int subscribeId);
+    void InjectPointerEvent([in] PointerEvent pointerEvent, [in] boolean isNativeInject);
+    void InjectTouchPadEvent([in] PointerEvent pointerEvent, [in] TouchpadCDG touchpadCDG, [in] boolean isNativeInject);
+    void SetAnrObserver();
+    void GetDisplayBindInfo([out] DisplayBindInfo[] infos);
+    void SetMoveEventFilters([in] boolean flag);
+    void SetCurrentUser([in] int userId);
+    void SetTouchpadThreeFingersTapSwitch([in] boolean switchFlag);
+    void GetTouchpadThreeFingersTapSwitch([out] boolean switchFlag);
+    void AddVirtualInputDevice([in] InputDevice device, [out] int deviceId);
+    void RemoveVirtualInputDevice([in] int deviceId);
+    void EnableHardwareCursorStats([in] boolean enable);
+    void GetHardwareCursorStats([out] unsigned int frameCount, [out] unsigned int vsyncCount);
+    void GetAllMmiSubscribedEvents([out] MmiEventMap mmiEventMap);
+    void SetDisplayBind([in] int deviceId, [in] int displayId, [out] String msg);
+    void GetFunctionKeyState([in] int funckey, [out] boolean state);
+    void SetFunctionKeyState([in] int funcKey, [in] boolean enable);
+    void SetPointerLocation([in] int x, [in] int y, [in] int displayId);
+    void ClearWindowPointerStyle([in] int pid, [in] int windowId);
+    void SetMouseCaptureMode([in] int windowId, [in] boolean isCaptureMode);
+    void GetWindowPid([in] int windowId, [out] int windowPid);
+    void AppendExtraData([in] ExtraData extraData);
+    void EnableInputDevice([in] boolean enable);
+    void SetKeyDownDuration([in] String businessId, [in] int delay);
+    void SetTouchpadScrollSwitch([in] boolean switchFlag);
+    void GetTouchpadScrollSwitch([out] boolean switchFlag);
+    void SetTouchpadScrollDirection([in] boolean state);
+    void GetTouchpadScrollDirection([out] boolean state);
+    void SetTouchpadTapSwitch([in] boolean switchFlag);
+    void GetTouchpadTapSwitch([out] boolean switchFlag);
+    void SetTouchpadPointerSpeed([in] int speed);
+    void GetTouchpadPointerSpeed([out] int speed);
+    void GetTouchpadCDG([out] TouchpadCDG touchpadCDG);
+    void SetTouchpadPinchSwitch([in] boolean switchFlag);
+    void GetTouchpadPinchSwitch([out] boolean switchFlag);
+    void SetTouchpadSwipeSwitch([in] boolean switchFlag);
+    void GetTouchpadSwipeSwitch([out] boolean switchFlag);
+    void SetTouchpadRightClickType([in] int type);
+    void GetTouchpadRightClickType([out] int type);
+    void SetTouchpadRotateSwitch([in] boolean rotateSwitch);
+    void GetTouchpadRotateSwitch([out] boolean rotateSwitch);
+    void SetTouchpadDoubleTapAndDragState([in] boolean switchFlag);
+    void GetTouchpadDoubleTapAndDragState([out] boolean switchFlag);
+    void SetShieldStatus([in] int shieldMode, [in] boolean isShield);
+    void GetShieldStatus([in] int shieldMode, [out] boolean isShield);
+    void GetKeyState([out] int[] pressedKeys, [out] Map<int, int> specialKeysState);
+    void Authorize([in] boolean isAuthorize);
+    void CancelInjection();
+    void HasIrEmitter([out] boolean hasIrEmitter);
+    void GetInfraredFrequencies([out] InfraredFrequency[] requencys);
+    void TransmitInfrared([in] long number, [in] long[] pattern);
+    [macrodef OHOS_BUILD_ENABLE_VKEYBOARD] void CreateVKeyboardDevice([out] IRemoteObject vkeyboardDevice);
+    void SetPixelMapData([in] int infoId, [in] CursorPixelMap pixelMap);
+    void SetTouchpadScrollRows([in] int rows);
+    void GetTouchpadScrollRows([out] int rows);
+    void SetClientInfo([in] int pid, [in] unsigned long readThreadId);
+    void GetIntervalSinceLastInput([out] long timeInterval);
+    [macrodef OHOS_BUILD_ENABLE_MAGICCURSOR] void GetPointerSnapshot([out] CursorPixelMap pixelMap);
+    void TransferBinderClientSrv([in] IRemoteObject binderClientObject);
+    void SkipPointerLayer([in] boolean isSkip);
+    [macrodef OHOS_BUILD_ENABLE_ANCO] void AncoAddChannel([in] IAncoChannel channel);
+    [macrodef OHOS_BUILD_ENABLE_ANCO] void AncoRemoveChannel([in] IAncoChannel channel);
+    [macrodef OHOS_BUILD_ENABLE_ANCO] void CheckKnuckleEvent([in] float pointX, [in] float pointY, [out] boolean isKnuckleType);
+    void GetAllSystemHotkeys([out] KeyOption[] keyOptions);
+    void SetInputDeviceEnabled([in] int deviceId, [in] boolean enable, [in] int index);
+    void ShiftAppPointerEvent([in] ShiftWindowParam param, [in] boolean autoGenDown);
+    void SetMultiWindowScreenId([in] unsigned long screenId, [in] unsigned long displayNodeScreenId);
+    void QuerySwitchStatus([in] int switchType, [out] int status);
+    void SetKnuckleSwitch([in] boolean isKnuckleSwitch);
+    void LaunchAiScreenAbility();
+    void GetMaxMultiTouchPointNum([out] int pointNum);
+    void SetInputDeviceConsumer([in] String[] deviceNames);
+    void ClearInputDeviceConsumer([in] String[] deviceNames);
+    void SubscribeInputActive([in] int subscribeId, [in] long interval);
+    void UnsubscribeInputActive([in] int subscribeId);
+    void SwitchTouchTracking([in] boolean touchTracking);
+}

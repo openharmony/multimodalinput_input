@@ -35,6 +35,13 @@
             OHOS::MMI::MultimodalEventHandler*;
             OHOS::MMI::MMIClient*;
             "vtable for OHOS::MMI::MMIClient";
+            "virtual thunk to OHOS::MMI::InputDevice::~InputDevice()";
+            "virtual thunk to OHOS::MMI::InputEvent::~InputEvent()";
+            "virtual thunk to OHOS::MMI::KeyEvent::~KeyEvent()";
+            "virtual thunk to OHOS::MMI::KeyMonitorOption::~KeyMonitorOption()";
+            "virtual thunk to OHOS::MMI::KeyOption::~KeyOption()";
+            "virtual thunk to OHOS::MMI::PointerEvent::~PointerEvent()";
+            "virtual thunk to OHOS::MMI::PointerStyle::~PointerStyle()";
         };
     local:
         *;

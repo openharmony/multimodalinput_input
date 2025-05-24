@@ -38,7 +38,7 @@ bool StubRemoveInputEventFilterFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::RMV_INPUT_EVENT_FILTER), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_REMOVE_INPUT_EVENT_FILTER), datas, reply, option);
     return true;
 }
 } // namespace OHOS
