@@ -20,7 +20,6 @@
 #include "oh_input_manager.h"
 #include "pointer_event.h"
 
-std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(
-    struct Input_TouchEvent* touchEvent);
+std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input_TouchEvent *touchEvent);
 
 #endif // POINTER_EVENT_NDK_H

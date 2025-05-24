@@ -16,10 +16,10 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+#include "mmi_log.h"
 #include "oh_input_manager.h"
 #include "pointer_event.h"
 #include "pointer_event_ndk.h"
-#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerEventNdkTest"
