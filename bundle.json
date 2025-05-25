@@ -99,7 +99,8 @@
         "audio_framework",
         "graphic_surface",
         "ipc",
-        "sensor"
+        "sensor",
+        "idl_tool"
       ],
       "third_party": [
         "libuv",
@@ -138,7 +139,8 @@
               "event/include/key_event.h",
               "event/include/pointer_event.h",
               "event/include/input_event.h",
-              "event/include/mmi_event_observer.h"
+              "event/include/mmi_event_observer.h",
+              "event/include/pointer_style.h"
             ],
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"
           },

@@ -34,6 +34,7 @@ namespace {
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t DRIVER_NUMBER { 8 };
+constexpr int32_t MT_TOOL_THP_FEATURE {11};
 constexpr uint32_t TOUCH_CANCEL_MASK { 1U << 29U };
 constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
 } // namespace
@@ -139,8 +140,8 @@ void TouchTransformProcessor::UpdatePointerItemProperties(PointerEvent::PointerI
     CALL_DEBUG_ENTER;
     item.SetDisplayX(touchInfo.point.x);
     item.SetDisplayY(touchInfo.point.y);
-    item.SetDisplayXPos(touchInfo.point.x);
-    item.SetDisplayYPos(touchInfo.point.y);
+    item.SetDisplayXPos(touchInfo.coordF.x);
+    item.SetDisplayYPos(touchInfo.coordF.y);
     item.SetRawDisplayX(touchInfo.point.x);
     item.SetRawDisplayY(touchInfo.point.y);
     item.SetToolDisplayX(touchInfo.toolRect.point.x);
@@ -222,8 +223,8 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     item.SetShortAxis(shortAxis);
     item.SetDisplayX(touchInfo.point.x);
     item.SetDisplayY(touchInfo.point.y);
-    item.SetDisplayXPos(touchInfo.point.x);
-    item.SetDisplayYPos(touchInfo.point.y);
+    item.SetDisplayXPos(touchInfo.coordF.x);
+    item.SetDisplayYPos(touchInfo.coordF.y);
     item.SetRawDisplayX(touchInfo.point.x);
     item.SetRawDisplayY(touchInfo.point.y);
     item.SetToolDisplayX(touchInfo.toolRect.point.x);
@@ -367,6 +368,9 @@ int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_event_touch *d
         }
         case MT_TOOL_PEN: {
             return PointerEvent::TOOL_TYPE_PEN;
+        }
+        case MT_TOOL_THP_FEATURE: {
+            return PointerEvent::TOOL_TYPE_THP_FEATURE;
         }
         default : {
             MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolType);

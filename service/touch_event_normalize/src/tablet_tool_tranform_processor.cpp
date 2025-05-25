@@ -70,6 +70,7 @@ std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libin
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
+    DrawTouchGraphic();
     return pointerEvent_;
 }
 
@@ -175,6 +176,8 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     item.SetDisplayY(static_cast<int32_t>(tCoord.y));
     item.SetDisplayXPos(tCoord.x);
     item.SetDisplayYPos(tCoord.y);
+    item.SetRawDisplayX(static_cast<int32_t>(tCoord.x));
+    item.SetRawDisplayY(static_cast<int32_t>(tCoord.y));
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetToolType(toolType);
@@ -221,13 +224,15 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
         item.SetPointerId(DEFAULT_POINTER_ID);
         item.SetDeviceId(deviceId_);
         item.SetDownTime(time);
-        item.SetPressed(true);
-        item.SetToolType(toolType);
     }
+    item.SetPressed(true);
+    item.SetToolType(toolType);
     item.SetDisplayX(static_cast<int32_t>(tCoord.x));
     item.SetDisplayY(static_cast<int32_t>(tCoord.y));
     item.SetDisplayXPos(tCoord.x);
     item.SetDisplayYPos(tCoord.y);
+    item.SetRawDisplayX(static_cast<int32_t>(tCoord.x));
+    item.SetRawDisplayY(static_cast<int32_t>(tCoord.y));
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
@@ -302,11 +307,28 @@ bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
     item.SetDisplayY(static_cast<int32_t>(coord.y));
     item.SetDisplayXPos(coord.x);
     item.SetDisplayYPos(coord.y);
+    item.SetRawDisplayX(static_cast<int32_t>(coord.x));
+    item.SetRawDisplayY(static_cast<int32_t>(coord.y));
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
+}
+
+void TabletToolTransformProcessor::DrawTouchGraphic()
+{
+    auto pointerAction = pointerEvent_->GetPointerAction();
+    if ((pointerAction == PointerEvent::POINTER_ACTION_MOVE) &&
+        (lastAction_ == PointerEvent::POINTER_ACTION_PROXIMITY_IN)) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    } else if ((pointerAction == PointerEvent::POINTER_ACTION_PROXIMITY_OUT) &&
+               (lastAction_ == PointerEvent::POINTER_ACTION_MOVE)) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    }
+    WIN_MGR->DrawTouchGraphic(pointerEvent_);
+    lastAction_ = pointerAction;
+    pointerEvent_->SetPointerAction(pointerAction);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -38,7 +38,7 @@ bool StubSetPointerSpeedFuzzTest(const uint8_t *data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SPEED), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_POINTER_SPEED), datas, reply, option);
     return true;
 }
 } // namespace MMI

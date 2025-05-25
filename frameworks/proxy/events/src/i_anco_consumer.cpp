@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -121,38 +121,57 @@ static bool UnmarshalWindowInfo(Parcel &parcel, AncoWindowInfo &windowInfo)
     return result;
 }
 
-bool AncoWindows::Marshalling(const AncoWindows &windows, Parcel &parcel)
+bool AncoWindows::Marshalling(Parcel &out) const
 {
     return (
-        parcel.WriteUint32(static_cast<uint32_t>(windows.updateType)) &&
-        parcel.WriteInt32(windows.focusWindowId) &&
-        MarshalVector(windows.windows, parcel, &MarshalWindowInfo)
+        out.WriteUint32(static_cast<uint32_t>(updateType)) &&
+        out.WriteInt32(focusWindowId) &&
+        MarshalVector(windows, out, &MarshalWindowInfo)
     );
 }
 
-bool AncoWindows::Unmarshalling(Parcel &parcel, AncoWindows &windows)
+bool AncoWindows::ReadFromParcel(Parcel &in)
 {
-    uint32_t updateType {};
-
+    uint32_t updateTypeData {};
     bool result = (
-        parcel.ReadUint32(updateType) &&
-        parcel.ReadInt32(windows.focusWindowId) &&
-        UnmarshalVector(parcel, windows.windows, &UnmarshalWindowInfo)
+        in.ReadUint32(updateTypeData) &&
+        in.ReadInt32(focusWindowId) &&
+        UnmarshalVector(in, windows, &UnmarshalWindowInfo)
     );
-    windows.updateType = static_cast<ANCO_WINDOW_UPDATE_TYPE>(updateType);
+    updateType = static_cast<ANCO_WINDOW_UPDATE_TYPE>(updateTypeData);
     return result;
 }
 
-bool AncoOneHandData::Marshalling(const AncoOneHandData &oneHandData, Parcel &parcel)
+AncoWindows *AncoWindows::Unmarshalling(Parcel &in)
 {
-    return (parcel.WriteInt32(oneHandData.oneHandX) && parcel.WriteInt32(oneHandData.oneHandY) &&
-            parcel.WriteInt32(oneHandData.expandHeight) && parcel.WriteInt32(oneHandData.scalePercent));
+    AncoWindows *data = new (std::nothrow) AncoWindows();
+    if (data && !data->ReadFromParcel(in)) {
+        delete data;
+        data = nullptr;
+    }
+    return data;
 }
 
-bool AncoOneHandData::Unmarshalling(Parcel &parcel, AncoOneHandData &oneHandData)
+bool AncoOneHandData::Marshalling(Parcel &parcel) const
 {
-    return (parcel.ReadInt32(oneHandData.oneHandX) && parcel.ReadInt32(oneHandData.oneHandY) &&
-            parcel.ReadInt32(oneHandData.expandHeight) && parcel.ReadInt32(oneHandData.scalePercent));
+    return (parcel.WriteInt32(oneHandX) && parcel.WriteInt32(oneHandY) &&
+            parcel.WriteInt32(expandHeight) && parcel.WriteInt32(scalePercent));
+}
+
+bool AncoOneHandData::ReadFromParcel(Parcel &parcel)
+{
+    return (parcel.ReadInt32(oneHandX) && parcel.ReadInt32(oneHandY) &&
+            parcel.ReadInt32(expandHeight) && parcel.ReadInt32(scalePercent));
+}
+
+AncoOneHandData *AncoOneHandData::Unmarshalling(Parcel &parcel)
+{
+    AncoOneHandData *data = new (std::nothrow) AncoOneHandData();
+    if (data && !data->ReadFromParcel(parcel)) {
+        delete data;
+        data = nullptr;
+    }
+    return data;
 }
 } // namespace MMI
 } // namespace OHOS

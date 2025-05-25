@@ -920,5 +920,26 @@ int32_t InputManager::GetMaxMultiTouchPointNum(int32_t &pointNum)
 {
     return InputMgrImpl.GetMaxMultiTouchPointNum(pointNum);
 }
+
+int32_t InputManager::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
+    std::shared_ptr<IInputEventConsumer> consumer)
+{
+    return InputMgrImpl.SetInputDeviceConsumer(deviceNames, consumer);
+}
+
+int32_t InputManager::SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval)
+{
+    return InputMgrImpl.SubscribeInputActive(inputEventConsumer, interval);
+}
+
+void InputManager::UnsubscribeInputActive(int32_t subscribeId)
+{
+    InputMgrImpl.UnsubscribeInputActive(subscribeId);
+}
+
+int32_t InputManager::SwitchTouchTracking(bool touchTracking)
+{
+    return InputMgrImpl.SwitchTouchTracking(touchTracking);
+}
 } // namespace MMI
 } // namespace OHOS

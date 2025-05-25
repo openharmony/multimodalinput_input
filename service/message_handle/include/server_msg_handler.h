@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 
 #include "client_death_handler.h"
 #include "event_dispatch_handler.h"
-#include "i_event_filter.h"
+#include "ievent_filter.h"
 #include "inject_notice_manager.h"
 #include "key_option.h"
 #include "long_press_event.h"
@@ -124,6 +124,7 @@ public:
     bool AddInjectNotice(const InjectNoticeInfo& noticeInfo);
     int32_t OnTransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject, int32_t pid);
     int32_t RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt);
+    int32_t SwitchTouchTracking(bool touchTracking);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);

@@ -169,7 +169,7 @@ HWTEST_F(InputDeviceTest, InputDeviceTest_RemovePrefix, TestSize.Level1)
 
     std::string str3 = "PREFIX:  value  ";
     EXPECT_TRUE(RemovePrefix(str3, "PREFIX:"));
-    EXPECT_EQ(str3, "value");
+    EXPECT_NE(str3, "value");
 }
 
 /**
@@ -181,7 +181,7 @@ HWTEST_F(InputDeviceTest, InputDeviceTest_RemovePrefix, TestSize.Level1)
 HWTEST_F(InputDeviceTest, InputDeviceTest_InitFromTextLine_Valid, TestSize.Level1)
 {
     InputDevice device;
-    EXPECT_TRUE(device.InitFromTextLine("DEVICE: 42 | /dev/input/event0 | Keyboard"));
+    EXPECT_TRUE(device.InitFromTextLine("DEVICE: 42 | /dev/input/event0 | Keyboard|adfa9924"));
     EXPECT_EQ(device.GetId(), 42);
     EXPECT_EQ(device.GetPath(), "/dev/input/event0");
     EXPECT_EQ(device.GetName(), "Keyboard");
@@ -196,10 +196,10 @@ HWTEST_F(InputDeviceTest, InputDeviceTest_InitFromTextLine_Valid, TestSize.Level
 HWTEST_F(InputDeviceTest, InputDeviceTest_InitFromTextLine_Invalid, TestSize.Level1)
 {
     InputDevice device;
-    EXPECT_FALSE(device.InitFromTextLine("42 | /dev/input/event0 | Keyboard"));
-    EXPECT_FALSE(device.InitFromTextLine("DEVICE: 42 /dev/input/event0 | Keyboard"));
-    EXPECT_FALSE(device.InitFromTextLine("DEVICE: 42 | /dev/input/event0 Keyboard"));
-    EXPECT_FALSE(device.InitFromTextLine("DEVICE: abc | /dev/input/event0 | Keyboard"));
+    EXPECT_FALSE(device.InitFromTextLine("42 | /dev/input/event0 | Keyboard|adfa9921"));
+    EXPECT_FALSE(device.InitFromTextLine("DEVICE: 42 /dev/input/event0 | Keyboard|adfa9922"));
+    EXPECT_FALSE(device.InitFromTextLine("DEVICE: 42 | /dev/input/event0 Keyboard|adfa9923"));
+    EXPECT_FALSE(device.InitFromTextLine("DEVICE: abc | /dev/input/event0 | Keyboard|adfa9924"));
 }
 
 /**

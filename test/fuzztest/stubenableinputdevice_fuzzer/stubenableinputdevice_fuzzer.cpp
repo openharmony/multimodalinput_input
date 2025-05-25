@@ -38,7 +38,7 @@ bool StubEnableInputDeviceFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::ENABLE_INPUT_DEVICE), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_ENABLE_INPUT_DEVICE), datas, reply, option);
     return true;
 }
 } // namespace OHOS

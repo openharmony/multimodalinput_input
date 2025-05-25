@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,31 +29,37 @@ AncoChannel::AncoChannel(std::shared_ptr<IAncoConsumer> consumer)
     : consumer_(consumer)
 {}
 
-int32_t AncoChannel::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+ErrCode AncoChannel::SyncInputPointEvent(const PointerEvent &pointerEvent)
 {
     CHKPR(consumer_, RET_ERR);
-    return consumer_->SyncInputEvent(pointerEvent);
+    auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
+    CHKPR(pointerEventPtr, RET_ERR);
+    return consumer_->SyncInputEvent(pointerEventPtr);
 }
 
-int32_t AncoChannel::SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent)
+ErrCode AncoChannel::SyncInputKeyEvent(const KeyEvent &keyEvent)
 {
     CHKPR(consumer_, RET_ERR);
-    return consumer_->SyncInputEvent(keyEvent);
+    auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
+    CHKPR(keyEventPtr, RET_ERR);
+    return consumer_->SyncInputEvent(keyEventPtr);
 }
 
-int32_t AncoChannel::UpdateWindowInfo(std::shared_ptr<AncoWindows> windows)
+ErrCode AncoChannel::UpdateWindowInfo(const AncoWindows &windows)
 {
     CHKPR(consumer_, RET_ERR);
-    return consumer_->UpdateWindowInfo(windows);
+    auto windowsPtr = std::make_shared<AncoWindows>(windows);
+    CHKPR(windowsPtr, RET_ERR);
+    return consumer_->UpdateWindowInfo(windowsPtr);
 }
 
-int32_t AncoChannel::UpdateOneHandData(const AncoOneHandData &oneHandData)
+ErrCode AncoChannel::UpdateOneHandData(const AncoOneHandData &oneHandData)
 {
     CHKPR(consumer_, RET_ERR);
     return consumer_->UpdateOneHandData(oneHandData);
 }
 
-int32_t AncoChannel::SyncKnuckleStatus(bool isKnuckleEnable)
+ErrCode AncoChannel::SyncKnuckleStatus(bool isKnuckleEnable)
 {
     CHKPR(consumer_, RET_ERR);
     return consumer_->SyncKnuckleStatus(isKnuckleEnable);

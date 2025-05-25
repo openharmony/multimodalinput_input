@@ -25,6 +25,7 @@
 #include "mmi_log.h"
 #include "uds_server.h"
 #include "uds_session.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace MMI {
@@ -1614,5 +1615,45 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsInputDeviceEnable_Test
     ret = inputDevice.IsInputDeviceEnable(deviceId);
     ASSERT_EQ(ret, true);
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+/**
+ * @tc.name: InputDeviceManagerTest_KeyboardExtFlag_Verify_Json
+ * @tc.desc: Test the json file format
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_KeyboardExtFlag_Verify_Json, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string filePath = "/system/etc/multimodalinput/keyboard_ext_flag.json";
+    std::ifstream file(filePath);
+    EXPECT_TRUE(file.is_open());
+    std::string jsonContent = ReadJsonFile(filePath);
+    EXPECT_FALSE(jsonContent.empty());
+    cJSON *root = cJSON_Parse(jsonContent.c_str());
+    EXPECT_NE(root, nullptr);
+    cJSON *keyboardExtFlag = cJSON_GetObjectItem(root, "keyboardExtFlag");
+    EXPECT_NE(keyboardExtFlag, nullptr);
+    EXPECT_EQ(keyboardExtFlag->type, cJSON_Array);
+    cJSON *item = nullptr;
+    cJSON *vendor = nullptr;
+    cJSON *product = nullptr;
+    cJSON *extFlag = nullptr;
+    cJSON_ArrayForEach(item, keyboardExtFlag)
+    {
+        vendor = cJSON_GetObjectItem(item, "vendor");
+        EXPECT_NE(vendor, nullptr);
+        EXPECT_EQ(vendor->type, cJSON_Number);
+        product = cJSON_GetObjectItem(item, "product");
+        EXPECT_NE(product, nullptr);
+        EXPECT_EQ(product->type, cJSON_Number);
+        extFlag = cJSON_GetObjectItem(item, "extFlag");
+        EXPECT_NE(extFlag, nullptr);
+        EXPECT_EQ(extFlag->type, cJSON_Number);
+    }
+    cJSON_Delete(root);
+}
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
 } // namespace MMI
 } // namespace OHOS

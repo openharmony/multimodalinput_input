@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,13 +18,14 @@
 
 #include "event_filter_service.h"
 #include "extra_data.h"
-#include "i_anco_channel.h"
+#include "ianco_channel.h"
 #include "i_anr_observer.h"
 #include "i_input_service_watcher.h"
 #include "i_window_checker.h"
 #include "if_mmi_client.h"
 #include "infrared_frequency_info.h"
 #include "input_device_impl.h"
+#include "input_device_consumer.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 #include "input_interceptor_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -88,6 +89,9 @@ public:
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
+    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceName,
+        std::shared_ptr<IInputEventConsumer> consumer);
+    void OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -95,7 +99,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    int32_t PackDisplayData(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
+    int32_t PackDisplayData(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
@@ -243,17 +247,20 @@ public:
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
     int32_t LaunchAiScreenAbility();
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+    int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
+    void UnsubscribeInputActive(int32_t subscribeId);
+    int32_t SwitchTouchTracking(bool touchTracking);
 
 private:
-    int32_t PackWindowInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
+    int32_t PackWindowInfo(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
     int32_t PackUiExtentionWindowInfo(const std::vector<WindowInfo>& windowsInfo, NetPacket &pkt);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo);
-    void PrintDisplayInfo(DisplayGroupInfo &displayGroupInfo);
+    void PrintDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     void PrintWindowGroupInfo();
-    int32_t SendDisplayInfo(DisplayGroupInfo &displayGroupInfo);
+    int32_t SendDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SendWindowInfo();
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
     bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);

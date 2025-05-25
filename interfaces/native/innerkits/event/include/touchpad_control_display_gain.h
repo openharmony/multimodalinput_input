@@ -16,14 +16,53 @@
 #ifndef TOUCHPAD_CONTROL_DISPLAY_GAIN
 #define TOUCHPAD_CONTROL_DISPLAY_GAIN
 
+#include "parcel.h"
+
 namespace OHOS {
 namespace MMI {
-struct TouchpadCDG {
+struct TouchpadCDG : public Parcelable {
     double ppi;
     double size;
     int32_t speed;
     float zOrder;
     int32_t frequency;
+
+    bool Marshalling(Parcel &parcel) const
+    {
+        if (!parcel.WriteDouble(ppi)) {
+            return false;
+        }
+        if (!parcel.WriteDouble(size)) {
+            return false;
+        }
+        if (!parcel.WriteInt32(speed)) {
+            return false;
+        }
+        if (!parcel.WriteInt32(frequency)) {
+            return false;
+        }
+        return true;
+    };
+
+    bool ReadFromParcel(Parcel &parcel)
+    {
+        return (
+            parcel.ReadDouble(ppi) &&
+            parcel.ReadDouble(size) &&
+            parcel.ReadInt32(speed) &&
+            parcel.ReadInt32(frequency)
+        );
+    }
+
+    static TouchpadCDG* Unmarshalling(Parcel &parcel)
+    {
+        auto obj = new (std::nothrow) TouchpadCDG();
+        if (obj && !obj->ReadFromParcel(parcel)) {
+            delete obj;
+            obj = nullptr;
+        }
+        return obj;
+    };
 };
 } // namespace MMI
 } // namespace OHOS

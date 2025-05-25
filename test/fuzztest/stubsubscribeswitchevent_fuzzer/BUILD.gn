@@ -51,6 +51,13 @@ ohos_fuzztest("StubSubscribeSwitchEventFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  configs = [
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
   sources = [ "stubsubscribeswitchevent_fuzzer.cpp" ]
 
   deps = [
@@ -61,13 +68,13 @@ ohos_fuzztest("StubSubscribeSwitchEventFuzzTest") {
 
   external_deps = [
     "ability_runtime:app_manager",
+    "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
-    "ipc:ipc_single",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",

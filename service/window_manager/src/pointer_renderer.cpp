@@ -120,11 +120,11 @@ image_ptr_t PointerRenderer::UserIconScale(uint32_t width, uint32_t height, cons
 int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg)
 {
     CHKPR(addr, RET_ERR);
-    MMI_HILOGI("Render %{public}s", cfg.ToString().c_str());
+    MMI_HILOGI("Render cfg:%{public}s, width:%{public}u, height:%{public}u", cfg.ToString().c_str(), width, height);
 
     uint32_t addrSize = width * height * RENDER_STRIDE;
     if (cfg.style_ == MOUSE_ICON::TRANSPARENT_ICON) {
-        memset_s(addr, addrSize, 0, addrSize);
+        (void)memset_s(addr, addrSize, 0, addrSize);
         return RET_OK;
     }
 
@@ -134,7 +134,9 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
         OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE,
     };
-    bitmap.Build(width, height, format);
+    if (!bitmap.Build(width, height, format)) {
+        MMI_HILOGE("Bitmap build failed");
+    }
 
     // construct canvas and bind to bitmap
     OHOS::Rosen::Drawing::Canvas canvas;
@@ -152,11 +154,12 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
         image = UserIconScale(width, height, cfg);
     }
     CHKPR(image, RET_ERR);
-    //Draw image on canvas
+    // Draw image on canvas
     canvas.DrawImage(*image, cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
 
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), bitmap.ComputeByteSize());
     if (ret != EOK) {
+        MMI_HILOGE("Memcpy_s failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -236,6 +239,9 @@ pixelmap_ptr_t PointerRenderer::LoadCursorSvgWithColor(const RenderConfig &cfg)
     }
 
     pixelmap_ptr_t pmap = imageSource->CreatePixelMap(decodeOpts, ret);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("CreatePixelMap failed, ret=%{public}u", ret);
+    }
     return pmap;
 }
 
@@ -328,7 +334,7 @@ image_ptr_t PointerRenderer::ExtractDrawingImage(pixelmap_ptr_t pixelMap)
         ConvertToColorSpace(imageInfo.colorSpace),
     };
     Rosen::Drawing::Pixmap imagePixmap(drawingImageInfo, reinterpret_cast<const void*>(pixelMap->GetPixels()),
-        pixelMap->GetRowBytes());
+        pixelMap->GetRowStride());
     PixelMapContext *releaseContext = new (std::nothrow) PixelMapContext(pixelMap);
     CHKPP(releaseContext);
     auto image = Rosen::Drawing::Image::MakeFromRaster(imagePixmap, PixelMapReleaseProc, releaseContext);
@@ -395,8 +401,9 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(width, height, format);
-
+    if (!bitmap.Build(width, height, format)) {
+        MMI_HILOGE("Bitmap build failed");
+    }
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
