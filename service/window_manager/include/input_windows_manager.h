@@ -116,7 +116,7 @@ public:
     const DisplayGroupInfo& GetDisplayGroupInfo(int32_t groupId = -1);
     std::vector<DisplayInfo> GetDisplayInfoVector(int32_t groupId = -1) const;
     const std::vector<WindowInfo> GetWindowInfoVector(int32_t groupId = -1) const;
-    int32_t GetFocusWindowId(int32_t groupId = -1) const;
+    int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetLogicalPositionX(int32_t id);
     int32_t GetLogicalPositionY(int32_t id);
     Direction GetLogicalPositionDirection(int32_t id);
