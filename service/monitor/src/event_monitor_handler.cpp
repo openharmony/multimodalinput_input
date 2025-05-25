@@ -590,7 +590,7 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler &monitor,
-    std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt)
+    std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt, std::unordered_set<int32_t> fingerFocusPidSet)
 {
     if (monitor.Expect(pointerEvent)) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
@@ -599,7 +599,7 @@ void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler
                 pointerEvent->GetPointerAction(),
                 pointerEvent->GetFingerCount());
         }
-        if (monitor.session_ && CheckIfNeedSendToClient(monitor, pointerEvent)) {
+        if (monitor.session_ && CheckIfNeedSendToClient(monitor, pointerEvent, fingerFocusPidSet)) {
             monitor.SendToClient(pointerEvent, pkt);
             return;
         }
@@ -636,8 +636,15 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     pointerEvent->GetPointerItem(pointerId, pointerItem);
     int32_t displayX = pointerItem.GetDisplayX();
     int32_t displayY = pointerItem.GetDisplayY();
+    std::unordered_set<int32_t> fingerFocusPidSet;
     for (const auto &monitor : monitors_) {
-        IsSendToClient(monitor, pointerEvent, pkt);
+        if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT &&
+            monitor.session_->GetPid() == WIN_MGR->GetPidByWindowId(WIN_MGR->GetFocusWindowId())) {
+            fingerFocusPidSet.insert(monitor.session_->GetPid());
+        }
+    }
+    for (const auto &monitor : monitors_) {
+        IsSendToClient(monitor, pointerEvent, pkt, fingerFocusPidSet);
         PointerEvent::PointerItem pointerItem1;
         pointerEvent->GetPointerItem(pointerId, pointerItem1);
         int32_t displayX1 = pointerItem1.GetDisplayX();
@@ -738,11 +745,40 @@ bool EventMonitorHandler::MonitorCollection::IsFingerprint(std::shared_ptr<Point
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
-        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
-        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
+        (((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) ||
+        ((PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH)) ||
+        (PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL == pointerEvent->GetPointerAction()))
+        ) {
             return true;
     }
     MMI_HILOGD("not fingerprint event");
+    return false;
+}
+
+bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendFingerprintEvent(
+    SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent, std::unordered_set<int32_t> fingerFocusPidSet)
+{
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT) {
+        if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
+            MMI_HILOGD("fingerprint event pointer action is:%{public}d", pointerEvent->GetPointerAction());
+            return true;
+        }
+        if (fingerFocusPidSet.empty()) {
+            MMI_HILOGD("fingerprint slide event send all monitor pid:%{public}d", monitor.session_->GetPid());
+            return true;
+        }
+        if (fingerFocusPidSet.count(monitor.session_->GetPid())) {
+            MMI_HILOGD("fingerprint slide event send focus monitor pid:%{public}d", monitor.session_->GetPid());
+            return true;
+        }
+        MMI_HILOGD("fingerprint slide event not send monitor pid:%{public}d, focus pid:%{public}d",
+            monitor.session_->GetPid(),
+            WIN_MGR->GetPidByWindowId(WIN_MGR->GetFocusWindowId()));
+        return false;
+    }
+    MMI_HILOGD("monitor eventType is not fingerprint pid:%{public}d", monitor.session_->GetPid());
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -759,14 +795,13 @@ bool EventMonitorHandler::MonitorCollection::IsXKey(std::shared_ptr<PointerEvent
 }
 #endif // OHOS_BUILD_ENABLE_X_KEY
 
-bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(SessionHandler monitor,
-    std::shared_ptr<PointerEvent> pointerEvent)
+bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(
+    SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent, std::unordered_set<int32_t> fingerFocusPidSet)
 {
     CHKPF(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) ==
-        HANDLE_EVENT_TYPE_FINGERPRINT && IsFingerprint(pointerEvent)) {
-        return true;
+    if (IsFingerprint(pointerEvent)) {
+        return CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_X_KEY
