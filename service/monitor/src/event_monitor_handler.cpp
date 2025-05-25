@@ -758,7 +758,7 @@ bool EventMonitorHandler::MonitorCollection::IsFingerprint(std::shared_ptr<Point
 }
 
 bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendFingerprintEvent(
-    SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent, std::unordered_set<int32_t> fingerFocusPidSet)
+    SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent, std::unordered_set<int32_t> fingerFocusPidSet)
 {
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT) {
         if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
