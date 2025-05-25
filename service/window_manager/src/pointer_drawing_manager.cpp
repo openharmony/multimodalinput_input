@@ -31,7 +31,7 @@
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
-#include "i_multimodal_input_connect.h"
+#include "mmi_service.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
 #include "ipc_skeleton.h"
@@ -476,6 +476,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (GetSurfaceNode() != nullptr) {
         if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
+            MMI_HILOGE("SetCursorLocation failed");
             return;
         }
         MMI_HILOGD("Move pointer, physicalX:%d, physicalY:%d", physicalX, physicalY);
@@ -612,7 +613,8 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     // Listening enabling cursor deformation and color inversion
     SettingObserver::UpdateFunc func = [](const std::string& key) {
         bool statusValue = false;
-        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue);
+        auto ret = SettingDataShare::GetInstance(
+            MMIService::MULTIMODAL_INPUT_CONNECT_SERVICE_ID).GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
@@ -786,20 +788,18 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPR(hardwareCursorPointerManager_, RET_ERR);
     if (hardwareCursorPointerManager_->IsSupported()) {
+        MMI_HILOGI("mouseStyle:%{public}u", static_cast<uint32_t>(mouseStyle));
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
             return InitVsync(mouseStyle);
-        } else {
-            GetCanvasSize();
-            GetFocusCoordinates();
-            hardwareCanvasSize_ = g_hardwareCanvasSize;
-            // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
-            // repeatedly obtain the surfaceBuffer.
-            PostSoftCursorTask([this, mouseStyle]() {
-                SoftwareCursorRender(mouseStyle);
-            });
-            HardwareCursorRender(mouseStyle);
-            return RET_OK;
         }
+        hardwareCanvasSize_ = g_hardwareCanvasSize;
+        // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
+        // repeatedly obtain the surfaceBuffer.
+        PostSoftCursorTask([this, mouseStyle]() {
+            SoftwareCursorRender(mouseStyle);
+        });
+        HardwareCursorRender(mouseStyle);
+        return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return DrawCursor(mouseStyle);
@@ -1019,45 +1019,21 @@ void PointerDrawingManager::PostMoveRetryTask(std::function<void()> task)
     }
 }
 
-void PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<OHOS::Rosen::Drawing::Bitmap> bitmap,
-    int32_t px, int32_t py, ICON_TYPE align)
-{
-    auto sp = GetScreenPointer(screenId_);
-    CHKPV(sp);
-    auto buffer = sp->RequestBuffer();
-    CHKPV(buffer);
-    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
-    CHKPV(addr);
-
-    uint32_t addrSize = static_cast<uint32_t>(buffer->GetWidth()) *
-        static_cast<uint32_t>(buffer->GetHeight()) * CURSOR_STRIDE;
-    auto ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), bitmap->ComputeByteSize());
-    if (ret != EOK) {
-        MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
-        return;
-    }
-    for (auto &sp : GetMirrorScreenPointers()) {
-        auto buf = sp->RequestBuffer();
-        CHKPC(buf);
-        auto addr = static_cast<uint8_t*>(buf->GetVirAddr());
-        CHKPC(addr);
-        ret = memcpy_s(addr, addrSize, bitmap->GetPixels(), bitmap->ComputeByteSize());
-        if (ret != EOK) {
-            MMI_HILOGE("memcpy_s failed, ret:%{public}d", ret);
-            return;
-        }
-    }
-}
-
 int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenPointer> sp,
     const RenderConfig &cfg)
 {
     CHKPR(sp, RET_ERR);
-    auto buffer = sp->RequestBuffer();
+    bool isCommonBuffer;
+    auto buffer = sp->RequestBuffer(cfg, isCommonBuffer);
     CHKPR(buffer, RET_ERR);
-    auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
-    CHKPR(addr, RET_ERR);
-    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    if (isCommonBuffer) {
+        auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
+        CHKPR(addr, RET_ERR);
+        if (pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+            MMI_HILOGE("DynamicRender failed");
+        };
+    }
+
     MMI_HILOGI("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u, style = %{public}d",
         sp->GetScreenId(), cfg.style);
     auto sret = buffer->FlushCache();
@@ -1119,8 +1095,9 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
     CHKPR(buffer, RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
-
+    if (pointerRenderer_.DynamicRender(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+        MMI_HILOGE("DynamicRender failed");
+    }
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
             .w = buffer->GetWidth(),
@@ -1588,10 +1565,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = displayInfo_.direction;
     }
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (!hardwareCursorPointerManager_->IsSupported()) {
-        return;
-    }
+    
     if (direction == DIRECTION0) {
         if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
             physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
@@ -1621,23 +1595,6 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
             physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
         }
     }
-#else
-    if (direction == DIRECTION0 || direction == DIRECTION180) {
-        if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
-            physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
-            physicalY = displayInfo_.validHeight - imageHeight_ / cursorUnit;
-        }
-    } else {
-        if (physicalX > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
-            physicalX = displayInfo_.validHeight - imageHeight_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
-            physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
-        }
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::AttachToDisplay()
@@ -1716,7 +1673,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
             if (!g_isRsRestart) {
                 for (auto it : screenPointers_) {
                     CHKPR(it.second, RET_ERR);
-                    it.second->Init();
+                    it.second->Init(pointerRenderer_);
                 }
                 if (displayId == displayInfo_.uniqueId) {
                     CHKPR(sp, RET_ERR);
@@ -1730,7 +1687,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
             sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
             CHKPR(sp, RET_ERR);
             screenPointers_[displayInfo_.uniqueId] = sp;
-            if (!sp->Init()) {
+            if (!sp->Init(pointerRenderer_)) {
                 MMI_HILOGE("ScreenPointer %{public}d init failed", displayInfo_.uniqueId);
                 return RET_ERR;
             }
@@ -1979,21 +1936,21 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     }
 }
 
-int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX,
-    int32_t focusY)
+int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap,
+    int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY)
 {
     CALL_DEBUG_ENTER;
     followSystem_ = false;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     userIconFollowSystem_ = true;
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPR(pixelMap, RET_ERR);
+    CHKPR(curPixelMap.pixelMap, RET_ERR);
     if (pid == -1) {
         MMI_HILOGE("The pid is invalid");
         return RET_ERR;
     }
     if (windowId < 0) {
-        int32_t ret = UpdateCursorProperty(pixelMap, focusX, focusY);
+        int32_t ret = UpdateCursorProperty(curPixelMap, focusX, focusY);
         if (ret != RET_OK) {
             MMI_HILOGE("UpdateCursorProperty is failed");
             return ret;
@@ -2014,7 +1971,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
         MMI_HILOGE("The windowId not in right pid");
         return RET_ERR;
     }
-    int32_t ret = UpdateCursorProperty(pixelMap, focusX, focusY);
+    int32_t ret = UpdateCursorProperty(curPixelMap, focusX, focusY);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
         return ret;
@@ -2034,13 +1991,20 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
 }
 
 
-int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY)
+int32_t PointerDrawingManager::UpdateCursorProperty(CursorPixelMap curPixelMap,
+    const int32_t &focusX, const int32_t &focusY)
 {
-    CHKPR(pixelMap, RET_ERR);
-    Media::PixelMap* newPixelMap = static_cast<Media::PixelMap*>(pixelMap);
+    CHKPR(curPixelMap.pixelMap, RET_ERR);
+    Media::PixelMap* newPixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
     CHKPR(newPixelMap, RET_ERR);
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
+    int32_t newFocusX = 0;
+    int32_t newFocusY = 0;
+    newFocusX = focusX < 0 ? 0 : focusX;
+    newFocusY = focusY < 0 ? 0 : focusY;
+    newFocusX = newFocusX > newPixelMap->GetWidth() ? newPixelMap->GetWidth() : newFocusX;
+    newFocusY = newFocusY > newPixelMap->GetHeight() ? newPixelMap->GetHeight() : newFocusY;
     int32_t cursorSize = GetPointerSize();
     cursorWidth_ =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
@@ -2055,16 +2019,16 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
         std::lock_guard<std::mutex> guard(mtx_);
         userIcon_.reset(newPixelMap);
     }
-    userIconHotSpotX_ = static_cast<int32_t>((float)focusX * xAxis);
-    userIconHotSpotY_ = static_cast<int32_t>((float)focusY * yAxis);
+    userIconHotSpotX_ = static_cast<int32_t>((float)newFocusX * xAxis);
+    userIconHotSpotY_ = static_cast<int32_t>((float)newFocusY * yAxis);
     MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
         "focusX:%{public}d, focuxY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"
         "userIconHotSpotY_:%{public}d", cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
-        focusX, focusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
+        newFocusX, newFocusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
     __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
@@ -2072,7 +2036,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         MMI_HILOGE("pid is invalid return -1");
         return RET_ERR;
     }
-    CHKPR(pixelMap, RET_ERR);
+    CHKPR(curPixelMap.pixelMap, RET_ERR);
     if (windowId < 0) {
         MMI_HILOGE("Get invalid windowId, %{public}d", windowId);
         return RET_ERR;
@@ -2081,7 +2045,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(curPixelMap.pixelMap);
     {
         std::lock_guard<std::mutex> guard(mtx_);
         userIcon_.reset(pixelMapPtr);
@@ -2170,7 +2134,6 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
             decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
         }
     }
-
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
     CHKPL(pixelMap);
     return pixelMap;
@@ -2593,7 +2556,9 @@ bool PointerDrawingManager::Init()
         std::lock_guard<std::mutex> guard(mousePixelMapMutex_);
         mousePixelMap_.clear();
     }
-    InitPixelMaps();
+    initLoadingAndLoadingRightPixelTimerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
+        InitPixelMaps();
+    });
     return true;
 }
 
@@ -2642,8 +2607,8 @@ void PointerDrawingManager::UpdatePointerVisible()
         }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         surfaceNodePtr->SetVisible(false);
-        MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s",
-            mouseDisplayState_ ? "true" : "false");
+        MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}d",
+            mouseDisplayState_ ? "true" : "false", displayId_);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -3385,7 +3350,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                 MMI_HILOGI("OnScreenModeChange got new screen %{public}u", sid);
                 auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, si);
                 screenPointers_[sid] = sp;
-                if (!sp->Init()) {
+                if (!sp->Init(pointerRenderer_)) {
                     MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}u", sid);
                 }
             }
@@ -3449,15 +3414,19 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         RenderConfig cfg;
         CreateRenderConfig(cfg, it.second, mouseStyle, true);
-        MMI_HILOGI("HardwareCursorRender, screen:%{public}u, dpi:%{public}f, screenId_:%{public}" PRIu64,
-            it.first, cfg.dpi, screenId_);
+        MMI_HILOGI("screen:%{public}u, mode:%{public}u, dpi:%{public}f, screenId_:%{public}" PRIu64,
+            it.first, it.second->GetMode(), cfg.dpi, screenId_);
         if (it.second->IsMirror() || it.first == screenId_) {
-            DrawHardCursor(it.second, cfg);
+            if (DrawHardCursor(it.second, cfg) != RET_OK) {
+                MMI_HILOGE("DrawHardCursor failed");
+            }
         } else {
-            it.second->SetInvisible();
+            if (!it.second->SetInvisible()) {
+                MMI_HILOGE("SetInvisible failed");
+            }
         }
     }
-    MMI_HILOGD("HardwareCursorRender success");
+    MMI_HILOGD("HardwareCursorRender completed");
 }
 
 void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
@@ -3472,8 +3441,8 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         RenderConfig cfg;
         CreateRenderConfig(cfg, it.second, mouseStyle, false);
-        MMI_HILOGI("SoftwareCursorRender, screen:%{public}u, dpi:%{public}f, direction:%{public}d,"
-            "screenId_:%{public}" PRIu64, it.first, cfg.dpi, cfg.direction, screenId_);
+        MMI_HILOGI("SoftwareCursorRender, screen:%{public}u, mode:%{public}u, dpi:%{public}f, direction:%{public}d,"
+            "screenId_:%{public}" PRIu64, it.first, it.second->GetMode(), cfg.dpi, cfg.direction, screenId_);
         if (!it.second->IsMirror() && it.first != screenId_) {
             cfg.style = MOUSE_ICON::TRANSPARENT_ICON;
             cfg.align = MouseIcon2IconType(cfg.style);
@@ -3499,7 +3468,11 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
     CHKPR(buffer->GetVirAddr(), RET_ERR);
     auto addr = static_cast<uint8_t*>(buffer->GetVirAddr());
     CHKPR(addr, RET_ERR);
-    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    BytraceAdapter::StartSoftPointerRender(buffer->GetWidth(), buffer->GetHeight(), cfg.style_);
+    if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+        MMI_HILOGE("Render failed");
+    }
+    BytraceAdapter::StopSoftPointerRender();
 
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
@@ -3521,12 +3494,19 @@ int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp,
 {
     CHKPR(sp, RET_ERR);
 
-    auto buffer = sp->RequestBuffer();
+    bool isCommonBuffer;
+    auto buffer = sp->RequestBuffer(cfg, isCommonBuffer);
     CHKPR(buffer, RET_ERR);
-
-    auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-    CHKPR(addr, RET_ERR);
-    pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg);
+    if (isCommonBuffer) {
+        auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
+        CHKPR(addr, RET_ERR);
+        BytraceAdapter::StartHardPointerRender(buffer->GetWidth(), buffer->GetHeight(), sp->GetBufferId(),
+            sp->GetScreenId(), cfg.style_);
+        if (pointerRenderer_.Render(addr, buffer->GetWidth(), buffer->GetHeight(), cfg) != RET_OK) {
+            MMI_HILOGE("Render failed");
+        }
+        BytraceAdapter::StopHardPointerRender();
+    }
 
     MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u, style=%{public}d",
         sp->GetScreenId(), cfg.style);
@@ -3650,29 +3630,40 @@ void PointerDrawingManager::SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_T
 
 void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align)
 {
-    moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, REPEAT_ONCE, [this, x, y, align]() {
+    moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, MAX_MOVE_RETRY_COUNT, [this, x, y, align]() {
         PostMoveRetryTask([this, x, y, align]() {
+            moveRetryCount_++;
             MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, align:%{public}d, Timer Id:%{public}d,"
                 "move retry count:%{public}d", x, y, align, moveRetryTimerId_, moveRetryCount_);
-            moveRetryTimerId_ = DEFAULT_VALUE;
-            if (moveRetryCount_ > MAX_MOVE_RETRY_COUNT) {
-                MMI_HILOGI("Move retry count exceeds limit");
+            if (moveRetryTimerId_ == DEFAULT_VALUE) {
+                moveRetryCount_ = 0;
+                MMI_HILOGI("MoveRetryAsync timer id is invalid, stop retry");
                 return;
             }
-            if (HardwareCursorMove(x, y, align) != RET_OK) {
-                MoveRetryAsync(x, y, align);
+            if (HardwareCursorMove(x, y, align) == RET_OK) {
+                int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
+                MMI_HILOGI("Move retry success, cancel timer, TimerId:%{public}d, ret:%{public}d",
+                    moveRetryTimerId_, ret);
+                moveRetryTimerId_ = DEFAULT_VALUE;
+                moveRetryCount_ = 0;
+                return;
+            }
+            MMI_HILOGE("Move retry failed, TimerId:%{public}d", moveRetryTimerId_);
+            if (moveRetryCount_ == MAX_MOVE_RETRY_COUNT) {
+                MMI_HILOGI("Move retry execeed max count, stop retry");
+                moveRetryTimerId_ = DEFAULT_VALUE;
+                moveRetryCount_ = 0;
             }
         });
     });
-    moveRetryCount_++;
     MMI_HILOGI("Create MoveRetry Timer, timerId: %{public}d", moveRetryTimerId_);
 }
 
 void PointerDrawingManager::ResetMoveRetryTimer()
 {
     if (moveRetryTimerId_ != DEFAULT_VALUE) {
-        TimerMgr->RemoveTimer(moveRetryTimerId_);
-        MMI_HILOGI("Cancel moveRetry Timer, Id=%{public}d", moveRetryTimerId_);
+        int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
+        MMI_HILOGI("Cancel moveRetry Timer, TimerId:%{public}d, ret:%{public}d", moveRetryTimerId_, ret);
         moveRetryTimerId_ = DEFAULT_VALUE;
     }
     if (moveRetryCount_ > 0) {

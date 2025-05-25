@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <list>
 #include <set>
 #include <unordered_map>
+#include "parcel.h"
 
 #include "input_event.h"
 #include "input_handler_type.h"
@@ -489,6 +490,7 @@ public:
      * @since 10
      */
     static constexpr int32_t TOOL_TYPE_PALM = 10;
+    static constexpr int32_t TOOL_TYPE_THP_FEATURE = 11;
 
     /**
      * Indicates the TL2 key on the joystick.
@@ -1267,6 +1269,19 @@ public:
          * @return void
          */
         void SetFixedDisplayY(int32_t fixedDisplayY);
+
+        /**
+         * @brief Sets the orientation of the physical display.
+         * @param orientation Indicates the orientation coordinate to set.
+         * @return void
+         */
+        void SetOrientation(int32_t orientation);
+
+        /**
+         * @brief Obtains the orientation of the physical display.
+         * @return Returns the orientation
+         */
+        int32_t GetOrientation();
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
@@ -1306,6 +1321,7 @@ public:
         int32_t blobId_ {};
         int32_t twist_ {};
         bool canceled_ { false };
+        int32_t orientation_ {-1};
     };
 
 public:
@@ -1695,7 +1711,7 @@ public:
      * @since 9
      */
     bool WriteToParcel(Parcel &out) const;
-
+    bool Marshalling(Parcel &out) const override;
     /**
      * @brief Reads data from a <b>Parcel</b> object.
      * @param in Indicates the object from which data will be read.
@@ -1703,6 +1719,7 @@ public:
      * @since 9
      */
     bool ReadFromParcel(Parcel &in);
+    static PointerEvent *Unmarshalling(Parcel &in);
 
     /**
      * @brief The number of times the input event is dispatched.

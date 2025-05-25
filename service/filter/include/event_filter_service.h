@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,8 +28,8 @@ public:
     EventFilterService(std::shared_ptr<IInputEventFilter> filter) : filter_(filter) {}
     DISALLOW_COPY_AND_MOVE(EventFilterService);
     ~EventFilterService() override = default;
-    bool HandleKeyEvent(const std::shared_ptr<KeyEvent> event) override;
-    bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override;
+    ErrCode HandleKeyEvent(const std::shared_ptr<KeyEvent>& event, bool &resultValue) override;
+    ErrCode HandlePointerEvent(const std::shared_ptr<PointerEvent>& event, bool &resultValue) override;
 private:
     const std::shared_ptr<IInputEventFilter> filter_;
     static inline int32_t filterIdSeed_ { 0 };

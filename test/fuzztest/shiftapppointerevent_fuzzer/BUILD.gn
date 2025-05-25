@@ -69,6 +69,13 @@ ohos_fuzztest("ShiftAppPointerEventFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
+
+  configs = [
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
   sources = [ "shiftapppointerevent_fuzzer.cpp" ]
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",

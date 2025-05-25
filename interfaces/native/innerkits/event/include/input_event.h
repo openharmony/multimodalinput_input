@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputEvent {
+class InputEvent : public Parcelable {
 public:
     /**
      * Unknown action. It is usually used as the initial value.
@@ -123,7 +123,7 @@ public:
     static constexpr uint32_t EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH = 0x00000600;
 
     static constexpr uint32_t EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER = 0x00001000;
- #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+
       /**
      * The multimodal input event for device enter focus flag.
      *
@@ -136,7 +136,6 @@ public:
      * @since 19
      */
     static constexpr uint32_t EVENT_FLAG_KEYBOARD_EXIT_FOCUS = 0x00004000;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
 
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
@@ -527,6 +526,7 @@ public:
      * @since 9
      */
     bool WriteToParcel(Parcel &out) const;
+    bool Marshalling(Parcel &out) const;
 
     /**
      * @brief Reads data from a <b>Parcel</b> object.
@@ -535,6 +535,7 @@ public:
      * @since 9
      */
     bool ReadFromParcel(Parcel &in);
+    static InputEvent *Unmarshalling(Parcel &in);
 
 protected:
     /**

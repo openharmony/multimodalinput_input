@@ -361,7 +361,8 @@ bool LibinputAdapter::GetIsCaptureMode()
 
     InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
     if (inputWindowsManager != nullptr) {
-        DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
+        DisplayGroupInfo displayGroupInfo;
+        inputWindowsManager->GetDisplayGroupInfo(displayGroupInfo);        
         bool isFloating = false;
         for (auto &windowInfo : displayGroupInfo.windowsInfo) {
             if (windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT) {
@@ -1360,7 +1361,8 @@ bool LibinputAdapter::IsCursorInCastWindow()
     if (inputWindowsManager == nullptr) {
         return false;
     }
-    DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
+    DisplayGroupInfo displayGroupInfo;
+    inputWindowsManager->GetDisplayGroupInfo(displayGroupInfo);    
     for (auto &windowInfo : displayGroupInfo.windowsInfo) {
         if (windowInfo.windowType == CAST_WINDOW_TYPE) {
             auto mouseInfo = WIN_MGR->GetMouseInfo();
@@ -1972,5 +1974,6 @@ void LibinputAdapter::OnDeviceRemoved(std::string path)
         OnEventHandler();
     }
 }
+///add
 } // namespace MMI
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,20 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_MANAGER_H
 #define MULTIMODAL_INPUT_CONNECT_MANAGER_H
 
+#include <system_ability_definition.h>
+
 #include "i_input_service_watcher.h"
-#include "i_multimodal_input_connect.h"
+#include "imultimodal_input_connect.h"
 
 namespace OHOS {
 namespace MMI {
 class MultimodalInputConnectManager final : public std::enable_shared_from_this<MultimodalInputConnectManager> {
 public:
+    enum {
+        CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
+    };
+    static constexpr int32_t INVALID_SOCKET_FD = -1;
+    static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = MULTIMODAL_INPUT_SERVICE_ID;
     ~MultimodalInputConnectManager() = default;
     static std::shared_ptr<MultimodalInputConnectManager> GetInstance();
     int32_t AllocSocketPair(const int32_t moduleType);
@@ -176,6 +183,11 @@ public:
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
     int32_t LaunchAiScreenAbility();
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames);
+    int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames);
+    int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval);
+    int32_t UnsubscribeInputActive(int32_t subscribeId);
+    int32_t SwitchTouchTracking(bool touchTracking);
 
 private:
     MultimodalInputConnectManager() = default;
@@ -188,7 +200,7 @@ private:
     void NotifyDeath();
     sptr<IMultimodalInputConnect> multimodalInputConnectService_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ { nullptr };
-    int32_t socketFd_ { IMultimodalInputConnect::INVALID_SOCKET_FD };
+    int32_t socketFd_ { MultimodalInputConnectManager::INVALID_SOCKET_FD };
     int32_t tokenType_ { -1 };
     std::mutex lock_;
     std::set<std::shared_ptr<IInputServiceWatcher>> watchers_;

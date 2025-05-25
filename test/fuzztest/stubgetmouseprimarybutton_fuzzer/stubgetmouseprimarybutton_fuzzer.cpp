@@ -38,7 +38,7 @@ bool StubGetMousePrimaryButtonFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_PRIMARY_BUTTON), datas, reply, option);
+        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_MOUSE_PRIMARY_BUTTON), datas, reply, option);
     return true;
 }
 } // namespace OHOS

@@ -35,9 +35,11 @@ private:
     bool OnTipDown(struct libinput_event_tablet_tool* event);
     bool OnTipMotion(struct libinput_event* event);
     bool OnTipUp(struct libinput_event_tablet_tool* event);
+    void DrawTouchGraphic();
 
 private:
     const int32_t deviceId_ { -1 };
+    int32_t lastAction_ { PointerEvent::POINTER_ACTION_UNKNOWN };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
 };
 } // namespace MMI

@@ -96,9 +96,10 @@ void EventRecorder::Stop()
             if (deviceEventBuffers_.find(device.GetId()) != deviceEventBuffers_.end()) {
                 std::string deviceName = device.GetName();
                 std::replace(deviceName.begin(), deviceName.end(), '|', '_');
-                outputFile_ << "DEVICE: ";
-                outputFile_ << device.GetId() << "|" << device.GetPath() << "|" << deviceName << std::endl;
-                std::cout << "DEVICE: " << device.GetId() << "|" << device.GetPath() << "|" << deviceName << std::endl;
+                outputFile_ << "DEVICE: " << device.GetId() << "|" << device.GetPath() << "|" << deviceName << "|";
+                outputFile_ << device.GetHash() << std::endl;
+                std::cout << "DEVICE: " << device.GetId() << "|" << device.GetPath() << "|" << deviceName << "|";
+                std::cout << device.GetHash() << std::endl;
             }
         }
         outputFile_.close();
@@ -168,13 +169,14 @@ void EventRecorder::MainLoop()
 
 void EventRecorder::FlushDeviceEvents(const EventRecord& record)
 {
-    if (record.event.type != EV_SYN) {
+    if (record.event.type != EV_SYN || record.event.code != SYN_REPORT) {
         return;
     }
     auto& currentDeviceBuffer = deviceEventBuffers_[record.deviceId];
     for (const auto& record : currentDeviceBuffer) {
         WriteEventText(record);
     }
+    std::cout << std::endl;
     currentDeviceBuffer.clear();
 }
 

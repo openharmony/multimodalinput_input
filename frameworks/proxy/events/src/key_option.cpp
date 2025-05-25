@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,22 +171,6 @@ void KeyMonitorOption::SetAction(int32_t action)
 void KeyMonitorOption::SetRepeat(bool repeat)
 {
     isRepeat_ = repeat;
-}
-
-bool KeyMonitorOption::Marshalling(Parcel &parcel) const
-{
-    return (parcel.WriteInt32(key_) &&
-            parcel.WriteInt32(action_) &&
-            parcel.WriteBool(isRepeat_));
-}
-
-bool KeyMonitorOption::Unmarshalling(Parcel &parcel)
-{
-    return (
-        parcel.ReadInt32(key_) &&
-        parcel.ReadInt32(action_) &&
-        parcel.ReadBool(isRepeat_)
-    );
 }
 } // namespace MMI
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include "crown_transform_processor.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
+#include "input_device_consumer_handler.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 #include "event_resample.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -119,7 +120,7 @@ constexpr int32_t POINTER_MOVEFLAG = { 7 };
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t EventNormalizeHandler::tpRegisterTryCount_ = 10;
+int32_t EventNormalizeHandler::tpRegisterTryCount_ = 30;
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -366,7 +367,9 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         WIN_MGR->UpdateTargetPointer(pointerEvent);
     }
-    if (!item.IsCanceled()) {
+    if (IsAccessibilityEventWithZOrder(pointerEvent)) {
+        BypassChainAndDispatchDirectly(pointerEvent);
+    } else if (!item.IsCanceled()) {
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
     DfxHisysevent::CalcPointerDispTimes();
@@ -375,6 +378,7 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+
 void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(nextHandler_);
@@ -387,7 +391,9 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
         MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
         return;
     }
-    if (!item.IsCanceled()) {
+    if (IsAccessibilityEventWithZOrder(pointerEvent)) {
+        BypassChainAndDispatchDirectly(pointerEvent);
+    } else if (!item.IsCanceled()) {
         nextHandler_->HandleTouchEvent(pointerEvent);
     }
     BytraceAdapter::StopTouchEvent();
@@ -749,7 +755,12 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             nextHandler_->HandlePointerEvent(pointerEvent);
         } else {
-            nextHandler_->HandleTouchEvent(pointerEvent);
+            auto toolType = GetToolType(event);
+            if (toolType == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+                HandleDeviceConsumerEvent(toolType, event, item, pointerEvent);
+            } else {
+                nextHandler_->HandleTouchEvent(pointerEvent);
+            }
         }
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1187,6 +1198,64 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return false;
+}
+
+int32_t EventNormalizeHandler::GetToolType(libinput_event* event)
+{
+    auto touch = libinput_event_get_touch_event(event);
+    if (touch == nullptr) {
+        return RET_ERR;
+    }
+    return libinput_event_touch_get_tool_type(touch);
+}
+
+void EventNormalizeHandler::HandleDeviceConsumerEvent(int32_t toolType, libinput_event* event,
+    PointerEvent::PointerItem &item, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    auto touch = libinput_event_get_touch_event(event);
+    CHKPV(touch);
+    auto orientation = libinput_event_touch_get_orientation(touch);
+    item.SetOrientation(orientation);
+    item.SetToolType(toolType);
+    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+    CHKPV(event);
+    auto device = libinput_event_get_device(event);
+    CHKPV(device);
+    std::string name = libinput_device_get_name(device);
+    DEVICEHANDLER->HandleDeviceConsumerEvent(name, pointerEvent);
+}
+
+bool EventNormalizeHandler::IsAccessibilityEventWithZOrder(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, false);
+    static std::unordered_set<int32_t> accessibilityEventAction {
+        PointerEvent::POINTER_ACTION_HOVER_MOVE,
+        PointerEvent::POINTER_ACTION_HOVER_ENTER,
+        PointerEvent::POINTER_ACTION_HOVER_EXIT,
+        PointerEvent::POINTER_ACTION_HOVER_CANCEL
+    };
+    auto pointerAction = pointerEvent->GetPointerAction();
+    if (accessibilityEventAction.find(pointerAction) != accessibilityEventAction.end() &&
+        pointerEvent->GetZOrder() > 0) {
+        return true;
+    }
+    return false;
+}
+
+void EventNormalizeHandler::BypassChainAndDispatchDirectly(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+    CHKPV(eventDispatchHandler);
+    int32_t sourceType = pointerEvent->GetSourceType();
+    if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        eventDispatchHandler->HandleTouchEvent(pointerEvent);
+    } else if (sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+        eventDispatchHandler->HandlePointerEvent(pointerEvent);
+    } else {
+        MMI_HILOGW("Unsupported sourceType:%{public}d", sourceType);
+    }
+    MMI_HILOGD("Dispatch directly, id:%{public}d", pointerEvent->GetId());
 }
 } // namespace MMI
 } // namespace OHOS

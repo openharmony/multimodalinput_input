@@ -15,6 +15,7 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <securec.h>
 
 #include "anco_channel_death_recipient.h"
 #include "anco_channel_proxy.h"
@@ -263,12 +264,12 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SetMou
 }
 
 /**
- * @tc.name: MultimodalInputConnectProxyTest_SyncInputEvent_001
- * @tc.desc: Test the function SyncInputEvent
+ * @tc.name: MultimodalInputConnectProxyTest_SyncInputPointEvent_001
+ * @tc.desc: Test the function SyncInputPointEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncInputEvent_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncInputPointEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     sptr<IRemoteObject> remoteObject;
@@ -276,20 +277,20 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncIn
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
-    int32_t ret = ancoChannelProxy.SyncInputEvent(pointerEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    int32_t ret = ancoChannelProxy.SyncInputPointEvent(*pointerEvent);
+    EXPECT_EQ(ret, ERR_INVALID_VALUE);
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(true));
-    ret = ancoChannelProxy.SyncInputEvent(pointerEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    ret = ancoChannelProxy.SyncInputPointEvent(*pointerEvent);
+    EXPECT_EQ(ret, ERR_INVALID_DATA);
 }
 
 /**
- * @tc.name: MultimodalInputConnectProxyTest_SyncInputEvent_002
- * @tc.desc: Test the function SyncInputEvent
+ * @tc.name: MultimodalInputConnectProxyTest_SyncInputPointEvent_002
+ * @tc.desc: Test the function SyncInputPointEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncInputEvent_002, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncInputPointEvent_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     sptr<IRemoteObject> remoteObject;
@@ -298,17 +299,17 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncIn
     int32_t eventType = 1;
     auto pointerEvent = std::make_shared<MockPointerEvent>(eventType);
     EXPECT_CALL(*pointerEvent, WriteToParcel(_)).WillRepeatedly(Return(true));
-    int32_t ret = ancoChannelProxy.SyncInputEvent(pointerEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    int32_t ret = ancoChannelProxy.SyncInputPointEvent(*pointerEvent);
+    EXPECT_EQ(ret, ERR_INVALID_DATA);
 }
 
 /**
- * @tc.name: MultimodalInputConnectProxyTest_SyncInputEvent_003
- * @tc.desc: Test the function SyncInputEvent
+ * @tc.name: MultimodalInputConnectProxyTest_SyncInputKeyEvent_003
+ * @tc.desc: Test the function SyncInputKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncInputEvent_003, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncInputKeyEvent_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     sptr<IRemoteObject> remoteObject;
@@ -316,20 +317,20 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncIn
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
-    int32_t ret = ancoChannelProxy.SyncInputEvent(keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    int32_t ret = ancoChannelProxy.SyncInputKeyEvent(*keyEvent);
+    EXPECT_EQ(ret, ERR_INVALID_VALUE);
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(true));
-    ret = ancoChannelProxy.SyncInputEvent(keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    ret = ancoChannelProxy.SyncInputKeyEvent(*keyEvent);
+    EXPECT_EQ(ret, ERR_INVALID_DATA);
 }
 
 /**
- * @tc.name: MultimodalInputConnectProxyTest_SyncInputEvent_004
- * @tc.desc: Test the function SyncInputEvent
+ * @tc.name: MultimodalInputConnectProxyTest_SyncInputKeyEvent_004
+ * @tc.desc: Test the function SyncInputKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncInputEvent_004, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncInputKeyEvent_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     sptr<IRemoteObject> remoteObject;
@@ -347,8 +348,8 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SyncIn
     item.SetPressed(true);
     keyEvent->AddKeyItem(item);
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(true));
-    int32_t ret = ancoChannelProxy.SyncInputEvent(keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    int32_t ret = ancoChannelProxy.SyncInputKeyEvent(*keyEvent);
+    EXPECT_EQ(ret, ERR_INVALID_DATA);
 }
 
 /**
@@ -364,11 +365,11 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_Update
     OHOS::MMI::AncoChannelProxy ancoChannelProxy(remoteObject);
     auto windows = std::make_shared<AncoWindows>();
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
-    int32_t ret = ancoChannelProxy.UpdateWindowInfo(windows);
-    EXPECT_EQ(ret, RET_ERR);
+    int32_t ret = ancoChannelProxy.UpdateWindowInfo(*windows);
+    EXPECT_EQ(ret, ERR_INVALID_VALUE);
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(true));
-    ret = ancoChannelProxy.UpdateWindowInfo(windows);
-    EXPECT_EQ(ret, RET_ERR);
+    ret = ancoChannelProxy.UpdateWindowInfo(*windows);
+    EXPECT_EQ(ret, ERR_INVALID_DATA);
 }
 
 /**
@@ -422,5 +423,43 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPoi
     EXPECT_EQ(proxy.GetPointerSnapshot((void *)pixelMapPtr.get()), ERR_INVALID_VALUE);
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_SetInputDeviceConsumer
+ * @tc.desc: Test the function SetInputDeviceConsumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SetInputDeviceConsumer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    std::vector<std::string> deviceNames;
+    deviceNames.push_back("test1");
+    deviceNames.push_back("test2");
+    auto ret = proxy.SetInputDeviceConsumer(deviceNames);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_ClearInputDeviceConsumer
+ * @tc.desc: Test the function ClearInputDeviceConsumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_ClearInputDeviceConsumer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    std::vector<std::string> deviceNames;
+    deviceNames.push_back("test1");
+    deviceNames.push_back("test2");
+    auto ret = proxy.ClearInputDeviceConsumer(deviceNames);
+    EXPECT_NE(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

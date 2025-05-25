@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -426,6 +426,16 @@ bool PointerEvent::PointerItem::IsCanceled() const
 void PointerEvent::PointerItem::SetCanceled(bool canceled)
 {
     canceled_ = canceled;
+}
+
+void PointerEvent::PointerItem::SetOrientation(int32_t orientation)
+{
+    orientation_ = orientation;
+}
+
+int32_t PointerEvent::PointerItem::GetOrientation()
+{
+    return orientation_;
 }
 
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
@@ -1041,6 +1051,11 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     return true;
 }
 
+bool PointerEvent::Marshalling(Parcel &out) const
+{
+    return WriteToParcel(out);
+}
+
 bool PointerEvent::ReadFromParcel(Parcel &in)
 {
     if (!InputEvent::ReadFromParcel(in)) {
@@ -1123,6 +1138,16 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
     READBOOL(in, autoToVirtualScreen_);
     return true;
+}
+
+PointerEvent *PointerEvent::Unmarshalling(Parcel &parcel)
+{
+    PointerEvent *data = new (std::nothrow) PointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    if (data && !data->ReadFromParcel(parcel)) {
+        delete data;
+        data = nullptr;
+    }
+    return data;
 }
 
 bool PointerEvent::ReadFixedModeFromParcel(Parcel &in)

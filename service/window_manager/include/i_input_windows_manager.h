@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@
 #include "libinput.h"
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
-#include "i_anco_channel.h"
+#include "ianco_channel.h"
 #endif
 #include "key_event.h"
 #include "pointer_event.h"
@@ -137,7 +137,7 @@ public:
     virtual bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord) = 0;
     virtual const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
     virtual void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent) = 0;
@@ -184,6 +184,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     virtual std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) = 0;
+        virtual void SwitchTouchTracking(bool touchTracking) = 0;
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();

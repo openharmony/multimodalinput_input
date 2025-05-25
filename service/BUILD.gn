@@ -279,11 +279,15 @@ ohos_shared_library("libmmi-server") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   deps = [
     ":mmi_device_config.ini",
     ":mmi_rust",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
     "${mmi_path}/util:libmmi-util",
@@ -293,9 +297,7 @@ ohos_shared_library("libmmi-server") {
     deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
   }
 
-  if (input_ext_feature_anco) {
-    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
-  }
+  deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
 
   if (input_ext_feature_keyboard_ext_flag) {
     include_dirs += [
@@ -566,7 +568,11 @@ ohos_unittest("EventFilterHandlerTest") {
     "${mmi_path}/service/filter/test",
   ]
 
-  configs = [ ":libmmi_server_config" ]
+  configs = [
+    ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
 
   cflags = [
     "-DUNIT_TEST",
@@ -574,9 +580,15 @@ ohos_unittest("EventFilterHandlerTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   sources = [
-    "${mmi_path}/service/filter/src/event_filter_handler.cpp",
-    "${mmi_path}/service/filter/src/event_filter_proxy.cpp",
     "${mmi_path}/service/filter/test/event_filter_handler_ex_test.cpp",
     "${mmi_path}/service/filter/test/event_filter_handler_test.cpp",
     "${mmi_path}/service/filter/test/message_parcel_mock.cpp",
@@ -585,6 +597,8 @@ ohos_unittest("EventFilterHandlerTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/filter:mmi_event_filter_proxy",
+    "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -711,6 +725,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+  configs = [ "${mmi_path}/service/filter:mmi_event_filter_config" ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -1011,6 +1026,7 @@ ohos_unittest("PointerDrawingManagerTest") {
   sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
@@ -1067,6 +1083,7 @@ ohos_unittest("PointerDrawingManagerExTest") {
   sources = [ "window_manager/test/pointer_drawing_manager_ex_test.cpp" ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
@@ -1300,6 +1317,8 @@ ohos_unittest("InputWindowsManagerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1348,7 +1367,10 @@ ohos_unittest("InputWindowsManagerTest") {
 ohos_unittest("InputWindowsManagerOneTest") {
   module_out_path = module_output_path
 
-  configs = [ "${mmi_path}:coverage_flags" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
 
   cflags = [
     "-Dprivate=public",
@@ -1433,6 +1455,8 @@ ohos_unittest("InputWindowsManagerEXTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1559,6 +1583,8 @@ ohos_unittest("SubscriberTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1669,6 +1695,8 @@ ohos_unittest("NapProcessTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1699,6 +1727,7 @@ ohos_unittest("MonitorTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
 
   cflags = [
@@ -1745,6 +1774,9 @@ ohos_unittest("ModuleLoaderTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1761,6 +1793,7 @@ ohos_unittest("ModuleLoaderTest") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -1870,6 +1903,8 @@ ohos_unittest("KeyEventValueTransformationTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1902,6 +1937,7 @@ ohos_unittest("KeyCommandTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
 
   cflags = [
@@ -2005,7 +2041,11 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
     "joystick/include",
   ]
 
-  configs = [ "${mmi_path}:coverage_flags" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
 
   cflags = [
     "-Dprivate=public",
@@ -2216,6 +2256,8 @@ ohos_unittest("EventHandlerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -2261,7 +2303,10 @@ ohos_unittest("EventHandlerTest") {
 ohos_unittest("InputEventHandlerTest") {
   module_out_path = module_output_path
 
-  configs = [ "${mmi_path}:coverage_flags" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
 
   cflags = [
     "-Dprivate=public",
@@ -2340,6 +2385,8 @@ ohos_unittest("EventNormalizeHandlerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -2416,6 +2463,7 @@ ohos_unittest("EventDispatchTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
 
   cflags = [
@@ -2455,6 +2503,8 @@ ohos_unittest("LibinputAdapterTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -2485,6 +2535,7 @@ ohos_unittest("ServerMsgHandlerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
 
   cflags = [
@@ -2682,6 +2733,9 @@ ohos_unittest("DelegateTaskTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -2734,6 +2788,7 @@ ohos_unittest("ConnectManagerTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
+    "config_policy:configpolicy_util",
     "cJSON:cjson",
     "c_utils:utilsbase",
     "data_share:datashare_consumer",
@@ -2853,6 +2908,8 @@ ohos_unittest("ConnectManagerProxyEXTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
   ]
 
   cflags = [
@@ -2860,17 +2917,24 @@ ohos_unittest("ConnectManagerProxyEXTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   sources = [
-    "${mmi_path}/common/anco/comm/src/anco_channel_death_recipient.cpp",
-    "${mmi_path}/common/anco/comm/src/anco_channel_proxy.cpp",
-    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
-    "connect_manager/src/multimodal_input_connect_def_parcel.cpp",
-    "connect_manager/src/multimodal_input_connect_proxy.cpp",
     "connect_manager/test/message_parcel_mock.cpp",
     "connect_manager/test/multimodal_input_connect_proxy_ex_test.cpp",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [
     "ability_runtime:app_manager",
@@ -2904,6 +2968,9 @@ ohos_unittest("ConnectManagerEXTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -2914,8 +2981,6 @@ ohos_unittest("ConnectManagerEXTest") {
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
 
   sources = [
-    "connect_manager/src/multimodal_input_connect_def_parcel.cpp",
-    "connect_manager/src/multimodal_input_connect_stub.cpp",
     "connect_manager/test/message_parcel_mock.cpp",
     "connect_manager/test/multimodal_input_connect_stub_ex_test.cpp",
     "module_loader/src/input_screen_capture_agent.cpp",
@@ -2923,12 +2988,14 @@ ohos_unittest("ConnectManagerEXTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
+    "config_policy:configpolicy_util",
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
@@ -2960,6 +3027,7 @@ ohos_unittest("EventDumpTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
 
   cflags = [
@@ -2973,6 +3041,7 @@ ohos_unittest("EventDumpTest") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -3084,6 +3153,7 @@ ohos_unittest("JoystickTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
 
   cflags = [
@@ -3120,6 +3190,7 @@ ohos_unittest("KeymapMgrTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
 
   cflags = [

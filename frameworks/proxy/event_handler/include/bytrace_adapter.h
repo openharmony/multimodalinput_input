@@ -103,6 +103,16 @@ public:
     static void StartWindowVisible(int32_t pid);
     static void StopWindowVisible();
 
+    static void StartHardPointerRender(uint32_t width, uint32_t height, uint32_t bufferId, uint32_t screenId,
+        int32_t style);
+    static void StopHardPointerRender();
+
+    static void StartSoftPointerRender(uint32_t width, uint32_t height, int32_t style);
+    static void StopSoftPointerRender();
+
+    static void StartHardPointerMove(uint32_t width, uint32_t height, uint32_t bufferId, uint32_t screenId);
+    static void StopHardPointerMove();
+
 private:
     static std::string GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent);

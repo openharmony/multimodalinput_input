@@ -141,40 +141,49 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         MMI_HILOGE("Failed to initialize MMI client");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    displayGroupInfoArray_.clear();
-    if (displayGroupInfo.windowsInfo.size() < MAX_WINDOW_SIZE) {
-        windowGroupInfo_.windowsInfo.clear();
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        if (displayGroupInfo.windowsInfo.size() < MAX_WINDOW_SIZE) {
+            windowGroupInfo_.windowsInfo.clear();
+        }
+        displayGroupInfoArray_.clear();
+        displayGroupInfoArray_.emplace_back(displayGroupInfo);
     }
-    displayGroupInfo_ = displayGroupInfo;
-    int32_t ret = SendDisplayInfo(displayGroupInfo_);
-    displayGroupInfoArray_.emplace_back(displayGroupInfo_);
+    int32_t ret = SendDisplayInfo(displayGroupInfo);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to send display information to service");
         return ret;
     }
-    PrintDisplayInfo(displayGroupInfo_);
+    PrintDisplayInfo(displayGroupInfo);
     return RET_OK;
 }
 
-int32_t InputManagerImpl::UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfo)
+int32_t InputManagerImpl::UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfos)
 {
     CALL_DEBUG_ENTER;
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Failed to initialize MMI client");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    displayGroupInfoArray_.clear();
-    for (auto &item : displayGroupInfo) {
-        displayGroupInfo_ = item;
-        int32_t ret = SendDisplayInfo(displayGroupInfo_);
-        displayGroupInfoArray_.emplace_back(displayGroupInfo_);
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        displayGroupInfoArray_.clear();
+        size_t cnt = 0;
+        for (auto &it : displayGroupInfos) {
+            displayGroupInfoArray_.emplace_back(it);
+            cnt += it.windowsInfo.size();
+        }
+        if (cnt < MAX_WINDOW_SIZE) {
+            windowGroupInfo_.windowsInfo.clear();
+        }
+    }
+    for (const auto &item : displayGroupInfos) {
+        int32_t ret = SendDisplayInfo(item);
         if (ret != RET_OK) {
             MMI_HILOGE("Failed to send display information to service");
             return ret;
         }
-        PrintDisplayInfo(displayGroupInfo_);
+        PrintDisplayInfo(item);
     }
     return RET_OK;
 }
@@ -435,7 +444,7 @@ int32_t InputManagerImpl::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
         return -CAPABILITY_NOT_SUPPORTED;
     }
@@ -452,7 +461,7 @@ int32_t InputManagerImpl::UnsubscribeKeyMonitor(int32_t subscriberId)
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
         return -CAPABILITY_NOT_SUPPORTED;
     }
@@ -658,7 +667,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo)
+int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     pkt << displayGroupInfo.groupId << displayGroupInfo.isMainGroup << displayGroupInfo.width << displayGroupInfo.height
@@ -671,7 +680,7 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, DisplayGroupInfo &disp
         MMI_HILOGE("Packet write windows info failed");
         return RET_ERR;
     }
-    return PackDisplayInfo(pkt, displayGroupInfo);
+    return PackDisplayInfo(pkt, const_cast<DisplayGroupInfo &>(displayGroupInfo));
 }
 
 int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
@@ -744,7 +753,7 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
 }
 
 int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
-    DisplayGroupInfo &displayGroupInfo) __attribute__((no_sanitize("cfi")))
+    const DisplayGroupInfo &displayGroupInfo) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     uint32_t num = static_cast<uint32_t>(displayGroupInfo.windowsInfo.size());
@@ -859,8 +868,10 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
             << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
             << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
             << item.validWidth << item.validHeight << item.fixedDirection
-            << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight
-            << item.oneHandX << item.oneHandY << item.uniqueId;
+            << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight << item.uniqueId;
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+            pkt << item.oneHandX << item.oneHandY;
+#endif
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt << item.pointerActiveWidth << item.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -931,7 +942,7 @@ void InputManagerImpl::PrintForemostThreeWindowInfo(const std::vector<WindowInfo
     }
 }
 
-void InputManagerImpl::PrintDisplayInfo(DisplayGroupInfo &displayGroupInfo)
+void InputManagerImpl::PrintDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     MMI_HILOGD("displayGroupId:%{public}d,windowsInfos,num:%{public}zu,focusWindowId:%{public}d",
         displayGroupInfo.groupId, displayGroupInfo.windowsInfo.size(),
@@ -1728,7 +1739,7 @@ void InputManagerImpl::OnDisconnected()
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-int32_t InputManagerImpl::SendDisplayInfo(DisplayGroupInfo &displayGroupInfo)
+int32_t InputManagerImpl::SendDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
@@ -2825,7 +2836,70 @@ int32_t InputManagerImpl::LaunchAiScreenAbility()
 int32_t InputManagerImpl::GetMaxMultiTouchPointNum(int32_t &pointNum)
 {
     CALL_INFO_TRACE;
-    return MULTIMODAL_INPUT_CONNECT_MGR->GetMaxMultiTouchPointNum(pointNum);
+    return MultimodalEventHandler::GetMaxMultiTouchPointNum(pointNum);
+}
+
+int32_t InputManagerImpl::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
+    std::shared_ptr<IInputEventConsumer> consumer)
+{
+    CALL_DEBUG_ENTER;
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return DEVICE_CONSUMER.SetInputDeviceConsumer(deviceNames, consumer);
+}
+
+void InputManagerImpl::OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
+    CHKPV(pointerEvent);
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    CHKPV(DEVICE_CONSUMER.deviceConsumer_);
+    inputConsumer = DEVICE_CONSUMER.deviceConsumer_;
+    inputConsumer->OnInputEvent(pointerEvent);
+    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
+}
+
+int32_t InputManagerImpl::SubscribeInputActive(
+    std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    CHKPR(inputEventConsumer, RET_ERR);
+    if (interval < 0) {
+        MMI_HILOGE("Interval time error, interval: %{public}" PRId64, interval);
+        return RET_ERR;
+    }
+    constexpr int64_t SUBSCRIBE_INPUT_ACTIVE_MIN_INTERVAL = 500; // ms
+    constexpr int64_t SUBSCRIBE_INPUT_ACTIVE_MAX_INTERVAL = 2000; // ms
+    // interval : 0 is a normal value, no filtering
+    if (interval > 0 && interval < SUBSCRIBE_INPUT_ACTIVE_MIN_INTERVAL) {
+        MMI_HILOGE("Interval(%{public}" PRId64 ") is less than minimum threshold(500ms)", interval);
+        interval = SUBSCRIBE_INPUT_ACTIVE_MIN_INTERVAL;
+    } else if (interval > SUBSCRIBE_INPUT_ACTIVE_MAX_INTERVAL) {
+        MMI_HILOGE("Interval(%{public}" PRId64 ") is greater than maximum threshold(2000ms)", interval);
+        interval = SUBSCRIBE_INPUT_ACTIVE_MAX_INTERVAL;
+    }
+    return INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(inputEventConsumer, interval);
+}
+
+void InputManagerImpl::UnsubscribeInputActive(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+    INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscribeId);
+}
+
+int32_t InputManagerImpl::SwitchTouchTracking(bool touchTracking)
+{
+    CALL_INFO_TRACE;
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support touch-tracking on %{public}s", PRODUCT_TYPE.c_str());
+        return CAPABILITY_NOT_SUPPORTED;
+    }
+    return MULTIMODAL_INPUT_CONNECT_MGR->SwitchTouchTracking(touchTracking);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -755,15 +755,17 @@ int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
             >> info.offsetX >> info.offsetY >> info.isCurrentOffScreenRendering >> info.screenRealWidth
             >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
             >> info.validWidth >> info.validHeight >> info.fixedDirection
-            >> info.physicalWidth >> info.physicalHeight >> info.scalePercent >> info.expandHeight
-            >> info.oneHandX >> info.oneHandY >> info.uniqueId;
+            >> info.physicalWidth >> info.physicalHeight >> info.scalePercent >> info.expandHeight >> info.uniqueId;
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+        pkt >> info.oneHandX >> info.oneHandY;
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt >> info.pointerActiveWidth >> info.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-        pkt >> info.groupId;
         if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
             info.uniq = "default" + std::to_string(info.id);
         }
+        pkt >> info.groupId;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -875,6 +877,16 @@ int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetP
     int32_t pid = sess->GetPid();
     WIN_MGR->SetWindowStateNotifyPid(pid);
     MMI_HILOGI("The pid:%{public}d", pid);
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::SwitchTouchTracking(bool touchTracking)
+{
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        MMI_HILOGW("Does not support touch-tracking on %{public}s", PRODUCT_TYPE.c_str());
+        return CAPABILITY_NOT_SUPPORTED;
+    }
+    WIN_MGR->SwitchTouchTracking(touchTracking);
     return RET_OK;
 }
 
@@ -1068,7 +1080,7 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
 {
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
         return -CAPABILITY_NOT_SUPPORTED;
     }
@@ -1083,7 +1095,7 @@ int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorO
 
 int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
 {
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
         return -CAPABILITY_NOT_SUPPORTED;
     }
@@ -1140,7 +1152,7 @@ int32_t ServerMsgHandler::OnSubscribeLongPressEvent(IUdsServer *server, int32_t 
     CHKPR(sess, ERROR_NULL_POINTER);
     return LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
 }
- 
+
 int32_t ServerMsgHandler::OnUnsubscribeLongPressEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
 {
     CALL_DEBUG_ENTER;

@@ -16,6 +16,7 @@
 #define MULTIMODAL_EVENT_HANDLER_H
 
 #include "if_mmi_client.h"
+#include "input_active_subscribe_manager.h"
 #include "key_event_input_subscribe_manager.h"
 #include "long_press_event.h"
 #include "pointer_event.h"
@@ -72,8 +73,11 @@ public:
     int32_t Authorize(bool isAuthorize);
     int32_t CancelInjection();
 
+    static int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
+
 private:
     int32_t SetClientInfo(int32_t pid, uint64_t readThreadId);
+
     std::mutex mtx_;
     MMIClientPtr client_ { nullptr };
 };
