@@ -5206,5 +5206,24 @@ void MMIService::OnRemoveAccessibility()
         MMI_HILOGE("PostSyncTask-SwitchTouchTracking fail, error:%{public}d", ret);
     }
 }
+
+ErrCode MMIService::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable)
+{
+    CALL_INFO_TRACE;
+    if (!PER_HELPER->RequestFromShell()) {
+        MMI_HILOGE("Verify Request From Shell failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [deviceId, enable] {
+            return MouseEventHdr->SetMouseAccelerateMotionSwitch(deviceId, enable);
+        }
+    );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set accelerate motion switch failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

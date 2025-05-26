@@ -2901,5 +2901,10 @@ int32_t InputManagerImpl::SwitchTouchTracking(bool touchTracking)
     }
     return MULTIMODAL_INPUT_CONNECT_MGR->SwitchTouchTracking(touchTracking);
 }
+
+int32_t InputManagerImpl::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetMouseAccelerateMotionSwitch(deviceId, enable);
+}
 } // namespace MMI
 } // namespace OHOS
