@@ -461,5 +461,74 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_ClearI
     auto ret = proxy.ClearInputDeviceConsumer(deviceNames);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_SubscribeInputActive_001
+ * @tc.desc: SubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SubscribeInputActive_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillOnce(Return(false));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    int32_t subscribeId = 0;
+    int64_t interval = 500;
+    EXPECT_EQ(proxy.SubscribeInputActive(subscribeId, interval), ERR_INVALID_VALUE);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_SubscribeInputActive_002
+ * @tc.desc: SubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SubscribeInputActive_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteInt64(_)).WillRepeatedly(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    int32_t subscribeId = 0;
+    int64_t interval = 500;
+    EXPECT_EQ(proxy.SubscribeInputActive(subscribeId, interval), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_UnsubscribeInputActive_001
+ * @tc.desc: UnsubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_UnsubscribeInputActive_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillOnce(Return(false));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    int32_t subscribeId = 0;
+    EXPECT_EQ(proxy.UnsubscribeInputActive(subscribeId), ERR_INVALID_VALUE);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_UnsubscribeInputActive_002
+ * @tc.desc: UnsubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_UnsubscribeInputActive_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillRepeatedly(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    int32_t subscribeId = 0;
+    EXPECT_EQ(proxy.UnsubscribeInputActive(subscribeId), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
