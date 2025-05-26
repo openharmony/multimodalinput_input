@@ -5492,6 +5492,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_024, TestSize.Leve
 }
 
 /*
+ * @tc.name: InputManagerTest_SetMouseAccelerateMotionSwitch
+ * @tc.desc: SetMouseAccelerateMotionSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseAccelerateMotionSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 0;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->SetMouseAccelerateMotionSwitch(deviceId, true));
+}
+
+/*
  * @tc.name: InputManagerTest_AddPreMonitor_001
  * @tc.desc: AddPreMonitor.
  * @tc.type: FUNC

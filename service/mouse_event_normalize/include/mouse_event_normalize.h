@@ -56,6 +56,7 @@ public:
     int32_t SetTouchpadPointerSpeed(int32_t speed) const;
     void GetTouchpadPointerSpeed(int32_t &speed) const;
     void GetTouchpadCDG(TouchpadCDG &touchpadCDG) const;
+    int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable);
 
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;
