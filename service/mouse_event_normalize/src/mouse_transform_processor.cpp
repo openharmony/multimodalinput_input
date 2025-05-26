@@ -209,6 +209,13 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
     HandleFilterMouseEvent(&offset);
     CalculateOffset(displayInfo, offset);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+    if (!enableMouseAleaccelerateBool_) {
+        abs_x += offset.dx;
+        abs_y += offset.dy;
+        ret = RET_OK;
+        MMI_HILOGD("Skip mouse acceleration motion");
+        return ret;
+    }
     if (displayInfo->ppi > static_cast<float>(CONST_DOUBLE_ZERO)) {
         double displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height, CONST_TWO));
         double diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
@@ -1527,6 +1534,13 @@ void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_
 {
     int32_t defaultValue = value;
     value = PREFERENCES_MGR->GetIntValue(key, defaultValue);
+}
+
+int32_t MouseTransformProcessor::SetMouseAccelerateMotionSwitch(bool enable)
+{
+    enableMouseAleaccelerateBool_ = enable;
+    MMI_HILOGI("Set accelerate motion switch is %{public}d", enableMouseAleaccelerateBool_);
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE

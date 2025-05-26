@@ -106,6 +106,7 @@ public:
     void HandleFilterMouseEvent(Offset* offset);
     bool CheckFilterMouseEvent(struct libinput_event *event);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+    int32_t SetMouseAccelerateMotionSwitch(bool enable);
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
@@ -204,6 +205,7 @@ private:
                 return TimerMgr->ResetTimer(timerId);
             }
     };
+    bool enableMouseAleaccelerateBool_ { true };
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
     struct FilterInsertionPoint filterInsertionPoint_;
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE

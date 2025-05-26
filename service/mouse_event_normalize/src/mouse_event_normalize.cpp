@@ -265,5 +265,19 @@ bool MouseEventNormalize::CheckFilterMouseEvent(struct libinput_event *event)
     return processor->CheckFilterMouseEvent(event);
 }
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+
+int32_t MouseEventNormalize::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable)
+{
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
+    if (auto it = processors_.find(deviceId); it != processors_.end()) {
+        processor = it->second;
+    } else {
+        processor = std::make_shared<MouseTransformProcessor>(deviceId);
+        [[ maybe_unused ]] auto [tIter, isOk] = processors_.emplace(deviceId, processor);
+    }
+    CHKPR(processor, RET_ERR);
+    processor->SetMouseAccelerateMotionSwitch(enable);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
