@@ -1221,6 +1221,16 @@ public:
 
     int32_t SwitchTouchTracking(bool touchTracking);
 
+    /**
+    * @brief Enables or disables the mouse acceleration feature.
+    * @note Only users with specific shell permissions are allowed to call this interface.
+    * @param deviceId The identifier of the input device.
+    * @param enable A boolean value; true to enable acceleration, false to disable it.
+    * @return Returns 0 on success, or a non-zero error code on failure.
+    * @since 20
+    */
+    int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
