@@ -61,12 +61,18 @@ HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_001, TestSiz
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
     int64_t interval = 500; // ms
-    int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
+    int32_t subscriberId = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
         std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
-    EXPECT_GE(subscriberInput, 0);
-    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
+    EXPECT_GE(subscriberId, 0);
+    int32_t subscriberId1 = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_LT(subscriberId1, 0);
+    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberId);
     EXPECT_EQ(result, RET_OK);
+    result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberId);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**
@@ -78,34 +84,12 @@ HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_001, TestSiz
 HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
-    int64_t interval = 500; // ms
-    int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(inputEventConsumer, interval);
-    EXPECT_GE(subscriberInput, 0);
-    int32_t subscriberInput1 = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(inputEventConsumer, interval);
-    EXPECT_GE(subscriberInput1, 0);
-    int32_t subscriberInput2 = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(inputEventConsumer, interval);
-    EXPECT_GE(subscriberInput2, 0);
-    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
-    EXPECT_EQ(result, RET_OK);
-    result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput1);
-    EXPECT_EQ(result, RET_OK);
-    result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput2);
-    EXPECT_EQ(result, RET_OK);
-}
-
-/**
- * @tc.name: SubscribeInputActive_Test_003
- * @tc.desc: Test SubscribeInputActive
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
     int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(nullptr, interval);
     EXPECT_LT(subscriberInput, 0);
+    subscriberInput = 2;
+    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**
@@ -118,6 +102,7 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
     int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
         std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
@@ -129,6 +114,8 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
     EXPECT_EQ(result, RET_OK);
     result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
     EXPECT_EQ(result, RET_OK);
+    result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, subscriberInput);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**
@@ -141,6 +128,7 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
     int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
         std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
@@ -152,6 +140,8 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
     EXPECT_EQ(result, RET_OK);
     result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
     EXPECT_EQ(result, RET_OK);
+    result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, subscriberInput);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**
@@ -164,6 +154,7 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
     int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
         std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
@@ -189,6 +180,7 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
     int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
         std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
@@ -202,6 +194,25 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
     EXPECT_NE(result, RET_OK);
     result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
     EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: OnConnectedTest
+ * @tc.desc: OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscribeManagerTest, OnConnectedTest, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected();
+    std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = 500; // ms
+    int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberInput, 0);
+    INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -140,7 +140,7 @@ int32_t InputActiveSubscribeManager::OnSubscribeInputActiveCallback(
     }
     CHKPR(inputEventConsumer, RET_ERR);
     inputEventConsumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("subscribeId: %{public}d, keycode:%{private}d", subscribeId, pointerEvent->GetPointerId());
+    MMI_HILOGD("subscribeId: %{public}d, pointerId:%{private}d", subscribeId, pointerEvent->GetPointerId());
     return RET_OK;
 }
 
