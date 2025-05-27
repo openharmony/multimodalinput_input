@@ -15,6 +15,8 @@
 
 #include "i_pointer_drawing_manager.h"
 
+#include <common/rs_common_def.h>
+
 #include "define_multimodal.h"
 
 #undef MMI_LOG_DOMAIN

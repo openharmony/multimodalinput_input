@@ -215,6 +215,8 @@ enum libinput_key_state libinput_event_keyboard_get_key_state(struct libinput_ev
 
 enum libinput_button_state libinput_event_pointer_get_button_state(struct libinput_event_pointer *event);
 
+int32_t libinput_event_touch_get_blob_id(struct libinput_event_touch* event);
+
 uint64_t libinput_event_touch_get_time_usec(struct libinput_event_touch *event);
 
 int32_t libinput_event_touch_get_seat_slot(struct libinput_event_touch *event);
@@ -320,6 +322,8 @@ int32_t libinput_device_get_axis_fuzz(struct libinput_device* device, int32_t co
 int32_t libinput_device_get_axis_flat(struct libinput_device* device, int32_t code);
 
 int32_t libinput_device_get_axis_resolution(struct libinput_device* device, int32_t code);
+
+int libinput_device_get_size(struct libinput_device *device, double *width, double *height);
 
 int libinput_get_funckey_state(struct libinput_device *device, unsigned int code);
 

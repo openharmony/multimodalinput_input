@@ -151,6 +151,11 @@ enum libinput_button_state libinput_event_pointer_get_button_state(struct libinp
     return (event != nullptr ? event->buttonState : LIBINPUT_BUTTON_STATE_RELEASED);
 }
 
+int32_t libinput_event_touch_get_blob_id(struct libinput_event_touch* event)
+{
+    return g_instance->TouchEventGetBlobId(event);
+}
+
 uint64_t libinput_event_touch_get_time_usec(struct libinput_event_touch *event)
 {
     return g_instance->TouchEventGetTime(event);
@@ -414,6 +419,11 @@ int32_t libinput_device_get_axis_flat(struct libinput_device* device, int32_t co
 int32_t libinput_device_get_axis_resolution(struct libinput_device* device, int32_t code)
 {
     return -1;
+}
+
+int libinput_device_get_size(struct libinput_device *device, double *width, double *height)
+{
+    return g_instance->DeviceGetSize(device, width, height);
 }
 
 int libinput_get_funckey_state(struct libinput_device *device, unsigned int code)

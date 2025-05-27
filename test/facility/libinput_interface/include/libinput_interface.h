@@ -116,6 +116,7 @@ public:
     virtual uint64_t TabletToolGetTimeUsec(struct libinput_event_tablet_tool *event) = 0;
     virtual double TabletToolGetPressure(struct libinput_event_tablet_tool *event) = 0;
     virtual int32_t TabletToolGetTwist(struct libinput_event_tablet_tool *event) = 0;
+    virtual int32_t TouchEventGetBlobId(struct libinput_event_touch *event) = 0;
     virtual uint64_t TouchEventGetTime(struct libinput_event_touch *event) = 0;
     virtual int32_t TouchEventGetSeatSlot(struct libinput_event_touch *event) = 0;
     virtual double TouchEventGetPressure(struct libinput_event_touch* event) = 0;
@@ -136,6 +137,7 @@ public:
     virtual double PointerGetAxisValue(struct libinput_event_pointer *event, enum libinput_pointer_axis axis) = 0;
     virtual struct libinput_event_touch* GetTouchpadEvent(struct libinput_event *event) = 0;
     virtual int32_t TouchpadGetTool(struct libinput_event_touch *event) = 0;
+    virtual int DeviceGetSize(struct libinput_device *device, double *width, double *height) = 0;
     virtual char* DeviceGetName(struct libinput_device *device) = 0;
     virtual struct libinput_event_keyboard* LibinputEventGetKeyboardEvent (struct libinput_event *event) = 0;
     virtual uint32_t LibinputEventKeyboardGetKey (struct libinput_event_keyboard *event) = 0;
