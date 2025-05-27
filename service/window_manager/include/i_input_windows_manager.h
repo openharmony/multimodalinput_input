@@ -88,7 +88,7 @@ public:
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual bool IsWindowVisible(int32_t pid) = 0;
     virtual ExtraData GetExtraData() const = 0;
-    virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
+    virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
     virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
