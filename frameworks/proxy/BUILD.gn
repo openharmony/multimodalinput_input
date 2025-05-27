@@ -97,7 +97,11 @@ if (is_arkui_x) {
       defines += [ "IOS_PLATFORM" ]
     }
 
-    deps = [ "${hilog_root}/interfaces/native/innerkits:libhilog_${target_os}" ]
+    deps = [
+      "${hilog_root}/interfaces/native/innerkits:libhilog_${target_os}",
+      "//foundation/multimedia/image_framework/interfaces/innerkits:image_native",
+    ]
+
 
     part_name = "input"
     subsystem_name = "multimodalinput"
