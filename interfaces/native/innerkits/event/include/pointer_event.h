@@ -861,6 +861,35 @@ public:
         void SetWindowYPos(double y);
 
         /**
+         * @brief Set global X coordinate.
+         * @param globalX Indicates the global X coordinate to set.
+         * @return void
+         * @since 20
+         */
+        void SetGlobalX(double globalX);
+
+         /**
+         * @brief Get global X coordinate.
+         * @return double
+         * @since 20
+         */
+        double GetGlobalX();
+    
+        /**
+         * @brief Set global Y coordinate.
+         * @param globalY Indicates the global Y coordinate to set.
+         * @return void
+         * @since 20
+         */
+        void SetGlobalY(double globalY);
+
+        /**
+         * @brief Get global X coordinate.
+         * @return double
+         * @since 20
+         */
+        double GetGlobalY();
+        /**
          * @brief Obtains the width of the pressed area.
          * @return Returns the width.
          * @since 9
@@ -1287,6 +1316,8 @@ public:
         bool pressed_ { false };
         int32_t displayX_ {};
         int32_t displayY_ {};
+        double globalX_ { 0.0f };
+        double globalY_ { 0.0f };
         int32_t fixedDisplayX_ {};
         int32_t fixedDisplayY_ {};
         int32_t windowX_ {};

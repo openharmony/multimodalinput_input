@@ -58,6 +58,8 @@ std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
 
     item.SetDisplayX(623);
     item.SetDisplayY(823);
+    item.SetGlobalX(0);
+    item.SetGlobalY(0);
     item.SetWindowX(600);
     item.SetWindowY(800);
 
@@ -2299,6 +2301,24 @@ HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_SetOrientation, TestSize
     PointerEvent::PointerItem item;
     ASSERT_NO_FATAL_FAILURE(item.SetOrientation(orientation));
     ASSERT_EQ(item.GetOrientation(), orientation);
+}
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_GlobalCoordinates
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_GlobalCoordinates, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    double globalX { -1.0 };
+    double globalY { -1.0 };
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetGlobalX(globalX));
+    ASSERT_NO_FATAL_FAILURE(item.SetGlobalY(globalY));
+    ASSERT_EQ(static_cast<int32_t>(item.GetGlobalX()), globalX);
+    ASSERT_EQ(static_cast<int32_t>(item.GetGlobalY()), globalY);
 }
 } // namespace MMI
 } // namespace OHOS
