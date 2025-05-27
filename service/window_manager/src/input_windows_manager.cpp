@@ -881,7 +881,7 @@ void InputWindowsManager::CheckZorderWindowChange(const std::vector<WindowInfo> 
 
 void InputWindowsManager::UpdateDisplayIdAndName()
 {
-    MMI_HILOGI("UpdateDisplayIdAndName In.");
+    CALL_DEBUG_ENTER;
     using IdNames = std::set<std::pair<int32_t, std::string>>;
     IdNames newInfo;
     auto DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
@@ -1576,7 +1576,7 @@ bool InputWindowsManager::IsValidDisplayChange(const DisplayInfo &displayInfo)
 
 void InputWindowsManager::HandleWindowPositionChange(const DisplayGroupInfo &displayGroupInfo)
 {
-     CALL_DEBUG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t groupId = displayGroupInfo.groupId;
     PrintWindowNavbar(groupId);
     auto WindowInfo = GetWindowInfoVector(groupId);
@@ -1609,7 +1609,7 @@ void InputWindowsManager::HandleWindowPositionChange(const DisplayGroupInfo &dis
 
 void InputWindowsManager::SendCancelEventWhenWindowChange(int32_t pointerId, int32_t groupId)
 {
-    MMI_HILOGI("Dispatch cancel event pointerId:%{public}d", pointerId);
+    MMI_HILOGD("Dispatch cancel event pointerId:%{public}d", pointerId);
     std::shared_ptr<PointerEvent> lastPointerEventforWindowChangeTmp = lastPointerEventforWindowChange_;
     
     const auto iter = lastPointerEventforWindowChangeMap_.find(groupId);
@@ -1656,7 +1656,7 @@ void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
 
 bool InputWindowsManager::JudgeCaramaInFore()
 {
-    MMI_HILOGI("JudgeCaramaInFore In.");
+    CALL_DEBUG_ENTER;
     int32_t focWid = GetFocusWindowId(MAIN_GROUPID);
     int32_t focPid = GetPidByWindowId(focWid);
     if (udsServer_ == nullptr) {
@@ -1905,7 +1905,7 @@ DisplayMode InputWindowsManager::GetDisplayMode() const
 void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 {
     CALL_DEBUG_ENTER;
-     DisplayMode mode;
+    DisplayMode mode;
     const auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         if (iter->second.displaysInfo.empty()) {
@@ -4407,11 +4407,11 @@ void InputWindowsManager::JudgMouseIsDownOrUp(bool dragState)
 
 int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
+    CALL_DEBUG_ENTER;
     if (windowId < 0) {
         MMI_HILOGE("Windowid(%{public}d) is invalid", windowId);
         return RET_ERR;
     }
-    MMI_HILOGI("SetMouseCaptureMode In.");
     auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
     if (itr != captureModeInfoMap_.end()) {
         if (itr->second.isCaptureMode == isCaptureMode && !isCaptureMode) {
@@ -4427,7 +4427,7 @@ int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptur
 
 bool InputWindowsManager::GetMouseIsCaptureMode() const
 {
-    MMI_HILOGI("GetMouseIsCaptureMode In.");
+    CALL_DEBUG_ENTER;
     auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
     if (itr != captureModeInfoMap_.end()) {
         return itr->second.isCaptureMode;
@@ -6043,7 +6043,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
     if (iter != mouseLocationMap_.end()) {
         curMouseLocation = iter->second;
     }
-    MMI_HILOGI("Mouselocation start: displayId:%{public}d, X:%{public}d, Y:%{public}d",
+    MMI_HILOGD("Mouselocation start: displayId:%{public}d, X:%{public}d, Y:%{public}d",
         curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY);
     if ((curMouseLocation.displayId < 0) && !displaysInfoVector.empty()) {
         DisplayInfo displayInfo = displaysInfoVector[0];
@@ -6057,18 +6057,18 @@ MouseLocation InputWindowsManager::GetMouseInfo()
             mouseLocationMap_[MAIN_GROUPID].physicalY = displayInfo.validHeight / TWOFOLD;
             curMouseLocation = iter->second;
         }
-        MMI_HILOGI("Mouselocation displayinfo: displayId:%{public}d, W:%{public}d, H:%{public}d",
+        MMI_HILOGD("Mouselocation displayinfo: displayId:%{public}d, W:%{public}d, H:%{public}d",
         displayInfo.id, displayInfo.validWidth, displayInfo.validHeight);
         return curMouseLocation;
     }
-    MMI_HILOGI("Mouselocation next: displayId:%{public}d, X:%{public}d, Y:%{public}d",
+    MMI_HILOGD("Mouselocation next: displayId:%{public}d, X:%{public}d, Y:%{public}d",
         curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY);
     return curMouseLocation;
 }
 
 CursorPosition InputWindowsManager::GetCursorPos()
 {
-    MMI_HILOGI("GetCursorPos In");
+    CALL_DEBUG_ENTER;
     auto displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
     CursorPosition cursorPos;
     const auto iter = cursorPosMap_.find(MAIN_GROUPID);
@@ -6092,7 +6092,7 @@ CursorPosition InputWindowsManager::GetCursorPos()
 
 CursorPosition InputWindowsManager::ResetCursorPos()
 {
-    MMI_HILOGI("ResetCursorPos In");
+    CALL_DEBUG_ENTER;
     auto displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
     if (!displaysInfoVector.empty()) {
         DisplayInfo displayInfo = displaysInfoVector[0];
@@ -6476,7 +6476,7 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
 {
-    MMI_HILOGI("ReverseXY In");
+    CALL_DEBUG_ENTER;
     auto DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
     if (DisplaysInfo.empty()) {
         MMI_HILOGE("DisplaysInfo is empty");
