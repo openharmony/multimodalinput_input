@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,6 +49,8 @@ struct Input_MouseEvent {
     int32_t action;
     int32_t displayX;
     int32_t displayY;
+    int32_t globalX;
+    int32_t globalY;
     int32_t button { -1 };
     int32_t axisType { -1 };
     float axisValue { 0.0f };
@@ -62,6 +64,8 @@ struct Input_TouchEvent {
     int32_t id;
     int32_t displayX;
     int32_t displayY;
+    int32_t globalX;
+    int32_t globalY;
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
@@ -71,6 +75,8 @@ struct Input_AxisEvent {
     int32_t axisAction;
     float displayX;
     float displayY;
+    int32_t globalX;
+    int32_t globalY;
     std::map<int32_t, double> axisValues;
     int64_t actionTime { -1 };
     int32_t sourceType;
@@ -681,6 +687,34 @@ int32_t OH_Input_GetMouseEventDisplayId(const struct Input_MouseEvent* mouseEven
     return mouseEvent->displayId;
 }
 
+void OH_Input_SetMouseEventGlobalX(struct Input_MouseEvent* mouseEvent, int32_t globalX)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(mouseEvent);
+    mouseEvent->globalX = globalX;
+}
+
+int32_t OH_Input_GetMouseEventGlobalX(const struct Input_MouseEvent* mouseEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(mouseEvent, RET_ERR);
+    return mouseEvent->globalX;
+}
+
+void OH_Input_SetMouseEventGlobalY(struct Input_MouseEvent* mouseEvent, int32_t globalY)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(mouseEvent);
+    mouseEvent->globalY = globalY;
+}
+
+int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(mouseEvent, RET_ERR);
+    return mouseEvent->globalY;
+}
+
 static void HandleTouchActionDown(OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
 {
     auto pointIds = g_touchEvent->GetPointerIds();
@@ -910,6 +944,34 @@ int32_t OH_Input_GetTouchEventDisplayId(const struct Input_TouchEvent* touchEven
     return touchEvent->displayId;
 }
 
+void OH_Input_SetTouchEventGlobalX(struct Input_TouchEvent* touchEvent, int32_t globalX)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    touchEvent->globalX = globalX;
+}
+
+int32_t OH_Input_GetTouchEventGlobalX(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(touchEvent, RET_ERR);
+    return touchEvent->globalX;
+}
+
+void OH_Input_SetTouchEventGlobalY(struct Input_TouchEvent* touchEvent, int32_t globalY)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    touchEvent->globalY = globalY;
+}
+
+int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(touchEvent, RET_ERR);
+    return touchEvent->globalY;
+}
+
 void OH_Input_CancelInjection()
 {
     CALL_DEBUG_ENTER;
@@ -1109,6 +1171,36 @@ Input_Result OH_Input_GetAxisEventDisplayId(const Input_AxisEvent* axisEvent, in
     return INPUT_SUCCESS;
 }
 
+Input_Result OH_Input_SetAxisEventGlobalX(struct Input_AxisEvent* axisEvent, int32_t globalX)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->globalX = globalX;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventGlobalX(const Input_AxisEvent* axisEvent, int32_t* globalX)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(globalX, INPUT_PARAMETER_ERROR);
+    *globalX = axisEvent->globalX;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventGlobalY(struct Input_AxisEvent* axisEvent, int32_t globalY)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->globalY = globalY;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventGlobalY(const Input_AxisEvent* axisEvent, int32_t* globalY)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(globalY, INPUT_PARAMETER_ERROR);
+    *globalY = axisEvent->globalY;
+    return INPUT_SUCCESS;
+}
+
 static Input_Result NormalizeResult(int32_t result)
 {
     if (result < RET_OK) {
@@ -1242,6 +1334,8 @@ static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
     touchEvent->id = event->GetPointerId();
     touchEvent->displayX = item.GetDisplayX();
     touchEvent->displayY = item.GetDisplayY();
+    touchEvent->globalX = item.GetGlobalX();
+    touchEvent->globalY = item.GetGlobalY();
     touchEvent->actionTime = event->GetActionTime();
     touchEvent->windowId = event->GetTargetWindowId();
     touchEvent->displayId = event->GetTargetDisplayId();
@@ -1325,6 +1419,8 @@ static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
     }
     mouseEvent->displayX = item.GetDisplayX();
     mouseEvent->displayY = item.GetDisplayY();
+    mouseEvent->globalX = item.GetGlobalX();
+    mouseEvent->globalY = item.GetGlobalY();
     mouseEvent->actionTime = event->GetActionTime();
     mouseEvent->windowId = event->GetTargetWindowId();
     mouseEvent->displayId = event->GetTargetDisplayId();
@@ -1371,6 +1467,8 @@ static void AxisEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> ev
     SetAxisEventAction(axisEvent, event->GetPointerAction());
     axisEvent->displayX = item.GetDisplayX();
     axisEvent->displayY = item.GetDisplayY();
+    axisEvent->globalX = item.GetGlobalX();
+    axisEvent->globalY = item.GetGlobalY();
     axisEvent->actionTime = event->GetActionTime();
     axisEvent->sourceType = event->GetSourceType();
     axisEvent->windowId = event->GetTargetWindowId();
@@ -1677,6 +1775,8 @@ static void TouchEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     touchEvent->id = event->GetPointerId();
     touchEvent->displayX = item.GetDisplayX();
     touchEvent->displayY = item.GetDisplayY();
+    touchEvent->globalX = item.GetGlobalX();
+    touchEvent->globalY = item.GetGlobalY();
     touchEvent->actionTime = event->GetActionTime();
     touchEvent->windowId = event->GetTargetWindowId();
     touchEvent->displayId = event->GetTargetDisplayId();
@@ -1711,6 +1811,8 @@ static void MouseEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     }
     mouseEvent->displayX = item.GetDisplayX();
     mouseEvent->displayY = item.GetDisplayY();
+    mouseEvent->globalX = item.GetGlobalX();
+    mouseEvent->globalY = item.GetGlobalY();
     mouseEvent->actionTime = event->GetActionTime();
     mouseEvent->windowId = event->GetTargetWindowId();
     mouseEvent->displayId = event->GetTargetDisplayId();
@@ -1743,6 +1845,8 @@ static void AxisEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent
     SetAxisEventAction(axisEvent, event->GetPointerAction());
     axisEvent->displayX = item.GetDisplayX();
     axisEvent->displayY = item.GetDisplayY();
+    axisEvent->globalX = item.GetGlobalX();
+    axisEvent->globalY = item.GetGlobalY();
     axisEvent->actionTime = event->GetActionTime();
     axisEvent->sourceType = event->GetSourceType();
     axisEvent->windowId = event->GetTargetWindowId();
@@ -2681,7 +2785,6 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     CALL_INFO_TRACE;
     CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
     CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
-    int32_t id = touchEvent->id;
     int32_t screenX = touchEvent->displayX;
     int32_t screenY = touchEvent->displayY;
     if (screenX < 0 || screenY < 0) {
@@ -2690,6 +2793,13 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     }
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
+
+    int32_t globalX = touchEvent->globalX;
+    int32_t globalY = touchEvent->globalY;
+    item.SetGlobalX(globalX);
+    item.SetGlobalY(globalY);
+
+    int32_t id = touchEvent->id;
     item.SetOriginPointerId(id);
     if (id < SIMULATE_POINTER_EVENT_START_ID) {
         item.SetPointerId(id + SIMULATE_POINTER_EVENT_START_ID);
