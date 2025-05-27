@@ -785,7 +785,45 @@ void OH_Input_SetMouseEventDisplayId(struct Input_MouseEvent* mouseEvent, int32_
  */
 int32_t OH_Input_GetMouseEventDisplayId(const struct Input_MouseEvent* mouseEvent);
 
+/**
+ * @brief Set the global X coordinate of the mouse event.
+ *
+ * @param mouseEvent Mouse event object.
+ * @param globalX Global X coordinate.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+void OH_Input_SetMouseEventGlobalX(struct Input_MouseEvent* mouseEvent, int32_t globalX);
 
+/**
+ * @brief Queries the global X coordinate of the mouse event.
+ *
+ * @param mouseEvent Mouse event object.
+ * @return Global X coordinate.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+int32_t OH_Input_GetMouseEventGlobalX(const struct Input_MouseEvent* mouseEvent);
+
+/**
+ * @brief Set the global Y coordinate of the mouse event.
+ *
+ * @param mouseEvent Mouse event object.
+ * @param globalY Global Y coordinate.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+void OH_Input_SetMouseEventGlobalY(struct Input_MouseEvent* mouseEvent, int32_t globalY);
+
+/**
+ * @brief Queries the global Y coordinate of the mouse event.
+ *
+ * @param mouseEvent Mouse event object.
+ * @return Global Y coordinate.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent);
 
 /**
  * @brief Inject touch event.
@@ -957,6 +995,46 @@ void OH_Input_SetTouchEventDisplayId(struct Input_TouchEvent* touchEvent, int32_
  * @since 15
 */
 int32_t OH_Input_GetTouchEventDisplayId(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Set the global X coordinate of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param globalX Global X coordinate.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+void OH_Input_SetTouchEventGlobalX(struct Input_TouchEvent* touchEvent, int32_t globalX);
+
+/**
+ * @brief Queries the global X coordinate of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return Global X coordinate.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+int32_t OH_Input_GetTouchEventGlobalX(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Set the global Y coordinate of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param globalY Global Y coordinate.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+void OH_Input_SetTouchEventGlobalY(struct Input_TouchEvent* touchEvent, int32_t globalY);
+
+/**
+ * @brief Queries the global Y coordinate of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return Global Y coordinate.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent);
 
 /**
  * @brief Cancels event injection and revokes authorization.
