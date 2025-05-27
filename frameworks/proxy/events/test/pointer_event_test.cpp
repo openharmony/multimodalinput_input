@@ -2269,5 +2269,36 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetTwist_001, TestSize.Level2)
     int32_t ret = item.GetTwist();
     ASSERT_EQ(ret, twist);
 }
+
+/**
+ * @tc.name: PointerEventTest_CheckInputEvent_001
+ * @tc.desc: Verify point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_CheckInputEvent_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    inputEvent->IsFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    inputEvent->ClearFlag();
+}
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_SetOrientation
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_SetOrientation, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    int32_t orientation = 1;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetOrientation(orientation));
+    ASSERT_EQ(item.GetOrientation(), orientation);
+}
 } // namespace MMI
 } // namespace OHOS
