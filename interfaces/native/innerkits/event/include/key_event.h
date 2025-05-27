@@ -3166,7 +3166,7 @@ public:
     /**
      * Div key
      *
-     * @since 18
+     * @since 20
      */
     static const int32_t KEYCODE_DIV;
 public:
