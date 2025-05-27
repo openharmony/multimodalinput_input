@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1304,6 +1304,58 @@ Input_Result OH_Input_SetAxisEventDisplayId(Input_AxisEvent* axisEvent, int32_t 
  * @since 15
  */
 Input_Result OH_Input_GetAxisEventDisplayId(const Input_AxisEvent* axisEvent, int32_t* displayId);
+
+/**
+ * @brief Set the global X coordinate of the axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param globalX Global X coordinate.
+ * @return OH_Input_SetAxisEventGlobalX function result code.
+ *        {@link INPUT_SUCCESS} Success.\n
+ *        {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+Input_Result OH_Input_SetAxisEventGlobalX(struct Input_AxisEvent* axisEvent, int32_t globalX);
+
+/**
+ * @brief Queries the global X coordinate of the axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param globalX Global X coordinate.
+ * @return OH_Input_GetAxisEventGlobalX function result code.
+ *         {@link INPUT_SUCCESS} Success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the globalX is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+Input_Result OH_Input_GetAxisEventGlobalX(const Input_AxisEvent* axisEvent, int32_t* globalX);
+
+/**
+ * @brief Set the global Y coordinate of the axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param globalY Global Y coordinate.
+ * @return OH_Input_SetAxisEventGlobalY function result code.
+ *         {@link INPUT_SUCCESS} Success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+Input_Result OH_Input_SetAxisEventGlobalY(struct Input_AxisEvent* axisEvent, int32_t globalY);
+
+/**
+ * @brief Queries the global Y coordinate of the axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param globalY Global Y coordinate.
+ * @return OH_Input_GetAxisEventGlobalY function result code.
+ *         {@link INPUT_SUCCESS} Success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the globalY is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 20
+ */
+Input_Result OH_Input_GetAxisEventGlobalY(const Input_AxisEvent* axisEvent, int32_t* globalY);
 
 /**
  * @brief Adds a listener of key events.

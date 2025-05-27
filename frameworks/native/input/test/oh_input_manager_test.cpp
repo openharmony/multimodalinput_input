@@ -82,6 +82,8 @@ using namespace testing::ext;
 constexpr int32_t MIN_MULTI_TOUCH_POINT_NUM { 0 };
 constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
 constexpr int32_t UNKNOWN_MULTI_TOUCH_POINT_NUM { -1 };
+constexpr int32_t DEFAULT_GLOBAL_X { -1 };
+constexpr int32_t DEFAULT_GLOBAL_Y { -1 };
 } // namespace
 
 class OHInputManagerTest : public testing::Test {
@@ -1957,6 +1959,59 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_QueryMaxTouchPoints_002, TestSiz
     EXPECT_EQ(ret, INPUT_SUCCESS);
     EXPECT_TRUE((pointNum == UNKNOWN_MULTI_TOUCH_POINT_NUM) ||
         ((pointNum >= MIN_MULTI_TOUCH_POINT_NUM) && (pointNum <= MAX_MULTI_TOUCH_POINT_NUM)));
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchMouseGlobalCoordinates
+ * @tc.desc: OH_Input_SetTouchMouseGlobalX OH_Input_SetTouchMouseGlobalY
+ * OH_Input_GetTouchMouseGlobalX OH_Input_GetMouseEventGlobalY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_MouseEventGlobalCoordinates, TestSize.Level1)
+{
+    Input_MouseEvent mouseEvent;
+    OH_Input_SetMouseEventGlobalX(&mouseEvent, DEFAULT_GLOBAL_X);
+    OH_Input_SetMouseEventGlobalY(&mouseEvent, DEFAULT_GLOBAL_Y);
+    int32_t globalX = OH_Input_GetMouseEventGlobalX(&mouseEvent);
+    int32_t globalY = OH_Input_GetMouseEventGlobalY(&mouseEvent);
+    EXPECT_TRUE((globalX == DEFAULT_GLOBAL_X) && (globalY == DEFAULT_GLOBAL_Y));
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchEventGlobalCoordinates
+ * @tc.desc: OH_Input_SetTouchEventGlobalX OH_Input_SetTouchEventGlobalY
+ * OH_Input_GetTouchEventGlobalX OH_Input_GetTouchEventGlobalY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventGlobalCoordinates, TestSize.Level1)
+{
+    Input_TouchEvent touchEvent;
+    OH_Input_SetTouchEventGlobalX(&touchEvent, DEFAULT_GLOBAL_X);
+    OH_Input_SetTouchEventGlobalY(&touchEvent, DEFAULT_GLOBAL_Y);
+    int32_t globalX = OH_Input_GetTouchEventGlobalX(&touchEvent);
+    int32_t globalY = OH_Input_GetTouchEventGlobalY(&touchEvent);
+    EXPECT_TRUE((globalX == DEFAULT_GLOBAL_X) && (globalY == DEFAULT_GLOBAL_Y));
+}
+
+/*
+ * @tc.name: OHInputManagerTest_AxisEventGlobalCoordinates
+ * @tc.desc: OH_Input_SetAxisEventGlobalX OH_Input_SetAxisEventGlobalY
+ * OH_Input_GetAxisEventGlobalX OH_Input_GetAxisEventGlobalY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_AxisEventGlobalCoordinates, TestSize.Level1)
+{
+    Input_AxisEvent axisEvent;
+    OH_Input_SetAxisEventGlobalX(&axisEvent, DEFAULT_GLOBAL_X);
+    OH_Input_SetAxisEventGlobalY(&axisEvent, DEFAULT_GLOBAL_Y);
+    int32_t globalX { 0 };
+    int32_t globalY { 0 };
+    ASSERT_EQ(OH_Input_GetAxisEventGlobalX(&axisEvent, &globalX), INPUT_SUCCESS);
+    ASSERT_EQ(OH_Input_GetAxisEventGlobalY(&axisEvent, &globalY), INPUT_SUCCESS);
+    EXPECT_TRUE((globalX == DEFAULT_GLOBAL_X) && (globalY == DEFAULT_GLOBAL_Y));
 }
 } // namespace MMI
 } // namespace OHOS
