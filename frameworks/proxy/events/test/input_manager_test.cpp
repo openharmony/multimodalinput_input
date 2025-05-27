@@ -5854,5 +5854,38 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetMaxMultiTouchPointNum_001, TestSi
         EXPECT_EQ(pointNum, UNKNOWN_MULTI_TOUCH_POINT_NUM);
     }
 }
+
+/*
+ * @tc.name: InputManagerTest_SubscribeTabletProximity
+ * @tc.desc: Test SubscribeTabletProximity and UnsubscribetabletProximity
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeTabletProximity, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<PointerEvent>)> callback;
+    int32_t ret = InputManager::GetInstance()->SubscribeTabletProximity(callback);
+    EXPECT_EQ(ret, INVAID_VALUE);
+    int32_t subscriberId = INVAID_VALUE;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribetabletProximity(subscriberId));
+}
+
+/*
+ * @tc.name: InputManagerTest_SubscribeInputActive
+ * @tc.desc: Test SubscribeInputActive and UnsubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_subscribeInputActive, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<IInputEventConsumer> consumer;
+    int64_t interval = 1;
+    int32_t ret = InputManager::GetInstance()->SubscribeInputActive(consumer, interval);
+    ASSERT_EQ(ret, INVALID_HANDLER_ID);
+    int32_t subscriberId = INVAID_VALUE;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeInputActive(subscriberId));
+}
 } // namespace MMI
 } // namespace OHOS
