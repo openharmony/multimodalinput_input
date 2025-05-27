@@ -6315,15 +6315,15 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInfo &window,
     double logicX, double logicY) const
 {
-    int32_t currX = logicX - currentDisplayX_;
-    int32_t currY = logicY - currentDisplayY_;
+    double currX = logicX - currentDisplayX_;
+    double currY = logicY - currentDisplayY_;
     Matrix3f transform(window.transform);
     if (window.transform.size() != MATRIX3_SIZE || transform.IsIdentity()) {
         return {currX, currY};
     }
     Vector3f logicXY(currX, currY, 1.0);
     Vector3f windowXY = transform * logicXY;
-    return {round(windowXY[0]), round(windowXY[1])};
+    return { windowXY[0], windowXY[1] };
 }
 
 std::pair<double, double> InputWindowsManager::TransformDisplayXY(const DisplayInfo &info,

@@ -23,13 +23,7 @@ std::mutex IInputWindowsManager::mutex_;
 
 std::shared_ptr<IInputWindowsManager> IInputWindowsManager::GetInstance()
 {
-    if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (instance_ == nullptr) {
-            instance_ = InputWindowsManagerMock::GetInstance();
-        }
-    }
-    return instance_;
+    return InputWindowsManagerMock::GetInstance();
 }
 
 std::shared_ptr<InputWindowsManagerMock> InputWindowsManagerMock::instance_;
@@ -37,13 +31,17 @@ std::mutex InputWindowsManagerMock::mutex_;
 
 std::shared_ptr<InputWindowsManagerMock> InputWindowsManagerMock::GetInstance()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (instance_ == nullptr) {
-            instance_ = std::make_shared<InputWindowsManagerMock>();
-        }
+        instance_ = std::make_shared<InputWindowsManagerMock>();
     }
     return instance_;
+}
+
+void InputWindowsManagerMock::ReleaseInstance()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    instance_.reset();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -408,12 +408,24 @@ ohos_unittest("TransformPointTest") {
 ohos_unittest("TouchTransformProcessorTestWithMock") {
   module_out_path = module_output_path
 
-  configs = [ "${mmi_path}:coverage_flags" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
 
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
@@ -431,7 +443,9 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/fingersense_wrapper/include",
     "${mmi_path}/service/gesturesense_wrapper/include",
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/joystick/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/module_loader/include",
@@ -492,12 +506,20 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     ]
   }
 
+  if (enable_player_framework) {
+    sources += [ "${mmi_path}/service/module_loader/src/input_screen_capture_agent.cpp" ]
+  }
+
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines = [ "USE_ROSEN_DRAWING" ]
   }
 
   deps = [
+    "${mmi_path}/common/anco/comm:anco_channel_interface",
+    "${mmi_path}/service/connect_manager:multimodal_input_interface",
+    "${mmi_path}/service/filter:event_filter_interface",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -515,6 +537,8 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -545,6 +569,10 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
       "eventhandler:libeventhandler",
       "graphic_2d_ext:libsdf",
     ]
+  }
+
+  if (input_feature_combination_key) {
+    external_deps += [ "sensor:sensor_interface_native" ]
   }
 }
 
@@ -946,6 +974,7 @@ group("TouchEventNormalizeTests") {
 
   deps = [
     ":TouchEventNormalizeTest",
+    ":TouchTransformProcessorTestWithMock",
     ":TransformPointTest",
   ]
 }

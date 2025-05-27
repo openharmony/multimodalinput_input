@@ -43,16 +43,6 @@ static int g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
 using namespace testing;
 using namespace testing::ext;
 
-extern "C" {
-int libinput_device_get_size(struct libinput_device *device, double *width, double *height)
-{
-    if (width != nullptr) {
-        *width = g_mockLibinputDeviceGetSizeWidth;
-    }
-    return g_mockLibinputDeviceGetSizeRetrunIntValue;
-}
-}  // extern "C"
-
 namespace OHOS {
 namespace MMI {
 
@@ -419,6 +409,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadButtonMistouch_001, 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(&touchpadButtonEvent));
     EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    EXPECT_CALL(libinputMock, DeviceGetSize).WillOnce(Return(1)).WillRepeatedly(Return(0));
     g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
     inputEventHandler->isDwtEdgeAreaForTouchpadButtonActing_ = true;
     inputEventHandler->touchpadEventAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH_FOR_BUTTON;
@@ -495,6 +486,9 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadMotionMistouch_001, 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchpadEvent));
     EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    EXPECT_CALL(libinputMock, DeviceGetSize).WillOnce(Return(1))
+        .WillOnce(DoAll(SetArgPointee<1>(InputEventHandler::TOUCHPAD_EDGE_WIDTH), Return(0)))
+        .WillRepeatedly(DoAll(SetArgPointee<1>(1000.0), Return(0)));
     g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
     inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH;
     EXPECT_FALSE(inputEventHandler->IsTouchpadMotionMistouch(&event));
@@ -529,6 +523,9 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadPointerMotionMistouc
     g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
     EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(&pointerEvent));
     EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    EXPECT_CALL(libinputMock, DeviceGetSize).WillOnce(Return(1)).WillOnce(Return(0))
+        .WillOnce(DoAll(SetArgPointee<1>(InputEventHandler::TOUCHPAD_EDGE_WIDTH), Return(0)))
+        .WillRepeatedly(DoAll(SetArgPointee<1>(1000.0), Return(0)));
     EXPECT_FALSE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
 
     g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
