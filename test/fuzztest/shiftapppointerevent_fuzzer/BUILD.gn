@@ -100,6 +100,7 @@ ohos_fuzztest("ShiftAppPointerEventFuzzTest") {
     "eventhandler:libeventhandler",
     "faultloggerd:libbacktrace_local",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
     "hicollie:libhicollie",
     "hilog:libhilog",
