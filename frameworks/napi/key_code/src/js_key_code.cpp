@@ -416,6 +416,8 @@ napi_value JsKeyCode::Export(napi_env env, napi_value exports)
             GetNapiInt32(env, KeyEvent::KEYCODE_DAGGER_DOUBLE_CLICK)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_DAGGER_LONG_PRESS",
             GetNapiInt32(env, KeyEvent::KEYCODE_DAGGER_LONG_PRESS)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_DIV",
+            GetNapiInt32(env, KeyEvent::KEYCODE_DIV)),
     };
 
     napi_value result = nullptr;
