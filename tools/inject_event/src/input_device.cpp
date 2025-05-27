@@ -155,7 +155,7 @@ bool InputDevice::WriteEvents(const std::vector<input_event>& events)
     if (fd_ < 0 || events.empty()) {
         return false;
     }
-    ssize_t eventBytes = sizeof(input_event) * events.size();
+    ssize_t eventBytes = static_cast<ssize_t>(sizeof(input_event) * events.size());
     ssize_t bytesWritten = write(fd_, &events[0], eventBytes);
     return bytesWritten == eventBytes;
 }
