@@ -202,8 +202,8 @@ bool EventReplayer::InitializeOutputDevices(std::ifstream& inputFile,
 void EventReplayer::ApplyEventDelay(const struct input_event& currentEvent)
 {
     if (!firstEvent_) {
-        unsigned long nowSec = currentEvent.input_event_sec;
-        unsigned long nowUsec = currentEvent.input_event_usec;
+        long nowSec = currentEvent.input_event_sec;
+        long nowUsec = currentEvent.input_event_usec;
         long diffSec = nowSec - lastSec_;
         long diffUsec = nowUsec - lastUsec_;
         if (diffUsec < 0) {
