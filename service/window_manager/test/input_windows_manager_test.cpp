@@ -171,7 +171,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_001, TestS
     displayGroupInfo.width = 20;
     displayGroupInfo.height = 20;
     displayGroupInfo.focusWindowId = 1;
-    WIN_MGR->GetDisplayGroupInfo(displayGroupInfo);
+    displayGroupInfo = WIN_MGR->GetDisplayGroupInfo();
     int32_t idNames = -1;
     ASSERT_EQ(WIN_MGR->GetClientFd(pointerEvent), idNames);
 }
@@ -915,7 +915,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost_001, Tes
     displayGroupInfo.width = 20;
     displayGroupInfo.height = 20;
     displayGroupInfo.focusWindowId = 1;
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo(displayGroupInfo));
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo());
 }
 
 /**
