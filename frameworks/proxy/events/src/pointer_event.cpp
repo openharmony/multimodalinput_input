@@ -254,6 +254,26 @@ void PointerEvent::PointerItem::SetToolWindowY(int32_t y)
     toolWindowY_ = y;
 }
 
+void PointerEvent::PointerItem::SetGlobalX(double globalX)
+{
+    globalX_ = globalX;
+}
+
+double PointerEvent::PointerItem::GetGlobalX()
+{
+    return globalX_;
+}
+
+void PointerEvent::PointerItem::SetGlobalY(double globalY)
+{
+    globalY_ = globalY;
+}
+
+double PointerEvent::PointerItem::GetGlobalY()
+{
+    return globalY_;
+}
+
 int32_t PointerEvent::PointerItem::GetToolWidth() const
 {
     return toolWidth_;
@@ -476,7 +496,9 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(blobId_) &&
         out.WriteInt32(twist_) &&
         out.WriteInt32(fixedDisplayX_) &&
-        out.WriteInt32(fixedDisplayY_)
+        out.WriteInt32(fixedDisplayY_) &&
+        out.WriteDouble(globalX_) &&
+        out.WriteDouble(globalY_)
     );
 }
 
@@ -518,7 +540,9 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(blobId_) &&
         in.ReadInt32(twist_) &&
         in.ReadInt32(fixedDisplayX_) &&
-        in.ReadInt32(fixedDisplayY_)
+        in.ReadInt32(fixedDisplayY_) &&
+        in.ReadDouble(globalX_) &&
+        in.ReadDouble(globalY_)
     );
 }
 
