@@ -785,6 +785,8 @@ void OH_Input_SetMouseEventDisplayId(struct Input_MouseEvent* mouseEvent, int32_
  */
 int32_t OH_Input_GetMouseEventDisplayId(const struct Input_MouseEvent* mouseEvent);
 
+
+
 /**
  * @brief Inject touch event.
  *

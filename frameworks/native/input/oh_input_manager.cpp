@@ -49,6 +49,8 @@ struct Input_MouseEvent {
     int32_t action;
     int32_t displayX;
     int32_t displayY;
+    int32_t globalX;
+    int32_t globalY;
     int32_t button { -1 };
     int32_t axisType { -1 };
     float axisValue { 0.0f };
@@ -62,6 +64,8 @@ struct Input_TouchEvent {
     int32_t id;
     int32_t displayX;
     int32_t displayY;
+    int32_t globalX;
+    int32_t globalY;
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
