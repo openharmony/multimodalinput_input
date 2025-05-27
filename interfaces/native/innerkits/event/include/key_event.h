@@ -3163,6 +3163,12 @@ public:
      * @since 18
      */
     static const int32_t KEYCODE_FLOATING_BACK;
+    /**
+     * Div key
+     *
+     * @since 20
+     */
+    static const int32_t KEYCODE_DIV;
 public:
     class KeyItem {
     public:
