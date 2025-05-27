@@ -49,7 +49,6 @@ JsEventTarget::JsEventTarget()
 void JsEventTarget::EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     reportData->DecStrongRef(nullptr);
     auto addEvent = devListener_.find(CHANGED_TYPE);
     if (addEvent == devListener_.end()) {
@@ -92,7 +91,6 @@ void JsEventTarget::EmitAddedDeviceEvent(sptr<JsUtil::ReportData> reportData)
 void JsEventTarget::EmitRemoveDeviceEvent(sptr<JsUtil::ReportData> reportData)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     reportData->DecStrongRef(nullptr);
     auto removeEvent = devListener_.find(CHANGED_TYPE);
     if (removeEvent == devListener_.end()) {
