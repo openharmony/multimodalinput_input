@@ -3949,6 +3949,9 @@ void InputWindowsManager::HandleEventsWithPointerIdCausedPullCancel(std::shared_
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_CANCEL) {
         return;
     }
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->BypassChainAndDispatchDirectly(pointerEvent);
     auto pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
