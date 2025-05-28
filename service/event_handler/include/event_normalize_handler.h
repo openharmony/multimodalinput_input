@@ -45,6 +45,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     int32_t SetMoveEventFilters(bool flag);
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    void BypassChainAndDispatchDirectly(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
@@ -107,7 +108,6 @@ private:
     void TerminateAxis(libinput_event* event);
     void CancelTwoFingerAxis(libinput_event* event);
     bool IsAccessibilityEventWithZOrder(std::shared_ptr<PointerEvent> pointerEvent);
-    void BypassChainAndDispatchDirectly(std::shared_ptr<PointerEvent> pointerEvent);
 };
 } // namespace MMI
 } // namespace OHOS
