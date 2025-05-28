@@ -47,8 +47,8 @@ private:
     std::unordered_map<uint32_t, std::vector<input_event>> deviceEventBuffers_;
     std::map<uint16_t, std::string> deviceMapping_;
     std::map<std::string, std::string> hashToDevicePath_;
-    unsigned long lastSec_{0};
-    unsigned long lastUsec_{0};
+    long lastSec_{0};
+    long lastUsec_{0};
     bool firstEvent_{true};
 };
 } // namespace MMI
