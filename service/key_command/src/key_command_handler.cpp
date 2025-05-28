@@ -1562,7 +1562,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     if (specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
-        HandleSpecialKeys(key->GetKeyCode(), key->GetAction());
+        HandleSpecialKeys(key->GetKeyCode(), key->GetKeyAction());
         return true;
     }
 
