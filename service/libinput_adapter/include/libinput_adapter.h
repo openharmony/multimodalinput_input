@@ -152,7 +152,7 @@ private:
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
-    void LibinputAdapter::HandleVKeyTrackPadTouchPadDown(libinput_event_touch *touch,
+    void HandleVKeyTrackPadTouchPadDown(libinput_event_touch *touch,
         const std::vector<int32_t> &msgItem);
     bool HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
@@ -209,7 +209,7 @@ private:
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
     void HandleHWKeyEventForVKeyboard(libinput_event* event);
-    void LibinputAdapter::HandleVKeyTrackPadSingleTap(libinput_event_touch* touch,
+    void HandleVKeyTrackPadSingleTap(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem,
         libinput_event* event, bool& delayvtpDestroy);
     void ShowMouseCursor();
