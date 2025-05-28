@@ -884,7 +884,7 @@ void InputWindowsManager::UpdateDisplayIdAndName()
     CALL_DEBUG_ENTER;
     using IdNames = std::set<std::pair<int32_t, std::string>>;
     IdNames newInfo;
-    auto DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
     for (const auto &item : DisplaysInfo) {
         newInfo.insert(std::make_pair(item.uniqueId, item.uniq));
     }
@@ -925,7 +925,7 @@ int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId,
 
 void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo)
 {
-    auto WindowInfo = GetWindowInfoVector(displayGroupInfo.groupId);
+    auto &WindowInfo = GetWindowInfoVector(displayGroupInfo.groupId);
     int32_t focusWindowId = GetFocusWindowId(displayGroupInfo.groupId);
     if (displayGroupInfo.windowsInfo.empty()) {
         MMI_HILOGW("windowsInfo is empty");
@@ -1529,7 +1529,7 @@ bool InputWindowsManager::IsValidDisplayChange(const DisplayInfo &displayInfo)
 {
     int32_t touchDisplayId = displayInfo.id;
     int32_t groupId = FindDisplayGroupId(touchDisplayId);
-    auto DisplaysInfo = GetDisplayInfoVector(groupId);
+    auto &DisplaysInfo = GetDisplayInfoVector(groupId);
     for (auto &currentDisplay : DisplaysInfo) {
         if (touchDisplayId == currentDisplay.id) {
             auto currentDirection = currentDisplay.direction;
@@ -1579,6 +1579,7 @@ void InputWindowsManager::HandleWindowPositionChange(const DisplayGroupInfo &dis
     CALL_DEBUG_ENTER;
     int32_t groupId = displayGroupInfo.groupId;
     PrintWindowNavbar(groupId);
+
     auto WindowInfo = GetWindowInfoVector(groupId);
     for (auto it = touchItemDownInfosMap_[groupId].begin(); it != touchItemDownInfosMap_[groupId].end(); ++it) {
         int32_t pointerId = it->first;
@@ -1635,7 +1636,7 @@ void InputWindowsManager::SendCancelEventWhenWindowChange(int32_t pointerId, int
 
 void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
 {
-    auto WindowsInfo = GetWindowInfoVector(groupId);
+    auto &WindowsInfo = GetWindowInfoVector(groupId);
     for (auto &item : WindowsInfo) {
         if (item.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
             std::string dump;
@@ -2456,7 +2457,7 @@ void InputWindowsManager::NotifyPointerToWindow(int32_t groupId)
         return;
     }
     bool isFindLastWindow = false;
-    auto WindowsInfo = GetWindowInfoVector(groupId);
+    auto &WindowsInfo = GetWindowInfoVector(groupId);
     for (const auto &item : WindowsInfo) {
         if (item.id == lastWindowInfo_.id) {
             DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
@@ -3001,26 +3002,30 @@ const DisplayGroupInfo InputWindowsManager::GetDisplayGroupInfo(int32_t groupId)
 
 const std::vector<DisplayInfo>& InputWindowsManager::GetDisplayInfoVector(int32_t groupId) const
 {
-    auto iter = displayGroupInfoMap_.find(groupId);
-    if (iter != displayGroupInfoMap_.end()) {
-        return iter->second.displaysInfo;
+    const auto &groupInfo = displayGroupInfoMap_.find(groupId);
+    if (groupInfo != displayGroupInfoMap_.end()) {
+        const auto &displaysInfo = groupInfo->second.displaysInfo;
+        return displaysInfo;
     }
-    iter = displayGroupInfoMap_.find(MAIN_GROUPID);
-    if (iter != displayGroupInfoMap_.end()) {
-        return iter->second.displaysInfo;
+    const auto &mainGroupInfo = displayGroupInfoMap_.find(MAIN_GROUPID);
+    if (mainGroupInfo != displayGroupInfoMap_.end()) {
+        const auto &displaysInfo = mainGroupInfo->second.displaysInfo;
+        return displaysInfo;
     }
     return displayGroupInfo_.displaysInfo;
 }
 
 const std::vector<WindowInfo>& InputWindowsManager::GetWindowInfoVector(int32_t groupId) const
 {
-    auto iter = displayGroupInfoMap_.find(groupId);
-    if (iter != displayGroupInfoMap_.end()) {
-        return iter->second.windowsInfo;
+    const auto &groupInfo = displayGroupInfoMap_.find(groupId);
+    if (groupInfo != displayGroupInfoMap_.end()) {
+        const auto &windowsInfo = groupInfo->second.windowsInfo;
+        return windowsInfo;
     }
-    iter = displayGroupInfoMap_.find(MAIN_GROUPID);
-    if (iter != displayGroupInfoMap_.end()) {
-        return iter->second.windowsInfo;
+    const auto &mainGroupInfo = displayGroupInfoMap_.find(MAIN_GROUPID);
+    if (mainGroupInfo != displayGroupInfoMap_.end()) {
+        const auto &windowsInfo = mainGroupInfo->second.windowsInfo;
+        return windowsInfo;
     }
     return displayGroupInfo_.windowsInfo;
 }
@@ -3417,7 +3422,7 @@ void InputWindowsManager::InitPointerStyle(int32_t groupId)
     CALL_DEBUG_ENTER;
     PointerStyle pointerStyle;
     pointerStyle.id = DEFAULT_POINTER_STYLE;
-    auto WindowsInfo = GetWindowInfoVector(groupId);
+    auto &WindowsInfo = GetWindowInfoVector(groupId);
     for (const auto& windowItem : WindowsInfo) {
         int32_t pid = windowItem.pid;
         auto it = pointerStyle_.find(pid);
@@ -3572,7 +3577,7 @@ void InputWindowsManager::AdjustDisplayCoordinate(
 bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
 {
     int32_t groupId = FindDisplayGroupId(displayId);
-    auto DisplaysInfo = GetDisplayInfoVector(groupId);
+    auto &DisplaysInfo = GetDisplayInfoVector(groupId);
     if (DisplaysInfo.empty()) {
         MMI_HILOGE("DisplaysInfo is empty");
         return false;
@@ -3758,7 +3763,7 @@ void InputWindowsManager::CheckUIExtentionWindowPointerHotArea(int32_t logicalX,
 std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, int32_t logicalY, int32_t groupId)
 {
     CALL_DEBUG_ENTER;
-    auto WindowsInfo = GetWindowInfoVector(groupId);
+    auto &WindowsInfo = GetWindowInfoVector(groupId);
     for (const auto& item : WindowsInfo) {
         if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
             MMI_HILOGD("Skip the untouchable window to continue searching, "
@@ -5326,7 +5331,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     if (pointerAction == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
         WindowInfo touchWindow;
         bool isChanged { false };
-        auto WindowsInfo = GetWindowInfoVector(groupId);
+        auto &WindowsInfo = GetWindowInfoVector(groupId);
         for (const auto &item : WindowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
@@ -5759,7 +5764,7 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
         return;
     }
     int32_t groupId = FindDisplayGroupId(displayId);
-    auto displaysInfoVector = GetDisplayInfoVector(groupId);
+    auto &displaysInfoVector = GetDisplayInfoVector(groupId);
     for (const auto &item : displaysInfoVector) {
         if (item.id == displayInfo.id) {
             continue;
@@ -6037,7 +6042,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
 
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
-    auto displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
     MouseLocation curMouseLocation;
     const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
     if (iter != mouseLocationMap_.end()) {
@@ -6069,7 +6074,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 CursorPosition InputWindowsManager::GetCursorPos()
 {
     CALL_DEBUG_ENTER;
-    auto displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
     CursorPosition cursorPos;
     const auto iter = cursorPosMap_.find(MAIN_GROUPID);
     if (iter != cursorPosMap_.end()) {
@@ -6093,7 +6098,7 @@ CursorPosition InputWindowsManager::GetCursorPos()
 CursorPosition InputWindowsManager::ResetCursorPos()
 {
     CALL_DEBUG_ENTER;
-    auto displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
     if (!displaysInfoVector.empty()) {
         DisplayInfo displayInfo = displaysInfoVector[0];
         int32_t x = displayInfo.validWidth * HALF_RATIO;
@@ -6477,7 +6482,7 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
 void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
 {
     CALL_DEBUG_ENTER;
-    auto DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
     if (DisplaysInfo.empty()) {
         MMI_HILOGE("DisplaysInfo is empty");
         return;
@@ -6557,7 +6562,7 @@ void InputWindowsManager::PrintChangedWindowByEvent(int32_t eventType, const Win
 
 void InputWindowsManager::PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo)
 {
-    auto WindowsInfo = GetWindowInfoVector(newDisplayInfo.groupId);
+    auto &WindowsInfo = GetWindowInfoVector(newDisplayInfo.groupId);
     auto &oldWindows = WindowsInfo;
     auto &newWindows = newDisplayInfo.windowsInfo;
     if (!oldWindows.empty() && !newWindows.empty()) {
@@ -6567,7 +6572,7 @@ void InputWindowsManager::PrintChangedWindowBySync(const DisplayGroupInfo &newDi
                 newWindows[0].pid, newWindows[0].zOrder);
         }
     }
-    auto DisplaysInfo = GetDisplayInfoVector(newDisplayInfo.groupId);
+    auto &DisplaysInfo = GetDisplayInfoVector(newDisplayInfo.groupId);
     if (newDisplayInfo.displaysInfo.empty() || DisplaysInfo.empty()) {
         MMI_HILOGE("displayGroupInfo.displaysInfo is empty");
         return;
@@ -6656,7 +6661,7 @@ int32_t InputWindowsManager::GetWindowStateNotifyPid()
 int32_t InputWindowsManager::GetPidByWindowId(int32_t id)
 {
     int32_t groupId = FindDisplayGroupId(id);
-    auto WindowsInfo = GetWindowInfoVector(groupId);
+    auto &WindowsInfo = GetWindowInfoVector(groupId);
     for (auto &item : WindowsInfo) {
         if (item.id == id) {
             return item.pid;
@@ -6723,7 +6728,7 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
 
 void InputWindowsManager::CleanInvalidPiexMap(int32_t groupId)
 {
-    auto WindowInfo = GetWindowInfoVector(groupId);
+    auto &WindowInfo = GetWindowInfoVector(groupId);
     for (auto it = transparentWins_.begin(); it != transparentWins_.end();) {
         int32_t windowId = it->first;
         auto iter = std::find_if(WindowInfo.begin(), WindowInfo.end(),
@@ -6791,7 +6796,7 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
             hasFound = true;
         }
     }
-    auto DisplaysInfo = GetDisplayInfoVector(groupId);
+    auto &DisplaysInfo = GetDisplayInfoVector(groupId);
     if (!hasFound && !DisplaysInfo.empty()) {
         keyEvent->SetTargetDisplayId(DisplaysInfo[0].id);
     }
@@ -6799,7 +6804,7 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
 
 bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const DisplayGroupInfo &displayGroupInfo)
 {
-    auto displaysInfoVector = GetDisplayInfoVector(displayGroupInfo.groupId);
+    auto &displaysInfoVector = GetDisplayInfoVector(displayGroupInfo.groupId);
     if (displayGroupInfo.displaysInfo.empty() || displaysInfoVector.empty()) {
         return false;
     }
