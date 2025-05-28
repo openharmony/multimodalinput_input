@@ -340,6 +340,10 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_HILOGE("GetPointerItem failed, pointerId:%{public}d", pointerEvent->GetPointerId());
+        return;
+    }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
         MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d, PointerId:%{public}d,"
             "SourceType:%{public}d, ButtonId:%{public}d,"
@@ -347,10 +351,6 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
             pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
             pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
-        if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-            MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
-            return;
-        }
         if (!EventLogHelper::IsBetaVersion()) {
             MMI_HILOGI("MouseEvent Item Normalization Results, IsPressed:%{public}d, Pressure:%{public}f"
                        ", Device:%{public}d",
