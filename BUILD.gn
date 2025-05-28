@@ -141,6 +141,27 @@ group("input_jsapi_group") {
   }
 }
 
+group("cryptoframework_taihe") {
+  deps = [
+    "frameworks/ets/input_event:inputEvent",
+    "frameworks/ets/key_code:keyCode",
+    "frameworks/ets/key_event:keyEvent",
+    "frameworks/ets/mouse_event:mouseEvent",
+    "frameworks/ets/touch_event:touchEvent",
+    "frameworks/ets/input_moniter:inputMoniter",
+    "frameworks/ets/intention_code:intentionCode",
+    "frameworks/ets/gesture_event:gestureEvent",
+  ]
+  if (input_feature_short_key) {
+    deps += [ "frameworks/ets/short_key:shortKey" ]
+  }
+  if (input_feature_keyboard) {
+    deps += [
+      "frameworks/ets/input_consumer:inputConsumer",
+    ]
+  }
+}
+
 group("mmi_tests") {
   testonly = true
   deps = [
