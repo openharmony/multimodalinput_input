@@ -2317,8 +2317,8 @@ HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_GlobalCoordinates, TestS
     PointerEvent::PointerItem item;
     ASSERT_NO_FATAL_FAILURE(item.SetGlobalX(globalX));
     ASSERT_NO_FATAL_FAILURE(item.SetGlobalY(globalY));
-    ASSERT_EQ(static_cast<int32_t>(item.GetGlobalX()), globalX);
-    ASSERT_EQ(static_cast<int32_t>(item.GetGlobalY()), globalY);
+    ASSERT_EQ(static_cast<int32_t>(item.GetGlobalX()), static_cast<int32_t>(globalX));
+    ASSERT_EQ(static_cast<int32_t>(item.GetGlobalY()), static_cast<int32_t>(globalY));
 }
 } // namespace MMI
 } // namespace OHOS
