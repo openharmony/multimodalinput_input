@@ -167,6 +167,36 @@
         },
         {
           "name": "//foundation/multimodalinput/input/libudev:mmi_libudev"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/input_event:input_event_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/intention_code:intention_code_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/key_code:key_code_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/key_event:key_event_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/mouse_event:mouse_event_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/short_key:short_key_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/touch_event:touch_event_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/gesture_event:gesture_event_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/input_consumer:input_consumer_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/input_moniter:input_moniter_taihe"
         }
       ],
       "test": [
