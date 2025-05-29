@@ -222,7 +222,13 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
             if (window.transform.empty()) {
                 return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
             }
-            auto windowXY = WIN_MGR->TransformWindowXY(window, logicX, logicY);
+            auto physicalDisplayInfo = WIN_MGR->GetPhysicalDisplay(window.displayId);
+            if (physicalDisplayInfo == nullptr) {
+                MMI_HILOGE("physicalDisplayInfo is null");
+                return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
+            }
+            auto windowXY = WIN_MGR->TransformWindowXY(window, logicX + physicalDisplayInfo->x,
+                logicY + physicalDisplayInfo->y);
             auto windowX = static_cast<int32_t>(windowXY.first);
             auto windowY = static_cast<int32_t>(windowXY.second);
             return {windowX, windowY};

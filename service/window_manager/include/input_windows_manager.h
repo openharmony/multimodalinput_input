@@ -263,6 +263,7 @@ private:
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
     Direction GetDisplayDirection(const DisplayInfo *displayInfo);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height, bool isRealData = true);
+    void UpdateCurrentDisplay(int32_t displayId) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
     void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
@@ -554,8 +555,7 @@ private:
     int32_t scalePercent_ = 100;
     mutable int32_t lastWinX_ { 0 };
     mutable int32_t lastWinY_ { 0 };
-    int32_t currentDisplayX_ { 0 };
-    int32_t currentDisplayY_ { 0 };
+    mutable std::pair<int32_t, int32_t> currentDisplayXY_ { 0, 0 };
 };
 } // namespace MMI
 } // namespace OHOS
