@@ -97,7 +97,10 @@ if (is_arkui_x) {
       defines += [ "IOS_PLATFORM" ]
     }
 
-    deps = [ "${hilog_root}/interfaces/native/innerkits:libhilog_${target_os}" ]
+    deps = [
+      "${hilog_root}/interfaces/native/innerkits:libhilog_${target_os}",
+      "//foundation/multimedia/image_framework/interfaces/innerkits:image_native",
+    ]
 
     part_name = "input"
     subsystem_name = "multimodalinput"
@@ -151,8 +154,8 @@ ohos_shared_library("libmmi-client") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   external_deps = [
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
@@ -363,8 +366,8 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
@@ -437,8 +440,8 @@ ohos_unittest("InputMonitorManagerTest") {
 
   external_deps = [
     "ability_runtime:abilitykit_native",
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
@@ -505,8 +508,8 @@ ohos_unittest("InputManagerImplTest") {
 
   external_deps = [
     "ability_runtime:abilitykit_native",
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
@@ -573,8 +576,8 @@ ohos_unittest("InputManagerTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
