@@ -45,6 +45,15 @@ constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
+constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
+constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
+constexpr uint32_t TEST_WINDOW_START { -100 };
+constexpr uint32_t TEST_WINDOW_END { 100000 };
+#define SCREEN_RECORD_WINDOW_WIDTH 400
+#define SCREEN_RECORD_WINDOW_HEIGHT 200
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
 #ifdef WIN_MGR
@@ -9867,5 +9876,128 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleEventsWithPointe
 
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/**
+ * @tc.name: InputWindowsManagerTest_IsMouseInCastWindow_001
+ * @tc.desc: Test that IsMouseInCastWindow should return false when there is no window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.clear();
+    EXPECT_FALSE(inputWindowsManager.IsMouseInCastWindow());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsMouseInCastWindow_002
+ * @tc.desc: Test whether IsMouseInCastWindow returns false when there is window information but no window of the CAST_WINDOW_TYPE type.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowInfo windowInfo;
+    windowInfo.windowType = CAST_WINDOW_TYPE + 1;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_FALSE(inputWindowsManager.IsMouseInCastWindow());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsMouseInCastWindow_003
+ * @tc.desc: Test whether IsMouseInCastWindow returns false when there is window information and window of the CAST_WINDOW_TYPE type.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo testWindow;
+    testWindow.windowType = CAST_WINDOW_TYPE;
+    testWindow.area.x = TEST_WINDOW_START;
+    testWindow.area.y = TEST_WINDOW_START;
+    testWindow.area.width = TEST_WINDOW_END;
+    testWindow.area.height = TEST_WINDOW_END;
+
+    InputWindowsManager manager;
+    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+
+    bool result = manager.IsMouseInCastWindow();
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsCaptureMode_001
+ * @tc.desc: est case for IsCaptureMode when screenshot window exists
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    WindowInfo screenshotWindow;
+    screenshotWindow.windowNameType = WINDOW_NAME_TYPE_SCHREENSHOT;
+    manager.displayGroupInfo_.windowsInfo.push_back(screenshotWindow);
+
+    EXPECT_FALSE(manager.IsCaptureMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsCaptureMode_002
+ * @tc.desc: Test case for IsCaptureMode when capture window exists and size exceeds threshold
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    WindowInfo captureWindow;
+    captureWindow.zOrder = SCREEN_CAPTURE_WINDOW_ZORDER;
+    captureWindow.area.width = SCREEN_RECORD_WINDOW_WIDTH + 1;
+    captureWindow.area.height = SCREEN_RECORD_WINDOW_HEIGHT + 1;
+    manager.displayGroupInfo_.windowsInfo.push_back(captureWindow);
+
+    EXPECT_TRUE(manager.IsCaptureMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsCaptureMode_003
+ * @tc.desc: Test case for IsCaptureMode when capture window exists and size does not exceed threshold
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    WindowInfo captureWindow;
+    captureWindow.zOrder = SCREEN_CAPTURE_WINDOW_ZORDER;
+    captureWindow.area.width = SCREEN_RECORD_WINDOW_WIDTH - 1;
+    captureWindow.area.height = SCREEN_RECORD_WINDOW_HEIGHT - 1;
+    manager.displayGroupInfo_.windowsInfo.push_back(captureWindow);
+
+    EXPECT_FALSE(manager.IsCaptureMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsCaptureMode_004
+ * @tc.desc: TTest case for IsCaptureMode when no special windows exist
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    WindowInfo normalWindow;
+    normalWindow.windowNameType = WINDOW_NAME_TYPE_SCHREENSHOT + 1;
+    normalWindow.zOrder = SCREEN_CAPTURE_WINDOW_ZORDER - 1;
+    manager.displayGroupInfo_.windowsInfo.push_back(normalWindow);
+
+    EXPECT_FALSE(manager.IsCaptureMode());
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS

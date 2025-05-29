@@ -91,6 +91,13 @@ constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr int32_t DEFAULT_DPI { 0 };
 constexpr int32_t DEFAULT_POSITION { 0 };
 constexpr int32_t MAIN_GROUPID { 0 };
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
+constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
+constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
+#define SCREEN_RECORD_WINDOW_WIDTH 400
+#define SCREEN_RECORD_WINDOW_HEIGHT 200
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1468,6 +1475,44 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
 bool InputWindowsManager::IsPointerActiveRectValid(const DisplayInfo &currentDisplay)
 {
     return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
+}
+
+bool InputWindowsManager::IsMouseInCastWindow()
+{
+    for (const auto& windowInfo : displayGroupInfo_.windowsInfo) {
+        if (windowInfo.windowType == CAST_WINDOW_TYPE) {
+            auto mouseInfo = GetMouseInfo();
+            int32_t x = mouseInfo.physicalX;
+            int32_t y = mouseInfo.physicalY;
+            if ((x > windowInfo.area.x && x < (windowInfo.area.x + windowInfo.area.width)) &&
+                (y > windowInfo.area.y && y < (windowInfo.area.y + windowInfo.area.height))) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool InputWindowsManager::IsCaptureMode()
+{
+    auto screenshotWindow = std::find_if(displayGroupInfo_.windowsInfo.begin(),
+        displayGroupInfo_.windowsInfo.end(), [](const WindowInfo& windowInfo) {
+            return windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT;
+        });
+    if (screenshotWindow != displayGroupInfo_.windowsInfo.end()) {
+            return false;
+    }
+
+    auto captureWindow = std::find_if(displayGroupInfo_.windowsInfo.begin(),
+        displayGroupInfo_.windowsInfo.end(), [](const WindowInfo& windowInfo) {
+            return windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER;
+        });
+    if (captureWindow != displayGroupInfo_.windowsInfo.end()) {
+        return (captureWindow->area.width > SCREEN_RECORD_WINDOW_WIDTH ||
+                             captureWindow->area.height > SCREEN_RECORD_WINDOW_HEIGHT);
+    }
+
+    return false;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
