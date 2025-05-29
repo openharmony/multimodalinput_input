@@ -18,8 +18,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t ABS_MAX_X = 480;
-constexpr int32_t ABS_MAX_Y = 960;
+constexpr int32_t ABS_MAX_X = 11520;
+constexpr int32_t ABS_MAX_Y = 20480;
 constexpr int32_t ABS_PRESSURE_MAX = 100;
 constexpr int32_t ABS_MT_ORIENTATION_MIN = -90;
 constexpr int32_t ABS_MT_ORIENTATION_MAX = 90;
