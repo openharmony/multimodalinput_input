@@ -168,15 +168,11 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-bool KeyCommandHandler::GetKnuckleSwitchValue()
-{
-    return gameForbidFingerKnuckle_;
-}
-
 bool KeyCommandHandler::SkipKnuckleDetect()
 {
-    return ((!screenshotSwitch_.statusConfigValue) && (!recordSwitch_.statusConfigValue)) ||
-        gameForbidFingerKnuckle_;
+    return ((screenCapturePermission_ & (KNUCKLE_SCREENSHOT | KNUCKLE_SCROLL_SCREENSHOT | KNUCKLE_ENABLE_AI_BASE |
+                                           KNUCKLE_SCREEN_RECORDING)) == 0) ||
+           !(screenshotSwitch_.statusConfigValue || recordSwitch_.statusConfigValue) || gameForbidFingerKnuckle_;
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -409,10 +405,6 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
             return;
         }
     }
-    if (gameForbidFingerKnuckle_) {
-        MMI_HILOGI("Knuckle switch closed");
-        return;
-    }
     if (CheckInputMethodArea(touchEvent)) {
         MMI_HILOGW("Event skipping inputmethod area");
         return;
@@ -493,8 +485,8 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
         MMI_HILOGI("Knuckle gesture start launch ability");
         knuckleCount_ = 0;
-        if ((type == KnuckleType::KNUCKLE_TYPE_SINGLE && screenshotSwitch_.statusConfigValue) ||
-            (type == KnuckleType::KNUCKLE_TYPE_DOUBLE && recordSwitch_.statusConfigValue)) {
+        if ((type == KnuckleType::KNUCKLE_TYPE_SINGLE && HasScreenCapturePermission(KNUCKLE_SCREENSHOT)) ||
+            (type == KnuckleType::KNUCKLE_TYPE_DOUBLE && HasScreenCapturePermission(KNUCKLE_SCREEN_RECORDING))) {
             DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
             BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
             LaunchAbility(knuckleGesture.ability, NO_DELAY);
@@ -756,20 +748,6 @@ bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touc
             return false;
         }
     }
-    if (gameForbidFingerKnuckle_) {
-        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
-            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-            MMI_HILOGI("Knuckle switch closed");
-        }
-        return false;
-    }
-    if (!screenshotSwitch_.statusConfigValue) {
-        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
-            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-            MMI_HILOGI("Screenshot knuckle switch closed");
-        }
-        return false;
-    }
     if (CheckInputMethodArea(touchEvent)) {
         if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
             touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
@@ -879,13 +857,25 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
         isGesturing_, isLetterGesturing_));
     switch (notifyType) {
         case NotifyType::REGIONGESTURE: {
-            ProcessKnuckleGestureTouchUp(notifyType);
+            if (HasScreenCapturePermission(KNUCKLE_ENABLE_AI_BASE)) {
+                ProcessKnuckleGestureTouchUp(notifyType);
+            } else {
+                MMI_HILOGI("knuckle_enable_ai_base is skipped in HandleKnuckleGestureTouchUp, "
+                           "screenCapturePermission_:%{public}d",
+                    screenCapturePermission_);
+            }
             drawOSuccTimestamp_ = touchEvent->GetActionTime();
             ReportRegionGesture();
             break;
         }
         case NotifyType::LETTERGESTURE: {
-            ProcessKnuckleGestureTouchUp(notifyType);
+            if (HasScreenCapturePermission(KNUCKLE_SCROLL_SCREENSHOT)) {
+                ProcessKnuckleGestureTouchUp(notifyType);
+            } else {
+                MMI_HILOGI("knuckle_scroll_screenshot is skipped in HandleKnuckleGestureTouchUp, "
+                           "screenCapturePermission_:%{public}d",
+                    screenCapturePermission_);
+            }
             drawOFailTimestamp_ = touchEvent->GetActionTime();
             ReportLetterGesture();
             break;
@@ -2209,6 +2199,15 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
 
 bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility)
 {
+    std::string bundleName = sequence.ability.bundleName;
+    std::string matchName = ".screenshot";
+    if (bundleName.find(matchName) != std::string::npos && !HasScreenCapturePermission(SHORTCUT_KEY_SCREENSHOT)) {
+        MMI_HILOGI("shortcut_key_screenshot is skipped in HandleNormalSequence, "
+                   "screenCapturePermission_:%{public}d",
+            screenCapturePermission_);
+        isLaunchAbility = true;
+        return true;
+    }
     sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, &sequence] () {
         MMI_HILOGI("Timer callback");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
@@ -2229,6 +2228,23 @@ bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbi
 
 bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility)
 {
+    std::string bundleName = sequence.ability.bundleName;
+    std::string matchName = ".screenshot";
+    if (bundleName.find(matchName) != std::string::npos && !HasScreenCapturePermission(SHORTCUT_KEY_SCREENSHOT)) {
+        MMI_HILOGI("shortcut_key_screenshot is skipped in HandleNormalSequence, "
+                   "screenCapturePermission_:%{public}d",
+            screenCapturePermission_);
+        isLaunchAbility = true;
+        return true;
+    }
+    matchName = ".screenrecorder";
+    if (bundleName.find(matchName) != std::string::npos && !HasScreenCapturePermission(SHORTCUT_KEY_SCREEN_RECORDING)) {
+        MMI_HILOGI("shortcut_key_screen_recording is skipped in HandleNormalSequence, "
+                   "screenCapturePermission_:%{public}d",
+            screenCapturePermission_);
+        isLaunchAbility = true;
+        return true;
+    }
     if (sequence.abilityStartDelay == 0) {
         MMI_HILOGI("Start launch ability immediately");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
@@ -2822,14 +2838,20 @@ bool KeyCommandHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEven
 {
     CHKPF(event);
     auto actionType = event->GetKeyAction();
-    if (actionType == KNUCKLE_1F_DOUBLE_CLICK) {
-        TouchPadKnuckleDoubleClickProcess(PC_PRO_SCREENSHOT_BUNDLE_NAME,
-            PC_PRO_SCREENSHOT_ABILITY_NAME, "single_knuckle");
+    if (actionType == KNUCKLE_1F_DOUBLE_CLICK || actionType == KNUCKLE_2F_DOUBLE_CLICK) {
+        MMI_HILOGI("Knuckle in TouchPadKnuckleDoubleClickHandle, actionType is %{public}d, "
+                   "screenCapturePermission_ is %{public}d",
+            actionType,
+            screenCapturePermission_);
+    }
+    if (actionType == KNUCKLE_1F_DOUBLE_CLICK && HasScreenCapturePermission(TOUCHPAD_KNUCKLE_SCREENSHOT)) {
+        TouchPadKnuckleDoubleClickProcess(
+            PC_PRO_SCREENSHOT_BUNDLE_NAME, PC_PRO_SCREENSHOT_ABILITY_NAME, "single_knuckle");
         return true;
     }
-    if (actionType == KNUCKLE_2F_DOUBLE_CLICK) {
-        TouchPadKnuckleDoubleClickProcess(PC_PRO_SCREENRECORDER_BUNDLE_NAME,
-            PC_PRO_SCREENRECORDER_ABILITY_NAME, "double_knuckle");
+    if (actionType == KNUCKLE_2F_DOUBLE_CLICK && HasScreenCapturePermission(TOUCHPAD_KNUCKLE_SCREEN_RECORDING)) {
+        TouchPadKnuckleDoubleClickProcess(
+            PC_PRO_SCREENRECORDER_BUNDLE_NAME, PC_PRO_SCREENRECORDER_ABILITY_NAME, "double_knuckle");
         return true;
     }
     return false;
@@ -3114,6 +3136,46 @@ void KeyCommandHandler::UnregisterProximitySensor()
     if (ret != 0) {
         MMI_HILOGE("Failed to UnsubscribeSensor: %{public}d ret:%{public}d", SENSOR_TYPE_ID_PROXIMITY, ret);
     }
+}
+
+int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
+{
+    if (enable) {
+        screenCapturePermission_ |= permissionType;
+    } else {
+        screenCapturePermission_ &= ~permissionType;
+    }
+    MMI_HILOGI("SwitchScreenCapturePermission is successful in keyCommand handler, "
+               "screenCapturePermission_:%{public}d, permissionType:%{public}d, "
+               "enable:%{public}d",
+        screenCapturePermission_,
+        permissionType,
+        enable);
+    return RET_OK;
+}
+ 
+bool KeyCommandHandler::HasScreenCapturePermission(uint32_t permissionType)
+{
+    bool hasScreenCapturePermission = ((screenCapturePermission_ & permissionType) == permissionType);
+    if ((permissionType & (KNUCKLE_SCREENSHOT | KNUCKLE_SCROLL_SCREENSHOT | KNUCKLE_ENABLE_AI_BASE)) != 0) {
+        hasScreenCapturePermission =
+            hasScreenCapturePermission && !gameForbidFingerKnuckle_ && screenshotSwitch_.statusConfigValue;
+    }
+    if ((permissionType & KNUCKLE_SCREEN_RECORDING) != 0) {
+        hasScreenCapturePermission =
+            hasScreenCapturePermission && !gameForbidFingerKnuckle_ && recordSwitch_.statusConfigValue;
+    }
+    MMI_HILOGD("HasScreenCapturePermission is successful in keyCommand handler, screenCapturePermission_:%{public}d, "
+               "permissionType:%{public}d, gameForbidFingerKnuckle_:%{public}d, screenshotSwitch_:%{public}d, "
+               "recordSwitch_:%{public}d, "
+               "hasScreenCapturePermission:%{public}d ",
+        screenCapturePermission_,
+        permissionType,
+        gameForbidFingerKnuckle_,
+        screenshotSwitch_.statusConfigValue,
+        recordSwitch_.statusConfigValue,
+        hasScreenCapturePermission);
+    return hasScreenCapturePermission;
 }
 } // namespace MMI
 } // namespace OHOS

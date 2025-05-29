@@ -37,6 +37,18 @@ enum InputHandlerType : int32_t {
     MONITOR,
 };
 
+enum ScreenCapturePermissionType : uint32_t {
+    KNUCKLE_SCREENSHOT = 1 << 0,
+    KNUCKLE_SCROLL_SCREENSHOT = 1 << 1,
+    KNUCKLE_ENABLE_AI_BASE = 1 << 2,
+    KNUCKLE_SCREEN_RECORDING = 1 << 3,
+    TOUCHPAD_KNUCKLE_SCREENSHOT = 1 << 4,
+    TOUCHPAD_KNUCKLE_SCREEN_RECORDING = 1 << 5,
+    SHORTCUT_KEY_SCREENSHOT = 1 << 6,
+    SHORTCUT_KEY_SCREEN_RECORDING = 1 << 7,
+    DEFAULT_PERMISSIONS = 0XFF,
+};
+
 using TouchGestureType = uint32_t;
 inline constexpr TouchGestureType TOUCH_GESTURE_TYPE_NONE { 0x0 };
 inline constexpr TouchGestureType TOUCH_GESTURE_TYPE_PINCH { 1u };

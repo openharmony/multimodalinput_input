@@ -1190,5 +1190,12 @@ int32_t MultimodalInputConnectManager::SetMouseAccelerateMotionSwitch(int32_t de
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMouseAccelerateMotionSwitch(deviceId, enable);
 }
+
+int32_t MultimodalInputConnectManager::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SwitchScreenCapturePermission(permissionType, enable);
+}
 } // namespace MMI
 } // namespace OHOS

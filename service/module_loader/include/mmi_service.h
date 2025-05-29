@@ -243,6 +243,7 @@ public:
     ErrCode UnsubscribeInputActive(int32_t subscribeId) override;
     ErrCode SwitchTouchTracking(bool touchTracking) override;
     ErrCode SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable) override;
+    ErrCode SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
