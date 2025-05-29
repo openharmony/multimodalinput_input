@@ -3958,25 +3958,39 @@ void InputWindowsManager::UpdateInnerAngleArea(const Rect &windowArea, std::vect
 void InputWindowsManager::HandleEventsWithPointerIdCausedPullCancel(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_CANCEL) {
+    auto action = pointerEvent->GetPointerAction();
+    if (action != PointerEvent::POINTER_ACTION_PULL_CANCEL &&
+        action != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+        action != PointerEvent::POINTER_ACTION_PULL_UP) {
         return;
     }
-    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-    CHKPV(inputEventNormalizeHandler);
-    inputEventNormalizeHandler->BypassChainAndDispatchDirectly(pointerEvent);
+    int32_t pullId = pointerEvent->GetPullId();
+    static int32_t originPullId { -1 };
+    if (action == PointerEvent::POINTER_ACTION_PULL_CANCEL) {
+        originPullId = pullId;
+        MMI_HILOGI("Set originPullId:%{public}d", originPullId);
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+            pointerEvent->SetPointerAction( PointerEvent::POINTER_ACTION_CANCEL);
+            MMI_HILOGI("Convert PULL_CANCEL to CANCEL When in accessibility");
+        }
+        return;
+    }
+    if (originPullId != pullId) {
+        MMI_HILOGD("Not the same drag instance, originPullId:%{public}d, pullId:%{public}d", originPullId, pullId);
+        return;
+    }
     auto pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGW("GetPointerItem of pointerId:%{public}d failed", pointerId);
+        MMI_HILOGE("GetPointerItem of pointerId:%{public}d failed", pointerId);
         return;
     }
     pointerItem.SetCanceled(true);
     pointerItem.SetPressed(false);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    MMI_HILOGI("SetCanceled true, SetPressed false, pointerId:%{public}d", pointerId);
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    }
+    MMI_HILOGI("SetCanceled true, SetPressed false, pointerId:%{public}d, originPullId:%{public}d",
+        pointerId, originPullId);
+    originPullId = -1;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
