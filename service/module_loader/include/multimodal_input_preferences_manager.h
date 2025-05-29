@@ -16,8 +16,8 @@
 #ifndef MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
 #define MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
 
-#include "nocopyable.h"
-#include "preferences_helper.h"
+#include <nocopyable.h>
+#include <preferences_helper.h>
 
 #include "i_preference_manager.h"
 
@@ -29,18 +29,19 @@ public:
     ~MultiModalInputPreferencesManager() = default;
     DISALLOW_COPY_AND_MOVE(MultiModalInputPreferencesManager);
 
-    int32_t InitPreferences();
-    int32_t GetPreferencesSettings();
-    int32_t InitPreferencesMap();
-    int32_t GetIntValue(const std::string &key, int32_t defaultValue);
-    bool GetBoolValue(const std::string &key, bool defaultValue);
-    int32_t SetIntValue(const std::string &key, const std::string &setFile, int32_t setValue);
-    int32_t SetBoolValue(const std::string &key, const std::string &setFile, bool setValue);
-    int32_t GetShortKeyDuration(const std::string &key);
-    int32_t SetShortKeyDuration(const std::string &key, int32_t setValue);
-    bool IsInitPreference();
+    int32_t InitPreferences() override;
+    int32_t GetIntValue(const std::string &key, int32_t defaultValue) override;
+    bool GetBoolValue(const std::string &key, bool defaultValue) override;
+    int32_t SetIntValue(const std::string &key, const std::string &setFile, int32_t setValue) override;
+    int32_t SetBoolValue(const std::string &key, const std::string &setFile, bool setValue) override;
+    int32_t GetShortKeyDuration(const std::string &key) override;
+    int32_t SetShortKeyDuration(const std::string &key, int32_t setValue) override;
+    bool IsInitPreference() override;
 
 private:
+    int32_t GetPreferencesSettings();
+    int32_t InitPreferencesMap();
+
     std::map<std::string, std::pair<std::string, int32_t>> preferencesMap_;
     std::map<std::string, int32_t> shortcutKeyMap_;
     int32_t keyboardRepeatRate_ { 50 };
