@@ -3450,16 +3450,16 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
     for (const auto &item : rects) {
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
-        if (!AddInt32(item.x - currentDisplayX_, item.width, displayMaxX)) {
+        if (!AddInt32(item.x - currentDisplayXY_.first, item.width, displayMaxX)) {
             MMI_HILOGE("The addition of displayMaxX overflows");
             return false;
         }
-        if (!AddInt32(item.y - currentDisplayY_, item.height, displayMaxY)) {
+        if (!AddInt32(item.y - currentDisplayXY_.second, item.height, displayMaxY)) {
             MMI_HILOGE("The addition of displayMaxY overflows");
             return false;
         }
-        if (((windowX >= (item.x - currentDisplayX_)) && (windowX < displayMaxX)) &&
-            (windowY >= (item.y - currentDisplayY_)) && (windowY < displayMaxY)) {
+        if (((windowX >= (item.x - currentDisplayXY_.first)) && (windowX < displayMaxX)) &&
+            (windowY >= (item.y - currentDisplayXY_.second)) && (windowY < displayMaxY)) {
             lastWinX_ = windowX;
             lastWinY_ = windowY;
             return true;
@@ -3592,6 +3592,13 @@ bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
         }
     }
     return false;
+}
+
+void InputWindowsManager::UpdateCurrentDisplay(int32_t displayId) const
+{
+    auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
+    CHKPV(physicalDisplayInfo);
+    currentDisplayXY_ =  std::make_pair(physicalDisplayInfo->x, physicalDisplayInfo->y);
 }
 
 std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX, int32_t logicalY,
@@ -4066,10 +4073,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t groupId = FindDisplayGroupId(displayId);
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        currentDisplayX_ = physicalDisplayInfo->x;
-        currentDisplayY_ = physicalDisplayInfo->y;
-    }
     int32_t DisplayInfoX = GetLogicalPositionX(displayId);
     int32_t DisplayInfoY = GetLogicalPositionY(displayId);
     int32_t pointerId = pointerEvent->GetPointerId();
@@ -4294,8 +4297,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
-        auto windowXY = TransformWindowXY(
-            *touchWindow, logicalX - physicalDisplayInfo->x, logicalY - physicalDisplayInfo->y);
+        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
     }
     windowX = static_cast<int32_t>(windowX);
     windowY = static_cast<int32_t>(windowY);
@@ -4888,7 +4890,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
         bool isSlidTouch = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER  &&
             pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            pointerEvent->GetPointerIds().size() == 1 && !checkToolType &&
+            pointerEvent->GetAllPointerItems().size() == 1 && !checkToolType &&
             pointerEvent->GetFixedMode() == PointerEvent::FixedMode::AUTO) ||
             (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
         if (isSlidTouch) {
@@ -5089,7 +5091,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
-        auto windowXY = TransformWindowXY(*touchWindow, physicalX, physicalY);
+        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
@@ -5130,7 +5132,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     bool isSlidData = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER  &&
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        pointerEvent->GetPointerIds().size() == 1 && !checkExtraData &&
+        pointerEvent->GetAllPointerItems().size() == 1 && !checkExtraData &&
         pointerEvent->GetFixedMode() == PointerEvent::FixedMode::AUTO) ||
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
     if (isSlidData) {
@@ -6315,8 +6317,9 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInfo &window,
     double logicX, double logicY) const
 {
-    double currX = logicX - currentDisplayX_;
-    double currY = logicY - currentDisplayY_;
+    UpdateCurrentDisplay(window.displayId);
+    int32_t currX = logicX - currentDisplayXY_.first;
+    int32_t currY = logicY - currentDisplayXY_.second;
     Matrix3f transform(window.transform);
     if (window.transform.size() != MATRIX3_SIZE || transform.IsIdentity()) {
         return {currX, currY};
@@ -7138,8 +7141,8 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
     }
     int32_t windowX = pointerItem.GetWindowX();
     int32_t windowY = pointerItem.GetWindowY();
-    windowX = std::max(touchWindow->area.x, std::min(windowX, touchWindow->area.width));
-    windowY = std::max(touchWindow->area.y, std::min(windowY, touchWindow->area.height));
+    windowX = std::max(currentDisplayXY_.first, std::min(windowX, touchWindow->area.width));
+    windowY = std::max(currentDisplayXY_.second, std::min(windowY, touchWindow->area.height));
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
         pointerItem.SetWindowX(windowX);
         pointerItem.SetWindowY(windowY);
@@ -7153,9 +7156,6 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
                 static_cast<int32_t>(lastTouchWindowInfo_.windowInputType),
                 static_cast<int32_t>(touchWindow->windowInputType));
             DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL);
-        }
-        if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE ||
-            lastTouchWindowInfo_.windowInputType == WindowInputType::SLID_TOUCH_WINDOW) {
             MMI_HILOG_DISPATCHI("Send down-action to the new window, (lastWId:%{public}d, LastPId:%{public}d), "
                 "(newWId:%{public}d, newWId:%{public}d)",
                 lastTouchWindowInfo_.id, lastTouchWindowInfo_.pid, touchWindow->id, touchWindow->pid);
