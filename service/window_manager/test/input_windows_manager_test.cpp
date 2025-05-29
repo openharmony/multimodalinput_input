@@ -9846,6 +9846,26 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CalculateAcrossDirecti
     ret = inputWindowsManager.CalculateAcrossDirection(displayInfo, layout);
     EXPECT_EQ(ret, AcrossDirection::ACROSS_ERROR);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleEventsWithPointerIdCausedPullCancel_001
+ * @tc.desc: Test HandleEventsWithPointerIdCausedPullCancel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleEventsWithPointerIdCausedPullCancel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleEventsWithPointerIdCausedPullCancel(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleEventsWithPointerIdCausedPullCancel(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleEventsWithPointerIdCausedPullCancel(pointerEvent));
+
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
