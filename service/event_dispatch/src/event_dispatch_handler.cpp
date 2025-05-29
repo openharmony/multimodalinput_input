@@ -189,9 +189,12 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
         int32_t windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
         int32_t windowY = pointerItem.GetDisplayY() - windowInfo->area.y;
+        auto physicalDisplayInfo = WIN_MGR->GetPhysicalDisplay(windowInfo->displayId);
+        CHKPV(physicalDisplayInfo);
         if (!windowInfo->transform.empty()) {
-            auto windowXY = WIN_MGR->TransformWindowXY(*windowInfo, pointerItem.GetDisplayX(),
-                pointerItem.GetDisplayY());
+            auto windowXY = WIN_MGR->TransformWindowXY(*windowInfo,
+                pointerItem.GetDisplayX() + physicalDisplayInfo->x,
+                pointerItem.GetDisplayY() + physicalDisplayInfo->y);
             windowX = windowXY.first;
             windowY = windowXY.second;
         }
