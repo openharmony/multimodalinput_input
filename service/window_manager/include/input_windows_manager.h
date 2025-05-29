@@ -226,6 +226,10 @@ public:
         PointerEvent::PointerItem pointerItem);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void SwitchTouchTracking(bool touchTracking);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool IsMouseInCastWindow();
+    bool IsCaptureMode();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 private:
     bool NeedTouchTracking(PointerEvent &event) const;
