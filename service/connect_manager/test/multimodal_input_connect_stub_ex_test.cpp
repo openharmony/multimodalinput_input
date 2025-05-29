@@ -407,6 +407,11 @@ public:
         return RET_OK;
     };
 
+    int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override
+    {
+        return RET_OK;
+    };
+
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;

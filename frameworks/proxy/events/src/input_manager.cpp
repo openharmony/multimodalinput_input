@@ -946,5 +946,10 @@ int32_t InputManager::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enab
 {
     return InputMgrImpl.SetMouseAccelerateMotionSwitch(deviceId, enable);
 }
+
+int32_t InputManager::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
+{
+    return InputMgrImpl.SwitchScreenCapturePermission(permissionType, enable);
+}
 } // namespace MMI
 } // namespace OHOS

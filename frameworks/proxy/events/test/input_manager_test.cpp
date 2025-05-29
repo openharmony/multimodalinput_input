@@ -5506,6 +5506,26 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseAccelerateMotionSwitch, Test
 }
 
 /*
+ * @tc.name: InputManagerTest_SwitchScreenCapturePermission
+ * @tc.desc: SwitchScreenCapturePermission DEFAULT_PERMISSIONS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, SwitchScreenCapturePermission, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::uint32_t permissions = DEFAULT_PERMISSIONS;
+    bool enable = true;
+    EXPECT_NE(InputManager::GetInstance()->SwitchScreenCapturePermission(permissions, enable), RET_OK);
+
+    auto uid = getuid();
+    int32_t panglaiUid = 7655;
+    setuid(panglaiUid);
+    EXPECT_EQ(InputManager::GetInstance()->SwitchScreenCapturePermission(permissions, enable), RET_OK);
+    setuid(uid);
+}
+
+/*
  * @tc.name: InputManagerTest_AddPreMonitor_001
  * @tc.desc: AddPreMonitor.
  * @tc.type: FUNC
