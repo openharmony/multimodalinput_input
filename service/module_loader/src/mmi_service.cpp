@@ -127,6 +127,8 @@ const std::string PRODUCT_DEVICE_TYPE = system::GetParameter("const.product.devi
 const std::string PRODUCT_TYPE_PC = "2in1";
 const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 constexpr int32_t MAX_DEVICE_NUM { 10 };
+constexpr int32_t GAME_UID { 7011 };
+constexpr int32_t PENGLAI_UID { 7655 };
 const size_t QUOTES_BEGIN = 1;
 const size_t QUOTES_END = 2;
 const std::set<int32_t> g_keyCodeValueSet = {
@@ -5221,6 +5223,34 @@ ErrCode MMIService::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable
     );
     if (ret != RET_OK) {
         MMI_HILOGE("Set accelerate motion switch failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
+{
+    CALL_INFO_TRACE;
+    int32_t callingUid = GetCallingUid();
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (callingUid != PENGLAI_UID && callingUid != GAME_UID) {
+        MMI_HILOGE("Verify specified system APP failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPR(eventKeyCommandHandler, RET_ERR);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [permissionType, enable, eventKeyCommandHandler] {
+            return eventKeyCommandHandler->SwitchScreenCapturePermission(permissionType, enable);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("SwitchScreenCapturePermission failed, return:%{public}d", ret);
         return ret;
     }
     return RET_OK;

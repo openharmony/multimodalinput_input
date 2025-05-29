@@ -5533,7 +5533,6 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     defined(OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER)
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
     CHKPV(InputHandler->GetKeyCommandHandler());
-    auto knuckleSwitch = InputHandler->GetKeyCommandHandler()->GetKnuckleSwitchValue();
     auto isInMethodWindow = InputHandler->GetKeyCommandHandler()->CheckInputMethodArea(pointerEvent);
     if (isInMethodWindow) {
         int32_t pointerId = pointerEvent->GetPointerId();
@@ -5547,7 +5546,7 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
             pointerEvent->UpdatePointerItem(pointerId, item);
         }
     }
-    if (!knuckleSwitch && !isInMethodWindow) {
+    if (!isInMethodWindow) {
         knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
         knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent, physicDisplayInfo->uniqueId);
 #ifndef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC

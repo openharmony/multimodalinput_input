@@ -19,6 +19,7 @@
 #include "window_info.h"
 
 #include "i_input_event_handler.h"
+#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -193,6 +194,7 @@ public:
     void RegisterProximitySensor();
     void UnregisterProximitySensor();
     int32_t LaunchAiScreenAbility(int32_t pid);
+    int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
 
 private:
     void Print();
@@ -328,6 +330,7 @@ private:
     bool MenuClickHandle(std::shared_ptr<KeyEvent> event);
     void MenuClickProcess(const std::string bundleName, const std::string abilityName, const std::string action);
     int32_t CheckTwoFingerGesture(int32_t pid);
+    bool HasScreenCapturePermission(uint32_t permissionType);
 
 private:
     Sequence matchedSequence_;
@@ -414,6 +417,7 @@ private:
     std::shared_ptr<KeyEvent> tmpkeyEvent_ {nullptr};
     bool gameForbidFingerKnuckle_ { false };
     bool hasRegisteredSensor_ { false };
+    uint32_t screenCapturePermission_ { ScreenCapturePermissionType::DEFAULT_PERMISSIONS };
 };
 } // namespace MMI
 } // namespace OHOS

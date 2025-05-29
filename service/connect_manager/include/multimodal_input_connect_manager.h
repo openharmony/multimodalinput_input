@@ -189,6 +189,7 @@ public:
     int32_t UnsubscribeInputActive(int32_t subscribeId);
     int32_t SwitchTouchTracking(bool touchTracking);
     int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable);
+    int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
 
 private:
     MultimodalInputConnectManager() = default;

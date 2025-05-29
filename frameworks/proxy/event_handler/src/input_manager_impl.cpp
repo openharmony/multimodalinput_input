@@ -2906,5 +2906,10 @@ int32_t InputManagerImpl::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool 
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SetMouseAccelerateMotionSwitch(deviceId, enable);
 }
+
+int32_t InputManagerImpl::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->SwitchScreenCapturePermission(permissionType, enable);
+}
 } // namespace MMI
 } // namespace OHOS
