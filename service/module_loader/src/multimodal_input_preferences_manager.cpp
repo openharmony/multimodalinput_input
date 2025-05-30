@@ -246,6 +246,7 @@ void MultiModalInputPreferencesManager::UpdatePreferencesMap(const std::string &
     if (iter == preferencesMap_.end()) {
         preferencesMap_[key] = {setFile, setValue};
         filePath = PATH + setFile;
+    } else {
         auto [fileName, value] = iter->second;
         if (value == setValue) {
             MMI_HILOGD("The set value is same");
