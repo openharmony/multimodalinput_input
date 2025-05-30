@@ -107,7 +107,7 @@ int32_t MultiModalInputPreferencesManager::GetRightClickTypeVal(
     std::vector<uint8_t> clickTypeVect = {TOUCHPAD_RIGHT_BUTTON, 0}; // index0: v1.0, index1: v2.0
     clickTypeVect[RIGHT_MENU_TYPE_INDEX_V2] = mousePrimaryButton_ == PRIMARY_BUTTON ?
         TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON : TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON;
-    
+
     clickType = touchpadPref->GetInt(strTouchpadRightClickType_, 0);
     if (clickType) {
         clickTypeVect[RIGHT_MENU_TYPE_INDEX_V1] = clickType;
@@ -117,6 +117,7 @@ int32_t MultiModalInputPreferencesManager::GetRightClickTypeVal(
     } else {
         clickTypeVect = static_cast<std::vector<uint8_t>>(touchpadPref->Get(strTouchpadRightClickType_, clickTypeVect));
     }
+
     MMI_HILOGI("clickType = %{public}d, %{public}d.", clickTypeVect[RIGHT_MENU_TYPE_INDEX_V1],
         clickTypeVect[RIGHT_MENU_TYPE_INDEX_V2]);
     return clickTypeVect[RIGHT_MENU_TYPE_INDEX_V2];
