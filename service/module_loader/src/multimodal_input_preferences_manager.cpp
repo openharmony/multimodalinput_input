@@ -104,7 +104,7 @@ int32_t MultiModalInputPreferencesManager::GetRightClickTypeVal(
     std::shared_ptr<NativePreferences::Preferences> &touchpadPref)
 {
     int32_t clickType = 0;
-    std::vector<uint8_t> clickTypeVect = {TOUCHPAD_RIGHT_BUTTON, 0};
+    std::vector<uint8_t> clickTypeVect = {TOUCHPAD_RIGHT_BUTTON, 0}; // index0: v1.0, index1: v2.0
     clickTypeVect[RIGHT_MENU_TYPE_INDEX_V2] = mousePrimaryButton_ == PRIMARY_BUTTON ?
         TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON : TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON;
     
