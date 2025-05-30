@@ -2373,6 +2373,10 @@ int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
 void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
+    if (displayGroupInfo.groupId != DEFAULT_GROUP_ID) {
+        MMI_HILOGD("groupId:%{public}d", displayGroupInfo.groupId);
+        return;
+    }
     for (const auto& item : displayGroupInfo.displaysInfo) {
         if (item.uniqueId == displayInfo_.uniqueId &&
             item.screenCombination == displayInfo_.screenCombination) {
