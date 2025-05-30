@@ -29,6 +29,7 @@
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseTransformProcessor"
+#define RIGHT_MENU_TYPE_INDEX_V2 1
 
 namespace OHOS {
 namespace MMI {
@@ -63,6 +64,7 @@ const char* DEVICE_TYPE_M_TABLET2 { "MRO" };
 const char* DEVICE_TYPE_M_TABLET3 { "MRDIL" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
+const std::string MOUSE_FILE_NAME { "touchpad_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
@@ -1496,7 +1498,12 @@ void MouseTransformProcessor::UpdateTouchpadCDG(double touchpadPPi, double touch
 int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
 {
     std::string name = "rightMenuSwitch";
-    if (PutConfigDataToDatabase(name, type) != RET_OK) {
+    std::vector<unit8_t> switchType {TOUCHPAD_RIGHT_BUTTON, type};
+    std::string filePath = "";
+    PREFERENCES_MGR->UPdatePreferencesMap(name, TOUCHPAD_FILE_NAME, type, filePath);
+    switchType = static_cast<std::vector<unit8_t>>(PREFERENCES_MGR->GetPreValue(name, switchType));
+    switchType[RIGHT_MENU_TYPE_INDEX_V2] = type;
+    if (PREFERENCES_MGR->SetPreValue(name, filePath, switchType) != RET_OK) {
         MMI_HILOGE("Failed to set right click type to mem");
         return RET_ERR;
     }
