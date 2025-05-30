@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <mutex>
+#include "preferences_value.h"
 
 namespace OHOS {
 namespace MMI {
