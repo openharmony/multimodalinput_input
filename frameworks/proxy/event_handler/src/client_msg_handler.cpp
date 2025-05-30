@@ -563,7 +563,7 @@ int32_t ClientMsgHandler::OnSubscribeInputActiveCallback(const UDSClient& client
         return RET_ERR;
     }
     if (ret != RET_OK) {
-        MMI_HILOGE("Read net packet failed, ret = %{%public}d", ret);
+        MMI_HILOGE("Read net packet failed, ret = %{public}d", ret);
         return RET_ERR;
     }
     int32_t subscribeId = -1;
