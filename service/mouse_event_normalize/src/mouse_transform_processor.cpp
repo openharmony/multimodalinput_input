@@ -64,7 +64,7 @@ const char* DEVICE_TYPE_M_TABLET2 { "MRO" };
 const char* DEVICE_TYPE_M_TABLET3 { "MRDIL" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-const std::string MOUSE_FILE_NAME { "touchpad_settings.xml" };
+const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
