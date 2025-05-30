@@ -1479,13 +1479,14 @@ bool InputWindowsManager::IsPointerActiveRectValid(const DisplayInfo &currentDis
 
 bool InputWindowsManager::IsMouseInCastWindow()
 {
-    for (const auto& windowInfo : displayGroupInfo_.windowsInfo) {
-        if (windowInfo.windowType == CAST_WINDOW_TYPE) {
+    auto WindowsInfo = GetWindowInfoVector();
+    for (const auto& windowItem : WindowsInfo) {
+        if (windowItem.windowType == CAST_WINDOW_TYPE) {
             auto mouseInfo = GetMouseInfo();
             int32_t x = mouseInfo.physicalX;
             int32_t y = mouseInfo.physicalY;
-            if ((x > windowInfo.area.x && x < (windowInfo.area.x + windowInfo.area.width)) &&
-                (y > windowInfo.area.y && y < (windowInfo.area.y + windowInfo.area.height))) {
+            if ((x > windowItem.area.x && x < (windowItem.area.x + windowItem.area.width)) &&
+                (y > windowItem.area.y && y < (windowItem.area.y + windowItem.area.height))) {
                 return true;
             }
         }
@@ -1495,19 +1496,20 @@ bool InputWindowsManager::IsMouseInCastWindow()
 
 bool InputWindowsManager::IsCaptureMode()
 {
-    auto screenshotWindow = std::find_if(displayGroupInfo_.windowsInfo.begin(),
-        displayGroupInfo_.windowsInfo.end(), [](const WindowInfo& windowInfo) {
-            return windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT;
+    auto WindowsInfo = GetWindowInfoVector();
+    auto screenshotWindow = std::find_if(WindowsInfo.begin(),
+        WindowsInfo.end(), [](const WindowInfo& windowItem) {
+            return windowItem.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT;
         });
-    if (screenshotWindow != displayGroupInfo_.windowsInfo.end()) {
+    if (screenshotWindow != WindowsInfo.end()) {
             return false;
     }
 
-    auto captureWindow = std::find_if(displayGroupInfo_.windowsInfo.begin(),
-        displayGroupInfo_.windowsInfo.end(), [](const WindowInfo& windowInfo) {
-            return windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER;
+    auto captureWindow = std::find_if(WindowsInfo.begin(),
+        WindowsInfo.end(), [](const WindowInfo& windowItem) {
+            return windowItem.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER;
         });
-    if (captureWindow != displayGroupInfo_.windowsInfo.end()) {
+    if (captureWindow != WindowsInfo.end()) {
         return (captureWindow->area.width > SCREEN_RECORD_WINDOW_WIDTH ||
                              captureWindow->area.height > SCREEN_RECORD_WINDOW_HEIGHT);
     }
