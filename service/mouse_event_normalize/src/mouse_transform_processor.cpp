@@ -1498,13 +1498,13 @@ void MouseTransformProcessor::UpdateTouchpadCDG(double touchpadPPi, double touch
 int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
 {
     std::string name = "rightMenuSwitch";
-    std::vector<unit8_t> switchType {TOUCHPAD_RIGHT_BUTTON, type};
+    std::vector<uint8_t> switchType {TOUCHPAD_RIGHT_BUTTON, type}; // index0: v1.0, index1: v2.0
     std::string filePath = "";
-    PREFERENCES_MGR->UPdatePreferencesMap(name, TOUCHPAD_FILE_NAME, type, filePath);
-    switchType = static_cast<std::vector<unit8_t>>(PREFERENCES_MGR->GetPreValue(name, switchType));
+    PREFERENCES_MGR->UpdatePreferencesMap(name, TOUCHPAD_FILE_NAME, type, filePath);
+    switchType = static_cast<std::vector<uint8_t>>(PREFERENCES_MGR->GetPreValue(name, switchType));
     switchType[RIGHT_MENU_TYPE_INDEX_V2] = type;
     if (PREFERENCES_MGR->SetPreValue(name, filePath, switchType) != RET_OK) {
-        MMI_HILOGE("Failed to set right click type to mem");
+        MMI_HILOGE("Failed to set touch pad right click type to mem");
         return RET_ERR;
     }
     DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_RIGHT_CLICK_SETTING,
