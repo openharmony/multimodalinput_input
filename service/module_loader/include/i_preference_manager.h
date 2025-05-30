@@ -35,6 +35,12 @@ public:
     virtual int32_t GetShortKeyDuration(const std::string &key) = 0;
     virtual int32_t SetShortKeyDuration(const std::string &key, int32_t setValue) = 0;
     virtual bool IsInitPreference() = 0;
+    virtual void UpdatePreferencesMap(const std::string &key, const std::string &setFile,
+        int32_t setValue, std::string &filePath) = 0;
+    virtual NativePreferences::PreferencesValue GetPreValue(const std::string &key,
+        NativePreferences::PreferencesValue defaultValue) = 0;
+    virtual int32_t SetPreValue(const std::string &key, const std::string &filePath,
+        const NativePreferences::PreferencesValue &setValue) = 0;
 
     static std::shared_ptr<IPreferenceManager> GetInstance();
 
