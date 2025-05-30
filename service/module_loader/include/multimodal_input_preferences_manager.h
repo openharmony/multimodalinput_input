@@ -38,11 +38,11 @@ public:
     int32_t SetShortKeyDuration(const std::string &key, int32_t setValue) override;
     bool IsInitPreference() override;
     void UpdatePreferencesMap(const std::string &key, const std::string &setFile,
-        int32_t setValue, std::string &filePath);
+        int32_t setValue, std::string &filePath) override;
     NativePreferences::PreferencesValue GetPreValue(const std::string &key,
-        NativePreferences::PreferencesValue defaultValue);
+        NativePreferences::PreferencesValue defaultValue) override;
     int32_t SetPreValue(const std::string &key, const std::string &filePath,
-        const NativePreferences::PreferencesValue &setValue);
+        const NativePreferences::PreferencesValue &setValue) override;
 
 private:
     int32_t GetPreferencesSettings();
