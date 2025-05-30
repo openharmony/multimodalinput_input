@@ -132,7 +132,8 @@ HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_OnSu
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_IsImmediateNotifySubscriber_001, TestSize.Level1)
+HWTEST_F(InputActiveSubscriberHandlerTest,
+    InputActiveSubscriberHandlerTest_IsImmediateNotifySubscriber_001, TestSize.Level1)
 {
     InputActiveSubscriberHandler handler;
     auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
