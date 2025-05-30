@@ -37,6 +37,12 @@ public:
     int32_t GetShortKeyDuration(const std::string &key) override;
     int32_t SetShortKeyDuration(const std::string &key, int32_t setValue) override;
     bool IsInitPreference() override;
+    void UpdatePreferencesMap(const std::string &key, const std::string &setFile,
+        int32_t setValue, std::string &filePath);
+    NativePreferences::PreferencesValue GetPreValue(const std::string &key,
+        NativePreferences::PreferencesValue defaultValue);
+    int32_t SetPreValue(const std::string &key, const std::string &filePath,
+        const NativePreferences::PreferencesValue &setValue);
 
 private:
     int32_t GetPreferencesSettings();
@@ -95,6 +101,7 @@ private:
     const std::string strMagicPointerColor_ = "magicPointerColor";
     const std::string strMagicPointerSize_ = "magicPointerSize";
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t GetRightClickTypeVal(std::shared_ptr<NativePreferences::Preferences> &touchpadPref);
 };
 } // namespace MMI
 } // namespace OHOS
