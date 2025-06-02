@@ -870,10 +870,11 @@ public:
 
          /**
          * @brief Get global X coordinate.
+         * Current interface is for testing purposes only, globalX retrieved is invalid.
          * @return double
          * @since 20
          */
-        double GetGlobalX();
+        double GetGlobalX() const;
     
         /**
          * @brief Set global Y coordinate.
@@ -885,10 +886,11 @@ public:
 
         /**
          * @brief Get global X coordinate.
+         * Current interface is for testing purposes only, globalY retrieved is invalid.
          * @return double
          * @since 20
          */
-        double GetGlobalY();
+        double GetGlobalY() const;
         /**
          * @brief Obtains the width of the pressed area.
          * @return Returns the width.
