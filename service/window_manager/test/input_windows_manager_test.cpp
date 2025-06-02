@@ -9864,7 +9864,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleEventsWithPointe
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleEventsWithPointerIdCausedPullCancel(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.HandleEventsWithPointerIdCausedPullCancel(pointerEvent));
-
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
