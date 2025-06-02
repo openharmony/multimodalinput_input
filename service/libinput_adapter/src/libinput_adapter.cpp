@@ -365,7 +365,7 @@ bool LibinputAdapter::GetIsCaptureMode()
     }
 
     isCaptureMode = inputWindowsManager->IsCaptureMode() && isFloating;
-    MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
+    MMI_HILOGD("Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
     return isCaptureMode;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
