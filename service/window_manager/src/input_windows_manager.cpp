@@ -1013,6 +1013,10 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGr
         MMI_HILOGE("displaysInfo is empty");
         return;
     }
+    if (displayGroupInfo.groupId != DEFAULT_GROUP_ID) {
+        MMI_HILOGD("groupId:%{public}d", displayGroupInfo.groupId);
+        return;
+    }
     auto physicDisplayInfo = GetPhysicalDisplay(displayGroupInfo.displaysInfo[0].id);
     CHKPV(physicDisplayInfo);
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
