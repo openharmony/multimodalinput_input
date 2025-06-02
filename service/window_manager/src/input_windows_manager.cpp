@@ -3970,7 +3970,7 @@ void InputWindowsManager::HandleEventsWithPointerIdCausedPullCancel(std::shared_
         originPullId = pullId;
         MMI_HILOGI("Set originPullId:%{public}d", originPullId);
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-            pointerEvent->SetPointerAction( PointerEvent::POINTER_ACTION_CANCEL);
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             MMI_HILOGI("Convert PULL_CANCEL to CANCEL When in accessibility");
         }
         return;

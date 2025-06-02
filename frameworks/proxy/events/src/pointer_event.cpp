@@ -259,7 +259,7 @@ void PointerEvent::PointerItem::SetGlobalX(double globalX)
     globalX_ = globalX;
 }
 
-double PointerEvent::PointerItem::GetGlobalX()
+double PointerEvent::PointerItem::GetGlobalX() const
 {
     return globalX_;
 }
@@ -269,7 +269,7 @@ void PointerEvent::PointerItem::SetGlobalY(double globalY)
     globalY_ = globalY;
 }
 
-double PointerEvent::PointerItem::GetGlobalY()
+double PointerEvent::PointerItem::GetGlobalY() const
 {
     return globalY_;
 }
