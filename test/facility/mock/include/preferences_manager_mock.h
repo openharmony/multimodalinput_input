@@ -37,6 +37,12 @@ public:
     MOCK_METHOD(int32_t, GetShortKeyDuration, (const std::string&));
     MOCK_METHOD(int32_t, SetShortKeyDuration, (const std::string&, int32_t));
     MOCK_METHOD(bool, IsInitPreference, ());
+    MOCK_METHOD(void, UpdatePreferencesMap, (const std::string &key, const std::string &setFile,
+        int32_t setValue, std::string &filePath));
+    MOCK_METHOD(NativePreferences::PreferencesValue, GetPreValue, (const std::string &key,
+        NativePreferences::PreferencesValue defaultValue));
+    MOCK_METHOD(int32_t, SetPreValue, (const std::string &key, const std::string &filePath,
+        const NativePreferences::PreferencesValue &setValue));
 
     static std::shared_ptr<PreferencesManagerMock> GetInstance();
 
