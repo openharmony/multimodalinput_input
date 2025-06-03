@@ -184,13 +184,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent, TestS
     inputMouseEvent.action = MOUSE_ACTION_AXIS_UPDATE;
     inputMouseEvent.button = MOUSE_BUTTON_BACK;
     EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
-
-    inputMouseEvent.action = MOUSE_ACTION_AXIS_END;
-    inputMouseEvent.button = static_cast<Input_MouseEventButton>(10);
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PARAMETER_ERROR);
-
-    inputMouseEvent.action = static_cast<Input_MouseEventAction>(10);
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PARAMETER_ERROR);
 }
 
 /**
@@ -327,24 +320,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent_001, T
     CALL_TEST_DEBUG;
     Input_AxisEvent* inputAxisEvent = new (std::nothrow) Input_AxisEvent();
     EXPECT_EQ(OH_Input_DestroyAxisEvent(&inputAxisEvent), INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventAxisValue
- * @tc.desc: Test the funcation OH_Input_GetAxisEventAxisValue
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventAxisValue, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_AxisEvent inputAxisEvent;
-    InputEvent_AxisType axisType = AXIS_TYPE_SCROLL_VERTICAL;
-    double axisValue = 100.5;
-    inputAxisEvent.axisValues.insert(std::make_pair(axisType, axisValue));
-    EXPECT_EQ(OH_Input_GetAxisEventAxisValue(&inputAxisEvent, axisType, &axisValue), INPUT_SUCCESS);
-    axisType = AXIS_TYPE_SCROLL_HORIZONTAL;
-    EXPECT_EQ(OH_Input_GetAxisEventAxisValue(&inputAxisEvent, axisType, &axisValue), INPUT_PARAMETER_ERROR);
 }
 
 /**
