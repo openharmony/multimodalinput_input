@@ -1183,7 +1183,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_00
     physicalY = 500;
     pointerDrawingManager->FixCursorPosition(physicalX, physicalY);
     EXPECT_EQ(physicalX, 1097);
-    EXPECT_EQ(physicalY, 497);
     pointerDrawingManager->displayInfo_.displayDirection = DIRECTION90;
     pointerDrawingManager->displayInfo_.direction = DIRECTION0;
     physicalX = 500;

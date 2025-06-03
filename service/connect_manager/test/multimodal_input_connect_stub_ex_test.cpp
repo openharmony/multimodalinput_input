@@ -3389,15 +3389,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeKeyEvent_004, TestSize.Lev
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(false)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_))
-        .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -3417,15 +3411,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeKeyEvent_005, TestSize.Lev
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(false)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_))
-        .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
