@@ -39,8 +39,6 @@ constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t POINTER_COLOR { -1 };
 constexpr int32_t POINTER_SIZE_DEFAULT { 1 };
 constexpr int32_t POINTER_SIZE_HPR { 2 };
-#define RIGHT_MENU_TYPE_INDEX_V1 0
-#define RIGHT_MENU_TYPE_INDEX_V2 1
 
 int32_t GetPointSize()
 {
