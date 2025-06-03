@@ -4752,7 +4752,7 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
     std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
-    const std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    const std::vector<WindowInfo> &windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     auto windowId = pointerEvent->GetTargetWindowId();
     for (const auto& item : windowsInfo) {
         if (windowId == item.id) {
