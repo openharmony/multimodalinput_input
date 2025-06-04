@@ -23,7 +23,6 @@ ability_runtime_path = "//foundation/ability/ability_runtime"
 security_component_path = "//base/security"
 c_utils_root = "//commonlibrary/c_utils"
 hilog_root = "//base/hiviewdfx/hilog"
-third_party_path = "//third_party"
 
 declare_args() {
   hitrace_enabled = false

@@ -18,13 +18,6 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ohos_unittest("FingerprintEventProcessorTest") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
   module_out_path = module_output_path
 
   defines = input_default_defines
