@@ -192,7 +192,7 @@ int32_t ANRManager::SetANRNoticedPid(int32_t pid)
 void ANRManager::HandleAnrState(SessionPtr sess, int32_t type, int64_t currentTime)
 {
     CHKPV(sess);
-    auto &events = sess->GetEventsByType(type);
+    const auto &events = sess->GetEventsByType(type);
     std::vector<UDSSession::EventTime> timeoutEvents;
     MMI_HILOGD("Event list size. Type:%{public}d, Count:%{public}zu", type, events.size());
 
