@@ -355,5 +355,64 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_OnSessionLost, TestSize.Level1)
     anrMgr.anrNoticedPid_ = 200;
     ASSERT_NO_FATAL_FAILURE(anrMgr.OnSessionLost(sess));
 }
+
+/**
+* @tc.name  : AnrManagerTest_HandleAnrState_001
+* @tc.desc  : 测试当没有超时事件时，函数应直接返回，不进行任何操作。
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_001, TestSize.Level1)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    int32_t type = ANR_DISPATCH;
+    int64_t currentTime = 1000;
+
+    ANRMgr->HandleAnrState(sess, type, currentTime);
+
+    EXPECT_TRUE(sess->GetEventsByType(type).empty());
+}
+
+/**
+* @tc.name  : AnrManagerTest_HandleAnrState_002
+* @tc.desc  : 测试当存在多个超时事件时，函数应删除其他超时事件，保留最后一个超时事件。
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_002, TestSize.Level1)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    int32_t type = ANR_DISPATCH;
+    int64_t currentTime = 10000;
+
+    std::vector<UDSSession::EventTime> event { {1, 1000, 1}, {2, 2000, 2}, {3, 3000, 3} };
+    sess->events_[ANR_DISPATCH] = event;
+
+    ANRMgr->HandleAnrState(sess, type, currentTime);
+
+    auto events = sess->GetEventsByType(type);
+    EXPECT_EQ(events.size(), 1);
+    EXPECT_EQ(events[0].id, 3);
+}
+
+/**
+* @tc.name  : AnrManagerTest_HandleAnrState_003
+* @tc.desc  : 测试当只有一个超时事件时，函数应保留该事件，不进行删除操作。
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_003, TestSize.Level1)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    int32_t type = ANR_DISPATCH;
+    int64_t currentTime = 10000;
+    std::vector<UDSSession::EventTime> event { {1, 1000, 1} };
+    sess->events_[ANR_DISPATCH] = event;
+    ANRMgr->HandleAnrState(sess, type, currentTime);
+
+    auto events = sess->GetEventsByType(type);
+    EXPECT_EQ(events.size(), 1);
+    EXPECT_EQ(events[0].id, 1);
+}
 } // namespace MMI
 } // namespace OHOS
