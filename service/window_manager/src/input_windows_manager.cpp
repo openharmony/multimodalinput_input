@@ -1480,48 +1480,37 @@ bool InputWindowsManager::IsPointerActiveRectValid(const DisplayInfo &currentDis
 bool InputWindowsManager::IsMouseInCastWindow()
 {
     auto &WindowsInfo = GetWindowInfoVector();
-    //interate all the window info
     for (const auto& windowItem : WindowsInfo) {
-        //if the window type is cast window
         if (windowItem.windowType == CAST_WINDOW_TYPE) {
-            //get the mouse info
-            auto mouseInfo = GetMouseInfo();
-            //get the x and y coords of the mouse
+            auto &mouseInfo = GetMouseInfo();
             int32_t x = mouseInfo.physicalX;
             int32_t y = mouseInfo.physicalY;
-            //check whether the mouse coords are inside the cast window
             if ((x > windowItem.area.x && x < (windowItem.area.x + windowItem.area.width)) &&
                 (y > windowItem.area.y && y < (windowItem.area.y + windowItem.area.height))) {
-                //return true if they are
                 return true;
             }
         }
     }
-    
-    //return false if they are not
+
     return false;
 }
 
 bool InputWindowsManager::IsCaptureMode()
 {
-    //check whether there is a screenshowWindow
     auto &WindowsInfo = GetWindowInfoVector();
     auto &screenshotWindow = std::find_if(WindowsInfo.begin(),
         WindowsInfo.end(), [](const WindowInfo& windowItem) {
             return windowItem.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT;
         });
     if (screenshotWindow != WindowsInfo.end()) {
-            //return false is there is a screenshowWindow
             return false;
     }
 
-    //check whether there is a captureWindow
     auto &captureWindow = std::find_if(WindowsInfo.begin(),
         WindowsInfo.end(), [](const WindowInfo& windowItem) {
             return windowItem.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER;
         });
     if (captureWindow != WindowsInfo.end()) {
-        //if there exist a captureWindow , check whether its sizes exceed the size of a record window
         return (captureWindow->area.width > SCREEN_RECORD_WINDOW_WIDTH ||
                              captureWindow->area.height > SCREEN_RECORD_WINDOW_HEIGHT);
     }
