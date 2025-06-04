@@ -1054,6 +1054,7 @@ ohos_unittest("PointerDrawingManagerTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "preferences:native_preferences",
   ]
 }
 
@@ -1110,6 +1111,7 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "preferences:native_preferences",
   ]
 }
 
@@ -3235,6 +3237,7 @@ ohos_unittest("KeymapMgrTest") {
     "hilog:libhilog",
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
+    "preferences:native_preferences",
   ]
 }
 

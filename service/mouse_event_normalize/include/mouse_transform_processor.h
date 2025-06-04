@@ -23,6 +23,7 @@
 #include "pointer_event.h"
 #include "touchpad_control_display_gain.h"
 #include "window_info.h"
+#include <preferences_value.h>
 
 namespace OHOS {
 
