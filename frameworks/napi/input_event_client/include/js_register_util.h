@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,11 @@ int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, con
     int32_t& ret, bool required = true);
 int32_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name, int64_t& ret);
 int32_t GetNamedPropertyDouble(const napi_env& env, const napi_value& object, const std::string& name, double& ret);
+bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type);
+bool IsArray(const napi_env& env, const napi_value& value);
+bool ParseInt32(const napi_env& env, const napi_value& value, int32_t& result);
+int32_t GetNamedPropertyArrayInt32(const napi_env& env, const napi_value& object, const std::string &name,
+    std::vector<int32_t>& result);
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_REGISTER_UTIL_H
