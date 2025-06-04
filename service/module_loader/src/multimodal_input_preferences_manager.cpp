@@ -206,6 +206,7 @@ NativePreferences::PreferencesValue MultiModalInputPreferencesManager::GetPreVal
     int32_t errCode = RET_OK;
     auto iter = preferencesMap_.find(key);
     if (iter == preferencesMap_.end()) {
+        MMI_HILOGI("do not find preferences value, return defaultValue.");
         return defaultValue;
     }
     std::string filePath = "";
