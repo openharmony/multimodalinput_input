@@ -18,6 +18,7 @@
 #include "dfx_hisysevent.h"
 #include "i_input_windows_manager.h"
 #include "timer_manager.h"
+#include "uds_session.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_ANRDETECT
@@ -66,6 +67,12 @@ int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventI
             MMI_HILOGD("Remove anr timer, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d,"
                 "count:%{public}d", eventType, eventId, item, anrTimerCount_);
         }
+    }
+
+    int64_t currentTime = GetSysClockTime();
+    if (!(ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) && isTriggerANR_) {
+        isTriggerANR_ = false;
+        MMI_HILOGI("Exit anr state");
     }
     return RET_OK;
 }
@@ -120,6 +127,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         CHKPV(sess);
         if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
+            isTriggerANR_ = true;
             DfxHisysevent::ApplicationBlockInput(sess);
             MMI_HILOG_FREEZEE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
                 sess->GetPid(), type, id);
@@ -135,15 +143,6 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
             if (!udsServer_->SendMsg(fd, pkt)) {
                 MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
                 return;
-            }
-        }
-        std::vector<int32_t> timerIds = sess->GetTimerIds(type);
-        for (int32_t item : timerIds) {
-            if (item != -1) {
-                TimerMgr->RemoveTimer(item);
-                anrTimerCount_--;
-                MMI_HILOGD("Clear anr timer, type:%{public}d, timer id:%{public}d, count:%{public}d",
-                    type, item, anrTimerCount_);
             }
         }
     });
@@ -188,6 +187,43 @@ int32_t ANRManager::SetANRNoticedPid(int32_t pid)
     CALL_INFO_TRACE;
     anrNoticedPid_ = pid;
     return RET_OK;
+}
+
+void ANRManager::HandleAnrState(SessionPtr sess, int32_t type, int64_t currentTime)
+{
+    CHKPV(sess);
+    auto events = sess->GetEventsByType(type);
+    std::vector<UDSSession::EventTime> timeoutEvents;
+    MMI_HILOGD("Event list size. Type:%{public}d, Count:%{public}zu", type, events.size());
+
+    const int64_t timeoutThreshold = INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO;
+    for (const auto &event : events) {
+        const int64_t elapsedTime = currentTime - event.eventTime;
+        if (elapsedTime > timeoutThreshold) {
+            timeoutEvents.push_back(event);
+        }
+    }
+
+    if (!timeoutEvents.empty()) {
+        std::sort(timeoutEvents.begin(), timeoutEvents.end(),
+            [](const UDSSession::EventTime &a, const UDSSession::EventTime &b) {
+                return a.eventTime < b.eventTime;
+            });
+        const auto &lastEvent = timeoutEvents.back();
+        for (const auto &event : timeoutEvents) {
+            if (event.id != lastEvent.id) {
+                auto timerIds = sess->DelEvents(type, event.id);
+                for (auto timerId : timerIds) {
+                    if (timerId != -1) {
+                        TimerMgr->RemoveTimer(timerId);
+                        anrTimerCount_--;
+                    }
+                }
+            }
+        }
+        MMI_HILOGD("Keep anr state. Last timeout event. Type:%{public}d, PID:%{public}d",
+            type, sess->GetPid());
+    }
 }
 } // namespace MMI
 } // namespace OHOS
