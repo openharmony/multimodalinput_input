@@ -521,6 +521,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
 
   external_deps = [

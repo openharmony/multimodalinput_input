@@ -166,6 +166,7 @@ struct libinput_event_touch;
 struct libinput_event_tablet_tool;
 struct libinput_event_gesture;
 struct libinput_tablet_tool;
+struct libinput;
 
 enum libinput_event_type libinput_event_get_type(struct libinput_event *event);
 
@@ -190,6 +191,8 @@ double libinput_event_tablet_tool_get_pressure(struct libinput_event_tablet_tool
 int32_t libinput_event_tablet_tool_get_twist(struct libinput_event_tablet_tool *event);
 
 struct libinput_device* libinput_event_get_device(struct libinput_event *event);
+
+int32_t libinput_event_get_hand_feature(struct libinput_event *event);
 
 uint64_t libinput_event_get_sensortime(struct libinput_event *event);
 

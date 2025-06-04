@@ -19,7 +19,7 @@
 #include <chrono>
 #include <thread>
 
-#include <libevdev/libevdev-uinput.h>
+#include <libevdev-uinput.h>
 #include <libevdev/libevdev.h>
 
 class TestDevice {

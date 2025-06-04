@@ -3182,6 +3182,7 @@ ohos_unittest("JoystickTest") {
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
+    "ipc:ipc_core",
   ]
 }
 
