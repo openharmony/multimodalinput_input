@@ -316,7 +316,7 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
     }
     if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP
         || action == JS_CALLBACK_MOUSE_ACTION_MOVE) {
-        HandleMouseButton(env, mouseHandle, pointerEvent, action);
+        HandleMouseButton(env, mouseHandle, pointerEvent, action);  
     }
 }
 
