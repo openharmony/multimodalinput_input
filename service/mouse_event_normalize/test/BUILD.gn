@@ -53,6 +53,7 @@ ohos_unittest("MouseEventNormalizeTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
+    "preferences:native_preferences",
   ]
 }
 
