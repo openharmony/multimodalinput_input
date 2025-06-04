@@ -43,7 +43,7 @@ InputReplayCommand::InputReplayCommand(int32_t argc, char** argv)
     programName_ = (argc > 0) ? argv[0] : "uinput";
 }
 
-bool InputReplayCommand::ParseOptions(bool& useAllDevices)
+bool InputReplayCommand::ParseOptions()
 {
     static struct option longOptions[] = {
         {"help", no_argument, 0, 'h'},
@@ -64,7 +64,7 @@ bool InputReplayCommand::ParseOptions(bool& useAllDevices)
                 DeviceManager().PrintDeviceList();
                 exit(0);
             case 'a':
-                useAllDevices = true;
+                useAllDevices_ = true;
                 break;
             case 'm':
                 if (!ParseDeviceMapping(optarg)) {
@@ -84,8 +84,7 @@ bool InputReplayCommand::Parse()
         PrintUsage();
         return false;
     }
-    bool useAllDevices = false;
-    if (!ParseOptions(useAllDevices)) {
+    if (!ParseOptions()) {
         return false;
     }
     if (optind >= argc_) {
@@ -99,7 +98,7 @@ bool InputReplayCommand::Parse()
     }
     filePath_ = argv_[optind++];
     if (command_ == "record") {
-        return ParseRecordCommand(useAllDevices);
+        return ParseRecordCommand();
     } else if (command_ == "replay") {
         return ParseReplayCommand();
     } else {
@@ -183,12 +182,11 @@ void InputReplayCommand::SetupSignalHandlers()
     sigaction(SIGTERM, &sa, nullptr);
 }
 
-bool InputReplayCommand::ParseRecordCommand(bool useAllDevices)
+bool InputReplayCommand::ParseRecordCommand()
 {
-    useAllDevices_ = useAllDevices;
     if (!useAllDevices_) {
-        for (int32_t i = optind; i < argc_; i++) {
-            devicePaths_.push_back(argv_[i]);
+        while (optind < argc_) {
+            devicePaths_.push_back(argv_[optind++]);
         }
         if (devicePaths_.empty()) {
             PrintError("No devices specified for recording");
@@ -196,11 +194,19 @@ bool InputReplayCommand::ParseRecordCommand(bool useAllDevices)
             return false;
         }
     }
+    if (optind < argc_) {
+        PrintError("Unexpected arguments for record command");
+        return false;
+    }
     return true;
 }
 
 bool InputReplayCommand::ParseReplayCommand()
 {
+    if (useAllDevices_) {
+        PrintError("Not use -a option for replay command!");
+        return false;
+    }
     if (optind < argc_) {
         PrintError("Unexpected arguments for replay command");
         return false;
