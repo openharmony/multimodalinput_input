@@ -15,6 +15,8 @@
 
 #include "fingerprint_event_processor.h"
 
+#include "libinput.h"
+
 #include "ability_manager_client.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
