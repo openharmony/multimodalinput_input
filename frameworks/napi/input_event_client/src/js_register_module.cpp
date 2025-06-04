@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,8 +29,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_MIDDLE { 1 };
-constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT { 2 };
 
 std::map<JsJoystickEvent::Axis, PointerEvent::AxisType> g_joystickAxisType = {
     { JsJoystickEvent::Axis::ABS_X, PointerEvent::AXIS_TYPE_ABS_X },
@@ -74,6 +72,17 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
     { JsJoystickEvent::Button::BUTTON_C, PointerEvent::JOYSTICK_BUTTON_C },
     { JsJoystickEvent::Button::BUTTON_Z, PointerEvent::JOYSTICK_BUTTON_Z },
     { JsJoystickEvent::Button::BUTTON_MODE, PointerEvent::JOYSTICK_BUTTON_MODE }
+};
+
+static std::unordered_map<int32_t, int32_t> JSMouseButton2Native = {
+    { JS_MOUSE_BUTTON_LEFT, PointerEvent::MOUSE_BUTTON_LEFT },
+    { JS_MOUSE_BUTTON_RIGHT, PointerEvent::MOUSE_BUTTON_RIGHT },
+    { JS_MOUSE_BUTTON_MIDDLE, PointerEvent::MOUSE_BUTTON_MIDDLE },
+    { JS_MOUSE_BUTTON_SIDE, PointerEvent::MOUSE_BUTTON_SIDE },
+    { JS_MOUSE_BUTTON_EXTRA, PointerEvent::MOUSE_BUTTON_EXTRA },
+    { JS_MOUSE_BUTTON_FORWARD, PointerEvent::MOUSE_BUTTON_FORWARD },
+    { JS_MOUSE_BUTTON_BACK, PointerEvent::MOUSE_BUTTON_BACK },
+    { JS_MOUSE_BUTTON_TASK, PointerEvent::MOUSE_BUTTON_TASK }
 };
 } // namespace
 
@@ -262,23 +271,46 @@ static void HandleMouseButton(napi_env env, napi_value mouseHandle,
         MMI_HILOGE("button:%{public}d is less 0, can not process", button);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
     }
-
-    switch (button) {
-        case JS_CALLBACK_MOUSE_BUTTON_MIDDLE:
-            button = PointerEvent::MOUSE_BUTTON_MIDDLE;
-            break;
-        case JS_CALLBACK_MOUSE_BUTTON_RIGHT:
-            button = PointerEvent::MOUSE_BUTTON_RIGHT;
-            break;
-        default:
-            MMI_HILOGE("button:%{public}d is unknown", button);
-            break;
+    if (JSMouseButton2Native.find(button) != JSMouseButton2Native.end()) {
+        button = JSMouseButton2Native[button];
+    } else {
+        MMI_HILOGW("button:%{public}d is unknown", button);
     }
     pointerEvent->SetButtonId(button);
     if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN) {
         pointerEvent->SetButtonPressed(button);
     } else if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
         pointerEvent->DeleteReleaseButton(button);
+    }
+}
+
+static void HandleMousePressedButtons(napi_env env, napi_value mouseHandle,
+    std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
+{
+    CHKPV(pointerEvent);
+    std::vector<int32_t> jsPressedButtons { };
+    if (GetNamedPropertyArrayInt32(env, mouseHandle, "pressedButtons", jsPressedButtons) != RET_OK) {
+        MMI_HILOGE("Get pressedButtons failed");
+        return;
+    }
+    std::vector<int32_t> nativePressedButtons { };
+    for (const auto jsButton : jsPressedButtons) {
+        if (JSMouseButton2Native.find(jsButton) == JSMouseButton2Native.end()) {
+            MMI_HILOGE("Unknown jsButton:%{public}d", jsButton);
+            continue;
+        }
+        nativePressedButtons.push_back(JSMouseButton2Native[jsButton]);
+    }
+    MMI_HILOGD("NativePressedButtons size:%{public}zu", nativePressedButtons.size());
+    auto buttonId = pointerEvent->GetButtonId();
+    auto iter = std::find_if(nativePressedButtons.begin(), nativePressedButtons.end(),
+        [buttonId] (int32_t elem) { return elem == buttonId; }
+    );
+    if (iter != nativePressedButtons.end()) {
+        item.SetPressed(true);
+    }
+    for (const auto button : nativePressedButtons) {
+        pointerEvent->SetButtonPressed(button);
     }
 }
 
@@ -385,6 +417,7 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
 
     HandleMouseAction(env, mouseHandle, pointerEvent, item);
     HandleMousePropertyInt32(env, mouseHandle, pointerEvent, item);
+    HandleMousePressedButtons(env, mouseHandle, pointerEvent, item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
