@@ -23,6 +23,8 @@
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultiModalInputPreferencesManager"
+#define RIGHT_MENU_TYPE_INDEX_V1 0
+#define RIGHT_MENU_TYPE_INDEX_V2 1
 
 namespace OHOS {
 namespace MMI {
@@ -34,7 +36,6 @@ constexpr int32_t PRIMARY_BUTTON { 0 };
 constexpr int32_t POINTER_SPEED { 10 };
 constexpr int32_t TOUCHPAD_POINTER_SPEED { 6 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
-constexpr int32_t RIGHT_CLICK_TYPE { 4 };
 constexpr int32_t POINTER_COLOR { -1 };
 constexpr int32_t POINTER_SIZE_DEFAULT { 1 };
 constexpr int32_t POINTER_SIZE_HPR { 2 };
@@ -98,6 +99,29 @@ bool MultiModalInputPreferencesManager::IsInitPreference()
     return isInitPreference_.load();
 }
 
+int32_t MultiModalInputPreferencesManager::GetRightClickTypeVal(
+    std::shared_ptr<NativePreferences::Preferences> &touchpadPref)
+{
+    int32_t clickType = 0;
+    std::vector<uint8_t> clickTypeVect = {TOUCHPAD_RIGHT_BUTTON, 0}; // index0: v1.0, index1: v2.0
+    clickTypeVect[RIGHT_MENU_TYPE_INDEX_V2] = mousePrimaryButton_ == PRIMARY_BUTTON ?
+        TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON : TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON;
+
+    clickType = touchpadPref->GetInt(strTouchpadRightClickType_, 0);
+    if (clickType) {
+        clickTypeVect[RIGHT_MENU_TYPE_INDEX_V1] = clickType;
+        touchpadPref->Delete(strTouchpadRightClickType_);
+        touchpadPref->Put(strTouchpadRightClickType_, clickTypeVect);
+        touchpadPref->FlushSync();
+    } else {
+        clickTypeVect = static_cast<std::vector<uint8_t>>(touchpadPref->Get(strTouchpadRightClickType_, clickTypeVect));
+    }
+
+    MMI_HILOGI("clickType = %{public}d, %{public}d.", clickTypeVect[RIGHT_MENU_TYPE_INDEX_V1],
+        clickTypeVect[RIGHT_MENU_TYPE_INDEX_V2]);
+    return clickTypeVect[RIGHT_MENU_TYPE_INDEX_V2];
+}
+
 int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
 {
     int32_t errCode = RET_OK;
@@ -125,7 +149,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     touchpadSwipeSwitch_ = touchpadPref->GetBool(strTouchpadSwipeSwitch_, BOOL_DEFAULT);
     touchpadPointerSpeed_ = touchpadPref->GetInt(strTouchpadPointerSpeed_, TOUCHPAD_POINTER_SPEED);
     touchpadScrollSwitch_ = touchpadPref->GetBool(strTouchpadScrollSwitch_, BOOL_DEFAULT);
-    touchpadRightClickType_ = touchpadPref->GetInt(strTouchpadRightClickType_, RIGHT_CLICK_TYPE);
+    touchpadRightClickType_ = GetRightClickTypeVal(touchpadPref);
     touchpadScrollDirection_ = touchpadPref->GetBool(strTouchpadScrollDirection_, BOOL_DEFAULT);
     touchpadThreeFingerTapSwitch_ = touchpadPref->GetBool(strTouchpadThreeFingerTapSwitch_, BOOL_DEFAULT);
     touchpadScrollRows_ = touchpadPref->GetInt(strTouchpadScrollRows_, TOUCHPAD_SCROLL_ROWS);
@@ -176,6 +200,26 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     return RET_OK;
 }
 
+NativePreferences::PreferencesValue MultiModalInputPreferencesManager::GetPreValue(const std::string &key,
+    NativePreferences::PreferencesValue defaultValue)
+{
+    int32_t errCode = RET_OK;
+    auto iter = preferencesMap_.find(key);
+    if (iter == preferencesMap_.end()) {
+        MMI_HILOGI("do not find preferences value, return defaultValue.");
+        return defaultValue;
+    }
+    std::string filePath = "";
+    auto [fileName, value] = iter->second;
+    filePath = PATH + fileName;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(filePath, errCode);
+    CHKPR(pref, errno);
+    NativePreferences::PreferencesValue ret = pref->Get(key, defaultValue);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(filePath);
+    return ret;
+}
+
 int32_t MultiModalInputPreferencesManager::GetIntValue(const std::string &key, int32_t defaultValue)
 {
     auto iter = preferencesMap_.find(key);
@@ -196,11 +240,10 @@ bool MultiModalInputPreferencesManager::GetBoolValue(const std::string &key, boo
     return static_cast<bool>(value);
 }
 
-int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, const std::string &setFile,
-    int32_t setValue)
+void MultiModalInputPreferencesManager::UpdatePreferencesMap(const std::string &key, const std::string &setFile,
+    int32_t setValue, std::string &filePath)
 {
     auto iter = preferencesMap_.find(key);
-    std::string filePath = "";
     if (iter == preferencesMap_.end()) {
         preferencesMap_[key] = {setFile, setValue};
         filePath = PATH + setFile;
@@ -208,11 +251,18 @@ int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, c
         auto [fileName, value] = iter->second;
         if (value == setValue) {
             MMI_HILOGD("The set value is same");
-            return RET_OK;
+            return;
         }
         filePath = PATH + fileName;
         preferencesMap_[key].second = setValue;
     }
+}
+
+int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, const std::string &setFile,
+    int32_t setValue)
+{
+    std::string filePath = "";
+    UpdatePreferencesMap(key, setFile, setValue, filePath);
 
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
@@ -235,26 +285,35 @@ int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, c
 int32_t MultiModalInputPreferencesManager::SetBoolValue(const std::string &key, const std::string &setFile,
     bool setValue)
 {
-    auto iter = preferencesMap_.find(key);
     std::string filePath = "";
-    if (iter == preferencesMap_.end()) {
-        preferencesMap_[key] = {setFile, static_cast<int32_t>(setValue)};
-        filePath = PATH + setFile;
-    } else {
-        auto [fileName, value] = iter->second;
-        if (static_cast<bool>(value) == setValue) {
-            MMI_HILOGD("The set value is same");
-            return RET_OK;
-        }
-        filePath = PATH + fileName;
-        preferencesMap_[key].second = setValue;
-    }
+    UpdatePreferencesMap(key, setFile, static_cast<int32_t>(setValue), filePath);
 
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
         NativePreferences::PreferencesHelper::GetPreferences(filePath, errCode);
     CHKPR(pref, errno);
     int32_t ret = pref->PutBool(key, setValue);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(filePath);
+    return RET_OK;
+}
+
+int32_t MultiModalInputPreferencesManager::SetPreValue(const std::string &key, const std::string &filePath,
+    const NativePreferences::PreferencesValue &setValue)
+{
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(filePath, errCode);
+    CHKPR(pref, errno);
+    int32_t ret = pref->Put(key, setValue);
     if (ret != RET_OK) {
         MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
         return RET_ERR;
