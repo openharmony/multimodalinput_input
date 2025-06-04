@@ -41,7 +41,28 @@ int32_t InputDeviceConsumerHandler::SetDeviceConsumerHandler(const std::vector<s
             deviceConsumerHandler_.deviceHandler_.emplace(name, std::set<SessionHandler>{handler});
         }
     }
+
+    auto udsServerPtr = InputHandler->GetUDSServer();
+    CHKPR(udsServerPtr, RET_ERR);
+    udsServerPtr->AddSessionDeletedCallback([this] (SessionPtr session) {
+        return this->OnSessionLost(session);
+    });
+
     return RET_OK;
+}
+
+void InputDeviceManager::OnSessionLost(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    for (auto& pair : deviceConsumerHandler_.deviceHandler_) {
+        auto& sessionHandlers = pair.second;
+        for (auto it = sessionHandlers.begin(); it != sessionHandlers.end(); ++it) {
+            if (session == it->session_) {
+                sessionHandlers.erase(it);
+                break;
+            }
+        }
+    }
 }
 
 int32_t InputDeviceConsumerHandler::ClearDeviceConsumerHandler(const std::vector<std::string>& deviceNames,
