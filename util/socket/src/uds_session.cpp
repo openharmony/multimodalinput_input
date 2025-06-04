@@ -251,5 +251,11 @@ bool UDSSession::IsEventQueueEmpty(int32_t type)
     auto iter = events_.find(type);
     return (iter == events_.end() || (iter->second.empty()));
 }
+
+std::vector<UDSSession::EventTime> UDSSession::GetEventsByType(int32_t type) const
+{
+    auto iter = events_.find(type);
+    return (iter != events_.end()) ? iter->second : std::vector<EventTime>();
+}
 } // namespace MMI
 } // namespace OHOS

@@ -34,6 +34,11 @@ public:
     bool SendMsg(const char *buf, size_t size);
     bool SendMsg(NetPacket &pkt);
     void Close();
+    struct EventTime {
+        int32_t id { 0 };
+        int64_t eventTime { 0 };
+        int32_t timerId { -1 };
+    };
 
     int32_t GetUid() const
     {
@@ -101,13 +106,9 @@ public:
     int64_t GetEarliestEventTime(int32_t type = 0) const;
     bool IsEventQueueEmpty(int32_t type = 0);
     void ReportSocketBufferFull();
+    std::vector<EventTime> GetEventsByType(int32_t type) const;
 
 protected:
-    struct EventTime {
-        int32_t id { 0 };
-        int64_t eventTime { 0 };
-        int32_t timerId { -1 };
-    };
     std::map<int32_t, std::vector<EventTime>> events_;
     std::map<int32_t, bool> isAnrProcess_;
     std::string descript_;
