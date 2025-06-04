@@ -51,7 +51,7 @@ int32_t InputDeviceConsumerHandler::SetDeviceConsumerHandler(const std::vector<s
     return RET_OK;
 }
 
-void InputDeviceManager::OnSessionLost(SessionPtr session)
+void InputDeviceConsumerHandler::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
     for (auto& pair : deviceConsumerHandler_.deviceHandler_) {
