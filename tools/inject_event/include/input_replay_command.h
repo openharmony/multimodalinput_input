@@ -30,10 +30,10 @@ public:
 
     static int32_t HandleRecordReplayCommand(int32_t argc, char** argv);
 private:
-    bool ParseOptions(bool& useAllDevices);
+    bool ParseOptions();
     bool ParseDeviceMapping(const std::string& mappingStr);
     void SetupSignalHandlers();
-    bool ParseRecordCommand(bool useAllDevices);
+    bool ParseRecordCommand();
     bool ParseReplayCommand();
     bool ExecuteRecordCommand();
     bool ExecuteReplayCommand();
