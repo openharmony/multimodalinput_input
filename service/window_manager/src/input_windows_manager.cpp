@@ -95,6 +95,7 @@ constexpr int32_t MAIN_GROUPID { 0 };
 constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
 constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
+constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
 #define SCREEN_RECORD_WINDOW_WIDTH 400
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1475,6 +1476,22 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
 bool InputWindowsManager::IsPointerActiveRectValid(const DisplayInfo &currentDisplay)
 {
     return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
+}
+
+bool InputWindowsManager::IsPointInsideGuideWindow(double pointX, double pointY)
+{
+    auto &WindowsInfo = GetWindowInfoVector();
+    for (const auto& windowItem : WindowsInfo) {
+        if (windowItem.windowType == GUIDE_WINDOW_TYPE) {
+            for (const auto &win : windowItem.defaultHotAreas) {
+                int32_t x = static_cast<int32_t>(pointX);
+                int32_t y = static_cast<int32_t>(pointY);
+                return ((x > win.x && x < (win.x + win.width)) &&
+                    (y > win.y && y < (win.y + win.height)));
+            }
+        }
+    }
+    return false;
 }
 
 bool InputWindowsManager::IsMouseInCastWindow()
