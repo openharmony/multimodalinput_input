@@ -951,5 +951,10 @@ int32_t InputManager::SwitchScreenCapturePermission(uint32_t permissionType, boo
 {
     return InputMgrImpl.SwitchScreenCapturePermission(permissionType, enable);
 }
+
+int32_t InputManager::ClearMouseHideFlag(int32_t eventId)
+{
+    return InputMgrImpl.ClearMouseHideFlag(eventId);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -129,6 +129,8 @@ const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 constexpr int32_t MAX_DEVICE_NUM { 10 };
 constexpr int32_t GAME_UID { 7011 };
 constexpr int32_t PENGLAI_UID { 7655 };
+constexpr int32_t SYNERGY_UID { 5521 };
+
 const size_t QUOTES_BEGIN = 1;
 const size_t QUOTES_END = 2;
 const std::set<int32_t> g_keyCodeValueSet = {
@@ -5251,6 +5253,28 @@ ErrCode MMIService::SwitchScreenCapturePermission(uint32_t permissionType, bool 
         );
     if (ret != RET_OK) {
         MMI_HILOGE("SwitchScreenCapturePermission failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::ClearMouseHideFlag(int32_t eventId)
+{
+    CALL_INFO_TRACE;
+    int32_t callingUid = GetCallingUid();
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (callingUid != SYNERGY_UID) {
+        MMI_HILOGE("Verify specified synergy application failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask([eventId] () {
+        return WIN_MGR->ClearMouseHideFlag(eventId);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("ClearMouseHideFlag failed, return:%{public}d", ret);
         return ret;
     }
     return RET_OK;

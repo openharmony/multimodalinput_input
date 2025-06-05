@@ -190,6 +190,7 @@ public:
     int32_t SwitchTouchTracking(bool touchTracking);
     int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable);
     int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
+    int32_t ClearMouseHideFlag(int32_t eventId);
 
 private:
     MultimodalInputConnectManager() = default;

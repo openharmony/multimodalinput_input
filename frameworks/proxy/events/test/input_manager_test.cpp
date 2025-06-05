@@ -59,6 +59,7 @@ constexpr int32_t PARAMETER_ERROR = 401;
 constexpr int32_t INVAID_VALUE = -1;
 constexpr uint32_t MAX_WINDOW_NUMS = 15;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
+constexpr int32_t SYNERGY_UID = 5521;
 constexpr int32_t DEFAULT_SAMPLING_PERIOD { 8 }; // 8ms
 constexpr int32_t MIN_MULTI_TOUCH_POINT_NUM { 0 };
 constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
@@ -5503,6 +5504,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseAccelerateMotionSwitch, Test
     int32_t deviceId = 0;
     std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
     ASSERT_NO_FATAL_FAILURE(inputManager->SetMouseAccelerateMotionSwitch(deviceId, true));
+}
+
+/*
+ * @tc.name: InputManagerTest_ClearMouseHideFlag
+ * @tc.desc: ClearMouseHideFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ClearMouseHideFlag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t eventId = SYNERGY_UID;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->ClearMouseHideFlag(eventId));
 }
 
 /*

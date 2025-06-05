@@ -244,6 +244,7 @@ public:
     ErrCode SwitchTouchTracking(bool touchTracking) override;
     ErrCode SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable) override;
     ErrCode SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override;
+    ErrCode ClearMouseHideFlag(int32_t eventId) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
