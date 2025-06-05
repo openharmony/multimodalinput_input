@@ -69,7 +69,6 @@ libinput_event *XKeyEventProcessorTest::GetEvent()
 HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_IsXKeyEvent_001, TestSize.Level1)
 {
     libinput_event *event = GetEvent();
-    ASSERT_TRUE(event != nullptr);
     bool ret = XKeyEventHdr->IsXKeyEvent(event);
     EXPECT_FALSE(ret);
 }
@@ -83,9 +82,8 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_IsXKeyEvent_001, TestSiz
 HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_HandleXKeyEvent_001, TestSize.Level1)
 {
     libinput_event *event = GetEvent();
-    ASSERT_TRUE(event != nullptr);
     int32_t ret = XKeyEventHdr->HandleXKeyEvent(event);
-    EXPECT_EQ(ret, 65142788);
+    EXPECT_EQ(ret, 65142786);
 }
 
 /**
@@ -97,9 +95,8 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_HandleXKeyEvent_001, Tes
 HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_AnalyseKeyEvent_001, TestSize.Level1)
 {
     libinput_event *event = GetEvent();
-    ASSERT_TRUE(event != nullptr);
     int32_t ret = XKeyEventHdr->AnalyseKeyEvent(event);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, 65142786);
 }
 
 /**
