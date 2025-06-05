@@ -63,6 +63,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));
+    MOCK_METHOD(int32_t, ClearMouseHideFlag, (int32_t));
     MOCK_METHOD(int32_t, GetCurrentUserId, ());
     MOCK_METHOD(void, SetFoldState, ());
     MOCK_METHOD(bool, CheckAppFocused, (int32_t));

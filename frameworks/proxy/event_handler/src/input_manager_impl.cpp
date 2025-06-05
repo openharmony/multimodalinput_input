@@ -2911,5 +2911,11 @@ int32_t InputManagerImpl::SwitchScreenCapturePermission(uint32_t permissionType,
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SwitchScreenCapturePermission(permissionType, enable);
 }
+
+int32_t InputManagerImpl::ClearMouseHideFlag(int32_t eventId)
+{
+    MMI_HILOGI("eventId=%{public}d", eventId);
+    return MULTIMODAL_INPUT_CONNECT_MGR->ClearMouseHideFlag(eventId);
+}
 } // namespace MMI
 } // namespace OHOS
