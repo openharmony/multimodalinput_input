@@ -34,11 +34,13 @@ public:
     int32_t MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId);
     void RemoveTimers(SessionPtr sess);
     void RemoveTimersByType(SessionPtr sess, int32_t type);
+    void HandleAnrState(SessionPtr sess, int32_t type, int64_t currentTime);
 private:
     int32_t anrNoticedPid_ { -1 };
     UDSServer *udsServer_ { nullptr };
     int32_t anrTimerCount_ { 0 };
     int32_t pid_ { -1 };
+    bool isTriggerANR_ { false };
 };
 
 #define ANRMgr ::OHOS::DelayedSingleton<ANRManager>::GetInstance()
