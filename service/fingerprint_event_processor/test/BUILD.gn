@@ -20,6 +20,14 @@ module_output_path = "input/input"
 ohos_unittest("FingerprintEventProcessorTest") {
   module_out_path = module_output_path
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   defines = input_default_defines
   defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
 
