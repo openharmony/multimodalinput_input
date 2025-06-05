@@ -387,7 +387,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
         }
         MMI_HILOGD("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
             "action:%{public}s)", point->GetDeviceId(), point->DumpPointerAction());
-        return;
+        ANRMgr->HandleAnrState(sess, ANR_DISPATCH, currentTime);
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
     pointerEvent->SetMarkEnabled(AcquireEnableMark(pointerEvent));
@@ -466,7 +466,7 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
                 "KeyEvent(deviceid:%{public}d, keycode:%{private}d, key action:%{public}d)",
                 key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
         }
-        return RET_OK;
+        ANRMgr->HandleAnrState(session, ANR_DISPATCH, currentTime);
     }
     auto keyHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(keyHandler, RET_ERR);

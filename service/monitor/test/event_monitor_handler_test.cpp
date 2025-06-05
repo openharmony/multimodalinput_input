@@ -30,6 +30,9 @@ constexpr int32_t UID_ROOT { 0 };
 static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
 int32_t g_moduleType = 3;
 int32_t g_pid = 0;
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+int32_t g_no_focus_pid = 1;
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 int32_t g_writeFd = -1;
 constexpr size_t MAX_EVENTIDS_SIZE = 1001;
 constexpr int32_t REMOVE_OBSERVER { -2 };
@@ -1185,7 +1188,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendFingerp
     ASSERT_TRUE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
 
     fingerFocusPidSet.clear();
-    fingerFocusPidSet.insert(g_moduleType);
+    fingerFocusPidSet.insert(g_no_focus_pid);
     ASSERT_FALSE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
