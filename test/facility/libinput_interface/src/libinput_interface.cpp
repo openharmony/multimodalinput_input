@@ -91,6 +91,11 @@ struct libinput_device* libinput_event_get_device(struct libinput_event *event)
     return g_instance->GetDevice(event);
 }
 
+int32_t libinput_event_get_hand_feature(struct libinput_event *event)
+{
+    return g_instance->GetHandFeature(event);
+}
+
 uint64_t libinput_event_get_sensortime(struct libinput_event *event)
 {
     return g_instance->GetSensorTime(event);

@@ -60,6 +60,8 @@ ohos_unittest("PreferencesManagerTestWithMock") {
     "init:libbegetutil",
     "libxml2:libxml2",
     "preferences:native_preferences",
+    "c_utils:utils",
+    "hilog:libhilog",
   ]
 }
 

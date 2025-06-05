@@ -67,6 +67,7 @@ ohos_source_set("mmi_anco_channel_proxy") {
   external_deps = [
     "hilog:libhilog",
     "ipc:ipc_single",
+    "c_utils:utils",
   ]
 
   part_name = "${mmi_part_name}"
@@ -105,6 +106,7 @@ ohos_source_set("mmi_anco_channel_stub") {
   external_deps = [
     "hilog:libhilog",
     "ipc:ipc_single",
+    "c_utils:utils",
   ]
 
   part_name = "${mmi_part_name}"

@@ -168,6 +168,8 @@ ohos_shared_library("libmmi-client") {
     "samgr:samgr_proxy",
   ]
 
+  public_external_deps = ["eventhandler:libeventhandler"]
+
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
@@ -437,6 +439,7 @@ ohos_unittest("InputMonitorManagerTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
 
   external_deps = [
@@ -505,6 +508,7 @@ ohos_unittest("InputManagerImplTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
 
   external_deps = [
@@ -709,11 +713,14 @@ ohos_unittest("KeyEventInputSubscribeManagerTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
+
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "hilog:libhilog",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -740,10 +747,12 @@ ohos_unittest("LongPressEventSubscribeManagerTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
   ]
+
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "hilog:libhilog",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -770,9 +779,11 @@ ohos_unittest("InputDeviceImplTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
   ]
+
   external_deps = [
     "ability_runtime:abilitykit_native",
     "hilog:libhilog",
+    "eventhandler:libeventhandler",
   ]
 }
 
