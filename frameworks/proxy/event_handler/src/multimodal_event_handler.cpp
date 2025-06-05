@@ -59,6 +59,7 @@ void OnConnected(const IfMMIClient& client)
     InputInterMgr->OnConnected();
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected();
+    DEVICE_CONSUMER.OnConnected();
 }
 
 void OnDisconnected(const IfMMIClient &client)

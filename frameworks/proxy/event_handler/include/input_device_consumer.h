@@ -34,8 +34,11 @@ public:
     DISALLOW_MOVE(InputDeviceConsumer);
     int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames,
         std::shared_ptr<IInputEventConsumer> consumer);
+    void OnConnected();
 
     std::shared_ptr<IInputEventConsumer> deviceConsumer_ { nullptr };
+    std::vector<std::string> deviceNames_;
+    std::mutex mtx_;
 };
 #define DEVICE_CONSUMER ::OHOS::Singleton<InputDeviceConsumer>::GetInstance()
 } // namespace MMI
