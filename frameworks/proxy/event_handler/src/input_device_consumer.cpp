@@ -39,7 +39,18 @@ int32_t InputDeviceConsumer::SetInputDeviceConsumer(const std::vector<std::strin
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
+    deviceNames_ = deviceNames;
     return ret;
+}
+
+void InputDeviceConsumer::OnConnected()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (deviceNames_.empty()) {
+        return;
+    }
+    MULTIMODAL_INPUT_CONNECT_MGR->SetInputDeviceConsumer(deviceNames_);
 }
 } // namespace MMI
 } // namespace OHOS
