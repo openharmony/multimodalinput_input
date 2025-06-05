@@ -9878,6 +9878,80 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleEventsWithPointe
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 /**
+ * @tc.name: InputWindowsManagerTest_IsPointInsideGuideWindow_001
+ * @tc.desc: Test that IsPointInsideGuideWindow should return false when there is no window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.clear();
+    EXPECT_FALSE(inputWindowsManager.IsPointInsideGuideWindow(0, 0));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointInsideGuideWindow_002
+ * @tc.desc: Test that IsPointInsideGuideWindow should return false when the window type is not guide window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowInfo windowInfo;
+    windowInfo.windowType = GUIDE_WINDOW_TYPE + 1;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_FALSE(inputWindowsManager.IsPointInsideGuideWindow(0, 0));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointInsideGuideWindow_003
+ * @tc.desc: Test that IsPointInsideGuideWindow should return false
+    when the window type is guide window, but the point is not within it
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo testWindow;
+    testWindow.windowType = GUIDE_WINDOW_TYPE;
+    Rect rect = {TEST_WINDOW_START, TEST_WINDOW_START, TEST_WINDOW_END, TEST_WINDOW_END};
+    testWindow.defaultHotAreas.push_back(rect);
+
+    InputWindowsManager manager;
+    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+
+    bool result = manager.IsPointInsideGuideWindow(TEST_WINDOW_START -1, TEST_WINDOW_START -1);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointInsideGuideWindow_004
+ * @tc.desc: Test that IsPointInsideGuideWindow should return true
+    when the window type is guide window, abd the point is within it
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWindow_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo testWindow;
+    testWindow.windowType = GUIDE_WINDOW_TYPE;
+    Rect rect = {TEST_WINDOW_START, TEST_WINDOW_START, TEST_WINDOW_END, TEST_WINDOW_END};
+    testWindow.defaultHotAreas.push_back(rect);
+
+    InputWindowsManager manager;
+    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+
+    bool result = manager.IsPointInsideGuideWindow(0, 0);
+    EXPECT_TRUE(result);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_IsMouseInCastWindow_001
  * @tc.desc: Test that IsMouseInCastWindow should return false when there is no window information
  * @tc.type: FUNC
