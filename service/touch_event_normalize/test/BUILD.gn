@@ -64,6 +64,9 @@ ohos_unittest("GestureTransformTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -223,6 +226,9 @@ ohos_unittest("TabletToolTranformTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -580,7 +586,12 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
 ohos_unittest("TouchpadGestureTest") {
   module_out_path = module_output_path
 
-  configs = [ "${mmi_path}:coverage_flags" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
 
   cflags = [
     "-Dprivate=public",
@@ -931,6 +942,9 @@ ohos_unittest("TouchGestureManagerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
