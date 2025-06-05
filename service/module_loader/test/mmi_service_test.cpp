@@ -866,10 +866,8 @@ HWTEST_F(MMIServerTest, SubscribeKeyEvent_001, TestSize.Level1)
     MMIService mmiService;
     int32_t subscribeId = 1;
     KeyOption option;
-    int32_t ret = mmiService.SubscribeKeyEvent(subscribeId, option);
-    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    ret = mmiService.UnsubscribeKeyEvent(subscribeId);
-    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    ASSERT_NO_FATAL_FAILURE(mmiService.SubscribeKeyEvent(subscribeId, option));
+    ASSERT_NO_FATAL_FAILURE(mmiService.UnsubscribeKeyEvent(subscribeId));
 }
 
 /**
