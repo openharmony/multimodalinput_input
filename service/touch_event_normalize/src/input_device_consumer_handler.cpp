@@ -45,6 +45,7 @@ int32_t InputDeviceConsumerHandler::SetDeviceConsumerHandler(const std::vector<s
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPR(udsServerPtr, RET_ERR);
     udsServerPtr->AddSessionDeletedCallback([this] (SessionPtr session) {
+        CHKPV(session);
         return this->OnSessionLost(session->GetFd());
     });
 
@@ -57,8 +58,8 @@ void InputDeviceConsumerHandler::OnSessionLost(int32_t fd)
     for (auto& pair : deviceConsumerHandler_.deviceHandler_) {
         auto& sessionHandlers = pair.second;
         for (auto it = sessionHandlers.begin(); it != sessionHandlers.end(); ++it) {
-            auto& session = it->session_;
-            if (fd == session->GetFd()) {
+            CHKPV(it->session_);
+            if (fd == it->session_->GetFd()) {
                 sessionHandlers.erase(it);
                 break;
             }
