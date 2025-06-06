@@ -91,6 +91,14 @@ constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr int32_t DEFAULT_DPI { 0 };
 constexpr int32_t DEFAULT_POSITION { 0 };
 constexpr int32_t MAIN_GROUPID { 0 };
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
+constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
+constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
+constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
+#define SCREEN_RECORD_WINDOW_WIDTH 400
+#define SCREEN_RECORD_WINDOW_HEIGHT 200
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1472,6 +1480,63 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
 bool InputWindowsManager::IsPointerActiveRectValid(const DisplayInfo &currentDisplay)
 {
     return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
+}
+
+bool InputWindowsManager::IsPointInsideGuideWindow(double pointX, double pointY)
+{
+    auto &WindowsInfo = GetWindowInfoVector();
+    for (const auto& windowItem : WindowsInfo) {
+        if (windowItem.windowType == GUIDE_WINDOW_TYPE) {
+            for (const auto &win : windowItem.defaultHotAreas) {
+                int32_t x = static_cast<int32_t>(pointX);
+                int32_t y = static_cast<int32_t>(pointY);
+                return ((x > win.x && x < (win.x + win.width)) &&
+                    (y > win.y && y < (win.y + win.height)));
+            }
+        }
+    }
+    return false;
+}
+
+bool InputWindowsManager::IsMouseInCastWindow()
+{
+    auto &WindowsInfo = GetWindowInfoVector();
+    for (const auto& windowItem : WindowsInfo) {
+        if (windowItem.windowType == CAST_WINDOW_TYPE) {
+            auto &mouseInfo = GetMouseInfo();
+            int32_t x = mouseInfo.physicalX;
+            int32_t y = mouseInfo.physicalY;
+            if ((x > windowItem.area.x && x < (windowItem.area.x + windowItem.area.width)) &&
+                (y > windowItem.area.y && y < (windowItem.area.y + windowItem.area.height))) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool InputWindowsManager::IsCaptureMode()
+{
+    auto &WindowsInfo = GetWindowInfoVector();
+    auto &screenshotWindow = std::find_if(WindowsInfo.begin(),
+        WindowsInfo.end(), [](const WindowInfo& windowItem) {
+            return windowItem.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT;
+        });
+    if (screenshotWindow != WindowsInfo.end()) {
+            return false;
+    }
+
+    auto &captureWindow = std::find_if(WindowsInfo.begin(),
+        WindowsInfo.end(), [](const WindowInfo& windowItem) {
+            return windowItem.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER;
+        });
+    if (captureWindow != WindowsInfo.end()) {
+        return (captureWindow->area.width > SCREEN_RECORD_WINDOW_WIDTH ||
+                             captureWindow->area.height > SCREEN_RECORD_WINDOW_HEIGHT);
+    }
+
+    return false;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 

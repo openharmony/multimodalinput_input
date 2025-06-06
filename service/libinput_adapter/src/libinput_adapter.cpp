@@ -357,32 +357,15 @@ void LibinputAdapter::StartVKeyboardDelayTimer(int32_t delayMs)
 bool LibinputAdapter::GetIsCaptureMode()
 {
     bool isCaptureMode = false;
-    bool hasScreenShotWindow = false;
+    bool isFloating = (isFloatingKeyboard_ != nullptr) ? isFloatingKeyboard_() : false;
 
     InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
-    if (inputWindowsManager != nullptr) {
-        DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
-        bool isFloating = false;
-        for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-            if (windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT) {
-                hasScreenShotWindow = true;
-            }
-
-            if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
-                // screen recorder scenario will be an exception to true
-                isFloating = (isFloatingKeyboard_ == nullptr) ? false : isFloatingKeyboard_();
-                isCaptureMode = (((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
-                    || (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT)) && isFloating) ? true : false;
-                MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
-                break;
-            }
-        }
-
-        if (hasScreenShotWindow) {
-            isCaptureMode = false;
-        }
+    if (inputWindowsManager == nullptr) {
+        return false;
     }
 
+    isCaptureMode = inputWindowsManager->IsCaptureMode() && isFloating;
+    MMI_HILOGD("Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
     return isCaptureMode;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1360,20 +1343,7 @@ bool LibinputAdapter::IsCursorInCastWindow()
     if (inputWindowsManager == nullptr) {
         return false;
     }
-    DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();    
-    for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-        if (windowInfo.windowType == CAST_WINDOW_TYPE) {
-            auto mouseInfo = WIN_MGR->GetMouseInfo();
-            int32_t x = mouseInfo.physicalX;
-            int32_t y = mouseInfo.physicalY;
-            if ((x > windowInfo.area.x && x < (windowInfo.area.x + windowInfo.area.width)) &&
-                (y > windowInfo.area.y && y < (windowInfo.area.y + windowInfo.area.height))) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return inputWindowsManager->IsMouseInCastWindow();
 }
 
 bool LibinputAdapter::HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
@@ -1796,6 +1766,7 @@ void LibinputAdapter::OnEventHandler()
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
         static int32_t downCount = 0;
+        bool isInsideGuideWindow = false;
 
         // confirm boot completed msg in case of mmi restart.
         UpdateBootFlag();
@@ -1836,6 +1807,9 @@ void LibinputAdapter::OnEventHandler()
                     y = touchInfo.point.y;
 
                     touchPoints_[touchId] = std::pair<double, double>(x, y);
+
+                    InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
+                    isInsideGuideWindow = inputWindowsManager->IsPointInsideGuideWindow(x, y);
                 }
             } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
                 auto pos = touchPoints_.find(touchId);
@@ -1859,7 +1833,7 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                 longAxis,
                 shortAxis);
 
-            if (handleTouchPoint_ != nullptr &&
+            if (!isInsideGuideWindow && handleTouchPoint_ != nullptr &&
                 handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
                 MMI_HILOGD("Inside vkeyboard area");
                 HandleVFullKeyboardMessages(event, frameTime, eventType, touch);
