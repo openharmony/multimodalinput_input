@@ -298,5 +298,52 @@ HWTEST_F(InputReplayCommandTest, InputReplayCommandTest_HandleCommand, TestSize.
     };
     EXPECT_EQ(RET_ERR, InputReplayCommand::HandleRecordReplayCommand(1, incompleteArgv));
 }
+
+/**
+ * @tc.name: InputReplayCommandTest_ParseRecord_ExtraArguments
+ * @tc.desc: Test parsing record command with extra arguments
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputReplayCommandTest, InputReplayCommandTest_ParseRecord_ExtraArguments, TestSize.Level1)
+{
+    char programName[] = {"program_name"};
+    char allArg[] = {"--all"};
+    char recordArg[] = {"record"};
+    char outputPath[] = {"output.bin"};
+    char extraArg[] = {"extra_arg"}; // Adding redundant parameter
+
+    char* argv[] = {
+        programName,
+        recordArg, outputPath,
+        allArg,
+        extraArg
+    };
+    InputReplayCommand command(5, argv);
+    EXPECT_FALSE(command.Parse()); // should fail due to extra argument
+}
+
+/**
+ * @tc.name: InputReplayCommandTest_ParseReplay_WithAllDevicesFlag
+ * @tc.desc: Test parsing replay command with all devices flag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputReplayCommandTest, InputReplayCommandTest_ParseReplay_WithAllDevicesFlag, TestSize.Level1)
+{
+    char programName[] = {"program_name"};
+    char allArg[] = {"--all"};
+    char replayArg[] = {"replay"};
+    char inputPath[] = {"input.bin"};
+
+    char* argv[] = {
+        programName,
+        replayArg, inputPath,
+        allArg
+    };
+
+    InputReplayCommand command(4, argv);
+    EXPECT_FALSE(command.Parse());
+}
 } // namespace MMI
 } // namespace OHOS
