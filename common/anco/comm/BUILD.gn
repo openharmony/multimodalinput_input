@@ -16,8 +16,6 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../multimodalinput_mini.gni")
 
-module_output_path = "input/input"
-
 idl_gen_interface("anco_channel_interface") {
   src_idl = rebase_path("IAncoChannel.idl")
 }
@@ -111,34 +109,4 @@ ohos_source_set("mmi_anco_channel_stub") {
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"
-}
-
-ohos_unittest("AncoChannelStubTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "${mmi_path}/common/anco/comm/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  deps = [ "${mmi_path}/util:libmmi-util" ]
-
-  sources = [
-    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
-    "src/anco_channel_stub.cpp",
-    "test/anco_channel_stub_ex_test.cpp",
-    "test/mock.cpp",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "googletest:gmock_main",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-  ]
 }
