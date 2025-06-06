@@ -2665,6 +2665,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->RotateDegree(DIRECTION270);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION270, MOUSE_ICON::DEFAULT,
         physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     EXPECT_EQ(physicalX, 100);
     EXPECT_EQ(physicalY, 100);
 #else
