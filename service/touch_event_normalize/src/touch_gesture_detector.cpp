@@ -789,11 +789,14 @@ void TouchGestureDetector::OnGestureSendEvent(std::shared_ptr<PointerEvent> even
 std::string TouchGestureDetector::DumpTouches() const
 {
     std::ostringstream output;
-    output << "[" << downPoint_.size() << "]";
 
-    for (const auto &[id, downPt] : downPoint_) {
-        output << "(" << id << "," << downPt.time << "," << downPt.x
-               << "," << downPt.y << ")";
+    if (auto iter = downPoint_.cbegin(); iter != downPoint_.cend()) {
+        output << "(" << iter->first;
+
+        for (++iter; iter != downPoint_.cend(); ++iter) {
+            output << "," << iter->first;
+        }
+        output << ")";
     }
     return std::move(output).str();
 }

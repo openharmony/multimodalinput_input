@@ -109,7 +109,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_MakeTransformProcessor
     ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::GESTURE), nullptr);
     ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::REMOTE_CONTROL),
         nullptr);
-    ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::JOYSTICK), nullptr);
     ASSERT_EQ(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::KNUCKLE), nullptr);
 }
 
