@@ -3899,17 +3899,26 @@ DisplayInfo PointerDrawingManager::GetCurrentDisplayInfo()
 void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction direction, const MOUSE_ICON pointerStyle,
     int32_t &physicalX, int32_t &physicalY)
 {
-    if (pointerStyle == MOUSE_ICON::DEFAULT && mouseIcons_[pointerStyle].iconPath == CursorIconPath) {
-        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
-            physicalX, physicalY);
-    } else if (pointerStyle == MOUSE_ICON::DEFAULT &&
-        mouseIcons_[pointerStyle].iconPath == CustomCursorIconPath) {
-            AdjustMouseFocus(direction,
-                ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
+    if (pointerStyle == MOUSE_ICON::DEFAULT) {
+        switch (mouseIcons_[pointerStyle].iconPath) {
+            case CursorIconPath: {
+                AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
                     physicalX, physicalY);
+                break;
+            }
+            case CustomCursorIconPath: {
+                AdjustMouseFocus(direction,
+                    ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
+                        physicalX, physicalY);
+                break;
+            }
+            default: {
+                AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay), physicalX, physicalY);
+                break;
+            }
+        }
     } else {
-        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay),
-            physicalX, physicalY);
+        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay), physicalX, physicalY);
     }
 }
 } // namespace MMI
