@@ -150,7 +150,7 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        MMI_HILOGW("This event has been tagged as not to be intercepted");
+        MMI_HILOGD("This event has been tagged as not to be intercepted");
         return false;
     }
     return interceptors_.HandleEvent(keyEvent);
@@ -162,7 +162,7 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointe
 {
     CHKPF(pointerEvent);
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        MMI_HILOGW("This event has been tagged as not to be intercepted");
+        MMI_HILOGD("This event has been tagged as not to be intercepted");
         return false;
     }
     return interceptors_.HandleEvent(pointerEvent);
