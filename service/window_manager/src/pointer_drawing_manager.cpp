@@ -513,18 +513,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
     currentDirection_ = direction;
-    if (pointerStyle.id == MOUSE_ICON::DEFAULT && mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath == CursorIconPath) {
-        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
-            physicalX, physicalY);
-    } else if (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath == CustomCursorIconPath) {
-            AdjustMouseFocus(direction,
-                ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
-                    physicalX, physicalY);
-    } else {
-        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay),
-            physicalX, physicalY);
-    }
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
     if (currentMouseStyle_.id != lastMouseStyle_.id) {
         MMI_HILOGD("MagicCursor AdjustMouseFocus:%{public}d",
@@ -587,8 +576,8 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
     Direction direction = DIRECTION0;
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
-    AdjustMouseFocus(
-        direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay), physicalX, physicalY);
+    AdjustMouseFocusToSoftRenderOrigin(direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
+        physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         MAGIC_CURSOR->EnableCursorInversion();
@@ -2348,7 +2337,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     Direction direction = static_cast<Direction>((
         ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     auto& iconPath = GetMouseIconPath();
-    AdjustMouseFocus(direction, ICON_TYPE(iconPath.at(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
+    AdjustMouseFocusToSoftRenderOrigin(direction, ICON_TYPE(iconPath.at(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
         physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
