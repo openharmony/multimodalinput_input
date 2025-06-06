@@ -1861,7 +1861,12 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     } else {
         auto surfaceNodePtr = GetSurfaceNode();
         CHKPV(surfaceNodePtr);
-        surfaceNodePtr->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
+        int32_t physicalX = lastPhysicalX_;
+        int32_t physicalY = lastPhysicalY_;
+        Direction direction = static_cast<Direction>((
+            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        AdjustMouseFocusToSoftRenderOrigin(direction, mouseStyle, physicalX, physicalY);
+        surfaceNodePtr->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
         if (mouseStyle == MOUSE_ICON::RUNNING) {
             pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
         } else {
@@ -2786,7 +2791,8 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t dis
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
     MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
-    CHKPV(GetSurfaceNode());
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPV(surfaceNodePtr);
     displayId_ = displayId;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPV(hardwareCursorPointerManager_);
@@ -2799,6 +2805,15 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t dis
             return;
         }
     }
+#else
+    Direction direction = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), x, y);
+    surfaceNodePtr->SetBounds(x,
+        y,
+        surfaceNodePtr->GetStagingProperties().GetBounds().z_,
+        surfaceNodePtr->GetStagingProperties().GetBounds().w_);
+    Rosen::RSTransaction::FlushImplicitTransaction();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGD("Pointer window move success");
 }
@@ -3879,6 +3894,23 @@ void PointerDrawingManager::SetSurfaceNode(std::shared_ptr<Rosen::RSSurfaceNode>
 DisplayInfo PointerDrawingManager::GetCurrentDisplayInfo()
 {
     return displayInfo_;
+}
+
+void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction direction, const MOUSE_ICON pointerStyle,
+    int32_t &physicalX, int32_t &physicalY)
+{
+    if (pointerStyle == MOUSE_ICON::DEFAULT && mouseIcons_[pointerStyle].iconPath == CursorIconPath) {
+        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
+            physicalX, physicalY);
+    } else if (pointerStyle == MOUSE_ICON::DEFAULT &&
+        mouseIcons_[pointerStyle].iconPath == CustomCursorIconPath) {
+            AdjustMouseFocus(direction,
+                ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
+                    physicalX, physicalY);
+    } else {
+        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay),
+            physicalX, physicalY);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
