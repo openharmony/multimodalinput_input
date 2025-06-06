@@ -1231,7 +1231,7 @@ void PointerDrawingManager::SoftCursorRenderThreadLoop()
 {
     SetThreadName(std::string("SoftCurRender"));
 #ifdef OHOS_BUILD_PC_PRIORITY
-    struct sched_param param = {0};
+    struct sched_param param = { 0 };
     param.sched_priority = PC_PRIORITY;
     int32_t schRet = sched_setscheduler(0, SCHED_FIFO, &param);
     if (schRet != 0) {
