@@ -365,7 +365,7 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
         const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo);
-    void HandleEventsWithPointerIdCausedPullCancel(std::shared_ptr<PointerEvent> pointerEvent);
+    void HandlePullEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,

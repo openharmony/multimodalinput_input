@@ -4024,7 +4024,7 @@ void InputWindowsManager::UpdateInnerAngleArea(const Rect &windowArea, std::vect
     windowHotAreas.push_back(newBottomRightRect);
 }
 
-void InputWindowsManager::HandleEventsWithPointerIdCausedPullCancel(std::shared_ptr<PointerEvent> pointerEvent)
+void InputWindowsManager::HandlePullEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     auto action = pointerEvent->GetPointerAction();
@@ -5723,7 +5723,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
         }
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    HandleEventsWithPointerIdCausedPullCancel(pointerEvent);
+    HandlePullEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return ret;
 }
