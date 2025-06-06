@@ -491,6 +491,25 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     }
     OnVKeyTrackPadMessage(touch, touchMsgList);
 }
+
+void LibinputAdapter::HandleVKeyTrackPadTouchPadDown(libinput_event_touch *touch, const std::vector<int32_t> &msgItem)
+{
+    MMI_HILOGD("Virtual TrackPad state machine message: LEFT_TOUCH_DOWN");
+    vtpSingleTapDownTime = std::chrono::system_clock::now();
+    if (vtpTimerId_ != EXPIRED_TIMER_ID && vtpState_ == VKeyboardStatusType::SINGLE_TAP) {
+        MMI_HILOGI("Virtual TrackPad state %{public}d, Cancel the previous release", vtpState_);
+        // Cancel the previous release
+        TimerMgr->RemoveTimer(vtpTimerId_);
+        SafeDestroyVTrackPadDelayedEvent();
+        vtpState_ = VKeyboardStatusType::DOUBLE_TAP;
+    } else if (vtpTimerId_ != EXPIRED_TIMER_ID && vtpState_ == VKeyboardStatusType::DOUBLE_TAP) {
+        MMI_HILOGI("Virtual TrackPad state %{public}d, Cancel the double tap release", vtpState_);
+        // Cancel the previous release
+        TimerMgr->RemoveTimer(vtpTimerId_);
+        SafeDestroyVTrackPadDelayedEvent();
+    }
+}
+
 void LibinputAdapter::update_pointer_move(auto msgType)
 {
     if (msgType != VTPStateMachineMessageType::POINTER_MOVE) {
@@ -909,18 +928,18 @@ bool LibinputAdapter::HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
     free(lpEvent);
     return true;
 }
-
-bool LibinputAdapter::HandleVKeyTrackPadTouchPadDown(libinput_event_touch* touch,
-    const std::vector<int32_t>& msgItem)
+// Scenario: Single tap Mode; Action: Send Press immediately + Plan a release in 180ms
+void LibinputAdapter::HandleVKeyTrackPadSingleTap(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem,
+    libinput_event* event, bool& delayvtpDestroy)
 {
-    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
-        MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
-            static_cast<int32_t>(msgItem.size()));
-        return false;
+    CHKPV(funInputEvent_);
+    MMI_HILOGI("Scenario: Single tap Mode");
+    std::chrono::duration<double> delta = std::chrono::system_clock::now() - vtpSingleTapDownTime;
+    if (delta.count() > vtpSingleTapThreshold) {
+        MMI_HILOGI("Single tap not sent. Time exceeded the limit.");
+        return;
     }
-    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
-    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
-    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
     event_pointer pEvent;
     pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_TAP;
     pEvent.button = VKEY_TP_LB_ID;
@@ -931,11 +950,19 @@ bool LibinputAdapter::HandleVKeyTrackPadTouchPadDown(libinput_event_touch* touch
     pEvent.delta_raw_x = VTP_LEFT_BUTTON_DELTA_X;
     pEvent.delta_raw_y = VTP_LEFT_BUTTON_DELTA_Y;
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    CHKPV(lpEvent);
+    MMI_HILOGD("Virtual TrackPad send: LIBINPUT_EVENT_POINTER_TAP PRESS");
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lpEvent, frameTime);
     free(lpEvent);
-    return true;
+    bool touchUpDelay = false;
+    touchUpDelay = CreateVTrackPadDelayTimer(event);
+    if (touchUpDelay) {
+        delayvtpDestroy = true;
+        StartVTrackPadDelayTimer();
+        MMI_HILOGD("Start the delay %{private}d", WAIT_TIME_MS_DTAP);
+    }
 }
 
 bool LibinputAdapter::HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
@@ -1122,7 +1149,15 @@ bool LibinputAdapter::HandleVKeyTrackPadScrollUpdate(libinput_event_touch* touch
     pEvent.delta_raw_x = msgPPosX;
     pEvent.delta_raw_y = msgPPosY;
     pEvent.source = libinput_pointer_axis_source::LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
-    pEvent.axes = VKEY_TP_AXES_ONE;
+    pEvent.axes = VKEY_TP_AXES_ZERO;
+    // Moving in the x direction
+    if (msgPPosX != 0) {
+        pEvent.axes |= VKEY_TP_AXES_TWO;
+    }
+    // Moving in the y direction
+    if (msgPPosY != 0) {
+        pEvent.axes |= VKEY_TP_AXES_ONE;
+    }
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
