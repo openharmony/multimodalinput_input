@@ -2536,36 +2536,196 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->RotateDegree(DIRECTION0);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION0, MOUSE_ICON::TEXT_CURSOR,
         physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
     EXPECT_EQ(physicalX, 75);
     EXPECT_EQ(physicalY, 75);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION90);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION90, MOUSE_ICON::TEXT_CURSOR,
         physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
     EXPECT_EQ(physicalX, 75);
     EXPECT_EQ(physicalY, 125);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION180);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION180, MOUSE_ICON::TEXT_CURSOR,
         physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
     EXPECT_EQ(physicalX, 125);
     EXPECT_EQ(physicalY, 125);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION270);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION270, MOUSE_ICON::TEXT_CURSOR,
         physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
     EXPECT_EQ(physicalX, 125);
     EXPECT_EQ(physicalY, 75);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(static_cast<Direction>(4));
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(static_cast<Direction>(4),
         MOUSE_ICON::TEXT_CURSOR, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustMouseFocusToSoftRenderOrigin_002
+ * @tc.desc: Test AdjustMouseFocusToSoftRenderOrigin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSoftRenderOrigin_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto* pointerDrawingManager = static_cast<PointerDrawingManager*>(IPointerDrawingManager::GetInstance());
+    pointerDrawingManager->imageWidth_ = 50;
+    pointerDrawingManager->imageHeight_ = 50;
+    pointerDrawingManager->UpdateIconPath(MOUSE_ICON::DEFAULT, CursorIconPath);
+    int32_t physicalX = 100;
+    int32_t physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION0);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION0, MOUSE_ICON::DEFAULT,
+        physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
     EXPECT_EQ(physicalX, 75);
     EXPECT_EQ(physicalY, 75);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION90);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION90, MOUSE_ICON::DEFAULT,
+        physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
+    EXPECT_EQ(physicalX, 75);
+    EXPECT_EQ(physicalY, 125);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION180);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION180, MOUSE_ICON::DEFAULT,
+        physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
+    EXPECT_EQ(physicalX, 125);
+    EXPECT_EQ(physicalY, 125);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION270);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION270, MOUSE_ICON::DEFAULT,
+        physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
+    EXPECT_EQ(physicalX, 125);
+    EXPECT_EQ(physicalY, 75);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(static_cast<Direction>(4));
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(static_cast<Direction>(4),
+        MOUSE_ICON::DEFAULT, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustMouseFocusToSoftRenderOrigin_003
+ * @tc.desc: Test AdjustMouseFocusToSoftRenderOrigin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSoftRenderOrigin_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto* pointerDrawingManager = static_cast<PointerDrawingManager*>(IPointerDrawingManager::GetInstance());
+    pointerDrawingManager->imageWidth_ = 50;
+    pointerDrawingManager->imageHeight_ = 50;
+    pointerDrawingManager->UpdateIconPath(MOUSE_ICON::DEFAULT, CustomCursorIconPath);
+    int32_t physicalX = 100;
+    int32_t physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION0);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION0, MOUSE_ICON::DEFAULT,
+        physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
+    EXPECT_EQ(physicalX, 75);
+    EXPECT_EQ(physicalY, 75);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION90);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION90, MOUSE_ICON::DEFAULT,
+        physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
+    EXPECT_EQ(physicalX, 75);
+    EXPECT_EQ(physicalY, 125);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION180);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION180, MOUSE_ICON::DEFAULT,
+        physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
+    EXPECT_EQ(physicalX, 125);
+    EXPECT_EQ(physicalY, 125);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION270);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION270, MOUSE_ICON::DEFAULT,
+        physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
+#else
+    EXPECT_EQ(physicalX, 125);
+    EXPECT_EQ(physicalY, 75);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(static_cast<Direction>(4));
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(static_cast<Direction>(4),
+        MOUSE_ICON::DEFAULT, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 100);
+    EXPECT_EQ(physicalY, 100);
 }
 
 /**
