@@ -1923,7 +1923,7 @@ bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGE("Failed to do swipe inward, wrong source:%{public}d ", pointerEvent->GetSourceType());
+        MMI_HILOGD("Failed to do swipe inward, wrong source:%{public}d ", pointerEvent->GetSourceType());
         return false;
     } else if (pointerEvent->GetFingerCount() != ONE_FINGERS) {
         MMI_HILOGE("Failed to do swipe inward, more than one finger");

@@ -638,7 +638,7 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService() __attribute_
     sptr<IRemoteObject> remoteObject = INPUT_BINDER_CLIENT_SERVICE->GetClientSrv();
     CHKPF(remoteObject);
     multimodalInputConnectService_->TransferBinderClientSrv(remoteObject);
-    MMI_HILOGI("Get multimodalinput service successful");
+    MMI_HILOGD("Get multimodalinput service successful");
     return true;
 }
 
