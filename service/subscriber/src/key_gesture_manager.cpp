@@ -54,7 +54,7 @@ void KeyGestureManager::Handler::ResetTimer()
 
 void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGI("[Handler] Handler(%{public}d) will run after %{public}dms", GetId(), GetLongPressTime());
+    MMI_HILOGD("[Handler] Handler(%{public}d) will run after %{public}dms", GetId(), GetLongPressTime());
     keyEvent_ = KeyEvent::Clone(keyEvent);
     timerId_ = TimerMgr->AddTimer(GetLongPressTime(), REPEAT_ONCE,
         [this]() {
@@ -423,7 +423,7 @@ KeyGestureManager::KeyGestureManager()
 
 bool KeyGestureManager::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPF(keyOption);
     return std::any_of(keyGestures_.cbegin(), keyGestures_.cend(),
         [keyOption](const auto &keyGesture) {
@@ -455,7 +455,7 @@ void KeyGestureManager::RemoveKeyGesture(int32_t id)
 
 bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
         if ((*iter)->Intercept(keyEvent)) {
