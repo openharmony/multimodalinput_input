@@ -576,8 +576,7 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
     Direction direction = DIRECTION0;
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
-    AdjustMouseFocusToSoftRenderOrigin(direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
-        physicalX, physicalY);
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         MAGIC_CURSOR->EnableCursorInversion();
@@ -2336,9 +2335,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     Direction direction = static_cast<Direction>((
         ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    auto& iconPath = GetMouseIconPath();
-    AdjustMouseFocusToSoftRenderOrigin(direction, ICON_TYPE(iconPath.at(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
-        physicalX, physicalY);
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         MAGIC_CURSOR->CreatePointerWindow(displayInfo_.uniqueId, physicalX, physicalY, direction, surfaceNode_);
@@ -3889,22 +3886,15 @@ void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction directi
     int32_t &physicalX, int32_t &physicalY)
 {
     if (pointerStyle == MOUSE_ICON::DEFAULT) {
-        switch (mouseIcons_[pointerStyle].iconPath) {
-            case CursorIconPath: {
-                AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
+        if (mouseIcons_[pointerStyle].iconPath == CursorIconPath) {
+            AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
+                physicalX, physicalY);
+        } else if (mouseIcons_[pointerStyle].iconPath == CustomCursorIconPath) {
+            AdjustMouseFocus(direction,
+                ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
                     physicalX, physicalY);
-                break;
-            }
-            case CustomCursorIconPath: {
-                AdjustMouseFocus(direction,
-                    ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
-                        physicalX, physicalY);
-                break;
-            }
-            default: {
-                AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay), physicalX, physicalY);
-                break;
-            }
+        } else {
+            AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay), physicalX, physicalY);
         }
     } else {
         AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay), physicalX, physicalY);
