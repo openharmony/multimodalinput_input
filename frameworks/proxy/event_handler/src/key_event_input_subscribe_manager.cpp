@@ -143,7 +143,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         MMI_HILOGE("PreKeys number invalid");
         return INVALID_SUBSCRIBE_ID;
     }
-    MMI_HILOGI("PRE:[%{private}s],FINAL:%{private}d,KA:%{public}s,HT:%{public}d",
+    MMI_HILOGD("PRE:[%{private}s],FINAL:%{private}d,KA:%{public}s,HT:%{public}d",
         DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
         (keyOption->IsFinalKeyDown() ? "down" : "up"), keyOption->GetFinalKeyDownDuration());
 

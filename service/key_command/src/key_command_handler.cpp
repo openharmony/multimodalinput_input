@@ -1687,7 +1687,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, const std::shared
     }
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
         (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
-        MMI_HILOGI("The isDownStart:%{public}d", isDownStart_);
+        MMI_HILOGD("The isDownStart:%{public}d", isDownStart_);
         if (isDownStart_) {
             HandleSpecialKeys(keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         }

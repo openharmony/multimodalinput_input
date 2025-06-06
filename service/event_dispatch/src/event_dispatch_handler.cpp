@@ -485,7 +485,7 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         MMI_HILOGE("Packet write structure of EventKeyboard failed");
         return RET_ERR;
     }
-    MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+    MMI_HILOGD("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
         key->GetId(), session->GetProgramName().c_str(), session->GetPid());
     if (!udsServer.SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);

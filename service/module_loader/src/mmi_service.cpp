@@ -740,7 +740,7 @@ ErrCode MMIService::SetMouseScrollRows(int32_t rows)
 ErrCode MMIService::SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, int32_t focusY,
     const CursorPixelMap& curPixelMap)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
