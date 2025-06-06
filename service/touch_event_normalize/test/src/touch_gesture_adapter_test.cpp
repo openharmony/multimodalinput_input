@@ -81,6 +81,57 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_process_001, TestSize.
 }
 
 /**
+ * @tc.name: TouchGestureAdapterTest_process_002
+ * @tc.desc: Test TouchGestureAdapter::process
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_process_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto nextAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_PINCH, nullptr);
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, nextAdapter);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->process(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureAdapterTest_process_003
+ * @tc.desc: Test TouchGestureAdapter::process
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_process_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto nextAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_PINCH, nullptr);
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, nextAdapter);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    touchGestureAdapter->shouldDeliverToNext_ = false;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->process(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureAdapterTest_process_004
+ * @tc.desc: Test TouchGestureAdapter::process
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_process_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->process(pointerEvent));
+}
+
+/**
  * @tc.name: TouchGestureAdapterTest_Init_001
  * @tc.desc: Test the funcation Init
  * @tc.type: FUNC
@@ -339,6 +390,86 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_003, Test
     touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::IDLE;
     event->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
+}
+
+/**
+ * @tc.name: TouchGestureAdapterTest_LogTouchEvent_01
+ * @tc.desc: Test TouchGestureAdapter::LogTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_LogTouchEvent_01, TestSize.Level1)
+{
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->LogTouchEvent(nullptr));
+}
+
+/**
+ * @tc.name: TouchGestureAdapterTest_LogTouchEvent_02
+ * @tc.desc: Test TouchGestureAdapter::LogTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_LogTouchEvent_02, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->LogTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureAdapterTest_LogTouchEvent_03
+ * @tc.desc: Test TouchGestureAdapter::LogTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_LogTouchEvent_03, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->LogTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureAdapterTest_LogTouchEvent_04
+ * @tc.desc: Test TouchGestureAdapter::LogTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_LogTouchEvent_04, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->LogTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureAdapterTest_LogTouchEvent_05
+ * @tc.desc: Test TouchGestureAdapter::LogTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_LogTouchEvent_05, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    int32_t pointerId = 1;
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(pointerId);
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->LogTouchEvent(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
