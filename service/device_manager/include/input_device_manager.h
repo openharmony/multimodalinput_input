@@ -19,6 +19,7 @@
 #include "device_config_file_parser.h"
 #include "device_observer.h"
 #include "input_device.h"
+#include "key_event.h"
 #include "uds_session.h"
 #include <shared_mutex>
 
@@ -102,6 +103,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     bool IsAddKeyboardExtFlag(int32_t deviceId, uint32_t &flag);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+    bool IsLocalDevice(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
