@@ -308,7 +308,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_001, TestSize.Le
 {
     CALL_TEST_DEBUG;
     TimerManager timermanager;
-    auto timer = std::make_unique<TimerManager::TimerItem>();
+    auto timer = std::make_shared<TimerManager::TimerItem>();
     timer->nextCallTime = 100;
     timermanager.InsertTimerInternal(timer);
     EXPECT_EQ(timermanager.timers_.front()->nextCallTime, 100);
@@ -324,10 +324,10 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_002, TestSize.Le
 {
     CALL_TEST_DEBUG;
     TimerManager timermanager;
-    auto timer1 = std::make_unique<TimerManager::TimerItem>();
+    auto timer1 = std::make_shared<TimerManager::TimerItem>();
     timer1->nextCallTime = 100;
     timermanager.InsertTimerInternal(timer1);
-    auto timer2 = std::make_unique<TimerManager::TimerItem>();
+    auto timer2 = std::make_shared<TimerManager::TimerItem>();
     timer2->nextCallTime = 50;
     timermanager.InsertTimerInternal(timer2);
     EXPECT_EQ(timermanager.timers_.front()->nextCallTime, 50);
@@ -343,13 +343,13 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_003, TestSize.Le
 {
     CALL_TEST_DEBUG;
     TimerManager timermanager;
-    auto timer1 = std::make_unique<TimerManager::TimerItem>();
+    auto timer1 = std::make_shared<TimerManager::TimerItem>();
     timer1->nextCallTime = 100;
     timermanager.InsertTimerInternal(timer1);
-    auto timer2 = std::make_unique<TimerManager::TimerItem>();
+    auto timer2 = std::make_shared<TimerManager::TimerItem>();
     timer2->nextCallTime = 200;
     timermanager.InsertTimerInternal(timer2);
-    auto timer3 = std::make_unique<TimerManager::TimerItem>();
+    auto timer3 = std::make_shared<TimerManager::TimerItem>();
     timer3->nextCallTime = 200;
     timermanager.InsertTimerInternal(timer3);
     EXPECT_EQ(timermanager.timers_.front()->nextCallTime, 100);
@@ -380,7 +380,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelayInternal_001, TestSize.
 HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelayInternal, TestSize.Level1)
 {
     TimerManager tMgr;
-    auto timer = std::make_unique<TimerManager::TimerItem>();
+    auto timer = std::make_shared<TimerManager::TimerItem>();
     timer->nextCallTime = -1;
     tMgr.InsertTimerInternal(timer);
     EXPECT_EQ(tMgr.CalcNextDelayInternal(), 0);
@@ -408,7 +408,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_001, TestSize.
 HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal, TestSize.Level1)
 {
     TimerManager tMgr;
-    auto timer = std::make_unique<TimerManager::TimerItem>();
+    auto timer = std::make_shared<TimerManager::TimerItem>();
     timer->nextCallTime = 10000000000;
     tMgr.InsertTimerInternal(timer);
     ASSERT_NO_FATAL_FAILURE(tMgr.ProcessTimersInternal());
