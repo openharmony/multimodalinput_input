@@ -875,7 +875,6 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt, DisplayGroupInfo &disp
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         pkt << item.pointerActiveWidth << item.pointerActiveHeight;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-        pkt << item.groupId;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -961,7 +960,7 @@ void InputManagerImpl::PrintDisplayInfo(const DisplayGroupInfo &displayGroupInfo
                    "dpi:%{public}d,name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
                    "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,scalePercent:%{public}d,"
                    "expandHeight:%{public}d,validWH:{%{private}d %{private}d},fixedDirection:%{public}d,"
-                   "physicalWH:{%{private}d %{private}d},pActiveWH:{%{private}d %{private}d},groupId:%{public}d",
+                   "physicalWH:{%{private}d %{private}d},pActiveWH:{%{private}d %{private}d}",
             item.id,
             item.x,
             item.y,
@@ -983,8 +982,7 @@ void InputManagerImpl::PrintDisplayInfo(const DisplayGroupInfo &displayGroupInfo
             item.physicalWidth,
             item.physicalHeight,
             item.pointerActiveWidth,
-            item.pointerActiveHeight,
-            item.groupId);
+            item.pointerActiveHeight);
     }
 }
 
