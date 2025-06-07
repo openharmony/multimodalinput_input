@@ -537,13 +537,6 @@ struct DisplayInfo {
      * @since 12
      */
     int32_t uniqueId { 0 };
-
-	/**
-     * Display group ID
-     *
-     * @since 16
-     */
-    int32_t groupId { DEFAULT_GROUP_ID };
 };
 
 /**
