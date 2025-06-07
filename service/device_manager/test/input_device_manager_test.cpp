@@ -31,6 +31,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID { 1000 };
+constexpr int32_t UINPUT_INPUT_DEVICE_ID { -1 };
+constexpr int32_t LOC_INPUT_DEVICE_ID { 1 };
 } // namespace
 
 class InputDeviceManagerTest : public testing::Test {
@@ -1655,5 +1658,347 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_KeyboardExtFlag_Verify_J
     cJSON_Delete(root);
 }
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_01
+ * @tc.desc: Test the function IsLocalDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int64_t time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item1;
+    item1.SetPressed(true);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(LOC_INPUT_DEVICE_ID);
+    InputDeviceManager inputDevice;
+    bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, true);
+
+    time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item1.SetPressed(false);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(LOC_INPUT_DEVICE_ID);
+    isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, true);
+}
+
+/**
+  * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_02
+  * @tc.desc: Test the function IsLocalDevice
+  * @tc.type: FUNC
+  * @tc.require:
+  */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int64_t time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item1;
+    item1.SetPressed(true);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(UINPUT_INPUT_DEVICE_ID);
+    InputDeviceManager inputDevice;
+    bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, false);
+
+    time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item1.SetPressed(false);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(UINPUT_INPUT_DEVICE_ID);
+    isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, false);
+}
+
+/**
+  * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_03
+  * @tc.desc: Test the function IsLocalDevice
+  * @tc.type: FUNC
+  * @tc.require:
+  */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int64_t time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item1;
+    item1.SetPressed(true);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(MIN_VIRTUAL_INPUT_DEVICE_ID);
+    InputDeviceManager inputDevice;
+    bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, false);
+
+    time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item1.SetPressed(false);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(MIN_VIRTUAL_INPUT_DEVICE_ID);
+    isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, false);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_01
+ * @tc.desc: Test the function IsLocalDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_01, TestSize.Level1)
+ {
+     CALL_TEST_DEBUG;
+     auto keyEvent = KeyEvent::Create();
+     ASSERT_NE(keyEvent, nullptr);
+     int64_t time = GetSysClockTime();
+     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+     keyEvent->SetActionTime(time);
+     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+     KeyEvent::KeyItem item1;
+     item1.SetPressed(true);
+     item1.SetKeyCode(KeyEvent::KEYCODE_A);
+     item1.SetDownTime(time);
+     keyEvent->AddKeyItem(item1);
+     keyEvent->SetDeviceId(LOC_INPUT_DEVICE_ID);
+     InputDeviceManager inputDevice;
+     bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+     ASSERT_EQ(isLocalDevice, true);
+ 
+     time = GetSysClockTime();
+     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+     keyEvent->SetActionTime(time);
+     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+     item1.SetPressed(false);
+     item1.SetKeyCode(KeyEvent::KEYCODE_A);
+     item1.SetDownTime(time);
+     keyEvent->AddKeyItem(item1);
+     keyEvent->SetDeviceId(LOC_INPUT_DEVICE_ID);
+     isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+     ASSERT_EQ(isLocalDevice, true);
+ }
+ 
+ /**
+   * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_02
+   * @tc.desc: Test the function IsLocalDevice
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_02, TestSize.Level1)
+ {
+     CALL_TEST_DEBUG;
+     auto keyEvent = KeyEvent::Create();
+     ASSERT_NE(keyEvent, nullptr);
+     int64_t time = GetSysClockTime();
+     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+     keyEvent->SetActionTime(time);
+     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+     KeyEvent::KeyItem item1;
+     item1.SetPressed(true);
+     item1.SetKeyCode(KeyEvent::KEYCODE_A);
+     item1.SetDownTime(time);
+     keyEvent->AddKeyItem(item1);
+     keyEvent->SetDeviceId(UINPUT_INPUT_DEVICE_ID);
+     InputDeviceManager inputDevice;
+     bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+     ASSERT_EQ(isLocalDevice, false);
+ 
+     time = GetSysClockTime();
+     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+     keyEvent->SetActionTime(time);
+     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+     item1.SetPressed(false);
+     item1.SetKeyCode(KeyEvent::KEYCODE_A);
+     item1.SetDownTime(time);
+     keyEvent->AddKeyItem(item1);
+     keyEvent->SetDeviceId(UINPUT_INPUT_DEVICE_ID);
+     isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+     ASSERT_EQ(isLocalDevice, false);
+ }
+ 
+ /**
+   * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_03
+   * @tc.desc: Test the function IsLocalDevice
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_03, TestSize.Level1)
+ {
+     CALL_TEST_DEBUG;
+     auto keyEvent = KeyEvent::Create();
+     ASSERT_NE(keyEvent, nullptr);
+     int64_t time = GetSysClockTime();
+     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+     keyEvent->SetActionTime(time);
+     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+     KeyEvent::KeyItem item1;
+     item1.SetPressed(true);
+     item1.SetKeyCode(KeyEvent::KEYCODE_A);
+     item1.SetDownTime(time);
+     keyEvent->AddKeyItem(item1);
+     keyEvent->SetDeviceId(MIN_VIRTUAL_INPUT_DEVICE_ID);
+     InputDeviceManager inputDevice;
+     bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+     ASSERT_EQ(isLocalDevice, false);
+ 
+     time = GetSysClockTime();
+     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+     keyEvent->SetActionTime(time);
+     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+     item1.SetPressed(false);
+     item1.SetKeyCode(KeyEvent::KEYCODE_A);
+     item1.SetDownTime(time);
+     keyEvent->AddKeyItem(item1);
+     keyEvent->SetDeviceId(MIN_VIRTUAL_INPUT_DEVICE_ID);
+     isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+     ASSERT_EQ(isLocalDevice, false);
+ }
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_01
+ * @tc.desc: Test the function IsLocalDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int64_t time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item1;
+    item1.SetPressed(true);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(LOC_INPUT_DEVICE_ID);
+    InputDeviceManager inputDevice;
+    bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, true);
+
+    time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item1.SetPressed(false);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(LOC_INPUT_DEVICE_ID);
+    isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, true);
+}
+
+/**
+  * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_02
+  * @tc.desc: Test the function IsLocalDevice
+  * @tc.type: FUNC
+  * @tc.require:
+  */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int64_t time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item1;
+    item1.SetPressed(true);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(UINPUT_INPUT_DEVICE_ID);
+    InputDeviceManager inputDevice;
+    bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, false);
+
+    time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item1.SetPressed(false);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(UINPUT_INPUT_DEVICE_ID);
+    isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, false);
+}
+
+/**
+  * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_03
+  * @tc.desc: Test the function IsLocalDevice
+  * @tc.type: FUNC
+  * @tc.require:
+  */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int64_t time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item1;
+    item1.SetPressed(true);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(MIN_VIRTUAL_INPUT_DEVICE_ID);
+    InputDeviceManager inputDevice;
+    bool isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, false);
+
+    time = GetSysClockTime();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item1.SetPressed(false);
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(time);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->SetDeviceId(MIN_VIRTUAL_INPUT_DEVICE_ID);
+    isLocalDevice = inputDevice.IsLocalDevice(keyEvent);
+    ASSERT_EQ(isLocalDevice, false);
+}
 } // namespace MMI
 } // namespace OHOS
