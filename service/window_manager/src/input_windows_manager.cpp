@@ -1753,7 +1753,6 @@ void InputWindowsManager::InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInf
     pointerDrawFlagMap_[displayGroupInfo.groupId] = pointerDrawFlag_;
     mouseLocationMap_[displayGroupInfo.groupId] = mouseLocation_;
     windowsPerDisplayMap_[displayGroupInfo.groupId] = windowsPerDisplay_;
-    windowsPerDisplayMap_[displayGroupInfo.groupId] = windowsPerDisplay_;
     lastPointerEventforWindowChangeMap_[displayGroupInfo.groupId] = lastPointerEventforWindowChange_;
     displayModeMap_[displayGroupInfo.groupId] = displayMode_;
     lastDpiMap_[displayGroupInfo.groupId] = lastDpi_;
