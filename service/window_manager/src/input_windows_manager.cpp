@@ -1989,17 +1989,18 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
         }
         mode = displayGroupInfo_.displaysInfo[0].displayMode;
     }
-    DisplayMode& displayMode = displayMode_;
     const auto tempMode = displayModeMap_.find(groupId);
     if (tempMode == displayModeMap_.end()) {
         return;
     }
-    displayMode = tempMode->second;
+    DisplayMode& displayMode = tempMode->second;
     if (mode == displayMode) {
         MMI_HILOGD("Displaymode not change, mode:%{public}d, diaplayMode_:%{public}d", mode, displayMode);
         return;
     }
+    displayMode_ = mode;
     displayModeMap_[groupId] = mode;
+    displayMode = mode;
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
         MMI_HILOGD("Send fingersense display mode is nullptr");
