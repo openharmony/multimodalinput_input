@@ -100,7 +100,8 @@
         "graphic_surface",
         "ipc",
         "sensor",
-        "idl_tool"
+        "idl_tool",
+	"runtime_core"
       ],
       "third_party": [
         "libuv",
