@@ -120,7 +120,7 @@ static constexpr int32_t INVALID_MONITOR_ID = -1;
 static constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
 static constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
 static constexpr int32_t OCCUPIED_BY_OTHER = -4;
-static constexpr int32_t SIMULATE_POINTER_EVENT_START_ID { 10000 };
+static constexpr int32_t SIMULATE_POINTER_EVENT_START_ID { 30000 };
 static std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_mouseEvent = OHOS::MMI::PointerEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_touchEvent = OHOS::MMI::PointerEvent::Create();
@@ -2780,7 +2780,8 @@ static int32_t TransformTouchAction(const struct Input_TouchEvent *touchEvent,
 }
 
 static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
-    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
+    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
+    OHOS::MMI::PointerEvent::PointerItem &item, int32_t windowX, int32_t windowY)
 {
     CALL_INFO_TRACE;
     CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
@@ -2798,8 +2799,14 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     int32_t globalY = touchEvent->globalY;
     item.SetGlobalX(globalX);
     item.SetGlobalY(globalY);
+    item.SetWindowX(windowX);
+    item.SetWindowY(windowY);
 
     int32_t id = touchEvent->id;
+    if (id < 0) {
+        MMI_HILOGE("displayId is less 0, can not process");
+        return INPUT_PARAMETER_ERROR;
+    }
     item.SetOriginPointerId(id);
     if (id < SIMULATE_POINTER_EVENT_START_ID) {
         item.SetPointerId(id + SIMULATE_POINTER_EVENT_START_ID);
@@ -2820,11 +2827,16 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     return INPUT_SUCCESS;
 }
 
-std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input_TouchEvent *touchEvent)
+std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input_TouchEvent *touchEvent,
+    int32_t windowX, int32_t windowY)
 {
     CALL_INFO_TRACE;
     if (touchEvent == nullptr) {
         MMI_HILOGE("touchEvent is null");
+        return nullptr;
+    }
+    if (windowX < 0 || windowY < 0) {
+        MMI_HILOGE("window coordination is less 0");
         return nullptr;
     }
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent = OHOS::MMI::PointerEvent::Create();
@@ -2838,7 +2850,7 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input
         return nullptr;
     }
 
-    ret = TransformTouchProperty(touchEvent, pointerEvent, item);
+    ret = TransformTouchProperty(touchEvent, pointerEvent, item, windowX, windowY);
     if (ret != INPUT_SUCCESS) {
         return nullptr;
     }
