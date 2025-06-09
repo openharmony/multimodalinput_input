@@ -3543,6 +3543,12 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
     int32_t areaNum = 0;
     bool findFlag = false;
     for (const auto &item : rects) {
+        if (item.width == 0 || item.height == 0) {
+            MMI_HILOGD("The width or height of hotArea is 0, width: %{public}d, height: %{public}d, "
+            "areaNum: %{public}d", item.width, item.height, areaNum);
+            areaNum++;
+            continue;
+        }
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
         if (!AddInt32(item.x, item.width, displayMaxX)) {
@@ -3862,8 +3868,8 @@ bool InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, 
     bool findFlag = false;
     if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
         std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
-        MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d",
-            windowHotAreas.size(), windowId);
+        MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d, pid:%{public}d",
+            windowHotAreas.size(), windowId, windowInfo.pid);
         findFlag = InWhichHotArea(logicalX, logicalY, windowHotAreas, pointerStyle);
     }
     return findFlag;
