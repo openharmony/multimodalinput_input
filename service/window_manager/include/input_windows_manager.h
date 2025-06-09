@@ -104,6 +104,7 @@ public:
     int32_t focusWindowId_ { -1 };
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
+    int32_t ClearMouseHideFlag(int32_t eventId);
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MouseLocation GetMouseInfo();

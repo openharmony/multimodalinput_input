@@ -135,5 +135,6 @@ group("test") {
     "supportkeys_fuzzer:fuzztest",
     "unregisterdevListener_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
+    "clearmousehideflag_fuzzer:fuzztest",
   ]
 }

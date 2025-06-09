@@ -104,6 +104,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     virtual int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid) = 0;
+    virtual int32_t ClearMouseHideFlag(int32_t eventId) = 0;
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual MouseLocation GetMouseInfo() = 0;

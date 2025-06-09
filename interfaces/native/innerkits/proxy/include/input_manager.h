@@ -1240,6 +1240,13 @@ public:
     */
     int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
 
+    /**
+    * @brief When the collaborative application is disconnected, clear the mouse hide flag.
+    * @param eventId The collaborative application event id.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 20
+    */
+    int32_t ClearMouseHideFlag(int32_t eventId);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
