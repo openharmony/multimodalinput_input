@@ -582,6 +582,11 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
 
     std::string name = "primaryButton";
     int32_t primaryButton = PREFERENCES_MGR->GetIntValue(name, 0);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (isVirtualDeviceEvent_) {
+        primaryButton = GetVirtualTouchpadPrimaryButton();
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     if (type == LIBINPUT_EVENT_POINTER_BUTTON && primaryButton == RIGHT_BUTTON) {
         if (buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
@@ -1626,6 +1631,12 @@ void MouseTransformProcessor::GetVirtualTouchpadRightClickType(int32_t &type)
     // always allow two finger tap to open menu for virtual trackpad regardless of the settings.
     MMI_HILOGI("VTrackpad always uses right-click type=%{public}d", twoFingerSwitchType);
     type = twoFingerSwitchType;
+}
+
+int32_t MouseTransformProcessor::GetVirtualTouchpadPrimaryButton()
+{
+    MMI_HILOGI("VTrackpad always sets left button as primary button.");
+    return LEFT_BUTTON;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI

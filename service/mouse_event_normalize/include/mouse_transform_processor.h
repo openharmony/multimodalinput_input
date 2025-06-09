@@ -151,6 +151,7 @@ private:
     static void CheckEventFromVirtualTouchpad(struct libinput_event* event);
     static void GetVirtualTouchpadTapSwitch(bool &switchFlag);
     static void GetVirtualTouchpadRightClickType(int32_t &type);
+    static int32_t GetVirtualTouchpadPrimaryButton();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static void GetConfigDataFromDatabase(std::string &key, bool &value);
