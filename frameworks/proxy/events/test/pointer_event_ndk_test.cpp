@@ -61,9 +61,11 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
     inputTouchEvent.id = 1;
     inputTouchEvent.displayX = 100;
     inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
 
     std::shared_ptr<OHOS::MMI::PointerEvent> result
-        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent);
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
     EXPECT_NE(result, nullptr);
 }
 
@@ -82,9 +84,11 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
     inputTouchEvent.id = 1;
     inputTouchEvent.displayX = 100;
     inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
 
     std::shared_ptr<OHOS::MMI::PointerEvent> result
-        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent);
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
     EXPECT_NE(result, nullptr);
 }
 
@@ -103,9 +107,11 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
     inputTouchEvent.id = 1;
     inputTouchEvent.displayX = 100;
     inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
 
     std::shared_ptr<OHOS::MMI::PointerEvent> result
-        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent);
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
     EXPECT_EQ(result, nullptr);
 }
 
@@ -124,9 +130,11 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
     inputTouchEvent.id = 1;
     inputTouchEvent.displayX = -1;
     inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
 
     std::shared_ptr<OHOS::MMI::PointerEvent> result
-        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent);
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
     EXPECT_EQ(result, nullptr);
 }
 
@@ -145,9 +153,57 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
     inputTouchEvent.id = 1;
     inputTouchEvent.displayX = 100;
     inputTouchEvent.displayY = -1;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
 
     std::shared_ptr<OHOS::MMI::PointerEvent> result
-        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent);
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_InvalidWindowX
+ * @tc.desc: Test the function OH_Input_TouchEventToPointerEvent with invalid windowX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.action = TOUCH_ACTION_DOWN;
+    inputTouchEvent.id = 1;
+    inputTouchEvent.displayX = 100;
+    inputTouchEvent.displayY = 200;
+    int32_t windowX = -1;
+    int32_t windowY = 20;
+
+    std::shared_ptr<OHOS::MMI::PointerEvent> result
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_InvalidWindowY
+ * @tc.desc: Test the function OH_Input_TouchEventToPointerEvent with invalid windowY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.action = TOUCH_ACTION_DOWN;
+    inputTouchEvent.id = 1;
+    inputTouchEvent.displayX = 100;
+    inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = -1;
+
+    std::shared_ptr<OHOS::MMI::PointerEvent> result
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
     EXPECT_EQ(result, nullptr);
 }
 } // namespace MMI
