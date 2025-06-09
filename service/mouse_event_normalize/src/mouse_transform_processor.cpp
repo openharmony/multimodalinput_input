@@ -94,7 +94,7 @@ int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
 int32_t MouseTransformProcessor::scrollSwitchPid_ = -1;
 TouchpadCDG MouseTransformProcessor::touchpadOption_;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-std::atomic_bool MouseTransformProcessor::isEventFromVirtualTouchpad_ = false;
+std::atomic_bool MouseTransformProcessor::isVirtualDeviceEvent_ = false;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
@@ -450,7 +450,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     GetTouchpadTapSwitch(tpTapSwitch);
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    if (isEventFromVirtualTouchpad_) {
+    if (isVirtualDeviceEvent_) {
         GetVirtualTouchpadTapSwitch(tpTapSwitch);
 
         unaccelerated_.dx = libinput_event_vtrackpad_get_dx_unaccelerated(data);
@@ -489,7 +489,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
         GetTouchpadRightClickType(switchTypeData);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        if (isEventFromVirtualTouchpad_) {
+        if (isVirtualDeviceEvent_) {
             GetVirtualTouchpadRightClickType(switchTypeData);
         }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -769,7 +769,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
         deviceType = DeviceType::DEVICE_M_TABLET;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    if (isEventFromVirtualTouchpad_) {
+    if (isVirtualDeviceEvent_) {
         deviceType = DeviceType::DEVICE_FOLD_PC_VIRT;
         double speedAdjustCoef = 1.0;
         axisValue = axisValue * speedAdjustCoef;
@@ -957,7 +957,7 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     }
     pointerEvent_->ClearAxisValue();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    CheckEventFromVirtualTouchpad(event);
+    isVirtualDeviceEvent_ = IsEventFromVirtualSource(event);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t result;
     switch (type) {
@@ -1293,7 +1293,7 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
 {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     // skip button remapping for virtual trackpad
-    if (isEventFromVirtualTouchpad_) {
+    if (isVirtualDeviceEvent_) {
         return;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1351,7 +1351,7 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
     GetTouchpadRightClickType(switchTypeData);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    if (isEventFromVirtualTouchpad_) {
+    if (isVirtualDeviceEvent_) {
         GetVirtualTouchpadRightClickType(switchTypeData);
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1607,15 +1607,14 @@ bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-void MouseTransformProcessor::CheckEventFromVirtualTouchpad(struct libinput_event* event)
+bool MouseTransformProcessor::IsEventFromVirtualSource(struct libinput_event* event)
 {
-    isEventFromVirtualTouchpad_ = false;
-    CHKPV(event);
+    CHKPF(event);
     struct libinput_device *device = libinput_event_get_device(event);
-    CHKPV(device);
+    CHKPF(device);
     const std::string devName = libinput_device_get_name(device);
     // virtual touchpad's event is generated from the touchscreen on a foldable PC.
-    isEventFromVirtualTouchpad_ = (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper");
+    return (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper");
 }
 
 void MouseTransformProcessor::GetVirtualTouchpadTapSwitch(bool &switchFlag)
