@@ -132,6 +132,9 @@ constexpr uint32_t CURSOR_STRIDE { 4 };
 constexpr int32_t MAX_FAIL_COUNT { 1000 };
 constexpr int32_t CHECK_SLEEP_TIME { 10 };
 std::atomic<bool> g_isRsRestart { false };
+#ifdef OHOS_BUILD_PC_PRIORITY
+constexpr int32_t PC_PRIORITY { 2 };
+#endif // OHOS_BUILD_PC_PRIORITY
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -1226,6 +1229,16 @@ void PointerDrawingManager::RenderThreadLoop()
 
 void PointerDrawingManager::SoftCursorRenderThreadLoop()
 {
+    SetThreadName(std::string("SoftCurRender"));
+#ifdef OHOS_BUILD_PC_PRIORITY
+    struct sched_param param = { 0 };
+    param.sched_priority = PC_PRIORITY;
+    int32_t schRet = sched_setscheduler(0, SCHED_FIFO, &param);
+    if (schRet != 0) {
+        MMI_HILOGE("SoftCursorRenderThreadLoop set SCHED_FIFO failed, schRet:%{public}d, errno:%{public}d",
+            schRet, errno);
+    }
+#endif // OHOS_BUILD_PC_PRIORITY
     softCursorRunner_ = AppExecFwk::EventRunner::Create(false);
     CHKPV(softCursorRunner_);
     softCursorHander_ = std::make_shared<AppExecFwk::EventHandler>(softCursorRunner_);
