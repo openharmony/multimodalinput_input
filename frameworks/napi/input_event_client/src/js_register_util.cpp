@@ -158,12 +158,10 @@ bool ParseInt32(const napi_env& env, const napi_value& value, int32_t& result)
 {
     if (!CheckType(env, value, napi_number)) {
         MMI_HILOGE("ParseInt32 type not number");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element of pattern", "Number");
         return false;
     }
     if (napi_get_value_int32(env, value, &result) != napi_ok) {
         MMI_HILOGE("napi_get_value_int32 failed");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element of pattern", "Int32");
         return false;
     }
     return true;
@@ -179,12 +177,10 @@ int32_t GetNamedPropertyArrayInt32(const napi_env& env, const napi_value& object
     }
     if (napiValue == nullptr) {
         MMI_HILOGE("The value is null");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid value");
         return RET_ERR;
     }
     if (!IsArray(env, napiValue)) {
         MMI_HILOGE("Current obj is not array");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pattern", "Array");
         return RET_ERR;
     }
     uint32_t length = 0;
@@ -198,7 +194,6 @@ int32_t GetNamedPropertyArrayInt32(const napi_env& env, const napi_value& object
         int32_t res = { -1 };
         if (!ParseInt32(env, arrayElem, res)) {
             MMI_HILOGE("parse array elem fail, index:%{public}d", i);
-            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element of pattern", "Int32");
             return RET_ERR;
         }
         if (res < 0) {
