@@ -379,14 +379,14 @@ void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCod
             libinput_create_keyboard_event(touch, keyCode, state);
 
     if (keyCode == KEY_CAPSLOCK && state == libinput_key_state::LIBINPUT_KEY_STATE_PRESSED) {
-        struct libinput_device* device = INPUT_DEV_MGR->GetKeyboardDevice();
-        if (device != nullptr) {
-            std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
-            if (keyEvent != nullptr) {
-                bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+        std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+        if (keyEvent != nullptr) {
+            bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+            keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
 
+            struct libinput_device* device = INPUT_DEV_MGR->GetKeyboardDevice();
+            if (device != nullptr) {
                 DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
-                keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
             }
         }
     }
