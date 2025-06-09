@@ -5276,8 +5276,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         gestureInject = true;
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && (defined(OHOS_BUILD_ENABLE_POINTER_DRAWING) || defined(OHOS_BUILD_EMULATOR))
-    auto lastPointerEventCopy = GetlastPointerEvent();
-    CHKPF(lastPointerEventCopy);
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
@@ -5293,17 +5291,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         IPointerDrawingManager::GetInstance()->DrawPointer(physicDisplayInfo->uniqueId,
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
-    } else if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState() ||
-            lastPointerEventCopy->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+    } else if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
             MMI_HILOG_DISPATCHD("PointerAction is to leave the window");
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH) && timerId_ == DEFAULT_VALUE) {
-                timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject,
-                    lastPointerEventCopy]() {
+                timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
                     DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
                     HandleGestureInjection(gestureInject);
-                    lastPointerEventCopy->ClearFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
                     timerId_ = DEFAULT_VALUE;
                 });
             }
@@ -7323,6 +7318,21 @@ void InputWindowsManager::ProcessTouchTracking(std::shared_ptr<PointerEvent> eve
     pointerItem.SetPressed(true);
     event->UpdatePointerItem(event->GetPointerId(), pointerItem);
     event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+}
+
+int32_t InputWindowsManager::ClearMouseHideFlag(int32_t eventId)
+{
+    auto pointerEvent = GetlastPointerEvent();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t lastEventId = pointerEvent->GetId();
+    MMI_HILOGI("eventId=%{public}d, lastEventId=%{public}d", eventId, lastEventId);
+    if (lastEventId == eventId) {
+        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
+        MMI_HILOGI("clear hide flag succ.");
+        return RET_OK;
+    }
+    return RET_ERR;
 }
 } // namespace MMI
 } // namespace OHOS
