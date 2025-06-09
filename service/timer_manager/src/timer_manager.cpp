@@ -142,6 +142,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             if ((*it)->id == timerId) {
                 timer = (*it);
                 timers_.erase(it);
+                break;
             }
         }
     }
@@ -211,10 +212,7 @@ void TimerManager::ProcessTimersInternal()
         auto nowTime = GetMillisTime();
         for (;;) {
             auto it = timers_.begin();
-            if (it == timers_.end()) {
-                break;
-            }
-            if ((*it)->nextCallTime > nowTime) {
+            if (it == timers_.end() || (*it)->nextCallTime > nowTime) {
                 break;
             }
             auto timer = (*it);
