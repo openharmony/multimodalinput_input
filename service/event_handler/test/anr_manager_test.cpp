@@ -35,6 +35,8 @@ constexpr int32_t MODULE_TYPE { 1 };
 constexpr int32_t UDS_FD { 1 };
 constexpr int32_t UDS_UID { 100 };
 constexpr int32_t UDS_PID { 100 };
+constexpr int64_t INPUT_UI_TIMEOUT_TIME { 5 * 1000000 };
+constexpr int32_t TIME_CONVERT_RATIO { 1000 };
 } // namespace
 
 class AnrManagerTest : public testing::Test {
@@ -53,10 +55,65 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     UDSServer udsServer;
+    ANRManager anrMgr;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     int32_t pid = 123;
     int32_t eventType = 1;
     int32_t eventId = 456;
+    int64_t time = 123456789;
+    SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
+    ANRMgr->TriggerANR(eventType, time, sess);
+    anrMgr.isTriggerANR_ = true;
+
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
+}
+
+/**
+ * @tc.name: AnrManagerTest_MarkProcessed_003
+ * @tc.desc: Features of the mark processed function
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    ANRManager anrMgr;
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
+    int32_t pid = 123;
+    int32_t eventType = 1;
+    int32_t eventId = 456;
+    int64_t time = 123456789;
+    SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
+    ANRMgr->TriggerANR(eventType, time, sess);
+    anrMgr.isTriggerANR_ = true;
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
+
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
+    pid = 124;
+    eventType = 1;
+    eventId = 457;
+    time = 123456789;
+    ANRMgr->TriggerANR(eventType, time, sess);
+    anrMgr.isTriggerANR_ = false;
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
+
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
+    pid = 124;
+    eventType = 1;
+    eventId = 457;
+    time = 1000;
+    ANRMgr->TriggerANR(eventType, time, sess);
+    anrMgr.isTriggerANR_ = true;
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
+
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
+    pid = 124;
+    eventType = 1;
+    eventId = 457;
+    time = 1000;
+    ANRMgr->TriggerANR(eventType, time, sess);
+    anrMgr.isTriggerANR_ = false;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
 }
 
@@ -164,9 +221,11 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_002, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    ANRManager anrMgr;
     int32_t type = 1;
     int32_t id = 1001;
     int64_t currentTime = 123456789;
+    anrMgr.isTriggerANR_ = false;
     SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
     ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
 }
@@ -180,9 +239,11 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_001, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    ANRManager anrMgr;
     int32_t type = -1;
     int32_t id = -2;
     int64_t currentTime = 123456789;
+    anrMgr.isTriggerANR_ = true;
     SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
     ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
 }
@@ -413,6 +474,47 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_003, TestSize.Level1)
     auto events = sess->GetEventsByType(type);
     EXPECT_EQ(events.size(), 1);
     EXPECT_EQ(events[0].id, 1);
+}
+
+/**
+* @tc.name  : AnrManagerTest_HandleAnrState_004
+* @tc.desc  : 测试当事件存在但无超时事件时，函数不删除任何事件。
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_004, TestSize.Level1)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    int32_t type = ANR_DISPATCH;
+    int64_t currentTime = 1500;
+    std::vector<UDSSession::EventTime> events { {1, 1000, 1} };
+    sess->events_[type] = events;
+    ANRMgr->HandleAnrState(sess, type, currentTime);
+    auto resultEvents = sess->GetEventsByType(type);
+    EXPECT_EQ(resultEvents.size(), 1);
+    EXPECT_EQ(resultEvents[0].id, 1);
+}
+
+/**
+* @tc.name  : AnrManagerTest_HandleAnrState_005
+* @tc.desc  : 测试多个事件中部分超时时，只删除超时事件（保留最后一个超时事件）。
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_005, TestSize.Level1)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    int32_t type = ANR_DISPATCH;
+    int64_t currentTime = 10000;
+    const int64_t timeoutThreshold = INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO;
+    std::vector<UDSSession::EventTime> events {
+        {1, currentTime - timeoutThreshold - 100, 1},
+        {2, currentTime - timeoutThreshold + 100, 2},
+        {3, currentTime - timeoutThreshold - 200, 3} };
+    sess->events_[type] = events;
+    ANRMgr->HandleAnrState(sess, type, currentTime);
+    auto resultEvents = sess->GetEventsByType(type);
+    ASSERT_EQ(resultEvents.size(), 0);
 }
 } // namespace MMI
 } // namespace OHOS
