@@ -1147,10 +1147,11 @@ bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId)
     return enable;
 }
 
-bool InputDeviceManager::IsLocalDevice(std::shared_ptr<KeyEvent> keyEvent)
+bool InputDeviceManager::IsLocalDevice(int32_t deviceId)
 {
-    CHKPF(keyEvent);
-    return (keyEvent->GetDeviceId() >= 0 && keyEvent->GetDeviceId() < MIN_VIRTUAL_INPUT_DEVICE_ID);
+    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
+    auto iter = inputDevice_.find(deviceId);
+    return (iter != inputDevice_.end());
 }
 } // namespace MMI
 } // namespace OHOS
