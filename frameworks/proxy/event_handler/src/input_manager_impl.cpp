@@ -168,12 +168,12 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const std::vector<DisplayGroupInfo> 
     {
         std::lock_guard<std::mutex> guard(mtx_);
         displayGroupInfoArray_.clear();
-        size_t cnt = 0;
+        auto cnt = 0;
         for (auto &it : displayGroupInfos) {
             displayGroupInfoArray_.emplace_back(it);
             cnt += it.windowsInfo.size();
         }
-        if (cnt < MAX_WINDOW_SIZE) {
+        if (cnt < static_cast<size_t>(MAX_WINDOW_SIZE)) {
             windowGroupInfo_.windowsInfo.clear();
         }
     }
