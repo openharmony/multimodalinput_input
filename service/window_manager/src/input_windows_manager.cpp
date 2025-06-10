@@ -3694,13 +3694,14 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             if (transparentWins_.find(item.id) != transparentWins_.end()) {
                 if (IsTransparentWin(transparentWins_[item.id], logicalX - item.area.x, logicalY - item.area.y)) {
                     winId2ZorderMap.insert({item.id, item.zOrder});
-                    MMI_HILOG_DISPATCHE("It's an abnormal window and pointer find the next window");
+                    MMI_HILOG_DISPATCHE("It's an abnormal window and pointer find the next window, window:%{public}d",
+                        item.id);
                     continue;
                 }
             }
             if (item.windowInputType == WindowInputType::TRANSMIT_ANTI_AXIS_MOVE) {
-                MMI_HILOG_DISPATCHD("Pointer enents do not respond to the window, windowInputType%{public}d",
-                    static_cast<int32_t>(item.windowInputType));
+                MMI_HILOG_DISPATCHD("Pointer enents do not respond to the window, window:%{public}d, "
+                    "windowInputType%{public}d", item.id, static_cast<int32_t>(item.windowInputType));
                 continue;
             }
             if (SkipPrivacyProtectionWindow(pointerEvent, item.isSkipSelfWhenShowOnVirtualScreen)) {
