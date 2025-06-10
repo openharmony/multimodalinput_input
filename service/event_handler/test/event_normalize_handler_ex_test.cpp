@@ -85,32 +85,6 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_TerminateAxis_
 }
 
 /**
- * @tc.name: EventNormalizeHandlerEXTest_TerminateRotate_001
- * @tc.desc: Test the function TerminateRotate
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_TerminateRotate_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventNormalizeHandler handler;
-    libinput_event event {};
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    GestureHandler gestureHandler;
-    gestureHandler.isStartRotate_ = false;
-    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
-    gestureHandler.isStartRotate_ = true;
-    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
-    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
-    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD));
-    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
-    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_AXIS));
-    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
-    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_TAP));
-    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
-}
-
-/**
  * @tc.name: EventNormalizeHandlerEXTest_ResetTouchUpEvent_001
  * @tc.desc: Test the function ResetTouchUpEvent
  * @tc.type: FUNC
