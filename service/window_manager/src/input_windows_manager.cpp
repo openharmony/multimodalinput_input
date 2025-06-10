@@ -1719,7 +1719,7 @@ void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
                 dump += StringPrintf("%f,", it);
             }
             dump += StringPrintf("]\n");
-            MMI_HILOGD("%{public}s", dump.c_str());
+            MMI_HILOGI("%{public}s", dump.c_str());
         }
     }
 }
@@ -1795,7 +1795,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         }
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    MMI_HILOGD("Displays Info size:%{public}zu, focusWindowId:%{public}d",
+    MMI_HILOGI("Displays Info size:%{public}zu, focusWindowId:%{public}d",
         displayGroupInfo.displaysInfo.size(), displayGroupInfo.focusWindowId);
     auto action = UpdateWindowInfo(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
@@ -6433,7 +6433,7 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
         return true;
     }
     if (MMI_GE(window.zOrder, pointerEvent->GetZOrder())) {
-        MMI_HILOGD("Current window zorder:%{public}f greater than the simulate target zOrder:%{public}f, "
+        MMI_HILOGE("Current window zorder:%{public}f greater than the simulate target zOrder:%{public}f, "
             "ignore this window::%{public}d", window.zOrder, pointerEvent->GetZOrder(), window.id);
         return false;
     }
