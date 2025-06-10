@@ -317,6 +317,7 @@ ohos_unittest("InputHandlerManagerTest") {
 
 ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   module_out_path = module_output_path
+  defines += [ "OHOS_BUILD_ENABLE_SWITCH" ]
   include_dirs = [
     "$root_out_dir/diff_libinput_mmi/export_include",
     "${mmi_path}/service/filter/include",
