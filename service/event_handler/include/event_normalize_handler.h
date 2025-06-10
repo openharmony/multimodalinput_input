@@ -104,7 +104,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     void RestoreTouchPadStatus();
 #endif // OHOS_BUILD_ENABLE_SWITCH
-    void TerminateRotate(libinput_event* event);
     void TerminateAxis(libinput_event* event);
     void CancelTwoFingerAxis(libinput_event* event);
     bool IsAccessibilityEventWithZOrder(std::shared_ptr<PointerEvent> pointerEvent);
