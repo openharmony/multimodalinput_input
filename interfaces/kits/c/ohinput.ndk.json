@@ -501,7 +501,7 @@
     },
     {
         "first_introduced": "20",
-        "name": "OH_Input_GetMaxMultiTouchPointNum"
+        "name": "OH_Input_QueryMaxTouchPoints"
     },
     {
         "first_introduced": "20",
