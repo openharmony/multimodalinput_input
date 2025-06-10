@@ -1668,14 +1668,17 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_KeyboardExtFlag_Verify_J
 HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo info;
+    info.networkIdOrigin = "local_device";
     InputDeviceManager inputDevice;
+    inputDevice.AddPhysicalInputDeviceInner(LOC_INPUT_DEVICE_ID, info);
     bool isLocalDevice = inputDevice.IsLocalDevice(LOC_INPUT_DEVICE_ID);
     ASSERT_EQ(isLocalDevice, true);
 
-    inputDevice.IsLocalDevice(UINPUT_INPUT_DEVICE_ID);
+    isLocalDevice = inputDevice.IsLocalDevice(UINPUT_INPUT_DEVICE_ID);
     ASSERT_EQ(isLocalDevice, false);
 
-    inputDevice.IsLocalDevice(MIN_VIRTUAL_INPUT_DEVICE_ID);
+    isLocalDevice = inputDevice.IsLocalDevice(MIN_VIRTUAL_INPUT_DEVICE_ID);
     ASSERT_EQ(isLocalDevice, false);
 }
 } // namespace MMI
