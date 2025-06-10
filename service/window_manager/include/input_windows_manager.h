@@ -104,6 +104,7 @@ public:
     int32_t focusWindowId_ { -1 };
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
+    int32_t ClearMouseHideFlag(int32_t eventId);
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MouseLocation GetMouseInfo();
@@ -226,6 +227,11 @@ public:
         PointerEvent::PointerItem pointerItem);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void SwitchTouchTracking(bool touchTracking);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    bool IsPointInsideGuideWindow(double x, double y);
+    bool IsMouseInCastWindow();
+    bool IsCaptureMode();
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 private:
     bool NeedTouchTracking(PointerEvent &event) const;
@@ -360,7 +366,7 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
         const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo);
-    void HandleEventsWithPointerIdCausedPullCancel(std::shared_ptr<PointerEvent> pointerEvent);
+    void HandlePullEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
