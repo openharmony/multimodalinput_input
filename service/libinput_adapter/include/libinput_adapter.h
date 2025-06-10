@@ -152,7 +152,7 @@ private:
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
-    bool HandleVKeyTrackPadTouchPadDown(libinput_event_touch* touch,
+    void HandleVKeyTrackPadTouchPadDown(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
     bool HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
         const std::vector<int32_t>& msgItem);
@@ -209,6 +209,9 @@ private:
     void PrintVKeyTPPointerLog(event_pointer &pEvent);
     void PrintVKeyTPGestureLog(event_gesture &gEvent);
     void HandleHWKeyEventForVKeyboard(libinput_event* event);
+    void HandleVKeyTrackPadSingleTap(libinput_event_touch* touch,
+        const std::vector<int32_t>& msgItem,
+        libinput_event* event, bool& delayvtpDestroy);
     void ShowMouseCursor();
     void HideMouseCursorTemporary();
     double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
@@ -222,6 +225,8 @@ private:
 
     libinput_event *vkbDelayedEvent_ = nullptr;
     int32_t vkbDelayedKeyCode_ = 0;
+    std::chrono::system_clock::time_point vtpSingleTapDownTime;
+    const double vtpSingleTapThreshold = 0.18; // s
     // set as true once subscriber succeeded.
     std::atomic_bool hasInitSubscriber_ { false };
     static std::atomic_bool isBootCompleted_;

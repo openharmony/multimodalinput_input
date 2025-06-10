@@ -357,32 +357,15 @@ void LibinputAdapter::StartVKeyboardDelayTimer(int32_t delayMs)
 bool LibinputAdapter::GetIsCaptureMode()
 {
     bool isCaptureMode = false;
-    bool hasScreenShotWindow = false;
+    bool isFloating = (isFloatingKeyboard_ != nullptr) ? isFloatingKeyboard_() : false;
 
     InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
-    if (inputWindowsManager != nullptr) {
-        DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();
-        bool isFloating = false;
-        for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-            if (windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT) {
-                hasScreenShotWindow = true;
-            }
-
-            if (windowInfo.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
-                // screen recorder scenario will be an exception to true
-                isFloating = (isFloatingKeyboard_ == nullptr) ? false : isFloatingKeyboard_();
-                isCaptureMode = (((windowInfo.area.width > SCREEN_RECORD_WINDOW_WIDTH) \
-                    || (windowInfo.area.height > SCREEN_RECORD_WINDOW_HEIGHT)) && isFloating) ? true : false;
-                MMI_HILOGD("#####Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
-                break;
-            }
-        }
-
-        if (hasScreenShotWindow) {
-            isCaptureMode = false;
-        }
+    if (inputWindowsManager == nullptr) {
+        return false;
     }
 
+    isCaptureMode = inputWindowsManager->IsCaptureMode() && isFloating;
+    MMI_HILOGD("Currently keyboard will %s consume touch points", (isCaptureMode ? "not" : ""));
     return isCaptureMode;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -396,14 +379,14 @@ void LibinputAdapter::InjectKeyEvent(libinput_event_touch* touch, int32_t keyCod
             libinput_create_keyboard_event(touch, keyCode, state);
 
     if (keyCode == KEY_CAPSLOCK && state == libinput_key_state::LIBINPUT_KEY_STATE_PRESSED) {
-        struct libinput_device* device = INPUT_DEV_MGR->GetKeyboardDevice();
-        if (device != nullptr) {
-            std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
-            if (keyEvent != nullptr) {
-                bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+        std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+        if (keyEvent != nullptr) {
+            bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+            keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
 
+            struct libinput_device* device = INPUT_DEV_MGR->GetKeyboardDevice();
+            if (device != nullptr) {
                 DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
-                keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
             }
         }
     }
@@ -508,6 +491,25 @@ void LibinputAdapter::HandleVKeyTouchpadMessages(libinput_event_touch* touch)
     }
     OnVKeyTrackPadMessage(touch, touchMsgList);
 }
+
+void LibinputAdapter::HandleVKeyTrackPadTouchPadDown(libinput_event_touch *touch, const std::vector<int32_t> &msgItem)
+{
+    MMI_HILOGD("Virtual TrackPad state machine message: LEFT_TOUCH_DOWN");
+    vtpSingleTapDownTime = std::chrono::system_clock::now();
+    if (vtpTimerId_ != EXPIRED_TIMER_ID && vtpState_ == VKeyboardStatusType::SINGLE_TAP) {
+        MMI_HILOGI("Virtual TrackPad state %{public}d, Cancel the previous release", vtpState_);
+        // Cancel the previous release
+        TimerMgr->RemoveTimer(vtpTimerId_);
+        SafeDestroyVTrackPadDelayedEvent();
+        vtpState_ = VKeyboardStatusType::DOUBLE_TAP;
+    } else if (vtpTimerId_ != EXPIRED_TIMER_ID && vtpState_ == VKeyboardStatusType::DOUBLE_TAP) {
+        MMI_HILOGI("Virtual TrackPad state %{public}d, Cancel the double tap release", vtpState_);
+        // Cancel the previous release
+        TimerMgr->RemoveTimer(vtpTimerId_);
+        SafeDestroyVTrackPadDelayedEvent();
+    }
+}
+
 void LibinputAdapter::update_pointer_move(auto msgType)
 {
     if (msgType != VTPStateMachineMessageType::POINTER_MOVE) {
@@ -926,18 +928,18 @@ bool LibinputAdapter::HandleVKeyTrackPadLeftBtnDown(libinput_event_touch* touch,
     free(lpEvent);
     return true;
 }
-
-bool LibinputAdapter::HandleVKeyTrackPadTouchPadDown(libinput_event_touch* touch,
-    const std::vector<int32_t>& msgItem)
+// Scenario: Single tap Mode; Action: Send Press immediately + Plan a release in 180ms
+void LibinputAdapter::HandleVKeyTrackPadSingleTap(libinput_event_touch* touch,
+    const std::vector<int32_t>& msgItem,
+    libinput_event* event, bool& delayvtpDestroy)
 {
-    if (msgItem.size() < VKEY_TP_SM_MSG_SIZE) {
-        MMI_HILOGE("Virtual TrackPad state machine message size:%{public}d is not correct",
-            static_cast<int32_t>(msgItem.size()));
-        return false;
+    CHKPV(funInputEvent_);
+    MMI_HILOGI("Scenario: Single tap Mode");
+    std::chrono::duration<double> delta = std::chrono::system_clock::now() - vtpSingleTapDownTime;
+    if (delta.count() > vtpSingleTapThreshold) {
+        MMI_HILOGI("Single tap not sent. Time exceeded the limit.");
+        return;
     }
-    int32_t msgPId = msgItem[VKEY_TP_SM_MSG_POINTER_ID_IDX];
-    int32_t msgPPosX = msgItem[VKEY_TP_SM_MSG_POS_X_IDX];
-    int32_t msgPPosY = msgItem[VKEY_TP_SM_MSG_POS_Y_IDX];
     event_pointer pEvent;
     pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_TAP;
     pEvent.button = VKEY_TP_LB_ID;
@@ -948,11 +950,19 @@ bool LibinputAdapter::HandleVKeyTrackPadTouchPadDown(libinput_event_touch* touch
     pEvent.delta_raw_x = VTP_LEFT_BUTTON_DELTA_X;
     pEvent.delta_raw_y = VTP_LEFT_BUTTON_DELTA_Y;
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
+    CHKPV(lpEvent);
+    MMI_HILOGD("Virtual TrackPad send: LIBINPUT_EVENT_POINTER_TAP PRESS");
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
     funInputEvent_((libinput_event*)lpEvent, frameTime);
     free(lpEvent);
-    return true;
+    bool touchUpDelay = false;
+    touchUpDelay = CreateVTrackPadDelayTimer(event);
+    if (touchUpDelay) {
+        delayvtpDestroy = true;
+        StartVTrackPadDelayTimer();
+        MMI_HILOGD("Start the delay %{private}d", WAIT_TIME_MS_DTAP);
+    }
 }
 
 bool LibinputAdapter::HandleVKeyTrackPadLeftBtnUp(libinput_event_touch* touch,
@@ -1139,7 +1149,15 @@ bool LibinputAdapter::HandleVKeyTrackPadScrollUpdate(libinput_event_touch* touch
     pEvent.delta_raw_x = msgPPosX;
     pEvent.delta_raw_y = msgPPosY;
     pEvent.source = libinput_pointer_axis_source::LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
-    pEvent.axes = VKEY_TP_AXES_ONE;
+    pEvent.axes = VKEY_TP_AXES_ZERO;
+    // Moving in the x direction
+    if (msgPPosX != 0) {
+        pEvent.axes |= VKEY_TP_AXES_TWO;
+    }
+    // Moving in the y direction
+    if (msgPPosY != 0) {
+        pEvent.axes |= VKEY_TP_AXES_ONE;
+    }
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     PrintVKeyTPPointerLog(pEvent);
     int64_t frameTime = GetSysClockTime();
@@ -1360,20 +1378,7 @@ bool LibinputAdapter::IsCursorInCastWindow()
     if (inputWindowsManager == nullptr) {
         return false;
     }
-    DisplayGroupInfo displayGroupInfo = inputWindowsManager->GetDisplayGroupInfo();    
-    for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-        if (windowInfo.windowType == CAST_WINDOW_TYPE) {
-            auto mouseInfo = WIN_MGR->GetMouseInfo();
-            int32_t x = mouseInfo.physicalX;
-            int32_t y = mouseInfo.physicalY;
-            if ((x > windowInfo.area.x && x < (windowInfo.area.x + windowInfo.area.width)) &&
-                (y > windowInfo.area.y && y < (windowInfo.area.y + windowInfo.area.height))) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return inputWindowsManager->IsMouseInCastWindow();
 }
 
 bool LibinputAdapter::HandleVKeyTrackPadPanBegin(libinput_event_touch* touch,
@@ -1796,6 +1801,7 @@ void LibinputAdapter::OnEventHandler()
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
         static int32_t downCount = 0;
+        bool isInsideGuideWindow = false;
 
         // confirm boot completed msg in case of mmi restart.
         UpdateBootFlag();
@@ -1836,6 +1842,9 @@ void LibinputAdapter::OnEventHandler()
                     y = touchInfo.point.y;
 
                     touchPoints_[touchId] = std::pair<double, double>(x, y);
+
+                    InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
+                    isInsideGuideWindow = inputWindowsManager->IsPointInsideGuideWindow(x, y);
                 }
             } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
                 auto pos = touchPoints_.find(touchId);
@@ -1859,7 +1868,7 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                 longAxis,
                 shortAxis);
 
-            if (handleTouchPoint_ != nullptr &&
+            if (!isInsideGuideWindow && handleTouchPoint_ != nullptr &&
                 handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
                 MMI_HILOGD("Inside vkeyboard area");
                 HandleVFullKeyboardMessages(event, frameTime, eventType, touch);

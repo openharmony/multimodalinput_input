@@ -32,6 +32,7 @@ class InputDeviceConsumerHandler {
 public:
 
     int32_t SetDeviceConsumerHandler(const std::vector<std::string>& deviceName, SessionPtr sess);
+    void OnSessionLost(int32_t fd);
     int32_t ClearDeviceConsumerHandler(const std::vector<std::string>& deviceNames, SessionPtr sess);
 
     void HandleDeviceConsumerEvent(std::string name, const std::shared_ptr<PointerEvent> pointerEvent);

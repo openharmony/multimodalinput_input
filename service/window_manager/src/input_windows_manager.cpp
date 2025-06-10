@@ -91,6 +91,14 @@ constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr int32_t DEFAULT_DPI { 0 };
 constexpr int32_t DEFAULT_POSITION { 0 };
 constexpr int32_t MAIN_GROUPID { 0 };
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
+constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
+constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
+constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
+#define SCREEN_RECORD_WINDOW_WIDTH 400
+#define SCREEN_RECORD_WINDOW_HEIGHT 200
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1473,6 +1481,63 @@ bool InputWindowsManager::IsPointerActiveRectValid(const DisplayInfo &currentDis
 {
     return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
 }
+
+bool InputWindowsManager::IsPointInsideGuideWindow(double pointX, double pointY)
+{
+    auto &WindowsInfo = GetWindowInfoVector();
+    for (const auto& windowItem : WindowsInfo) {
+        if (windowItem.windowType == GUIDE_WINDOW_TYPE) {
+            for (const auto &win : windowItem.defaultHotAreas) {
+                int32_t x = static_cast<int32_t>(pointX);
+                int32_t y = static_cast<int32_t>(pointY);
+                return ((x > win.x && x < (win.x + win.width)) &&
+                    (y > win.y && y < (win.y + win.height)));
+            }
+        }
+    }
+    return false;
+}
+
+bool InputWindowsManager::IsMouseInCastWindow()
+{
+    auto &WindowsInfo = GetWindowInfoVector();
+    for (const auto& windowItem : WindowsInfo) {
+        if (windowItem.windowType == CAST_WINDOW_TYPE) {
+            auto &mouseInfo = GetMouseInfo();
+            int32_t x = mouseInfo.physicalX;
+            int32_t y = mouseInfo.physicalY;
+            if ((x > windowItem.area.x && x < (windowItem.area.x + windowItem.area.width)) &&
+                (y > windowItem.area.y && y < (windowItem.area.y + windowItem.area.height))) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool InputWindowsManager::IsCaptureMode()
+{
+    auto &WindowsInfo = GetWindowInfoVector();
+    auto &screenshotWindow = std::find_if(WindowsInfo.begin(),
+        WindowsInfo.end(), [](const WindowInfo& windowItem) {
+            return windowItem.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT;
+        });
+    if (screenshotWindow != WindowsInfo.end()) {
+            return false;
+    }
+
+    auto &captureWindow = std::find_if(WindowsInfo.begin(),
+        WindowsInfo.end(), [](const WindowInfo& windowItem) {
+            return windowItem.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER;
+        });
+    if (captureWindow != WindowsInfo.end()) {
+        return (captureWindow->area.width > SCREEN_RECORD_WINDOW_WIDTH ||
+                             captureWindow->area.height > SCREEN_RECORD_WINDOW_HEIGHT);
+    }
+
+    return false;
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const DisplayGroupInfo &displayGroupInfo)
@@ -1687,7 +1752,6 @@ void InputWindowsManager::InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInf
     captureModeInfoMap_[displayGroupInfo.groupId] = captureModeInfo_;
     pointerDrawFlagMap_[displayGroupInfo.groupId] = pointerDrawFlag_;
     mouseLocationMap_[displayGroupInfo.groupId] = mouseLocation_;
-    windowsPerDisplayMap_[displayGroupInfo.groupId] = windowsPerDisplay_;
     windowsPerDisplayMap_[displayGroupInfo.groupId] = windowsPerDisplay_;
     lastPointerEventforWindowChangeMap_[displayGroupInfo.groupId] = lastPointerEventforWindowChange_;
     displayModeMap_[displayGroupInfo.groupId] = displayMode_;
@@ -1925,17 +1989,18 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
         }
         mode = displayGroupInfo_.displaysInfo[0].displayMode;
     }
-    DisplayMode& displayMode = displayMode_;
     const auto tempMode = displayModeMap_.find(groupId);
     if (tempMode == displayModeMap_.end()) {
         return;
     }
-    displayMode = tempMode->second;
+    DisplayMode& displayMode = tempMode->second;
     if (mode == displayMode) {
         MMI_HILOGD("Displaymode not change, mode:%{public}d, diaplayMode_:%{public}d", mode, displayMode);
         return;
     }
+    displayMode_ = mode;
     displayModeMap_[groupId] = mode;
+    displayMode = mode;
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
         MMI_HILOGD("Send fingersense display mode is nullptr");
@@ -3478,6 +3543,12 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
     int32_t areaNum = 0;
     bool findFlag = false;
     for (const auto &item : rects) {
+        if (item.width == 0 || item.height == 0) {
+            MMI_HILOGD("The width or height of hotArea is 0, width: %{public}d, height: %{public}d, "
+            "areaNum: %{public}d", item.width, item.height, areaNum);
+            areaNum++;
+            continue;
+        }
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
         if (!AddInt32(item.x, item.width, displayMaxX)) {
@@ -3629,13 +3700,14 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             if (transparentWins_.find(item.id) != transparentWins_.end()) {
                 if (IsTransparentWin(transparentWins_[item.id], logicalX - item.area.x, logicalY - item.area.y)) {
                     winId2ZorderMap.insert({item.id, item.zOrder});
-                    MMI_HILOG_DISPATCHE("It's an abnormal window and pointer find the next window");
+                    MMI_HILOG_DISPATCHE("It's an abnormal window and pointer find the next window, window:%{public}d",
+                        item.id);
                     continue;
                 }
             }
             if (item.windowInputType == WindowInputType::TRANSMIT_ANTI_AXIS_MOVE) {
-                MMI_HILOG_DISPATCHD("Pointer enents do not respond to the window, windowInputType%{public}d",
-                    static_cast<int32_t>(item.windowInputType));
+                MMI_HILOG_DISPATCHD("Pointer enents do not respond to the window, window:%{public}d, "
+                    "windowInputType%{public}d", item.id, static_cast<int32_t>(item.windowInputType));
                 continue;
             }
             if (SkipPrivacyProtectionWindow(pointerEvent, item.isSkipSelfWhenShowOnVirtualScreen)) {
@@ -3797,8 +3869,8 @@ bool InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, 
     bool findFlag = false;
     if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
         std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
-        MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d",
-            windowHotAreas.size(), windowId);
+        MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d, pid:%{public}d",
+            windowHotAreas.size(), windowId, windowInfo.pid);
         findFlag = InWhichHotArea(logicalX, logicalY, windowHotAreas, pointerStyle);
     }
     return findFlag;
@@ -3959,7 +4031,7 @@ void InputWindowsManager::UpdateInnerAngleArea(const Rect &windowArea, std::vect
     windowHotAreas.push_back(newBottomRightRect);
 }
 
-void InputWindowsManager::HandleEventsWithPointerIdCausedPullCancel(std::shared_ptr<PointerEvent> pointerEvent)
+void InputWindowsManager::HandlePullEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     auto action = pointerEvent->GetPointerAction();
@@ -5211,8 +5283,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         gestureInject = true;
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && (defined(OHOS_BUILD_ENABLE_POINTER_DRAWING) || defined(OHOS_BUILD_EMULATOR))
-    auto lastPointerEventCopy = GetlastPointerEvent();
-    CHKPF(lastPointerEventCopy);
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
@@ -5228,17 +5298,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         IPointerDrawingManager::GetInstance()->DrawPointer(physicDisplayInfo->uniqueId,
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
-    } else if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState() ||
-            lastPointerEventCopy->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+    } else if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
             MMI_HILOG_DISPATCHD("PointerAction is to leave the window");
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH) && timerId_ == DEFAULT_VALUE) {
-                timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject,
-                    lastPointerEventCopy]() {
+                timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
                     DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
                     HandleGestureInjection(gestureInject);
-                    lastPointerEventCopy->ClearFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
                     timerId_ = DEFAULT_VALUE;
                 });
             }
@@ -5658,7 +5725,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
         }
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    HandleEventsWithPointerIdCausedPullCancel(pointerEvent);
+    HandlePullEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return ret;
 }
@@ -7258,6 +7325,21 @@ void InputWindowsManager::ProcessTouchTracking(std::shared_ptr<PointerEvent> eve
     pointerItem.SetPressed(true);
     event->UpdatePointerItem(event->GetPointerId(), pointerItem);
     event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+}
+
+int32_t InputWindowsManager::ClearMouseHideFlag(int32_t eventId)
+{
+    auto pointerEvent = GetlastPointerEvent();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t lastEventId = pointerEvent->GetId();
+    MMI_HILOGI("eventId=%{public}d, lastEventId=%{public}d", eventId, lastEventId);
+    if (lastEventId == eventId) {
+        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
+        MMI_HILOGI("clear hide flag succ.");
+        return RET_OK;
+    }
+    return RET_ERR;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -168,7 +168,9 @@ ohos_shared_library("libmmi-client") {
     "samgr:samgr_proxy",
   ]
 
-  public_external_deps = ["eventhandler:libeventhandler"]
+  if (!is_arkui_x) {
+    public_external_deps = ["eventhandler:libeventhandler"]
+  }
 
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
