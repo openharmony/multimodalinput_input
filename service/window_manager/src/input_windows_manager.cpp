@@ -1744,38 +1744,26 @@ bool InputWindowsManager::JudgeCaramaInFore()
 
 void InputWindowsManager::InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInfo)
 {
-    
-    if (displayGroupInfoMap_.find(displayGroupInfo.groupId) != displayGroupInfoMap_.end()) {
-        return;
-    }
-    displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
-    captureModeInfoMap_[displayGroupInfo.groupId] = captureModeInfo_;
-    pointerDrawFlagMap_[displayGroupInfo.groupId] = pointerDrawFlag_;
-    mouseLocationMap_[displayGroupInfo.groupId] = mouseLocation_;
-    windowsPerDisplayMap_[displayGroupInfo.groupId] = windowsPerDisplay_;
-    lastPointerEventforWindowChangeMap_[displayGroupInfo.groupId] = lastPointerEventforWindowChange_;
-    displayModeMap_[displayGroupInfo.groupId] = displayMode_;
-    lastDpiMap_[displayGroupInfo.groupId] = lastDpi_;
-    CursorPosition cursorPos = {};
-    cursorPosMap_[displayGroupInfo.groupId] = cursorPos;
-}
-
-void InputWindowsManager::UpdateGroupInfo()
-{
-    for (auto &curGroupInfo : displayGroupInfoMap_) {
-        if (!(curGroupInfo.second.isMainGroup) 
-            && !(displayGroupInfoMapTmp_.find(curGroupInfo.first) != displayGroupInfoMapTmp_.end())) {
-            displayGroupInfoMap_.erase(curGroupInfo.first);
-            captureModeInfoMap_.erase(curGroupInfo.first);
-            pointerDrawFlagMap_.erase(curGroupInfo.first);
-            //mouseLocationMap_.erase(curGroupInfo.first);
-            windowsPerDisplayMap_.erase(curGroupInfo.first);
-            lastPointerEventforWindowChangeMap_.erase(curGroupInfo.first);
-            displayModeMap_.erase(curGroupInfo.first);
-            lastDpiMap_.erase(curGroupInfo.first);
-            cursorPosMap_.erase(curGroupInfo.first);
+    int32_t groupId = displayGroupInfo.groupId;
+    if (displayGroupInfo.isMainGroup) {
+        if (groupId != MAIN_GROUPID) {
+            MMI_HILOGE("The groupId is incorrect, groupId:%{public}d", groupId);
+            return;
         }
     }
+    if (displayGroupInfoMap_.find(groupId) != displayGroupInfoMap_.end()) {
+        return;
+    }
+    displayGroupInfoMap_[groupId] = displayGroupInfo;
+    captureModeInfoMap_[groupId] = captureModeInfo_;
+    pointerDrawFlagMap_[groupId] = pointerDrawFlag_;
+    mouseLocationMap_[groupId] = mouseLocation_;
+    windowsPerDisplayMap_[groupId] = windowsPerDisplay_;
+    lastPointerEventforWindowChangeMap_[groupId] = lastPointerEventforWindowChange_;
+    displayModeMap_[groupId] = displayMode_;
+    lastDpiMap_[groupId] = lastDpi_;
+    CursorPosition cursorPos = {};
+    cursorPosMap_[groupId] = cursorPos;
 }
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
