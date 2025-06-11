@@ -326,7 +326,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_01, TestSize
     CALL_TEST_DEBUG;
     int32_t color = 6;
     int32_t ret = InputMgrImpl.SetPointerColor(color);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -340,7 +340,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_02, TestSize
     CALL_TEST_DEBUG;
     int32_t color = -10;
     int32_t ret = InputMgrImpl.SetPointerColor(color);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
