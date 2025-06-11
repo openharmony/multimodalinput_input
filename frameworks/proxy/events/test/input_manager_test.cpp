@@ -4258,6 +4258,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchpadPinchSwitch_001, TestSize.Le
 }
 
 /**
+ * @tc.name: InputManagerTest_TouchpadPinchSwitch_002
+ * @tc.desc: GetTouchpadPinchSwitch interface detection without SetTouchpadPinchSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadPinchSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetTouchpadPinchSwitch(switchFlag));
+    EXPECT_EQ(switchFlag, true);
+}
+
+/**
  * @tc.name: InputManagerTest_TouchpadSwipeSwitch_001
  * @tc.desc: SetTouchpadSwipeSwitch and GetTouchpadSwipeSwitch interface detection
  * @tc.type: FUNC
@@ -4272,6 +4286,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchpadSwipeSwitch_001, TestSize.Le
     result = InputManager::GetInstance()->GetTouchpadSwipeSwitch(switchFlag);
     ASSERT_EQ(switchFlag, true);
     ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadSwipeSwitch_002
+ * @tc.desc: GetTouchpadSwipeSwitch interface detection witchout SetTouchpadSwipeSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadSwipeSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetTouchpadSwipeSwitch(switchFlag));
+    EXPECT_EQ(switchFlag, true);
 }
 
 /**
@@ -5921,6 +5949,25 @@ HWTEST_F(InputManagerTest, InputManagerTest_subscribeInputActive, TestSize.Level
     ASSERT_EQ(ret, INVALID_HANDLER_ID);
     int32_t subscriberId = INVAID_VALUE;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeInputActive(subscriberId));
+}
+
+/**
+ * @tc.name: InputManagerTest_SwitchTouchTracking_001
+ * @tc.desc: SwitchTouchTracking called
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SwitchTouchTracking_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadSwipeSwitch(switchFlag);
+    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
+        EXPECT_EQ(ret, CAPABILITY_NOT_SUPPORTED);
+    } else {
+        EXPECT_EQ(ret, RET_OK);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
