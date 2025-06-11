@@ -449,7 +449,6 @@ private:
     const DisplayGroupInfo& FindDisplayGroupInfo(int32_t displayId) const;
     void RotateScreen90(const DisplayInfo& info, PhysicalCoordinate& coord) const;
     void InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInfo);
-    void UpdateGroupInfo();
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
