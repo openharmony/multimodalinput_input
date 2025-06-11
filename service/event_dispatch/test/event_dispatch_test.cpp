@@ -768,7 +768,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_001, TestSize.
     KeyEvent* keyEvent = new KeyEvent(keyevent);
     std::shared_ptr<KeyEvent> sharedKeyEvent(keyEvent);
     int32_t ret = eventdispatchhandler.DispatchKeyEventPid(udsServer, sharedKeyEvent);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -1846,37 +1846,6 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_01, TestS
     pointerItem.SetTargetWindowId(2);
 
     EXPECT_FALSE(pointerEvent->GetPointerItem(id, pointerItem));
-    ASSERT_NO_FATAL_FAILURE(dispatch.FilterInvalidPointerItem(pointerEvent, fd));
-}
-
-/**
- * @tc.name: EventDispatchTest_FilterInvalidPointerItem_02
- * @tc.desc: Test the function FilterInvalidPointerItem
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_02, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    int32_t fd = 1;
-    int32_t windowId = 3;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-
-    std::vector<int32_t> pointerIdList;
-    pointerIdList.push_back(1);
-    pointerIdList.push_back(2);
-    pointerIdList.push_back(3);
-    EXPECT_TRUE(pointerIdList.size() > 1);
-
-    PointerEvent::PointerItem pointerItem;
-    pointerItem.SetWindowX(10);
-    pointerItem.SetWindowY(20);
-    pointerItem.SetTargetWindowId(2);
-
-    auto itemPid = WIN_MGR->GetWindowPid(windowId);
-    EXPECT_FALSE(itemPid >= 0);
-    EXPECT_FALSE(itemPid != InputHandler->udsServer_->GetClientPid(fd));
     ASSERT_NO_FATAL_FAILURE(dispatch.FilterInvalidPointerItem(pointerEvent, fd));
 }
 

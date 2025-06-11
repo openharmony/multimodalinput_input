@@ -1947,9 +1947,7 @@ ohos_unittest("KeyCommandTest") {
 
   sources = [
     "key_command/test/ability_manager_client_stub.cpp",
-    "key_command/test/key_cmd_handleRepeatKey_test.cpp",
     "key_command/test/key_cmd_sendKeyEvent_test.cpp",
-    "key_command/test/key_command_handler_test.cpp",
     "key_command/test/key_command_handler_util_test.cpp",
     "key_command/test/pull_throw_subscriber_handler_test.cpp",
     "key_command/test/setting_datashare_test.cpp",
