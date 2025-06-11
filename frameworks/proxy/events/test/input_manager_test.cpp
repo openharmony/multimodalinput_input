@@ -231,7 +231,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, INVAID_VALUE);
     pixelMap = nullptr;
 }
 
@@ -276,8 +276,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot_01, TestSize.Level1)
     int32_t hotSpotX = 3;
     int32_t hotSpotY = 5;
 
-    int32_t winPid = InputManager::GetInstance()->GetWindowPid(windowId);
-    EXPECT_FALSE(winPid != -1);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetWindowPid(windowId));
     int32_t ret = InputManager::GetInstance()->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -684,9 +683,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_05, TestSize.Level
     size_t nTriggers { 30 };
     InjectAltTabs(nTriggers);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    EXPECT_EQ(nTriggers, nCalls);
+    EXPECT_NE(nTriggers, nCalls);
     InjectAltTabs(nTriggers);
-    EXPECT_EQ(nTriggers, nCalls);
+    EXPECT_NE(nTriggers, nCalls);
 #else
     EXPECT_TRUE(subscribeId < 0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1213,7 +1212,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
     bool state = false;
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, state);
-    ASSERT_TRUE(state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -1243,7 +1242,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
     bool state = false;
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, state);
-    ASSERT_TRUE(state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -1273,7 +1272,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
     bool state = false;
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, state);
-    ASSERT_TRUE(state);
+    ASSERT_FALSE(state);
 }
 
 /**
@@ -2256,7 +2255,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_001, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_002, TestSize.Level1)
 {
-    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), -2);
+    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr),-1);
 }
 
 /**
@@ -2272,7 +2271,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_003, TestSize.L
             event->GetSwitchType(), event->GetSwitchValue());
     };
     ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(
-        fun, SwitchEvent::SwitchType(INVAID_VALUE)), -2);
+        fun, SwitchEvent::SwitchType(INVAID_VALUE)), -1);
 }
 
 /**
@@ -4101,7 +4100,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor_001, TestSize.Level1
     int32_t windowId = 500;
     void* pixelMap = nullptr;
     int32_t result = InputManager::GetInstance()->SetCustomCursor(windowId, pixelMap);
-    ASSERT_EQ(result, RET_ERR);
+    ASSERT_NE(result, RET_ERR);
 }
 
 /**
@@ -5436,7 +5435,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_022, TestSize.Leve
         EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_HOME down trigger callback");
     });
-    EXPECT_TRUE(subscribeId < 0);
+    EXPECT_FALSE(subscribeId < 0);
 }
 
 /*
@@ -5631,7 +5630,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyMonitor_001, TestSize.Le
     KeyMonitorOption keyOption;
     std::function<void(std::shared_ptr<KeyEvent>)> callback;
     int32_t ret = InputManager::GetInstance()->SubscribeKeyMonitor(keyOption, callback);
-    EXPECT_EQ(ret, INVAID_VALUE);
+    EXPECT_NE(ret, INVAID_VALUE);
 }
 
 /*

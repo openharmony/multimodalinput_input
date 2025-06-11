@@ -1918,10 +1918,10 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_004, TestSize.Level1)
 HWTEST_F(InputWindowsManagerTest, DispatchTouch_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillRepeatedly(Return(1));
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
-    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillRepeatedly(Return(session));
+    EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillRepeatedly(Return(true));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);

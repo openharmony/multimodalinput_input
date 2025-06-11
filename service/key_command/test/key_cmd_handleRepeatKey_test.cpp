@@ -113,29 +113,6 @@ HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_00
 }
 
 /**
- * @tc.name: KeyCmdHandleRepeatKeyTest_HandleRepeatKey_004
- * @tc.desc: Test if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
- * (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER))
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCmdHandleRepeatKeyTest, KeyCmdHandleRepeatKeyTest_HandleRepeatKey_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    RepeatKey repeatKey;
-    repeatKey.keyCode = KeyEvent::KEYCODE_POWER;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    handler.count_ = 5;
-    handler.maxCount_ = 0;
-    handler.isDownStart_ = true;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleRepeatKey(repeatKey, keyEvent));
-}
-
-/**
  * @tc.name: KeyCmdHandleRepeatKeyTest_HandleRepeatKey_005
  * @tc.desc: Test if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
  * (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER))

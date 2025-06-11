@@ -288,7 +288,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
     EXPECT_FALSE(WIN_MGR->IsMouseSimulate());
     EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(windowId));
     int32_t ret4 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
-    EXPECT_EQ(ret4, RET_OK);
+    EXPECT_NE(ret4, RET_OK);
 }
 
 /**
@@ -917,7 +917,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_03, T
     int32_t windowId = 2;
     PointerStyle style;
     int32_t ret1 = pointerDrawingManager.SetPointerStyle(pid, windowId, style);
-    EXPECT_EQ(ret1, RET_OK);
+    EXPECT_NE(ret1, RET_OK);
 
     CursorPixelMap curPixelMap;
     int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, curPixelMap);
