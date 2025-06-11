@@ -3553,7 +3553,9 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
         }
         if (it.second->IsMirror()) {
             auto& mirrorScreen = it.second;
-            if (sp->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
+            if (mirrorScreen->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
+                MMI_HILOGI("update rotation of mirror screen from %{public}u to %{public}d",
+                    mirrorScreen->GetRotation(), displayInfo.direction);
                 mirrorScreen->SetRotation(static_cast<rotation_t>(displayInfo.direction));
                 mirrorScreen->UpdatePadding(mainWidth, mainHeight);
             }
