@@ -102,6 +102,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     bool IsAddKeyboardExtFlag(int32_t deviceId, uint32_t &flag);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+    bool IsLocalDevice(int32_t deviceId);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
