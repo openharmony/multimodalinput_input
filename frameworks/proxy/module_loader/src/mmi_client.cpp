@@ -110,7 +110,7 @@ bool MMIClient::StartEventRunner()
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     bool selfCreateEventHandle = false;
-    if (USE_ISOLATE_DISPATCH_THREAD || eventHandler_ == nullptr) {
+    if (USE_ISOLATE_DISPATCH_THREAD || eventHandler_ == nullptr || !USE_FILE_DESCRIPTION) {
         MMI_HILOGI("USE_ISOLATE_DISPATCH_THREAD:%{public}d, eventHandler_:%{public}d",
             USE_ISOLATE_DISPATCH_THREAD, (eventHandler_ == nullptr));
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
@@ -149,7 +149,7 @@ bool MMIClient::AddFdListener(int32_t fd, bool selfCreate)
     }
     CHKPF(eventHandler_);
     auto fdListener = std::make_shared<MMIFdListener>(GetSharedPtr());
-    if (!USE_ISOLATE_DISPATCH_THREAD && !selfCreate) {
+    if (!USE_ISOLATE_DISPATCH_THREAD && !selfCreate && USE_FILE_DESCRIPTION) {
         fdListener->SetDeamonWaiter();
     }
     
