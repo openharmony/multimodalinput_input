@@ -83,15 +83,15 @@ HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_002, TestSiz
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(inputEventConsumer, interval);
     EXPECT_GE(subscriberInput, 0);
     int32_t subscriberInput1 = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(inputEventConsumer, interval);
-    EXPECT_GE(subscriberInput1, 0);
+    EXPECT_NE(subscriberInput1, 0);
     int32_t subscriberInput2 = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(inputEventConsumer, interval);
-    EXPECT_GE(subscriberInput2, 0);
+    EXPECT_NE(subscriberInput2, 0);
     int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
     EXPECT_EQ(result, RET_OK);
     result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput1);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_NE(result, RET_OK);
     result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput2);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**

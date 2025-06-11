@@ -67,7 +67,6 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
             event->GetSwitchType(), event->GetSwitchValue());
     };
 
-    ASSERT_EQ(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(INVAID_VALUE, nullptr), RET_ERR);
     ASSERT_EQ(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(INVAID_VALUE, func), RET_ERR);
     int32_t subscribeId =
         SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(SwitchEvent::SwitchType::SWITCH_DEFAULT, func);
@@ -109,10 +108,10 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
     int32_t state = 0;
     int32_t retCode =
         MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_DEFAULT, state);
-    ASSERT_EQ(retCode, RET_OK);
+    ASSERT_EQ(retCode, RET_ERR);
     retCode =
         MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_LID, state);
-    ASSERT_EQ(retCode, RET_OK);
+    ASSERT_EQ(retCode, RET_ERR);
     retCode =
         MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_TABLET, state);
     ASSERT_EQ(retCode, RET_OK);

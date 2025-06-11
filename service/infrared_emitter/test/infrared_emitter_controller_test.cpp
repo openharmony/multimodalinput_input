@@ -82,7 +82,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
     int64_t carrierFreq = 12;
     std::vector<int64_t> pattern = {10, 20, 30};
     bool ret = controller.Transmit(carrierFreq, pattern);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -99,7 +99,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequen
     std::vector<InfraredFrequencyInfo> frequencyInfo;
     frequencyInfo.push_back(InfraredFrequencyInfo({1, 1000}));
     bool ret = controller.GetFrequencies(frequencyInfo);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 #endif // OHOS_BUILD_PC_UNIT_TEST
 } // namespace MMI

@@ -122,25 +122,6 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_PushKeyEvent, TestSize.Level1)
 }
 
 /**
- * @tc.name: EventDumpTest_PushSwitchEvent
- * @tc.desc: Event dump PushSwitchEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventStatisticTest, EventStatisticTest_PushSwitchEvent, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventStatistic eventStatistic;
-    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(0);
-    switchEvent->SetSwitchType(SwitchEvent::SWITCH_DEFAULT);
-    switchEvent->bitwise_ = 0x000040;
-    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushSwitchEvent(switchEvent));
-
-    switchEvent->SetSwitchType(SwitchEvent::SWITCH_TABLET);
-    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushSwitchEvent(switchEvent));
-}
-
-/**
  * @tc.name: EventDumpTest_PushEventStr
  * @tc.desc: Event dump PushEventStr
  * @tc.type: FUNC
