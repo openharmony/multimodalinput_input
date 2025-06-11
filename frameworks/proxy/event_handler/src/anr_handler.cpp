@@ -71,7 +71,7 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MarkProcessed(eventType, eventId);
     BytraceAdapter::StopMarkedTracker();
     if (ret != 0) {
-        MMI_HILOGD("Send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
 }
 

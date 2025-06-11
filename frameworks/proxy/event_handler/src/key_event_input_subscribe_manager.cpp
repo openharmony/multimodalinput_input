@@ -143,7 +143,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         MMI_HILOGE("PreKeys number invalid");
         return INVALID_SUBSCRIBE_ID;
     }
-    MMI_HILOGD("PRE:[%{private}s],FINAL:%{private}d,KA:%{public}s,HT:%{public}d",
+    MMI_HILOGI("PRE:[%{private}s],FINAL:%{private}d,KA:%{public}s,HT:%{public}d",
         DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
         (keyOption->IsFinalKeyDown() ? "down" : "up"), keyOption->GetFinalKeyDownDuration());
 
@@ -212,7 +212,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeHotkey(std::shared_ptr<KeyOption
         MMI_HILOGE("PreKeys number invalid");
         return INVALID_SUBSCRIBE_ID;
     }
-    MMI_HILOGI("PRE:[%{private}s],FINAL:%{private}d,KA:%{public}s,HT:%{public}d",
+    MMI_HILOGD("PRE:[%{private}s],FINAL:%{private}d,KA:%{public}s,HT:%{public}d",
         DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
         (keyOption->IsFinalKeyDown() ? "down" : "up"), keyOption->GetFinalKeyDownDuration());
 
@@ -234,7 +234,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeHotkey(std::shared_ptr<KeyOption
         return ret;
     }
 
-    MMI_HILOGI("The subscribeId:%{public}d, preKeys:%{private}s, finalKey:%{private}d,"
+    MMI_HILOGD("The subscribeId:%{public}d, preKeys:%{private}s, finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
         tIter->GetSubscribeId(), DumpSet(preKeys).c_str(), keyOption->GetFinalKey(),
         keyOption->IsFinalKeyDown() ? "true" : "false", keyOption->GetFinalKeyDownDuration());
