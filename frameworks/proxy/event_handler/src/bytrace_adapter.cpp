@@ -265,15 +265,15 @@ void BytraceAdapter::StartBytrace(TraceBtn traceBtn, EventType eventType)
     } else {
         switch (eventType) {
             case START_EVENT: {
-                FinishAsyncTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, KEY_EVENT_INTERCEPT, START_ID);
+                FinishAsyncTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, ON_START_EVENT, START_ID);
                 break;
             }
             case LAUNCH_EVENT: {
-                FinishAsyncTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, KEY_EVENT_INTERCEPT, LAUNCH_ID);
+                FinishAsyncTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, ON_LAUNCH_EVENT, LAUNCH_ID);
                 break;
             }
             case STOP_EVENT: {
-                FinishAsyncTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, KEY_EVENT_INTERCEPT, STOP_ID);
+                FinishAsyncTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, ON_STOP_EVENT, STOP_ID);
                 break;
             }
         }
