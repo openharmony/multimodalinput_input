@@ -121,41 +121,6 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RemoveMonitor_01, TestSize
     keyMonitorManager->RemoveMonitor(monitor1);
     EXPECT_EQ(keyMonitorManager->monitors_.size(), size);
 }
-<<<<<<< HEAD
-=======
-
-/**
- * @tc.name: KeyMonitorManagerTest_Intercept_02
- * @tc.desc: Verify the Intercept function
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
-    std::shared_ptr<KeyEvent> keyEvent1 = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_VOLUME_UP);
-    KeyMonitorManager::Monitor monitor1{
-        .session_ = 1, .key_ = KeyEvent::KEY_ACTION_DOWN, .action_ = KeyEvent::KEY_ACTION_DOWN, .isRepeat_ = true};
-    keyMonitorManager->monitors_.emplace(monitor1);
-    EXPECT_EQ(keyMonitorManager->monitors_.size(), 1);
-
-    keyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    int32_t delay = 0;
-    EXPECT_FALSE(keyMonitorManager->Intercept(keyEvent1, delay));
-
-    keyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    EXPECT_FALSE(keyMonitorManager->Intercept(keyEvent1, delay));
-
-    delay = 1;
-    keyEvent1->SetKeyCode(monitor1.key_);
-    keyEvent1->SetKeyAction(monitor1.action_);
-    EXPECT_FALSE(keyMonitorManager->Intercept(keyEvent1, delay));
-
-    keyEvent1->SetKeyCode(KeyEvent::KEY_ACTION_UP);
-    EXPECT_FALSE(keyMonitorManager->Intercept(keyEvent1, delay));
-}
->>>>>>> 762eb9a272439e95af910633e20fcf01e21a8260
 
 /**
  * @tc.name: KeyMonitorManagerTest_OnSessionLost_01
