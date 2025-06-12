@@ -250,7 +250,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_006, TestSize.Level1)
         std::cout <<"Test UpdateFunc" << std::endl;
     };
     observer.updateFunc_ = UpdateFunc;
-    EXPECT_TRUE(observer.RegisterTpObserver(123));
+    ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
 }
 
 /**
@@ -276,7 +276,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
             .CreateObserver(g_touchpadSwitchesKey, observer.updateFunc_);
     observer.knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, observer.updateFunc_);
-    EXPECT_TRUE(observer.RegisterTpObserver(123));
+    ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
     observer.pressureObserver_ = nullptr;
     observer.vibrationObserver_ = nullptr;
     observer.touchpadSwitchesObserver_ = nullptr;
