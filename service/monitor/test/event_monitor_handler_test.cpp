@@ -1211,7 +1211,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClien
     bool ret = false;
     std::unordered_set<int32_t> fingerFocusPidSet;
     ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
     ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);

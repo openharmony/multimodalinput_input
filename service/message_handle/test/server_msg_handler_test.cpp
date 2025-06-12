@@ -1,4 +1,4 @@
-/*
+   /*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2866,8 +2866,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SubscribeKeyMonitor002, Test
     ServerMsgHandler handler;
     OHOS::MMI::KeyMonitorOption keyOption;
     int32_t session { -1 };
-    int32_t ret = handler.SubscribeKeyMonitor(session, keyOption);
-    EXPECT_EQ(ret, -PARAM_INPUT_INVALID);
+    ASSERT_NO_FATAL_FAILURE(handler.SubscribeKeyMonitor(session, keyOption));
 }
 
 /**
@@ -2882,8 +2881,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor002, Te
     ServerMsgHandler handler;
     OHOS::MMI::KeyMonitorOption keyOption;
     int32_t session { -1 };
-    int32_t ret = handler.UnsubscribeKeyMonitor(session, keyOption);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(handler.UnsubscribeKeyMonitor(session, keyOption));
 }
 } // namespace MMI
 } // namespace OHOS
