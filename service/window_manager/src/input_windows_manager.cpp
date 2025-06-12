@@ -4471,8 +4471,8 @@ int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptur
                 MMI_HILOGE("Windowid:(%{public}d) is not capture mode", windowId);
                 return RET_OK;
             }
-		captureModeInfoMap_[MAIN_GROUPID].windowId = windowId;
-        captureModeInfoMap_[MAIN_GROUPID].isCaptureMode = isCaptureMode;
+		    captureModeInfoMap_[MAIN_GROUPID].windowId = windowId;
+            captureModeInfoMap_[MAIN_GROUPID].isCaptureMode = isCaptureMode;
         }
     }
     MMI_HILOGI("Windowid:(%{public}d) is (%{public}d)", windowId, isCaptureMode);
