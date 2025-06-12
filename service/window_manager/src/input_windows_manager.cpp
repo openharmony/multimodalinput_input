@@ -3903,7 +3903,7 @@ void InputWindowsManager::UpdatePointerChangeAreas()
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
         const auto iter = displayGroupInfoMapTmp_.find(MAIN_GROUPID);
-        if(iter == displayGroupInfoMapTmp_.end()){
+        if (iter == displayGroupInfoMapTmp_.end()) {
             return;
         }
         UpdatePointerChangeAreas(iter->second);
