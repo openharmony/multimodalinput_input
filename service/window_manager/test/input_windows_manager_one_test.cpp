@@ -1589,5 +1589,81 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppTouchPoi
     ASSERT_EQ(ret, RET_ERR);
 }
 #endif  // OHOS_BUILD_ENABLE_TOUCH
+
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_PrintHighZorder_001
+ * @tc.desc: Test the funcation PrintHighZorder
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintHighZorder_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.id = 2;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas = { { 0, 0, 30, 40 } };
+    windowInfo.windowInputType = WindowInputType::NORMAL;
+    std::vector<WindowInfo> windowsInfo = {windowInfo};
+    pointerEvent->SetZOrder(1.0f);
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+    int32_t targetWindowId = 1;
+    int32_t logicalX = 1;
+    int32_t logicalY = 1;
+    EXPECT_NO_FATAL_FAILURE(
+        inputWindowsManager->PrintHighZorder(windowsInfo, pointerAction, targetWindowId, logicalX, logicalY));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_PrintHighZorder_002
+ * @tc.desc: Test the funcation PrintHighZorder
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintHighZorder_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.flags = 1;
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    std::vector<WindowInfo> windowsInfo = {windowInfo};
+    pointerEvent->SetZOrder(1.0f);
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+    int32_t targetWindowId = 1;
+    int32_t logicalX = 1;
+    int32_t logicalY = 1;
+    EXPECT_NO_FATAL_FAILURE(
+        inputWindowsManager->PrintHighZorder(windowsInfo, pointerAction, targetWindowId, logicalX, logicalY));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_FindTargetDisplayGroupInfo_001
+ * @tc.desc: Test the funcation FindTargetDisplayGroupInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDisplayGroupInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    int32_t displayId = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FindTargetDisplayGroupInfo(displayId));
+    displayId = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FindTargetDisplayGroupInfo(displayId));
+}
 }  // namespace MMI
 }  // namespace OHOS
