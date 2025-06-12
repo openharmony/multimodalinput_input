@@ -1044,12 +1044,12 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_StartFinge
     displayInfo.height = 2720;
     displayInfo.uniq = "default0";
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-     DisplayGroupInfo displayGroupInfoRef;
-     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-         displayGroupInfoRef = it->second;
-     }
-     displayGroupInfoRef.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
     LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
     LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 600;
@@ -1077,12 +1077,12 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     displayInfo.height = 2720;
     displayInfo.uniq = "default0";
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-     DisplayGroupInfo displayGroupInfoRef;
-     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-         displayGroupInfoRef = it->second;
-     }
-     displayGroupInfoRef.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
     LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
     LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].y = 600;
@@ -1128,12 +1128,12 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     displayInfo.height = 2720;
     displayInfo.uniq = "default0";
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-     DisplayGroupInfo displayGroupInfoRef;
-     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-         displayGroupInfoRef = it->second;
-     }
-     displayGroupInfoRef.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
     int32_t fingerCount = 2;
     LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
@@ -1181,12 +1181,12 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     displayInfo.height = 2720;
     displayInfo.uniq = "default0";
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-     DisplayGroupInfo displayGroupInfoRef;
-     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-         displayGroupInfoRef = it->second;
-     }
-     displayGroupInfoRef.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
     int32_t fingerCount = 2;
     LONG_PRESS_EVENT_HANDLER->fingerGesture_.touches[0].x = 600;
@@ -1263,12 +1263,12 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_ConvertVPT
     displayInfo.dpi = -1;
     displayInfo.uniq = "default0";
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-     DisplayGroupInfo displayGroupInfoRef;
-     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-         displayGroupInfoRef = it->second;
-     }
-     displayGroupInfoRef.displaysInfo.push_back(displayInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
     int32_t ret = LONG_PRESS_EVENT_HANDLER->ConvertVPToPX(vp);
     ASSERT_EQ(ret, 0);
@@ -1383,12 +1383,12 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_NotifySubs
     WindowInfo windowInfo;
     windowInfo.id = 10000;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-     DisplayGroupInfo displayGroupInfoRef;
-     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-         displayGroupInfoRef = it->second;
-     }
-     displayGroupInfoRef.windowsInfo.push_back(windowInfo);
+    DisplayGroupInfo displayGroupInfoRef;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        displayGroupInfoRef = it->second;
+    }
+    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     auto pointerEvent = SetupSingleFingerDownEvent();

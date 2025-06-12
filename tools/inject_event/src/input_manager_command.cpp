@@ -260,8 +260,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                 int32_t ppx = 0;
                 int32_t ppy = 0;
-                auto simulateMouseEvent = [&ppx, &ppy](std::shared_ptr<PointerEvent> pointerEvent)
-                {
+                auto simulateMouseEvent = [&ppx, &ppy](std::shared_ptr<PointerEvent> pointerEvent) {
                     PointerEvent::PointerItem item;
                     pointerEvent->GetPointerItem(0, item);
                     int32_t x = item.GetDisplayX();

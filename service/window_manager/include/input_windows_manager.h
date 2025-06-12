@@ -117,8 +117,6 @@ public:
     std::vector<DisplayInfo> GetDisplayInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
     const std::vector<WindowInfo> GetWindowInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
-
-
     int32_t GetLogicalPositionX(int32_t id);
     int32_t GetLogicalPositionY(int32_t id);
     Direction GetLogicalPositionDirection(int32_t id);
@@ -408,7 +406,8 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
     void CancelTouchScreenEventIfValidDisplayChange(const DisplayGroupInfo &displayGroupInfo);
     bool IsValidDisplayChange(const DisplayInfo &displayInfo);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);
+    void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent,
+        int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);
     bool OnDisplayRemovedOrCombinationChanged(const DisplayGroupInfo &displayGroupInfo);
     void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
     void ResetPointerPosition(const DisplayGroupInfo &displayGroupInfo);
@@ -482,17 +481,13 @@ private:
     PointerStyle lastPointerStyle_;
     PointerStyle dragPointerStyle_;
     MouseLocation mouseLocation_ = { -1, 0, 0 };
-
     std::map<int32_t, MouseLocation> mouseLocationMap_;
     CursorPosition cursorPos_ {};
     std::map<int32_t, CursorPosition> cursorPosMap_;
-
-
     std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfosMap_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
-
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
         int32_t windowId { -1 };
