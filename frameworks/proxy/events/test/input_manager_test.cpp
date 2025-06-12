@@ -2255,7 +2255,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_001, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_002, TestSize.Level1)
 {
-    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr),-1);
+    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), -1);
 }
 
 /**

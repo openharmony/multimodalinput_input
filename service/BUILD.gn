@@ -820,6 +820,7 @@ ohos_unittest("InputDisplayBindHelperTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   sources = [ "window_manager/test/input_display_bind_helper_test.cpp" ]
