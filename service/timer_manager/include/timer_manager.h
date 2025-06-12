@@ -29,8 +29,8 @@ class TimerManager final {
 
 public:
     DISALLOW_COPY_AND_MOVE(TimerManager);
-    int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
-    int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
+    int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback, std::string name = "");
+    int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback, std::string name = "");
     int32_t RemoveTimer(int32_t timerId);
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId);
@@ -45,10 +45,11 @@ private:
         int32_t callbackCount { 0 };
         int64_t nextCallTime { 0 };
         std::function<void()> callback;
+        std::string name { "" };
     };
 private:
     int32_t TakeNextTimerId();
-    int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
+    int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback, std::string name = "");
     int32_t RemoveTimerInternal(int32_t timerId);
     int32_t ResetTimerInternal(int32_t timerId);
     bool IsExistInternal(int32_t timerId);
