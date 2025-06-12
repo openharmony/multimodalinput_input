@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "input_event.h"
+#include "window_info.h"
 #include "mmi_log.h"
  
 #undef MMI_LOG_TAG
@@ -196,6 +197,72 @@ HWTEST_F(InputEventTest, InputEventTest_operator_001, TestSize.Level1)
     destination = std::move(source1);
     LogTracer source2(400, 7, 8);
     destination = std::move(source2);
+}
+
+/**
+ * @tc.name: InputEventTest_DisplayBindInfo_Marshalling_001
+ * @tc.desc: Test Unmarshalling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_DisplayBindInfo_Marshalling_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayBindInfo info;
+    Parcel out;
+    info.inputDeviceId = 1;
+    info.inputDeviceName = "testName";
+    info.displayId = 1;
+    info.displayName = "testDisplayName";
+    bool ret = info.Marshalling(out);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventTest_Marshalling_001
+ * @tc.desc: Test Marshalling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_Marshalling_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto InputEvent = InputEvent::Create();
+    ASSERT_NE(InputEvent, nullptr);
+    Parcel out;
+    InputEvent->extraData_ = nullptr;
+    InputEvent->extraDataLength_ = 0;
+    bool ret = InputEvent->Marshalling(out);
+    ASSERT_TRUE(ret);
+    InputEvent->extraDataLength_ = 5;
+    ret = InputEvent->Marshalling(out);
+    ASSERT_TRUE(ret);
+    uint8_t datas[5] = {1, 2, 3, 4, 5};
+    std::shared_ptr<const uint8_t[]> sharedData(datas, [](const uint8_t*) {});
+    InputEvent->extraData_ = sharedData;
+    InputEvent->extraDataLength_ = 0;
+    ret = InputEvent->Marshalling(out);
+    ASSERT_TRUE(ret);
+    InputEvent->extraDataLength_ = 5;
+    ret = InputEvent->Marshalling(out);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventTest_Unmarshalling_001
+ * @tc.desc: Test Unmarshalling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_Unmarshalling_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto InputEvent = InputEvent::Create();
+    ASSERT_NE(InputEvent, nullptr);
+    Parcel in;
+    InputEvent->extraDataLength_ = 0;
+    auto ret = InputEvent->Unmarshalling(in);
+    ASSERT_TRUE(ret == nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
