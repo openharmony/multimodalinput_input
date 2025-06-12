@@ -52,14 +52,13 @@ private:
     int32_t RemoveTimerInternal(int32_t timerId);
     int32_t ResetTimerInternal(int32_t timerId);
     bool IsExistInternal(int32_t timerId);
-    void InsertTimerInternal(const std::shared_ptr<TimerItem>& timer);
+    void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int32_t CalcNextDelayInternal();
     void ProcessTimersInternal();
 
 private:
-    std::list<std::shared_ptr<TimerItem>> timers_;
-    std::mutex timersResourceMutex_;
-    std::mutex addTimerProcedureMutex_;
+    std::list<std::unique_ptr<TimerItem>> timers_;
+    std::recursive_mutex timerMutex_;
 };
 
 #define TimerMgr ::OHOS::DelayedSingleton<TimerManager>::GetInstance()
