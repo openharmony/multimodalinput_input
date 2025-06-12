@@ -628,6 +628,8 @@ int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, 
     CHKRR(SetNameProperty(jsEnv_, value, "pressedTime", item.GetDownTime()), "Set pressedTime", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "screenX", item.GetDisplayX()), "Set screenX", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "screenY", item.GetDisplayY()), "Set screenY", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "globalX", static_cast<int32_t>(item.GetGlobalX())), "Set globalX", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "globalY", static_cast<int32_t>(item.GetGlobalY())), "Set globalY", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "windowX", item.GetWindowX()), "Set windowX", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "windowY", item.GetWindowY()), "Set windowY", RET_ERR);
     CHKRR(SetNameProperty(jsEnv_, value, "pressure", item.GetPressure()), "Set pressure", RET_ERR);
@@ -949,6 +951,8 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
     mapFun["windowY"] = [item] { return item.GetWindowY(); };
     mapFun["screenX"] = [item] { return item.GetDisplayX(); };
     mapFun["screenY"] = [item] { return item.GetDisplayY(); };
+    mapFun["globalX"] = [item] { return static_cast<int32_t>(item.GetGlobalX()); };
+    mapFun["globalY"] = [item] { return static_cast<int32_t>(item.GetGlobalY()); };
     mapFun["rawDeltaX"] = [item] { return item.GetRawDx(); };
     mapFun["rawDeltaY"] = [item] { return item.GetRawDy(); };
     return mapFun;
