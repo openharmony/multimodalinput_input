@@ -2728,12 +2728,12 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateMouseStyle, 
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_ConvertToColorSpace
+ * @tc.name: PointerDrawingManagerTest_ConvertToColorSpace_001
  * @tc.desc: Test ConvertToColorSpace
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToColorSpace, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToColorSpace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
@@ -2746,8 +2746,8 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToColorSpac
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_ConvertToColorSpace
- * @tc.desc: Test ConvertToColorSpace
+ * @tc.name: PointerDrawingManagerTest_SetMouseIconTest
+ * @tc.desc: Test SetMouseIconTest
  * @tc.type: Function
  * @tc.require:
  */
