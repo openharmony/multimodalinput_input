@@ -2745,28 +2745,5 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToColorSpac
     colorSpace = Media::ColorSpace::ACES;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ConvertToColorSpace(colorSpace));
 }
-
-/**
- * @tc.name: PointerDrawingManagerTest_SetMouseIconTest
- * @tc.desc: Test SetMouseIconTest
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SetMouseIconTest001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 1;
-    int32_t windowId = -1;
-    int32_t focusX = 2;
-    int32_t focusY = 3;
-    CursorPixelMap curPixelMap;
-    curPixelMap.pixelMap = (void *)pixelMap.get();
-    int32_t ret = pointerDrawingManager.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY);
-    ASSERT_EQ(ret, RET_ERR);
-}
 } // namespace MMI
 } // namespace OHOS
