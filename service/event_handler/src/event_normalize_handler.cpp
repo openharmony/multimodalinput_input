@@ -322,7 +322,6 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPV(nextHandler_);
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
     UpdateKeyEventHandlerChain(keyEvent);
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);

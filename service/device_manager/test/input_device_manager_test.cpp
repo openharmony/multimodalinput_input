@@ -31,6 +31,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID { 1000 };
+constexpr int32_t UINPUT_INPUT_DEVICE_ID { -1 };
+constexpr int32_t LOC_INPUT_DEVICE_ID { 1 };
 } // namespace
 
 class InputDeviceManagerTest : public testing::Test {
@@ -1655,5 +1658,28 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_KeyboardExtFlag_Verify_J
     cJSON_Delete(root);
 }
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_01
+ * @tc.desc: Test the function IsLocalDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo info;
+    info.networkIdOrigin = "local_device";
+    InputDeviceManager inputDevice;
+    inputDevice.AddPhysicalInputDeviceInner(LOC_INPUT_DEVICE_ID, info);
+    bool isLocalDevice = inputDevice.IsLocalDevice(LOC_INPUT_DEVICE_ID);
+    ASSERT_EQ(isLocalDevice, true);
+
+    isLocalDevice = inputDevice.IsLocalDevice(UINPUT_INPUT_DEVICE_ID);
+    ASSERT_EQ(isLocalDevice, false);
+
+    isLocalDevice = inputDevice.IsLocalDevice(MIN_VIRTUAL_INPUT_DEVICE_ID);
+    ASSERT_EQ(isLocalDevice, false);
+}
 } // namespace MMI
 } // namespace OHOS

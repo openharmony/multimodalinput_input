@@ -255,6 +255,8 @@ private:
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<Rosen::RSSurfaceNode> GetSurfaceNode();
     void SetSurfaceNode(std::shared_ptr<Rosen::RSSurfaceNode> ptr);
+    void AdjustMouseFocusToSoftRenderOrigin(Direction direction, const MOUSE_ICON pointerStyle, int32_t &physicalX,
+        int32_t &physicalY);
 private:
     struct PidInfo {
         int32_t pid { 0 };
