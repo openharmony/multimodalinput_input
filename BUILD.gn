@@ -117,7 +117,6 @@ group("input_jsapi_group") {
     }
     if (input_feature_mouse) {
       deps += [
-        "frameworks/ani/pointer:ani_pointer_package",
         "frameworks/napi/pointer:pointer",
       ]
     }
@@ -158,6 +157,11 @@ group("cryptoframework_taihe") {
   if (input_feature_keyboard) {
     deps += [
       "frameworks/ets/input_consumer:inputConsumer",
+    ]
+  }
+  if (input_feature_mouse) {
+    deps += [
+      "frameworks/ets/pointer:pointer",
     ]
   }
 }
