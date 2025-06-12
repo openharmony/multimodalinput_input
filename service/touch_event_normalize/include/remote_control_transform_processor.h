@@ -44,7 +44,8 @@ private:
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
-                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback), "RemoteControlTransformProcessor-Aggregator");
+                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback),
+                    "RemoteControlTransformProcessor-Aggregator");
             },
             [](int32_t timerId) -> int32_t
             {
