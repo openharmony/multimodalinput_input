@@ -362,7 +362,7 @@ bool LibinputAdapter::GetIsCaptureMode()
     InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
     if (inputWindowsManager != nullptr) {
         DisplayGroupInfo displayGroupInfo;
-        inputWindowsManager->GetDisplayGroupInfo(displayGroupInfo);  
+        inputWindowsManager->GetDisplayGroupInfo(displayGroupInfo);
         bool isFloating = false;
         for (auto &windowInfo : displayGroupInfo.windowsInfo) {
             if (windowInfo.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT) {
