@@ -612,5 +612,20 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Proc
     pointerEvent->SetActionTime(1000);
     EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessUpAndCancelEvent(pointerEvent));
 }
+
+/**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_ProcessMoveEvent
+ * @tc.desc: Test ProcessMoveEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_ProcessMoveEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    knuckleDynamicDrawMgr.pointCounter_ = MAX_DIVERGENCE_NUM;
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS

@@ -2518,5 +2518,64 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_branchCoverage, Test
     ret = pointerDrawingManager.DrawNewDpiPointer();
     ASSERT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateMouseStyle
+ * @tc.desc: Test UpdateMouseStyle
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateMouseStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerStyle pointerStyle;
+    pointerStyle.id = AECH_DEVELOPER_DEFINED_STYLE;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateMouseStyle());
+    pointerStyle.id = AECH_DEVELOPER_DEFINED;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateMouseStyle());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ConvertToColorSpace
+ * @tc.desc: Test ConvertToColorSpace
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToColorSpace, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Media::ColorSpace colorSpace = Media::ColorSpace::DISPLAY_P3;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ConvertToColorSpace(colorSpace));
+    colorSpace = Media::ColorSpace::LINEAR_SRGB;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ConvertToColorSpace(colorSpace));
+    colorSpace = Media::ColorSpace::ACES;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ConvertToColorSpace(colorSpace));
+
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ConvertToColorSpace
+ * @tc.desc: Test ConvertToColorSpace
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SetMouseIconTest001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    int32_t pid = 1;
+    int32_t windowId = -1;
+    int32_t focusX = 2;
+    int32_t focusY = 3;
+    CursorPixelMap curPixelMap;
+    curPixelMap.pixelMap = (void *)pixelMap.get();
+    int32_t ret = pointerDrawingManager.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY);
+    ASSERT_EQ(ret, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
