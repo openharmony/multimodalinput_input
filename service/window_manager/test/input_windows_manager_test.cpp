@@ -9289,7 +9289,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_003, Test
     displaysInfo.uniq = "uniq2";
     auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
-        it->second.displaysInfo.push_back(displaysInfo);
+        iter->second.displaysInfo.push_back(displaysInfo);
     }
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetCursorPos());
     EXPECT_EQ(cursorPosRef.displayId, displaysInfo.id);
