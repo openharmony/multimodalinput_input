@@ -1254,5 +1254,96 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_003, TestSi
     touchDrawingMgr.pointerEvent_->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DrawBubble());
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_SetupSettingObserver_001
+ * @tc.desc: Test SetupSettingObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetupSettingObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingMgr.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingMgr.pointerEvent_, nullptr);
+    touchDrawingMgr.scaleW_ = 1;
+    touchDrawingMgr.scaleH_ = 1;
+    touchDrawingMgr.hasBubbleObserver_ = true;
+    touchDrawingMgr.hasPointerObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.Initialize());
+    int32_t nRetries = 0;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(nRetries));
+    touchDrawingMgr.hasBubbleObserver_ = false;
+    touchDrawingMgr.hasPointerObserver_ = false;
+    touchDrawingMgr.scaleW_ = 0;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(nRetries));
+    nRetries = 1;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(nRetries));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_SetupSettingObserver_002
+ * @tc.desc: Test SetupSettingObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetupSettingObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingMgr.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingMgr.pointerEvent_, nullptr);
+    touchDrawingMgr.scaleW_ = 1;
+    touchDrawingMgr.scaleH_ = 1;
+    touchDrawingMgr.hasBubbleObserver_ = true;
+    touchDrawingMgr.hasPointerObserver_ = false;
+    int32_t nRetries = 0;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(nRetries));
+    touchDrawingMgr.hasBubbleObserver_ = false;
+    touchDrawingMgr.hasPointerObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(nRetries));
+    touchDrawingMgr.hasBubbleObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(nRetries));
+    nRetries = 1;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(nRetries));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateDisplayInfo001
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    DisplayInfo displayInfo;
+    displayInfo.direction = Direction::DIRECTION0;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION0;
+    displayInfo.width = 700;
+    displayInfo.height = 500;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    displayInfo.direction = Direction::DIRECTION180;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    displayInfo.direction = Direction::DIRECTION270;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    displayInfo.screenCombination = ScreenCombination::SCREEN_MAIN;
+    touchDrawingMgr.displayInfo_.screenCombination = ScreenCombination::SCREEN_MAIN;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    displayInfo.uniqueId = 1;
+    touchDrawingMgr.displayInfo_.uniqueId = 2;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "touch window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    touchDrawingMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+}
 } // namespace MMI
 } // namespace OHOS
