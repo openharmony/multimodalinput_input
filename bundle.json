@@ -197,6 +197,9 @@
         },
         {
           "name": "//foundation/multimodalinput/input/frameworks/ets/input_moniter:input_moniter_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/pointer:pointer_taihe"
         }
       ],
       "test": [
