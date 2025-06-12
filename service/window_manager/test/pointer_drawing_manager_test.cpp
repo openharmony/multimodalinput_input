@@ -50,6 +50,8 @@ const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotat
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
 const std::string CUSTOM_CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
+constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
+constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
