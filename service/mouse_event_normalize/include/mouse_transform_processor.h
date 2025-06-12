@@ -200,7 +200,8 @@ private:
     static TouchpadCDG touchpadOption_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
-                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback), "MouseTransformProcessorAggregator");
+                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback),
+                    "MouseTransformProcessor-Aggregator");
             },
             [](int32_t timerId) -> int32_t
             {
