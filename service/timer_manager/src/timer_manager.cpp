@@ -209,6 +209,7 @@ void TimerManager::ProcessTimersInternal()
             break;
         }
         auto curTimer = std::move(*it);
+        CrashObjDumper dumper((curTimer->name).c_str());
         timers_.erase(it);
         ++curTimer->callbackCount;
         if ((curTimer->repeatCount >= 1) && (curTimer->callbackCount >= curTimer->repeatCount)) {
