@@ -50,6 +50,8 @@ const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotat
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
 const std::string CUSTOM_CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
+constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
+constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
@@ -2707,6 +2709,41 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
         physicalX, physicalY);
     EXPECT_EQ(physicalX, 100);
     EXPECT_EQ(physicalY, 100);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateMouseStyle
+ * @tc.desc: Test UpdateMouseStyle
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateMouseStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerStyle pointerStyle;
+    pointerStyle.id = AECH_DEVELOPER_DEFINED_STYLE;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateMouseStyle());
+    pointerStyle.id = AECH_DEVELOPER_DEFINED;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateMouseStyle());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ConvertToColorSpace_001
+ * @tc.desc: Test ConvertToColorSpace
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToColorSpace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Media::ColorSpace colorSpace = Media::ColorSpace::DISPLAY_P3;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ConvertToColorSpace(colorSpace));
+    colorSpace = Media::ColorSpace::LINEAR_SRGB;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ConvertToColorSpace(colorSpace));
+    colorSpace = Media::ColorSpace::ACES;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ConvertToColorSpace(colorSpace));
 }
 } // namespace MMI
 } // namespace OHOS
