@@ -34,8 +34,7 @@ int32_t InputDisplayBindHelper::GetDisplayBindInfo(DisplayBindInfos &infos)
     return 0;
 }
 
-int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t displayId,
-    std::string &msg)
+int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     return 0;
 }
@@ -165,7 +164,8 @@ TimerManager::TimerManager() {}
 
 TimerManager::~TimerManager() {}
 
-int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback, std::string name)
+int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+    std::string name)
 {
     return 0;
 }
