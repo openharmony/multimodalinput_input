@@ -113,7 +113,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
                 CHKPV(inputEventNormalizeHandler);
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
-            });
+            }, "CrownTransformProcessor");
 
             HandleCrownRotateBegin(rawPointerEvent);
         }

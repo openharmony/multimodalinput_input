@@ -62,7 +62,7 @@ void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
             Run(keyEvent_);
             keyEvent_ = nullptr;
             timerId_ = INVALID_ENTITY_ID;
-        });
+        }, "KeyGestureManager");
     if (timerId_ < 0) {
         MMI_HILOGI("[Handler] AddTimer fail");
     }

@@ -5300,7 +5300,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
                     HandleGestureInjection(gestureInject);
                     timerId_ = DEFAULT_VALUE;
-                });
+                }, "InputWindowsManager");
             }
         }
     }

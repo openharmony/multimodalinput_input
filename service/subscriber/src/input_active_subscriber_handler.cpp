@@ -150,7 +150,7 @@ void InputActiveSubscriberHandler::StartIntervalTimer(std::shared_ptr<Subscriber
         }
         subscriber->timerId_ = INVALID_TIMERID;
         CleanSubscribeInfo(subscriber, currentTime);
-    });
+    }, "InputActiveSubscriberHandler");
     if (timerId < 0) {
         MMI_HILOGE("AddTimer fail, setting will not work");
     } else {
