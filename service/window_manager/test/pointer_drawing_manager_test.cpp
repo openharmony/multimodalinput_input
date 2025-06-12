@@ -2524,6 +2524,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_branchCoverage, Test
     ASSERT_NE(ret, RET_OK);
 }
 
+/**
  * @tc.name: InputWindowsManagerTest_AdjustMouseFocusToSoftRenderOrigin_001
  * @tc.desc: Test AdjustMouseFocusToSoftRenderOrigin
  * @tc.type: FUNC
