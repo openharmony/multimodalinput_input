@@ -99,6 +99,9 @@ constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
 #define SCREEN_RECORD_WINDOW_WIDTH 400
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+constexpr uint32_t CURSOR_POSITION_EXPECTED_SIZE { 2 };
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1719,7 +1722,7 @@ void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
                 dump += StringPrintf("%f,", it);
             }
             dump += StringPrintf("]\n");
-            MMI_HILOGD("%{public}s", dump.c_str());
+            MMI_HILOGI("%{public}s", dump.c_str());
         }
     }
 }
@@ -1744,38 +1747,26 @@ bool InputWindowsManager::JudgeCaramaInFore()
 
 void InputWindowsManager::InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInfo)
 {
-    
-    if (displayGroupInfoMap_.find(displayGroupInfo.groupId) != displayGroupInfoMap_.end()) {
-        return;
-    }
-    displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
-    captureModeInfoMap_[displayGroupInfo.groupId] = captureModeInfo_;
-    pointerDrawFlagMap_[displayGroupInfo.groupId] = pointerDrawFlag_;
-    mouseLocationMap_[displayGroupInfo.groupId] = mouseLocation_;
-    windowsPerDisplayMap_[displayGroupInfo.groupId] = windowsPerDisplay_;
-    lastPointerEventforWindowChangeMap_[displayGroupInfo.groupId] = lastPointerEventforWindowChange_;
-    displayModeMap_[displayGroupInfo.groupId] = displayMode_;
-    lastDpiMap_[displayGroupInfo.groupId] = lastDpi_;
-    CursorPosition cursorPos = {};
-    cursorPosMap_[displayGroupInfo.groupId] = cursorPos;
-}
-
-void InputWindowsManager::UpdateGroupInfo()
-{
-    for (auto &curGroupInfo : displayGroupInfoMap_) {
-        if (!(curGroupInfo.second.isMainGroup) 
-            && !(displayGroupInfoMapTmp_.find(curGroupInfo.first) != displayGroupInfoMapTmp_.end())) {
-            displayGroupInfoMap_.erase(curGroupInfo.first);
-            captureModeInfoMap_.erase(curGroupInfo.first);
-            pointerDrawFlagMap_.erase(curGroupInfo.first);
-            //mouseLocationMap_.erase(curGroupInfo.first);
-            windowsPerDisplayMap_.erase(curGroupInfo.first);
-            lastPointerEventforWindowChangeMap_.erase(curGroupInfo.first);
-            displayModeMap_.erase(curGroupInfo.first);
-            lastDpiMap_.erase(curGroupInfo.first);
-            cursorPosMap_.erase(curGroupInfo.first);
+    int32_t groupId = displayGroupInfo.groupId;
+    if (displayGroupInfo.isMainGroup) {
+        if (groupId != MAIN_GROUPID) {
+            MMI_HILOGE("The groupId is incorrect, groupId:%{public}d", groupId);
+            return;
         }
     }
+    if (displayGroupInfoMap_.find(groupId) != displayGroupInfoMap_.end()) {
+        return;
+    }
+    displayGroupInfoMap_[groupId] = displayGroupInfo;
+    captureModeInfoMap_[groupId] = captureModeInfo_;
+    pointerDrawFlagMap_[groupId] = pointerDrawFlag_;
+    mouseLocationMap_[groupId] = mouseLocation_;
+    windowsPerDisplayMap_[groupId] = windowsPerDisplay_;
+    lastPointerEventforWindowChangeMap_[groupId] = lastPointerEventforWindowChange_;
+    displayModeMap_[groupId] = displayMode_;
+    lastDpiMap_[groupId] = lastDpi_;
+    CursorPosition cursorPos = {};
+    cursorPosMap_[groupId] = cursorPos;
 }
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
@@ -1795,7 +1786,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         }
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    MMI_HILOGD("Displays Info size:%{public}zu, focusWindowId:%{public}d",
+    MMI_HILOGI("Displays Info size:%{public}zu, focusWindowId:%{public}d",
         displayGroupInfo.displaysInfo.size(), displayGroupInfo.focusWindowId);
     auto action = UpdateWindowInfo(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
@@ -3543,6 +3534,12 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
     int32_t areaNum = 0;
     bool findFlag = false;
     for (const auto &item : rects) {
+        if (item.width == 0 || item.height == 0) {
+            MMI_HILOGD("The width or height of hotArea is 0, width: %{public}d, height: %{public}d, "
+            "areaNum: %{public}d", item.width, item.height, areaNum);
+            areaNum++;
+            continue;
+        }
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
         if (!AddInt32(item.x, item.width, displayMaxX)) {
@@ -3863,8 +3860,8 @@ bool InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, 
     bool findFlag = false;
     if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
         std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
-        MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d",
-            windowHotAreas.size(), windowId);
+        MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d, pid:%{public}d",
+            windowHotAreas.size(), windowId, windowInfo.pid);
         findFlag = InWhichHotArea(logicalX, logicalY, windowHotAreas, pointerStyle);
     }
     return findFlag;
@@ -4207,13 +4204,15 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             }
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
-            if (cursorPos.empty()) {
-                MMI_HILOGW("cursorPos is empty");
+            if (cursorPos.size() < CURSOR_POSITION_EXPECTED_SIZE) {
+                MMI_HILOGW("cursorPos is invalid");
                 return RET_ERR;
             }
-            IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, cursorPos[0], cursorPos[1]);
+            IPointerDrawingManager::GetInstance()->DrawMovePointer(physicalDisplayInfo->uniqueId,
+                cursorPos[0], cursorPos[1]);
 #else
-            IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
+            IPointerDrawingManager::GetInstance()->DrawMovePointer(physicalDisplayInfo->uniqueId,
+                physicalX, physicalY);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             MMI_HILOGI("UpdateMouseTarget id:%{public}d, logicalX:%{public}d, logicalY:%{public}d,"
                 "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->uniqueId, logicalX, logicalY,
@@ -6427,7 +6426,7 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
         return true;
     }
     if (MMI_GE(window.zOrder, pointerEvent->GetZOrder())) {
-        MMI_HILOGD("Current window zorder:%{public}f greater than the simulate target zOrder:%{public}f, "
+        MMI_HILOGE("Current window zorder:%{public}f greater than the simulate target zOrder:%{public}f, "
             "ignore this window::%{public}d", window.zOrder, pointerEvent->GetZOrder(), window.id);
         return false;
     }

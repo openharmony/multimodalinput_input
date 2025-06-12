@@ -1146,5 +1146,12 @@ bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId)
     enable = item->second.enable;
     return enable;
 }
+
+bool InputDeviceManager::IsLocalDevice(int32_t deviceId)
+{
+    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
+    auto iter = inputDevice_.find(deviceId);
+    return (iter != inputDevice_.end());
+}
 } // namespace MMI
 } // namespace OHOS

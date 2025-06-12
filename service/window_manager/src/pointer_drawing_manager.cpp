@@ -516,18 +516,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
     currentDirection_ = direction;
-    if (pointerStyle.id == MOUSE_ICON::DEFAULT && mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath == CursorIconPath) {
-        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
-            physicalX, physicalY);
-    } else if (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath == CustomCursorIconPath) {
-            AdjustMouseFocus(direction,
-                ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
-                    physicalX, physicalY);
-    } else {
-        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay),
-            physicalX, physicalY);
-    }
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
     if (currentMouseStyle_.id != lastMouseStyle_.id) {
         MMI_HILOGD("MagicCursor AdjustMouseFocus:%{public}d",
@@ -590,8 +579,7 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
     Direction direction = DIRECTION0;
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
-    AdjustMouseFocus(
-        direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay), physicalX, physicalY);
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         MAGIC_CURSOR->EnableCursorInversion();
@@ -1874,7 +1862,12 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     } else {
         auto surfaceNodePtr = GetSurfaceNode();
         CHKPV(surfaceNodePtr);
-        surfaceNodePtr->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
+        int32_t physicalX = lastPhysicalX_;
+        int32_t physicalY = lastPhysicalY_;
+        Direction direction = static_cast<Direction>((
+            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        AdjustMouseFocusToSoftRenderOrigin(direction, mouseStyle, physicalX, physicalY);
+        surfaceNodePtr->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
         if (mouseStyle == MOUSE_ICON::RUNNING) {
             pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
         } else {
@@ -2355,9 +2348,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     Direction direction = static_cast<Direction>((
         ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    auto& iconPath = GetMouseIconPath();
-    AdjustMouseFocus(direction, ICON_TYPE(iconPath.at(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
-        physicalX, physicalY);
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         MAGIC_CURSOR->CreatePointerWindow(displayInfo_.uniqueId, physicalX, physicalY, direction, surfaceNode_);
@@ -2799,7 +2790,8 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t dis
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
     MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
-    CHKPV(GetSurfaceNode());
+    auto surfaceNodePtr = GetSurfaceNode();
+    CHKPV(surfaceNodePtr);
     displayId_ = displayId;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPV(hardwareCursorPointerManager_);
@@ -2812,6 +2804,15 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t dis
             return;
         }
     }
+#else
+    Direction direction = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), x, y);
+    surfaceNodePtr->SetBounds(x,
+        y,
+        surfaceNodePtr->GetStagingProperties().GetBounds().z_,
+        surfaceNodePtr->GetStagingProperties().GetBounds().w_);
+    Rosen::RSTransaction::FlushImplicitTransaction();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGD("Pointer window move success");
 }
@@ -3566,7 +3567,9 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
         }
         if (it.second->IsMirror()) {
             auto& mirrorScreen = it.second;
-            if (sp->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
+            if (mirrorScreen->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
+                MMI_HILOGI("update rotation of mirror screen from %{public}u to %{public}d",
+                    mirrorScreen->GetRotation(), displayInfo.direction);
                 mirrorScreen->SetRotation(static_cast<rotation_t>(displayInfo.direction));
                 mirrorScreen->UpdatePadding(mainWidth, mainHeight);
             }
@@ -3892,6 +3895,25 @@ void PointerDrawingManager::SetSurfaceNode(std::shared_ptr<Rosen::RSSurfaceNode>
 DisplayInfo PointerDrawingManager::GetCurrentDisplayInfo()
 {
     return displayInfo_;
+}
+
+void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction direction, const MOUSE_ICON pointerStyle,
+    int32_t &physicalX, int32_t &physicalY)
+{
+    if (pointerStyle == MOUSE_ICON::DEFAULT) {
+        if (mouseIcons_[pointerStyle].iconPath == CursorIconPath) {
+            AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
+                physicalX, physicalY);
+        } else if (mouseIcons_[pointerStyle].iconPath == CustomCursorIconPath) {
+            AdjustMouseFocus(direction,
+                ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON)].alignmentWay),
+                    physicalX, physicalY);
+        } else {
+            AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay), physicalX, physicalY);
+        }
+    } else {
+        AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay), physicalX, physicalY);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

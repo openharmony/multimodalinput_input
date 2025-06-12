@@ -815,9 +815,9 @@ void InputHandlerManager::OnDisconnected()
 void InputHandlerManager::OnConnected()
 {
     std::lock_guard guard(mtxHandlers_);
-    MMI_HILOGD("Reregister gesture monitors on reconnection");
+    MMI_HILOGI("Reregister gesture monitors on reconnection");
     RegisterGestureMonitors();
-    MMI_HILOGD("Enable event monitors(interceptors) on reconnection");
+    MMI_HILOGI("Enable event monitors(interceptors) on reconnection");
     HandleEventType eventType = GetEventType();
     int32_t priority = GetPriority();
     uint32_t deviceTags = GetDeviceTags();

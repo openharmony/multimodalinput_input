@@ -115,6 +115,164 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_02, Tes
 }
 
 /**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_05
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, listener);
+    ASSERT_NO_FATAL_FAILURE(detector.OnTouchEvent(nullptr));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_06
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, listener);
+    ASSERT_NO_FATAL_FAILURE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_07
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, listener);
+    int32_t fingerCnt = 3;
+    detector.AddGestureFingers(fingerCnt);
+    ASSERT_NO_FATAL_FAILURE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_08
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, listener);
+    int32_t fingerCnt = 3;
+    detector.AddGestureFingers(fingerCnt);
+    ASSERT_NO_FATAL_FAILURE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_09
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_09, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, listener);
+    int32_t fingerCnt = 3;
+    detector.AddGestureFingers(fingerCnt);
+    ASSERT_NO_FATAL_FAILURE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_10
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_10, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, listener);
+    int32_t fingerCnt = 3;
+    detector.AddGestureFingers(fingerCnt);
+    ASSERT_NO_FATAL_FAILURE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_11
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_11, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, listener);
+    int32_t fingerCnt = 3;
+    detector.AddGestureFingers(fingerCnt);
+    ASSERT_NO_FATAL_FAILURE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_OnTouchEvent_12
+ * @tc.desc: Test OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_OnTouchEvent_12, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, listener);
+    int32_t fingerCnt = 3;
+    detector.AddGestureFingers(fingerCnt);
+    ASSERT_NO_FATAL_FAILURE(detector.OnTouchEvent(pointerEvent));
+}
+
+/**
  * @tc.name: TouchGestureDetectorTest_HandleDownEvent_01
  * @tc.desc: Test HandleDownEvent
  * @tc.type: FUNC
@@ -418,7 +576,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_WhetherDiscardTouchE
     pointerEvent->bitwise_ = 0;
     pointerEvent->SetPointerId(7);
     pointerEvent->targetDisplayId_ = INT32_MAX - 1;
-    EXPECT_FALSE(detector.WhetherDiscardTouchEvent(pointerEvent));
+    EXPECT_TRUE(detector.WhetherDiscardTouchEvent(pointerEvent));
 
     detector.gestureDisplayId_ = INT32_MAX;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -540,6 +698,58 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetMaxFingerSpacing_
     detector.downPoint_[2] = Point(3.0f, 4.0f);
     detector.downPoint_[3] = Point(5.0f, 6.0f);
     ASSERT_NO_FATAL_FAILURE(detector.GetMaxFingerSpacing());
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_GetMaxFingerSpacing_03
+ * @tc.desc: Test GetMaxFingerSpacing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetMaxFingerSpacing_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    EXPECT_FLOAT_EQ(detector.GetMaxFingerSpacing(), 0.0f);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_GetMaxFingerSpacing_04
+ * @tc.desc: Test GetMaxFingerSpacing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetMaxFingerSpacing_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    detector.downPoint_[1] = Point(1.0f, 1.0f);
+    detector.downPoint_[2] = Point(2.0f, 2.0f);
+    detector.downPoint_[3] = Point(3.0f, 3.0f);
+    EXPECT_FLOAT_EQ(detector.GetMaxFingerSpacing(), std::hypot(2.0f, 2.0f));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_GetMaxFingerSpacing_05
+ * @tc.desc: Test GetMaxFingerSpacing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetMaxFingerSpacing_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    detector.downPoint_[1] = Point(1.0f, 1.0f);
+    detector.downPoint_[2] = Point(2.0f, 2.0f);
+    detector.downPoint_[3] = Point(3.0f, 3.0f);
+    detector.downPoint_[4] = Point(4.0f, 4.0f);
+    EXPECT_FLOAT_EQ(detector.GetMaxFingerSpacing(), std::hypot(3.0f, 3.0f));
 }
 
 /**
@@ -1054,6 +1264,58 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_AddGestureFingers_01
 }
 
 /**
+ * @tc.name: TouchGestureDetectorTest_AddGestureFingers_02
+ * @tc.desc: Test AddGestureFingers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_AddGestureFingers_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    int32_t fingers = 5;
+    ASSERT_NO_FATAL_FAILURE(detector.AddGestureFingers(fingers));
+    EXPECT_TRUE(detector.gestureEnable_);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_AddGestureFingers_03
+ * @tc.desc: Test AddGestureFingers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_AddGestureFingers_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    int32_t fingers = 5;
+    ASSERT_NO_FATAL_FAILURE(detector.AddGestureFingers(fingers));
+    EXPECT_TRUE(detector.gestureEnable_);
+    detector.gestureEnable_ = false;
+    ASSERT_NO_FATAL_FAILURE(detector.AddGestureFingers(fingers));
+    EXPECT_FALSE(detector.gestureEnable_);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_AddGestureFingers_04
+ * @tc.desc: Test AddGestureFingers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_AddGestureFingers_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    int32_t fingers1 = 3;
+    ASSERT_NO_FATAL_FAILURE(detector.AddGestureFingers(fingers1));
+    EXPECT_TRUE(detector.gestureEnable_);
+    detector.gestureEnable_ = false;
+    int32_t fingers2 = 4;
+    ASSERT_NO_FATAL_FAILURE(detector.AddGestureFingers(fingers2));
+    EXPECT_TRUE(detector.gestureEnable_);
+}
+
+/**
  * @tc.name: TouchGestureDetectorTest_RemoveGestureFingers_01
  * @tc.desc: Test RemoveGestureFingers
  * @tc.type: FUNC
@@ -1075,6 +1337,60 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_RemoveGestureFingers
 
     detector.fingers_.clear();
     ASSERT_NO_FATAL_FAILURE(detector.RemoveGestureFingers(fingers));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_RemoveGestureFingers_02
+ * @tc.desc: Test RemoveGestureFingers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_RemoveGestureFingers_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    int32_t fingers = 1;
+    detector.AddGestureFingers(fingers);
+    ASSERT_NO_FATAL_FAILURE(detector.RemoveGestureFingers(fingers));
+    EXPECT_FALSE(detector.fingers_.find(fingers) != detector.fingers_.cend());
+    EXPECT_FALSE(detector.gestureEnable_);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_RemoveGestureFingers_03
+ * @tc.desc: Test RemoveGestureFingers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_RemoveGestureFingers_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    int32_t finger1 = 3;
+    detector.AddGestureFingers(finger1);
+    int32_t finger2 = 4;
+    ASSERT_NO_FATAL_FAILURE(detector.RemoveGestureFingers(finger2));
+    EXPECT_TRUE(detector.fingers_.find(finger1) != detector.fingers_.cend());
+    EXPECT_TRUE(detector.gestureEnable_);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_RemoveGestureFingers_04
+ * @tc.desc: Test RemoveGestureFingers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_RemoveGestureFingers_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    int32_t finger1 = 3;
+    detector.AddGestureFingers(finger1);
+    int32_t finger2 = 4;
+    detector.AddGestureFingers(finger2);
+    ASSERT_NO_FATAL_FAILURE(detector.RemoveGestureFingers(finger2));
+    EXPECT_TRUE(detector.fingers_.find(finger1) != detector.fingers_.cend());
+    EXPECT_TRUE(detector.gestureEnable_);
 }
 
 /**
@@ -1893,6 +2209,90 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CheckGestureTrend_00
     pointerEvent->pointers_.push_back(item2);
     pointerEvent->SetPointerId(2);
     ASSERT_NO_FATAL_FAILURE(detector.CheckGestureTrend(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_GetAngle_01
+ * @tc.desc: Test TouchGestureDetector::GetAngle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetAngle_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    float startX = 0.0f;
+    float startY = 0.0f;
+    float endX = 0.0f;
+    float endY = 1.0f;
+    constexpr double expectedAngle = 90.0;
+    constexpr double precision = 0.001;
+
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    double actualAngle = detector.GetAngle(startX, startY, endX, endY);
+    EXPECT_NEAR(expectedAngle, actualAngle, precision);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_GetAngle_02
+ * @tc.desc: Test TouchGestureDetector::GetAngle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetAngle_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    float startX = 0.0f;
+    float startY = 0.0f;
+    float endX = 1.0f;
+    float endY = 1.0f;
+    constexpr double expectedAngle = 45.0;
+    constexpr double precision = 0.001;
+
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    double actualAngle = detector.GetAngle(startX, startY, endX, endY);
+    EXPECT_NEAR(expectedAngle, actualAngle, precision);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_GetAngle_03
+ * @tc.desc: Test TouchGestureDetector::GetAngle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetAngle_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    float startX = 0.0f;
+    float startY = 0.0f;
+    float endX = -1.0f;
+    float endY = 1.0f;
+    constexpr double expectedAngle = 135.0;
+    constexpr double precision = 0.001;
+
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    double actualAngle = detector.GetAngle(startX, startY, endX, endY);
+    EXPECT_NEAR(expectedAngle, actualAngle, precision);
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_GetAngle_04
+ * @tc.desc: Test TouchGestureDetector::GetAngle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetAngle_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    float startX = 0.0f;
+    float startY = 0.0f;
+    float endX = -1.0f;
+    float endY = -1.0f;
+    constexpr double expectedAngle = -135.0;
+    constexpr double precision = 0.001;
+
+    TouchGestureDetector detector(TOUCH_GESTURE_TYPE_SWIPE, nullptr);
+    double actualAngle = detector.GetAngle(startX, startY, endX, endY);
+    EXPECT_NEAR(expectedAngle, actualAngle, precision);
 }
 } // namespace MMI
 } // namespace OHOS
