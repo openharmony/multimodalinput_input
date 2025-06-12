@@ -36,7 +36,11 @@ ohos_prebuilt_etc("mmi_uinput.rc") {
 }
 
 ohos_prebuilt_etc("multimodalinput.rc") {
-  source = "multimodalinput.cfg"
+  if (input_feature_watch_cfg_source) {
+    source = "watch/multimodalinput.cfg"
+  } else {
+    source = "multimodalinput.cfg"
+  }
   relative_install_dir = "init"
   part_name = "input"
   subsystem_name = "multimodalinput"
