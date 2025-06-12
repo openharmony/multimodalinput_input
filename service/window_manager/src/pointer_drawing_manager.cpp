@@ -2586,7 +2586,7 @@ bool PointerDrawingManager::Init()
     }
     initLoadingAndLoadingRightPixelTimerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
         InitPixelMaps();
-    });
+    }, "PointerDrawingManager-Init");
     return true;
 }
 
@@ -3695,7 +3695,7 @@ void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align
                 moveRetryCount_ = 0;
             }
         });
-    });
+    }, "PointerDrawingManager-MoveRetryAsync");
     MMI_HILOGI("Create MoveRetry Timer, timerId: %{public}d", moveRetryTimerId_);
 }
 

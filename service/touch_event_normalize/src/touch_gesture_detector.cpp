@@ -170,7 +170,7 @@ void TouchGestureDetector::HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> ev
 #else
             MMI_HILOGI("Touch-swipe identified, will not cancel touches");
 #endif // TOUCH_GESTURE_MONITOR_ENABLED
-        });
+        }, "TouchGestureDetector");
     if (gestureTimer_ < 0) {
         MMI_HILOGE("TimerMgr::AddTimer fail");
     }

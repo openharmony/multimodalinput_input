@@ -701,7 +701,7 @@ void KeyShortcutManager::TriggerDown(
             [this, tKeyEvent = KeyEvent::Clone(keyEvent), shortcutId]() {
                 triggering_.erase(shortcutId);
                 RunShortcut(tKeyEvent, shortcutId);
-            });
+            }, "KeyShortcutManager");
         if (timerId < 0) {
             MMI_HILOGE("AddTimer fail");
             return;

@@ -490,7 +490,7 @@ void MMIService::OnStart()
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
-    });
+    }, "MMIService-OnStart");
     [[ maybe_unused ]] auto taskFunc = [this]() {
         if (threadStatusFlag_) {
             MMI_HILOGI("Set thread status flag to false");
@@ -3079,7 +3079,7 @@ void MMIService::AddReloadDeviceTimer()
         if (deviceIds.empty()) {
             libinputAdapter_.ReloadDevice();
         }
-    });
+    }, "MMIService-AddReloadDeviceTimer");
 }
 
 int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
@@ -4670,7 +4670,7 @@ void MMIService::InitPrintClientInfo()
                 it->first.c_str(), it->second.pid, it->second.pid, it->second.readThreadId);
             }
         });
-    });
+    }, "MMIService-InitPrintClientInfo");
     std::function<void(SessionPtr)> callback = [this](SessionPtr sess) {
         return this->OnSessionDelete(sess);
     };

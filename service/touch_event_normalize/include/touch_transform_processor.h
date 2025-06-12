@@ -51,7 +51,7 @@ private:
     std::unordered_map<int32_t, bool> pointerItemCancelMarks_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
-                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
+                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback), "TouchTransformProcessor-Aggregator");
             },
             [](int32_t timerId) -> int32_t
             {

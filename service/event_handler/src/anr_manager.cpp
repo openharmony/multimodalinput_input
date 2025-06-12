@@ -145,7 +145,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
                 return;
             }
         }
-    });
+    }, "ANRManager");
     CHK_INVALID_RV(timerId, "Add anr timer failed, timer count reached the maximum number");
     anrTimerCount_++;
     MMI_HILOGD("Add anr timer success, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d, count:%{public}d",

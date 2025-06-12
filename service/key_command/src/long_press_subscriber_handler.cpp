@@ -372,7 +372,7 @@ void LongPressSubscriberHandler::StartFingerGesture(int32_t fingerCount)
                 return;
             }
             OnSubscribeLongPressEvent(fingerCount, durationTimers_[i].duration);
-        });
+        }, "LongPressSubscriberHandler");
     }
     isAllTimerClosed = false;
 }
