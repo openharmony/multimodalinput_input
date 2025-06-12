@@ -19,3 +19,5 @@ src:*foundation/multimodalinput/input/service/touch_event_normalize/test/*
 src:*foundation/multimodalinput/input/service/filter/test/*
 src:*foundation/multimodalinput/input/service/connect_manager/test/*
 src:*foundation/multimodalinput/input/service/event_handler/test/*
+src:*foundation/multimodalinput/input/service/fingerprint_event_processor/test/*
+
