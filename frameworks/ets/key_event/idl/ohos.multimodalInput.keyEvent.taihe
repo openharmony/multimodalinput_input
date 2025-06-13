@@ -25,7 +25,7 @@ enum Action : i32 {
 
 struct Key {
   code: KeyCode;
-  pressedTime: i32;
+  pressedTime: i64;
   deviceId: i32;
 }
 

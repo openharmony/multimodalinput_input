@@ -18,7 +18,7 @@
 struct InputEvent {
   id: i32;
   deviceId: i32;
-  actionTime: i32;
+  actionTime: i64;
   screenId: i32;
   windowId: i32;
 }

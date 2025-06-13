@@ -116,13 +116,10 @@ group("input_jsapi_group") {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
     if (input_feature_mouse) {
-      deps += [
-        "frameworks/napi/pointer:pointer",
-      ]
+      deps += [ "frameworks/napi/pointer:pointer" ]
     }
     if (input_feature_keyboard) {
       deps += [
-        "frameworks/ani/input_consumer:input_consumer_package",
         "frameworks/napi/input_consumer:inputconsumer",
         "frameworks/napi/input_event_client:inputeventclient",
       ]
@@ -140,29 +137,31 @@ group("input_jsapi_group") {
   }
 }
 
-group("cryptoframework_taihe") {
+group("input_ets_group") {
   deps = [
     "frameworks/ets/input_event:inputEvent",
+    "frameworks/ets/intention_code:intentionCode",
+    "frameworks/ets/input_moniter:inputMoniter",
     "frameworks/ets/key_code:keyCode",
     "frameworks/ets/key_event:keyEvent",
     "frameworks/ets/mouse_event:mouseEvent",
     "frameworks/ets/touch_event:touchEvent",
-    "frameworks/ets/input_moniter:inputMoniter",
-    "frameworks/ets/intention_code:intentionCode",
-    "frameworks/ets/gesture_event:gestureEvent",
+    "frameworks/ets/gesture_event:gestureEvent"
   ]
-  if (input_feature_short_key) {
-    deps += [ "frameworks/ets/short_key:shortKey" ]
-  }
   if (input_feature_keyboard) {
-    deps += [
-      "frameworks/ets/input_consumer:inputConsumer",
-    ]
+      deps += [
+        "frameworks/ets/input_consumer:inputConsumer",
+        "frameworks/ets/input_event_client:inputEventClient"
+      ]
+  }
+  if (input_feature_input_device) {
+    deps += [ "frameworks/ets/input_device:inputDevice" ]
   }
   if (input_feature_mouse) {
-    deps += [
-      "frameworks/ets/pointer:pointer",
-    ]
+      deps += [ "frameworks/ets/pointer:pointer" ]
+    }
+  if (input_feature_short_key) {
+  deps += [ "frameworks/ets/short_key:shortKey" ]
   }
 }
 
