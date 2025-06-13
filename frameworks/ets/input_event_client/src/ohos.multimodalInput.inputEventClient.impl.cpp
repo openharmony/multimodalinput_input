@@ -13,24 +13,17 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.intentionCode", "intentionCode")
-@!sts_inject("""
-static { loadLibrary("IntentionCode.z") }
-""")
+#include "ohos.multimodalInput.inputEventClient.proj.hpp"
+#include "ohos.multimodalInput.inputEventClient.impl.hpp"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
 
-enum IntentionCode : i32 {
-  INTENTION_UNKNOWN = -1,
-  INTENTION_UP = 1,
-  INTENTION_DOWN = 2,
-  INTENTION_LEFT = 3,
-  INTENTION_RIGHT = 4,
-  INTENTION_SELECT = 5,
-  INTENTION_ESCAPE = 6,
-  INTENTION_BACK = 7,
-  INTENTION_FORWARD = 8,
-  INTENTION_MENU = 9,
-  INTENTION_PAGE_UP = 11,
-  INTENTION_PAGE_DOWN = 12,
-  INTENTION_ZOOM_OUT = 13,
-  INTENTION_ZOOM_IN = 14
-}
+using namespace taihe;
+using namespace ohos::multimodalInput::inputEventClient;
+
+namespace {
+} // namespace
+
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
+// NOLINTEND

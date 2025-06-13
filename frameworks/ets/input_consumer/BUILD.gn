@@ -83,7 +83,7 @@ generate_static_abc("input_consumer_abc") {
 }
 ohos_prebuilt_etc("input_consumer_etc") {
   source = "$target_out_dir/input_consumer_abc.abc"
-  module_install_dir = "frameworks"
+  module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   deps = [ ":input_consumer_abc" ]

@@ -13,21 +13,17 @@ import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
-copy_taihe_idl("key_event_taihe") {
-  sources = [ "idl/ohos.multimodalInput.keyEvent.taihe" ]
-  deps = [
-  "${mmi_path}/frameworks/ets/input_event:input_event_taihe",
-  "${mmi_path}/frameworks/ets/key_code:key_code_taihe",
-  ]
+copy_taihe_idl("input_device_taihe") {
+  sources = [ "idl/ohos.multimodalInput.inputDevice.taihe" ]
 }
-config("keyEvent_config") {
+config("inputDevice_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
     "${mmi_path}/util/common/include",
-    "${mmi_path}/tools/event_inject/include",
-    "${mmi_path}/interfaces/kits/c/input",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/moudle_loader/include",
   ]
 }
 subsystem_name = "multimodalinput"
@@ -35,24 +31,24 @@ part_name = "input"
 taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "$taihe_generated_file_path"
-  deps = [ ":key_event_taihe" ]
+  deps = [ ":input_device_taihe" ]
   outputs = [
-    "$taihe_generated_file_path/src/ohos.multimodalInput.keyEvent.ani.cpp",
-    "$taihe_generated_file_path/src/ohos.multimodalInput.keyEvent.abi.c",
+    "$taihe_generated_file_path/src/ohos.multimodalInput.inputDevice.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.multimodalInput.inputDevice.abi.c",
   ]
 }
-taihe_shared_library("KeyEvent") {
+taihe_shared_library("InputDevice") {
   taihe_generated_file_path = "$taihe_generated_file_path"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
   configs = [
     "${mmi_path}:coverage_flags",
-    ":keyEvent_config",
+    ":inputDevice_config",
   ]
   sources += [
     "src/ani_constructor.cpp",
-    "src/ohos.multimodalInput.keyEvent.impl.cpp",
+    "src/ohos.multimodalInput.inputDevice.impl.cpp",
   ]
   deps = [
     ":run_taihe",
@@ -73,23 +69,23 @@ taihe_shared_library("KeyEvent") {
     debug = false
   }
 }
-generate_static_abc("key_event_abc") {
+generate_static_abc("input_device_abc") {
   base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.keyEvent.ets" ]
+  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputDevice.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/key_event_abc.abc"
+  device_dst_file = "/system/framework/input_device_abc.abc"
   dependencies = [ ":run_taihe" ]
 }
-ohos_prebuilt_etc("key_event_etc") {
-  source = "$target_out_dir/key_event_abc.abc"
+ohos_prebuilt_etc("input_device_etc") {
+  source = "$target_out_dir/input_device_abc.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":key_event_abc" ]
+  deps = [ ":input_device_abc" ]
 }
-group("keyEvent") {
+group("inputDevice") {
   deps = [
-    ":key_event_etc",
-    ":KeyEvent",
+    ":input_device_etc",
+    ":InputDevice",
   ]
 }
