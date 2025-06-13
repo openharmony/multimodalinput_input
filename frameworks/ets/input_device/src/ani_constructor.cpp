@@ -13,37 +13,18 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.keyEvent", "keyEvent")
-from ohos.multimodalInput.inputEvent use InputEvent;
-from ohos.multimodalInput.keyCode use KeyCode;
-@!sts_inject("""
-static { loadLibrary("KeyEvent.z") }
-""")
+#include "ohos.multimodalInput.inputDevice.ani.hpp"
 
-enum Action : i32 {
-  CANCEL = 0,
-  DOWN = 1,
-  UP = 2
-}
-
-struct Key {
-  code: KeyCode;
-  pressedTime: i32;
-  deviceId: i32;
-}
-
-struct KeyEvent {
-  @extends base: InputEvent;
-  action: Action;
-  key: Key;
-  unicodeChar: i32;
-  keys: Array<Key>;
-  ctrlKey: bool;
-  altKey: bool;
-  shiftKey: bool;
-  logoKey: bool;
-  fnKey: bool;
-  capsLock: bool;
-  numLock: bool;
-  scrollLock: bool;
+ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
+{
+    ani_env *env;
+    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
+        return ANI_ERROR;
+    }
+    if (ANI_OK != ohos::multimodalInput::inputDevice::ANIRegister(env)) {
+        std::cerr << "Error from ohos::multimodalInput::inputDevice::ANIRegister" << std::endl;
+        return ANI_ERROR;
+    }
+    *result = ANI_VERSION_1;
+    return ANI_OK;
 }
