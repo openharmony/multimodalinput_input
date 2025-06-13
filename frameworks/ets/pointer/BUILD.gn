@@ -78,7 +78,7 @@ generate_static_abc("pointer_abc") {
 }
 ohos_prebuilt_etc("pointer_etc") {
   source = "$target_out_dir/pointer_abc.abc"
-  module_install_dir = "frameworks"
+  module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   deps = [ ":pointer_abc" ]
