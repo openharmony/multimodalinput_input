@@ -6316,7 +6316,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_002,
         displayGroupInfoRef = it->second;
     }
     displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.focusWindowId = 0;    
+    displayGroupInfoRef.focusWindowId = 0;
     UDSServer udsServer;
     udsServer.idxPidMap_.insert(std::make_pair(0, 1));
     SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
@@ -6358,7 +6358,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_003,
         displayGroupInfoRef = it->second;
     }
     displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.focusWindowId = 0;    
+    displayGroupInfoRef.focusWindowId = 0;
     UDSServer udsServer;
     udsServer.idxPidMap_.insert(std::make_pair(0, 1));
     SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
@@ -6400,7 +6400,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_004,
         displayGroupInfoRef = it->second;
     }
     displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.focusWindowId = 0;    
+    displayGroupInfoRef.focusWindowId = 0;
     UDSServer udsServer;
     udsServer.idxPidMap_.insert(std::make_pair(0, 1));
     SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName, 0, 0, 0, 0);
