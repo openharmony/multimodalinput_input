@@ -149,19 +149,19 @@ group("input_ets_group") {
     "frameworks/ets/gesture_event:gestureEvent"
   ]
   if (input_feature_keyboard) {
-      deps += [
-        "frameworks/ets/input_consumer:inputConsumer",
-        "frameworks/ets/input_event_client:inputEventClient"
-      ]
+    deps += [
+      "frameworks/ets/input_consumer:inputConsumer",
+      "frameworks/ets/input_event_client:inputEventClient"
+    ]
   }
   if (input_feature_input_device) {
     deps += [ "frameworks/ets/input_device:inputDevice" ]
   }
   if (input_feature_mouse) {
-      deps += [ "frameworks/ets/pointer:pointer" ]
+    deps += [ "frameworks/ets/pointer:pointer" ]
     }
   if (input_feature_short_key) {
-  deps += [ "frameworks/ets/short_key:shortKey" ]
+    deps += [ "frameworks/ets/short_key:shortKey" ]
   }
 }
 
