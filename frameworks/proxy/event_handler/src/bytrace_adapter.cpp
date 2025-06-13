@@ -470,7 +470,7 @@ void BytraceAdapter::StopWindowVisible()
 void BytraceAdapter::StartHardPointerRender(uint32_t width, uint32_t height, uint32_t bufferId, uint32_t screenId,
     int32_t style)
 {
-    StartTrace(HITRACE_TAG_MULTIMODALINPUT,"hard pointer render buffer width:" + std::to_string(width)
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "hard pointer render buffer width:" + std::to_string(width)
         + " height:" + std::to_string(height)
         + " bufferId:" + std::to_string(bufferId)
         + " screenId:" + std::to_string(screenId)

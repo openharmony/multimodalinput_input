@@ -535,7 +535,7 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
 
 DisplayGroupInfo& InputWindowsManager::FindTargetDisplayGroupInfo(int32_t displayId)
 {
-     {
+    {
         std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
         for (auto& it : displayGroupInfoMap_) {
             for (const auto& item : it.second.displaysInfo) {
@@ -813,8 +813,6 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
             for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
                 CHKCC(uiExtentionWindow.id == windowId);
                 return uiExtentionWindow.pid;
- 
- 
             }
         }
     }
@@ -1585,7 +1583,7 @@ bool InputWindowsManager::IsValidDisplayChange(const DisplayInfo &displayInfo)
 
 void InputWindowsManager::HandleWindowPositionChange(const DisplayGroupInfo &displayGroupInfo)
 {
-     CALL_DEBUG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t groupId = displayGroupInfo.groupId;
     PrintWindowNavbar(groupId);
     auto WindowInfo = GetWindowInfoVector(groupId);
@@ -1708,12 +1706,11 @@ void InputWindowsManager::UpdateGroupInfo()
 {
     std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
     for (auto &curGroupInfo : displayGroupInfoMap_) {
-        if (!(curGroupInfo.second.isMainGroup) 
+        if (!(curGroupInfo.second.isMainGroup)
             && !(displayGroupInfoMapTmp_.find(curGroupInfo.first) != displayGroupInfoMapTmp_.end())) {
             displayGroupInfoMap_.erase(curGroupInfo.first);
             captureModeInfoMap_.erase(curGroupInfo.first);
             pointerDrawFlagMap_.erase(curGroupInfo.first);
-            //mouseLocationMap_.erase(curGroupInfo.first);
             windowsPerDisplayMap_.erase(curGroupInfo.first);
             lastPointerEventforWindowChangeMap_.erase(curGroupInfo.first);
             displayModeMap_.erase(curGroupInfo.first);
@@ -1936,14 +1933,14 @@ DisplayMode InputWindowsManager::GetDisplayMode() const
     const auto iter = displayModeMap_.find(MAIN_GROUPID);
     if (iter != displayModeMap_.end()) {
         return iter->second;
-    } 
+    }
     return displayMode_;
 }
 
 void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 {
     CALL_DEBUG_ENTER;
-     DisplayMode mode;
+    DisplayMode mode;
     {
         std::shared_lock<std::shared_mutex> lock(displayGroupInfoMtx);
         const auto iter = displayGroupInfoMap_.find(groupId);
@@ -3093,7 +3090,6 @@ int32_t InputWindowsManager::GetFocusWindowId(int32_t groupId) const
     auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         return iter->second.focusWindowId;
-        
     }
     iter = displayGroupInfoMap_.find(MAIN_GROUPID);
     if (iter != displayGroupInfoMap_.end()) {
@@ -3905,9 +3901,9 @@ void InputWindowsManager::UpdatePointerChangeAreas()
 {
     CALL_DEBUG_ENTER;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-         std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
+        std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
         const auto iter = displayGroupInfoMapTmp_.find(MAIN_GROUPID);
-        if(iter == displayGroupInfoMapTmp_.end()) {
+        if (iter == displayGroupInfoMapTmp_.end()) {
             return;
         }
         UpdatePointerChangeAreas(iter->second);
@@ -4467,7 +4463,7 @@ int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptur
         return RET_ERR;
     }
     MMI_HILOGI("SetMouseCaptureMode In.");
-	{
+    {
         std::unique_lock<std::shared_mutex> lock(displayGroupInfoMtx);
         auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
         if (itr != captureModeInfoMap_.end()) {
@@ -6132,7 +6128,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
             }
         }
         MMI_HILOGI("Mouselocation displayinfo: displayId:%{public}d, W:%{public}d, H:%{public}d",
-        displayInfo.id, displayInfo.validWidth, displayInfo.validHeight);
+            displayInfo.id, displayInfo.validWidth, displayInfo.validHeight);
         return curMouseLocation;
     }
     MMI_HILOGI("Mouselocation next: displayId:%{public}d, X:%{public}d, Y:%{public}d",
@@ -6949,7 +6945,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
             for (const auto& item : iter->second.windowsInfo) {
                 CHKCC(item.id == windowId &&
                     (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) != WindowInfo::FLAG_BIT_UNTOUCHABLE &&
-                    transparentWins_.find(item.id) == transparentWins_.end());    
+                    transparentWins_.find(item.id) == transparentWins_.end());
                 return std::make_optional(item);
             }
         }
@@ -7057,7 +7053,7 @@ int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &sh
     item.SetPointerId(shiftWindowInfo.fingerId);
     lastTouchEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     lastTouchEvent_->SetTargetDisplayId(targetWindowInfo.displayId);
-    lastTouchEvent_->SetPointerId(shiftWindowInfo.fingerId);//？？？
+    lastTouchEvent_->SetPointerId(shiftWindowInfo.fingerId);
     lastTouchEvent_->SetTargetWindowId(targetWindowInfo.id);
     lastTouchEvent_->SetAgentWindowId(targetWindowInfo.agentWindowId);
     lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
