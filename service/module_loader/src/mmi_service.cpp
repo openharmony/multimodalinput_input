@@ -870,7 +870,7 @@ ErrCode MMIService::SetNapStatus(int32_t pid, int32_t uid, const std::string& bu
     }
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
-        MMI_HILOGE("Check pid permission failed");
+        MMI_HILOGD("Check pid permission failed");
         return ret;
     }
     NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
@@ -3233,7 +3233,7 @@ int32_t MMIService::CheckPidPermission(int32_t pid)
     CALL_DEBUG_ENTER;
     int32_t checkingPid = GetCallingPid();
     if (checkingPid != pid) {
-        MMI_HILOGE("Check pid failed, input pid:%{public}d, but checking pid:%{public}d", pid, checkingPid);
+        MMI_HILOGD("Check pid failed, input pid:%{public}d, but checking pid:%{public}d", pid, checkingPid);
         return RET_ERR;
     }
     return RET_OK;
@@ -4657,7 +4657,7 @@ void MMIService::InitPrintClientInfo()
             std::lock_guard<std::mutex> guard(mutex_);
             for (const auto &info : clientInfos_) {
                 if (static_cast<uint64_t>(info.second.pid) == info.second.readThreadId) {
-                    MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
+                    MMI_HILOGD("The application main thread and event reading thread are combined, such as:"
                     "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
                     info.first.c_str(), info.second.pid, info.second.pid, info.second.readThreadId);
                     return;
