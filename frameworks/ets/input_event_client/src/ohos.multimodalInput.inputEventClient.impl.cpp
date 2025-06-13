@@ -13,37 +13,17 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.keyEvent", "keyEvent")
-from ohos.multimodalInput.inputEvent use InputEvent;
-from ohos.multimodalInput.keyCode use KeyCode;
-@!sts_inject("""
-static { loadLibrary("KeyEvent.z") }
-""")
+#include "ohos.multimodalInput.inputEventClient.proj.hpp"
+#include "ohos.multimodalInput.inputEventClient.impl.hpp"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
 
-enum Action : i32 {
-  CANCEL = 0,
-  DOWN = 1,
-  UP = 2
-}
+using namespace taihe;
+using namespace ohos::multimodalInput::inputEventClient;
 
-struct Key {
-  code: KeyCode;
-  pressedTime: i32;
-  deviceId: i32;
-}
+namespace {
+} // namespace
 
-struct KeyEvent {
-  @extends base: InputEvent;
-  action: Action;
-  key: Key;
-  unicodeChar: i32;
-  keys: Array<Key>;
-  ctrlKey: bool;
-  altKey: bool;
-  shiftKey: bool;
-  logoKey: bool;
-  fnKey: bool;
-  capsLock: bool;
-  numLock: bool;
-  scrollLock: bool;
-}
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
+// NOLINTEND

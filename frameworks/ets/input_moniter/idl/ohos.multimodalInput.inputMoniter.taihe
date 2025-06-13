@@ -16,6 +16,9 @@
 @!namespace("@ohos.multimodalInput.inputMoniter", "inputMoniter")
 from ohos.multimodalInput.touchEvent use TouchEvent;
 from ohos.multimodalInput.mouseEvent use MouseEvent;
+@!sts_inject("""
+static { loadLibrary("InputMoniter.z") }
+""")
 
 struct TouchEventReceiver {
     filter: (touchEvent: TouchEvent) => bool;
