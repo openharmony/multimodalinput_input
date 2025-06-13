@@ -22,7 +22,7 @@ using namespace taihe;
 using namespace ohos::multimodalInput::pointer;
 
 namespace {
-std::map<int32_t, PointerStyle> POINTER_STYLE_TRANSFORMATION = {
+const static std::map<int32_t, PointerStyle> POINTER_STYLE_TRANSFORMATION = {
     { DEFAULT_IMPL,                                 PointerStyle::key_t::DEFAULT },
     { EAST_IMPL,                                    PointerStyle::key_t::EAST },
     { WEST_IMPL,                                    PointerStyle::key_t::WEST },

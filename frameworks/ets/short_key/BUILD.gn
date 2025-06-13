@@ -76,7 +76,7 @@ generate_static_abc("crypto_framework_abc") {
 }
 ohos_prebuilt_etc("crypto_framework_etc") {
   source = "$target_out_dir/crypto_framework_abc.abc"
-  module_install_dir = "frameworks"
+  module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   deps = [ ":crypto_framework_abc" ]

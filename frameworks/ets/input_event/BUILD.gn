@@ -18,7 +18,7 @@ copy_taihe_idl("input_event_taihe") {
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path = "$taihe_file_path/out/subsystem_name/$part_name"
+taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "$taihe_generated_file_path"
   deps = [ ":input_event_taihe" ]
@@ -36,7 +36,7 @@ generate_static_abc("crypto_framework_abc") {
 }
 ohos_prebuilt_etc("crypto_framework_etc") {
   source = "$target_out_dir/crypto_framework_abc.abc"
-  module_install_dir = "frameworks"
+  module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   deps = [ ":crypto_framework_abc" ]
