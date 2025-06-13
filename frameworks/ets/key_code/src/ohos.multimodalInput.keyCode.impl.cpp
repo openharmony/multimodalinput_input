@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 
-std::map<int32_t, KeyCode> KEY_CODE_TRANSFORMATION = {
+const static std::map<int32_t, KeyCode> KEY_CODE_TRANSFORMATION = {
     { KEYCODE_FN_ETS,                        KeyCode::key_t::KEYCODE_FN },
     { KEYCODE_UNKNOWN_ETS,                   KeyCode::key_t::KEYCODE_UNKNOWN },
     { KEYCODE_HOME_ETS,                      KeyCode::key_t::KEYCODE_HOME },
