@@ -35,7 +35,7 @@ TimerManager::TimerManager() {}
 TimerManager::~TimerManager() {}
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
-    std::string name)
+    const std::string &name)
 {
     if (intervalMs < MIN_INTERVAL) {
         intervalMs = MIN_INTERVAL;
@@ -46,7 +46,7 @@ int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::fun
 }
 
 int32_t TimerManager::AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
-    std::string name)
+    const std::string &name)
 {
     if (intervalMs < MIN_INTERVAL) {
         intervalMs = MIN_INTERVAL;
@@ -99,7 +99,7 @@ int32_t TimerManager::TakeNextTimerId()
 }
 
 int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
-    std::string name)
+    const std::string &name)
 {
     if (!callback) {
         return NONEXISTENT_ID;
