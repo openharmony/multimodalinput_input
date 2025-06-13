@@ -16,6 +16,9 @@
 @!namespace("@ohos.multimodalInput.mouseEvent", "mouseEvent")
 from ohos.multimodalInput.inputEvent use InputEvent;
 from ohos.multimodalInput.keyCode use KeyCode;
+@!sts_inject("""
+static { loadLibrary("MouseEvent.z") }
+""")
 
 enum Action : i32 {
   CANCEL = 0,

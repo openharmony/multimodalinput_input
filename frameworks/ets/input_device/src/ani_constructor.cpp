@@ -13,24 +13,18 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.intentionCode", "intentionCode")
-@!sts_inject("""
-static { loadLibrary("IntentionCode.z") }
-""")
+#include "ohos.multimodalInput.inputDevice.ani.hpp"
 
-enum IntentionCode : i32 {
-  INTENTION_UNKNOWN = -1,
-  INTENTION_UP = 1,
-  INTENTION_DOWN = 2,
-  INTENTION_LEFT = 3,
-  INTENTION_RIGHT = 4,
-  INTENTION_SELECT = 5,
-  INTENTION_ESCAPE = 6,
-  INTENTION_BACK = 7,
-  INTENTION_FORWARD = 8,
-  INTENTION_MENU = 9,
-  INTENTION_PAGE_UP = 11,
-  INTENTION_PAGE_DOWN = 12,
-  INTENTION_ZOOM_OUT = 13,
-  INTENTION_ZOOM_IN = 14
+ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
+{
+    ani_env *env;
+    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
+        return ANI_ERROR;
+    }
+    if (ANI_OK != ohos::multimodalInput::inputDevice::ANIRegister(env)) {
+        std::cerr << "Error from ohos::multimodalInput::inputDevice::ANIRegister" << std::endl;
+        return ANI_ERROR;
+    }
+    *result = ANI_VERSION_1;
+    return ANI_OK;
 }
