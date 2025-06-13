@@ -982,7 +982,12 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
     WindowGroupInfo windowGroupInfoTmp;
     windowGroupInfoTmp.focusWindowId = windowGroupInfo.focusWindowId;
     windowGroupInfoTmp.displayId = windowGroupInfo.displayId;
+    int32_t focWid = 0;
     for (const auto &it : groupWindows) {
+        if (it.first != MAIN_GROUPID) {
+            focWid = GetFocusWindowId(it.first);
+            windowGroupInfoTmp.focusWindowId = focWid;
+        }
         windowGroupInfoTmp.windowsInfo = it.second;
 #ifdef OHOS_BUILD_ENABLE_ANCO
         if (windowGroupInfoTmp.windowsInfo.size() == SHELL_WINDOW_COUNT
@@ -990,15 +995,15 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
             return UpdateShellWindow(windowGroupInfoTmp.windowsInfo[0]);
         }
 #endif // OHOS_BUILD_ENABLE_ANCO
-        int32_t groupId = FindDisplayGroupId(windowGroupInfoTmp.windowsInfo[0].displayId);
         DisplayGroupInfo displayGroupInfo;
-        const auto &iter = displayGroupInfoMapTmp_.find(groupId);
+        const auto &iter = displayGroupInfoMapTmp_.find(it.first);
         displayGroupInfo = (iter != displayGroupInfoMapTmp_.end()) ? iter->second : GetMainDisplayGroupInfo();
- 
+        if (it.first != MAIN_GROUPID) {
+            displayGroupInfo.focusWindowId = focWid;
+        }
         for (const auto &item : windowGroupInfoTmp.windowsInfo) {
             UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
         }
- 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         bool pointDrawFlag = NeedUpdatePointDrawFlag(windowGroupInfoTmp.windowsInfo);
         pointerDrawFlagMap_[displayGroupInfo.groupId] = pointDrawFlag;
@@ -1114,6 +1119,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
     }
    
     windowsPerDisplayMap_[groupId] = windowsPerDisplay;
+    windowsPerDisplay_ = windowsPerDisplay;
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     for (const auto &window : displayGroupInfo.windowsInfo) {
         if (window.windowType == static_cast<int32_t>(Rosen::WindowType::WINDOW_TYPE_TRANSPARENT_VIEW)) {
@@ -1754,19 +1760,7 @@ void InputWindowsManager::InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInf
             return;
         }
     }
-    if (displayGroupInfoMap_.find(groupId) != displayGroupInfoMap_.end()) {
-        return;
-    }
     displayGroupInfoMap_[groupId] = displayGroupInfo;
-    captureModeInfoMap_[groupId] = captureModeInfo_;
-    pointerDrawFlagMap_[groupId] = pointerDrawFlag_;
-    mouseLocationMap_[groupId] = mouseLocation_;
-    windowsPerDisplayMap_[groupId] = windowsPerDisplay_;
-    lastPointerEventforWindowChangeMap_[groupId] = lastPointerEventforWindowChange_;
-    displayModeMap_[groupId] = displayMode_;
-    lastDpiMap_[groupId] = lastDpi_;
-    CursorPosition cursorPos = {};
-    cursorPosMap_[groupId] = cursorPos;
 }
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
@@ -1775,8 +1769,11 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     if (!mainGroupExisted_ && displayGroupInfo.isMainGroup) {
         mainGroupExisted_ = true;
     }
+    int32_t groupId = displayGroupInfo.groupId;
+    bool bFlag = false;
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (mainGroupExisted_ && !displayGroupInfo.displaysInfo.empty()) {
+    bFlag = mainGroupExisted_ && !displayGroupInfo.displaysInfo.empty();
+    if (bFlag) {
         const auto &displayInfo = displayGroupInfo.displaysInfo.front();
         std::lock_guard<std::mutex> lock(oneHandMtx_);
         if (scalePercent_ != displayInfo.scalePercent) {
@@ -1794,28 +1791,23 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool isDisplayChanged = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    int32_t groupId = displayGroupInfo.groupId;
     DisplayGroupInfo displayGroupInfoTemp;
-    
     displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
-    if ((!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
-        && ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfo.currentUserId))) {
-        for (auto &displayInfo : displayGroupInfoMapTmp_) {
-            groupId = displayInfo.first;
-            displayGroupInfo = displayInfo.second;
+    bFlag = (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
+        && ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfo.currentUserId));
+    if (bFlag) {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            bool isDisplayUpdate = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
-            if (isDisplayUpdate) {
-                ResetPointerPosition(displayGroupInfo);
-            }
-#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            PrintChangedWindowBySync(displayGroupInfo);
-            CleanInvalidPiexMap(groupId);
-            HandleValidDisplayChange(displayGroupInfo);
-            displayGroupInfoMap_[groupId] = displayGroupInfo;
-            UpdateWindowsInfoPerDisplay(displayGroupInfo);
-            HandleWindowPositionChange(displayGroupInfo);
+        if (isDisplayChanged) {
+            ResetPointerPosition(displayGroupInfo);
         }
+#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        PrintChangedWindowBySync(displayGroupInfo);
+        CleanInvalidPiexMap(groupId);
+        HandleValidDisplayChange(displayGroupInfo);
+        displayGroupInfoMap_[groupId] = displayGroupInfo;
+        displayGroupInfo_ = displayGroupInfo;
+        UpdateWindowsInfoPerDisplay(displayGroupInfo);
+        HandleWindowPositionChange(displayGroupInfo);
         const auto iter = displayGroupInfoMap_.find(groupId);
         if (iter != displayGroupInfoMap_.end()) {
             displayGroupInfoTemp = iter->second;
