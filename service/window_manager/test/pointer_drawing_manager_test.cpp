@@ -50,6 +50,7 @@ const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotat
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
 const std::string CUSTOM_CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
+const std::string DEFAULT_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
 constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
 } // namespace
@@ -2688,6 +2689,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     auto* pointerDrawingManager = static_cast<PointerDrawingManager*>(IPointerDrawingManager::GetInstance());
     pointerDrawingManager->imageWidth_ = 50;
     pointerDrawingManager->imageHeight_ = 50;
+    pointerDrawingManager->UpdateIconPath(MOUSE_ICON::DEFAULT, DEFAULT_ICON_PATH);
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION0);
