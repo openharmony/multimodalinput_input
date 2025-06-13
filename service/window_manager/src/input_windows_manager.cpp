@@ -1829,7 +1829,6 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     }
     InitPointerStyle(displayGroupInfo.groupId);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    bool bFlag = false;
     
     const auto iter = pointerDrawFlagMap_.find(groupId);
     bFlag = (iter != pointerDrawFlagMap_.end()) ? true : false;
