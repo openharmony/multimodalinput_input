@@ -183,7 +183,6 @@ ohos_unittest("GestureTransformTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utils",
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -207,6 +206,10 @@ ohos_unittest("GestureTransformTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (call_manager_service_enabled) {
+      external_deps += ["call_manager:tel_call_manager_api"]
+  }
 
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
@@ -345,7 +348,6 @@ ohos_unittest("TabletToolTranformTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utils",
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -372,6 +374,10 @@ ohos_unittest("TabletToolTranformTest") {
 
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
+  }
+
+  if (call_manager_service_enabled) {
+      external_deps += ["call_manager:tel_call_manager_api"]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -540,7 +546,6 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utils",
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -577,6 +582,10 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
       "eventhandler:libeventhandler",
       "graphic_2d_ext:libsdf",
     ]
+  }
+
+  if (call_manager_service_enabled) {
+      external_deps += ["call_manager:tel_call_manager_api"]
   }
 
   if (input_feature_combination_key) {
@@ -695,7 +704,6 @@ ohos_unittest("TouchpadGestureTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utils",
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -722,6 +730,10 @@ ohos_unittest("TouchpadGestureTest") {
 
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
+  }
+
+  if (call_manager_service_enabled) {
+      external_deps += ["call_manager:tel_call_manager_api"]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -848,7 +860,6 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utils",
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -875,6 +886,10 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (call_manager_service_enabled) {
+      external_deps += ["call_manager:tel_call_manager_api"]
+  }
 
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
