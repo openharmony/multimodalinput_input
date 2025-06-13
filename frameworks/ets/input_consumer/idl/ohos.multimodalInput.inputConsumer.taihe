@@ -14,6 +14,10 @@
  */
 
 @!namespace("@ohos.multimodalInput.inputConsumer", "inputConsumer")
+from ohos.multimodalInput.keyEvent use KeyEvent;
+@!sts_inject("""
+static { loadLibrary("InputConsumer.z") }
+""")
 
 struct KeyOptions {
     preKeys: Array<i32>;
@@ -22,3 +26,53 @@ struct KeyOptions {
     finalKeyDownDuration: i32;
     isRepeat: Optional<bool>;
 }
+
+struct HotkeyOptions {
+    preKeys: Array<i32>;
+    finalKey: i32;
+    isRepeat: Optional<bool>;
+}
+
+struct KeyPressedConfig {
+    key: i32;
+    action: i32;
+    isRepeat: bool;
+}
+
+struct InfraredFrequency {
+    max: i32;
+    min: i32;
+}
+
+@!sts_inject("""
+    function on(type: 'key', keyOptions: KeyOptions, callback: (info: KeyOptions) => void) {
+        return onKey(keyOptions, callback, callback);
+    }
+    function off(type: 'key', keyOptions: KeyOptions, callback?: (info: KeyOptions) => void) {
+        return offKey(keyOptions, callback);
+    }
+""")
+@!sts_inject("""
+    function on(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void) {
+        return onHotkeyChange(hotkeyOptions, callback, callback);
+    }
+    function off(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void) {
+        return offHotkeyChange(hotkeyOptions, callback);
+    }
+""")
+@!sts_inject("""
+    function on(type: 'keyPressed', options: KeyPressedConfig,
+        callback: (info: __ohos_multimodalInput_keyEvent.keyEvent.KeyEvent) => void) {
+        return onKeyPressed(options, callback, callback);
+    }
+    function off(type: 'keyPressed', callback?: (info: __ohos_multimodalInput_keyEvent.keyEvent.KeyEvent) => void) {
+        return offKeyPressed(callback);
+    }
+""")
+
+function onKey(keyOptions: KeyOptions, f: (info: KeyOptions) => void, opq: Opaque);
+function offKey(keyOptions: KeyOptions, opq: Optional<Opaque>);
+function onHotkeyChange(hotkeyOptions: HotkeyOptions, f: (info: HotkeyOptions) => void, opq: Opaque);
+function offHotkeyChange(hotkeyOptions: HotkeyOptions, opq: Optional<Opaque>);
+function onKeyPressed(options: KeyPressedConfig, f: (info: KeyEvent) => void, opq: Opaque);
+function offKeyPressed(opq: Optional<Opaque>);
