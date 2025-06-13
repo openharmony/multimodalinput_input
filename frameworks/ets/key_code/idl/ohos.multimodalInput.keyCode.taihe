@@ -14,6 +14,9 @@
  */
 
 @!namespace("@ohos.multimodalInput.keyCode", "keyCode")
+@!sts_inject("""
+static { loadLibrary("KeyCode.z") }
+""")
 
 enum KeyCode : i32 {
   KEYCODE_FN = 0,

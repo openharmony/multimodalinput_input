@@ -22,7 +22,6 @@ using namespace taihe;
 using namespace ohos::multimodalInput::gestureEvent;
 
 namespace {
-// To be implemented.
 } // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.

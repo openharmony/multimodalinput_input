@@ -18,7 +18,7 @@ copy_taihe_idl("input_event_taihe") {
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path = "$taihe_file_path/out/subsystem_name/$part_name"
+taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "$taihe_generated_file_path"
   deps = [ ":input_event_taihe" ]
@@ -27,22 +27,22 @@ ohos_taihe("run_taihe") {
     "$taihe_generated_file_path/src/ohos.multimodalInput.inputEvent.abi.c",
   ]
 }
-generate_static_abc("crypto_framework_abc") {
+generate_static_abc("input_event_abc") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputEvent.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/crypto_framework_abc.abc"
+  device_dst_file = "/system/framework/input_event_abc.abc"
   dependencies = [ ":run_taihe" ]
 }
-ohos_prebuilt_etc("crypto_framework_etc") {
-  source = "$target_out_dir/crypto_framework_abc.abc"
-  module_install_dir = "frameworks"
+ohos_prebuilt_etc("input_event_etc") {
+  source = "$target_out_dir/input_event_abc.abc"
+  module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":crypto_framework_abc" ]
+  deps = [ ":input_event_abc" ]
 }
 group("inputEvent") {
   deps = [
-   ":crypto_framework_etc",
+   ":input_event_etc",
    ]
 }

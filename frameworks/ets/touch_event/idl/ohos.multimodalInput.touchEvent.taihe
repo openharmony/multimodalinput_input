@@ -15,6 +15,9 @@
 
 @!namespace("@ohos.multimodalInput.touchEvent", "touchEvent")
 from ohos.multimodalInput.inputEvent use InputEvent;
+@!sts_inject("""
+static { loadLibrary("TouchEvent.z") }
+""")
 
 enum Action : i32 {
   CANCEL = 0,
