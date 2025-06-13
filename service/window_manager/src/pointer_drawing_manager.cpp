@@ -3750,7 +3750,7 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
             DrawPointer(displayInfo_.uniqueId, x, y, pointerStyle, direction);
         }
 #else
-        DrawPointer(displayInfo_.id, displayInfo_.validWidth / CALCULATE_MIDDLE,
+        DrawPointer(displayInfo_.uniqueId, displayInfo_.validWidth / CALCULATE_MIDDLE,
             displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
