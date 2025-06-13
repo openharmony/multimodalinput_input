@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
- #ifndef INPUT_CONSUMER_KEY_PRESSED_IMPL_H
- #define INPUT_CONSUMER_KEY_PRESSED_IMPL_H
- 
- #include "ohos.multimodalInput.inputConsumer.proj.hpp"
- #include "ohos.multimodalInput.inputConsumer.impl.hpp"
- #include "taihe/runtime.hpp"
- #include "stdexcept"
- 
+#ifndef INPUT_CONSUMER_KEY_PRESSED_IMPL_H
+#define INPUT_CONSUMER_KEY_PRESSED_IMPL_H
+
+#include "ohos.multimodalInput.inputConsumer.proj.hpp"
+#include "ohos.multimodalInput.inputConsumer.impl.hpp"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
+
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "ohos.multimodalInput.keyCode.impl.h"
