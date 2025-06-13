@@ -165,7 +165,7 @@ TimerManager::TimerManager() {}
 TimerManager::~TimerManager() {}
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
-    std::string name)
+    const std::string &name)
 {
     return 0;
 }
