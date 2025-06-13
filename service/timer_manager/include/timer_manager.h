@@ -23,14 +23,37 @@
 #include "util.h"
 
 namespace OHOS {
+
+extern "C" uintptr_t DFX_SetCrashObj(uint8_t type, uintptr_t addr);
+extern "C" void DFX_ResetCrashObj(uintptr_t crashObj);
+
+struct CrashObjDumper {
+public:
+    explicit CrashObjDumper(const char *str)
+    {
+        if (str == nullptr) {
+            return;
+        }
+        ptr_ = DFX_SetCrashObj(0, reinterpret_cast<uintptr_t>(str));
+    }
+    ~CrashObjDumper()
+    {
+        DFX_ResetCrashObj(ptr_);
+    }
+private:
+    uintptr_t ptr_ = 0;
+};
+
 namespace MMI {
 class TimerManager final {
     DECLARE_DELAYED_SINGLETON(TimerManager);
 
 public:
     DISALLOW_COPY_AND_MOVE(TimerManager);
-    int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
-    int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
+    int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name = "");
+    int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name = "");
     int32_t RemoveTimer(int32_t timerId);
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId);
@@ -45,21 +68,22 @@ private:
         int32_t callbackCount { 0 };
         int64_t nextCallTime { 0 };
         std::function<void()> callback;
+        std::string name { "" };
     };
 private:
     int32_t TakeNextTimerId();
-    int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
+    int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name = "");
     int32_t RemoveTimerInternal(int32_t timerId);
     int32_t ResetTimerInternal(int32_t timerId);
     bool IsExistInternal(int32_t timerId);
-    void InsertTimerInternal(const std::shared_ptr<TimerItem>& timer);
+    void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int32_t CalcNextDelayInternal();
     void ProcessTimersInternal();
 
 private:
-    std::list<std::shared_ptr<TimerItem>> timers_;
-    std::mutex timersResourceMutex_;
-    std::mutex addTimerProcedureMutex_;
+    std::list<std::unique_ptr<TimerItem>> timers_;
+    std::recursive_mutex timerMutex_;
 };
 
 #define TimerMgr ::OHOS::DelayedSingleton<TimerManager>::GetInstance()

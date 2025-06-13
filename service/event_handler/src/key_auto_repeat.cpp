@@ -172,7 +172,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);
-    });
+    }, "KeyAutoRepeat");
 }
 
 std::string KeyAutoRepeat::GetTomlFilePath(const std::string &fileName) const

@@ -34,7 +34,8 @@ constexpr int32_t NONEXISTENT_ID { -1 };
 TimerManager::TimerManager() {}
 TimerManager::~TimerManager() {}
 
-int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
+int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+    const std::string &name)
 {
     if (intervalMs < MIN_INTERVAL) {
         intervalMs = MIN_INTERVAL;
@@ -44,7 +45,8 @@ int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::fun
     return AddTimerInternal(intervalMs, repeatCount, callback);
 }
 
-int32_t TimerManager::AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
+int32_t TimerManager::AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+    const std::string &name)
 {
     if (intervalMs < MIN_INTERVAL) {
         intervalMs = MIN_INTERVAL;
@@ -83,7 +85,7 @@ int32_t TimerManager::TakeNextTimerId()
 {
     uint64_t timerSlot = 0;
     uint64_t one = 1;
-    std::lock_guard guard(timersResourceMutex_);
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (const auto &timer : timers_) {
         timerSlot |= (one << timer->id);
     }
@@ -96,22 +98,24 @@ int32_t TimerManager::TakeNextTimerId()
     return NONEXISTENT_ID;
 }
 
-int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
+int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+    const std::string &name)
 {
     if (!callback) {
         return NONEXISTENT_ID;
     }
-    auto timer = std::make_shared<TimerItem>();
+    auto timer = std::make_unique<TimerItem>();
     timer->intervalMs = intervalMs;
     timer->repeatCount = repeatCount;
     timer->callbackCount = 0;
+    timer->name = name;
     auto nowTime = GetMillisTime();
     if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
         MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
         return NONEXISTENT_ID;
     }
     timer->callback = callback;
-    std::lock_guard guard(addTimerProcedureMutex_);
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     int32_t timerId = TakeNextTimerId();
     if (timerId < 0) {
         return NONEXISTENT_ID;
@@ -123,7 +127,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
 
 int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 {
-    std::lock_guard guard(timersResourceMutex_);
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             timers_.erase(it);
@@ -135,35 +139,27 @@ int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 
 int32_t TimerManager::ResetTimerInternal(int32_t timerId)
 {
-    std::shared_ptr<TimerItem> timer;
-    {
-        std::lock_guard guard(timersResourceMutex_);
-        for (auto it = timers_.begin(); it != timers_.end(); ++it) {
-            if ((*it)->id == timerId) {
-                timer = (*it);
-                timers_.erase(it);
-                break;
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
+    for (auto it = timers_.begin(); it != timers_.end(); ++it) {
+        if ((*it)->id == timerId) {
+            auto timer = std::move(*it);
+            timers_.erase(it);
+            auto nowTime = GetMillisTime();
+            if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
+                MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
+                return RET_ERR;
             }
+            timer->callbackCount = 0;
+            InsertTimerInternal(timer);
+            return RET_OK;
         }
     }
-    if (timer == nullptr) {
-        MMI_HILOGI("TimerID does not exist");
-        return RET_ERR;
-    }
-
-    auto nowTime = GetMillisTime();
-    if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-        MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
-        return RET_ERR;
-    }
-    timer->callbackCount = 0;
-    InsertTimerInternal(timer);
-    return RET_OK;
+    return RET_ERR;
 }
 
 bool TimerManager::IsExistInternal(int32_t timerId)
 {
-    std::lock_guard guard(timersResourceMutex_);
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             return true;
@@ -172,22 +168,22 @@ bool TimerManager::IsExistInternal(int32_t timerId)
     return false;
 }
 
-void TimerManager::InsertTimerInternal(const std::shared_ptr<TimerItem>& timer)
+void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 {
-    std::lock_guard guard(timersResourceMutex_);
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->nextCallTime > timer->nextCallTime) {
-            timers_.insert(it, timer);
+            timers_.insert(it, std::move(timer));
             return;
         }
     }
-    timers_.push_back(timer);
+    timers_.push_back(std::move(timer));
 }
 
 int32_t TimerManager::CalcNextDelayInternal()
 {
     auto delay = MIN_DELAY;
-    std::lock_guard guard(timersResourceMutex_);
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     if (!timers_.empty()) {
         auto nowTime = GetMillisTime();
         const auto& item = *timers_.begin();
@@ -202,34 +198,33 @@ int32_t TimerManager::CalcNextDelayInternal()
 
 void TimerManager::ProcessTimersInternal()
 {
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     if (timers_.empty()) {
         return;
     }
-    std::vector<int32_t> resetedTimerIDs;
-    std::vector<std::function<void()>> callbacks;
-    {
-        std::lock_guard guard(timersResourceMutex_);
-        auto nowTime = GetMillisTime();
-        for (;;) {
-            auto it = timers_.begin();
-            if (it == timers_.end() || (*it)->nextCallTime > nowTime) {
-                break;
-            }
-            auto timer = (*it);
-            timers_.erase(it);
-            callbacks.push_back(timer->callback);
-            ++timer->callbackCount;
-            if ((timer->repeatCount >= 1) && (timer->callbackCount >= timer->repeatCount)) {
-                continue;
-            }
-            resetedTimerIDs.push_back(timer->id);
+    auto nowTime = GetMillisTime();
+    for (;;) {
+        auto it = timers_.begin();
+        if (it == timers_.end()) {
+            break;
         }
-    }
-
-    for (auto id : resetedTimerIDs) {
-        ResetTimerInternal(id);
-    }
-    for (auto callback  : callbacks) {
+        if ((*it)->nextCallTime > nowTime) {
+            break;
+        }
+        auto curTimer = std::move(*it);
+        CrashObjDumper dumper((curTimer->name).c_str());
+        timers_.erase(it);
+        ++curTimer->callbackCount;
+        if ((curTimer->repeatCount >= 1) && (curTimer->callbackCount >= curTimer->repeatCount)) {
+            curTimer->callback();
+            continue;
+        }
+        if (!AddInt64(curTimer->nextCallTime, curTimer->intervalMs, curTimer->nextCallTime)) {
+            MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
+            return;
+        }
+        auto callback = curTimer->callback;
+        InsertTimerInternal(curTimer);
         callback();
     }
 }

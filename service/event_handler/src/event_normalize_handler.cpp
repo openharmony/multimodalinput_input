@@ -921,7 +921,7 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
         int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
         this->AddHandleTimer(triggerTime);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    });
+    }, "EventNormalizeHandler");
     return timerId_;
 }
 

@@ -167,7 +167,7 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent, int32_t de
                 [this, monitor, tKeyEvent]() {
                     pending_.erase(monitor);
                     NotifyKeyMonitor(tKeyEvent, monitor.session_);
-                });
+                }, "KeyMonitorManager");
             if (timerId < 0) {
                 MMI_HILOGE("AddTimer fail");
                 return false;

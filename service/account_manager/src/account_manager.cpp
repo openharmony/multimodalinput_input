@@ -190,7 +190,7 @@ void AccountManager::AccountSetting::InitializeSetting()
         timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
             InitializeSetting();
             timerId_ = -1;
-        });
+        }, "AccountManager-AccountSetting-InitializeSetting");
         if (timerId_ < 0) {
             MMI_HILOGE("AddTimer fail, setting will not work");
         }
@@ -387,7 +387,7 @@ void AccountManager::SubscribeCommonEvent()
     timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
         SubscribeCommonEvent();
         timerId_ = -1;
-    });
+    }, "AccountManager-SubscribeCommonEvent");
     if (timerId_ < 0) {
         MMI_HILOGE("AddTimer fail, SubscribeCommonEvent fail");
     }
