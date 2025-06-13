@@ -17,7 +17,9 @@
 
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 #include "call_manager_client.h"
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 #include "display_event_monitor.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
@@ -49,7 +51,9 @@ constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 const std::string CALL_BEHAVIOR_KEY { "incall_power_button_behavior" };
 const std::string SETTINGS_DATA_SYSTEM_URI {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true" };
@@ -579,6 +583,7 @@ void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> 
     EventFwk::CommonEventManager::PublishCommonEvent(commonData, publishInfo);
 }
 
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -637,6 +642,7 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -647,6 +653,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         }
     };
     CHKPF(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
     if (HandleRingMute(keyEvent)) {
         MMI_HILOGI("Mute Ring in subscribe keyEvent");
         RemoveSubscriberTimer(keyEvent);
@@ -656,6 +663,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGI("Call Ended in subscribe keyEvent");
         return true;
     }
+#endif  // OHOS_BUILD_ENABLE_CALL_MANAGER
     if (!IsEnableCombineKey(keyEvent)) {
         MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
         return false;
@@ -1452,6 +1460,7 @@ void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEv
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1548,6 +1557,7 @@ void KeySubscriberHandler::RejectCallProcess()
     }
     MMI_HILOGI("RejectCall success");
 }
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 void KeySubscriberHandler::InitDataShareListener()
 {

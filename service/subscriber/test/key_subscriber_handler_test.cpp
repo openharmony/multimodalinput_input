@@ -21,7 +21,9 @@
 #include "key_option.h"
 #include "key_subscriber_handler.h"
 #include "key_shortcut_manager.h"
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 #include "call_manager_client.h"
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
@@ -762,6 +764,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyOption_001, 
     ASSERT_NO_FATAL_FAILURE(handler.PrintKeyOption(keyOption));
 }
 
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_002
  * @tc.desc: Test HandleKeyUpWithDelay
@@ -983,6 +986,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_009, 
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 /**
  * @tc.name: KeySubscriberHandlerTest_SubscribeKeyEvent_002
@@ -1507,6 +1511,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsRepeatedKeyEvent, 
     ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
 }
 
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_010
  * @tc.desc: Test the funcation HandleRingMute
@@ -1542,6 +1547,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_010, 
     ret = handler.HandleRingMute(keyEvent);
     ASSERT_FALSE(ret);
 }
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 /**
  * @tc.name: KeySubscriberHandlerTest_OnSubscribeKeyEvent_002
@@ -1817,6 +1823,8 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_004, Tes
     bool ret = handler.HandleKeyUp(keyEvent);
     ASSERT_FALSE(ret);
 }
+
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_01
  * @tc.desc: Test the funcation HandleRingMute
@@ -2070,6 +2078,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_11, T
     keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 /**
  * @tc.name: KeySubscriberHandlerTest_AddKeyGestureSubscriber_01
@@ -2681,6 +2690,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_InitDataShareListene
     EXPECT_NO_FATAL_FAILURE(handler.InitDataShareListener());
 }
 
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 /**
  * @tc.name: KeySubscriberHandlerTest_RejectCallProcess
  * @tc.desc: Test RejectCallProcess
@@ -2767,6 +2777,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTime
     }
     EXPECT_NO_FATAL_FAILURE(handler.RemoveSubscriberTimer(keyEvent));
 }
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 /**
  * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer
@@ -2926,6 +2937,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_UnsubscribeHotkey, T
     ASSERT_NE(handler.UnsubscribeHotkey(session, subscribeId), RET_ERR);
 }
 
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
  * @tc.desc: Test HandleCallEnded
@@ -2998,6 +3010,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded002, 
     ret = handler.HandleCallEnded(keyEvent);
     ASSERT_FALSE(ret);
 }
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 /**
  * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer
@@ -3156,6 +3169,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_InterceptByVm_002, T
     ASSERT_NO_FATAL_FAILURE(handler.InterceptByVm(keyEvent));
 }
 
+#ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_011
  * @tc.desc: Test ring mute
@@ -3205,6 +3219,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_012, 
     result = keySubscriberHandler.HandleRingMute(keyEvent);
     ASSERT_FALSE(DEVICE_MONITOR->GetHasHandleRingMute());
 }
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 
 /**
