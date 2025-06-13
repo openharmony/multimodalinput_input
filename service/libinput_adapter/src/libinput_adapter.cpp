@@ -351,7 +351,7 @@ void LibinputAdapter::StartVKeyboardDelayTimer(int32_t delayMs)
 {
     TimerMgr->AddTimer(delayMs, 1, [this]() {
         DelayInjectKeyEventCallback();
-    }, "StartVKeyboardDelayTimer");
+    }, "LibinputAdapter-StartVKeyboardDelayTimer");
 }
 
 bool LibinputAdapter::GetIsCaptureMode()
