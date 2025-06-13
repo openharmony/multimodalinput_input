@@ -1394,7 +1394,7 @@ ErrCode MMIService::SupportKeys(int32_t deviceId, const std::vector<int32_t>& ke
         return RET_ERR;
     }
     if (keys.size() < 0 || keys.size() > ExtraData::MAX_BUFFER_SIZE) {
-        MMI_HILOGE("Invalid size:%{public}d", keys.size());
+        MMI_HILOGE("Invalid size:%{public}zu", keys.size());
         return RET_ERR;
     }
     std::vector<int32_t> keyCode {};
@@ -3166,7 +3166,7 @@ ErrCode MMIService::AppendExtraData(const ExtraData &extraData)
         return MMISERVICE_NOT_RUNNING;
     }
     if (extraData.buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
-        MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", extraData.buffer.size());
+        MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}zu", extraData.buffer.size());
         return ERROR_OVER_SIZE_BUFFER;
     }
     if (extraData.sourceType != InputEvent::SOURCE_TYPE_TOUCHSCREEN &&
@@ -4625,7 +4625,7 @@ ErrCode MMIService::SetClientInfo(int32_t pid, uint64_t readThreadId)
         return MMISERVICE_NOT_RUNNING;
     }
     if (readThreadId < 0) {
-        MMI_HILOGE("invalid readThreadId :%{public}llu", readThreadId);
+        MMI_HILOGE("invalid readThreadId:%{public}" PRIu64, readThreadId);
         return RET_ERR;
     }
     auto sess = GetSessionByPid(pid);
