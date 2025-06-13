@@ -107,7 +107,7 @@ void TouchDrawingManager::SetupSettingObserver(int32_t nRetries)
     }
     auto timerId = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, nRetries]() {
         SetupSettingObserver(nRetries - 1);
-    });
+    }, "TouchDrawingManager");
     if (timerId < 0) {
         MMI_HILOGE("AddTimer fail");
     }

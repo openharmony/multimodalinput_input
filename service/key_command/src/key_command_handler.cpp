@@ -626,7 +626,7 @@ void KeyCommandHandler::StartTwoFingerGesture()
         auto now = std::chrono::high_resolution_clock::now();
         auto duration = now.time_since_epoch();
         twoFingerGesture_.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    });
+    }, "KeyCommandHandler-StartTwoFingerGesture");
 }
 
 void KeyCommandHandler::StopTwoFingerGesture()
@@ -1088,7 +1088,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
                 } else {
                     MMI_HILOGW("Timer fired, but object is already destroyed.");
                 }
-            });
+            }, "KeyCommandHandler-CheckSpecialRepeatKey");
             if (timerId < 0) {
                 MMI_HILOGE("Add timer failed");
             }
@@ -1567,7 +1567,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
             auto handler = InputHandler->GetSubscriberHandler();
             CHKPV(handler);
             handler->HandleKeyEvent(tmpKey);
-        });
+        }, "KeyCommandHandler-OnHandleEvent");
         if (timerId < 0) {
             DfxHisysevent::ReportFailHandleKey("OnHandleEvent", key->GetKeyCode(),
                 DfxHisysevent::KEY_ERROR_CODE::FAILED_TIMER);
@@ -1755,7 +1755,7 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item,
             if (it != repeatKeyTimerIds_.end()) {
                 repeatKeyTimerIds_.erase(it);
             }
-        });
+        }, "KeyCommandHandler-HandleRepeatKeyAbility");
         if (timerId < 0) {
             DfxHisysevent::ReportFailHandleKey("HandleRepeatKeyAbility", keyEvent->GetKeyCode(),
                 DfxHisysevent::KEY_ERROR_CODE::FAILED_TIMER);
@@ -1820,7 +1820,7 @@ int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
         SOS_COUNT_DOWN_TIMES / SECONDS_SYSTEM, 1, [this] () {
         MMI_HILOGW("Timeout, restore the power button");
         isFreezePowerKey_ = false;
-    });
+    }, "KeyCommandHandler-SetIsFreezePowerKey");
     if (timerId < 0) {
         MMI_HILOGE("Add timer failed");
         isFreezePowerKey_ = false;
@@ -1863,7 +1863,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
         repeatTimerId_ = TimerMgr->AddTimer(intervalTime / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
             repeatTimerId_ = -1;
-        });
+        }, "KeyCommandHandler-HandleRepeatKeyCount");
         if (repeatTimerId_ < 0) {
             return false;
         }
@@ -2215,7 +2215,7 @@ bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbi
         LaunchAbility(sequence);
         sequence.timerId = -1;
         BytraceAdapter::StopLaunchAbility();
-    });
+    }, "KeyCommandHandler-HandleScreenLocked");
     if (sequence.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
         return false;
@@ -2261,7 +2261,7 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
         DfxHisysevent::ReportKeyEvent(sequence.ability.bundleName);
         sequence.timerId = -1;
         BytraceAdapter::StopLaunchAbility();
-    });
+    }, "KeyCommandHandler-HandleNormalSequence");
     if (sequence.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
         DfxHisysevent::ReportFailLaunchAbility(sequence.ability.bundleName,
@@ -2398,7 +2398,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         LaunchAbility(shortcutKey);
         DfxHisysevent::ReportKeyEvent(shortcutKey.ability.bundleName);
         BytraceAdapter::StopLaunchAbility();
-    });
+    }, "KeyCommandHandler-HandleKeyDown");
     if (shortcutKey.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
         DfxHisysevent::ReportFailLaunchAbility(shortcutKey.ability.bundleName,
@@ -2567,7 +2567,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
                 isFreezePowerKey_ = false;
                 sosDelayTimerId_ = -1;
                 MMI_HILOGW("Timeout, restore the power button");
-            });
+            }, "KeyCommandHandler-LaunchAbility");
             if (sosDelayTimerId_ < 0) {
                 isFreezePowerKey_ = false;
                 MMI_HILOGE("Add timer failed");

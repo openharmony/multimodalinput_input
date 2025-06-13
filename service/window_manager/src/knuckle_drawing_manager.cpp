@@ -746,7 +746,7 @@ int32_t KnuckleDrawingManager::ProcessUpEvent(bool isNeedUpAnimation)
         int32_t repeatTime = 1;
         int32_t timerId = TimerMgr->AddTimer(PROTOCOL_DURATION, repeatTime, [this]() {
             DestoryWindow();
-        });
+        }, "KnuckleDrawingManager");
         if (timerId < 0) {
             MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
             DestoryWindow();

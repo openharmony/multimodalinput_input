@@ -1027,7 +1027,7 @@ bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscribe
         CHKPV(subscriber);
         subscriber->timerId_ = -1;
         OnTimer(subscriber);
-    });
+    }, "KeySubscriberHandler");
 
     if (subscriber->timerId_ < 0) {
         MMI_HILOGE("Leave, addTimer failed");

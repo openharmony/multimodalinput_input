@@ -123,7 +123,7 @@ void XKeyEventProcessor::StartLongPressTimer()
             HandleQuickAccessMenu(LONG_PRESS);
             MMI_HILOGI("X-key is long press.");
         }
-    });
+    }, "XKeyEventProcessor");
 }
 
 void XKeyEventProcessor::InterceptXKeyUp()
@@ -163,7 +163,7 @@ void XKeyEventProcessor::StartSingleClickTimer()
             HandleQuickAccessMenu(SINGLE_CLICK);
             MMI_HILOGI("X-key is single click.");
         }
-    });
+    }, "XKeyEventProcessor");
 }
 
 void XKeyEventProcessor::RemoveTimer()
