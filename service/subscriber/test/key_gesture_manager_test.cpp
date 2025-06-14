@@ -17,7 +17,6 @@
 #include <list>
 #include <gtest/gtest.h>
 
-#include "ability_manager_client.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"
 #include "key_option.h"
@@ -374,7 +373,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_01, TestSize.Lev
 {
     CALL_TEST_DEBUG;
     KeyGestureManager::PullUpAccessibility pullUpAccessibility;
-    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_OFF;
+    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF;
     bool ret = pullUpAccessibility.IsWorking();
     EXPECT_FALSE(ret);
 }

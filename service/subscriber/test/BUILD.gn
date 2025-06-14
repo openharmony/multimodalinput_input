@@ -97,7 +97,6 @@ ohos_unittest("KeyGestureManagerTest") {
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/subscriber/test/include",
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/connect_manager/include",
@@ -109,7 +108,7 @@ ohos_unittest("KeyGestureManagerTest") {
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
     "${mmi_path}/service/subscriber/src/key_gesture_manager.cpp",
     "${mmi_path}/service/subscriber/test/key_gesture_manager_test.cpp",
-    "${mmi_path}/service/subscriber/test/src/timer_manager.cpp",
+    "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
   ]
 
   cflags = [
@@ -126,9 +125,9 @@ ohos_unittest("KeyGestureManagerTest") {
   ]
 
   external_deps = [
-    "ability_base:want",
     "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "init:libbegetutil",
