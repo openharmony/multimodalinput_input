@@ -221,7 +221,7 @@ int32_t KeySubscriberHandler::AddKeyGestureSubscriber(
         MMI_HILOGE("AddKeyGesture fail, error:%{public}d", subscriber->timerId_);
         return RET_ERR;
     }
-    MMI_HILOGI("Handler(%{public}d) of key gesture was added", subscriber->timerId_);
+    MMI_HILOGD("Handler(%{public}d) of key gesture was added", subscriber->timerId_);
     PrintKeyOption(keyOption);
     for (auto &iter : keyGestures_) {
         if (IsEqualKeyOption(keyOption, iter.first)) {
@@ -245,7 +245,7 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
             if ((subscriber->id_ != subscribeId) || (subscriber->sess_ != sess)) {
                 continue;
             }
-            MMI_HILOGI("Removing handler(%{public}d) of key gesture", subscriber->timerId_);
+            MMI_HILOGD("Removing handler(%{public}d) of key gesture", subscriber->timerId_);
             keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
             auto option = subscriber->keyOption_;
             MMI_HILOGD("SubscribeId:%{public}d, finalKey:%{private}d, isFinalKeyDown:%{public}s,"
@@ -1457,7 +1457,7 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (!callBahaviorState_) {
-        MMI_HILOGE("CallBehaviorState is false");
+        MMI_HILOGD("CallBehaviorState is false");
         return false;
     }
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER ||
