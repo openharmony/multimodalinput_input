@@ -7214,6 +7214,8 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
         pointerItem.SetWindowX(windowX);
         pointerItem.SetWindowY(windowY);
+        pointerItem.SetWindowXPos(windowX);
+        pointerItem.SetWindowYPos(windowY);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     }
     if (lastTouchWindowInfo_.id != touchWindow->id) {
