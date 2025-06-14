@@ -495,6 +495,7 @@ void JsInputMonitorManager::EmitJsQueryTouchEvents(sptr<JsInputMonitor::Callback
         uv_qos_user_initiated);
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
+        cb->DecStrongRef(nullptr);
         JsInputMonitor::DeletePtr<uv_work_t *>(work);
     }
 }

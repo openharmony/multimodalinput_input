@@ -16,6 +16,7 @@
 #ifndef EVENT_STATISTIC_H
 #define EVENT_STATISTIC_H
 
+#include <algorithm>
 #include <fstream>
 #include <queue>
 #include <sys/stat.h>

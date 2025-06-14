@@ -623,12 +623,14 @@ int32_t JsInputMonitor::GetSourceType(int32_t sourceType)
     }
 }
 
-int32_t JsInputMonitor::GetJsPointerItem(napi_env env, const PointerEvent::PointerItem &item, napi_value value) const
+int32_t JsInputMonitor::GetJsPointerItem(napi_env env, const PointerEvent::PointerItem &item, napi_value value)
 {
     CHKRR(SetNameProperty(env, value, "id", item.GetPointerId()), "Set id", RET_ERR);
     CHKRR(SetNameProperty(env, value, "pressedTime", item.GetDownTime()), "Set pressedTime", RET_ERR);
     CHKRR(SetNameProperty(env, value, "screenX", item.GetDisplayX()), "Set screenX", RET_ERR);
     CHKRR(SetNameProperty(env, value, "screenY", item.GetDisplayY()), "Set screenY", RET_ERR);
+    CHKRR(SetNameProperty(env, value, "globalX", static_cast<int32_t>(item.GetGlobalX())), "Set globalX", RET_ERR);
+    CHKRR(SetNameProperty(env, value, "globalY", static_cast<int32_t>(item.GetGlobalY())), "Set globalY", RET_ERR);
     CHKRR(SetNameProperty(env, value, "windowX", item.GetWindowX()), "Set windowX", RET_ERR);
     CHKRR(SetNameProperty(env, value, "windowY", item.GetWindowY()), "Set windowY", RET_ERR);
     CHKRR(SetNameProperty(env, value, "pressure", item.GetPressure()), "Set pressure", RET_ERR);
