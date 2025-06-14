@@ -5279,5 +5279,28 @@ ErrCode MMIService::ClearMouseHideFlag(int32_t eventId)
     }
     return RET_OK;
 }
+
+ErrCode MMIService::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
+{
+    CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Verify Request From Monitor failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [count, &pointerList] {
+            return EventStatistic::QueryPointerRecord(count, pointerList);
+        }
+    );
+    if (ret != RET_OK) {
+        MMI_HILOGE("query poniterRecord failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

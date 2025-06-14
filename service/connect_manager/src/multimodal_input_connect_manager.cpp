@@ -1204,5 +1204,13 @@ int32_t MultimodalInputConnectManager::ClearMouseHideFlag(int32_t eventId)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->ClearMouseHideFlag(eventId);
 }
+
+int32_t MultimodalInputConnectManager::QueryPointerRecord(
+    int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->QueryPointerRecord(count, pointerList);
+}
 } // namespace MMI
 } // namespace OHOS

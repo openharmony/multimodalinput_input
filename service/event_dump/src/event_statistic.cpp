@@ -30,12 +30,14 @@ constexpr int32_t FILE_MAX_SIZE = 100 * 1024 * 1024;
 constexpr int32_t EVENT_OUT_SIZE = 30;
 constexpr int32_t FUNC_EXE_OK = 0;
 constexpr int32_t STRING_WIDTH = 3;
+constexpr int32_t POINTER_RECORD_MAX_SIZE = 100;
 }
 
 std::queue<std::string> EventStatistic::eventQueue_;
 std::list<std::string> EventStatistic::dumperEventList_;
 std::mutex EventStatistic::queueMutex_;
 std::condition_variable EventStatistic::queueCondition_;
+std::deque<EventStatistic::PointerEventRecord> EventStatistic::pointerRecordDeque_;
 bool EventStatistic::writeFileEnabled_ = false;
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_CANCEL, "cancel" },
@@ -127,6 +129,7 @@ std::string EventStatistic::ConvertTimeToStr(int64_t timestamp)
 void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
 {
     CHKPV(eventPtr);
+    PushPointerRecord(eventPtr);
     int32_t pointerAction = eventPtr->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_MOVE || pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE ||
         pointerAction == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
@@ -140,8 +143,7 @@ void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
     eventStr += ",pointerId:" + std::to_string(eventPtr->GetPointerId());
     eventStr += ",pointerAction:";
     eventStr += ConvertPointerActionToString(eventPtr);
-    eventStr += ",buttonId:" + std::to_string(eventPtr->GetButtonId());
-    eventStr += ",pointers:[";
+    eventStr += ",buttonId:" + std::to_string(eventPtr->GetButtonId()) + ",pointers:[";
     size_t pointerSize = 0;
     std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
     for (auto it = pointerItems.begin(); it != pointerItems.end(); it++) {
@@ -231,6 +233,56 @@ void EventStatistic::PushEventStr(std::string eventStr)
         eventQueue_.push(eventStr);
         queueCondition_.notify_all();
     }
+}
+
+void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
+{
+    std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
+    std::vector<double> pressures;
+    std::vector<double> tiltXs;
+    std::vector<double> tiltYs;
+    for (auto it = pointerItems.begin(); it != pointerItems.end(); ++it) {
+        pressures.push_back(it->GetPressure());
+        tiltXs.push_back(it->GetTiltX());
+        tiltYs.push_back(it->GetTiltY());
+    }
+    pointerRecordDeque_.emplace_back(eventPtr->GetActionTime(),
+        eventPtr->GetSourceType(),
+        eventPtr->HasFlag(InputEvent::EVENT_FLAG_SIMULATE),
+        pressures,
+        tiltXs,
+        tiltYs);
+    if (pointerRecordDeque_.size() > POINTER_RECORD_MAX_SIZE) {
+        pointerRecordDeque_.pop_front();
+    }
+}
+
+int32_t EventStatistic::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
+{
+    if (count <= 0 || pointerRecordDeque_.empty()) {
+        MMI_HILOGD("Return pointerList is empty");
+        return RET_OK;
+    }
+    count = std::min(count, static_cast<int32_t>(pointerRecordDeque_.size()));
+    for (auto it = pointerRecordDeque_.end() - count; it != pointerRecordDeque_.end(); ++it) {
+        auto pointerEvent = PointerEvent::Create();
+        pointerEvent->SetActionTime(it->actionTime);
+        pointerEvent->SetSourceType(it->sourceType);
+        if (it->isInject) {
+            pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+        }
+        for (auto pressuresIt = it->pressures.begin(), tiltXsIt = it->tiltXs.begin(), tiltYsIt = it->tiltYs.begin();
+             pressuresIt != it->pressures.end() && tiltXsIt != it->tiltXs.end() && tiltYsIt != it->tiltYs.end();
+             ++pressuresIt, ++tiltXsIt, ++tiltYsIt) {
+            PointerEvent::PointerItem pointerItem;
+            pointerItem.SetPressure(*pressuresIt);
+            pointerItem.SetTiltX(*tiltXsIt);
+            pointerItem.SetTiltY(*tiltYsIt);
+            pointerEvent->AddPointerItem(pointerItem);
+        }
+        pointerList.push_back(pointerEvent);
+    }
+    return RET_OK;
 }
 
 std::string EventStatistic::PopEvent()

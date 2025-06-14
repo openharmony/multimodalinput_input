@@ -253,6 +253,7 @@ public:
     int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
     void UnsubscribeInputActive(int32_t subscribeId);
     int32_t SwitchTouchTracking(bool touchTracking);
+    int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo);
