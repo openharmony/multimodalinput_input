@@ -564,6 +564,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]

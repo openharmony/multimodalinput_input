@@ -211,11 +211,10 @@ public:
     void CleanInvalidPiexMap(int32_t groupId = DEFAULT_GROUP_ID);
     void HandleWindowPositionChange(const DisplayGroupInfo &displayGroupInfo);
     void SendCancelEventWhenWindowChange(int32_t pointerId, int32_t groupId = DEFAULT_GROUP_ID);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    bool IsSupported();
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    bool GetHardCursorEnabled();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
+    Direction GetDisplayDirection(const DisplayInfo *displayInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
@@ -267,7 +266,6 @@ private:
     void UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
-    Direction GetDisplayDirection(const DisplayInfo *displayInfo);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height, bool isRealData = true);
     void UpdateCurrentDisplay(int32_t displayId) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -415,7 +413,6 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
         Coordinate2D &position, const DisplayInfo &currentDisplay, bool isPhysicalPos = false);
     void CancelTouchScreenEventIfValidDisplayChange(const DisplayGroupInfo &displayGroupInfo);
     bool IsValidDisplayChange(const DisplayInfo &displayInfo);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);
     bool OnDisplayRemovedOrCombinationChanged(const DisplayGroupInfo &displayGroupInfo);
     void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
@@ -424,7 +421,6 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
         DisplayInfo &mainScreenDisplayInfo) const;
     bool IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay);
     void SendBackCenterPointerEevent(const CursorPosition &cursorPos);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;

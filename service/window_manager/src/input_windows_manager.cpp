@@ -785,15 +785,15 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     }
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     const int32_t focusWindowId = GetFocusWindowId(groupId);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    UpdateKeyEventDisplayId(keyEvent, focusWindowId, groupId);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+        UpdateKeyEventDisplayId(keyEvent, focusWindowId_);
+    }
     WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     bool isUIExtention = false;
     auto iter = windowsInfo.begin();
     for (; iter != windowsInfo.end(); ++iter) {
-        if (iter->id == focusWindowId) {
+        if (iter->id == focusWindowId_) {
             windowInfo = &(*iter);
             if (!iter->uiExtentionWindowInfo.empty() && !IsOnTheWhitelist(keyEvent)) {
                 isUIExtention = true;
@@ -1147,26 +1147,30 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
         [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
         return lwindow.zOrder > rwindow.zOrder;
     });
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-        if (windowInfo.isDisplayCoord) {
-            continue;
-        }
-        auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
-        CHKPR(displayInfo, action);
-        ChangeWindowArea(displayInfo->x, displayInfo->y, windowInfo);
-        if (!windowInfo.uiExtentionWindowInfo.empty()) {
-            for (auto &item : windowInfo.uiExtentionWindowInfo) {
-                ChangeWindowArea(displayInfo->x, displayInfo->y, item);
+    if (GetHardCursorEnabled())
+    {
+        for (auto &windowInfo : displayGroupInfo.windowsInfo)
+        {
+            if (windowInfo.isDisplayCoord)
+            {
+                continue;
             }
+            auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
+            CHKPR(displayInfo, action);
+            ChangeWindowArea(displayInfo->x, displayInfo->y, windowInfo);
+            if (!windowInfo.uiExtentionWindowInfo.empty())
+            {
+                for (auto &item : windowInfo.uiExtentionWindowInfo)
+                {
+                    ChangeWindowArea(displayInfo->x, displayInfo->y, item);
+                }
+            }
+            windowInfo.isDisplayCoord = true;
         }
-        windowInfo.isDisplayCoord = true;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return action;
 }
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void InputWindowsManager::ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo)
 {
     windowInfo.area.x += x;
@@ -1243,16 +1247,15 @@ CursorPosition  InputWindowsManager::ResetCursorPos(const DisplayGroupInfo &disp
         DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
-        x = displayInfo.validWidth * HALF_RATIO;
-        y = displayInfo.validHeight * HALF_RATIO;
-        if (IsSupported()) {
-            if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
+        if (GetHardCursorEnabled()) {
+            (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
+            x = displayInfo.validWidth * HALF_RATIO;
+            y = displayInfo.validHeight * HALF_RATIO;
+            Direction direction = GetDisplayDirection(&displayInfo);
+            if (direction == DIRECTION90 || direction == DIRECTION270) {
                 std::swap(x, y);
             }
         }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         cursorPosMap_[groupId].displayId = displayInfo.id;
         cursorPosMap_[groupId].cursorPos.x = x;
         cursorPosMap_[groupId].cursorPos.y = y;
@@ -1306,7 +1309,6 @@ bool InputWindowsManager::IsPointerOnCenter(const CursorPosition &currentPos, co
     }
     return false;
 }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 void InputWindowsManager::HandleValidDisplayChange(const DisplayGroupInfo &displayGroupInfo)
 {
@@ -1319,9 +1321,9 @@ CursorPosition InputWindowsManager::GetCursorPos(const DisplayGroupInfo &display
     int32_t groupId = displayGroupInfo.groupId;
     if ((cursorPosMap_[groupId].displayId < 0) && !displayGroupInfoMap_[groupId].displaysInfo.empty()) {
         DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (GetHardCursorEnabled()) {
+            (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
+        }
         cursorPosMap_[groupId].displayId = displayInfo.id;
         cursorPosMap_[groupId].cursorPos.x = displayInfo.validWidth * HALF_RATIO;
         cursorPosMap_[groupId].cursorPos.y = displayInfo.validHeight * HALF_RATIO;
@@ -1788,19 +1790,21 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     auto action = UpdateWindowInfo(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    bool isDisplayChanged = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    bool isDisplayChanged = false;
+    if (GetHardCursorEnabled()) {
+        isDisplayChanged = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
+    }
     DisplayGroupInfo displayGroupInfoTemp;
     displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
     bFlag = (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
         && ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfo.currentUserId));
     if (bFlag) {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (isDisplayChanged) {
-            ResetPointerPosition(displayGroupInfo);
+        if (GetHardCursorEnabled()) {
+            bool isDisplayUpdate = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
+            if (isDisplayUpdate) {
+                ResetPointerPosition(displayGroupInfo);
+            }
         }
-#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         PrintChangedWindowBySync(displayGroupInfo);
         CleanInvalidPiexMap(groupId);
         HandleValidDisplayChange(displayGroupInfo);
@@ -1834,11 +1838,11 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     bFlag = (iter != pointerDrawFlagMap_.end()) ? true : false;
     if (!displayGroupInfo.displaysInfo.empty() && bFlag) {
         AdjustDisplayRotation(groupId);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
-#else
-        PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+            PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+        } else {
+            PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
+        }
     }
     
     lastDpiMap_[groupId] = displayGroupInfoTemp.displaysInfo.empty() ? DEFAULT_DPI :
@@ -1886,11 +1890,10 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
             cursorPosMap_[groupId].displayDirection = displayInfo->displayDirection;
         }
         UpdateAndAdjustMouseLocation(cursorPosCur.displayId, coord.x, coord.y);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (IsSupported() && extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
-        AdjustDragPosition(groupId);
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (GetHardCursorEnabled() && extraData_.appended &&
+            (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
+            AdjustDragPosition(groupId);
+        }
         IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*displayInfo);
         int32_t displayId = -1;
        
@@ -2828,13 +2831,7 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordina
 
 void InputWindowsManager::RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord)
 {
-    Direction displayDirection = static_cast<Direction>(
-        (((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (IsSupported()) {
-        displayDirection = info.direction;
-    }
-#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    Direction displayDirection = GetDisplayDirection(&info);
     bool isEnable = Rosen::SceneBoardJudgement::IsSceneBoardEnabled();
     double oldX = coord.x;
     double oldY = coord.y;
@@ -4117,13 +4114,7 @@ std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(std::shared_ptr<D
     std::vector<int32_t> cursorPos = {DEFAULT_POSITION, DEFAULT_POSITION};
     Direction direction = DIRECTION0;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        direction = static_cast<Direction>((((physicalDisplayInfo->direction -
-        physicalDisplayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (IsSupported()) {
-            direction = physicalDisplayInfo->direction;
-        }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        direction = GetDisplayDirection(physicalDisplayInfo.get());
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
     }
@@ -4193,18 +4184,16 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             } else {
                 IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
             }
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
-            if (cursorPos.size() < CURSOR_POSITION_EXPECTED_SIZE) {
-                MMI_HILOGW("cursorPos is invalid");
-                return RET_ERR;
+            if (GetHardCursorEnabled()) {
+                std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
+                if (cursorPos.empty()) {
+                    MMI_HILOGW("cursorPos is empty");
+                    return RET_ERR;
+                }
+                IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, cursorPos[0], cursorPos[1]);
+            } else {
+                IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
             }
-            IPointerDrawingManager::GetInstance()->DrawMovePointer(physicalDisplayInfo->uniqueId,
-                cursorPos[0], cursorPos[1]);
-#else
-            IPointerDrawingManager::GetInstance()->DrawMovePointer(physicalDisplayInfo->uniqueId,
-                physicalX, physicalY);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
             MMI_HILOGI("UpdateMouseTarget id:%{public}d, logicalX:%{public}d, logicalY:%{public}d,"
                 "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->uniqueId, logicalX, logicalY,
                 pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
@@ -4313,13 +4302,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     Direction direction = DIRECTION0;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        direction = static_cast<Direction>((((physicalDisplayInfo->direction - physicalDisplayInfo->displayDirection) *
-            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (IsSupported()) {
-            direction = physicalDisplayInfo->direction;
-        }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        direction = GetDisplayDirection(physicalDisplayInfo.get());
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
@@ -5736,13 +5719,11 @@ bool InputWindowsManager::CalculateLayout(const DisplayInfo &displayInfo, const 
 {
     Direction direction = GetDisplayDirection(&displayInfo);
     Vector2D<double> logical = physical;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (IsSupported()) {
+    if (GetHardCursorEnabled()) {
         auto screenRect = RotateRect<double>(direction, {displayInfo.width, displayInfo.height});
         auto transforms = RotateAndFitScreen(direction, screenRect);
         logical = MMI::ApplyTransformSteps(transforms, physical);
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     layout.x = logical.x + displayInfo.x;
     layout.y = logical.y + displayInfo.y;
 
@@ -5853,13 +5834,11 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, do
         }
         physical = logical;
         Direction direction = GetDisplayDirection(&item);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (IsSupported()) {
+        if (GetHardCursorEnabled()) {
             auto screenRect = RotateRect<double>(direction, { item.width, item.height });
             auto transforms = RotateAndFitScreen(direction, screenRect);
             physical = ResetTransformSteps(transforms, logical);
         }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         physicalX = physical.x;
         physicalY = physical.y;
         displayId = item.id;
@@ -5895,11 +5874,14 @@ Direction InputWindowsManager::GetDisplayDirection(const DisplayInfo *displayInf
 {
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (IsSupported()) {
-        displayDirection = displayInfo->direction;
+    if (GetHardCursorEnabled()) {
+        if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
+            displayDirection = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
+                ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        } else {
+            displayDirection = displayInfo->direction;
+        }
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = displayInfo->direction;
     }
@@ -5975,13 +5957,7 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
 void InputWindowsManager::ReverseRotateDisplayScreen(const DisplayInfo& info, const double x, const double y,
     Coordinate2D& cursorPos) const
 {
-    Direction displayDirection = static_cast<Direction>((
-        ((info.direction - info.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (WIN_MGR->IsSupported()) {
-        direction = info.direction;
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    Direction displayDirection = WIN_MGR->GetDisplayDirection(&info);
     MMI_HILOGD(
         "X:%{private}.2f, Y:%{private}.2f, info.WH:{%{private}d %{private}d}, info.validWH:{%{private}d %{private}d}",
         x,
@@ -6125,9 +6101,9 @@ MouseLocation InputWindowsManager::GetMouseInfo()
         curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY);
     if ((curMouseLocation.displayId < 0) && !displaysInfoVector.empty()) {
         DisplayInfo displayInfo = displaysInfoVector[0];
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (GetHardCursorEnabled()) {
+            (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
+        }
         const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
         if (iter != mouseLocationMap_.end()) {
             mouseLocationMap_[MAIN_GROUPID].displayId = displayInfo.id;
@@ -6155,9 +6131,9 @@ CursorPosition InputWindowsManager::GetCursorPos()
     }
     if ((cursorPos.displayId < 0) && !displaysInfoVector.empty()) {
         DisplayInfo displayInfo = displaysInfoVector[0];
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (GetHardCursorEnabled()) {
+            (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
+        }
         const auto iter = cursorPosMap_.find(MAIN_GROUPID);
         if (iter != cursorPosMap_.end()) {
             cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
@@ -6176,16 +6152,15 @@ CursorPosition InputWindowsManager::ResetCursorPos()
         DisplayInfo displayInfo = displaysInfoVector[0];
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
-        x = displayInfo.validWidth * HALF_RATIO;
-        y = displayInfo.validHeight * HALF_RATIO;
-        if (IsSupported()) {
-            if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
+        if (GetHardCursorEnabled()) {
+            (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
+            x = displayInfo.validWidth * HALF_RATIO;
+            y = displayInfo.validHeight * HALF_RATIO;
+            Direction displayDirection = GetDisplayDirection(&displayInfo);
+            if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
                 std::swap(x, y);
             }
         }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         const auto iter = cursorPosMap_.find(MAIN_GROUPID);
         if (iter != cursorPosMap_.end()) {
             cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
@@ -6852,7 +6827,6 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent,
     int32_t focusWindowId, int32_t groupId)
 {
@@ -6900,11 +6874,10 @@ bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const DisplayGrou
     return false;
 }
 
-bool InputWindowsManager::IsSupported()
+bool InputWindowsManager::GetHardCursorEnabled()
 {
-    return IPointerDrawingManager::GetInstance()->IsSupported();
+    return IPointerDrawingManager::GetInstance()->GetHardCursorEnabled();
 }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 int32_t InputWindowsManager::GetCurrentUserId()
 {
