@@ -75,8 +75,35 @@ private:
 
 class JsInputMonitor final {
 public:
+    struct CallbackData {
+        int32_t count { 0 };
+        std::vector<std::shared_ptr<PointerEvent>> touchEventList;
+    };
+
+    struct CallbackInfo : RefBase {
+        napi_env env { nullptr };
+        napi_ref ref { nullptr };
+        napi_deferred deferred { nullptr };
+        int32_t errCode { -1 };
+        CallbackData data;
+    };
+
     static void JsCallback(uv_work_t *work, int32_t status);
     static void JsPreCallback(uv_work_t *work, int32_t status);
+    static void CallJsQueryTouchEventsTask(uv_work_t *work);
+    static void CallJsQueryTouchEventsPromise(uv_work_t *work, int32_t status);
+    static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
+    static void JsQueryTouchEventsResolveDeferred(
+        sptr<CallbackInfo> cb, napi_handle_scope scope, napi_value callResult);
+    template <typename T>
+    static void DeletePtr(T &ptr)
+    {
+        if (ptr != nullptr) {
+            delete ptr;
+            ptr = nullptr;
+        }
+    }
+
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, std::vector<Rect> hotRectArea,
         int32_t rectTotal, napi_value callback, int32_t id, int32_t fingers);
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id, int32_t fingers);
@@ -100,11 +127,12 @@ public:
     bool IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, std::vector<Rect> hotRectArea);
 private:
     void SetCallback(napi_value callback);
-    MapFun GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent);
-    int32_t SetInputEventProperty(const std::shared_ptr<InputEvent> inputEvent, napi_value result);
-    int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    int32_t GetAction(int32_t action) const;
-    int32_t GetSourceType(int32_t sourceType) const;
+    static MapFun GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent);
+    static int32_t SetInputEventProperty(napi_env env, const std::shared_ptr<InputEvent> inputEvent, napi_value result);
+    static int32_t TransformPointerEvent(
+        napi_env env, const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    static int32_t GetAction(int32_t action);
+    static int32_t GetSourceType(int32_t sourceType);
     int32_t GetPinchAction(int32_t action) const;
     int32_t GetSwipeAction(int32_t action) const;
     int32_t GetRotateAction(int32_t action) const;
@@ -113,7 +141,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t GetFingerprintAction(int32_t action) const;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-    int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
+    static int32_t GetJsPointerItem(napi_env env, const PointerEvent::PointerItem &item, napi_value value);
     int32_t TransformTsActionValue(int32_t pointerAction);
     int32_t TransformMousePointerEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformPinchEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);

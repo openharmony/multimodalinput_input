@@ -1247,6 +1247,15 @@ public:
     * @since 20
     */
     int32_t ClearMouseHideFlag(int32_t eventId);
+
+    /**
+    * @brief Retrieves a specified number of pointer event records.
+    * @param count The number of pointer event records to retrieve.
+    * @param pointerList A reference to a vector that will store the retriebed pointer events.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 20
+    */
+    int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

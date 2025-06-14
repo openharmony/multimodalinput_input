@@ -391,8 +391,10 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
         return;
     }
     if (IsAccessibilityEventWithZOrder(pointerEvent)) {
+        EventStatistic::PushPointerEvent(pointerEvent);
         BypassChainAndDispatchDirectly(pointerEvent);
     } else if (!item.IsCanceled()) {
+        EventStatistic::PushPointerEvent(pointerEvent);
         nextHandler_->HandleTouchEvent(pointerEvent);
     }
     BytraceAdapter::StopTouchEvent();

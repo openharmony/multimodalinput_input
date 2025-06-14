@@ -44,6 +44,8 @@ public:
     void ThrowError(napi_env env, int32_t code);
     std::vector<Rect> GetHotRectAreaList(napi_env env, napi_value rectNapiValue, uint32_t rectListLength);
     bool GetKeysArray(napi_env env, napi_value keysNapiValue, uint32_t keysLength, std::vector<int32_t>& keys);
+    napi_value JsQueryTouchEvents(napi_env env, int32_t count);
+    void EmitJsQueryTouchEvents(sptr<JsInputMonitor::CallbackInfo> cb, int32_t count);
 
 private:
     JsInputMonitorManager() = default;
