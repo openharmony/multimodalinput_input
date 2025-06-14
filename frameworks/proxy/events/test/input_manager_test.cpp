@@ -5962,7 +5962,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SwitchTouchTracking_001, TestSize.Le
     CALL_TEST_DEBUG;
     std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
     bool switchFlag = true;
-    int32_t ret = InputManager::GetInstance()->GetTouchpadSwipeSwitch(switchFlag);
+    int32_t ret = InputManager::GetInstance()->SwitchTouchTracking(switchFlag);
     if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
         EXPECT_EQ(ret, CAPABILITY_NOT_SUPPORTED);
     } else {
