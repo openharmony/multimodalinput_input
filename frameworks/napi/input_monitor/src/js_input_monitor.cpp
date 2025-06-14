@@ -2289,7 +2289,7 @@ void JsInputMonitor::CallJsQueryTouchEventsPromise(uv_work_t *work, int32_t stat
 }
 
 void JsInputMonitor::JsQueryTouchEventsResolveDeferred(
-    sptr<CallbackInfo> cb, napi_handle_scope scope, napi_value callResult);
+    sptr<CallbackInfo> cb, napi_handle_scope scope, napi_value callResult)
 {
     CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult), CREATE_ARRAY, scope);
     for (size_t i = 0; i < cb->data.touchEventList.size(); ++i) {

@@ -336,10 +336,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 static napi_value JsQueryTouchEvents(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "", "");
-        return nullptr;
-    }
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     napi_valuetype valueType = napi_undefined;
