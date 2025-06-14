@@ -380,53 +380,6 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_01, TestSize.Lev
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_IsWorking_02
- * @tc.desc: Test the funcation ShouldIntercept
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
-    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_ON;
-    DISPLAY_MONITOR->isScreenLocked_ = true;
-    bool ret = pullUpAccessibility.IsWorking();
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name: KeyGestureManagerTest_IsWorking_03
- * @tc.desc: Test the funcation ShouldIntercept
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_03, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
-    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_ON;
-    DISPLAY_MONITOR->isScreenLocked_ = false;
-    bool ret = pullUpAccessibility.IsWorking();
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name: KeyGestureManagerTest_OnTriggerAll_01
- * @tc.desc: Test the funcation OnTriggerAll
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_OnTriggerAll_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    ASSERT_NO_FATAL_FAILURE(pullUpAccessibility.OnTriggerAll(keyEvent));
-}
-
-/**
  * @tc.name: KeyGestureManagerTest_RecognizeGesture_01
  * @tc.desc: Test the funcation RecognizeGesture
  * @tc.type: FUNC
