@@ -33,6 +33,8 @@ public:
     static void PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr);
     static void PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr);
     static void PushSwitchEvent(std::shared_ptr<SwitchEvent> eventPtr);
+    static void PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr);
+    static int32_t QueryPoniterRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
     static std::string PopEvent();
     static void WriteEventFile();
     static void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -45,11 +47,26 @@ public:
     static const char* ConvertSwitchTypeToString(int32_t switchType);
 
 private:
+    struct PointerEventRecord {
+        int64_t actionTime;
+        int32_t sourceType;
+        bool isInject;
+        std::vector<double> pressures;
+        std::vector<double> tiltXs;
+        std::vector<double> tiltYs;
+        PointerEventRecord(int64_t actionTime, int32_t sourceType, bool isInject, std::vector<double> pressures,
+            std::vector<double> tiltXs, std::vector<double> tiltYs)
+            : actionTime(actionTime), sourceType(sourceType), isInject(isInject), pressures(pressures), tiltXs(tiltXs),
+              tiltYs(tiltYs)
+        {}
+    };
     static std::queue<std::string> eventQueue_;
     static std::list<std::string> dumperEventList_;
     static std::mutex queueMutex_;
     static std::condition_variable queueCondition_;
     static bool writeFileEnabled_;
+    static std::deque<EventStatistic::PointerEventRecord> pointerRecordDeque_;
+    static std::mutex dequeMutex_;
 };
 } // namespace MMI
 } // namespace OHOS
