@@ -308,5 +308,33 @@ HWTEST_F(TouchpadSettingsHandlerTest, GetInstance_002, TestSize.Level1)
     auto instance = OHOS::MMI::TouchpadSettingsObserver::GetInstance();
     EXPECT_NE(instance, nullptr);
 }
+
+/**
+ * @tc.name: SyncTouchpadSettingsData_001
+ * @tc.desc: Test if GetInstance method returns the same singleton instance when called multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsDataTest_001, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    observer.SetCommonEventReady();
+    observer.hasRegistered_ = false;
+    ASSERT_NO_FATAL_FAILURE(observer.SyncTouchpadSettingsData());
+}
+
+/**
+ * @tc.name: SyncTouchpadSettingsData_002
+ * @tc.desc: Test if GetInstance method returns the same singleton instance when called multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsDataTest_002, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    observer.SetCommonEventReady();
+    observer.hasRegistered_ = true;
+    ASSERT_NO_FATAL_FAILURE(observer.SyncTouchpadSettingsData());
+}
 }
 } // namespace OHOS::MMI
