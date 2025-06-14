@@ -65,6 +65,11 @@ const char* DEVICE_TYPE_M_TABLET3 { "MRDIL" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
+constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr char ROTATE_WINDOW_ROTATE { '0' };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
@@ -406,17 +411,41 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(
     MMI_HILOGI("Mouse write end , ret:%{public}d", ret);
 }
 
+bool MouseTransformProcessor::IsWindowRotation(const DisplayInfo* displayInfo)
+{
+    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    return (ROTATE_POLICY == WINDOW_ROTATE ||
+        (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo->displayMode == DisplayMode::MAIN &&
+        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
+        (displayInfo->displayMode == DisplayMode::FULL &&
+        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
+}
+
+Direction MouseTransformProcessor::GetDisplayDirection(const DisplayInfo *displayInfo)
+{
+    Direction displayDirection = DIRECTION0;
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        displayDirection = static_cast<Direction>((
+            ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    }
+    if (WIN_MGR->GetHardCursorEnabled()) {
+        if (IsWindowRotation(displayInfo)) {
+            displayDirection = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
+                ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        } else {
+            displayDirection = displayInfo->direction;
+        }
+    }
+    return displayDirection;
+}
+
 void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
 {
 #ifndef OHOS_BUILD_EMULATOR
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        Direction direction = static_cast<Direction>((
-            ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (WIN_MGR->IsSupported()) {
-            direction = displayInfo->direction;
-        }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        Direction direction = GetDisplayDirection(displayInfo);
         std::negate<double> neg;
         if (direction == DIRECTION90) {
             double tmp = offset.dx;

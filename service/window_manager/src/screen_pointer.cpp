@@ -42,6 +42,8 @@ constexpr int32_t STRIDE_ALIGNMENT{8};
 constexpr uint32_t RENDER_STRIDE{4};
 constexpr uint32_t POINTER_SIZE_DEFAULT { 1 };
 constexpr uint32_t POINTER_SIZE_HPR { 2 };
+constexpr int32_t ANGLE_90 { 90 };
+constexpr int32_t ANGLE_360 { 360 };
 
 
 uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
@@ -309,7 +311,7 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
 
-void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
+void ScreenPointer::OnDisplayInfo(const DisplayInfo &di, bool isWindowRotation)
 {
     if (screenId_ != uint32_t(di.uniqueId)) {
         return;
@@ -320,6 +322,8 @@ void ScreenPointer::OnDisplayInfo(const DisplayInfo &di)
     if (!IsMirror()) {
         rotation_ = static_cast<rotation_t>(di.direction);
     }
+    displayDirection_ = di.displayDirection;
+    isWindowRotation_ = isWindowRotation;
     MMI_HILOGD("Update with DisplayInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
     if (isCurrentOffScreenRendering_) {
@@ -376,6 +380,9 @@ void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y)
     if (IsMirror() && (rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
         std::swap(width, height);
     }
+    if (IsMain() && isWindowRotation_ && (displayDirection_ == DIRECTION90 || displayDirection_ == DIRECTION270)) {
+        std::swap(width, height);
+    }
 
     if (rotation == rotation_t(DIRECTION90)) {
         x = height - tmpY;
@@ -407,7 +414,6 @@ void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
 
 bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
     if (IsPositionOutScreen(x, y)) {
         MMI_HILOGE("Position out of screen");
@@ -419,6 +425,11 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
         CalculateHwcPositionForMirror(x, y);
     } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
         CalculateHwcPositionForExtend(x, y);
+    }
+    if (IsMain() && isWindowRotation_) {
+        Direction direction = static_cast<Direction>((((DIRECTION0 - displayDirection_) *
+            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        Rotate(rotation_t(direction), x, y);
     }
 
     px = x - FOCUS_POINT;
@@ -435,7 +446,6 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
         MMI_HILOGE("SetPosition failed, screenId=%{public}u, pos=(%{public}d, %{public}d)", screenId_, px, py);
         return false;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return true;
 }
 
@@ -449,7 +459,7 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     int32_t py = 0;
     if (IsMirror()) {
         CalculateHwcPositionForMirror(x, y);
-    } else if (!IsExtend()) {
+    } else if (!IsExtend() && !isWindowRotation_) {
         Rotate(rotation_, x, y);
     }
     px = x - FOCUS_POINT;
@@ -467,7 +477,6 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 
 bool ScreenPointer::SetInvisible()
 {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     CHKPF(hwcMgr_);
 
     auto buffer = GetTransparentBuffer();
@@ -492,7 +501,6 @@ bool ScreenPointer::SetInvisible()
         return false;
     }
     MMI_HILOGI("SetInvisible success, screenId=%{public}u", screenId_);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return true;
 }
 

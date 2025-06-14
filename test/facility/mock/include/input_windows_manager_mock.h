@@ -139,10 +139,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(int32_t, ShiftAppPointerEvent, (const ShiftWindowParam&, bool));
+    MOCK_METHOD(Direction, GetDisplayDirection, (const DisplayInfo *));
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    MOCK_METHOD(bool, IsSupported, ());
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    MOCK_METHOD(bool, GetHardCursorEnabled, ());
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     MOCK_METHOD(void, AttachTouchGestureMgr, (std::shared_ptr<TouchGestureManager>));
     MOCK_METHOD(void, CancelAllTouches, (std::shared_ptr<PointerEvent>, bool));
