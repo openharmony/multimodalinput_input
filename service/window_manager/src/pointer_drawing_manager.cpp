@@ -53,6 +53,9 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 
+#include <charconv>
+#include "param/sys_param.h"
+
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
 #undef MMI_LOG_TAG
@@ -76,6 +79,11 @@ const char* MAGIC_POINTER_COLOR { "magicPointerColor" };
 const char* MAGIC_POINTER_SIZE { "magicPointerSize"};
 const char* POINTER_CURSOR_RENDER_RECEIVER_NAME { "PointerCursorReceiver" };
 const std::vector<std::string> DEVICE_TYPES = {};
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
+constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr char ROTATE_WINDOW_ROTATE { '0' };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
 [[ maybe_unused ]] constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
@@ -141,7 +149,6 @@ constexpr int32_t PC_PRIORITY { 2 };
 
 namespace OHOS {
 namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 class DisplyStatusReceiver : public EventFwk::CommonEventSubscriber {
 public:
     explicit DisplyStatusReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
@@ -154,6 +161,9 @@ public:
 
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
+        if (!IPointerDrawingManager::GetInstance()->GetHardCursorEnabled()) {
+            return;
+        }
         std::string action = eventData.GetWant().GetAction();
         if (action.empty()) {
             MMI_HILOGE("action is empty");
@@ -181,7 +191,6 @@ public:
         }
     }
 };
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 static bool IsSingleDisplayFoldDevice()
 {
@@ -220,8 +229,7 @@ void PointerDrawingManager::InitPointerCallback()
         MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (!initEventhandlerFlag_.load()) {
+    if (GetHardCursorEnabled() && !initEventhandlerFlag_.load()) {
         std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
         if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
             renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
@@ -231,7 +239,6 @@ void PointerDrawingManager::InitPointerCallback()
         }
         initEventhandlerFlag_.store(true);
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::DestroyPointerWindow()
@@ -286,34 +293,33 @@ PointerDrawingManager::PointerDrawingManager()
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     InitStyle();
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
-    g_hardwareCanvasSize = GetCanvasSize();
-    g_focalPoint = GetFocusCoordinates();
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+        g_hardwareCanvasSize = GetCanvasSize();
+        g_focalPoint = GetFocusCoordinates();
+    }
 }
 
 PointerDrawingManager::~PointerDrawingManager()
 {
     MMI_HILOGI("~PointerDrawingManager enter");
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (runner_ != nullptr) {
-        runner_->Stop();
+    if (GetHardCursorEnabled()) {
+        if (runner_ != nullptr) {
+            runner_->Stop();
+        }
+        if ((renderThread_ != nullptr) && renderThread_->joinable()) {
+            renderThread_->join();
+        }
+        if (softCursorRunner_ != nullptr) {
+            softCursorRunner_->Stop();
+        }
+        if ((softCursorRenderThread_ != nullptr) && softCursorRenderThread_->joinable()) {
+            softCursorRenderThread_->join();
+        }
+        if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
+            moveRetryThread_->join();
+        }
     }
-    if ((renderThread_ != nullptr) && renderThread_->joinable()) {
-        renderThread_->join();
-    }
-
-    if (softCursorRunner_ != nullptr) {
-        softCursorRunner_->Stop();
-    }
-    if ((softCursorRenderThread_ != nullptr) && softCursorRenderThread_->joinable()) {
-        softCursorRenderThread_->join();
-    }
-    if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
-        moveRetryThread_->join();
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGI("~PointerDrawingManager complete");
 }
 
@@ -338,41 +344,27 @@ bool PointerDrawingManager::SetCursorLocation(int32_t displayId, int32_t physica
     }
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPF(surfaceNodePtr);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPF(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (!magicCursorSetBounds) {
-        if (hardwareCursorPointerManager_->IsSupported()) {
-            if (lastMouseStyle_.id != MOUSE_ICON::LOADING &&
-                lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
+    if (GetHardCursorEnabled()) {
+        if (!magicCursorSetBounds) {
+            if (lastMouseStyle_.id != MOUSE_ICON::LOADING && lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
                 // Change the coordinates issued by RS to asynchronous,
                 // without blocking the issuance of HardwareCursor coordinates.
                 SoftwareCursorMoveAsync(physicalX, physicalY, iconType);
             }
-        } else {
+        }
+        if (lastMouseStyle_.id != MOUSE_ICON::LOADING && lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
+            ResetMoveRetryTimer();
+            if (HardwareCursorMove(physicalX, physicalY, iconType) != RET_OK) {
+                MoveRetryAsync(physicalX, physicalY, iconType);
+            }
+        }
+    } else {
+        if (!magicCursorSetBounds) {
             surfaceNodePtr->SetBounds(physicalX, physicalY, surfaceNodePtr->GetStagingProperties().GetBounds().z_,
                 surfaceNodePtr->GetStagingProperties().GetBounds().w_);
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
     }
-    CHKPF(hardwareCursorPointerManager_);
-    if (hardwareCursorPointerManager_->IsSupported() &&
-        lastMouseStyle_.id != MOUSE_ICON::LOADING &&
-        lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
-        ResetMoveRetryTimer();
-        if (HardwareCursorMove(physicalX, physicalY, iconType) != RET_OK) {
-            MoveRetryAsync(physicalX, physicalY, iconType);
-        }
-    }
-#else
-    if (!magicCursorSetBounds) {
-        surfaceNodePtr->SetBounds(physicalX, physicalY, surfaceNodePtr->GetStagingProperties().GetBounds().z_,
-            surfaceNodePtr->GetStagingProperties().GetBounds().w_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return true;
 }
 
@@ -413,9 +405,9 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         }
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    UpdateBindDisplayId(displayId);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+        UpdateBindDisplayId(displayId);
+    }
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             return RET_ERR;
@@ -429,9 +421,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         lastDirection_ = direction;
     }
     lastMouseStyle_ = pointerStyle;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPR(hardwareCursorPointerManager_, RET_ERR);
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         UpdatePointerVisible();
     } else {
         int32_t UpdateLayerRes = UpdateMouseLayer(pointerStyle, displayId, physicalX, physicalY);
@@ -440,13 +430,6 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         }
         UpdatePointerVisible();
     }
-#else
-    int32_t UpdateLayerRes = UpdateMouseLayer(pointerStyle, displayId, physicalX, physicalY);
-    if (UpdateLayerRes != RET_OK) {
-        MMI_HILOGE("Update Mouse Layer failed.");
-    }
-    UpdatePointerVisible();
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     mouseIconUpdate_ = false;
     MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
         displayId, physicalX, physicalY);
@@ -474,9 +457,9 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 {
     CALL_DEBUG_ENTER;
     displayId_ = displayId;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    UpdateBindDisplayId(displayId);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+        UpdateBindDisplayId(displayId);
+    }
     if (GetSurfaceNode() != nullptr) {
         if (!SetCursorLocation(displayId, physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             MMI_HILOGE("SetCursorLocation failed");
@@ -489,12 +472,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 void PointerDrawingManager::SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle)
 {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported() && lastMouseStyle_.id != MOUSE_ICON::LOADING &&
+    if (GetHardCursorEnabled() && lastMouseStyle_.id != MOUSE_ICON::LOADING &&
             lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
         auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
         ResetMoveRetryTimer();
@@ -502,7 +480,6 @@ void PointerDrawingManager::SetHardwareCursorPosition(int32_t displayId, int32_t
             MoveRetryAsync(physicalX, physicalY, align);
         }
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
@@ -718,7 +695,6 @@ bool PointerDrawingManager::HasMagicCursor()
     return hasMagicCursor_.isShow;
 }
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
 {
     if (g_isReStartVsync) {
@@ -739,7 +715,7 @@ int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
 sptr<OHOS::SurfaceBuffer> PointerDrawingManager::RetryGetSurfaceBuffer(sptr<OHOS::Surface> layer)
 {
     sptr<OHOS::SurfaceBuffer> buffer;
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         for (size_t i = 0; i < RETRY_TIMES; i++) {
             buffer = GetSurfaceBuffer(layer);
             if (buffer != nullptr && buffer->GetVirAddr() != nullptr) {
@@ -766,7 +742,6 @@ int32_t PointerDrawingManager::GetMainScreenDisplayInfo(const DisplayGroupInfo &
     mainScreenDisplayInfo = displayGroupInfo.displaysInfo[0];
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 {
@@ -776,9 +751,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
         return MAGIC_CURSOR->InitLayer(mouseStyle);
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPR(hardwareCursorPointerManager_, RET_ERR);
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         MMI_HILOGI("mouseStyle:%{public}u", static_cast<uint32_t>(mouseStyle));
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
             return InitVsync(mouseStyle);
@@ -792,7 +765,6 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
         HardwareCursorRender(mouseStyle);
         return RET_OK;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     return DrawCursor(mouseStyle);
 }
 
@@ -976,7 +948,6 @@ std::shared_ptr<Rosen::Drawing::Image> PointerDrawingManager::ExtractDrawingImag
     return image;
 }
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void PointerDrawingManager::PostTask(std::function<void()> task)
 {
     CHKPV(hardwareCursorPointerManager_);
@@ -1026,7 +997,7 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
     }
 
     MMI_HILOGI("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u, style = %{public}d",
-        sp->GetScreenId(), cfg.style);
+        sp->GetScreenId(), cfg.style_);
     auto sret = buffer->FlushCache();
     if (sret != RET_OK) {
         MMI_HILOGE("FlushCache ret: %{public}d", sret);
@@ -1043,9 +1014,9 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         screenPointers = screenPointers_;
     }
     RenderConfig cfg {
-        .style = mouseStyle,
-        .align = MouseIcon2IconType(mouseStyle),
-        .path = mouseIcons_[mouseStyle].iconPath,
+        .style_ = mouseStyle,
+        .align_ = MouseIcon2IconType(mouseStyle),
+        .path_ = mouseIcons_[mouseStyle].iconPath,
         .color = GetPointerColor(),
         .size = GetPointerSize(),
         .direction = displayInfo_.direction,
@@ -1101,7 +1072,7 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
         layer->CancelBuffer(buffer);
         return RET_ERR;
     }
-    MMI_HILOGI("DrawDynamicSoftCursor on sn success, styel = %{public}d", cfg.style);
+    MMI_HILOGI("DrawDynamicSoftCursor on sn success, styel = %{public}d", cfg.style_);
     return RET_OK;
 }
 
@@ -1114,9 +1085,9 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
     }
     for (auto it : screenPointers) {
         RenderConfig cfg {
-            .style = mouseStyle,
-            .align = MouseIcon2IconType(mouseStyle),
-            .path = mouseIcons_[mouseStyle].iconPath,
+            .style_ = mouseStyle,
+            .align_ = MouseIcon2IconType(mouseStyle),
+            .path_ = mouseIcons_[mouseStyle].iconPath,
             .color = GetPointerColor(),
             .size = GetPointerSize(),
             .direction = displayInfo_.direction,
@@ -1138,9 +1109,9 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
             }
             DrawDynamicSoftCursor(sn, cfg);
         } else {
-            cfg.style = MOUSE_ICON::TRANSPARENT_ICON;
-            cfg.align = MouseIcon2IconType(cfg.style);
-            cfg.path = mouseIcons_[cfg.style].iconPath;
+            cfg.style_ = MOUSE_ICON::TRANSPARENT_ICON;
+            cfg.align_ = MouseIcon2IconType(cfg.style_);
+            cfg.path_ = mouseIcons_[cfg.style_].iconPath;
             DrawDynamicSoftCursor(it.second->GetSurfaceNode(), cfg);
         }
     }
@@ -1248,7 +1219,6 @@ void PointerDrawingManager::MoveRetryThreadLoop()
         moveRetryRunner_->Run();
     }
 }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle)
 {
@@ -1315,12 +1285,9 @@ void PointerDrawingManager::AdjustMouseFocus(Direction direction, ICON_TYPE icon
     int32_t &physicalX, int32_t &physicalY)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         return;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (direction) {
         case DIRECTION0: {
             AdjustMouseFocusByDirection0(iconType, physicalX, physicalY);
@@ -1350,14 +1317,10 @@ void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int
     CALL_DEBUG_ENTER;
     int32_t height = imageHeight_;
     int32_t width = imageWidth_;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (hardwareCursorPointerManager_->IsSupported() &&
-        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+    if (GetHardCursorEnabled() && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         height = cursorHeight_;
         width = cursorWidth_;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_SW: {
             physicalY -= height;
@@ -1393,14 +1356,10 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
     CALL_DEBUG_ENTER;
     int32_t height = imageHeight_;
     int32_t width = imageWidth_;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (hardwareCursorPointerManager_->IsSupported() &&
-        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+    if (GetHardCursorEnabled() && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         height = cursorHeight_;
         width = cursorWidth_;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_SW: {
             physicalY += height;
@@ -1436,14 +1395,10 @@ void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, i
     CALL_DEBUG_ENTER;
     int32_t height = imageHeight_;
     int32_t width = imageWidth_;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (hardwareCursorPointerManager_->IsSupported() &&
-        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+    if (GetHardCursorEnabled() && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         height = cursorHeight_;
         width = cursorWidth_;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_SW: {
             physicalY += height;
@@ -1479,14 +1434,10 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
     CALL_DEBUG_ENTER;
     int32_t height = imageHeight_;
     int32_t width = imageWidth_;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (hardwareCursorPointerManager_->IsSupported() &&
-        currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+    if (GetHardCursorEnabled() && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         height = cursorHeight_;
         width = cursorWidth_;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     switch (iconType) {
         case ANGLE_SW: {
             physicalY -= height;
@@ -1522,15 +1473,8 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
     CALL_DEBUG_ENTER;
     if (mouseDisplayState_ != state) {
         mouseDisplayState_ = state;
-        if (mouseDisplayState_) {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            CHKPV(hardwareCursorPointerManager_);
-            if (!hardwareCursorPointerManager_->IsSupported()) {
-                InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-            }
-#else
+        if (mouseDisplayState_ && !GetHardCursorEnabled()) {
             InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         }
         MMI_HILOGI("The state:%{public}s", state ? "true" : "false");
         UpdatePointerVisible();
@@ -1540,6 +1484,36 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
 bool PointerDrawingManager::GetMouseDisplayState() const
 {
     return mouseDisplayState_;
+}
+
+bool PointerDrawingManager::IsWindowRotation(const DisplayInfo *displayInfo)
+{
+    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    return (ROTATE_POLICY == WINDOW_ROTATE ||
+        (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo->displayMode == DisplayMode::MAIN &&
+        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
+        (displayInfo->displayMode == DisplayMode::FULL &&
+        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
+}
+
+Direction PointerDrawingManager::GetDisplayDirection(const DisplayInfo *displayInfo)
+{
+    Direction direction = static_cast<Direction>((
+        ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    if (GetHardCursorEnabled()) {
+        if (IsWindowRotation(displayInfo)) {
+            direction = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
+                ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        } else {
+            direction = displayInfo->direction;
+        }
+    }
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        direction = displayInfo->direction;
+    }
+    return direction;
 }
 
 void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
@@ -1552,70 +1526,57 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    Direction direction = static_cast<Direction>((
-        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
-        direction = displayInfo_.direction;
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    Direction direction = GetDisplayDirection(&displayInfo_);
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = displayInfo_.direction;
     }
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    if (!hardwareCursorPointerManager_->IsSupported()) {
-        return;
-    }
-    if (direction == DIRECTION0) {
-        if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
-            physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
-            physicalY = displayInfo_.validHeight - imageHeight_ / cursorUnit;
-        }
-    } else if (direction == DIRECTION90) {
-        if (physicalX > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
-            physicalX = displayInfo_.validHeight - imageHeight_ / cursorUnit;
-        }
-        if (physicalY < imageWidth_ / cursorUnit) {
-            physicalY = imageWidth_ / cursorUnit;
-        }
-    } else if (direction == DIRECTION180) {
-        if (physicalX < imageHeight_ / cursorUnit) {
-            physicalX = imageHeight_ / cursorUnit;
-        }
-        if (physicalY < imageWidth_ / cursorUnit) {
-            physicalY = imageWidth_ / cursorUnit;
-        }
-    } else if (direction == DIRECTION270) {
-        if (physicalX < imageHeight_ / cursorUnit) {
-            physicalX = imageHeight_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
-            physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
-        }
-    }
-#else
-    if (direction == DIRECTION0 || direction == DIRECTION180) {
-        if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
-            physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
-            physicalY = displayInfo_.validHeight - imageHeight_ / cursorUnit;
+    if (GetHardCursorEnabled()) {
+        if (direction == DIRECTION0) {
+            if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
+                physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
+            }
+            if (physicalY > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
+                physicalY = displayInfo_.validHeight - imageHeight_ / cursorUnit;
+            }
+        } else if (direction == DIRECTION90) {
+            if (physicalX > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
+                physicalX = displayInfo_.validHeight - imageHeight_ / cursorUnit;
+            }
+            if (physicalY < imageWidth_ / cursorUnit) {
+                physicalY = imageWidth_ / cursorUnit;
+            }
+        } else if (direction == DIRECTION180) {
+            if (physicalX < imageHeight_ / cursorUnit) {
+                physicalX = imageHeight_ / cursorUnit;
+            }
+            if (physicalY < imageWidth_ / cursorUnit) {
+                physicalY = imageWidth_ / cursorUnit;
+            }
+        } else if (direction == DIRECTION270) {
+            if (physicalX < imageHeight_ / cursorUnit) {
+                physicalX = imageHeight_ / cursorUnit;
+            }
+            if (physicalY > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
+                physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
+            }
         }
     } else {
-        if (physicalX > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
-            physicalX = displayInfo_.validHeight - imageHeight_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
-            physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
+        if (direction == DIRECTION0 || direction == DIRECTION180) {
+            if (physicalX > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
+                physicalX = displayInfo_.validWidth - imageWidth_ / cursorUnit;
+            }
+            if (physicalY > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
+                physicalY = displayInfo_.validHeight - imageHeight_ / cursorUnit;
+            }
+        } else {
+            if (physicalX > (displayInfo_.validHeight - imageHeight_ / cursorUnit)) {
+                physicalX = displayInfo_.validHeight - imageHeight_ / cursorUnit;
+            }
+            if (physicalY > (displayInfo_.validWidth - imageWidth_ / cursorUnit)) {
+                physicalY = displayInfo_.validWidth - imageWidth_ / cursorUnit;
+            }
         }
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::AttachToDisplay()
@@ -1628,12 +1589,7 @@ void PointerDrawingManager::AttachToDisplay()
     }
     MMI_HILOGI("The screenId_:%{public}" PRIu64"", screenId_);
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         auto sp = GetScreenPointer(screenId_);
         CHKPV(sp);
         SetSurfaceNode(sp->GetSurfaceNode());
@@ -1647,7 +1603,6 @@ void PointerDrawingManager::AttachToDisplay()
             }
         }
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     surfaceNodePtr->AttachToDisplay(screenId_);
@@ -1655,15 +1610,9 @@ void PointerDrawingManager::AttachToDisplay()
 
 void PointerDrawingManager::CreateCanvasNode()
 {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         return;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     canvasNode_ = Rosen::RSCanvasNode::Create();
@@ -1681,7 +1630,6 @@ void PointerDrawingManager::CreateCanvasNode()
     surfaceNodePtr->AddChild(canvasNode_, DEFAULT_VALUE);
 }
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displayId,
     int32_t physicalX, int32_t physicalY)
 {
@@ -1726,7 +1674,6 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t displ
     sp->MoveSoft(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)));
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t displayId,
     int32_t physicalX, int32_t physicalY)
@@ -1756,12 +1703,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     CALL_INFO_TRACE;
     BytraceAdapter::StartRsSurfaceNode(displayId);
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         g_isHdiRemoteDied = false;
         if (CreatePointerWindowForScreenPointer(displayId, physicalX, physicalY) != RET_OK) {
             return;
@@ -1771,11 +1713,6 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
             return;
         }
     }
-#else
-    if (CreatePointerWindowForNoScreenPointer(displayId, physicalX, physicalY) != RET_OK) {
-        return;
-    }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGI("CreatePointerWindow The screenId_:%{public}" PRIu64, screenId_);
     screenId_ = static_cast<uint64_t>(displayId);
     AttachToDisplay();
@@ -1802,12 +1739,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
     int32_t releaseFence = -1;
     int32_t width = 0;
     int32_t height = 0;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPP(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         CALCULATE_CANVAS_SIZE(CALCULATE_CANVAS_SIZE_, CHANGE) = GetCanvasSize();
         auto canvasSize = static_cast<int32_t>(CALCULATE_CANVAS_SIZE_CHANGE);
         width = canvasSize;
@@ -1816,10 +1748,6 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
         width = canvasWidth_;
         height = canvasHeight_;
     }
-#else
-    width = canvasWidth_;
-    height = canvasHeight_;
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     OHOS::BufferRequestConfig config = {
         .width = width,
         .height = height,
@@ -1967,9 +1895,9 @@ int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap,
 {
     CALL_DEBUG_ENTER;
     followSystem_ = false;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    userIconFollowSystem_ = true;
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+        userIconFollowSystem_ = true;
+    }
     CHKPR(curPixelMap.pixelMap, RET_ERR);
     if (pid == -1) {
         MMI_HILOGE("The pid is invalid");
@@ -2277,22 +2205,16 @@ int32_t PointerDrawingManager::GetPointerColor()
 void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         if (screenPointers_.count(static_cast<size_t>(displayInfo.uniqueId))) {
             auto sp = screenPointers_[displayInfo.uniqueId];
             CHKPV(sp);
-            sp->OnDisplayInfo(displayInfo);
+            sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
             if (sp->IsMain()) {
                 UpdateMirrorScreens(sp, displayInfo);
             }
         }
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
@@ -2346,8 +2268,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    Direction direction = static_cast<Direction>((
-        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    Direction direction = GetDisplayDirection(&displayInfo_);
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
@@ -2410,20 +2331,20 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
         }
     }
     DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+        (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
+    }
     UpdateDisplayInfo(displayInfo);
     lastPhysicalX_ = displayInfo.validWidth / CALCULATE_MIDDLE;
     lastPhysicalY_ = displayInfo.validHeight / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.uniqueId);
     auto surfaceNodePtr = GetSurfaceNode();
     if (surfaceNodePtr != nullptr) {
-#ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
-        surfaceNodePtr->DetachToDisplay(screenId_);
-        SetSurfaceNode(nullptr);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (!GetHardCursorEnabled()) {
+            MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
+            surfaceNodePtr->DetachToDisplay(screenId_);
+            SetSurfaceNode(nullptr);
+        }
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
     }
@@ -2460,8 +2381,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     DrawManager();
     auto surfaceNodePtr = GetSurfaceNode();
     if (!hasPointerDevice_ && (surfaceNodePtr != nullptr)) {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        {
+        if (GetHardCursorEnabled()) {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto sp : screenPointers_) {
                 if (sp.second != nullptr && sp.second->IsMirror()) {
@@ -2469,7 +2389,6 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
                 }
             }
         }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         MMI_HILOGD("Pointer window destroy start");
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
@@ -2479,7 +2398,6 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     }
 }
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void PointerDrawingManager::AttachAllSurfaceNode()
 {
     std::lock_guard<std::mutex> lock(mtx_);
@@ -2526,7 +2444,6 @@ void PointerDrawingManager::DetachAllSurfaceNode()
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 void PointerDrawingManager::DrawManager()
 {
@@ -2549,8 +2466,7 @@ void PointerDrawingManager::DrawManager()
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGI("Pid_:%{public}d, windowId_:%{public}d, pointerStyle.id:%{public}d", pid_,
             windowId_, pointerStyle.id);
-        Direction direction = static_cast<Direction>((
-            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        Direction direction = GetDisplayDirection(&displayInfo_);
         lastDrawPointerStyle_ = pointerStyle;
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.uniqueId, displayInfo_.validWidth / CALCULATE_MIDDLE,
@@ -2603,12 +2519,7 @@ void PointerDrawingManager::UpdatePointerVisible()
     CHKPV(surfaceNodePtr);
     if (IsPointerVisible() && mouseDisplayState_) {
         surfaceNodePtr->SetVisible(true);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        CHKPV(hardwareCursorPointerManager_);
-        if (g_isHdiRemoteDied) {
-            hardwareCursorPointerManager_->SetHdiServiceState(false);
-        }
-        if (hardwareCursorPointerManager_->IsSupported()) {
+        if (GetHardCursorEnabled()) {
             if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
                 MMI_HILOGE("Init Layer failed");
                 return;
@@ -2618,22 +2529,15 @@ void PointerDrawingManager::UpdatePointerVisible()
                 MMI_HILOGE("SetCursorLocation fail");
             }
         }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s, displayId_:%{public}d",
             mouseDisplayState_ ? "true" : "false", displayId_);
     } else {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        CHKPV(hardwareCursorPointerManager_);
-        if (g_isHdiRemoteDied) {
-            hardwareCursorPointerManager_->SetHdiServiceState(false);
-        }
-        if (hardwareCursorPointerManager_->IsSupported()) {
+        if (GetHardCursorEnabled()) {
             PostSoftCursorTask([this]() {
                 SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON);
             });
             HideHardwareCursors();
         }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
         surfaceNodePtr->SetVisible(false);
         MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}d",
             mouseDisplayState_ ? "true" : "false", displayId_);
@@ -2793,27 +2697,21 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t dis
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     displayId_ = displayId;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         if (!SetCursorLocation(displayId_, x, y, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             MMI_HILOGE("SetCursorLocation fail");
             return;
         }
+    } else {
+        Direction direction = static_cast<Direction>((
+            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+        AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), x, y);
+        surfaceNodePtr->SetBounds(x,
+            y,
+            surfaceNodePtr->GetStagingProperties().GetBounds().z_,
+            surfaceNodePtr->GetStagingProperties().GetBounds().w_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
-#else
-    Direction direction = static_cast<Direction>((
-        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), x, y);
-    surfaceNodePtr->SetBounds(x,
-        y,
-        surfaceNodePtr->GetStagingProperties().GetBounds().z_,
-        surfaceNodePtr->GetStagingProperties().GetBounds().w_);
-    Rosen::RSTransaction::FlushImplicitTransaction();
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGD("Pointer window move success");
 }
 
@@ -3018,26 +2916,15 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
     if (hasDisplay_ && (hasPointerDevice_ || simulate)) {
         if (GetSurfaceNode() != nullptr) {
             AttachToDisplay();
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-            PostTask([]() {
+            if (GetHardCursorEnabled()) {
+                PostTask([]() {
+                    Rosen::RSTransaction::FlushImplicitTransaction();
+                });
+            } else {
                 Rosen::RSTransaction::FlushImplicitTransaction();
-            });
-#else
-            Rosen::RSTransaction::FlushImplicitTransaction();
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+            }
         }
-        Direction direction = static_cast<Direction>((
-            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        CHKPV(hardwareCursorPointerManager_);
-        if (g_isHdiRemoteDied) {
-            hardwareCursorPointerManager_->SetHdiServiceState(false);
-        }
-        if (hardwareCursorPointerManager_->IsSupported()) {
-            direction = static_cast<Direction>((
-                (displayInfo_.direction * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        Direction direction = GetDisplayDirection(&displayInfo_);
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.uniqueId, displayInfo_.validWidth / CALCULATE_MIDDLE,
                 displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
@@ -3064,18 +2951,12 @@ void PointerDrawingManager::CheckMouseIconPath()
 int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enable)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPR(hardwareCursorPointerManager_, ERROR_NULL_POINTER);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         if ((hardwareCursorPointerManager_->EnableStats(enable)) != RET_OK) {
             MMI_HILOGE("Enable stats failed");
             return RET_ERR;
         }
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGI("EnableHardwareCursorStats, enable:%{private}d", enable);
     return RET_OK;
 }
@@ -3083,37 +2964,28 @@ int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enabl
 int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPR(hardwareCursorPointerManager_, ERROR_NULL_POINTER);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         if ((hardwareCursorPointerManager_->GetCursorStats(frameCount, vsyncCount)) != RET_OK) {
             MMI_HILOGE("Query stats failed");
             return RET_ERR;
         }
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     MMI_HILOGI("GetHardwareCursorStats, frameCount:%{private}d, vsyncCount:%{private}d", frameCount, vsyncCount);
     return RET_OK;
 }
 
 void PointerDrawingManager::SubscribeScreenModeChange()
 {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (!GetHardCursorEnabled()) {
+        return;
+    }
     std::vector<sptr<OHOS::Rosen::ScreenInfo>> screenInfos;
-    OHOS::Rosen::ScreenManagerLite::GetInstance().GetPhysicalScreenInfos(screenInfos);
     if (!screenInfos.empty()) {
         OnScreenModeChange(screenInfos);
     }
 
     auto callback = [this](const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens) {
-        CHKPV(hardwareCursorPointerManager_);
-        if (g_isHdiRemoteDied) {
-            hardwareCursorPointerManager_->SetHdiServiceState(false);
-        }
-        if (hardwareCursorPointerManager_->IsSupported()) {
+        if (GetHardCursorEnabled()) {
             this->OnScreenModeChange(screens);
         }
     };
@@ -3138,7 +3010,6 @@ void PointerDrawingManager::SubscribeScreenModeChange()
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DisplyStatusReceiver>(commonEventSubscribeInfo));
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 void PointerDrawingManager::InitStyle()
@@ -3203,15 +3074,9 @@ void PointerDrawingManager::InitStyle()
 
 void PointerDrawingManager::RotateDegree(Direction direction)
 {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        CHKPV(hardwareCursorPointerManager_);
-        if (g_isHdiRemoteDied) {
-            hardwareCursorPointerManager_->SetHdiServiceState(false);
-        }
-        if (hardwareCursorPointerManager_->IsSupported()) {
-            return;
-        }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+        return;
+    }
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     surfaceNodePtr->SetPivot(0, 0);
@@ -3296,11 +3161,16 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
     DumpFullTable(oss, "Visible Info", pidTitles, pidInfos);
     oss << std::endl;
 
+    std::vector<std::string> hardCursorTitles = {"isHardCursorEnabled"};
+    std::vector<std::vector<std::string>> hardCursorInfos;
+    hardCursorInfos.push_back({GetHardCursorEnabled() ? "true" : "false"});
+    DumpFullTable(oss, "Hard Cursor Info", hardCursorTitles, hardCursorInfos);
+    oss << std::endl;
+
     std::string dumpInfo = oss.str();
     dprintf(fd, dumpInfo.c_str());
 }
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
 {
     if (lastDisplayId_ == displayId) {
@@ -3309,11 +3179,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
     MMI_HILOGI("Mouse traversal occurs, lastDisplayId_:%{public}d, displayId:%{public}d",
         lastDisplayId_, displayId);
 
-    CHKPV(hardwareCursorPointerManager_);
-    if (g_isHdiRemoteDied) {
-        hardwareCursorPointerManager_->SetHdiServiceState(false);
-    }
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         // 隐藏上一个屏幕的软、硬光标
         PostSoftCursorTask([this]() {
             SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON);
@@ -3345,12 +3211,6 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
     lastDisplayId_ = displayId;
 }
 
-bool PointerDrawingManager::IsSupported()
-{
-    CHKPF(hardwareCursorPointerManager_);
-    return hardwareCursorPointerManager_->IsSupported();
-}
-
 void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
 {
     MMI_HILOGI("OnScreenModeChange enter, screen size:%{public}zu", screens.size());
@@ -3362,7 +3222,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         std::lock_guard<std::mutex> lock(mtx_);
         // construct ScreenPointers for new screens
         for (auto si : screens) {
-            MMI_HILOGI("Got screen, id:%{public}lu, shape=(%{public}u,%{public}u), rotation=%{public}u, "
+            MMI_HILOGI("Got screen, id:%{public}llu, shape=(%{public}u,%{public}u), rotation=%{public}u, "
                 "dpi=%{public}f", si->GetRsId(), GetScreenInfoWidth(si), GetScreenInfoHeight(si),
                 si->GetRotation(), si->GetVirtualPixelRatio());
             if (si->GetType() != OHOS::Rosen::ScreenType::REAL) {
@@ -3420,9 +3280,9 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     MOUSE_ICON mouseStyle, bool isHard)
 {
     CHKPV(sp);
-    cfg.style = mouseStyle;
-    cfg.align = MouseIcon2IconType(mouseStyle);
-    cfg.path = mouseIcons_[mouseStyle].iconPath;
+    cfg.style_ = mouseStyle;
+    cfg.align_ = MouseIcon2IconType(mouseStyle);
+    cfg.path_ = mouseIcons_[mouseStyle].iconPath;
     cfg.color = static_cast<uint32_t>(GetPointerColor());
     cfg.size = static_cast<uint32_t>(GetPointerSize());
     cfg.isHard = isHard;
@@ -3482,9 +3342,9 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         MMI_HILOGI("SoftwareCursorRender, screen:%{public}u, mode:%{public}u, dpi:%{public}f, direction:%{public}d,"
             "screenId_:%{public}" PRIu64, it.first, it.second->GetMode(), cfg.dpi, cfg.direction, screenId_);
         if (!it.second->IsMirror() && it.first != screenId_) {
-            cfg.style = MOUSE_ICON::TRANSPARENT_ICON;
-            cfg.align = MouseIcon2IconType(cfg.style);
-            cfg.path = mouseIcons_[cfg.style].iconPath;
+            cfg.style_ = MOUSE_ICON::TRANSPARENT_ICON;
+            cfg.align_ = MouseIcon2IconType(cfg.style_);
+            cfg.path_ = mouseIcons_[cfg.style_].iconPath;
         }
         DrawSoftCursor(it.second->GetSurfaceNode(), cfg);
     }
@@ -3524,7 +3384,7 @@ int32_t PointerDrawingManager::DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNo
         layer->CancelBuffer(buffer);
         return RET_ERR;
     }
-    MMI_HILOGI("DrawSoftCursor on SurfaceNode success, style=%{public}d", cfg.style);
+    MMI_HILOGI("DrawSoftCursor on SurfaceNode success, style=%{public}d", cfg.style_);
     return RET_OK;
 }
 
@@ -3547,7 +3407,7 @@ int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp,
     }
 
     MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u, style=%{public}d",
-        sp->GetScreenId(), cfg.style);
+        sp->GetScreenId(), cfg.style_);
     auto sret = buffer->FlushCache();
     if (sret != RET_OK) {
         MMI_HILOGE("FlushCache ret: %{public}d", sret);
@@ -3726,8 +3586,6 @@ void PointerDrawingManager::HideHardwareCursors()
     }
 }
 
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-
 void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
@@ -3738,8 +3596,7 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
         }
         Direction direction = static_cast<Direction>((
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-        if (IsSupported()) {
+        if (GetHardCursorEnabled()) {
             direction = displayInfo_.direction;
             int32_t x = displayInfo_.width / CALCULATE_MIDDLE;
             int32_t y = displayInfo_.height / CALCULATE_MIDDLE;
@@ -3748,11 +3605,10 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
             }
             MMI_HILOGD("DrawScreenCenterPointer, x=%{public}d, y=%{public}d", x, y);
             DrawPointer(displayInfo_.uniqueId, x, y, pointerStyle, direction);
+        } else {
+            DrawPointer(displayInfo_.id, displayInfo_.validWidth / CALCULATE_MIDDLE,
+                        displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
         }
-#else
-        DrawPointer(displayInfo_.uniqueId, displayInfo_.validWidth / CALCULATE_MIDDLE,
-            displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
 }
 
@@ -3796,12 +3652,9 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
 
 void PointerDrawingManager::SetSurfaceNodeBounds()
 {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
-    if (hardwareCursorPointerManager_->IsSupported()) {
+    if (GetHardCursorEnabled()) {
         return;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (canvasWidth_ < cursorWidth_ && canvasHeight_ < cursorHeight_) {
         canvasWidth_ = cursorWidth_;
         canvasHeight_ = cursorHeight_;
@@ -3816,9 +3669,9 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
 {
     CALL_DEBUG_ENTER;
     followSystem_ = options.followSystem;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    userIconFollowSystem_ = false;
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (GetHardCursorEnabled()) {
+        userIconFollowSystem_ = false;
+    }
     int32_t ret = UpdateCursorProperty(cursor);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
@@ -3914,6 +3767,39 @@ void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction directi
     } else {
         AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[pointerStyle].alignmentWay), physicalX, physicalY);
     }
+}
+
+int ConvertToInt(const char *originValue, int defaultValue)
+{
+    if (originValue == nullptr) {
+        return defaultValue;
+    }
+    int value;
+    auto result = std::from_chars(originValue, originValue + std::strlen(originValue), value);
+    if (result.ec == std::errc()) {
+        return value;
+    } else {
+        return defaultValue;
+    }
+}
+
+bool PointerDrawingManager::GetHardCursorEnabled()
+{
+    bool isHardCursorEnabled = true;
+    CHKPF(hardwareCursorPointerManager_);
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (!hardwareCursorPointerManager_->IsSupported()) {
+        isHardCursorEnabled = false;
+    }
+    static CachedHandle g_Handle = CachedParameterCreate("rosen.hardCursor.enabled", "1");
+    int changed = 0;
+    const char *enable = CachedParameterGetChanged(g_Handle, &changed);
+    if (ConvertToInt(enable, 1) == 0) {
+        isHardCursorEnabled = false;
+    }
+    return isHardCursorEnabled;
 }
 } // namespace MMI
 } // namespace OHOS

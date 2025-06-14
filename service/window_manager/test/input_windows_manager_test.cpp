@@ -6634,7 +6634,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_005,
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
 }
 
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 /**
  * @tc.name: InputWindowsManagerTest_UpdateKeyEventDisplayId_001
  * @tc.desc: Test the funcation UpdateKeyEventDisplayId
@@ -6774,8 +6773,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_Poin
     CursorPosition pointerPos = WIN_MGR->GetCursorPos();
     EXPECT_EQ(pointerPos.displayId, displayInfo1.id);
 }
-
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 /**
  * @tc.name: InputWindowsManagerTest_IgnoreTouchEvent_002

@@ -26,7 +26,6 @@ namespace OHOS {
 namespace MMI {
 class HardwareCursorPointerManager {
 public:
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     HardwareCursorPointerManager() = default;
     ~HardwareCursorPointerManager() = default;
     void SetTargetDevice(uint32_t devId);
@@ -43,7 +42,6 @@ private:
     uint32_t devId_ { 0 };
     sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
     std::mutex mtx_;
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 };
 } // namespace MMI
 } // namespace OHOS

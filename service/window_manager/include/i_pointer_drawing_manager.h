@@ -174,18 +174,16 @@ public:
     {
         return 0;
     }
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    virtual bool IsSupported()
-    {
-        return false;
-    }
     virtual void AttachAllSurfaceNode() {}
     virtual void DetachAllSurfaceNode() {}
     virtual int32_t CheckHwcReady()
     {
         return 0;
     }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    virtual bool GetHardCursorEnabled()
+    {
+        return false;
+    }
 };
 } // namespace MMI
 } // namespace OHOS

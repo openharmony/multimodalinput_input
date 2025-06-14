@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void HardwareCursorPointerManager::SetTargetDevice(uint32_t devId)
 {
     if (static_cast<int32_t>(devId) < 0) {
@@ -137,6 +136,5 @@ sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> HardwareCurs
     std::lock_guard<std::mutex> guard(mtx_);
     return powerInterface_;
 }
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
 } // namespace OHOS
