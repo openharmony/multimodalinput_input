@@ -5283,6 +5283,10 @@ ErrCode MMIService::ClearMouseHideFlag(int32_t eventId)
 ErrCode MMIService::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
 {
     CALL_INFO_TRACE;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!PER_HELPER->CheckMonitor()) {
         MMI_HILOGE("Verify Request From Monitor failed");
         return ERROR_NO_PERMISSION;

@@ -238,7 +238,6 @@ void EventStatistic::PushEventStr(std::string eventStr)
 
 void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
 {
-    std::lock_guard<std::mutex> lock(dequeMutex_);
     std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
     std::vector<double> pressures;
     std::vector<double> tiltXs;
@@ -261,7 +260,6 @@ void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
 
 int32_t EventStatistic::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
 {
-    std::lock_guard<std::mutex> lock(dequeMutex_);
     if (count <= 0 || pointerRecordDeque_.empty()) {
         MMI_HILOGD("Return pointerList is empty");
         return RET_OK;
@@ -275,7 +273,7 @@ int32_t EventStatistic::QueryPointerRecord(int32_t count, std::vector<std::share
             pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
         }
         for (auto pressuresIt = it->pressures.begin(), tiltXsIt = it->tiltXs.begin(), tiltYsIt = it->tiltYs.begin();
-             pressuresIt != it->pressures.end() || tiltXsIt != it->tiltXs.end() || tiltYsIt != it->tiltYs.end();
+             pressuresIt != it->pressures.end() && tiltXsIt != it->tiltXs.end() && tiltYsIt != it->tiltYs.end();
              ++pressuresIt, ++tiltXsIt, ++tiltYsIt) {
             PointerEvent::PointerItem pointerItem;
             pointerItem.SetPressure(*pressuresIt);

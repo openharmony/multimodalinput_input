@@ -93,6 +93,8 @@ public:
     static void CallJsQueryTouchEventsTask(uv_work_t *work);
     static void CallJsQueryTouchEventsPromise(uv_work_t *work, int32_t status);
     static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
+    static void JsQueryTouchEventsResolveDeferred(
+        sptr<CallbackInfo> cb, napi_handle_scope scope, napi_value callResult);
     template <typename T>
     static void DeletePtr(T &ptr)
     {
@@ -129,8 +131,8 @@ private:
     static int32_t SetInputEventProperty(napi_env env, const std::shared_ptr<InputEvent> inputEvent, napi_value result);
     static int32_t TransformPointerEvent(
         napi_env env, const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    static int32_t GetAction(int32_t action) const;
-    static int32_t GetSourceType(int32_t sourceType) const;
+    static int32_t GetAction(int32_t action);
+    static int32_t GetSourceType(int32_t sourceType);
     int32_t GetPinchAction(int32_t action) const;
     int32_t GetSwipeAction(int32_t action) const;
     int32_t GetRotateAction(int32_t action) const;

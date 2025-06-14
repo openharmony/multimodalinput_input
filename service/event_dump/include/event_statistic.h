@@ -67,7 +67,6 @@ private:
     static std::condition_variable queueCondition_;
     static bool writeFileEnabled_;
     static std::deque<EventStatistic::PointerEventRecord> pointerRecordDeque_;
-    static std::mutex dequeMutex_;
 };
 } // namespace MMI
 } // namespace OHOS
