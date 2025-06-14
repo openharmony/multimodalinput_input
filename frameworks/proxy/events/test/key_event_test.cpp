@@ -642,5 +642,19 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetFourceMonitorFlag, TestSize.Level1)
     fourceMonitorFlag = true;
     ASSERT_NO_FATAL_FAILURE(keyEvent->SetFourceMonitorFlag(fourceMonitorFlag));
 }
+
+/**
+ * @tc.name: CloneTest
+ * @tc.desc: Test the funcation Clone
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, CloneTest1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(keyEvent->Clone(nullptr));
+}
 } // namespace MMI
 } // namespace OHOS

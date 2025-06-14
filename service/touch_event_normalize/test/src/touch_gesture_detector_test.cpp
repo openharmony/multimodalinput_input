@@ -2294,5 +2294,24 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_GetAngle_04, TestSiz
     double actualAngle = detector.GetAngle(startX, startY, endX, endY);
     EXPECT_NEAR(expectedAngle, actualAngle, precision);
 }
+
+/**
+ * @tc.name: NotifyGestureEventTest1
+ * @tc.desc: Test NotifyGestureEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, NotifyGestureEventTest1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    GestureMode mode = GestureMode::ACTION_UNKNOWN;
+    ASSERT_NO_FATAL_FAILURE(detector.NotifyGestureEvent(pointerEvent, mode));
+}
 } // namespace MMI
 } // namespace OHOS

@@ -1095,5 +1095,204 @@ HWTEST_F(InputManagerImplTest, SubscribeInputActive_Test001, TestSize.Level1)
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
 }
+
+/**
+ * @tc.name: InputManagerImplTest_GetDisplayBindInfo
+ * @tc.desc: Test GetDisplayBindInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetDisplayBindInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayBindInfos infos;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetDisplayBindInfo(infos));
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> datas;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetAllMmiSubscribedEvents(datas));
+    std::string msg = "test";
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetDisplayBind(0, 0, msg));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.IsGRLOrHopper());
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.PrintWindowGroupInfo());
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.EnableCombineKey(false));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutPoint
+ * @tc.desc: Test AboutPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutPoint, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerStyle pointerStyle;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetPointerStyle(-1, pointerStyle, false));
+    pointerStyle.id = 1;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetPointerStyle(-1, pointerStyle, false));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetPointerLocation(-1, -1, -1));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.ClearWindowPointerStyle(-1, -1));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutCaptureMode
+ * @tc.desc: Test AboutCaptureMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutCaptureMode, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.EnterCaptureMode(-1));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.LeaveCaptureMode(-1));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadScrollSwitch
+ * @tc.desc: Test AboutTouchpadScrollSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadScrollSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadScrollSwitch(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadScrollSwitch(switchFlag));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadScrollDirection
+ * @tc.desc: Test AboutTouchpadScrollDirection
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadScrollDirection, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadScrollDirection(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadScrollDirection(switchFlag));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadTapSwitch
+ * @tc.desc: Test AboutTouchpadTapSwitch
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadTapSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadTapSwitch(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadTapSwitch(switchFlag));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadPinchSwitch
+ * @tc.desc: Test AboutTouchpadPinchSwitch
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadPinchSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadPinchSwitch(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadPinchSwitch(switchFlag));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadSwipeSwitch
+ * @tc.desc: Test AboutTouchpadSwipeSwitch
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadSwipeSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadSwipeSwitch(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadSwipeSwitch(switchFlag));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadRotateSwitch
+ * @tc.desc: Test AboutTouchpadRotateSwitch
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadRotateSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadRotateSwitch(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadRotateSwitch(switchFlag));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadDoubleTapAndDragState
+ * @tc.desc: Test AboutTouchpadDoubleTapAndDragState
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadDoubleTapAndDragState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadDoubleTapAndDragState(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadDoubleTapAndDragState(switchFlag));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadThreeFingersTapSwitch
+ * @tc.desc: Test AboutTouchpadThreeFingersTapSwitch
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadThreeFingersTapSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SwitchTouchTracking(false));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadPointerSpeed
+ * @tc.desc: Test AboutTouchpadPointerSpeed
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadPointerSpeed, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t speed = -1;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadPointerSpeed(speed));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadPointerSpeed(speed));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutTouchpadRightClickType
+ * @tc.desc: Test AboutTouchpadRightClickType
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutTouchpadRightClickType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t speed = -1;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetTouchpadRightClickType(speed));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetTouchpadRightClickType(speed));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AboutShieldStatus
+ * @tc.desc: Test AboutShieldStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AboutShieldStatus, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isShield = false;
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetShieldStatus(-1, isShield));
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetShieldStatus(-1, isShield));
+    std::vector<int32_t> pressedKeys = {-1};
+    std::map<int32_t, int32_t> specialKeysState = {{-1, -1}};
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetKeyState(pressedKeys, specialKeysState));
+}
 } // namespace MMI
 } // namespace OHOS
