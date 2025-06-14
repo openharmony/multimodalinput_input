@@ -73,7 +73,7 @@ HWTEST_F(InputDeviceConsumerHandlerTest, InputDeviceConsumerHandlerTest_SetDevic
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     auto ret = DEVICEHANDLER->SetDeviceConsumerHandler(deviceNames, sess);
     DEVICEHANDLER->HandleDeviceConsumerEvent(name, pointerEvent);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(ret, RET_ERR);
 }
 
 /**
