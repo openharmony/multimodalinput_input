@@ -172,10 +172,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
+    virtual Direction GetDisplayDirection(const DisplayInfo *displayInfo) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    virtual bool IsSupported() = 0;
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     virtual void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr) = 0;
     virtual void CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged = false) = 0;
@@ -189,6 +187,7 @@ public:
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();
+    virtual bool GetHardCursorEnabled() = 0;
 
 private:
     static std::mutex mutex_;
