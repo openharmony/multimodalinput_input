@@ -956,5 +956,10 @@ int32_t InputManager::ClearMouseHideFlag(int32_t eventId)
 {
     return InputMgrImpl.ClearMouseHideFlag(eventId);
 }
+
+int32_t InputManager::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
+{
+    return InputMgrImpl.QueryPointerRecord(count, pointerList);
+}
 } // namespace MMI
 } // namespace OHOS

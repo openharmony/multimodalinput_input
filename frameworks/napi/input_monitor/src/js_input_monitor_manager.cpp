@@ -455,5 +455,48 @@ bool JsInputMonitorManager::GetKeysArray(napi_env env, napi_value keysNapiValue,
     }
     return true;
 }
+
+napi_value JsInputMonitorManager::JsQueryTouchEvents(napi_env env, int32_t count)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsInputMonitor::CallbackInfo> cb = new (std::nothrow) JsInputMonitor::CallbackInfo();
+    CHKPP(cb);
+    cb->env = env;
+    napi_value promise = nullptr;
+    CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+    EmitJsQueryTouchEvents(cb, count);
+    return promise;
+}
+
+void JsInputMonitorManager::EmitJsQueryTouchEvents(sptr<JsInputMonitor::CallbackInfo> cb, int32_t count)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    std::vector<std::shared_ptr<PointerEvent>> touchEventList {};
+    cb->data.count = count;
+    cb->data.touchEventList = touchEventList;
+    cb->errCode = RET_OK;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    ret = uv_queue_work_with_qos(
+        loop,
+        work,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work callback function is called");
+            JsInputMonitor::CallJsQueryTouchEventsTask(work);
+        },
+        JsInputMonitor::CallJsQueryTouchEventsPromise,
+        uv_qos_user_initiated);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsInputMonitor::DeletePtr<uv_work_t *>(work);
+    }
+}
 } // namespace MMI
 } // namespace OHOS

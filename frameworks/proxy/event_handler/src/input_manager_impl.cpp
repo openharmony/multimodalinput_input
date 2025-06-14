@@ -2915,5 +2915,10 @@ int32_t InputManagerImpl::ClearMouseHideFlag(int32_t eventId)
     MMI_HILOGI("eventId=%{public}d", eventId);
     return MULTIMODAL_INPUT_CONNECT_MGR->ClearMouseHideFlag(eventId);
 }
+
+int32_t InputManagerImpl::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->QueryPointerRecord(count, pointerList);
+}
 } // namespace MMI
 } // namespace OHOS

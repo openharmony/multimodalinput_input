@@ -245,6 +245,7 @@ public:
     ErrCode SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable) override;
     ErrCode SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override;
     ErrCode ClearMouseHideFlag(int32_t eventId) override;
+    ErrCode QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

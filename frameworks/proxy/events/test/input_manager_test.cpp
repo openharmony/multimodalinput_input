@@ -5969,5 +5969,75 @@ HWTEST_F(InputManagerTest, InputManagerTest_SwitchTouchTracking_001, TestSize.Le
         EXPECT_EQ(ret, RET_OK);
     }
 }
+
+/*
+ * @tc.name: InputManagerTest_QueryPointerRecord_001
+ * @tc.desc: QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_QueryPointerRecord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = -1;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    EXPECT_EQ(InputManager::GetInstance()->QueryPointerRecord(count, pointerList), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_QueryPointerRecord_002
+ * @tc.desc: QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_QueryPointerRecord_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 0;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    EXPECT_EQ(InputManager::GetInstance()->QueryPointerRecord(count, pointerList), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_QueryPointerRecord_003
+ * @tc.desc: QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_QueryPointerRecord_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 30;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    EXPECT_EQ(InputManager::GetInstance()->QueryPointerRecord(count, pointerList), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_QueryPointerRecord_004
+ * @tc.desc: QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_QueryPointerRecord_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 100;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    EXPECT_EQ(InputManager::GetInstance()->QueryPointerRecord(count, pointerList), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_QueryPointerRecord_005
+ * @tc.desc: QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_QueryPointerRecord_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 101;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    EXPECT_EQ(InputManager::GetInstance()->QueryPointerRecord(count, pointerList), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

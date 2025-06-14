@@ -333,6 +333,32 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+static napi_value JsQueryTouchEvents(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "", "");
+        return nullptr;
+    }
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return nullptr;
+    }
+    CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (valueType != napi_number) {
+        MMI_HILOGE("First parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "count", "number");
+        return nullptr;
+    }
+    int32_t count = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &count), GET_VALUE_INT32);
+    return JS_INPUT_MONITOR_MGR.JsQueryTouchEvents(env, count);
+}
+
 EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
@@ -340,6 +366,7 @@ static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
+        DECLARE_NAPI_FUNCTION("queryTouchEvents", JsQueryTouchEvents),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;
