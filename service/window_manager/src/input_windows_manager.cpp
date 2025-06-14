@@ -982,11 +982,11 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
     WindowGroupInfo windowGroupInfoTmp;
     windowGroupInfoTmp.focusWindowId = windowGroupInfo.focusWindowId;
     windowGroupInfoTmp.displayId = windowGroupInfo.displayId;
-    int32_t focWid = 0;
+    int32_t focusWid = 0;
     for (const auto &it : groupWindows) {
         if (it.first != MAIN_GROUPID) {
-            focWid = GetFocusWindowId(it.first);
-            windowGroupInfoTmp.focusWindowId = focWid;
+            focusWid = GetFocusWindowId(it.first);
+            windowGroupInfoTmp.focusWindowId = focusWid;
         }
         windowGroupInfoTmp.windowsInfo = it.second;
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -999,7 +999,7 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
         const auto &iter = displayGroupInfoMapTmp_.find(it.first);
         displayGroupInfo = (iter != displayGroupInfoMapTmp_.end()) ? iter->second : GetMainDisplayGroupInfo();
         if (it.first != MAIN_GROUPID) {
-            displayGroupInfo.focusWindowId = focWid;
+            displayGroupInfo.focusWindowId = focusWid;
         }
         for (const auto &item : windowGroupInfoTmp.windowsInfo) {
             UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
