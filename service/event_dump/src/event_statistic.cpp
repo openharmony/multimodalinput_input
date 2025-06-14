@@ -38,7 +38,6 @@ std::list<std::string> EventStatistic::dumperEventList_;
 std::mutex EventStatistic::queueMutex_;
 std::condition_variable EventStatistic::queueCondition_;
 std::deque<EventStatistic::PointerEventRecord> EventStatistic::pointerRecordDeque_;
-std::mutex EventStatistic::dequeMutex_;
 bool EventStatistic::writeFileEnabled_ = false;
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_CANCEL, "cancel" },
