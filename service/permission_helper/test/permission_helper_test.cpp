@@ -318,5 +318,17 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInterceptor, TestSize.L
     bool result4 = PER_HELPER->CheckInterceptor();
     EXPECT_TRUE(result4);
 }
+
+/**
+ * @tc.name: CheckInjectPermissionTest1
+ * @tc.desc: Test CheckInjectPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, CheckInjectPermissionTest1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NO_FATAL_FAILURE(PER_HELPER->CheckInjectPermission());
+}
 } // namespace MMI
 } // namespace OHOS

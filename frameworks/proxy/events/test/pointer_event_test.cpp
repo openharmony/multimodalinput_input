@@ -2320,5 +2320,52 @@ HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_GlobalCoordinates, TestS
     ASSERT_EQ(static_cast<int32_t>(item.GetGlobalX()), static_cast<int32_t>(globalX));
     ASSERT_EQ(static_cast<int32_t>(item.GetGlobalY()), static_cast<int32_t>(globalY));
 }
+
+/**
+ * @tc.name: AddPointerItemTest1
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, AddPointerItemTest1, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(0);
+    pointerEvent->AddPointerItem(item1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(0);
+    pointerEvent->AddPointerItem(item2);
+    ASSERT_TRUE(!pointerEvent->IsValid());
+    PointerEvent::PointerItem item3;
+    item3.SetPointerId(0);
+    pointerEvent->AddPointerItem(item3);
+    PointerEvent::PointerItem item4;
+    item4.SetPointerId(0);
+    pointerEvent->AddPointerItem(item4);
+    PointerEvent::PointerItem item5;
+    item5.SetPointerId(0);
+    pointerEvent->AddPointerItem(item5);
+    PointerEvent::PointerItem item6;
+    item6.SetPointerId(0);
+    pointerEvent->AddPointerItem(item6);
+    PointerEvent::PointerItem item7;
+    item7.SetPointerId(0);
+    pointerEvent->AddPointerItem(item7);
+    PointerEvent::PointerItem item8;
+    item8.SetPointerId(0);
+    pointerEvent->AddPointerItem(item8);
+    PointerEvent::PointerItem item9;
+    item9.SetPointerId(0);
+    pointerEvent->AddPointerItem(item9);
+    PointerEvent::PointerItem item10;
+    item10.SetPointerId(0);
+    pointerEvent->AddPointerItem(item10);
+    PointerEvent::PointerItem item11;
+    item11.SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->AddPointerItem(item11));
+}
 } // namespace MMI
 } // namespace OHOS
