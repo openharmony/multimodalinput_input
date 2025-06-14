@@ -970,5 +970,17 @@ HWTEST_F(EventResampleTest, EventResampleTest_RewriteMessage_001, TestSize.Level
     state.lastResample.actionTime = 10;
     ASSERT_NO_FATAL_FAILURE(EventResampleHdr->RewriteMessage(state, event));
 }
+
+/**
+ * @tc.name: ShouldResampleToolTest1
+ * @tc.desc: Test ShouldResampleTool
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, ShouldResampleToolTest1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ShouldResampleTool(PointerEvent::TOOL_TYPE_RUBBER));
+}
 } // namespace MMI
 } // namespace OHOS

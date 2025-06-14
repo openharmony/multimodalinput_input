@@ -251,5 +251,92 @@ HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_Noti
     ASSERT_NE(pointerEvent, nullptr);
     handler.NotifySubscriber(pointerEvent, subscriber);
 }
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_SubscribeInputActive_002
+ * @tc.desc: Verify SubscribeInputActive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_SubscribeInputActive_002, TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    auto session2 = std::make_shared<UDSSession>("test_program2", 1, 123, 1000, 2000);
+    auto session3 = std::make_shared<UDSSession>("test_program3", 1, 123, 1000, 2000);
+    auto session4 = std::make_shared<UDSSession>("test_program4", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    ASSERT_NE(session2, nullptr);
+    ASSERT_NE(session3, nullptr);
+    ASSERT_NE(session4, nullptr);
+    auto ret = handler.SubscribeInputActive(session, -1, 500);
+    EXPECT_NE(ret, RET_OK);
+    int32_t subscribeId = 0;
+    ret = handler.SubscribeInputActive(session, subscribeId, 500);
+    EXPECT_EQ(ret, RET_OK);
+    handler.SubscribeInputActive(session, subscribeId, 500);
+    handler.SubscribeInputActive(session, subscribeId + 1, 500);
+    handler.SubscribeInputActive(session2, subscribeId, 500);
+    handler.SubscribeInputActive(session2, subscribeId + 1, 500);
+    handler.SubscribeInputActive(session2, subscribeId + 2, -1);
+    handler.SubscribeInputActive(nullptr, subscribeId, 500);
+    handler.subscribers_.push_back(nullptr);
+    handler.SubscribeInputActive(session4, subscribeId, 500);
+    handler.subscribers_.back()->sess_ = nullptr;
+    std::vector<std::string> args;
+    handler.Dump(1, args);
+
+    int32_t size = handler.subscribers_.size();
+    EXPECT_NE(size, 0);
+    ret = handler.UnsubscribeInputActive(session, subscribeId);
+    EXPECT_EQ(handler.subscribers_.size(), size - 1);
+    ret = handler.UnsubscribeInputActive(session3, subscribeId);
+    EXPECT_EQ(handler.subscribers_.size(), size - 1);
+    ret = handler.UnsubscribeInputActive(session, subscribeId + 1);
+    EXPECT_EQ(handler.subscribers_.size(), size - 2);
+    ret = handler.UnsubscribeInputActive(session2, subscribeId);
+    EXPECT_EQ(handler.subscribers_.size(), size - 3);
+    ret = handler.UnsubscribeInputActive(session2, subscribeId + 1);
+    EXPECT_EQ(handler.subscribers_.size(), size - 4);
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.HandleKeyEvent(keyEvent);
+    handler.SubscribeInputActive(session, subscribeId, -1);
+    handler.subscribers_.push_back(nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.OnSubscribeInputActive(keyEvent));
+    std::shared_ptr<PointerEvent> pointerEvent =
+        std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    ASSERT_NE(pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.OnSubscribeInputActive(pointerEvent));
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_OnSessionDelete_001
+ * @tc.desc: Verify OnSessionDelete
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_OnSessionDelete_001, TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    auto session2 = std::make_shared<UDSSession>("test_program2", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    ASSERT_NE(session2, nullptr);
+    int32_t subscribeId = 0;
+    handler.SubscribeInputActive(session, subscribeId, 500);
+    EXPECT_EQ(handler.subscribers_.size(), 1);
+    handler.OnSessionDelete(session);
+    EXPECT_EQ(handler.subscribers_.size(), 0);
+    handler.SubscribeInputActive(session, subscribeId, 500);
+    handler.subscribers_.push_back(nullptr);
+    EXPECT_EQ(handler.subscribers_.size(), 2);
+    handler.OnSessionDelete(session2);
+    EXPECT_EQ(handler.subscribers_.size(), 2);
+    handler.callbackInitialized_ = true;
+    auto ret = handler.InitSessionDeleteCallback();
+    EXPECT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS

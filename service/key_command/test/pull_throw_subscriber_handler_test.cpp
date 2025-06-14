@@ -306,5 +306,22 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_StartFin
     CALL_TEST_DEBUG;
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->StartFingerGesture());
 }
+
+/**
+ * @tc.name: CheckThrowAngleValidTest_001
+ * @tc.desc: Test StartFingerGesture
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, CheckThrowAngleValidTest_001, testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double angle = 100;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle));
+    angle = 300;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle));
+    angle = 500;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle));
+}
 } // namespace MMI
 } // namespace OHOS

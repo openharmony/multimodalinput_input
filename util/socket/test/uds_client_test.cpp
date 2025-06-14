@@ -134,5 +134,25 @@ HWTEST_F(UDSClientTest, SendMsg_005, TestSize.Level1)
     auto retResult = udsClientUt.SendMsg(buf, size);
     ASSERT_FALSE(retResult);
 }
+
+void StartClientTest(const UDSClient &udsClient, NetPacket &netPacket) {}
+
+HWTEST_F(UDSClientTest, StartClient_001, TestSize.Level1)
+{
+    UDSClientUnitTest udsClientUt;
+    udsClientUt.isRunning_ = true;
+    udsClientUt.isConnected_ = false;
+    MsgClientFunCallback fun = StartClientTest;
+    ASSERT_NO_FATAL_FAILURE(udsClientUt.StartClient(fun));
+}
+
+HWTEST_F(UDSClientTest, StartClient_002, TestSize.Level1)
+{
+    UDSClientUnitTest udsClientUt;
+    udsClientUt.isRunning_ = false;
+    udsClientUt.isConnected_ = true;
+    MsgClientFunCallback fun = StartClientTest;
+    ASSERT_NO_FATAL_FAILURE(udsClientUt.StartClient(fun));
+}
 } // namespace MMI
 } // namespace OHOS
