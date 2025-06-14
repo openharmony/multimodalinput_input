@@ -2932,7 +2932,7 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
         return false;
     }
     if (appWhiteList_.find(bundleName) == appWhiteList_.end()) {
-        MMI_HILOGE("The app does not support long-press drag., bundle name:%{public}s", bundleName.c_str());
+        MMI_HILOGD("The app does not support long-press drag., bundle name:%{public}s", bundleName.c_str());
         return false;
     }
     return true;
