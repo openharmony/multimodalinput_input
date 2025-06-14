@@ -35,7 +35,7 @@ public:
     static void PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr);
     static void PushSwitchEvent(std::shared_ptr<SwitchEvent> eventPtr);
     static void PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr);
-    static int32_t QueryPoniterRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
+    static int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
     static std::string PopEvent();
     static void WriteEventFile();
     static void Dump(int32_t fd, const std::vector<std::string> &args);

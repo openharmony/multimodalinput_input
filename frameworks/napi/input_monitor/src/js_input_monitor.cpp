@@ -2299,8 +2299,8 @@ void JsInputMonitor::JsQueryTouchEventsResolveDeferred(
             cb->env, napi_create_object(cb->env, &touchEvent), CREATE_OBJECT, scope, pointerEventItem);
         int32_t ret = TransformPointerEvent(cb->env, pointerEventItem, touchEvent);
         if (SetNameProperty(
-                cb->env, touchEvent, "isInject", pointerEventItem->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) !=
-            napi_ok) {
+                cb->env, touchEvent, "isInject", 
+                pointerEventItem->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) != napi_ok) {
             MMI_HILOGE("Set isInject property failed");
             ret = RET_ERR;
         }

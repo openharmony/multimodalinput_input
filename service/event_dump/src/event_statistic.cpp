@@ -129,7 +129,7 @@ std::string EventStatistic::ConvertTimeToStr(int64_t timestamp)
 void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
 {
     CHKPV(eventPtr);
-    PushPoniterRecord(eventPtr);
+    PushPointerRecord(eventPtr);
     int32_t pointerAction = eventPtr->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_MOVE || pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE ||
         pointerAction == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
