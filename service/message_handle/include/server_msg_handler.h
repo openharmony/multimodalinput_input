@@ -29,7 +29,6 @@
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
-
 namespace OHOS {
 namespace MMI {
 enum class AuthorizationStatus : int32_t {
@@ -119,6 +118,12 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection(int32_t callPidId = 0);
+    int32_t RequestInjection(const int32_t callingPid, int32_t &status, int32_t &reqId);
+    int32_t QueryAuthorizedStatus(const int32_t callingPid, int32_t &status);
+    bool IsPC() const;
+    int32_t GetRequestInjectionCallbackReqId();
+    bool CheckForRequestInjectionFrequentAccess(int32_t callingPid, int64_t interval);
+
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     bool InitInjectNoticeSource();
     bool AddInjectNotice(const InjectNoticeInfo& noticeInfo);
@@ -172,6 +177,8 @@ private:
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     std::shared_ptr<InjectNoticeManager> injectNotice_ { nullptr };
     ClientDeathHandler clientDeathHandler_;
+    std::mutex mutexMapQueryAuthorizeLastTimestamp_;
+    std::map<int32_t, int64_t> mapQueryAuthorizeLastTimestamp_;
 };
 } // namespace MMI
 } // namespace OHOS

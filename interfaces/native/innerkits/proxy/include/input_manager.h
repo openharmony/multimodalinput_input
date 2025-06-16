@@ -1239,6 +1239,10 @@ public:
     * @since 20
     */
     int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
+    int32_t RequestInjection(int32_t &status, int32_t &reqId);
+    int32_t QueryAuthorizedStatus(int32_t &status);
+    void RequestInjectionCallback(int32_t reqId, int32_t status);
+    void InsertRequestInjectionCallback(int32_t reqId, std::function<void(int32_t)> fun);
 
     /**
     * @brief When the collaborative application is disconnected, clear the mouse hide flag.
@@ -1260,6 +1264,8 @@ private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
     static InputManager *instance_;
+    std::mutex mutexMapCallBack_;
+    std::map<int32_t, std::function<void(int32_t)>> mapCallBack_;
 };
 } // namespace MMI
 } // namespace OHOS

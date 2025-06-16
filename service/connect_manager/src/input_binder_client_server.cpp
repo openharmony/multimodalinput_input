@@ -14,8 +14,9 @@
  */
 
 #include "input_binder_client_server.h"
-
+#include "input_binder_client_server_impl.h"
 #include "mmi_log.h"
+#include "input_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputBinderClientServer"
@@ -35,7 +36,7 @@ void InputBinderClientServer::InitClientSrv()
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> clientLock(clientSrvMutex_);
     if (clientSrvStub_ == nullptr) {
-        clientSrvStub_ = new (std::nothrow) InputBinderClientStub();
+        clientSrvStub_ = sptr<InputBinderClientServerImpl>::MakeSptr();
         CHKPV(clientSrvStub_);
     }
 }

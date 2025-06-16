@@ -914,6 +914,20 @@ int32_t MultimodalInputConnectManager::CancelInjection()
     return multimodalInputConnectService_->CancelInjection();
 }
 
+int32_t MultimodalInputConnectManager::RequestInjection(int32_t &status, int32_t &reqId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RequestInjection(status, reqId);
+}
+
+int32_t MultimodalInputConnectManager::QueryAuthorizedStatus(int32_t &status)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->QueryAuthorizedStatus(status);
+}
+
 int32_t MultimodalInputConnectManager::HasIrEmitter(bool &hasIrEmitter)
 {
     std::lock_guard<std::mutex> guard(lock_);

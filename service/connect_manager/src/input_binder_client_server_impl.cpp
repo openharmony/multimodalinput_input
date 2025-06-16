@@ -13,28 +13,20 @@
  * limitations under the License.
  */
 
-#include "input_binder_client_stub.h"
-
-#include "message_parcel.h"
+#include "input_binder_client_server_impl.h"
 #include "mmi_log.h"
+#include "input_manager.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "InputBinderClientStub"
+#define MMI_LOG_TAG "InputBinderClientServerImpl"
 
 namespace OHOS {
 namespace MMI {
-
-int32_t InputBinderClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-    MessageOption &option)
+ErrCode InputBinderClientServerImpl::NoticeRequestInjectionResult(int32_t reqId, int32_t status)
 {
-    std::u16string descriptor = InputBinderClientStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
-        MMI_HILOGE("Client and service descriptors are inconsistent");
-        return INVALID_DATA;
-    }
-    MMI_HILOGD("Begin, cmd:%{public}u", code);
-    return NO_ERROR;
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->RequestInjectionCallback(reqId, status);
+    return RET_OK;
 }
-} // namespace OHOS
 } // namespace MMI
+} // namespace OHOS

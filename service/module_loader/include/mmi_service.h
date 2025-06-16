@@ -182,6 +182,8 @@ public:
         std::unordered_map<int32_t, int32_t>& specialKeysState) override;
     ErrCode Authorize(bool isAuthorize) override;
     ErrCode CancelInjection() override;
+    ErrCode RequestInjection(int32_t &status, int32_t &reqId) override;
+    ErrCode QueryAuthorizedStatus(int32_t &status) override;
     ErrCode SetMoveEventFilters(bool flag) override;
 #ifdef OHOS_RSS_CLIENT
     void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);

@@ -2562,6 +2562,18 @@ int32_t InputManagerImpl::CancelInjection()
     return RET_OK;
 }
 
+int32_t InputManagerImpl::RequestInjection(int32_t &status, int32_t &reqId)
+{
+    CALL_DEBUG_ENTER;
+    return MULTIMODAL_INPUT_CONNECT_MGR->RequestInjection(status, reqId);
+}
+
+int32_t InputManagerImpl::QueryAuthorizedStatus(int32_t &status)
+{
+    CALL_DEBUG_ENTER;
+    return MULTIMODAL_INPUT_CONNECT_MGR->QueryAuthorizedStatus(status);
+}
+
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 int32_t InputManagerImpl::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
 {

@@ -27,6 +27,16 @@ inline constexpr int32_t ERROR_NO_PERMISSION { -201 };
 inline constexpr int32_t ERROR_KEYBOARD_NO_PERMISSION { 201 };
 inline constexpr int32_t ERROR_NOT_SYSAPI { 202 };
 inline constexpr int32_t ERROR_DEVICE_NOT_EXIST { 3900001 };
+inline constexpr int32_t ERROR_OPERATION_FREQUENT { -1001 };
+inline constexpr int32_t ERROR_DEVICE_NOT_SUPPORTED { -1002 };
+
+enum class AUTHORIZE_QUERY_STATE : int32_t {
+    OTHER_PID_IN_AUTHORIZATION_SELECTION = 0,
+    OTHER_PID_AUTHORIZED = 1,
+    UNAUTHORIZE = 2,
+    CURRENT_PID_IN_AUTHORIZATION_SELECTION = 3,
+    CURRENT_PID_AUTHORIZED = 4
+};
 
 enum {
     MODULE_CLIENT = 0x00,

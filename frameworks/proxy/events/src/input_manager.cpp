@@ -798,6 +798,34 @@ void InputManager::Authorize(bool isAuthorize)
     InputMgrImpl.Authorize(isAuthorize);
 }
 
+int32_t InputManager::RequestInjection(int32_t &status, int32_t &reqId)
+{
+    int32_t ret = InputMgrImpl.RequestInjection(status, reqId);
+    return ret;
+}
+
+int32_t InputManager::QueryAuthorizedStatus(int32_t &status)
+{
+    int32_t ret = InputMgrImpl.QueryAuthorizedStatus(status);
+    return ret;
+}
+
+void InputManager::RequestInjectionCallback(int32_t reqId, int32_t status)
+{
+    std::lock_guard<std::mutex> lock(mutexMapCallBack_);
+    auto itFind = mapCallBack_.find(reqId);
+    if (itFind != mapCallBack_.end()) {
+        itFind->second(status);
+        mapCallBack_.erase(itFind);
+    }
+}
+
+void InputManager::InsertRequestInjectionCallback(int32_t reqId, std::function<void(int32_t)> fun)
+{
+    std::lock_guard<std::mutex> lock(mutexMapCallBack_);
+    mapCallBack_.insert(std::make_pair(reqId, fun));
+}
+
 int32_t InputManager::HasIrEmitter(bool &hasIrEmitter)
 {
     return InputMgrImpl.HasIrEmitter(hasIrEmitter);
