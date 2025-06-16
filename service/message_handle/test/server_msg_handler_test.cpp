@@ -31,6 +31,7 @@
 #include "input_device_manager.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
+#include "running_process_info.h"
 #include "server_msg_handler.h"
 #include "stream_buffer.h"
 
@@ -2915,6 +2916,89 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor002, Te
     int32_t session { -1 };
     int32_t ret = handler.UnsubscribeKeyMonitor(session, keyOption);
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_DealGesturePointers002
+ * @tc.desc: Test the function DealGesturePointers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_DealGesturePointers002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerId(10001);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_ACCESSIBILITY;
+    ASSERT_NO_FATAL_FAILURE(handler.DealGesturePointers(pointerEvent));
+    auto touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10002);
+    item.SetOriginPointerId(10002);
+    item.SetPressed(true);
+    touchEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.DealGesturePointers(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSetFunctionKeyState003
+ * @tc.desc: Test the function OnSetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AppExecFwk::RunningProcessInfo processInfo;
+    processInfo.extensionType_ = AppExecFwk::ExtensionAbilityType::INPUTMETHOD;
+    int32_t funcKey = 1;
+    int32_t pid = 15;
+    bool enable = true;
+    INPUT_DEV_MGR->IsKeyboardDevice(nullptr);
+    ASSERT_NO_FATAL_FAILURE(handler.OnSetFunctionKeyState(pid, funcKey, enable));
+    enable = false;
+    ASSERT_NO_FATAL_FAILURE(handler.OnSetFunctionKeyState(pid, funcKey, enable));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectPointerEventExt002
+ * @tc.desc: Test OnInjectPointerEventExt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    pointerEvent->SetId(1);
+    pointerEvent->eventType_ = 1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    msgHandler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
 }
 } // namespace MMI
 } // namespace OHOS

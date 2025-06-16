@@ -1078,12 +1078,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     displayInfo.width = 150;
     displayInfo.height = 300;
     displayInfo.uniq = "default0";
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     bool ret = handler.CheckTwoFingerGestureAction();
     EXPECT_FALSE(ret);
     handler.twoFingerGesture_.touches[0].x = 30;
@@ -1127,12 +1125,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     displayInfo.width = 150;
     displayInfo.height = 300;
     displayInfo.uniq = "default0";
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     handler.twoFingerGesture_.touches[0].y = 200;
     handler.twoFingerGesture_.touches[1].x = 30;
     bool ret = handler.CheckTwoFingerGestureAction();
@@ -1301,16 +1297,14 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_004, TestSiz
     DisplayInfo displayInfo;
     displayInfo.dpi = -10;
     displayInfo.uniq = "default0";
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     int32_t ret = handler.ConvertVPToPX(vp);
     ASSERT_EQ(ret, 0);
     displayInfo.dpi = 160;
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
+    it->second.displaysInfo.push_back(displayInfo);
     ret = handler.ConvertVPToPX(vp);
     ASSERT_EQ(ret, 0);
 }
@@ -4063,12 +4057,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_002, TestSiz
     displayInfo.width = 4;
     displayInfo.height = 5;
     displayInfo.dpi = -1;
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     ret = handler.ConvertVPToPX(vp);
     ASSERT_EQ(ret, 0);
 }
@@ -4092,12 +4084,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_003, TestSiz
     displayInfo.width = 4;
     displayInfo.height = 5;
     displayInfo.dpi = 160;
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     int32_t ret = handler.ConvertVPToPX(vp);
     ASSERT_EQ(ret, 0);
 }
@@ -4129,12 +4119,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     displayInfo.width = 4;
     displayInfo.height = 5;
     displayInfo.dpi = -1;
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     bool ret = handler.CheckTwoFingerGestureAction();
     EXPECT_FALSE(ret);
 }
@@ -4166,12 +4154,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     displayInfo.width = 40;
     displayInfo.height = 50;
     displayInfo.dpi = -1;
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     bool ret = handler.CheckTwoFingerGestureAction();
     EXPECT_FALSE(ret);
 }
@@ -4203,12 +4189,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     displayInfo.width = 40;
     displayInfo.height = 50;
     displayInfo.dpi = -1;
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     bool ret = handler.CheckTwoFingerGestureAction();
     EXPECT_FALSE(ret);
 }
@@ -5617,13 +5601,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     windowInfo.id = 0;
     windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
@@ -5658,12 +5640,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     displayInfo.height = 2720;
     displayInfo.uniq = "default0";
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
     handler.twoFingerGesture_.touches[0].x = 600;
     handler.twoFingerGesture_.touches[0].y = 600;
@@ -5724,12 +5704,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_006, TestSiz
     displayInfo.dpi = -1;
     displayInfo.uniq = "default0";
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
     KeyCommandHandler handler;
     int32_t ret = handler.ConvertVPToPX(vp);
@@ -5765,13 +5743,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_001,
     windowInfo.id = 0;
     windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     touchEvent->SetTargetDisplayId(1);
@@ -5825,13 +5801,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_002,
     windowInfo.id = 0;
     windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     touchEvent->SetTargetDisplayId(0);
@@ -5872,12 +5846,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     KeyCommandHandler handler;
@@ -5923,12 +5895,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     KeyCommandHandler handler;
@@ -5974,12 +5944,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     KeyCommandHandler handler;
@@ -6022,12 +5990,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     KeyCommandHandler handler;
@@ -6073,12 +6039,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     KeyCommandHandler handler;
@@ -6123,12 +6087,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfoRef.displaysInfo.push_back(displayInfo);
     IInputWindowsManager::instance_ = inputWindowsManager;
 
     KeyCommandHandler handler;
@@ -6315,13 +6277,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_001,
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
     WindowInfo windowInfo;
     windowInfo.id = 0;
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.focusWindowId = 0;
     }
-    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.focusWindowId = 0;    
     UDSServer udsServer;
     udsServer.idxPidMap_.insert(std::make_pair(0, 1));
     SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName,
@@ -6358,13 +6318,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_002,
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
     WindowInfo windowInfo;
     windowInfo.id = 0;
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.focusWindowId = 0;
     }
-    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.focusWindowId = 0;    
     UDSServer udsServer;
     udsServer.idxPidMap_.insert(std::make_pair(0, 1));
     SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName,
@@ -6401,13 +6359,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_003,
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
     WindowInfo windowInfo;
     windowInfo.id = 0;
-    DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        displayGroupInfoRef = it->second;
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.focusWindowId = 0;
     }
-    displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.focusWindowId = 0;    
     UDSServer udsServer;
     udsServer.idxPidMap_.insert(std::make_pair(0, 1));
     SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName,
@@ -6779,6 +6735,143 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HasScreenCapturePermission
     EXPECT_EQ(handler.HasScreenCapturePermission(SHORTCUT_KEY_SCREENSHOT), 1);
     EXPECT_EQ(handler.HasScreenCapturePermission(SHORTCUT_KEY_SCREEN_RECORDING), 1);
     EXPECT_EQ(handler.HasScreenCapturePermission(DEFAULT_PERMISSIONS), 1);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor
+ * @tc.desc: Test if (bundleName.find(matchName) == std::string::npos)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.focusWindowId = 0;
+    }
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName,
+        MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+    ASSERT_NO_FATAL_FAILURE(handler.RegisterProximitySensor());
+    handler.hasRegisteredSensor_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.RegisterProximitySensor());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_020
+ * @tc.desc: Test HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_030
+ * @tc.desc: Test ParseRepeatKeyMaxCount
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_030, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.ParseRepeatKeyMaxCount());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_031
+ * @tc.desc: Test UnregisterProximitySensor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_031, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.UnregisterProximitySensor());
+    handler.hasRegisteredSensor_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.UnregisterProximitySensor());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_032
+ * @tc.desc: Test RegisterProximitySensor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_032, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.RegisterProximitySensor());
+    handler.hasRegisteredSensor_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.RegisterProximitySensor());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_033
+ * @tc.desc: Test SendSaveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_033, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.isParseConfig_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.SendSaveEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_034
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_034, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    DisplayEventMonitor displayEventMonitor;
+    std::string bundleName = "";
+    std::string abilityName = "";
+    std::string action = "";
+    displayEventMonitor.screenStatus_ = "usual.event.SCREEN_OFF";
+    displayEventMonitor.isScreenLocked_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.MenuClickProcess(bundleName, abilityName, action));
+    displayEventMonitor.screenStatus_ = "usual";
+    displayEventMonitor.isScreenLocked_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.MenuClickProcess(bundleName, abilityName, action));
 }
 } // namespace MMI
 } // namespace OHOS

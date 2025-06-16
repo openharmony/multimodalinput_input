@@ -2568,6 +2568,7 @@ ohos_unittest("ServerMsgHandlerTest") {
 
   external_deps = [
     "ability_runtime:ability_connect_callback_stub",
+    "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utils",
