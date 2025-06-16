@@ -33,8 +33,10 @@ typedef std::function<void(const std::string &keyName)> HardwareKeyEventDetected
 typedef std::function<int32_t()> GetKeyboardActivationState;
 typedef std::function<bool()> IsFloatingKeyboard;
 typedef std::function<bool()> IsVKeyboardShown;
-typedef std::function<int32_t(libinput_event_touch *touch, int32_t& delayMs, std::vector<libinput_event*>& events)> GetLibinputEventForVKeyboard;
-typedef std::function<int32_t(libinput_event_touch *touch, std::vector<libinput_event*>& events)> GetLibinputEventForVTrackpad;
+typedef std::function<int32_t(libinput_event_touch *touch, int32_t& delayMs,
+                              std::vector<libinput_event*>& events)> GetLibinputEventForVKeyboard;
+typedef std::function<int32_t(libinput_event_touch *touch,
+                              std::vector<libinput_event*>& events)> GetLibinputEventForVTrackpad;
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 enum VTPSwipeStateType {
@@ -146,6 +148,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void HandleVFullKeyboardMessages(
         libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch);
+	void HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> keyEvents, int64_t frameTime);
+    void HandleVTrackpadMessage(VTrackpadEventType eventType, std::vector<libinput_event*> events,
+                                int64_t frameTime, libinput_event_touch *touch);
     bool IsVKeyboardActivationDropEvent(libinput_event_touch* touch, libinput_event_type eventType);
     void InjectEventForTwoFingerOnTouchpad(libinput_event_touch* touch,
         libinput_event_type eventType, int64_t frameTime);
@@ -165,7 +170,7 @@ private:
     VTPSwipeStateType vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
 
     libinput_event *vkbDelayedEvent_ = nullptr;
-	libinput_event *vkbDelayedKeyEvent_ = nullptr;
+    libinput_event *vkbDelayedKeyEvent_ = nullptr;
     int32_t vkbDelayedKeyCode_ = 0;
     std::chrono::system_clock::time_point vtpSingleTapDownTime;
     const double vtpSingleTapThreshold = 0.18; // s
@@ -182,7 +187,7 @@ private:
     GetKeyboardActivationState getKeyboardActivationState_ { nullptr };
     IsFloatingKeyboard isFloatingKeyboard_ { nullptr };
     IsVKeyboardShown isVKeyboardShown_ { nullptr };
-	GetLibinputEventForVKeyboard getLibinputEventForVKeyboard_ { nullptr };
+    GetLibinputEventForVKeyboard getLibinputEventForVKeyboard_ { nullptr };
     GetLibinputEventForVTrackpad getLibinputEventForVTrackpad_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
