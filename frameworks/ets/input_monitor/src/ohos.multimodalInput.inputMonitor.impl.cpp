@@ -13,13 +13,17 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.inputMoniter", "inputMoniter")
-from ohos.multimodalInput.touchEvent use TouchEvent;
-from ohos.multimodalInput.mouseEvent use MouseEvent;
-@!sts_inject("""
-static { loadLibrary("InputMoniter.z") }
-""")
+#include "ohos.multimodalInput.inputMonitor.proj.hpp"
+#include "ohos.multimodalInput.inputMonitor.impl.hpp"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
 
-struct TouchEventReceiver {
-    filter: (touchEvent: TouchEvent) => bool;
-}
+using namespace taihe;
+using namespace ohos::multimodalInput::inputMonitor;
+
+namespace {
+} // namespace
+
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
+// NOLINTEND

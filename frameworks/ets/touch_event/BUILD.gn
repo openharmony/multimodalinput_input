@@ -68,21 +68,21 @@ taihe_shared_library("TouchEvent") {
     debug = false
   }
 }
-generate_static_abc("touch_event_abc") {
+generate_static_abc("touch_event") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.touchEvent.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/touch_event_abc.abc"
+  device_dst_file = "/system/framework/touch_event.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("touch_event_etc") {
-  source = "$target_out_dir/touch_event_abc.abc"
+  source = "$target_out_dir/touch_event.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":touch_event_abc" ]
+  deps = [ ":touch_event" ]
 }
-group("touchEvent") {
+group("ets_touchEvent_package") {
   deps = [
     ":touch_event_etc",
     ":TouchEvent",
