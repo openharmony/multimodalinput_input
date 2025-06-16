@@ -84,6 +84,7 @@ constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
 constexpr int32_t UNKNOWN_MULTI_TOUCH_POINT_NUM { -1 };
 constexpr int32_t DEFAULT_GLOBAL_X { -1 };
 constexpr int32_t DEFAULT_GLOBAL_Y { -1 };
+constexpr int32_t REQUEST_INJECTION_TIME_MS { 4000 };
 } // namespace
 
 class OHInputManagerTest : public testing::Test {
@@ -1987,6 +1988,96 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_AxisEventGlobalCoordinates, Test
     ASSERT_EQ(OH_Input_GetAxisEventGlobalX(&axisEvent, &globalX), INPUT_SUCCESS);
     ASSERT_EQ(OH_Input_GetAxisEventGlobalY(&axisEvent, &globalY), INPUT_SUCCESS);
     EXPECT_TRUE((globalX == DEFAULT_GLOBAL_X) && (globalY == DEFAULT_GLOBAL_Y));
+}
+
+/**
+ * @tc.name:  OHInputManagerTest_RequestInjection_001
+ * @tc.desc: Verify the RequestInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_RequestInjection_001, TestSize.Level1)
+{
+    auto retResult = OH_Input_RequestInjection(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_QueryAuthorizedStatus(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    auto fnCallBack = [](Input_InjectionStatus authorizedStatus) {
+        MMI_HILOGI("OH_Input_RequestInjection callbak:status:%{public}d", authorizedStatus);
+    };
+#ifndef OHOS_BUILD_PC_PRIORITY
+    retResult = OH_Input_RequestInjection(fnCallBack);
+    EXPECT_EQ(retResult, INPUT_DEVICE_NOT_SUPPORTED);
+    return;
+#endif
+   Input_InjectionStatus status = Input_InjectionStatus::UNAUTHORIZED;
+   InputManager::GetInstance()->Authorize(false);
+   retResult = OH_Input_QueryAuthorizedStatus(&status);
+   EXPECT_EQ(retResult, INPUT_SUCCESS);
+   EXPECT_EQ(status, Input_InjectionStatus::UNAUTHORIZED);
+
+   retResult = OH_Input_RequestInjection(fnCallBack);
+   EXPECT_EQ(retResult, INPUT_SUCCESS);
+
+   retResult = OH_Input_RequestInjection(fnCallBack);
+   EXPECT_EQ(retResult, INPUT_INJECTION_AUTHORIZING);
+
+   retResult = OH_Input_QueryAuthorizedStatus(&status);
+   EXPECT_EQ(retResult, INPUT_SUCCESS);
+   EXPECT_EQ(status, Input_InjectionStatus::AUTHORIZING);
+
+   InputManager::GetInstance()->Authorize(true);
+
+   retResult = OH_Input_RequestInjection(fnCallBack);
+   EXPECT_EQ(retResult, INPUT_INJECTION_AUTHORIZED);
+
+   retResult = OH_Input_QueryAuthorizedStatus(&status);
+   EXPECT_EQ(retResult, INPUT_SUCCESS);
+   EXPECT_EQ(status, Input_InjectionStatus::AUTHORIZED);
+
+   InputManager::GetInstance()->Authorize(false);
+   OH_Input_CancelInjection();
+   retResult = OH_Input_QueryAuthorizedStatus(&status);
+   EXPECT_EQ(retResult, INPUT_SUCCESS);
+   EXPECT_EQ(status, Input_InjectionStatus::UNAUTHORIZED);
+}
+
+/**
+ * @tc.name:  OHInputManagerTest_RequestInjection_002
+ * @tc.desc: Verify the RequestInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_RequestInjection_002, TestSize.Level1)
+{
+    Input_InjectionStatus status = Input_InjectionStatus::UNAUTHORIZED;
+    auto retResult = OH_Input_QueryAuthorizedStatus(&status);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+#ifndef OHOS_BUILD_PC_PRIORITY
+    return;
+#endif
+    auto fnCallBack = [](Input_InjectionStatus authorizedStatus) {
+        MMI_HILOGI("OH_Input_RequestInjection callbak:status:%{public}d", authorizedStatus);
+    };
+    InputManager::GetInstance()->Authorize(false);
+    OH_Input_CancelInjection();
+    std::this_thread::sleep_for(std::chrono::milliseconds(REQUEST_INJECTION_TIME_MS));
+    retResult = OH_Input_RequestInjection(fnCallBack);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+    InputManager::GetInstance()->Authorize(false);
+    retResult = OH_Input_QueryAuthorizedStatus(&status);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+    EXPECT_EQ(status, Input_InjectionStatus::UNAUTHORIZED);
+
+    InputManager::GetInstance()->Authorize(false);
+    retResult = OH_Input_RequestInjection(fnCallBack);
+    EXPECT_EQ(retResult, INPUT_INJECTION_OPERATION_FREQUENT);
+
+    retResult = OH_Input_QueryAuthorizedStatus(&status);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+    EXPECT_EQ(status, Input_InjectionStatus::UNAUTHORIZED);
+    InputManager::GetInstance()->Authorize(false);
+    OH_Input_CancelInjection();
 }
 } // namespace MMI
 } // namespace OHOS

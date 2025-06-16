@@ -17,8 +17,9 @@
 #define INPUT_BINDER_CLIENT_SERVER_H
 
 #include "singleton.h"
-
+#include "iinput_binder_client.h"
 #include "input_binder_client_stub.h"
+#include "iremote_object.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,7 +31,7 @@ public:
 private:
     void InitClientSrv();
     std::mutex clientSrvMutex_;
-    sptr<InputBinderClientStub> clientSrvStub_ = nullptr;
+    sptr<IInputBinderClient> clientSrvStub_ = nullptr;
 };
 #define INPUT_BINDER_CLIENT_SERVICE ::OHOS::DelayedSingleton<InputBinderClientServer>::GetInstance()
 } // namespace MMI

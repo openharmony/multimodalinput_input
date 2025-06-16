@@ -4019,6 +4019,36 @@ ErrCode MMIService::HasIrEmitter(bool &hasIrEmitter)
     return RET_OK;
 }
 
+ErrCode MMIService::RequestInjection(int32_t &status, int32_t &reqId)
+{
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, &status, &reqId] {
+            return sMsgHandler_.RequestInjection(pid, status, reqId);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnHasIrEmitter failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::QueryAuthorizedStatus(int32_t &status)
+{
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, &status] {
+            return sMsgHandler_.QueryAuthorizedStatus(pid, status);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("QueryAuthorizedStatus failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 ErrCode MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies)
 {
     CALL_DEBUG_ENTER;

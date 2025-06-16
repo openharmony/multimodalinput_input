@@ -15,6 +15,9 @@
 
 #include "authorize_helper.h"
 
+#include "error_multimodal.h"
+#include "iinput_binder_client.h"
+#include "input_binder_client_proxy.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -57,7 +60,7 @@ int32_t AuthorizeHelper::GetAuthorizePid()
     return pid;
 }
 
-void AuthorizeHelper::Init(ClientDeathHandler &clientDeathHandler)
+void AuthorizeHelper::Init(ClientDeathHandler* clientDeathHandler)
 {
     CALL_DEBUG_ENTER;
     if (isInit_) {
@@ -65,14 +68,24 @@ void AuthorizeHelper::Init(ClientDeathHandler &clientDeathHandler)
         return;
     }
 
-    clientDeathHandler.AddClientDeathCallback(CallBackType::CALLBACK_TYPE_AUTHORIZE_HELPER,
+    if (clientDeathHandler == nullptr) {
+        MMI_HILOGE("clientDeathHandler is nullptr");
+        return;
+    }
+
+    clientDeathHandler->AddClientDeathCallback(CallBackType::CALLBACK_TYPE_AUTHORIZE_HELPER,
         [&](int32_t pid) -> void { OnClientDeath(pid); });
+    clientDeathHandler_ = clientDeathHandler;
     isInit_ = true;
 }
 
 void AuthorizeHelper::OnClientDeath(int32_t pid)
 {
     CALL_DEBUG_ENTER;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        ClearRequestInjectionCallback(pid);
+    }
     if (pid != pid_) {
         MMI_HILOGD("Cancel process is inconsistent with authorize, cancel pid:%{public}d, authorize pid:%{public}d",
             pid, pid_);
@@ -93,7 +106,7 @@ void AuthorizeHelper::AuthorizeProcessExit()
     pid_ = INVALID_AUTHORIZE_PID;
 }
 
-int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback exitCallback)
+int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback exitCallback, const int32_t reqId)
 {
     CALL_DEBUG_ENTER;
     if (!isInit_) {
@@ -116,6 +129,9 @@ int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback 
         pid_ = pid;
         state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
         exitCallback_ = exitCallback;
+        if (reqId > 0) {
+            mapQueryAuthorizeInfo_.insert(std::make_pair(reqId, pid_));
+        }
         MMI_HILOGD("A process enters the authorization select state %{public}d", state_);
         return RET_OK;
     }
@@ -126,6 +142,7 @@ int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback 
     }
     if (state_ == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
         state_ = AuthorizeState::STATE_AUTHORIZE;
+        NotifyRequestInjectionResult();
     }
     exitCallback_ = exitCallback;
     MMI_HILOGD("A process will be authorized, authorize pid:%{public}d", pid_);
@@ -146,7 +163,52 @@ void AuthorizeHelper::CancelAuthorize(int32_t pid)
     }
     state_ = AuthorizeState::STATE_UNAUTHORIZE;
     pid_ = INVALID_AUTHORIZE_PID;
+    NotifyRequestInjectionResult();
     exitCallback_ = nullptr;
+}
+
+void AuthorizeHelper::NotifyRequestInjectionResult()
+{
+    CALL_DEBUG_ENTER;
+    if (clientDeathHandler_ == nullptr) {
+        MMI_HILOGE("clientDeathHandler is nullptr");
+        return;
+    }
+    for (auto it = mapQueryAuthorizeInfo_.begin(); it != mapQueryAuthorizeInfo_.end();) {
+        NoticeRequestInjectionResult(it->first, it->second);
+        mapQueryAuthorizeInfo_.erase(it++);
+    }
+}
+
+void AuthorizeHelper::NoticeRequestInjectionResult(const int32_t reqId, const int32_t callingPid)
+{
+    auto object =  clientDeathHandler_->GetClientProxy(callingPid);
+    sptr<IInputBinderClient> pClientProxy = iface_cast<IInputBinderClient>(object);
+    if (!pClientProxy) {
+        MMI_HILOGE("clientDeathHandler is nullptr");
+        return;
+    }
+    auto sendStatus = AUTHORIZE_QUERY_STATE::UNAUTHORIZE;
+    if (state_ == AuthorizeState::STATE_AUTHORIZE) {
+        if (pid_ == callingPid) {
+            sendStatus = AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED;
+        }
+    }
+    MMI_HILOGD("result callback! pid_:%{public}d,sendStatus:%{public}d,state_:%{public}d,mapId:%{public}d",
+        pid_, sendStatus, pid_, callingPid);
+    pClientProxy->NoticeRequestInjectionResult(reqId, static_cast<int32_t>(sendStatus));
+}
+
+void AuthorizeHelper::ClearRequestInjectionCallback(int32_t callingPid)
+{
+    CALL_DEBUG_ENTER;
+    for (auto it = mapQueryAuthorizeInfo_.begin(); it != mapQueryAuthorizeInfo_.end();) {
+        if (it->second == callingPid) {
+            mapQueryAuthorizeInfo_.erase(it++);
+        } else {
+            it++;
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

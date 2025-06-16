@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef I_INPUT_BINDER_CLIENT_STUB_H
-#define I_INPUT_BINDER_CLIENT_STUB_H
+#ifndef INPUT_BINDER_CLIENT_SERVER_IMPL_H
+#define INPUT_BINDER_CLIENT_SERVER_IMPL_H
 
-#include "iremote_stub.h"
-
-#include "i_input_binder_client.h"
+#include "input_binder_client_stub.h"
+#include "iremote_object.h"
 
 namespace OHOS {
 namespace MMI {
-class InputBinderClientStub : public IRemoteStub<IInputBinderClient> {
+class InputBinderClientServerImpl final: public InputBinderClientStub {
+    DISALLOW_COPY_AND_MOVE(InputBinderClientServerImpl);
 public:
-    InputBinderClientStub() = default;
-    virtual ~InputBinderClientStub() = default;
-    virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                    MessageOption &option) override;
+    InputBinderClientServerImpl() = default;
+    ~InputBinderClientServerImpl() = default;
+public:
+     ErrCode NoticeRequestInjectionResult(int32_t reqId, int32_t status) override;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INPUT_BINDER_CLIENT_STUB_H
+#endif // INPUT_BINDER_CLIENT_SERVER_IMPL_H

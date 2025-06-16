@@ -160,5 +160,17 @@ void ClientDeathHandler::NotifyDeath(int32_t pid)
         (it->second)(pid);
     }
 }
+
+sptr<IRemoteObject> ClientDeathHandler::GetClientProxy(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lockPidMap(mutexPidMap_);
+    auto it = clientPidMap_.find(pid);
+    if (it == clientPidMap_.end()) {
+        MMI_HILOGI("Not found Death recipient proxy! pid:%{public}d", pid);
+        return nullptr;
+    }
+    return it->second;
+}
 } // namespace MMI
 } // namespace OHOS

@@ -149,6 +149,8 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void GetKeyState([out] int[] pressedKeys, [out] Map<int, int> specialKeysState);
     void Authorize([in] boolean isAuthorize);
     void CancelInjection();
+    void RequestInjection([out] int status, [out] int reqId);
+    void QueryAuthorizedStatus([out] int status);
     void HasIrEmitter([out] boolean hasIrEmitter);
     void GetInfraredFrequencies([out] InfraredFrequency[] requencys);
     void TransmitInfrared([in] long number, [in] long[] pattern);

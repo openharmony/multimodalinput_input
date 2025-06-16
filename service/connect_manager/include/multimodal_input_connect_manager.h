@@ -144,6 +144,8 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
     int32_t Authorize(bool isAuthorize);
     int32_t CancelInjection();
+    int32_t RequestInjection(int32_t &status, int32_t &reqId);
+    int32_t QueryAuthorizedStatus(int32_t &status);
     int32_t HasIrEmitter(bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);

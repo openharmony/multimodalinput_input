@@ -35,6 +35,7 @@ public:
     bool AddClientDeathCallback(CallBackType type, ClientDeathCallback callback);
     bool UnregisterClientDeathRecipient(const wptr<IRemoteObject> &remoteObj);
     void RemoveClientDeathCallback(CallBackType type);
+    sptr<IRemoteObject> GetClientProxy(int32_t pid);
 
 protected:
     bool RegisterClientDeathRecipient(const sptr<IRemoteObject> &binderClientSrv);
