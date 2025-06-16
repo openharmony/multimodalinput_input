@@ -40,6 +40,7 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -78,6 +79,7 @@ constexpr float FACTOR_18 { 1.0f };
 constexpr float FACTOR_27 { 1.2f };
 constexpr float FACTOR_55 { 1.6f };
 constexpr float FACTOR_MAX { 2.4f };
+constexpr int64_t QUERY_AUTHORIZE_MAX_INTERVAL_TIME { 3000 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -102,7 +104,7 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
             continue;
         }
     }
-    AUTHORIZE_HELPER->Init(clientDeathHandler_);
+    AUTHORIZE_HELPER->Init(&clientDeathHandler_);
 }
 
 void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
@@ -1257,6 +1259,97 @@ int32_t ServerMsgHandler::OnCancelInjection(int32_t callPid)
         }
     }
     return ERR_OK;
+}
+
+int32_t ServerMsgHandler::RequestInjection(const int32_t callingPid, int32_t &status, int32_t &reqId)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsPC()) {
+        return ERROR_DEVICE_NOT_SUPPORTED;
+    }
+    auto ret = QueryAuthorizedStatus(callingPid, status);
+    MMI_HILOGD("QueryAuthorizedStatus,ret:%{public}d, callingPid:%{public}d, status:%{public}d",
+        ret, callingPid, status);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("QueryAuthorizedStatus,ret:%{public}d, callingPid:%{public}d", ret, callingPid);
+        return ret;
+    }
+    if (static_cast<AUTHORIZE_QUERY_STATE>(status) != AUTHORIZE_QUERY_STATE::UNAUTHORIZE) {
+        return ERR_OK;
+    }
+    if (CheckForRequestInjectionFrequentAccess(callingPid, QUERY_AUTHORIZE_MAX_INTERVAL_TIME)) {
+        return ERROR_OPERATION_FREQUENT;
+    }
+    LaunchAbility();
+    AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+        MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+        AUTH_DIALOG.CloseDialog();
+    };
+    reqId = GetRequestInjectionCallbackReqId();
+    return AUTHORIZE_HELPER->AddAuthorizeProcess(callingPid, fnCallback, reqId);
+}
+
+int32_t ServerMsgHandler::QueryAuthorizedStatus(const int32_t callingPid, int32_t &status)
+{
+    CALL_DEBUG_ENTER;
+    auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+    if (state == AuthorizeState::STATE_UNAUTHORIZE) {
+        status = static_cast<int32_t>(AUTHORIZE_QUERY_STATE::UNAUTHORIZE);
+        return ERR_OK;
+    }
+    int32_t curAuthPid = AUTHORIZE_HELPER->GetAuthorizePid();
+    if (curAuthPid == callingPid) {
+        if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
+            status = static_cast<int32_t>(AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION);
+        } else {
+            status = static_cast<int32_t>(AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED);
+        }
+        return ERR_OK;
+    }
+    if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
+        status = static_cast<int32_t>(AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION);
+    } else {
+        status = static_cast<int32_t>(AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED);
+    }
+    return ERR_OK;
+}
+
+bool ServerMsgHandler::IsPC() const
+{
+    return PRODUCT_TYPE == PRODUCT_TYPE_PC;
+}
+
+int32_t ServerMsgHandler::GetRequestInjectionCallbackReqId()
+{
+    static std::atomic<int32_t> reqId(1);
+    if (reqId >= INT32_MAX - 1) {
+        reqId = 1;
+        return reqId;
+    }
+    return reqId.fetch_add(1);
+}
+
+bool ServerMsgHandler::CheckForRequestInjectionFrequentAccess(int32_t callingPid, int64_t interval)
+{
+    CALL_DEBUG_ENTER;
+    int64_t curTimestamp = GetMillisTime();
+    std::lock_guard<std::mutex> lock(mutexMapQueryAuthorizeLastTimestamp_);
+    for (auto it = mapQueryAuthorizeLastTimestamp_.begin(); it != mapQueryAuthorizeLastTimestamp_.end();) {
+        if (curTimestamp - it->second >= interval) {
+            MMI_HILOGD("requestInjection cur:%{public}" PRId64",it:%{public}" PRId64",sub:%{public}" PRId64"",
+            curTimestamp, it->second, curTimestamp - it->second);
+            mapQueryAuthorizeLastTimestamp_.erase(it++);
+        } else {
+            it++;
+        }
+    }
+    auto itFind = mapQueryAuthorizeLastTimestamp_.find(callingPid);
+    if (itFind == mapQueryAuthorizeLastTimestamp_.end()) {
+        MMI_HILOGD("requestInjection instert: %{public}d", callingPid);
+        mapQueryAuthorizeLastTimestamp_.insert(std::make_pair(callingPid, curTimestamp));
+        return false;
+    }
+    return true;
 }
 
 void ServerMsgHandler::SetWindowInfo(int32_t infoId, WindowInfo &info)
