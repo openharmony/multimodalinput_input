@@ -47,24 +47,6 @@ constexpr int32_t MIN_RIGHT_BTN_AREA_PERCENT { 0 };
 constexpr int32_t MAX_RIGHT_BTN_AREA_PERCENT { 100 };
 constexpr int32_t INVALID_RIGHT_BTN_AREA { -1 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-constexpr int32_t VKEY_TP_SM_MSG_SIZE { 6 };
-constexpr int32_t VKEY_TP_SM_MSG_TYPE_IDX { 0 };
-constexpr int32_t VKEY_TP_SM_MSG_POINTER_ID_IDX { 1 };
-constexpr int32_t VKEY_TP_SM_MSG_POS_X_IDX { 2 };
-constexpr int32_t VKEY_TP_SM_MSG_POS_Y_IDX { 3 };
-constexpr int32_t VKEY_TP_SM_MSG_SCALE_IDX { 4 };
-constexpr int32_t VKEY_TP_SM_MSG_ANGLE_IDX { 5 };
-constexpr int32_t VKEY_TP_GSE_TWO_FINGERS { 2 };
-constexpr int32_t VKEY_TP_GSE_THREE_FINGERS { 3 };
-constexpr int32_t VKEY_TP_GSE_FOUR_FINGERS { 4 };
-constexpr uint32_t VKEY_TP_LB_ID { 272 };
-constexpr uint32_t VKEY_TP_RB_ID { 273 };
-constexpr uint32_t VKEY_TP_SEAT_BTN_COUNT_NONE { 0 };
-constexpr uint32_t VKEY_TP_SEAT_BTN_COUNT_ONE { 1 };
-constexpr uint32_t VKEY_TP_AXES_ZERO { 0 };
-constexpr uint32_t VKEY_TP_AXES_ONE { 1 };
-constexpr uint32_t VKEY_TP_AXES_TWO { 2 };
-constexpr double VTP_SCALE_AND_ANGLE_FACTOR { 1000.0 };
 constexpr uint32_t KEY_CAPSLOCK { 58 };
 constexpr uint32_t LIBINPUT_KEY_VOLUME_DOWN { 114 };
 constexpr uint32_t LIBINPUT_KEY_VOLUME_UP { 115 };
@@ -294,7 +276,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     GetKeyboardActivationState getKeyboardActivationState,
     IsFloatingKeyboard isFloatingKeyboard,
     IsVKeyboardShown isVKeyboardShown,
-	GetLibinputEventForVKeyboard getLibinputEventForVKeyboard,
+    GetLibinputEventForVKeyboard getLibinputEventForVKeyboard,
     GetLibinputEventForVTrackpad getLibinputEventForVTrackpad)
 {
     handleTouchPoint_ = handleTouchPoint;
@@ -302,7 +284,7 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     getKeyboardActivationState_ = getKeyboardActivationState;
     isFloatingKeyboard_ = isFloatingKeyboard;
     isVKeyboardShown_ = isVKeyboardShown;
-	getLibinputEventForVKeyboard_ = getLibinputEventForVKeyboard;
+    getLibinputEventForVKeyboard_ = getLibinputEventForVKeyboard;
     getLibinputEventForVTrackpad_ = getLibinputEventForVTrackpad;
 
     // init touch device Id.
@@ -384,42 +366,11 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
             delayDestroy = CreateVKeyboardDelayTimer(event, delayMs, *keyEvents.begin());
             if (delayDestroy) {
                 // create and delay this event.
-				confirmedDelayMs = delayMs;
+                confirmedDelayMs = delayMs;
                 continue;
             }
         }
-        switch (eventType) {
-            case VKeyboardEventType::NormalKeyboardEvent: {
-                for (auto event : keyEvents) {
-                    funInputEvent_(event, frameTime);
-                    free(event);
-                }
-                break;
-            }
-            case VKeyboardEventType::UpdateCaps: {
-                for (auto event : keyEvents) {
-                    funInputEvent_(event, frameTime);
-                    free(event);
-                }
-                struct libinput_device* device = INPUT_DEV_MGR->GetKeyboardDevice();
-                if (device != nullptr) {
-                    std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
-                    if (keyEvent != nullptr) {
-                        bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
-
-                        DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
-                        keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
-                    }
-                }
-                break;
-            }
-            case VKeyboardEventType::HideCursor: {
-                HideMouseCursorTemporary();
-                break;
-            }
-            default:
-                break;
-        }
+        HandleVKeyboardMessage(eventType, keyEvents, frameTime);
     }
     
 	// handle trackpad messages.
@@ -430,30 +381,7 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
             break;
         }
 
-        switch (eventType) {
-            case VTrackpadEventType::NormalTrackpadEvent: {
-                for (auto event : events) {
-                    libinput_event_type injectEventType = libinput_event_get_type(event);
-                    funInputEvent_(event, frameTime);
-                    free(event);
-
-                    if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
-                        InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN, frameTime);
-                    } else if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE) {
-                        InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION, frameTime);
-                    } else if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_END) {
-                        if (IsCursorInCastWindow()){
-                            InjectEventForCastWindow(touch);
-                        } else {
-                            InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP, frameTime);
-                        }
-                    }
-                }
-                break;
-            }
-            default:
-                break;
-        }
+        HandleVTrackpadMessage(eventType, events, frameTime, touch);
     }
 
     if (eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -464,6 +392,75 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
         StartVKeyboardDelayTimer(confirmedDelayMs);
     } else {
         libinput_event_destroy(event);
+    }
+}
+
+void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> keyEvents, int64_t frameTime)
+{
+     switch (eventType) {
+        case VKeyboardEventType::NormalKeyboardEvent: {
+            for (auto event : keyEvents) {
+                funInputEvent_(event, frameTime);
+                free(event);
+            }
+            break;
+        }
+        case VKeyboardEventType::UpdateCaps: {
+            for (auto event : keyEvents) {
+                funInputEvent_(event, frameTime);
+                free(event);
+            }
+            struct libinput_device* device = INPUT_DEV_MGR->GetKeyboardDevice();
+            if (device != nullptr) {
+                std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+                if (keyEvent != nullptr) {
+                    bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+
+                    DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+                    keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+                }
+            }
+            break;
+        }
+        case VKeyboardEventType::HideCursor: {
+            HideMouseCursorTemporary();
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void LibinputAdapter::HandleVTrackpadMessage(VTrackpadEventType eventType, std::vector<libinput_event*> events,
+                                             int64_t frameTime,  libinput_event_touch *touch)
+{
+    switch (eventType) {
+        case VTrackpadEventType::NormalTrackpadEvent: {
+            for (auto event : events) {
+                libinput_event_type injectEventType = libinput_event_get_type(event);
+                funInputEvent_(event, frameTime);
+                free(event);
+
+                if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
+                    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN,
+                                                      frameTime);
+                } else if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE) {
+                    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION,
+                                                      frameTime);
+                } else if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_END) {
+                    if (IsCursorInCastWindow()) {
+                        InjectEventForCastWindow(touch);
+                    } else {
+                        InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP,
+                                                          frameTime);
+                    }
+                }
+
+            }
+            break;
+        }
+        default:
+            break;
     }
 }
 
