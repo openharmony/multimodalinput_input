@@ -282,7 +282,6 @@ ohos_unittest("InputHandlerManagerTest") {
   ]
 
   external_deps = [
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -314,6 +313,10 @@ ohos_unittest("InputHandlerManagerTest") {
 
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
+  }
+
+  if (call_manager_service_enabled) {
+      external_deps += ["call_manager:tel_call_manager_api"]
   }
 }
 
