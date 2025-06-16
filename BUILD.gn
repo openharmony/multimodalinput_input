@@ -139,29 +139,29 @@ group("input_jsapi_group") {
 
 group("input_ets_group") {
   deps = [
-    "frameworks/ets/input_event:inputEvent",
-    "frameworks/ets/intention_code:intentionCode",
-    "frameworks/ets/input_moniter:inputMoniter",
-    "frameworks/ets/key_code:keyCode",
-    "frameworks/ets/key_event:keyEvent",
-    "frameworks/ets/mouse_event:mouseEvent",
-    "frameworks/ets/touch_event:touchEvent",
-    "frameworks/ets/gesture_event:gestureEvent"
+    "frameworks/ets/input_event:ets_inputEvent_package",
+    "frameworks/ets/intention_code:ets_intentionCode_package",
+    "frameworks/ets/input_monitor:ets_inputMonitor_package",
+    "frameworks/ets/key_code:ets_keyCode_package",
+    "frameworks/ets/key_event:ets_keyEvent_package",
+    "frameworks/ets/mouse_event:ets_mouseEvent_package",
+    "frameworks/ets/touch_event:ets_touchEvent_package",
+    "frameworks/ets/gesture_event:ets_gestureEvent_package"
   ]
   if (input_feature_keyboard) {
     deps += [
-      "frameworks/ets/input_consumer:inputConsumer",
-      "frameworks/ets/input_event_client:inputEventClient"
+      "frameworks/ets/input_consumer:ets_inputConsumer_package",
+      "frameworks/ets/input_event_client:ets_inputEventClient_package"
     ]
   }
   if (input_feature_input_device) {
-    deps += [ "frameworks/ets/input_device:inputDevice" ]
+    deps += [ "frameworks/ets/input_device:ets_inputDevice_package" ]
   }
   if (input_feature_mouse) {
-    deps += [ "frameworks/ets/pointer:pointer" ]
+    deps += [ "frameworks/ets/pointer:ets_pointer_package" ]
     }
   if (input_feature_short_key) {
-    deps += [ "frameworks/ets/short_key:shortKey" ]
+    deps += [ "frameworks/ets/short_key:ets_shortKey_package" ]
   }
 }
 

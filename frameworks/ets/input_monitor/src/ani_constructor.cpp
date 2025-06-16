@@ -13,17 +13,18 @@
  * limitations under the License.
  */
 
-#include "ohos.multimodalInput.inputMoniter.proj.hpp"
-#include "ohos.multimodalInput.inputMoniter.impl.hpp"
-#include "taihe/runtime.hpp"
-#include "stdexcept"
+#include "ohos.multimodalInput.inputMonitor.ani.hpp"
 
-using namespace taihe;
-using namespace ohos::multimodalInput::inputMoniter;
-
-namespace {
-} // namespace
-
-// Since these macros are auto-generate, lint will cause false positive.
-// NOLINTBEGIN
-// NOLINTEND
+ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
+{
+    ani_env *env;
+    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
+        return ANI_ERROR;
+    }
+    if (ANI_OK != ohos::multimodalInput::inputMonitor::ANIRegister(env)) {
+        std::cerr << "Error from ohos::multimodalInput::inputMonitor::ANIRegister" << std::endl;
+        return ANI_ERROR;
+    }
+    *result = ANI_VERSION_1;
+    return ANI_OK;
+}

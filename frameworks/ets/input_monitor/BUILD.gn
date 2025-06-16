@@ -13,14 +13,14 @@ import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
-copy_taihe_idl("input_moniter_taihe") {
-  sources = [ "idl/ohos.multimodalInput.inputMoniter.taihe" ]
+copy_taihe_idl("input_monitor_taihe") {
+  sources = [ "idl/ohos.multimodalInput.inputMonitor.taihe" ]
   deps = [
     "${mmi_path}/frameworks/ets/mouse_event:mouse_event_taihe",
     "${mmi_path}/frameworks/ets/touch_event:touch_event_taihe",
   ]
 }
-config("inputMoniter_config") {
+config("inputMonitor_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -34,24 +34,24 @@ part_name = "input"
 taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "$taihe_generated_file_path"
-  deps = [ ":input_moniter_taihe" ]
+  deps = [ ":input_monitor_taihe" ]
   outputs = [
-    "$taihe_generated_file_path/src/ohos.multimodalInput.inputMoniter.ani.cpp",
-    "$taihe_generated_file_path/src/ohos.multimodalInput.inputMoniter.abi.c",
+    "$taihe_generated_file_path/src/ohos.multimodalInput.inputMonitor.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.multimodalInput.inputMonitor.abi.c",
   ]
 }
-taihe_shared_library("InputMoniter") {
+taihe_shared_library("InputMonitor") {
   taihe_generated_file_path = "$taihe_generated_file_path"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
   configs = [
     "${mmi_path}:coverage_flags",
-    ":inputMoniter_config",
+    ":inputMonitor_config",
   ]
   sources += [
     "src/ani_constructor.cpp",
-    "src/ohos.multimodalInput.inputMoniter.impl.cpp",
+    "src/ohos.multimodalInput.inputMonitor.impl.cpp",
   ]
   deps = [
     ":run_taihe",
@@ -72,23 +72,23 @@ taihe_shared_library("InputMoniter") {
     debug = false
   }
 }
-generate_static_abc("input_moniter_abc") {
+generate_static_abc("input_moniter") {
   base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputMoniter.ets" ]
+  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputMonitor.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/input_moniter_abc.abc"
+  device_dst_file = "/system/framework/input_moniter.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("input_moniter_etc") {
-  source = "$target_out_dir/input_moniter_abc.abc"
+  source = "$target_out_dir/input_moniter.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":input_moniter_abc" ]
+  deps = [ ":input_moniter" ]
 }
-group("inputMoniter") {
+group("ets_inputMonitor_package") {
   deps = [
     ":input_moniter_etc",
-    ":InputMoniter",
+    ":InputMonitor",
   ]
 }

@@ -69,21 +69,21 @@ taihe_shared_library("Pointer") {
     debug = false
   }
 }
-generate_static_abc("pointer_abc") {
+generate_static_abc("pointer") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.pointer.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/pointer_abc.abc"
+  device_dst_file = "/system/framework/pointer.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("pointer_etc") {
-  source = "$target_out_dir/pointer_abc.abc"
+  source = "$target_out_dir/pointer.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":pointer_abc" ]
+  deps = [ ":pointer" ]
 }
-group("pointer") {
+group("ets_pointer_package") {
   deps = [
     ":pointer_etc",
     ":Pointer",

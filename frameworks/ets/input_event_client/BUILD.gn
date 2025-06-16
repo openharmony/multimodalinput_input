@@ -70,21 +70,21 @@ taihe_shared_library("InputEventClient") {
     debug = false
   }
 }
-generate_static_abc("input_event_client_abc") {
+generate_static_abc("input_event_client") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputEventClient.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/input_event_client_abc.abc"
+  device_dst_file = "/system/framework/input_event_client.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("input_event_client_etc") {
-  source = "$target_out_dir/input_event_client_abc.abc"
+  source = "$target_out_dir/input_event_client.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":input_event_client_abc" ]
+  deps = [ ":input_event_client" ]
 }
-group("inputEventClient") {
+group("ets_inputEventClient_package") {
   deps = [
     ":input_event_client_etc",
     ":InputEventClient",

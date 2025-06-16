@@ -73,21 +73,21 @@ taihe_shared_library("KeyEvent") {
     debug = false
   }
 }
-generate_static_abc("key_event_abc") {
+generate_static_abc("key_event") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.keyEvent.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/key_event_abc.abc"
+  device_dst_file = "/system/framework/key_event.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("key_event_etc") {
-  source = "$target_out_dir/key_event_abc.abc"
+  source = "$target_out_dir/key_event.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":key_event_abc" ]
+  deps = [ ":key_event" ]
 }
-group("keyEvent") {
+group("ets_keyEvent_package") {
   deps = [
     ":key_event_etc",
     ":KeyEvent",

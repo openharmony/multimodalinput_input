@@ -74,21 +74,21 @@ taihe_shared_library("InputConsumer") {
     debug = false
   }
 }
-generate_static_abc("input_consumer_abc") {
+generate_static_abc("input_consumer") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputConsumer.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/input_consumer_abc.abc"
+  device_dst_file = "/system/framework/input_consumer.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("input_consumer_etc") {
-  source = "$target_out_dir/input_consumer_abc.abc"
+  source = "$target_out_dir/input_consumer.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":input_consumer_abc" ]
+  deps = [ ":input_consumer" ]
 }
-group("inputConsumer") {
+group("ets_inputConsumer_package") {
   deps = [
     ":input_consumer_etc",
     ":InputConsumer",
