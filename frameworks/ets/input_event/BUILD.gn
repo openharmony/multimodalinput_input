@@ -27,21 +27,21 @@ ohos_taihe("run_taihe") {
     "$taihe_generated_file_path/src/ohos.multimodalInput.inputEvent.abi.c",
   ]
 }
-generate_static_abc("input_event_abc") {
+generate_static_abc("input_event") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputEvent.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/input_event_abc.abc"
+  device_dst_file = "/system/framework/input_event.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("input_event_etc") {
-  source = "$target_out_dir/input_event_abc.abc"
+  source = "$target_out_dir/input_event.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":input_event_abc" ]
+  deps = [ ":input_event" ]
 }
-group("inputEvent") {
+group("ets_inputEvent_package") {
   deps = [
    ":input_event_etc",
    ]

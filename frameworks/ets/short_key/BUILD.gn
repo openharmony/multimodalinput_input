@@ -67,21 +67,21 @@ taihe_shared_library("ShortKey") {
     debug = false
   }
 }
-generate_static_abc("short_key_abc") {
+generate_static_abc("short_key") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.shortKey.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/short_key_abc.abc"
+  device_dst_file = "/system/framework/short_key.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("short_key_etc") {
-  source = "$target_out_dir/short_key_abc.abc"
+  source = "$target_out_dir/short_key.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":short_key_abc" ]
+  deps = [ ":short_key" ]
 }
-group("shortKey") {
+group("ets_shortKey_package") {
   deps = [
     ":short_key_etc",
     ":ShortKey",

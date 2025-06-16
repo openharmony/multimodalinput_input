@@ -176,7 +176,7 @@
           "name": "//foundation/multimodalinput/input/frameworks/ets/input_event:input_event_taihe"
         },
         {
-          "name": "//foundation/multimodalinput/input/frameworks/ets/input_moniter:input_moniter_taihe"
+          "name": "//foundation/multimodalinput/input/frameworks/ets/input_monitor:input_monitor_taihe"
         },
         {
           "name": "//foundation/multimodalinput/input/frameworks/ets/intention_code:intention_code_taihe"

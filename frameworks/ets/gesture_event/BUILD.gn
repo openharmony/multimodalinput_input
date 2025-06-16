@@ -68,21 +68,21 @@ taihe_shared_library("GestureEvent") {
     debug = false
   }
 }
-generate_static_abc("gesture_event_abc") {
+generate_static_abc("gesture_event") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.gestureEvent.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/gesture_event_abc.abc"
+  device_dst_file = "/system/framework/gesture_event.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("gesture_event_etc") {
-  source = "$target_out_dir/gesture_event_abc.abc"
+  source = "$target_out_dir/gesture_event.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":gesture_event_abc" ]
+  deps = [ ":gesture_event" ]
 }
-group("gestureEvent") {
+group("ets_gestureEvent_package") {
   deps = [
     ":gesture_event_etc",
     ":GestureEvent",
