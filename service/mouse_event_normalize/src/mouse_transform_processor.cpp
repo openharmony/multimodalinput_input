@@ -415,12 +415,20 @@ bool MouseTransformProcessor::IsWindowRotation(const DisplayInfo* displayInfo)
 {
     MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
         ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+
+    bool foldableDevicePolicyMain = false;
+    bool foldableDevicePolicyFull = false;
+    if (!FOLDABLE_DEVICE_POLICY.empty()) {
+        foldableDevicePolicyMain = FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE;
+    }
+    if (FOLDABLE_DEVICE_POLICY.size() > FOLDABLE_DEVICE) {
+        foldableDevicePolicyFull = FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE;
+    }
+
     return (ROTATE_POLICY == WINDOW_ROTATE ||
         (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo->displayMode == DisplayMode::MAIN &&
-        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
-        (displayInfo->displayMode == DisplayMode::FULL &&
-        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
+        ((displayInfo->displayMode == DisplayMode::MAIN && foldableDevicePolicyMain) ||
+        (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
 }
 
 Direction MouseTransformProcessor::GetDisplayDirection(const DisplayInfo *displayInfo)
@@ -441,7 +449,7 @@ Direction MouseTransformProcessor::GetDisplayDirection(const DisplayInfo *displa
     return displayDirection;
 }
 
-void MouseTransformProcessor::CalculateOffset(const DisplayInfo* displayInfo, Offset &offset)
+void MouseTransformProcessor::CalculateOffset(const DisplayInfo *displayInfo, Offset &offset)
 {
 #ifndef OHOS_BUILD_EMULATOR
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
