@@ -714,5 +714,56 @@ HWTEST_F(EventInterceptorHandlerTest, TouchPadKnuckleDoubleClickHandle_Test_003,
     bool result = handler.TouchPadKnuckleDoubleClickHandle(event);
     EXPECT_TRUE(result);
 }
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0011
+ * @tc.desc: Test the function HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    event->SetKeyAction(KNUCKLE_2F_DOUBLE_CLICK);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0018
+ * @tc.desc: Test the function TouchPadKnuckleDoubleClickHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0018, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    int32_t keyAction = 123;
+    event->SetKeyAction(keyAction); // or KNUCKLE_2F_DOUBLE_CLICK
+    EventInterceptorHandler handler;
+    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
+    ASSERT_NO_FATAL_FAILURE(handler.TouchPadKnuckleDoubleClickHandle(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0019
+ * @tc.desc: Test the function HandlePointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0019, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    auto InputEvent = InputEvent::Create();
+    ASSERT_NE(InputEvent, nullptr);
+    InputEvent->ClearFlag();
+    uint32_t flag = 1;
+    InputEvent->AddFlag(flag);
+    EventInterceptorHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
