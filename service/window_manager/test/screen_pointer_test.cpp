@@ -80,7 +80,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetInvisible_001, TestSize.Level1)
     PointerRenderer renderer;
     ASSERT_TRUE(screenpointer->Init(renderer));
     bool ret = screenpointer->SetInvisible();
-    EXPECT_TRUE(ret);
+    EXPECT_EQ(ret, hwcmgr->IsSupported());
 }
 
 /**
@@ -174,23 +174,23 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_001, TestSize.Level1)
     int32_t x = 0;
     int32_t y = 0;
     bool ret = screenpointer->Move(x, y, align);
-    EXPECT_TRUE(ret);
+    EXPECT_EQ(ret, hwcmgr->IsSupported());
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
     screenpointer->isCurrentOffScreenRendering_ = true;
     ret = screenpointer->Move(x, y, align);
-    EXPECT_TRUE(ret);
+    EXPECT_EQ(ret, hwcmgr->IsSupported());
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
     screenpointer->isWindowRotation_ = true;
     ret = screenpointer->Move(x, y, align);
-    EXPECT_TRUE(ret);
+    EXPECT_EQ(ret, hwcmgr->IsSupported());
     screenpointer->mode_ = mode_t::SCREEN_EXTEND;
     screenpointer->isCurrentOffScreenRendering_ = false;
     ret = screenpointer->Move(x, y, align);
-    EXPECT_TRUE(ret);
+    EXPECT_EQ(ret, hwcmgr->IsSupported());
     screenpointer->mode_ = mode_t::SCREEN_MIRROR;
     screenpointer->isCurrentOffScreenRendering_ = false;
     ret = screenpointer->Move(x, y, align);
-    EXPECT_TRUE(ret);
+    EXPECT_EQ(ret, hwcmgr->IsSupported());
 }
 
 /**

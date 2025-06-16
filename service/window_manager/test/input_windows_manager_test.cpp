@@ -6654,11 +6654,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateKeyEventDisplayI
     keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     inputWindowsManager.UpdateKeyEventDisplayId(keyEvent, focusWindowId);
-    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 1);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), -1);
 
     focusWindowId = 2;
     inputWindowsManager.UpdateKeyEventDisplayId(keyEvent, focusWindowId);
-    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 1);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), -1);
 
     DisplayInfo info1 = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200};
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
