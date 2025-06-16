@@ -436,7 +436,7 @@ void LibinputAdapter::HandleVTrackpadMessage(VTrackpadEventType eventType, std::
                                              int64_t frameTime,  libinput_event_touch *touch)
 {
     if (eventType != VTrackpadEventType::NormalTrackpadEvent) {
-        return;	
+        return;
     }
 
     for (auto event : events) {
