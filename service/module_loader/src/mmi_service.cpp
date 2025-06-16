@@ -4166,7 +4166,7 @@ void MMIService::InitVKeyboardFuncHandler()
                 vkeyboard_getKeyboardActivationState_,
                 gaussiankeyboard_isFloatingKeyboard_,
                 vkeyboard_isShown_,
-				getLibinputEventForVKeyboard_,
+                getLibinputEventForVKeyboard_,
                 getLibinputEventForVTrackpad_);
         }
     }
