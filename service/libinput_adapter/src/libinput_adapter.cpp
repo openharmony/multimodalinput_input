@@ -349,7 +349,7 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
 {
     // delay the event destroy.
     bool delayDestroy = false;
-	int32_t confirmedDelayMs(0);
+    int32_t confirmedDelayMs(0);
 
     // handle keyboard messages.
     while (true) {
@@ -395,9 +395,10 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
     }
 }
 
-void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> keyEvents, int64_t frameTime)
+void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
+                                             std::vector<libinput_event*> keyEvents, int64_t frameTime)
 {
-     switch (eventType) {
+    switch (eventType) {
         case VKeyboardEventType::NormalKeyboardEvent: {
             for (auto event : keyEvents) {
                 funInputEvent_(event, frameTime);
@@ -434,33 +435,29 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType, std::
 void LibinputAdapter::HandleVTrackpadMessage(VTrackpadEventType eventType, std::vector<libinput_event*> events,
                                              int64_t frameTime,  libinput_event_touch *touch)
 {
-    switch (eventType) {
-        case VTrackpadEventType::NormalTrackpadEvent: {
-            for (auto event : events) {
-                libinput_event_type injectEventType = libinput_event_get_type(event);
-                funInputEvent_(event, frameTime);
-                free(event);
+    if (eventType != VTrackpadEventType::NormalTrackpadEvent) {
+        return;	
+    }
 
-                if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
-                    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN,
-                                                      frameTime);
-                } else if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE) {
-                    InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION,
-                                                      frameTime);
-                } else if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_END) {
-                    if (IsCursorInCastWindow()) {
-                        InjectEventForCastWindow(touch);
-                    } else {
-                        InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP,
-                                                          frameTime);
-                    }
-                }
+    for (auto event : events) {
+        libinput_event_type injectEventType = libinput_event_get_type(event);
+        funInputEvent_(event, frameTime);
+        free(event);
 
+        if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
+            InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN,
+                                              frameTime);
+        } else if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE) {
+            InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_MOTION,
+                                              frameTime);
+        } else if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_END) {
+            if (IsCursorInCastWindow()) {
+                InjectEventForCastWindow(touch);
+            } else {
+                InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_UP,
+                                                  frameTime);
             }
-            break;
         }
-        default:
-            break;
     }
 }
 
