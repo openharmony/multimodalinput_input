@@ -13,18 +13,13 @@
  * limitations under the License.
  */
 
-#include "ohos.multimodalInput.inputMoniter.ani.hpp"
+@!namespace("@ohos.multimodalInput.inputMonitor", "inputMonitor")
+from ohos.multimodalInput.touchEvent use TouchEvent;
+from ohos.multimodalInput.mouseEvent use MouseEvent;
+@!sts_inject("""
+static { loadLibrary("InputMonitor.z") }
+""")
 
-ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
-{
-    ani_env *env;
-    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
-        return ANI_ERROR;
-    }
-    if (ANI_OK != ohos::multimodalInput::inputMoniter::ANIRegister(env)) {
-        std::cerr << "Error from ohos::multimodalInput::inputMoniter::ANIRegister" << std::endl;
-        return ANI_ERROR;
-    }
-    *result = ANI_VERSION_1;
-    return ANI_OK;
+struct TouchEventReceiver {
+    filter: (touchEvent: TouchEvent) => bool;
 }

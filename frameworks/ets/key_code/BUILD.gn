@@ -69,21 +69,21 @@ taihe_shared_library("KeyCode") {
     debug = false
   }
 }
-generate_static_abc("key_code_abc") {
+generate_static_abc("key_code") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.keyCode.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/key_code_abc.abc"
+  device_dst_file = "/system/framework/key_code.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("key_code_etc") {
-  source = "$target_out_dir/key_code_abc.abc"
+  source = "$target_out_dir/key_code.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":key_code_abc" ]
+  deps = [ ":key_code" ]
 }
-group("keyCode") {
+group("ets_keyCode_package") {
   deps = [
     ":key_code_etc",
     ":KeyCode",

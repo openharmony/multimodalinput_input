@@ -68,21 +68,21 @@ taihe_shared_library("MouseEvent") {
     debug = false
   }
 }
-generate_static_abc("mouse_event_abc") {
+generate_static_abc("mouse_event") {
   base_url = "$taihe_generated_file_path"
   files = [ "$taihe_generated_file_path/@ohos.multimodalInput.mouseEvent.ets" ]
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/mouse_event_abc.abc"
+  device_dst_file = "/system/framework/mouse_event.abc"
   dependencies = [ ":run_taihe" ]
 }
 ohos_prebuilt_etc("mouse_event_etc") {
-  source = "$target_out_dir/mouse_event_abc.abc"
+  source = "$target_out_dir/mouse_event.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":mouse_event_abc" ]
+  deps = [ ":mouse_event" ]
 }
-group("mouseEvent") {
+group("ets_mouseEvent_package") {
   deps = [
     ":mouse_event_etc",
     ":MouseEvent",
