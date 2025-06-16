@@ -16,8 +16,6 @@
 #include "mmi_log.h"
 #include "setting_datashare.h"
 
-#undef MMI_LOG_DOMAIN
-#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "mock_setting_datashare"
 

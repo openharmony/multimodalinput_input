@@ -12,8 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define private public
-#define protected public
 
 #include <cstdio>
 #include <gtest/gtest.h>
@@ -23,8 +21,6 @@
 #include "key_event.h"
 #include "mmi_log.h"
 
-#undef protected
-#undef private
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AccountManagerTest"
 
