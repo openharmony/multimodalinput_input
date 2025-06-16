@@ -415,6 +415,7 @@ if (input_ext_feature_keyboard_ext_flag) {
 }
 
 if (input_feature_product == "pc") {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_HARDWARE_CURSOR" ]
   input_default_defines += [ "OHOS_BUILD_PC_PRIORITY" ]
   input_default_defines += [ "OHOS_BUILD_PC_UNIT_TEST" ]
   input_default_defines += [ "OHOS_BUILD_MOUSE_REPORTING_RATE" ]

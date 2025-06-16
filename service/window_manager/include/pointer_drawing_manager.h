@@ -20,9 +20,11 @@
 #include "transaction/rs_interfaces.h"
 
 #include "device_observer.h"
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #include "hardware_cursor_pointer_manager.h"
 #include "dm_common.h"
 #include "screen_manager_lite.h"
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "screen_pointer.h"
@@ -52,6 +54,7 @@ private:
     std::shared_ptr<Media::PixelMap> pixelMap_ { nullptr };
 };
 
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 class ScreenModeChangeListener final : public OHOS::Rosen::ScreenManagerLite::IScreenModeChangeListener {
 public:
     using callback_t = std::function<void(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &)>;
@@ -66,6 +69,7 @@ public:
 private:
     callback_t callback_;
 };
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 class DelegateInterface;
 class PointerDrawingManager final : public IPointerDrawingManager, public IDeviceObserver {
@@ -136,7 +140,9 @@ public:
     }
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
     int32_t displayId, int32_t physicalX, int32_t physicalY) override;
 
@@ -183,8 +189,6 @@ private:
     int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
-    bool IsWindowRotation(const DisplayInfo *displayInfo);
-    Direction GetDisplayDirection(const DisplayInfo *displayInfo);
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
     void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
@@ -208,6 +212,7 @@ private:
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
     void SetSurfaceNodeBounds();
     int32_t DrawNewDpiPointer() override;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
     void SoftCursorRenderThreadLoop();
@@ -223,6 +228,7 @@ private:
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void DumpScreenInfo(std::ostringstream& oss);
+    bool IsSupported() override;
     int32_t DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
     int32_t DrawHardCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
@@ -246,11 +252,11 @@ private:
     void AttachAllSurfaceNode() override;
     void DetachAllSurfaceNode() override;
     int32_t CheckHwcReady() override;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<Rosen::RSSurfaceNode> GetSurfaceNode();
     void SetSurfaceNode(std::shared_ptr<Rosen::RSSurfaceNode> ptr);
     void AdjustMouseFocusToSoftRenderOrigin(Direction direction, const MOUSE_ICON pointerStyle, int32_t &physicalX,
         int32_t &physicalY);
-    bool GetHardCursorEnabled() override;
 private:
     struct PidInfo {
         int32_t pid { 0 };
@@ -300,6 +306,7 @@ private:
     std::unique_ptr<std::thread> renderThread_ { nullptr };
     bool isInit_ { false };
     std::mutex mtx_;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
     sptr<ScreenModeChangeListener> screenModeChangeListener_ { nullptr };
     std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers_;
@@ -313,6 +320,7 @@ private:
     std::unique_ptr<std::thread> moveRetryThread_ { nullptr };
     int32_t moveRetryTimerId_ { -1 };
     int32_t moveRetryCount_ { 0 };
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };

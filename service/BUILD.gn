@@ -378,7 +378,6 @@ ohos_shared_library("libmmi-server") {
     "hisysevent:libhisysevent",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "window_manager:libdm_lite",
     "window_manager:libwsutils",
   ]
 
@@ -758,7 +757,6 @@ ohos_unittest("KeyShortcutManagerTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm_lite",
     "window_manager:libwm_lite",
   ]
 
@@ -2703,7 +2701,6 @@ ohos_unittest("DeviceManagerTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm_lite",
   ]
 }
 

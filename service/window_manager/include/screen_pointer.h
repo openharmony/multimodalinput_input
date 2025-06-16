@@ -44,7 +44,7 @@ public:
     bool InitSurface();
     void UpdateScreenInfo(screen_info_ptr_t si);
     bool UpdatePadding(uint32_t mainWidth, uint32_t mainHeight);
-    void OnDisplayInfo(const DisplayInfo &di, bool isWindowRotation);
+    void OnDisplayInfo(const DisplayInfo &di);
 
     buffer_ptr_t GetDefaultBuffer();
     buffer_ptr_t GetTransparentBuffer();
@@ -171,8 +171,6 @@ private:
     mode_t mode_{mode_t::SCREEN_MAIN};
     rotation_t rotation_{rotation_t::ROTATION_0};
     float dpi_{1.0f};
-    Direction displayDirection_{DIRECTION0};
-    bool isWindowRotation_{false};
 
     // screen scale and padding info
     float scale_{1.0f};
