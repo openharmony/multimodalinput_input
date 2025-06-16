@@ -1540,11 +1540,15 @@ ohos_unittest("AccountManagerTest") {
 
   include_dirs = [
     "${mmi_path}/service/account_manager/include",
-    "${mmi_service_path}/device_state_manager/include",
+    "${mmi_path}/service/device_state_manager/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/util/common/include",
   ]
 
   configs = [
     "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
     ":libmmi_server_config",
   ]
 
@@ -1553,12 +1557,18 @@ ohos_unittest("AccountManagerTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "account_manager/test/account_manager_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
+  sources = [
+    "${mmi_path}/service/account_manager/test/account_manager_test.cpp",
+    "${mmi_path}/service/account_manager/test/mock_setting_datashare.cpp",
   ]
+  sources += [
+    "${mmi_path}/service/account_manager/src/account_manager.cpp",
+    "${mmi_path}/service/display_state_manager/src/display_event_monitor.cpp",
+    "${mmi_path}/service/event_handler/src/touchpad_settings_handler.cpp",
+    "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
+  ]
+
+  deps = [ "${mmi_path}/util:libmmi-util" ]
 
   external_deps = [
     "ability_runtime:wantagent_innerkits",
@@ -1573,6 +1583,8 @@ ohos_unittest("AccountManagerTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libwm",
   ]
 }
 
