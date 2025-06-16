@@ -33,10 +33,10 @@ public:
     AuthorizeHelper();
     ~AuthorizeHelper();
     DISALLOW_COPY_AND_MOVE(AuthorizeHelper);
-    void Init(ClientDeathHandler& clientDeathHandler);
+    void Init(ClientDeathHandler* clientDeathHandler);
     void CancelAuthorize(int32_t pid);
     int32_t GetAuthorizePid();
-    int32_t AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback exitCallback);
+    int32_t AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback exitCallback, const int32_t reqId = -1);
     inline AuthorizeState GetAuthorizeState()
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -47,7 +47,9 @@ public:
 protected:
     void OnClientDeath(int32_t pid);
     void AuthorizeProcessExit();
-
+    void NotifyRequestInjectionResult();
+    void NoticeRequestInjectionResult(const int32_t reqId, const int32_t callingPid);
+    void ClearRequestInjectionCallback(int32_t callingPid);
 private:
     int32_t pid_;
     AuthorizeState state_ { AuthorizeState::STATE_UNAUTHORIZE };
@@ -55,6 +57,8 @@ private:
     AuthorizeExitCallback exitCallback_ { nullptr };
     static std::mutex mutex_;
     static std::shared_ptr<AuthorizeHelper> instance_;
+    ClientDeathHandler* clientDeathHandler_;
+    std::map<int32_t, int32_t> mapQueryAuthorizeInfo_;
 };
 
 #define AUTHORIZE_HELPER ::OHOS::MMI::AuthorizeHelper::GetInstance()

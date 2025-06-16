@@ -102,7 +102,6 @@ if (is_arkui_x) {
       "//foundation/multimedia/image_framework/interfaces/innerkits:image_native",
     ]
 
-
     part_name = "input"
     subsystem_name = "multimodalinput"
   }
@@ -155,8 +154,8 @@ ohos_shared_library("libmmi-client") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   external_deps = [
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
@@ -169,7 +168,7 @@ ohos_shared_library("libmmi-client") {
   ]
 
   if (!is_arkui_x) {
-    public_external_deps = ["eventhandler:libeventhandler"]
+    public_external_deps = [ "eventhandler:libeventhandler" ]
   }
 
   if (hitrace_enabled) {
@@ -329,10 +328,6 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   ]
 
   sources = [
-    "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
-    "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
-    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
-    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
     "event_handler/src/input_active_subscribe_manager.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
@@ -365,6 +360,7 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/util:libmmi-util",
   ]
   external_deps = [
@@ -372,8 +368,8 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
@@ -399,10 +395,6 @@ ohos_unittest("InputMonitorManagerTest") {
   ]
 
   sources = [
-    "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
-    "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
-    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
-    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/input_handler_manager.cpp",
@@ -438,17 +430,18 @@ ohos_unittest("InputMonitorManagerTest") {
 
   deps = [
     "${mmi_path}/common/anco/comm:mmi_anco_channel_stub",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
@@ -474,10 +467,6 @@ ohos_unittest("InputManagerImplTest") {
   ]
 
   sources = [
-    "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
-    "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
-    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
-    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/input_active_subscribe_manager.cpp",
@@ -507,17 +496,18 @@ ohos_unittest("InputManagerImplTest") {
 
   deps = [
     "${mmi_path}/common/anco/comm:mmi_anco_channel_stub",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
@@ -584,8 +574,8 @@ ohos_unittest("InputManagerTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
-    "c_utils:utils",
     "cJSON:cjson",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
@@ -714,16 +704,16 @@ ohos_unittest("KeyEventInputSubscribeManagerTest") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
-    "hilog:libhilog",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
   ]
 }
 
@@ -754,8 +744,8 @@ ohos_unittest("LongPressEventSubscribeManagerTest") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
-    "hilog:libhilog",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
   ]
 }
 
@@ -785,8 +775,8 @@ ohos_unittest("InputDeviceImplTest") {
 
   external_deps = [
     "ability_runtime:abilitykit_native",
-    "hilog:libhilog",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
   ]
 }
 

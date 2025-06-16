@@ -172,6 +172,7 @@ static const std::vector<int32_t> g_finalKeyCodes = {
     OHOS::MMI::KeyEvent::KEYCODE_META_LEFT,
     OHOS::MMI::KeyEvent::KEYCODE_META_RIGHT
 };
+using OHOS::MMI::AUTHORIZE_QUERY_STATE;
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 {
@@ -2718,6 +2719,80 @@ Input_Result OH_Input_QueryMaxTouchPoints(int32_t *count)
     if (ret != RET_OK) {
         *count = UNKNOWN_MAX_TOUCH_POINTS;
         MMI_HILOGE("GetMaxMultiTouchPointNum fail, error:%{public}d", ret);
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    int32_t reqId = 0;
+    int32_t status = 0;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->RequestInjection(status, reqId);
+    MMI_HILOGD("RequestInjection ret:%{public}d,status:%{public}d,reqId:%{public}d", ret, status, reqId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("RequestInjection fail, error:%{public}d", ret);
+        if (ret ==  OHOS::MMI::ERROR_DEVICE_NOT_SUPPORTED) {
+            return INPUT_DEVICE_NOT_SUPPORTED;
+        }
+        if (ret ==  OHOS::MMI::ERROR_OPERATION_FREQUENT) {
+            return INPUT_INJECTION_OPERATION_FREQUENT;
+        }
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    AUTHORIZE_QUERY_STATE recvStatus = static_cast<AUTHORIZE_QUERY_STATE>(status);
+    if (recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION ||
+        recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION) {
+        return INPUT_INJECTION_AUTHORIZING;
+    }
+    if (recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED) {
+        return INPUT_INJECTION_AUTHORIZED_OTHERS;
+    }
+    if (recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED) {
+        return INPUT_INJECTION_AUTHORIZED;
+    }
+    if (recvStatus == AUTHORIZE_QUERY_STATE::UNAUTHORIZE) {
+        MMI_HILOGD("RequestInjection ok reqId:%{public}d", reqId);
+        OHOS::MMI::InputManager::GetInstance()->InsertRequestInjectionCallback(reqId,
+            [callback, reqId](int32_t status) {
+            MMI_HILOGD("RequestInjection callback reqId:%{public}d,status:%{public}d",
+                reqId, status);
+            AUTHORIZE_QUERY_STATE callStatus = static_cast<AUTHORIZE_QUERY_STATE>(status);
+            if (callStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED) {
+                callback(Input_InjectionStatus::AUTHORIZED);
+            } else {
+                callback(Input_InjectionStatus::UNAUTHORIZED);
+            }
+        });
+        return INPUT_SUCCESS;
+    }
+    return INPUT_SERVICE_EXCEPTION;
+}
+
+Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(status, INPUT_PARAMETER_ERROR);
+    int32_t tmpStatus = 0;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->QueryAuthorizedStatus(tmpStatus);
+    MMI_HILOGD("QueryAuthorizedStatus ret:%{public}d,tmpStatus:%{public}d", ret, tmpStatus);
+    if (ret != RET_OK) {
+        MMI_HILOGE("QueryAuthorizedStatus fail, error:%{public}d", ret);
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    AUTHORIZE_QUERY_STATE recvStatus = static_cast<AUTHORIZE_QUERY_STATE>(tmpStatus);
+    if (recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION
+        || recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED
+        || recvStatus == AUTHORIZE_QUERY_STATE::UNAUTHORIZE) {
+            *status = Input_InjectionStatus::UNAUTHORIZED;
+    } else if (recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION) {
+        *status = Input_InjectionStatus::AUTHORIZING;
+    } else if (recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED) {
+         *status = Input_InjectionStatus::AUTHORIZED;
+    } else {
+        MMI_HILOGE("QueryAuthorizedStatus fail, status:%{public}d", recvStatus);
+        return INPUT_SERVICE_EXCEPTION;
     }
     return INPUT_SUCCESS;
 }

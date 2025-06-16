@@ -1984,6 +1984,37 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_002, TestSize.Le
 }
 
 /**
+ * @tc.name: ServerMsgHandlerTest_RequestInjection_001
+ * @tc.desc: Test the function RequestInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t callingPid = 100000;
+    int32_t status = 0;
+    int32_t reqId  = 0;
+    auto isPC = handler.IsPC();
+    int32_t result = ERR_OK;
+    if (!isPC) {
+        result = handler.RequestInjection(callingPid, status, reqId);
+        EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
+        return;
+    }
+    handler.OnCancelInjection(callingPid);
+    result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+    result = handler.RequestInjection(callingPid, status, reqId);
+    EXPECT_EQ(result, RET_ERR);
+    result = handler.OnAuthorize(true);
+    EXPECT_EQ(result, ERR_OK);
+    result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
  * @tc.desc: Test the function OnMoveMouse
  * @tc.type: FUNC

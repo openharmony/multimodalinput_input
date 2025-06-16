@@ -506,5 +506,13 @@
     {
         "first_introduced": "20",
         "name": "OH_Input_TouchEventToPointerEvent"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_RequestInjection"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_QueryAuthorizedStatus"
     }
 ]
