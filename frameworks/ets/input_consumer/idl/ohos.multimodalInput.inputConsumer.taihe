@@ -19,6 +19,8 @@ from ohos.multimodalInput.keyEvent use KeyEvent;
 static { loadLibrary("InputConsumer.z") }
 """)
 
+@!sts_inject_into_module("import * as ohos_multimodalInput_keyEvent from './@ohos.multimodalInput.keyEvent';")
+
 struct KeyOptions {
     preKeys: Array<i32>;
     finalKey: i32;
@@ -62,10 +64,10 @@ struct InfraredFrequency {
 """)
 @!sts_inject("""
     function on(type: 'keyPressed', options: KeyPressedConfig,
-        callback: (info: __ohos_multimodalInput_keyEvent.keyEvent.KeyEvent) => void) {
+        callback: (info: ohos_multimodalInput_keyEvent.keyEvent.KeyEvent) => void) {
         return onKeyPressed(options, callback, callback);
     }
-    function off(type: 'keyPressed', callback?: (info: __ohos_multimodalInput_keyEvent.keyEvent.KeyEvent) => void) {
+    function off(type: 'keyPressed', callback?: (info: ohos_multimodalInput_keyEvent.keyEvent.KeyEvent) => void) {
         return offKeyPressed(callback);
     }
 """)
