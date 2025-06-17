@@ -786,14 +786,14 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     const int32_t focusWindowId = GetFocusWindowId(groupId);
     if (GetHardCursorEnabled()) {
-        UpdateKeyEventDisplayId(keyEvent, focusWindowId_);
+        UpdateKeyEventDisplayId(keyEvent, focusWindowId);
     }
     WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     bool isUIExtention = false;
     auto iter = windowsInfo.begin();
     for (; iter != windowsInfo.end(); ++iter) {
-        if (iter->id == focusWindowId_) {
+        if (iter->id == focusWindowId) {
             windowInfo = &(*iter);
             if (!iter->uiExtentionWindowInfo.empty() && !IsOnTheWhitelist(keyEvent)) {
                 isUIExtention = true;
