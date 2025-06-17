@@ -316,7 +316,7 @@ bool LibinputAdapter::CreateVKeyboardDelayTimer(libinput_event *event, int32_t d
 
     vkbDelayedEvent_ = event;
     vkbDelayedKeyEvent_ = keyEvent;
-    MMI_HILOGI("Create the delayed event Delay=%{public}d", delayMs);
+    MMI_HILOGD("Create the delayed event Delay=%{public}d", delayMs);
     return true;
 }
 
@@ -350,13 +350,17 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
     // delay the event destroy.
     bool delayDestroy = false;
     int32_t confirmedDelayMs(0);
+	
+    if (getLibinputEventForVKeyboard_ == nullptr || getLibinputEventForVTrackpad_ == nullptr) {
+        return;		
+    }		
 
     // handle keyboard messages.
     while (true) {
         int32_t delayMs(0);
         std::vector<libinput_event*> keyEvents;
         VKeyboardEventType eventType = (VKeyboardEventType)getLibinputEventForVKeyboard_(touch, delayMs, keyEvents);
-        if (eventType == VKeyboardEventType::NoKeyboardEvent) {
+        if (eventType == VKeyboardEventType::NoKeyboardEvent || keyEvents.size() == 0) {
             break;
         }
 
