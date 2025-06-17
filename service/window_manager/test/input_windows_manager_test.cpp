@@ -49,6 +49,7 @@ constexpr int32_t INT32_BYTE { 4 };
 constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
 constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
+constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
 constexpr uint32_t TEST_WINDOW_START { -100 };
 constexpr uint32_t TEST_WINDOW_END { 100000 };
 #define SCREEN_RECORD_WINDOW_WIDTH 400
