@@ -36,7 +36,7 @@ public:
         return (GetMsgCallback(id) != nullptr);
     }
 
-    const std::string& GetDebugInfo() const
+    std::string GetDebugInfo() const
     {
         std::string str;
         for (auto &it : callbacks_) {
@@ -46,7 +46,7 @@ public:
         if (str.size() > 0) {
             str.resize(str.size() - 1);
         }
-        return std::move(str);
+        return str;
     }
 
 protected:
