@@ -398,5 +398,187 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     pointerEvent->SetActionTime(0);
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent));
 }
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0012
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0012,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = true;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+    EXPECT_EQ(PULL_THROW_EVENT_HANDLER->alreadyTouchDown_, false);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0013
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0013,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = true;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+    EXPECT_EQ(PULL_THROW_EVENT_HANDLER->alreadyTouchDown_, false);
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = false;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = true;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+    EXPECT_EQ(PULL_THROW_EVENT_HANDLER->alreadyTouchDown_, true);
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0014
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0014,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = true;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+    EXPECT_EQ(PULL_THROW_EVENT_HANDLER->alreadyTouchDown_, false);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0015
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0015,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = true;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+    EXPECT_EQ(PULL_THROW_EVENT_HANDLER->alreadyTouchDown_, false);
+
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = false;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0016
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0016,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0017
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0017,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->triggerTime_ = WINDOW_TIME_INTERVAL;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0018
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0018,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    int32_t pointId = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    bool ret = touchEvent->GetPointerItem(pointId, item);
+    EXPECT_EQ(ret, true);
+    int32_t downY = PullThrowSubscriberHandler::SPIN_UP_AREA_Y + 100;
+    item.SetDisplayY(downY);
+    touchEvent->AddPointerItem(item);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->triggerTime_ = WINDOW_TIME_INTERVAL;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent);
+
+    ret = touchEvent->GetPointerItem(pointId, item);
+    EXPECT_EQ(ret, true);
+    downY = PullThrowSubscriberHandler::SPIN_DOWN_AREA_Y + 100;
+    item.SetDisplayY(downY);
+    touchEvent->AddPointerItem(item);
+    PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(touchEvent);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_CheckThrowAngleValid_002
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_CheckThrowAngleValid_002,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double angle = 0;
+    bool ret = PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle);
+    EXPECT_EQ(ret, false);
+
+    angle = PullThrowSubscriberHandler::ANGLE_DOWN_MIN;
+    ret = PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle);
+    EXPECT_EQ(ret, true);
+
+    angle = PullThrowSubscriberHandler::ANGLE_DOWN_MAX + 10;
+    ret = PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle);
+    EXPECT_EQ(ret, false);
+
+    angle = PullThrowSubscriberHandler::ANGLE_UP_MIN;
+    ret = PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle);
+    EXPECT_EQ(ret, true);
+
+    angle = PullThrowSubscriberHandler::ANGLE_UP_MAX + 10;
+    ret = PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle);
+    EXPECT_EQ(ret, false);
+}
 } // namespace MMI
 } // namespace OHOS

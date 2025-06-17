@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
+#include <chrono>
 #include <gtest/gtest.h>
+#include <thread>
 
 #include "cJSON.h"
 #include "util.h"
@@ -6872,6 +6874,180 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_034, TestSi
     displayEventMonitor.screenStatus_ = "usual";
     displayEventMonitor.isScreenLocked_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.MenuClickProcess(bundleName, abilityName, action));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_001
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = true;
+    handler.RegisterProximitySensor();
+    EXPECT_EQ(handler.hasRegisteredSensor_, true);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_002
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = false;
+    handler.RegisterProximitySensor();
+    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_001
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = true;
+    handler.UnregisterProximitySensor();
+    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_002
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = false;
+    handler.UnregisterProximitySensor();
+    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MenuClickHandle_001
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    event->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    bool ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, true);
+    EXPECT_EQ(handler.existMenuDown_, true);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MenuClickHandle_002
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    event->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    bool ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, true);
+    EXPECT_EQ(handler.existMenuDown_, true);
+
+    event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(handler.existMenuDown_, false);
+    EXPECT_EQ(handler.tmpkeyEvent_, nullptr);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MenuClickHandle_003
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    event->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    bool ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, true);
+    EXPECT_EQ(handler.existMenuDown_, true);
+
+    event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MenuClickHandle_004
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    event->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    bool ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, false);
+    EXPECT_EQ(handler.existMenuDown_, false);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MenuClickHandle_005
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    event->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    bool ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, false);
+    EXPECT_EQ(handler.existMenuDown_, false);
+
+    ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, false);
+
+    handler.existMenuDown_ = true;
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, false);
+
+    handler.existMenuDown_ = false;
+    event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ret = handler.MenuClickHandle(event);
+    EXPECT_EQ(ret, false);
 }
 } // namespace MMI
 } // namespace OHOS
