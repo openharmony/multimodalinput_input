@@ -352,8 +352,8 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
     int32_t confirmedDelayMs(0);
 	
     if (getLibinputEventForVKeyboard_ == nullptr || getLibinputEventForVTrackpad_ == nullptr) {
-        return;		
-    }		
+        return;
+    }
 
     // handle keyboard messages.
     while (true) {
