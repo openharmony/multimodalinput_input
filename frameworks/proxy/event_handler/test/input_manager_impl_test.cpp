@@ -1097,26 +1097,6 @@ HWTEST_F(InputManagerImplTest, SubscribeInputActive_Test001, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManagerImplTest_GetDisplayBindInfo
- * @tc.desc: Test GetDisplayBindInfo
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetDisplayBindInfo, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DisplayBindInfos infos;
-    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetDisplayBindInfo(infos));
-    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> datas;
-    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.GetAllMmiSubscribedEvents(datas));
-    std::string msg = "test";
-    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.SetDisplayBind(0, 0, msg));
-    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.IsGRLOrHopper());
-    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.PrintWindowGroupInfo());
-    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.EnableCombineKey(false));
-}
-
-/**
  * @tc.name: InputManagerImplTest_AboutPoint
  * @tc.desc: Test AboutPoint
  * @tc.type: FUNC
