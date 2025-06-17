@@ -323,5 +323,80 @@ HWTEST_F(PullThrowSubscriberHandlerTest, CheckThrowAngleValidTest_001, testing::
     angle = 500;
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle));
 }
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0011
+ * @tc.desc: Test HandleFingerGesturePullMoveEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullMoveEvent_0011,
+ testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = false;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = true;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent));
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = false;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent));
+    touchEvent = SetupDoubleFingerDownEvent();
+    ASSERT_TRUE(touchEvent != nullptr);
+    PULL_THROW_EVENT_HANDLER->StartFingerGesture();
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = false;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = true;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent));
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PULL_THROW_EVENT_HANDLER->alreadyTouchDown_ = false;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent));
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_0012
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_0012,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PointerEvent::PointerItem item;
+    PointerEvent::PointerItem item1;
+    pointerEvent->pointers_.push_back(item);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->SetActionTime(1000);
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent));
+    pointerEvent->SetActionTime(0);
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_0013
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_0013,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PointerEvent::PointerItem item;
+    PointerEvent::PointerItem item1;
+    pointerEvent->pointers_.push_back(item);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->SetActionTime(1000);
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent));
+    pointerEvent->SetActionTime(0);
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS

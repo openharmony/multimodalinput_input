@@ -1345,5 +1345,76 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo001, 
     touchDrawingMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateDisplayInfo002
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    DisplayInfo displayInfo;
+    displayInfo.direction = Direction::DIRECTION0;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION0;
+    displayInfo.width = 700;
+    displayInfo.height = 500;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    displayInfo.direction = Direction::DIRECTION180;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    displayInfo.direction = Direction::DIRECTION270;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    displayInfo.screenCombination = ScreenCombination::SCREEN_MAIN;
+    touchDrawingMgr.displayInfo_.screenCombination = ScreenCombination::SCREEN_MAIN;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    displayInfo.uniqueId = 1;
+    touchDrawingMgr.displayInfo_.uniqueId = 2;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "touch window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    touchDrawingMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    touchDrawingMgr.isChangedMode_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+    touchDrawingMgr.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    touchDrawingMgr.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingMgr.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingMgr.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_009
+ * @tc.desc: Test RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.isChangedRotation_ = true;
+    touchDrawingMgr.isChangedMode_ = false;
+    touchDrawingMgr.pointerMode_.isShow = true;
+    touchDrawingMgr.bubbleMode_.isShow = true;
+    touchDrawingMgr.stopRecord_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
+    touchDrawingMgr.stopRecord_ = false;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    touchDrawingMgr.lastPointerItem_.emplace_back(item);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
+    touchDrawingMgr.stopRecord_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
+    touchDrawingMgr.stopRecord_ = false;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
+}
 } // namespace MMI
 } // namespace OHOS

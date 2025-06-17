@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "input_active_subscriber_handler.h"
+#include "key_gesture_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputActiveSubscriberHandlerTest"
@@ -337,6 +338,60 @@ HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_OnSe
     handler.callbackInitialized_ = true;
     auto ret = handler.InitSessionDeleteCallback();
     EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest
+ * @tc.desc: Test the funcation ResetTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, KeyGestureManagerTest_ResetTimer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::Handler handler(1, 2, 3000, nullptr);
+    handler.timerId_ = -1;
+    ASSERT_NO_FATAL_FAILURE(handler.ResetTimer());
+    handler.timerId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.ResetTimer());
+}
+
+/**
+ * @tc.name: KeyGestureManagerTest_Trigger
+ * @tc.desc: Test the funcation Trigger
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, KeyGestureManagerTest_Trigger, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::Handler handler(1, 2, 3000, nullptr);
+    handler.timerId_ = -1;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NO_FATAL_FAILURE(handler.Trigger(keyEvent));
+    handler.timerId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.Trigger(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerTest_Run
+ * @tc.desc: Test the funcation Run
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, KeyGestureManagerTest_Run, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::Handler handler(1, 2, 3000, nullptr);
+    handler.keyEvent_ = nullptr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NO_FATAL_FAILURE(handler.Run(keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.RunPending());
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    handler.callback_ = myCallback;
+    handler.keyEvent_ = keyEvent;
+    ASSERT_NO_FATAL_FAILURE(handler.Run(keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.RunPending());
 }
 } // namespace MMI
 } // namespace OHOS
