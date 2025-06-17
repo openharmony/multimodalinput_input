@@ -336,5 +336,38 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DrawImage_001, TestSize.Level1
     ret = renderer.DrawImage(canvas, config);
     EXPECT_EQ(ret, RET_OK);
 }
+ 
+/**
+ * @tc.name: PointerRendererTest_LoadCursorSvgWithColor_001
+ * @tc.desc: Test LoadCursorSvgWithColor
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_LoadCursorSvgWithColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    pixelmap_ptr_t ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_EQ(ret, nullptr);
+    config.color = 0xFFFFFF;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_EQ(ret, nullptr);
+    config.style_ = CURSOR_COPY;
+    config.color = 0x000123;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_EQ(ret, nullptr);
+    config.color = 0xFFFFFF;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_EQ(ret, nullptr);
+    config.style_ = HAND_GRABBING;
+    config.color = 0xFFFFFF;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_EQ(ret, nullptr);
+    config.style_ = HAND_GRABBING;
+    config.color = 0x000123;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_EQ(ret, nullptr);
+}
 } // namespace MMI
 } // namespace OHOS
