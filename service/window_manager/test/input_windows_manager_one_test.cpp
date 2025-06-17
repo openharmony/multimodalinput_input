@@ -1665,5 +1665,342 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDispla
     displayId = 1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FindTargetDisplayGroupInfo(displayId));
 }
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_IsPointerOnCenter_001
+ * @tc.desc: Test the funcation IsPointerOnCenter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsPointerOnCenter_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.validWidth = 1;
+    displayInfo.validHeight = 1;
+    CursorPosition currentPos;
+    currentPos.cursorPos.x = 0.5;
+    currentPos.cursorPos.y = 0.5;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->IsPointerOnCenter(currentPos, displayInfo));
+    currentPos.cursorPos.x = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->IsPointerOnCenter(currentPos, displayInfo));
+    currentPos.cursorPos.x = 0.5;
+    currentPos.cursorPos.y = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->IsPointerOnCenter(currentPos, displayInfo));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ShiftAppMousePointerEvent_002
+ * @tc.desc: Test the funcation ShiftAppMousePointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ShiftWindowInfo shiftWindowInfo;
+    bool autoGenDown = false;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pressedButtons_.insert(1);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown));
+    autoGenDown = true;
+    shiftWindowInfo.x = -1;
+    shiftWindowInfo.y = -1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown));
+    shiftWindowInfo.x = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown));
+    shiftWindowInfo.x = -1;
+    shiftWindowInfo.y = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ShiftAppTouchPointerEvent002
+ * @tc.desc: Test the funcation ShiftAppTouchPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppTouchPointerEvent002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    ShiftWindowInfo shiftWindowInfo;
+    shiftWindowInfo.fingerId = -1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppTouchPointerEvent(shiftWindowInfo));
+    shiftWindowInfo.fingerId = 1;
+    pointerEvent->pointers_.clear();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppTouchPointerEvent(shiftWindowInfo));
+    PointerEvent::PointerItem item;
+    int32_t pointerId = 0;
+    item.SetPointerId(pointerId);
+    pointerEvent->pointers_.push_back(item);
+    item.pressed_ = true;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppTouchPointerEvent(shiftWindowInfo));
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: InputWindowsManagerOneTest_ReissueEvent_005
+ * @tc.desc: Verify ReissueEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReissueEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    int32_t focusWindowId = -1;
+    inputWindowsManager->focusWindowId_ = 0;
+    keyEvent->SetRepeatKey(true);
+
+    std::shared_ptr<EventDispatchHandler> handler = std::make_shared<EventDispatchHandler>();
+    NiceMock<MockInputWindowsManager> mockInputWindowsManager;
+    UDSServer udServer;
+    EXPECT_CALL(mockInputWindowsManager, GetEventDispatchHandler).WillRepeatedly(Return(handler));
+    EXPECT_CALL(mockInputWindowsManager, GetUDSServer).WillRepeatedly(Return(&udServer));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ReissueEvent(keyEvent, focusWindowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ReissueEvent_006
+ * @tc.desc: Verify ReissueEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReissueEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    int32_t focusWindowId = -1;
+    inputWindowsManager->focusWindowId_ = 0;
+    keyEvent->SetRepeatKey(true);
+
+    std::shared_ptr<EventDispatchHandler> handler = std::make_shared<EventDispatchHandler>();
+    NiceMock<MockInputWindowsManager> mockInputWindowsManager;
+    EXPECT_CALL(mockInputWindowsManager, GetEventDispatchHandler).WillRepeatedly(Return(handler));
+    EXPECT_CALL(mockInputWindowsManager, GetUDSServer).WillRepeatedly(Return(nullptr));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ReissueEvent(keyEvent, focusWindowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ReissueEvent_007
+ * @tc.desc: Verify ReissueEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReissueEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    int32_t focusWindowId = -1;
+    inputWindowsManager->focusWindowId_ = 0;
+    keyEvent->SetRepeatKey(true);
+
+    NiceMock<MockInputWindowsManager> mockInputWindowsManager;
+    EXPECT_CALL(mockInputWindowsManager, GetEventDispatchHandler).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(mockInputWindowsManager, GetUDSServer).WillRepeatedly(Return(nullptr));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ReissueEvent(keyEvent, focusWindowId));
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_UpdateDisplayInfoExtIfNeed01
+ * @tc.desc: Test UpdateDisplayInfoExtIfNeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateDisplayInfoExtIfNeed01, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    DisplayGroupInfo displayGroupInfo;
+    DisplayInfo displayInfo;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    displayGroupInfo.groupId = -1;
+    bool needUpdateDisplayExt = true;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateDisplayInfoExtIfNeed(displayGroupInfo, needUpdateDisplayExt));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_GetMainScreenDisplayInfo
+ * @tc.desc: Test GetMainScreenDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetMainScreenDisplayInfo, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::vector<DisplayInfo> displaysInfo;
+    DisplayInfo mainScreenDisplayInfo;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetMainScreenDisplayInfo(displaysInfo, mainScreenDisplayInfo));
+    mainScreenDisplayInfo.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_ALONE;
+    displaysInfo.push_back(mainScreenDisplayInfo);
+    mainScreenDisplayInfo.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_MAIN;
+    displaysInfo.push_back(mainScreenDisplayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetMainScreenDisplayInfo(displaysInfo, mainScreenDisplayInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ResetPointerPosition
+ * @tc.desc: Test ResetPointerPosition
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ResetPointerPosition, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    DisplayGroupInfo displayGroupInfo;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetPointerPosition(displayGroupInfo));
+    DisplayInfo currentDisplay;
+    currentDisplay.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_ALONE;
+    displayGroupInfo.displaysInfo.push_back(currentDisplay);
+    currentDisplay.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_MAIN;
+    displayGroupInfo.displaysInfo.push_back(currentDisplay);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetPointerPosition(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_IsPointerOnCenter
+ * @tc.desc: Test IsPointerOnCenter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsPointerOnCenter, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    DisplayInfo currentDisplay;
+    currentDisplay.validHeight = 2;
+    currentDisplay.validWidth = 2;
+    CursorPosition currentPos;
+    currentPos.cursorPos.x = 1;
+    currentPos.cursorPos.y = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.IsPointerOnCenter(currentPos, currentDisplay));
+    currentPos.cursorPos.y = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.IsPointerOnCenter(currentPos, currentDisplay));
+    currentPos.cursorPos.x = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.IsPointerOnCenter(currentPos, currentDisplay));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ResetCursorPos
+ * @tc.desc: Test ResetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ResetCursorPos, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    DisplayGroupInfo displayGroupInfo;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetCursorPos(displayGroupInfo));
+    DisplayInfo displayInfo;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetCursorPos(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_IsPositionOutValidDisplay
+ * @tc.desc: Test IsPositionOutValidDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsPositionOutValidDisplay, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    DisplayInfo currentDisplay;
+    currentDisplay.validHeight = 2;
+    currentDisplay.validWidth = 2;
+    currentDisplay.height = 2;
+    currentDisplay.width = 2;
+    currentDisplay.offsetX = 0;
+    currentDisplay.offsetY = 0;
+    Coordinate2D position;
+    position.x = 1;
+    position.y = 1;
+    currentDisplay.fixedDirection = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.IsPositionOutValidDisplay(position, currentDisplay, true));
+    currentDisplay.fixedDirection = DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.IsPositionOutValidDisplay(position, currentDisplay, true));
+    currentDisplay.fixedDirection = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.IsPositionOutValidDisplay(position, currentDisplay, true));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.IsPositionOutValidDisplay(position, currentDisplay, false));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ProcessTouchTracking
+ * @tc.desc: Test the funcation ProcessTouchTracking
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ProcessTouchTracking, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetDisplayXPos(0.0);
+    pointerItem.SetDisplayYPos(0.0);
+    WindowInfo targetWindow;
+    targetWindow.id = 1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    inputWindowsManager->touchTracking_ = true;
+    pointerEvent->targetWindowId_ = 1;
+    pointerEvent->pointers_.clear();
+    pointerItem.SetPointerId(1);
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_EQ(pointerEvent->GetPointerCount(), 1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessTouchTracking(pointerEvent, targetWindow));
+
+    pointerEvent->SetTargetWindowId(targetWindow.id);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessTouchTracking(pointerEvent, targetWindow));
+
+    targetWindow.id = -1;
+    pointerEvent->pointers_.clear();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessTouchTracking(pointerEvent, targetWindow));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ClearMouseHideFlag
+ * @tc.desc: Test the funcation ClearMouseHideFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMouseHideFlag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto eventId = -1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(eventId);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    EXPECT_EQ(pointerEvent->GetId(), eventId);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ClearMouseHideFlag(eventId));
+    eventId = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ClearMouseHideFlag(eventId));
+}
 }  // namespace MMI
 }  // namespace OHOS
