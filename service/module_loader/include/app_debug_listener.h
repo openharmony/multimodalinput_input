@@ -25,8 +25,8 @@ public:
     static AppDebugListener *GetInstance();
     ~AppDebugListener() = default;
 
-    ErrCode OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos) override;
-    ErrCode OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos) override;
+    void OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos) override;
+    void OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos) override;
 
     int32_t GetAppDebugPid();
 
