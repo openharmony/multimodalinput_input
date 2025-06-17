@@ -1411,6 +1411,16 @@ public:
     bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem) const;
 
     /**
+     * @brief Obtains the origin pointer item of a specified pointer ID.
+     * @param pointerId Indicates the pointer ID.
+     * @param pointerItem Indicates the item used to receive the data of the pointer.
+     * @return Returns <b>true</b> if the data of the origin pointer with the specified ID exists;
+     * returns <b>false</b> otherwise.
+     * @since 20
+     */
+    bool GetOriginPointerItem(int32_t pointerId, PointerItem &pointerItem) const;
+
+    /**
      * @brief Adds a pointer item.
      * @param pointerItem Indicates the pointer item to add.
      * @return void

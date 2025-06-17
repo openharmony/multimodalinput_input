@@ -754,6 +754,17 @@ bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem) c
     return false;
 }
 
+bool PointerEvent::GetOriginPointerItem(int32_t pointerId, PointerItem &pointerItem) const
+{
+    for (const auto &item : pointers_) {
+        if (item.GetOriginPointerId() == pointerId) {
+            pointerItem = item;
+            return true;
+        }
+    }
+    return false;
+}
+
 void PointerEvent::RemovePointerItem(int32_t pointerId)
 {
     for (auto it = pointers_.begin(); it != pointers_.end(); ++it) {

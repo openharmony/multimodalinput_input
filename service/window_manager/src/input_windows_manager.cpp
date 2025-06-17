@@ -6428,17 +6428,14 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
     return RET_OK;
 }
 
-int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo)
+int32_t InputWindowsManager::ShiftAppSimulateTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo)
 {
     CHKPR(lastTouchEvent_, RET_ERR);
-    if (shiftWindowInfo.fingerId == -1) {
-        MMI_HILOGE("Failed shift pointerEvent, fingerId is invalid");
-        return RET_ERR;
-    }
     const WindowInfo &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
     const WindowInfo &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
     PointerEvent::PointerItem item;
-    if (!lastTouchEvent_->GetPointerItem(shiftWindowInfo.fingerId, item)) {
+    if (!lastTouchEvent_->GetPointerItem(shiftWindowInfo.fingerId, item) &&
+        !lastTouchEvent_->GetOriginPointerItem(shiftWindowInfo.fingerId, item)) {
         MMI_HILOGE("Get pointer item failed");
         return RET_ERR;
     }
@@ -6457,10 +6454,6 @@ int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &sh
     lastTouchEvent_->SetTargetDisplayId(sourceWindowInfo.displayId);
     lastTouchEvent_->SetTargetWindowId(sourceWindowInfo.id);
     lastTouchEvent_->SetAgentWindowId(sourceWindowInfo.agentWindowId);
-    int64_t time = GetSysClockTime();
-    lastTouchEvent_->SetActionTime(time);
-    lastTouchEvent_->SetActionStartTime(time);
-    LogTracer lt(lastTouchEvent_->GetId(), lastTouchEvent_->GetEventType(), lastTouchEvent_->GetPointerAction());
     lastTouchEvent_->UpdateId();
     ClearTargetWindowId(shiftWindowInfo.fingerId);
     lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
@@ -6476,17 +6469,30 @@ int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &sh
     item.SetPointerId(shiftWindowInfo.fingerId);
     lastTouchEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     lastTouchEvent_->SetTargetDisplayId(targetWindowInfo.displayId);
-    lastTouchEvent_->SetPointerId(shiftWindowInfo.fingerId);//？？？
+    lastTouchEvent_->SetPointerId(shiftWindowInfo.fingerId);
     lastTouchEvent_->SetTargetWindowId(targetWindowInfo.id);
     lastTouchEvent_->SetAgentWindowId(targetWindowInfo.agentWindowId);
     lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift touch event dispatch down event");
-    
+    InputHandler->GetFilterHandler()->HandlePointerEvent(lastTouchEvent_);
+    return RET_OK;
+}
+
+int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo)
+{
+    if (shiftWindowInfo.fingerId == -1) {
+        MMI_HILOGE("Failed shift touchpointerEvent, fingerId is invalid");
+        return RET_ERR;
+    }
+    if (ShiftAppSimulateTouchPointerEvent(shiftWindowInfo) != RET_OK) {
+        MMI_HILOGE("Failed shift touchPointerEvent");
+        return RET_ERR;
+    }
     WindowInfoEX windowInfoEX;
-    windowInfoEX.window = targetWindowInfo;
+    windowInfoEX.window = shiftWindowInfo.targetWindowInfo;
     windowInfoEX.flag = true;
     touchItemDownInfos_[shiftWindowInfo.fingerId] = windowInfoEX;
-    InputHandler->GetFilterHandler()->HandlePointerEvent(lastTouchEvent_);
+    MMI_HILOGI("Shift pointer event success for touch");
     return RET_OK;
 }
 
