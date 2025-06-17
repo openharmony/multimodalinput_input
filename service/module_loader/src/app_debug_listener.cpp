@@ -30,17 +30,16 @@ AppDebugListener *AppDebugListener::GetInstance()
     return instance_;
 }
 
-ErrCode AppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
+void AppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
 {
     CALL_DEBUG_ENTER;
     for (const auto &debugInfo : debugInfos) {
         appDebugPid_ = debugInfo.pid;
         MMI_HILOGD("The appDebugPid_:%{public}d", appDebugPid_);
     }
-    return ERR_OK;
 }
 
-ErrCode AppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
+void AppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
 {
     CALL_DEBUG_ENTER;
     for (const auto &debugInfo : debugInfos) {
@@ -48,7 +47,6 @@ ErrCode AppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebu
             appDebugPid_ = -1;
         }
     }
-    return ERR_OK;
 }
 
 int32_t AppDebugListener::GetAppDebugPid()
