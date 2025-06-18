@@ -765,5 +765,287 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0019, TestSiz
     EventInterceptorHandler handler;
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
 }
+
+static uint32_t TestCapabilityToTags(InputDeviceCapability capability)
+{
+    return static_cast<uint32_t>((1 << capability) - (capability / INPUT_DEV_CAP_MAX));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0020
+ * @tc.desc: Test the function CheckInputDeviceSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    uint32_t deviceTags = TestCapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+    bool ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, true);
+    deviceTags = TestCapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TABLET_TOOL);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, true);
+    deviceTags = 0;
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, false);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    deviceTags = TestCapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, true);
+    deviceTags = TestCapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, false);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    deviceTags = TestCapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, true);
+    deviceTags = TestCapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, false);
+
+    pointerEvent->SetSourceType(0);
+    deviceTags = TestCapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, false);
+    deviceTags = TestCapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0021
+ * @tc.desc: Test the function HandleEvent when ENABLE_KEYBOARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0021, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptor(handlerType, eventType, priority,
+        deviceTags, session);
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    interceptorHandler.interceptors_.push_back(interceptor);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    bool ret = interceptorHandler.HandleEvent(keyEvent);
+    EXPECT_EQ(ret, false);
+
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    item.SetDownTime(200);
+    keyEvent->AddKeyItem(item);
+    ret = interceptorHandler.HandleEvent(keyEvent);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0022
+ * @tc.desc: Test the function HandleEvent when ENABLE_KEYBOARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0022, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    int32_t priority = 0;
+    uint32_t deviceTags = INPUT_DEV_CAP_KEYBOARD;
+    EventInterceptorHandler::SessionHandler interceptor(handlerType, eventType, priority,
+        deviceTags, nullptr);
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    interceptorHandler.interceptors_.push_back(interceptor);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    item.SetDownTime(200);
+    keyEvent->AddKeyItem(item);
+
+    bool ret = interceptorHandler.HandleEvent(keyEvent);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0023
+ * @tc.desc: Test the function HandleEvent when ENABLE_KEYBOARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0023, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    int32_t priority = 0;
+    uint32_t deviceTags = INPUT_DEV_CAP_TOUCH;
+    EventInterceptorHandler::SessionHandler interceptor(handlerType, eventType, priority,
+        deviceTags, nullptr);
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    interceptorHandler.interceptors_.push_back(interceptor);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    item.SetDownTime(200);
+    keyEvent->AddKeyItem(item);
+
+    bool ret = interceptorHandler.HandleEvent(keyEvent);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0024
+ * @tc.desc: Test the function HandleEvent when ENABLE_KEYBOARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0024, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    int32_t priority = 0;
+    uint32_t deviceTags = INPUT_DEV_CAP_KEYBOARD;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptor(handlerType, eventType, priority,
+        deviceTags, session);
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    interceptorHandler.interceptors_.push_back(interceptor);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    item.SetDownTime(200);
+    keyEvent->AddKeyItem(item);
+
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0025
+ * @tc.desc: Test the function HandleEvent when ENABLE_KEYBOARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0025, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    int32_t priority = 0;
+    uint32_t deviceTags = INPUT_DEV_CAP_KEYBOARD;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptor(handlerType, eventType, priority,
+        deviceTags, session);
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    interceptorHandler.interceptors_.push_back(interceptor);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    item.SetDownTime(200);
+    keyEvent->AddKeyItem(item);
+
+    bool ret = interceptorHandler.HandleEvent(keyEvent);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0026
+ * @tc.desc: Test the function HandleEvent when ENABLE_KEYBOARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0026, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    interceptorHandler.interceptors_.push_back(interceptorFirst);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    bool ret = interceptorHandler.HandleEvent(pointerEvent);
+    EXPECT_EQ(ret, false);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    ret = interceptorHandler.HandleEvent(pointerEvent);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0027
+ * @tc.desc: Test the function HandleEvent when ENABLE_KEYBOARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0027, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, nullptr);
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    interceptorHandler.interceptors_.push_back(interceptorFirst);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    bool ret = interceptorHandler.HandleEvent(pointerEvent);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_0028
+ * @tc.desc: Test the function HandleEvent when ENABLE_KEYBOARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0028, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_POINTER;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    interceptorHandler.interceptors_.push_back(interceptorFirst);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    bool ret = interceptorHandler.HandleEvent(pointerEvent);
+    EXPECT_EQ(ret, false);
+}
 } // namespace MMI
 } // namespace OHOS
