@@ -1047,5 +1047,6 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0028, TestSiz
     bool ret = interceptorHandler.HandleEvent(pointerEvent);
     EXPECT_EQ(ret, false);
 }
+
 } // namespace MMI
 } // namespace OHOS
