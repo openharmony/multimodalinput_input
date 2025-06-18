@@ -55,6 +55,7 @@ constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 constexpr int32_t ERR_DEVICE_NOT_EXIST { 3900002 };
 constexpr int32_t ERR_NON_INPUT_APPLICATION { 3900003 };
+constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 constexpr float FACTOR_0 { 1.0f };
 constexpr float FACTOR_8 { 0.7f };
 constexpr float FACTOR_18 { 1.0f };
@@ -2999,6 +3000,61 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt002, 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
     ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_FixTargetWindowId_008
+@tc.desc: Test FixTargetWindowId
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.shellTargetWindowIds_.clear();
+    handler.castTargetWindowIds_.clear();
+    handler.accessTargetWindowIds_.clear();
+    handler.nativeTargetWindowIds_.clear();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    int32_t pointerId = -1;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(-1);
+    handler.shellTargetWindowIds_[0] = -1;
+    pointerEvent->SetZOrder(1);
+    ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
+    handler.castTargetWindowIds_[0] = -1;
+    ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
+    pointerEvent->SetZOrder(-1);
+    ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
+    handler.accessTargetWindowIds_[0] = -1;
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
+    handler.nativeTargetWindowIds_[0] = -1;
+    ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_SwitchTouchTracking
+@tc.desc: Test SwitchTouchTracking
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SwitchTouchTracking, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    bool touchTracking = true;
+    ASSERT_NO_FATAL_FAILURE(handler.SwitchTouchTracking(touchTracking));
+    touchTracking = false;
+    ASSERT_NO_FATAL_FAILURE(handler.SwitchTouchTracking(touchTracking));
 }
 } // namespace MMI
 } // namespace OHOS

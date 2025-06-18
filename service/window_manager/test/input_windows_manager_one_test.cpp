@@ -2002,5 +2002,65 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMouseHideFl
     eventId = 1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ClearMouseHideFlag(eventId));
 }
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_IsAccessibilityEventWithZorderInjected
+ * @tc.desc: Test the funcation IsAccessibilityEventWithZorderInjected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsAccessibilityEventWithZorderInjected, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
+    pointerEvent->SetZOrder(1.0f);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->IsAccessibilityEventWithZorderInjected(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->IsAccessibilityEventWithZorderInjected(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_ACCESSIBILITY;
+    pointerEvent->SetZOrder(0.0f);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->IsAccessibilityEventWithZorderInjected(pointerEvent));
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->IsAccessibilityEventWithZorderInjected(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock
+ * @tc.desc: Test the funcation SendCancelEventWhenLock
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerTest_SendCancelEventWhenLock, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.lastTouchEventOnBackGesture_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsMgr.lastTouchEventOnBackGesture_, nullptr);
+    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    EXPECT_NE(InputHandler->eventNormalizeHandler_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = true;
+    pointerEvent->SetPointerId(1);
+
+    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(2);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+}
 }  // namespace MMI
 }  // namespace OHOS
