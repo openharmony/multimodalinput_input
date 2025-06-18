@@ -15,6 +15,7 @@
 
 #include "pointer_drawing_manager.h"
 
+#include <charconv>
 #include <parameters.h>
 #include <regex>
 #include <utility>
@@ -53,7 +54,6 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 
-#include <charconv>
 #include "param/sys_param.h"
 
 #undef MMI_LOG_DOMAIN
@@ -1490,12 +1490,20 @@ bool PointerDrawingManager::IsWindowRotation(const DisplayInfo *displayInfo)
 {
     MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
         ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+
+    bool foldableDevicePolicyMain = false;
+    bool foldableDevicePolicyFull = false;
+    if (!FOLDABLE_DEVICE_POLICY.empty()) {
+        foldableDevicePolicyMain = FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE;
+    }
+    if (FOLDABLE_DEVICE_POLICY.size() > FOLDABLE_DEVICE) {
+        foldableDevicePolicyFull = FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE;
+    }
+
     return (ROTATE_POLICY == WINDOW_ROTATE ||
         (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo->displayMode == DisplayMode::MAIN &&
-        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
-        (displayInfo->displayMode == DisplayMode::FULL &&
-        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
+        ((displayInfo->displayMode == DisplayMode::MAIN && foldableDevicePolicyMain) ||
+        (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
 }
 
 Direction PointerDrawingManager::GetDisplayDirection(const DisplayInfo *displayInfo)
@@ -3793,9 +3801,9 @@ bool PointerDrawingManager::GetHardCursorEnabled()
     if (!hardwareCursorPointerManager_->IsSupported()) {
         isHardCursorEnabled = false;
     }
-    static CachedHandle g_Handle = CachedParameterCreate("rosen.hardCursor.enabled", "1");
+    static CachedHandle g_handle = CachedParameterCreate("rosen.hardCursor.enabled", "1");
     int changed = 0;
-    const char *enable = CachedParameterGetChanged(g_Handle, &changed);
+    const char *enable = CachedParameterGetChanged(g_handle, &changed);
     if (ConvertToInt(enable, 1) == 0) {
         isHardCursorEnabled = false;
     }
