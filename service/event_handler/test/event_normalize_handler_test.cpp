@@ -84,7 +84,9 @@ void EventNormalizeHandlerTest::SetupTouchpad()
 
 void EventNormalizeHandlerTest::CloseTouchpad()
 {
-    libinput_.RemovePath(vTouchpad_.GetDevPath());
+    if (!vTouchpad_.GetDevPath().empty()) {
+        libinput_.RemovePath(vTouchpad_.GetDevPath());
+    }
     vTouchpad_.Close();
 }
 
@@ -102,7 +104,9 @@ void EventNormalizeHandlerTest::SetupUwbRemoteControl()
 
 void EventNormalizeHandlerTest::CloseUwbRemoteControl()
 {
-    libinput_.RemovePath(vUwbRemoteControl_.GetDevPath());
+    if (!vUwbRemoteControl_.GetDevPath().empty()) {
+        libinput_.RemovePath(vUwbRemoteControl_.GetDevPath());
+    }
     vUwbRemoteControl_.Close();
 }
 
