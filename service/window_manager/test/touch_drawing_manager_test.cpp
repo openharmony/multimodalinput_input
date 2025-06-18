@@ -1416,5 +1416,37 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_009, Te
     touchDrawingMgr.stopRecord_ = false;
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_SetupSettingObserver_0010
+ * @tc.desc: Test SetupSettingObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetupSettingObserver_0010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.scaleW_ = 1;
+    touchDrawingMgr.hasBubbleObserver_ = true;
+    touchDrawingMgr.hasPointerObserver_ = false;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(1));
+    touchDrawingMgr.hasBubbleObserver_ = false;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.SetupSettingObserver(1));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateLabels_0010
+ * @tc.desc: Test UpdateLabels
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_0010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.pointerMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateLabels());
+}
 } // namespace MMI
 } // namespace OHOS
