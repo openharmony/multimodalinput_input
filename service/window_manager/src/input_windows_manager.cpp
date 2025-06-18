@@ -99,9 +99,7 @@ constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
 #define SCREEN_RECORD_WINDOW_WIDTH 400
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 constexpr uint32_t CURSOR_POSITION_EXPECTED_SIZE { 2 };
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1838,7 +1836,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     bFlag = (iter != pointerDrawFlagMap_.end()) ? true : false;
     if (!displayGroupInfo.displaysInfo.empty() && bFlag) {
         AdjustDisplayRotation(groupId);
-    if (GetHardCursorEnabled()) {
+        if (GetHardCursorEnabled()) {
             PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
         } else {
             PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
@@ -4186,13 +4184,15 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             }
             if (GetHardCursorEnabled()) {
                 std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
-                if (cursorPos.empty()) {
-                    MMI_HILOGW("cursorPos is empty");
+                if (cursorPos.size() < CURSOR_POSITION_EXPECTED_SIZE) {
+                    MMI_HILOGW("cursorPos is invalid");
                     return RET_ERR;
                 }
-                IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, cursorPos[0], cursorPos[1]);
+                IPointerDrawingManager::GetInstance()->DrawMovePointer(physicalDisplayInfo->uniqueId,
+                    cursorPos[0], cursorPos[1]);
             } else {
-                IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
+                IPointerDrawingManager::GetInstance()->DrawMovePointer(physicalDisplayInfo->uniqueId,
+                    physicalX, physicalY);
             }
             MMI_HILOGI("UpdateMouseTarget id:%{public}d, logicalX:%{public}d, logicalY:%{public}d,"
                 "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->uniqueId, logicalX, logicalY,
