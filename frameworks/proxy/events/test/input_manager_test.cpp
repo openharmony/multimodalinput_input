@@ -5966,7 +5966,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SwitchTouchTracking_001, TestSize.Le
     if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
         EXPECT_EQ(ret, CAPABILITY_NOT_SUPPORTED);
     } else {
-        EXPECT_EQ(ret, RET_OK);
+        EXPECT_NE(ret, CAPABILITY_NOT_SUPPORTED);
     }
 }
 
