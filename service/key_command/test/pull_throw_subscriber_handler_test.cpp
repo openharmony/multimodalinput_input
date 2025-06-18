@@ -580,5 +580,52 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_CheckThr
     ret = PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle);
     EXPECT_EQ(ret, false);
 }
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_0014
+ * @tc.desc: Test HandleFingerGesturePullUpEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_0014,
+         testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PULL_THROW_EVENT_HANDLER->gestureInProgress_ = true;
+    PointerEvent::PointerItem item;
+    PointerEvent::PointerItem item1;
+    pointerEvent->pointers_.push_back(item);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->SetActionTime(1000);
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent));
+    pointerEvent->SetActionTime(0);
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_0015
+ * @tc.desc: Test CheckThrowAngleValid
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGesturePullUpEvent_0015,
+         testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    double angle = -300.0;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle));
+    angle = -200.0;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle));
+    angle = -50.0;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle));
+    angle = 0;
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle));
+    double angle2{1e-1};
+    ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle2));
+}
 } // namespace MMI
 } // namespace OHOS
