@@ -485,6 +485,7 @@ private:
     PointerStyle lastPointerStyle_;
     PointerStyle dragPointerStyle_;
     MouseLocation mouseLocation_ = { -1, 0, 0 };
+    WindowInfo lockWindowInfo_;
 
     std::map<int32_t, MouseLocation> mouseLocationMap_;
     CursorPosition cursorPos_ {};

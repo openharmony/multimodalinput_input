@@ -4950,7 +4950,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             pointerEvent->GetAllPointerItems().size() == 1 && !checkToolType &&
             pointerEvent->GetFixedMode() == PointerEvent::FixedMode::AUTO) ||
             (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
-        if (isSlidTouch) {
+        if (isSlidTouch && lockWindowInfo_.windowInputType == WindowInputType::SLID_TOUCH_WINDOW) {
             if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
                 item.defaultHotAreas, item)) {
                 UpdateTargetTouchWinIds(item, pointerItem, pointerEvent, pointerId, displayId);
@@ -5064,6 +5064,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     winMap.clear();
     ProcessTouchTracking(pointerEvent, *touchWindow);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        lockWindowInfo_ = *touchWindow;
+        MMI_HILOG_DISPATCHD("lockWid:%{public}d, lockPid:%{public}d", lockWindowInfo_.id, lockWindowInfo_.pid);
+    }
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerItem.SetTargetWindowId(touchWindow->id);
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -7212,6 +7216,7 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
             lastTouchLogicY_ = logicalY;
             lastTouchEvent_ = pointerEvent;
             lastTouchWindowInfo_ = *touchWindow;
+            lockWindowInfo_ = *touchWindow;
             DispatchTouch(PointerEvent::POINTER_ACTION_DOWN);
             return;
         }
