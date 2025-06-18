@@ -256,8 +256,8 @@ private:
     void RewriteMessage(TouchState& state, MotionEvent &event);
     ssize_t FindSampleNoLaterThan(const Batch& batch, int64_t time);
     bool ShouldResampleTool(int32_t toolType);
-    std::pair<int32_t, int32_t> TransformSampleWindowXY(std::shared_ptr<PointerEvent> pointerEvent,
-        PointerEvent::PointerItem &item, int32_t logicX, int32_t logicY);
+    std::pair<double, double> TransformSampleWindowXY(std::shared_ptr<PointerEvent> pointerEvent,
+        PointerEvent::PointerItem &item, double logicX, double logicY);
 };
 
 inline static float CalcCoord(float a, float b, float alpha)

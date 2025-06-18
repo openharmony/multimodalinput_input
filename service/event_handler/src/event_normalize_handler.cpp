@@ -1156,6 +1156,9 @@ void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> poi
         default:
             return;
     }
+    pointerItem.SetDisplayXPos(pointerItem.GetDisplayX());
+    pointerItem.SetDisplayYPos(pointerItem.GetDisplayY());
+
     // angle and direction judge
     if ((std::abs(pointerItem.GetDisplayX() - lastPointerX) * SWIPE_INWARD_ANGLE_JUDGE <
         std::abs(pointerItem.GetDisplayY() - lastPointerY) ||

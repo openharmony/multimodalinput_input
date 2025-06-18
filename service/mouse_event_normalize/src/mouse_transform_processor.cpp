@@ -890,8 +890,12 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetDisplayXPos(mouseInfo.physicalX);
+    pointerItem.SetDisplayYPos(mouseInfo.physicalY);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
+    pointerItem.SetWindowXPos(0.0);
+    pointerItem.SetWindowYPos(0.0);
     pointerItem.SetPointerId(0);
     pointerItem.SetPressed(isPressed_);
     int64_t time = GetSysClockTime();
@@ -925,8 +929,12 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetDisplayXPos(mouseInfo.physicalX);
+    pointerItem.SetDisplayYPos(mouseInfo.physicalY);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
+    pointerItem.SetWindowXPos(0.0);
+    pointerItem.SetWindowYPos(0.0);
     pointerItem.SetPointerId(0);
     pointerItem.SetPressed(isPressed_);
 
@@ -1095,8 +1103,12 @@ void MouseTransformProcessor::HandlePostMoveMouse(PointerEvent::PointerItem& poi
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetDisplayXPos(mouseInfo.physicalX);
+    pointerItem.SetDisplayYPos(mouseInfo.physicalY);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
+    pointerItem.SetWindowXPos(0.0);
+    pointerItem.SetWindowYPos(0.0);
     pointerItem.SetPointerId(0);
     pointerItem.SetPressed(isPressed_);
 
