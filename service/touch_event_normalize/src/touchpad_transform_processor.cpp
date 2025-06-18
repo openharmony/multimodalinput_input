@@ -94,6 +94,8 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *e
     item.SetPressed(true);
     item.SetDisplayX(static_cast<int32_t>(logicalX));
     item.SetDisplayY(static_cast<int32_t>(logicalY));
+    item.SetDisplayXPos(logicalX);
+    item.SetDisplayYPos(logicalY);
     item.SetToolDisplayX(static_cast<int32_t>(toolPhysicalX));
     item.SetToolDisplayY(static_cast<int32_t>(toolPhysicalY));
     item.SetToolWidth(static_cast<int32_t>(toolWidth));
@@ -145,6 +147,8 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
     item.SetPressure(pressure);
     item.SetDisplayX(static_cast<int32_t>(logicalX));
     item.SetDisplayY(static_cast<int32_t>(logicalY));
+    item.SetDisplayXPos(logicalX);
+    item.SetDisplayYPos(logicalY);
     item.SetToolDisplayX(static_cast<int32_t>(toolPhysicalX));
     item.SetToolDisplayY(static_cast<int32_t>(toolPhysicalY));
     item.SetToolWidth(static_cast<int32_t>(toolWidth));
@@ -364,6 +368,8 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
     pointerItem.SetDownTime(time);
     pointerItem.SetDisplayX(avgCoord.x);
     pointerItem.SetDisplayY(avgCoord.y);
+    pointerItem.SetDisplayXPos(avgCoord.x);
+    pointerItem.SetDisplayYPos(avgCoord.y);
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
@@ -459,9 +465,13 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
+    pointerItem.SetWindowXPos(0.0);
+    pointerItem.SetWindowYPos(0.0);
     auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetDisplayXPos(mouseInfo.physicalX);
+    pointerItem.SetDisplayYPos(mouseInfo.physicalY);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     RemoveSurplusPointerItem();
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);

@@ -375,6 +375,8 @@ static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
     item.SetPointerId(0);
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
+    item.SetDisplayXPos(screenX);
+    item.SetDisplayYPos(screenY);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
 }
@@ -504,6 +506,8 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     }
     pointerItem.SetDisplayX(screenX);
     pointerItem.SetDisplayY(screenY);
+    pointerItem.SetDisplayXPos(screenX);
+    pointerItem.SetDisplayYPos(screenY);
     pointerItem.SetPointerId(pointerId);
     pointerItem.SetToolType(toolType);
     pointerItem.SetPressure(pressure);
