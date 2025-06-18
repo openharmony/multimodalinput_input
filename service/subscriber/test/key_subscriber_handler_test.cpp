@@ -34,6 +34,7 @@
 #include "mmi_log.h"
 #include "nap_process.h"
 #include "switch_subscriber_handler.h"
+#include "tablet_subscriber_handler.h"
 #include "uds_server.h"
 #include "want.h"
 #include "event_log_helper.h"
@@ -3397,6 +3398,86 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_005, TestSi
     bool ret = handler.AddTimer(subscriber, keyEvent);
     ASSERT_FALSE(ret);
     ASSERT_FALSE(handler.CloneKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_ClearTimer
+ * @tc.desc: Test the funcation ClearTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearTimer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t id = 1;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    auto subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    subscriber->timerId_ = 0;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    subscriber->keyEvent_ = keyEvent;
+    handler.AddTimer(subscriber, keyEvent);
+    ASSERT_NO_FATAL_FAILURE(handler.ClearTimer(subscriber));
+}
+
+/**
+ * @tc.name: TabletSubscriberHandlerTest_SubscribeTabletProximity
+ * @tc.desc: Test the funcation AboutSubscribeTabletProximity
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, TabletSubscriberHandlerTest_SubscribeTabletProximity, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto tabletSubscriberHandler = TABLET_SCRIBER_HANDLER;
+    SessionPtr sess;
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->SubscribeTabletProximity(sess, 0));
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->SubscribeTabletProximity(sess, -1));
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->SubscribeTabletProximity(sess, 1));
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->SubscribeTabletProximity(sess, 0));
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->SubscribeTabletProximity(nullptr, 0));
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->UnsubscribetabletProximity(nullptr, 0));
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->UnsubscribetabletProximity(nullptr, -1));
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->UnsubscribetabletProximity(sess, 0));
+}
+
+/**
+ * @tc.name: TabletSubscriberHandlerTest_OnSubscribeTabletProximity
+ * @tc.desc: Test the funcation OnSubscribeTabletProximity
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, TabletSubscriberHandlerTest_OnSubscribeTabletProximity, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto tabletSubscriberHandler = TABLET_SCRIBER_HANDLER;
+    SessionPtr sess;
+    tabletSubscriberHandler->SubscribeTabletProximity(sess, 0);
+    auto pointerEvent = std::make_shared<PointerEvent>(0);
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSubscribeTabletProximity(pointerEvent));
+    auto pointerEvent2 = std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_OUT);
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSubscribeTabletProximity(pointerEvent2));
+    auto pointerEvent3 = std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSubscribeTabletProximity(pointerEvent3));
+}
+
+/**
+ * @tc.name: TabletSubscriberHandlerTest_OnSessionDelete
+ * @tc.desc: Test the funcation OnSessionDelete
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, TabletSubscriberHandlerTest_OnSessionDelete, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto tabletSubscriberHandler = TABLET_SCRIBER_HANDLER;
+    SessionPtr sess;
+    SessionPtr sess2;
+    tabletSubscriberHandler->SubscribeTabletProximity(sess, 0);
+    tabletSubscriberHandler->SubscribeTabletProximity(sess2, 0);
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSessionDelete(sess));
+    ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSessionDelete(sess));
 }
 } // namespace MMI
 } // namespace OHOS

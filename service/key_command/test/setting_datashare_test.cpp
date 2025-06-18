@@ -278,5 +278,20 @@ HWTEST_F(SettingObserverTest, CheckIfSettingsDataReadyTest1, TestSize.Level1)
     settingDataShare.remoteObj_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(settingDataShare.CheckIfSettingsDataReady());
 }
+
+/**
+ * @tc.name: CheckIfSettingsUnregisterObserver20
+ * @tc.desc: Test CheckIfSettingsDataReady
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, CheckIfSettingsUnregisterObserver20, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare settingDataShare;
+    settingDataShare.isDataShareReady_ = false;
+    settingDataShare.remoteObj_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(settingDataShare.CheckIfSettingsDataReady());
+}
 } // namespace MMI
 } // namespace OHOS
