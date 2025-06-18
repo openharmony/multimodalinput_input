@@ -2313,8 +2313,12 @@ void InputManagerCommand::FillPointerItem(
 {
     item.SetDisplayX(pointX);
     item.SetDisplayY(pointY);
+    item.SetDisplayXPos(pointX);
+    item.SetDisplayYPos(pointY);
     item.SetWindowX(pointX);
     item.SetWindowY(pointY);
+    item.SetWindowXPos(pointX);
+    item.SetWindowYPos(pointY);
     item.SetPointerId(id);
     item.SetPressed(press);
 }

@@ -506,6 +506,8 @@ static int32_t HandleMouseProperty(const struct Input_MouseEvent* mouseEvent,
     item.SetPointerId(0);
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
+    item.SetDisplayXPos(screenX);
+    item.SetDisplayYPos(screenY);
     g_mouseEvent->SetPointerId(0);
     g_mouseEvent->UpdatePointerItem(g_mouseEvent->GetPointerId(), item);
     return INPUT_SUCCESS;
@@ -791,6 +793,8 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     }
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
+    item.SetDisplayXPos(screenX);
+    item.SetDisplayYPos(screenY);
     item.SetPointerId(id);
     g_touchEvent->SetPointerId(id);
     g_touchEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -2869,6 +2873,8 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     }
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
+    item.SetDisplayXPos(screenX);
+    item.SetDisplayYPos(screenY);
 
     int32_t globalX = touchEvent->globalX;
     int32_t globalY = touchEvent->globalY;
@@ -2876,6 +2882,8 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     item.SetGlobalY(globalY);
     item.SetWindowX(windowX);
     item.SetWindowY(windowY);
+    item.SetWindowXPos(windowX);
+    item.SetWindowYPos(windowY);
 
     int32_t id = touchEvent->id;
     if (id < 0) {
