@@ -192,10 +192,14 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);
             item.SetDisplayY(logicY);
+            item.SetDisplayXPos(logicX);
+            item.SetDisplayYPos(logicY);
 
             auto windowXY = TransformSampleWindowXY(pointerEvent_, item, logicX, logicY);
-            item.SetWindowX(windowXY.first);
-            item.SetWindowY(windowXY.second);
+            item.SetWindowX(static_cast<int32_t>(windowXY.first));
+            item.SetWindowY(static_cast<int32_t>(windowXY.second));
+            item.SetWindowXPos(windowXY.first);
+            item.SetWindowYPos(windowXY.second);
 
             if (PointerEvent::POINTER_ACTION_MOVE == outEvent->pointerAction) {
                 item.SetPressed(true);
@@ -209,8 +213,8 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
     }
 }
 
-std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_ptr<PointerEvent> pointerEvent,
-    PointerEvent::PointerItem &item, int32_t logicX, int32_t logicY)
+std::pair<double, double> EventResample::TransformSampleWindowXY(std::shared_ptr<PointerEvent> pointerEvent,
+    PointerEvent::PointerItem &item, double logicX, double logicY)
 {
     CALL_DEBUG_ENTER;
     if (pointerEvent == nullptr) {
@@ -229,9 +233,7 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
             }
             auto windowXY = WIN_MGR->TransformWindowXY(window, logicX + physicalDisplayInfo->x,
                 logicY + physicalDisplayInfo->y);
-            auto windowX = static_cast<int32_t>(windowXY.first);
-            auto windowY = static_cast<int32_t>(windowXY.second);
-            return {windowX, windowY};
+            return {windowXY.first, windowXY.second};
         }
     }
     return {logicX, logicY};

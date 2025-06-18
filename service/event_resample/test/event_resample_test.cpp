@@ -617,10 +617,12 @@ HWTEST_F(EventResampleTest, EventResampleTest_TransformSampleWindowXY, TestSize.
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     PointerEvent::PointerItem item;
-    int32_t logicX = 100;
-    int32_t logicY = 100;
-    std::pair<int32_t, int32_t> pair { logicX, logicY };
-    ASSERT_EQ(EventResampleHdr->TransformSampleWindowXY(pointerEvent, item, logicX, logicY), pair);
+    double logicX = 100;
+    double logicY = 100;
+    std::pair<double, double> pair { logicX, logicY };
+    auto result = EventResampleHdr->TransformSampleWindowXY(pointerEvent, item, logicX, logicY);
+    EXPECT_DOUBLE_EQ(result.first, pair.first);
+    EXPECT_DOUBLE_EQ(result.second, pair.second);
 }
 
 /**

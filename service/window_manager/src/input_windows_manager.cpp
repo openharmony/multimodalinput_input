@@ -1226,6 +1226,8 @@ void InputWindowsManager::SendBackCenterPointerEevent(const CursorPosition &curs
     pointerBackCenterEvent->GetPointerItem(pointerId, item);
     item.SetDisplayX(cursorPos.cursorPos.x);
     item.SetDisplayY(cursorPos.cursorPos.y);
+    item.SetDisplayXPos(cursorPos.cursorPos.x);
+    item.SetDisplayYPos(cursorPos.cursorPos.y);
     item.SetCanceled(true);
     pointerBackCenterEvent->UpdatePointerItem(pointerId, item);
     pointerBackCenterEvent->SetTargetWindowId(touchWindow->id);
@@ -1933,6 +1935,8 @@ void InputWindowsManager::AdjustDragPosition(int32_t groupId)
     pointerEvent->GetPointerItem(pointerId, item);
     item.SetDisplayX(physicalX);
     item.SetDisplayY(physicalY);
+    item.SetDisplayXPos(physicalX);
+    item.SetDisplayYPos(physicalY);
     pointerEvent->UpdatePointerItem(pointerId, item);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->id);
@@ -2264,8 +2268,12 @@ void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr
     PointerEvent::PointerItem currentPointerItem;
     currentPointerItem.SetWindowX(lastLogicX_- lastWindowInfo_.area.x);
     currentPointerItem.SetWindowY(lastLogicY_- lastWindowInfo_.area.y);
+    currentPointerItem.SetWindowXPos(lastLogicX_- lastWindowInfo_.area.x);
+    currentPointerItem.SetWindowYPos(lastLogicY_- lastWindowInfo_.area.y);
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+    currentPointerItem.SetDisplayXPos(lastPointerItem.GetDisplayXPos());
+    currentPointerItem.SetDisplayYPos(lastPointerItem.GetDisplayYPos());
     currentPointerItem.SetPointerId(0);
     pointerEvent->SetTargetDisplayId(lastPointerEventCopy->GetTargetDisplayId());
     SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
@@ -2317,8 +2325,12 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
     pointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
+    pointerItem.SetWindowXPos(lastLogicX_ - lastWindowInfo_.area.x);
+    pointerItem.SetWindowYPos(lastLogicY_ - lastWindowInfo_.area.y);
     pointerItem.SetDisplayX(mouseLocation.physicalX);
     pointerItem.SetDisplayY(mouseLocation.physicalY);
+    pointerItem.SetDisplayXPos(mouseLocation.physicalX);
+    pointerItem.SetDisplayYPos(mouseLocation.physicalY);
     pointerItem.SetPointerId(0);
 
     pointerEvent->SetTargetDisplayId(-1);
@@ -2400,6 +2412,8 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     PointerEvent::PointerItem currentPointerItem;
     currentPointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
     currentPointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
+    currentPointerItem.SetWindowXPos(lastLogicX_ - lastWindowInfo_.area.x);
+    currentPointerItem.SetWindowYPos(lastLogicY_ - lastWindowInfo_.area.y);
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW && windowId > 0) {
         auto displayGroupInfo = GetMainDisplayGroupInfo();
         int32_t displayId = 0;
@@ -2414,21 +2428,31 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         }
         currentPointerItem.SetDisplayX(cursorPosx);
         currentPointerItem.SetDisplayY(cursorPosy);
+        currentPointerItem.SetDisplayXPos(cursorPosx);
+        currentPointerItem.SetDisplayYPos(cursorPosy);
         pointerEvent->SetTargetDisplayId(displayId);
         if (IsMouseSimulate()) {
             currentPointerItem.SetWindowX(lastPointerItem.GetWindowX());
             currentPointerItem.SetWindowY(lastPointerItem.GetWindowY());
+            currentPointerItem.SetWindowXPos(lastPointerItem.GetWindowXPos());
+            currentPointerItem.SetWindowYPos(lastPointerItem.GetWindowYPos());
             currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
             currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+            currentPointerItem.SetDisplayXPos(lastPointerItem.GetDisplayXPos());
+            currentPointerItem.SetDisplayYPos(lastPointerItem.GetDisplayYPos());
             pointerEvent->SetTargetDisplayId(lastPointerEventCopy->GetTargetDisplayId());
         }
     } else {
         if (IsMouseSimulate()) {
             currentPointerItem.SetWindowX(lastPointerItem.GetWindowX());
             currentPointerItem.SetWindowY(lastPointerItem.GetWindowY());
+            currentPointerItem.SetWindowXPos(lastPointerItem.GetWindowXPos());
+            currentPointerItem.SetWindowYPos(lastPointerItem.GetWindowYPos());
         }
         currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
         currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+        currentPointerItem.SetDisplayXPos(lastPointerItem.GetDisplayXPos());
+        currentPointerItem.SetDisplayYPos(lastPointerItem.GetDisplayYPos());
         pointerEvent->SetTargetDisplayId(lastPointerEventCopy->GetTargetDisplayId());
     }
     currentPointerItem.SetPointerId(0);
@@ -4351,15 +4375,15 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent);
-    auto windowX = logicalX - touchWindow->area.x;
-    auto windowY = logicalY - touchWindow->area.y;
+    double windowX = logicalX - touchWindow->area.x;
+    double windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
         auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
     }
-    windowX = static_cast<int32_t>(windowX);
-    windowY = static_cast<int32_t>(windowY);
-    pointerItem.SetWindowX(windowX);
-    pointerItem.SetWindowY(windowY);
+    pointerItem.SetWindowX(static_cast<int32_t>(windowX));
+    pointerItem.SetWindowY(static_cast<int32_t>(windowY));
+    pointerItem.SetWindowXPos(windowX);
+    pointerItem.SetWindowYPos(windowY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     if ((extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) ||
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
@@ -4413,14 +4437,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             "logicalX:%{public}d, logicalY:%{public}d,"
             "displayX:%{public}d, displayY:%{public}d, windowX:%{public}d, windowY:%{public}d",
             isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
-            touchWindow->id, touchWindow->agentWindowId,
-            logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
+            touchWindow->id, touchWindow->agentWindowId, logicalX, logicalY,
+            pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerItem.GetWindowX(), pointerItem.GetWindowY());
     } else {
         MMI_HILOGD("pid:%{public}d, id:%{public}d, agentWindowId:%{public}d,"
             "logicalX:%d, logicalY:%d,displayX:%d, displayY:%d, windowX:%d, windowY:%d",
             isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
-            touchWindow->id, touchWindow->agentWindowId,
-            logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
+            touchWindow->id, touchWindow->agentWindowId, logicalX, logicalY,
+            pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerItem.GetWindowX(), pointerItem.GetWindowY());
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
@@ -4752,7 +4776,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
+void InputWindowsManager::SendUIExtentionPointerEvent(double logicalX, double logicalY,
     const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,pid:%{public}d", windowInfo.pid);
@@ -4763,8 +4787,8 @@ void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t 
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-    auto windowX = logicalX - windowInfo.area.x;
-    auto windowY = logicalY - windowInfo.area.y;
+    double windowX = logicalX - windowInfo.area.x;
+    double windowY = logicalY - windowInfo.area.y;
     if (!(windowInfo.transform.empty())) {
         auto windowXY = TransformWindowXY(windowInfo, logicalX, logicalY);
         windowX = windowXY.first;
@@ -4776,8 +4800,12 @@ void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t 
     double physicalY = logicalY - DisplayInfoY;
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
     pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
+    pointerItem.SetDisplayXPos(physicalX);
+    pointerItem.SetDisplayYPos(physicalY);
     pointerItem.SetWindowX(static_cast<int32_t>(windowX));
     pointerItem.SetWindowY(static_cast<int32_t>(windowY));
+    pointerItem.SetWindowXPos(windowX);
+    pointerItem.SetWindowYPos(windowY);
     pointerItem.SetTargetWindowId(windowInfo.id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(windowInfo.pid);
@@ -4791,7 +4819,7 @@ void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t 
     }
 }
 
-void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
+void InputWindowsManager::DispatchUIExtentionPointerEvent(double logicalX, double logicalY,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
@@ -5145,8 +5173,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             lastTouchEventOnBackGesture_ = std::make_shared<PointerEvent>(*pointerEvent);
         }
     }
-    auto windowX = logicalX - touchWindow->area.x;
-    auto windowY = logicalY - touchWindow->area.y;
+    double windowX = logicalX - touchWindow->area.x;
+    double windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
         auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
         windowX = windowXY.first;
@@ -5422,28 +5450,30 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     }
     PointerEvent::PointerItem currentPointerItem;
     bool isOneHand = lastTouchEvent_->GetFixedMode() == PointerEvent::FixedMode::AUTO;
-    int32_t windowX = isOneHand ? lastWinX_ : (lastTouchLogicX_ - lastTouchWindowInfo_.area.x);
-    int32_t windowY = isOneHand ? lastWinY_ : (lastTouchLogicY_ - lastTouchWindowInfo_.area.y);
+    double windowX = isOneHand ? lastWinX_ : (lastTouchLogicX_ - lastTouchWindowInfo_.area.x);
+    double windowY = isOneHand ? lastWinY_ : (lastTouchLogicY_ - lastTouchWindowInfo_.area.y);
     if (isOneHand) {
         WindowInputType windowInputType = lastTouchWindowInfo_.windowInputType;
         if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
             if (!(lastTouchWindowInfo_.transform.empty())) {
                 auto windowXY = TransformWindowXY(lastTouchWindowInfo_, lastTouchLogicX_, lastTouchLogicY_);
-                windowX = static_cast<int32_t>(windowXY.first);
-                windowY = static_cast<int32_t>(windowXY.second);
+                windowX = windowXY.first;
+                windowY = windowXY.second;
             }
             currentPointerItem.SetFixedDisplayX(lastPointerItem.GetFixedDisplayX());
             currentPointerItem.SetFixedDisplayY(lastPointerItem.GetFixedDisplayY());
             pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
         }
     }
-    currentPointerItem.SetWindowX(windowX);
-    currentPointerItem.SetWindowY(windowY);
-    currentPointerItem.SetWindowXPos(static_cast<double>(windowX));
-    currentPointerItem.SetWindowYPos(static_cast<double>(windowY));
+    currentPointerItem.SetWindowX(static_cast<int32_t>(windowX));
+    currentPointerItem.SetWindowY(static_cast<int32_t>(windowY));
+    currentPointerItem.SetWindowXPos(windowX);
+    currentPointerItem.SetWindowYPos(windowY);
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+    currentPointerItem.SetDisplayXPos(lastPointerItem.GetDisplayXPos());
+    currentPointerItem.SetDisplayYPos(lastPointerItem.GetDisplayYPos());
     currentPointerItem.SetPressed(lastPointerItem.IsPressed());
     currentPointerItem.SetPointerId(lastPointerId);
 
@@ -6947,6 +6977,8 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
     pointerEvent->GetPointerItem(pointerId, item);
     item.SetWindowX(lastLogicX_ - sourceWindowInfo.area.x);
     item.SetWindowY(lastLogicY_ - sourceWindowInfo.area.y);
+    item.SetWindowXPos(lastLogicX_ - sourceWindowInfo.area.x);
+    item.SetWindowYPos(lastLogicY_ - sourceWindowInfo.area.y);
     item.SetPressed(false);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -6960,9 +6992,13 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
     if (autoGenDown) {
         item.SetWindowX(shiftWindowInfo.x);
         item.SetWindowY(shiftWindowInfo.y);
+        item.SetWindowXPos(shiftWindowInfo.x);
+        item.SetWindowYPos(shiftWindowInfo.y);
         if (shiftWindowInfo.x == -1 && shiftWindowInfo.y == -1) {
             item.SetWindowX(lastLogicX_ - targetWindowInfo.area.x);
             item.SetWindowY(lastLogicY_ - targetWindowInfo.area.y);
+            item.SetWindowXPos(lastLogicX_ - targetWindowInfo.area.x);
+            item.SetWindowYPos(lastLogicY_ - targetWindowInfo.area.y);
         }
         item.SetPressed(true);
         pointerEvent->ClearButtonPressed();
@@ -6999,6 +7035,8 @@ int32_t InputWindowsManager::ShiftAppSimulateTouchPointerEvent(const ShiftWindow
     }
     item.SetWindowX(lastTouchLogicX_ - sourceWindowInfo.area.x);
     item.SetWindowY(lastTouchLogicY_ - sourceWindowInfo.area.y);
+    item.SetWindowXPos(lastTouchLogicX_ - sourceWindowInfo.area.x);
+    item.SetWindowYPos(lastTouchLogicY_ - sourceWindowInfo.area.y);
     item.SetPressed(false);
     item.SetTargetWindowId(sourceWindowInfo.id);
     item.SetPointerId(shiftWindowInfo.fingerId);
@@ -7014,9 +7052,13 @@ int32_t InputWindowsManager::ShiftAppSimulateTouchPointerEvent(const ShiftWindow
     InputHandler->GetFilterHandler()->HandlePointerEvent(lastTouchEvent_);
     item.SetWindowX(shiftWindowInfo.x);
     item.SetWindowY(shiftWindowInfo.y);
+    item.SetWindowXPos(shiftWindowInfo.x);
+    item.SetWindowYPos(shiftWindowInfo.y);
     if (shiftWindowInfo.x == -1 && shiftWindowInfo.y == -1) {
         item.SetWindowX(lastTouchLogicX_ - targetWindowInfo.area.x);
         item.SetWindowY(lastTouchLogicY_ - targetWindowInfo.area.y);
+        item.SetWindowXPos(lastTouchLogicX_ - targetWindowInfo.area.x);
+        item.SetWindowYPos(lastTouchLogicY_ - targetWindowInfo.area.y);
     }
     item.SetPressed(true);
     item.SetTargetWindowId(targetWindowInfo.id);

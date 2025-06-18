@@ -276,9 +276,9 @@ private:
     bool ParseConfig();
     bool ParseJson(const std::string &configFile);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void SendUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
+    void SendUIExtentionPointerEvent(double logicalX, double logicalY,
         const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent);
-    void DispatchUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
+    void DispatchUIExtentionPointerEvent(double logicalX, double logicalY,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER

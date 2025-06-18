@@ -596,6 +596,8 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
     auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetDisplayXPos(mouseInfo.physicalX);
+    pointerItem.SetDisplayYPos(mouseInfo.physicalY);
     pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), pointerItem);
     pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
 }

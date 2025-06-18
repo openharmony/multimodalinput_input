@@ -187,8 +187,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
-        int32_t windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
-        int32_t windowY = pointerItem.GetDisplayY() - windowInfo->area.y;
+        double windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
+        double windowY = pointerItem.GetDisplayY() - windowInfo->area.y;
         auto physicalDisplayInfo = WIN_MGR->GetPhysicalDisplay(windowInfo->displayId);
         CHKPV(physicalDisplayInfo);
         if (!windowInfo->transform.empty()) {
@@ -198,8 +198,10 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
             windowX = windowXY.first;
             windowY = windowXY.second;
         }
-        pointerItem.SetWindowX(windowX);
-        pointerItem.SetWindowY(windowY);
+        pointerItem.SetWindowX(static_cast<int32_t>(windowX));
+        pointerItem.SetWindowY(static_cast<int32_t>(windowY));
+        pointerItem.SetWindowXPos(windowX);
+        pointerItem.SetWindowYPos(windowY);
         pointerItem.SetTargetWindowId(windowId);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetDispatchTimes(count++);
@@ -344,6 +346,8 @@ void EventDispatchHandler::UpdateDisplayXY(const std::shared_ptr<PointerEvent> &
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
             pointerItem.SetDisplayX(pointerItem.GetFixedDisplayX());
             pointerItem.SetDisplayY(pointerItem.GetFixedDisplayY());
+            pointerItem.SetDisplayXPos(pointerItem.GetFixedDisplayX());
+            pointerItem.SetDisplayYPos(pointerItem.GetFixedDisplayY());
             point->UpdatePointerItem(pointerId, pointerItem);
         } else {
             MMI_HILOGI("targetDisplayId=%{private}d, targetWindowId=%{private}d, windowInputType=%{private}d, "
